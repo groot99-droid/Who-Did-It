@@ -77,7 +77,9 @@
       "use": "crowbar",
       "tooltip": "Break a locked door; it stays broken.",
       "ships": "V1",
-      "gddRef": "3.5"
+      "gddRef": "3.5",
+      "tool": { "pry": 1 },
+      "uses": 20
     },
     "magnifier": {
       "id": "magnifier",
@@ -354,7 +356,8 @@
       "use": "lockpick",
       "tooltip": "Open a locked door.",
       "ships": "V1.5",
-      "gddRef": "3.5"
+      "gddRef": "3.5",
+      "tool": { "pick": 1 }
     },
     "sack": {
       "id": "sack",
@@ -449,7 +452,9 @@
       "onDeath": "drops",
       "tooltip": "Dig tin ore out of a seam.",
       "ships": "V1",
-      "gddRef": "3.14"
+      "gddRef": "3.14",
+      "tool": { "dig": 1 },
+      "uses": 20
     },
     "timber": {
       "id": "timber",
@@ -521,6 +526,48 @@
       "ships": "V1",
       "gddRef": "3.20"
     },
+    "dough": {
+      "id": "dough",
+      "name": "Dough",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Mixed flour. Proof it, then bake it.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "proofedDough": {
+      "id": "proofedDough",
+      "name": "Proofed dough",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Risen dough, ready for the oven.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "herbFilling": {
+      "id": "herbFilling",
+      "name": "Herb filling",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Chopped herbs from the cold room, for bread.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "herbBread": {
+      "id": "herbBread",
+      "name": "Herb Bread",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eatHerbBread",
+      "buff": "resistant",
+      "tooltip": "Eat it to take poison more lightly until the buff wears off.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "wakeLoaf": {
       "id": "wakeLoaf",
       "name": "Wake Loaf",
@@ -551,6 +598,52 @@
       "tooltip": "Present it at a meeting: the vote begins again, and for a short while no vote may name you.",
       "ships": "V1",
       "gddRef": "3.23"
+    },
+    "logs": {
+      "id": "logs",
+      "name": "Logs",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Raw wood from a pile or a tree. Crafting waits for the mill.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "axe": {
+      "id": "axe",
+      "name": "Axe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "cut": 1 },
+      "uses": 20,
+      "tooltip": "Chops woodpiles, logs and stumps. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "pickaxe": {
+      "id": "pickaxe",
+      "name": "Pickaxe",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "break": 1, "dig": 1 },
+      "uses": 20,
+      "tooltip": "Breaks boulders and rock piles; digs a tin seam. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "hammer": {
+      "id": "hammer",
+      "name": "Hammer",
+      "kind": "tool",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tool": { "pry": 1 },
+      "uses": 40,
+      "tooltip": "Pries open a nailed crate. Wears with use.",
+      "ships": "V1",
+      "gddRef": "3.14"
     }
   }
 }

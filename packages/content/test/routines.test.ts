@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
   content,
+  interactions,
   routines,
   RoutinesFile,
   SCENE_IDS,
@@ -23,7 +24,7 @@ function broken(edit: (c: Content) => void): string[] {
 const has = (msg: string) => expect.arrayContaining([msg]);
 
 /** data.md section 1: the activity (or `ignore`) of every prop kind on 2026-10-17. */
-const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
+const TABLE: Record<string, 'work' | 'trade' | 'social' | 'rest' | 'ignore'> = {
   taskSource: 'work',
   pump: 'work',
   flourBin: 'work',
@@ -55,8 +56,12 @@ const TABLE: Record<string, 'work' | 'social' | 'rest' | 'ignore'> = {
   rack: 'ignore',
   hq: 'ignore',
   blackMarket: 'ignore',
-  counter: 'ignore',
+  counter: 'trade', // round 10, D1
   bank: 'ignore',
+  // Round 10 (A7, GDD 3.32): a seat sleeps in a bed; no NPC works one.
+  bed: 'ignore',
+  cot: 'ignore',
+  innBed: 'ignore',
 };
 
 function classOf(kind: string): string | undefined {
@@ -72,8 +77,10 @@ describe('routines.json (GDD 3.12)', () => {
     expect(errors.filter((e) => e.includes('routines.json') || e.includes('npc.'))).toEqual([]);
   });
 
-  it('holds no station hold in M5a, and lights an exterior with lantern posts', () => {
-    expect(routines.holds).toEqual({});
+  it('holds the logic table on gather classes and the shop on counters (D1), and lights an exterior with lantern posts', () => {
+    // Round 10 (D1): the holds name class ids of interactions.json as well as prop kinds.
+    expect(new Set(Object.values(routines.holds))).toEqual(new Set(['interact', 'shop']));
+    for (const key of Object.keys(routines.holds)) expect(interactions.classes[key], key).toBeDefined();
     expect(routines.lightKinds).toEqual(['lanternPost']);
     expect(routines.phaseClasses).toEqual({
       day: ['grace', 'day', 'immunity'],

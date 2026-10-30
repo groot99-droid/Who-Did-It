@@ -6,6 +6,7 @@ import { moodIdleOf } from './npc/needs';
 import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
 import { isWorldPhase, navGrid, sceneKey } from './World';
 import { bodySpeedPxPerTick, overlayBody } from './body/run';
+import { wakeOnInput } from './Sleep';
 
 const PX_PER_TICK = (tilesPerS: number): number => (tilesPerS * TILE_PX) / TICK_RATE;
 
@@ -46,6 +47,7 @@ export function applyInputs(room: PartyRoom): void {
     const input = parseMove(raw, tick);
     if (input === null || input.seq <= p.lastSeq) continue;
     p.lastSeq = input.seq;
+    if ((input.dx !== 0 || input.dy !== 0) && wakeOnInput(room, sessionId, false)) continue; // round 10, A7
     p.input = input;
   }
   const walking = isWorldPhase(room.state.phase);

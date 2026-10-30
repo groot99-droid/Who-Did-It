@@ -3,13 +3,26 @@ import { join } from 'node:path';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import type { Client } from '@colyseus/core';
-import { balance, navs, profileFor, routines, scenes, type Scene, type SceneId } from '@wdi/content';
-import { ClueKind, NavGrid, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
+import {
+  balance,
+  interactions,
+  items,
+  navs,
+  profileFor,
+  routines,
+  scenes,
+  type Scene,
+  type SceneId,
+} from '@wdi/content';
+import { ClueKind, NavGrid, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { addStack, count } from '../src/sim/Inventory';
+import { sleep } from './simHelpers';
 import { spawnBody } from '../src/sim/Bodies';
 import { removeClue, spawnClue } from '../src/sim/Clues';
 import { type Act, npcMemory } from '../src/sim/npc/memory';
 import { stationsOf, isLitAtNight, litAtNight } from '../src/sim/npc/routine';
 import { mapScenesOf } from '../src/sim/MapSites';
+import { bodyOf } from '../src/sim/body/state';
 import { mobBodies } from '../src/sim/Mobs';
 import { MobState } from '../src/sim/mobs/ai';
 import { simOf, type MeetingRequest } from '../src/sim/RoomSim';
@@ -134,8 +147,16 @@ vi.setConfig({ testTimeout: DAY_TIMEOUT_MS });
 describe('the privacy rule (npc.md part 2, section 2)', () => {
   beforeAll(async () => void (await recordedDay()), DAY_TIMEOUT_MS);
 
-  it('P1: routines.holds is empty in M5a', () => {
-    expect(Object.keys(routines.holds)).toEqual([]);
+  it('P1: the holds are the logic table on the gather classes and the shop on counters (D1)', () => {
+    expect(routines.holds).toEqual({
+      lumber: 'interact',
+      stump: 'interact',
+      timberSet: 'interact',
+      boulder: 'interact',
+      rockPile: 'interact',
+      orePile: 'interact',
+      counter: 'shop',
+    });
   });
 
   it('P2: no NPC code writes a hold, an animation or a yaw', () => {
@@ -148,14 +169,17 @@ describe('the privacy rule (npc.md part 2, section 2)', () => {
     }
   });
 
-  it('P3: over a day no NPC holds anything but Collect on a clue, and never animates idly', async () => {
+  it('P3: over a day an NPC holds only Collect on a clue and Interact at a gather station, and never animates idly', async () => {
     const { party, rows } = await recordedDay();
     const sim = simOf(party.room);
-    void sim;
+    const byId = new Map(stationsOf(mapScenesOf(party.room), sim.profile).map((s) => [s.propId, s]));
     for (const [id, list] of rows) {
       list.forEach((s, i) => {
-        if (s.hold) expect(s.hold.action, id).toBe('collect');
-        expect(s.holdTries, id).toBe(0);
+        if (s.hold) expect(['collect', 'interact'], id).toContain(s.hold.action);
+        // D1: an interact hold runs through the A10 resolver, only at a station whose class holds it.
+        if (s.hold?.action === 'interact')
+          expect(routines.holds[byId.get(s.hold.targetId)?.cls ?? ''], id).toBe('interact');
+        if (s.holdTries > 0) expect(routines.holds[byId.get(s.station)?.cls ?? ''], id).toBeDefined();
         const before = list[i - 1];
         // The publish runs before `runHolds`, so a start or an end shows one tick late (npc.md 4).
         if (s.anim === 4 && before)
@@ -238,12 +262,12 @@ describe('routines over a held day (npc.md part 2, section 4)', () => {
     expect(changed).toBeGreaterThanOrEqual(6);
   });
 
-  it('R5 and R6: visits last stationDwellS, at a day station, facing it, one NPC per station', async () => {
+  it('R5 and R6: visits last stationDwellS with a hold and idleS without, at a day station, facing it, one NPC per station', async () => {
     const { party, rows } = await recordedDay();
     const sim = simOf(party.room);
     const map = mapScenesOf(party.room);
     const byId = new Map(stationsOf(map, sim.profile).map((s) => [s.propId, s]));
-    const d = balance.npc.routine.stationDwellS;
+    const { stationDwellS: d, idleS } = balance.npc.routine;
     const atTick = new Map<number, Set<string>>();
     for (const [id, list] of rows) {
       let visits = 0;
@@ -261,8 +285,12 @@ describe('routines over a held day (npc.md part 2, section 4)', () => {
         while (list[i + len]?.act === 'work' && list[i + len]?.station === s.station) len++;
         if (i + len === list.length) continue; // cut by the end of the recording
         visits++;
-        expect(len, `${id} ${s.station}@${s.tick}`).toBeGreaterThanOrEqual(d.min * TICK_RATE - 1);
-        expect(len, `${id} ${s.station}@${s.tick}`).toBeLessThanOrEqual(d.max * TICK_RATE + 1);
+        // D1: a station with a hold is worked up to the dwell (a refusal, a spent prop or a busy one ends it sooner);
+        // one without is a stop of an idle's length.
+        if (routines.holds[st.cls ?? st.kind] === undefined)
+          expect(len, `${id} ${s.station}@${s.tick}`).toBeGreaterThanOrEqual(idleS.min * TICK_RATE - 1);
+        const max = routines.holds[st.cls ?? st.kind] === undefined ? idleS.max : d.max;
+        expect(len, `${id} ${s.station}@${s.tick}`).toBeLessThanOrEqual(max * TICK_RATE + 1);
         expect(routines.activities[st.activity]!.phases).toContain('day');
         const tx = Math.floor(s.x / TILE_PX);
         const ty = Math.floor(s.y / TILE_PX);
@@ -390,21 +418,47 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
     async () => {
       const party = await standardParty(colyseus, 'S1');
       const human = party.humans[0]!.id;
-      for (const [kind, action] of Object.entries(routines.holds)) {
-        const st = stationsOf(mapScenesOf(party.room), simOf(party.room).profile).find(
-          (s) => s.kind === kind,
-        )!;
+      const seat = party.room.state.players.get(human)!;
+      // D1: a hold key is a class id or a kind; the keys with no prop on the S1 map are named, so a lookup bug fails.
+      const NO_STATION_ON_S1 = ['timberSet'];
+      const stations = stationsOf(mapScenesOf(party.room), simOf(party.room).profile);
+      const missing = Object.keys(routines.holds).filter(
+        (k) => !stations.some((s) => (s.cls ?? s.kind) === k),
+      );
+      expect(missing).toEqual(NO_STATION_ON_S1);
+      let checked = 0;
+      for (const [key, action] of Object.entries(routines.holds)) {
+        const st = stations.find((s) => (s.cls ?? s.kind) === key);
+        if (!st) continue;
+        checked++;
+        // D1: an interact hold needs the class's tool, as a human comes by it.
+        seat.priv.inventory.slots.clear();
+        for (const it of Object.values(interactions.interactions).filter((i) => i.target === key))
+          for (const m of it.modes) {
+            const tool = m.tool;
+            const item =
+              tool && Object.values(items.items).find((i) => (i.tool?.[tool.tag] ?? 0) >= tool.tier);
+            if (item && count(seat, item.id) === 0) addStack(seat, item.id, 1);
+          }
         const at = st.stands[0]!;
         placeSeat(party, human, st.scene, at.x, at.y);
         holdPhase(party, Phase.day, 600);
         party.room.commands.push(asClient(human), 'act.hold', { action, targetId: st.propId, on: true });
         advance(party, 2);
-        expect(simOf(party.room).players.get(human)!.hold, kind).not.toBeNull();
+        // D1: a shop hold opens the counter's shop (`shop.open`) and leaves no hold running.
+        if (action === 'shop') {
+          await sleep(80);
+          expect(
+            party.humans[0]!.log.some((m) => m.type === S2C.shopOpen),
+            key,
+          ).toBe(true);
+        } else expect(simOf(party.room).players.get(human)!.hold?.targetId, key).toBe(st.propId);
       }
+      expect(checked).toBe(Object.keys(routines.holds).length - NO_STATION_ON_S1.length);
     },
   );
 
-  it('P4: with a patched hold row the visit tries exactly once, is refused, and never animates', async () => {
+  it('P4: with a patched hold row the visit tries exactly once, is refused, ends at once and never animates', async () => {
     const restore = [
       patch(routines.holds as Record<string, 'task'>, 'pump', 'task'),
       patch(balance.npc.routine.weights, 'day', { work: 1, stroll: 0, idle: 0 }),
@@ -420,7 +474,9 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
       brain.persona = { home: 'tavern_bar', favourites: ['ov.pump'] };
       const rows = record(party, [id], 1500).get(id)!;
       const visit = rows.filter((s) => s.act === 'work' && s.station === 'ov.pump');
-      expect(visit.length).toBeGreaterThan(200);
+      // D1: the refusal ends the visit on the next tick (the arrival tick, then the refused one).
+      expect(visit.length).toBeGreaterThan(0);
+      expect(rows.findIndex((s) => s === visit.at(-1)) - rows.indexOf(visit[0]!)).toBeLessThanOrEqual(2);
       // The arrival tick shows the last step toward the prop; no tick of the visit is `interact`.
       expect(visit.every((s) => s.hold === null && s.anim !== 4)).toBe(true);
       expect(visit.slice(1).every((s) => s.anim === 0)).toBe(true);
@@ -461,10 +517,13 @@ describe('the night (R9, R10)', () => {
       for (const id of ids) {
         const b = mem.brain(id);
         if (b.leaveAtTick >= 0 && !leave.has(id)) leave.set(id, b.leaveAtTick);
+        const body = bodyOf(party.room, id);
+        if (body) body.hp = body.maxHp;
       }
       // Round 6 (6G): the forest's wolves wake at dusk and an NPC a wolf chases flees the scene at once. R9 is about
       // the night leave, so the creatures are put back to idle after every step (brains run before the creatures in
       // a step, so none sees a chase); the flee itself is `mobs.test.ts`'s.
+      // A wolf can still bite within a step, so the NPCs' health is put back too: the isolation is complete (round 10, A5).
       for (const body of mobBodies(party.room).values()) {
         body.mind.state = MobState.idle;
         body.mind.prey = null;
@@ -894,7 +953,8 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
       // Round 6: the creatures draw from their own stream, keyed by spawner; the node pool (6F) from `nodes`.
       else if (name === 'mobs') expect(spawners.has(key!), k).toBe(true);
       // Round 8 (8A): a body's chance rolls (a wound's spread, a strike's knockout) draw from `body` (A49, no secret draw shares it).
-      else expect(['npcNames', 'nodes', 'body'], k).toContain(name);
+      // Round 10 (A7): the human seats' homes, drawn once on the first world tick from their own stream.
+      else expect(['npcNames', 'nodes', 'body', 'homes'], k).toContain(name);
     }
   });
 

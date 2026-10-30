@@ -30,7 +30,7 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
-import type { InteractionsFile } from './schemas/interactions.js';
+import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
 export interface Content {
@@ -332,6 +332,7 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (!isItem(r.out)) err(`${where}: unknown out ${r.out}`);
     else if (items.items[r.out]!.kind === 'material') err(`${where}: makes material ${r.out}`);
     for (const input of r.in) if (!isItem(input.item)) err(`${where}: unknown input ${input.item}`);
+    for (const m of r.maps ?? []) if (!Object.hasOwn(c.maps, m)) err(`${where}: unknown map ${m}`);
     if (r.station !== null && !stationKinds.has(r.station))
       err(`${where}: station ${r.station} is no station kind`);
   }
@@ -368,6 +369,10 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
         err(`effects.json: ${effect.id} applies unknown effect ${applied}`);
     }
   }
+  for (const item of Object.values(items.items)) {
+    if (item.buff !== undefined && !effectRows[item.buff as keyof typeof effectRows]?.dish)
+      err(`items.json ${item.id}: buff ${item.buff} is no dish buff`);
+  }
   const checkDamageEffects = (where: string, row: { effects: Record<string, number> }) => {
     for (const id of Object.keys(row.effects)) {
       if (!Object.hasOwn(effectRows, id)) err(`${where}: applies unknown effect ${id}`);
@@ -393,7 +398,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
         .filter((s) => PROFILE_RANK[s.profile] <= rank);
       const reach = reachable(c, open);
       inHand.set(`${map.id}/${profile}`, reach.have);
-      for (const id of Object.keys(recipes.recipes)) {
+      for (const [id, recipe] of Object.entries(recipes.recipes)) {
+        if (recipe.maps && !recipe.maps.includes(map.id)) continue;
         if (!reach.made.has(id))
           err(`map ${map.id} (${profile}): recipe ${id} cannot be crafted from its nodes`);
       }
@@ -517,6 +523,11 @@ function mainTrackS(cs: Content['cutscenes']['cutscenes'][string]): number {
 function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; have: Set<string> } {
   const nodeResources = new Set(scenes.flatMap((s) => (s.nodes ?? []).map((n) => n.resource)));
   const propKinds = new Set(scenes.flatMap((s) => s.props.map((p) => p.kind)));
+  // A shop in an open scene sells its stock: Flour comes from the bakery's counter (round 10, D4a).
+  const propIds = new Set(scenes.flatMap((s) => s.props.map((p) => p.id)));
+  const stock = new Set<string>(
+    Object.values(c.economy.shops).flatMap((s) => (propIds.has(s.prop) ? s.sells : [])),
+  );
   const have = new Set<string>();
   const made = new Set<string>();
   for (let grew = true; grew;) {
@@ -530,7 +541,7 @@ function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; h
     }
     for (const r of Object.values(c.recipes.recipes)) {
       if (made.has(r.id) || (r.station !== null && !propKinds.has(r.station))) continue;
-      if (r.in.every((input) => have.has(input.item))) {
+      if (r.in.every((input) => have.has(input.item) || stock.has(input.item))) {
         made.add(r.id);
         have.add(r.out);
         grew = true;
@@ -656,6 +667,22 @@ function checkDecksAndLooks(c: Content, err: (msg: string) => void): void {
     }
     if (!dealt.has(look.role)) err(`${where}: no deck deals ${look.role} (orphan art)`);
   }
+
+  // Round 10, B1 (GDD 3.17): a figure look is its own, never a card's or the villager family's; a townsfolk row
+  // wears a villager look or a figure look, never a card's.
+  const figures = looks.figures ?? {};
+  for (const [key, look] of Object.entries(figures)) {
+    if (key !== look.id) err(`looks.json figures: key "${key}" holds look "${look.id}"`);
+    if (key in looks.looks || key in looks.villagers) err(`looks.json figures: "${key}" is already a look`);
+    if (look.bodyAtlas !== `char_${key}` || look.overlayAtlas !== `ovl_${key}`)
+      err(`looks.json figures: ${key}'s atlases must be char_${key} and ovl_${key}`);
+  }
+  for (const [kind, row] of Object.entries(c.routines.townsfolk)) {
+    if (!(row.look in looks.villagers) && !(row.look in figures))
+      err(`routines.json townsfolk ${kind}: look ${row.look} is neither a villager nor a figure look`);
+    if (row.count !== undefined && !row.named)
+      err(`routines.json townsfolk ${kind}: count needs a named row`);
+  }
 }
 
 /**
@@ -705,11 +732,14 @@ function checkRoutines(c: Content, err: (msg: string) => void): void {
       return ch === '.' || ch === 'S';
     };
     for (const prop of scene.props) {
-      if (!known.has(prop.kind)) {
+      // Round 10 (D1): a prop whose class is a station is one, whatever its kind.
+      const [cls] = classesOfProp(c.interactions, prop);
+      const station = stationKinds.has(prop.kind) || (cls !== undefined && stationKinds.has(cls));
+      if (!station && !known.has(prop.kind)) {
         err(`routines.json: prop kind "${prop.kind}" (${prop.id}) is neither a station nor ignored`);
         continue;
       }
-      if (!stationKinds.has(prop.kind)) continue;
+      if (!station) continue;
       const { x, y } = prop;
       const stand = [
         [x, y],

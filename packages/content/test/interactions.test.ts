@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CENSUS_DECISIONS,
+  Item,
   Mode,
   classesOfProp,
   content,
@@ -25,7 +26,7 @@ const props = Object.values(content.scenes).flatMap((s) => s.props);
 const chop: Interaction = {
   verb: 'chop',
   label: 'Chop',
-  target: 'lumber',
+  target: 'testLumber',
   handler: 'stock',
   status: 'live',
   phases: ['day', 'night'],
@@ -52,8 +53,10 @@ describe('interactions.json: the census (logic-table.md 5)', () => {
       tally[d!] += 1;
     }
     expect(Object.values(tally).reduce((a, b) => a + b, 0)).toBe(props.length);
-    // Every live prop is read through its class; nothing else has one yet.
-    expect(tally.live).toBe(props.filter((p) => classesOfProp(interactions, p).length === 1).length);
+    // Every live prop is read through its class; so are the tool walls of A11.
+    for (const p of props.filter((q) => decideProp(interactions, q) === 'live'))
+      expect(classesOfProp(interactions, p).length, p.id).toBe(1);
+    expect(tally.live).toBeGreaterThan(0);
   });
 
   it('matches every prop to at most one class', () => {
@@ -88,9 +91,11 @@ describe('interactions.json: the census (logic-table.md 5)', () => {
   it('refuses a prop two classes match', () => {
     expect(
       broken((c) => {
-        c.interactions.classes.lumber = { name: 'Lumber', match: { stems: ['barrel'], kinds: ['bell'] } };
+        c.interactions.classes.testLumber = { name: 'Lumber', match: { stems: ['barrel'], kinds: ['bell'] } };
       }),
-    ).toEqual(expect.arrayContaining([expect.stringMatching(/prop \w+\.\w+ matches classes bell, lumber/)]));
+    ).toEqual(
+      expect.arrayContaining([expect.stringMatching(/prop \w+\.\w+ matches classes bell, testLumber/)]),
+    );
   });
 });
 
@@ -110,20 +115,20 @@ describe('interactions.json: modes and interactions (logic-table.md 3.2)', () =>
   it('accepts a tool wall on a class of placed stems', () => {
     expect(
       broken((c) => {
-        c.interactions.classes.lumber = { name: 'Lumber', match: { stems: ['woodpile', 'stump'] } };
-        c.interactions.interactions.chopLumber = chop;
+        c.interactions.classes.testLumber = { name: 'Lumber', match: { stems: ['planks'] } };
+        c.interactions.interactions.testChop = chop;
       }),
     ).toEqual([]);
   });
 
   it('refuses an unknown class, item, loot table, live mini-game and a wall with no NEED_TOOL line', () => {
     const errors = broken((c) => {
-      c.interactions.interactions.chopLumber = {
+      c.interactions.interactions.testChop = {
         ...chop,
         target: 'nowhere',
         fail: {},
         modes: [
-          { ...chop.modes[0]!, drops: [{ item: 'gold', qty: [1, 1] }], loot: 'void', minigame: 'lockpick' },
+          { ...chop.modes[0]!, drops: [{ item: 'gold', qty: [1, 1] }], loot: 'void', minigame: 'nosuch' },
         ],
       };
     });
@@ -136,14 +141,14 @@ describe('interactions.json: modes and interactions (logic-table.md 3.2)', () =>
       expect(errors).toEqual(expect.arrayContaining([expect.stringContaining(e)]));
     }
     expect(errors).toEqual(
-      expect.arrayContaining(['interactions.json chopLumber: a tool wall needs a NEED_TOOL line']),
+      expect.arrayContaining(['interactions.json testChop: a tool wall needs a NEED_TOOL line']),
     );
   });
 
   it('lets an nfy interaction name a mini-game that has not shipped', () => {
     expect(
       broken((c) => {
-        c.interactions.classes.lumber = { name: 'Lumber', match: { stems: ['woodpile'] } };
+        c.interactions.classes.testLumber = { name: 'Lumber', match: { stems: ['planks'] } };
         c.interactions.interactions.pickIt = {
           ...chop,
           status: 'nfy',
@@ -156,17 +161,28 @@ describe('interactions.json: modes and interactions (logic-table.md 3.2)', () =>
 
   it('refuses a stem placed nowhere and a tier the tag does not have', () => {
     const errors = broken((c) => {
-      c.interactions.classes.lumber = { name: 'Lumber', match: { stems: ['unicorn'] } };
-      c.interactions.interactions.chopLumber = {
+      c.interactions.classes.testLumber = { name: 'Lumber', match: { stems: ['unicorn'] } };
+      c.interactions.interactions.testChop = {
         ...chop,
         modes: [{ ...chop.modes[0]!, tool: { tag: 'dig', tier: 2 } }],
       };
     });
     expect(errors).toEqual(
       expect.arrayContaining([
-        'interactions.json class lumber: stem unicorn is placed nowhere',
-        'interactions.json chopLumber: dig has no tier 2',
+        'interactions.json class testLumber: stem unicorn is placed nowhere',
+        'interactions.json testChop: dig has no tier 2',
       ]),
     );
+  });
+});
+
+describe('items.json: tool tags and uses (A10; logic-table.md 3.3)', () => {
+  const item = (patch: object) => Item.safeParse({ ...content.items.items.spade, ...patch }).success;
+
+  it('takes a tier per capability tag and a positive number of uses', () => {
+    expect(item({ tool: { cut: 1, break: 2 }, uses: 20 })).toBe(true);
+    expect(item({ tool: { saw: 1 } })).toBe(false);
+    expect(item({ tool: { cut: 4 } })).toBe(false);
+    expect(item({ uses: 0 })).toBe(false);
   });
 });

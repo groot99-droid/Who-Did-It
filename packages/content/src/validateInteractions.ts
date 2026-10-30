@@ -1,5 +1,5 @@
 import type { ItemsFile } from './schemas/items.js';
-import type { MinigamesFile, ResourcesFile } from './schemas/m5b.js';
+import type { MinigamesFile, RecipesFile, ResourcesFile } from './schemas/m5b.js';
 import type { RoutinesFile } from './schemas/routines.js';
 import type { Scene, SceneId } from './schemas/scene.js';
 import {
@@ -18,12 +18,16 @@ import {
  * prop in a scene file is caught; every `live` kind is a class; every class, drop, loot table and mini-game an
  * interaction names exists; a tool wall has its `NEED_TOOL` line.
  */
+/** Mini-game kinds an interaction plays with no `minigames.json` row, which are rows of a station task (round 10, D5). */
+const STATIONLESS_MINIGAMES: readonly string[] = ['lockpick'];
+
 export function checkInteractions(
   c: {
     interactions: InteractionsFile;
     scenes: Record<SceneId, Scene>;
     items: ItemsFile;
     resources: ResourcesFile;
+    recipes: RecipesFile;
     minigames: MinigamesFile;
     routines: RoutinesFile;
   },
@@ -72,6 +76,21 @@ export function checkInteractions(
   for (const kind of censusMap(t.census.kinds).entries())
     if (kind[1] === 'live' && !classKinds.has(kind[0])) err(`${file}: live kind ${kind[0]} has no class`);
 
+  // Round 10 (A13; logic-table 8.6, 10.1): no recipe takes a role-bound item, and a shape shows exactly the inputs.
+  for (const [id, r] of Object.entries(c.recipes.recipes)) {
+    for (const i of r.in)
+      if (c.items.items[i.item]?.roleBound) err(`recipes.json ${id}: takes the role-bound item ${i.item}`);
+    if (r.shape) {
+      const shown = r.shape.flat().filter((x): x is string => x !== null);
+      const need = r.in.flatMap((i) => Array.from({ length: i.qty }, () => i.item));
+      if (shown.slice().sort().join() !== need.slice().sort().join())
+        err(`recipes.json ${id}: its shape does not show its inputs`);
+    }
+  }
+
+  const made = new Set(Object.values(c.recipes.recipes).map((r) => r.out));
+  const looted = new Set(Object.values(t.lootTables).flatMap((l) => l.entries.map((e) => e.item)));
+  const obtainable = (id: string) => made.has(id) || looted.has(id);
   const isItem = (id: string) => Object.hasOwn(c.items.items, id);
   for (const [id, table] of Object.entries(t.lootTables))
     for (const e of table.entries)
@@ -91,13 +110,25 @@ export function checkInteractions(
       if (
         m.minigame !== undefined &&
         it.status === 'live' &&
-        !Object.hasOwn(c.minigames.minigames, m.minigame)
+        !Object.hasOwn(c.minigames.minigames, m.minigame) &&
+        !STATIONLESS_MINIGAMES.includes(m.minigame)
       )
         err(`${where}: unknown mini-game ${m.minigame}`);
       for (const stem of m.only ?? [])
         if (!(cls?.match.stems?.includes(stem) ?? false))
           err(`${where}: mode stem ${stem} is not its class's`);
     }
+    for (const m of it.modes)
+      if (m.tool !== null) {
+        const carriers = Object.values(c.items.items).filter(
+          (i) => (i.tool?.[m.tool!.tag] ?? 0) >= m.tool!.tier,
+        );
+        // Logic table 10.1: no verb needs a role's item, and a wall's tool is one a seat can come by.
+        if (!carriers.some((i) => !i.roleBound))
+          err(`${where}: no neutral item carries ${m.tool.tag} ${m.tool.tier}`);
+        else if (!carriers.some((i) => !i.roleBound && obtainable(i.id)))
+          err(`${where}: nobody can come by a ${m.tool.tag} ${m.tool.tier} tool`);
+      }
     if (it.modes.every((m) => m.tool !== null) && it.fail.NEED_TOOL === undefined)
       err(`${where}: a tool wall needs a NEED_TOOL line`);
   }

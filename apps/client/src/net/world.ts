@@ -1,5 +1,5 @@
 import type { Emitter } from 'mitt';
-import type { HoldAction, S2CPayloads } from '@wdi/shared/protocol';
+import type { ErrorPayload, HoldAction, S2CPayloads } from '@wdi/shared/protocol';
 
 // What the World scene needs from the network. `ColyseusWorldFeed` reads the room state, the mock feed
 // (?mock=1) simulates the same data locally; the scene cannot tell them apart. Kept apart from
@@ -117,7 +117,7 @@ export interface MoveCmd {
 export type WorldFeedEvents = {
   sceneEnter: SceneEnter;
   noise: NoisePulse;
-  error: { code: number; msg: string };
+  error: ErrorPayload;
   /** Private: this player was killed and is now a ghost. */
   killed: { sceneId: string; cause: string; roles: Record<string, string>; cutsceneId?: string };
   /** Private: a collect finished; the entry is in `notebook()`. */
@@ -177,6 +177,8 @@ export interface MobSnap {
 export interface StackSnap {
   defId: string;
   qty: number;
+  /** Round 10 (A12): the slot number of `rules/inventory.ts`; absent in a mock that keeps the stacks in a list. */
+  slot?: number;
 }
 
 /** Round 6 (M5b): one of this player's own quests (`Private.quests`). */
@@ -242,6 +244,8 @@ export interface WorldFeed {
   taskBar(): number;
   /** Round 6 (6I): this player's own inventory slots, in slot order. */
   inventory(): StackSnap[];
+  /** Round 10 (A12): the held hotbar slot, `Private.inventory.selected`. */
+  selectedSlot(): number;
   /** Round 8 (8A): this seat's own body, or null while the row is empty (the lobby, the card, a ghost). */
   body(): OwnBodySnap | null;
   /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
@@ -251,6 +255,8 @@ export interface WorldFeed {
   sell(shopId: string, itemId: string, qty: number): void;
   /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
   faith(): number;
+  /** Round 10 (A7, GDD 3.32): whether this seat sleeps and, while it does, how many active players are in bed of how many. */
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number };
   /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */
   hqTiers(): Record<string, number>;
   /** Round 8, 8D: one of the civic acts at the altar, the black market, a station or a bank counter. */
@@ -261,6 +267,12 @@ export interface WorldFeed {
   questTurnIn(questId: string): void;
   /** Round 6 (6I): `act.light { on }`, light or douse the carried lantern or torch. */
   light(on: boolean): void;
+  /** Round 10 (A12): `inv.move { from, to }`, a stack to another slot of the own inventory. */
+  invMove(from: number, to: number): void;
+  /** Round 10 (A12): `inv.select { slot }`, the held hotbar slot. */
+  invSelect(slot: number): void;
+  /** Round 10 (A13): `craft.grid { size, cells }`, the crafting grid row by row. */
+  craftGrid(size: 2 | 3, cells: Array<string | null>): void;
   /** Round 6 (6I): the answer to a `minigameStart`. */
   minigameResult(taskId: string, answer: unknown): void;
   /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
@@ -272,6 +284,11 @@ export interface WorldFeed {
    * scene, so it survives World restarts; resets when the phase returns to the lobby.
    */
   dead(): boolean;
+  /**
+   * Round 10 (C1b, GDD 3.22): this seat died by day and waits for the morning train (`Private.onLine`). It is not a
+   * ghost then: `dead()` is false, and the On-the-line screen stands in for the world until the train.
+   */
+  onLine(): boolean;
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
   /** `targetId` is an avatar handle (GDD 3.17); the server resolves it to a seat. */

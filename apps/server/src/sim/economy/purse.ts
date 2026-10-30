@@ -3,6 +3,7 @@ import type { InvariantFailure } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { isWorldPhase } from '../World';
+import { cutPay } from './fare';
 
 /**
  * Scrip (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C: every seat's purse and bank balance, and the one
@@ -113,6 +114,7 @@ export function movePurse(
   amount: number,
   reason: PurseReason,
 ): number {
+  if (from === TOWN && (reason === 'wage' || reason === 'sale')) amount = cutPay(room, to, amount); // round 10, C2
   if (!Number.isInteger(amount) || amount <= 0 || from === to) return 0;
   if ((from === TOWN && !MINT.has(reason)) || (to === TOWN && !BURN.has(reason))) {
     ledgerOf(room).refused.push(`${from} -> ${to} ${amount} for ${reason} at tick ${room.state.tick}`);

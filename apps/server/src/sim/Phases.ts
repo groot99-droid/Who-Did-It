@@ -1,5 +1,5 @@
 import { balance, roles } from '@wdi/content';
-import { ErrorCode, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
+import { Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { fixedDealFits } from './Deck';
 import { beginFinalNight, endHunt, enforceFinalVote, isFinalNightRound } from './FinalNight';
@@ -8,6 +8,7 @@ import { enterImmunity, openMeeting, runMeeting } from './Meeting';
 import { isAiming } from './NightPowers';
 import { simOf } from './RoomSim';
 import { endMatch, evaluateWin, resetToLobby } from './Win';
+import { runSleep } from './Sleep';
 import { isWorldPhase } from './World';
 
 /**
@@ -39,6 +40,7 @@ export function runPhases(room: PartyRoom): void {
     // A body report ends the hunt at once and opens the forced meeting (GDD 3.3); nothing else opens one there.
     if (balance.finalNight.reportEndsHunt) return endHunt(room, request.callerId, request.bodyOf);
   } else if (request && isWorldPhase(state.phase)) return openMeeting(room, request);
+  runSleep(room); // round 10, A7 (GDD 3.32): every active player asleep ends the night here
   if (state.tick >= state.phaseEndsTick) advanceWorldPhase(room);
 }
 
@@ -130,18 +132,18 @@ function runDebugCommands(room: PartyRoom): void {
         Object.values(fixed).every((r) => typeof r === 'string' && known[r] !== undefined);
       const valid = strings && fixedDealFits(fixed as Record<string, string>, room.state.players.size);
       if (valid) flow.fixedDeal = { ...(fixed as Record<string, string>) };
-      else refuse(room, cmd.sessionId, ErrorCode.cannot, 'bad deal');
+      else refuse(room, cmd.sessionId, 'BAD_REQUEST');
       continue;
     }
     const name = payload.phase;
     const target = typeof name === 'string' ? CLOCK_PHASES[name] : undefined;
     if (name !== undefined && !target) {
-      refuse(room, cmd.sessionId, ErrorCode.cannot, 'unknown phase');
+      refuse(room, cmd.sessionId, 'BAD_REQUEST');
       continue;
     }
     if (target) {
       if (!isWorldPhase(room.state.phase)) {
-        refuse(room, cmd.sessionId, ErrorCode.wrongPhase, 'not now');
+        refuse(room, cmd.sessionId, 'PHASE_CLOSED');
         continue;
       }
       if (target.phase === Phase.immunity) enterImmunity(room);

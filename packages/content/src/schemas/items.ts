@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, Ships, Tiles } from './common.js';
+import { ToolTag } from './interactions.js';
 
 export const Item = z.strictObject({
   id: Id,
@@ -25,6 +26,14 @@ export const Item = z.strictObject({
   /** Ability in abilities.json this item performs, if any. */
   use: Id.optional(),
   lightRadiusTiles: Tiles.optional(),
+  /** Round 10, D4a (GDD 3.14): the dish buff (an `effects.json` id) eating this item gives. */
+  buff: Id.optional(),
+  /** Round 10, A12 (GDD 3.30): the equipment slot this item fits; none fits one until armour and weapons (D6). */
+  equip: z.enum(['head', 'body', 'weapon']).optional(),
+  /** Round 10 (A10; logic-table.md 3.3): the capability tags this tool carries, each with its tier. */
+  tool: z.partialRecord(ToolTag, z.number().int().min(1).max(3)).optional(),
+  /** Round 10 (A10): uses before the tool breaks, each worn by an interaction's `wear`; absent = it lasts. */
+  uses: z.number().int().positive().optional(),
   tooltip: z.string().min(1),
   ships: Ships,
   gddRef: GddRef,
@@ -33,6 +42,7 @@ export type Item = z.infer<typeof Item>;
 
 export const ItemsFile = z.strictObject({
   gddRef: GddRef,
+  /** The hotbar and the pack together (GDD 3.30); `balance.inventory.hotbar` of them are the hotbar. */
   inventorySlots: z.number().int().positive(),
   items: z.record(Id, Item),
 });

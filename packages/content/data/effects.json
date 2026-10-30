@@ -104,6 +104,24 @@
       "cures": [],
       "gddRef": "3.23"
     },
-    "charm": { "id": "charm", "name": "Charmed", "durationS": 0, "cures": [], "gddRef": "3.22" }
+    "charm": { "id": "charm", "name": "Charmed", "durationS": 0, "cures": [], "gddRef": "3.22" },
+    "exhausted": {
+      "id": "exhausted",
+      "name": "Exhausted",
+      "durationS": 0,
+      "staminaRegenFactor": 0.5,
+      "maxStaminaFactor": 0.5,
+      "cures": [],
+      "gddRef": "3.32"
+    },
+    "resistant": {
+      "id": "resistant",
+      "name": "Resistant",
+      "durationS": 780,
+      "poisonFactor": 0.5,
+      "dish": true,
+      "cures": [],
+      "gddRef": "3.14"
+    }
   }
 }

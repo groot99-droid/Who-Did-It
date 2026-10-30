@@ -9,15 +9,17 @@ function broken(edit: (c: Content) => void): string[] {
   return validateContent(copy);
 }
 
-const TOOLS = ['lantern', 'crowbar', 'lockpicks', 'snare', 'torch', 'spade'];
+const TOOLS = ['lantern', 'crowbar', 'lockpicks', 'snare', 'torch', 'spade', 'axe', 'pickaxe', 'hammer'];
+/** Round 10, D4a: the bakery's parts and dishes, made on Hollowmere only. */
+const BAKERY = ['dough', 'proofedDough', 'herbFilling', 'wakeLoaf', 'herbBread'];
 
 describe('resources and recipes', () => {
-  it('has a recipe for each of the six tools, and every node names a resource', () => {
+  it('has a recipe for each tool, and every node names a resource', () => {
     expect(
       Object.values(content.recipes.recipes)
         .map((r) => r.out)
         .sort(),
-    ).toEqual([...TOOLS].sort());
+    ).toEqual([...TOOLS, ...BAKERY].sort());
     for (const scene of Object.values(content.scenes)) {
       for (const n of scene.nodes ?? []) expect(content.resources.resources[n.resource], n.id).toBeDefined();
     }

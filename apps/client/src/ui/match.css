@@ -459,6 +459,86 @@
   background-color: var(--wdi-night-accent);
 }
 
+/* Round 10, A13 (UI.md 14.44): the inventory screen's slots, the crafting square and the hotbar strip. */
+.wdi-m5b .wdi-slot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  min-height: 3rem;
+  padding: 0.15rem;
+  color: var(--wdi-night-text);
+  background-color: rgb(var(--wdi-snow-rgb) / 0.06);
+  border: 1px solid rgb(var(--wdi-lilac-rgb) / 0.35);
+  border-radius: var(--wdi-radius-xs);
+  font-size: var(--wdi-text-sm);
+}
+
+.wdi-m5b .wdi-slot:disabled {
+  opacity: 0.4;
+}
+
+.wdi-m5b .wdi-slot--picked,
+.wdi-m5b .wdi-slot--held {
+  border-color: var(--wdi-night-label);
+  box-shadow: 0 0 0 1px var(--wdi-night-label);
+}
+
+.wdi-m5b .wdi-slot--no {
+  opacity: 0.25;
+}
+
+.wdi-m5b .wdi-slot .wdi-m5b__qty {
+  position: absolute;
+  right: 0.2rem;
+  bottom: 0.1rem;
+}
+
+.wdi-m5b .wdi-slots {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(3rem, 1fr));
+  gap: 0.25rem;
+}
+
+.wdi-m5b .wdi-slots--belt,
+.wdi-m5b .wdi-slots--head,
+.wdi-m5b .wdi-slots--body,
+.wdi-m5b .wdi-slots--weapon {
+  grid-template-columns: repeat(2, minmax(3rem, 1fr));
+}
+
+.wdi-m5b .wdi-inv__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.wdi-m5b .wdi-craftgrid__cells {
+  display: grid;
+  grid-template-columns: repeat(var(--wdi-grid-n, 2), 3rem);
+  gap: 0.25rem;
+}
+
+.wdi-m5b .wdi-hotbar {
+  position: fixed;
+  left: 50%;
+  bottom: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.wdi-m5b .wdi-hotbar kbd {
+  position: absolute;
+  left: 0.2rem;
+  top: 0.1rem;
+  font-size: var(--wdi-text-xs, 0.7rem);
+  opacity: 0.7;
+}
+
 /* The panels: Pockets, Crafting and Quests (`.wdi-root.wdi-m5b__panel`) and the mini-game's (`.wdi-m5b__modal`). */
 :is(.wdi-root.wdi-m5b__panel, .wdi-m5b__modal .wdi-m5b__panel) {
   color: var(--wdi-night-text);
@@ -649,4 +729,83 @@
   .wdi-m5b__modal .wdi-btn--sm {
     min-height: var(--wdi-touch);
   }
+}
+
+/* Round 10 (A8, UI.md 14.46): the asleep overlay dims the world to the bedroom and never takes a pointer, so the
+   stick and the keys still wake the sleeper; the dawn line sits above it. */
+.wdi-sleep .wdi-sleep__veil {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  background-color: color-mix(in srgb, var(--wdi-night) 80%, transparent);
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  text-align: center;
+  pointer-events: none;
+}
+
+.wdi-sleep .wdi-sleep__title,
+.wdi-sleep .wdi-sleep__count,
+.wdi-sleep .wdi-sleep__hint {
+  margin: 0;
+}
+
+.wdi-sleep .wdi-sleep__hint {
+  opacity: 0.7;
+}
+
+.wdi-sleep .wdi-sleep__through {
+  position: fixed;
+  top: var(--wdi-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  pointer-events: none;
+}
+
+.wdi-sleep .wdi-sleep__veil[hidden],
+.wdi-sleep .wdi-sleep__through[hidden] {
+  display: none;
+}
+
+/* Round 10, C1b (UI.md 14.47): On the line, the dark carriage of a seat that died by day; the world is hidden. */
+.wdi-line {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-4, 16px);
+  padding: var(--wdi-space-4, 16px);
+  color: var(--wdi-night-text);
+  background: var(--wdi-night-bg);
+  text-align: center;
+  pointer-events: auto;
+}
+
+.wdi-line__band {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-2, 8px);
+}
+
+.wdi-line__band h2 {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  color: var(--wdi-night-label);
+}
+
+.wdi-line__clock {
+  color: var(--wdi-night-accent);
+}
+
+.wdi-line__kept {
+  max-width: 32rem;
+  color: var(--wdi-night-text-muted);
 }

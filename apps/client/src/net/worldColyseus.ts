@@ -38,12 +38,19 @@ interface PlayerState {
   presence?: PresenceState;
   priv?: {
     notebook?: { forEach(cb: (e: Required<NotebookSnap>) => void): void };
-    inventory?: { slots?: { forEach(cb: (s: StackSnap) => void): void } };
+    inventory?: {
+      slots?: { forEach(cb: (s: StackSnap & { slot: number }) => void): void };
+      selected?: number;
+    };
     quests?: { forEach(cb: (q: QuestSnap) => void): void };
     body?: Omit<OwnBodySnap, 'effects'> & { effects: { forEach(cb: (e: OwnEffectSnap) => void): void } };
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
     faith?: number; // round 8, 8D
+    asleep?: boolean; // round 10, A7
+    inBed?: number;
+    inBedOf?: number;
+    onLine?: boolean; // round 10, C1
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -92,7 +99,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('sceneEnter', (m: SceneEnter) => this.bus.emit('sceneEnter', m));
     room.onMessage('noise', (m: NoisePulse) => this.bus.emit('noise', m));
     room.onMessage('killed', (m: WorldFeedEvents['killed']) => {
-      this.ghost = true;
+      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost.
+      const onLine = Object.keys(m.roles ?? {}).length === 0;
+      this.ghost = !onLine;
+      this.line = onLine;
       this.bus.emit('killed', m);
     });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
@@ -116,6 +126,8 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
   private ghost = false;
+  /** Round 10, C1b: the seat has been on the line since its death, so its `killed` made no ghost. */
+  private line = false;
 
   /** The room this feed reads; the router compares it to spot a reconnect to a new room. */
   get sessionRoom(): Room {
@@ -235,9 +247,18 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   dead(): boolean {
     const s = this.state;
-    if (s.phase === 0) this.ghost = false;
-    else if (s.players.get(this.selfId)?.alive === false) this.ghost = true;
+    const self = s.players.get(this.selfId);
+    const next = ghostAfter(
+      { ghost: this.ghost, line: this.line },
+      { phase: s.phase, alive: self?.alive, onLine: self?.priv?.onLine === true },
+    );
+    this.ghost = next.ghost;
+    this.line = next.line;
     return this.ghost;
+  }
+
+  onLine(): boolean {
+    return this.state.players.get(this.selfId)?.priv?.onLine === true;
   }
 
   clock() {
@@ -314,8 +335,12 @@ export class ColyseusWorldFeed implements WorldFeed {
     const out: StackSnap[] = [];
     this.state.players
       .get(this.selfId)
-      ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty }));
+      ?.priv?.inventory?.slots?.forEach((s) => out.push({ defId: s.defId, qty: s.qty, slot: s.slot }));
     return out;
+  }
+
+  selectedSlot(): number {
+    return this.state.players.get(this.selfId)?.priv?.inventory?.selected ?? 0;
   }
 
   /** Round 8 (8A): the own `Private.body`; null while the row is empty (`maxHp` 0: the lobby, the card, a ghost). */
@@ -352,6 +377,12 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.room.send('act.sell', { shopId, itemId, qty });
   }
 
+  // Round 10 (A7, GDD 3.32): the own sleep state; the counts are written only while asleep.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    const priv = this.state.players.get(this.selfId)?.priv;
+    return { asleep: priv?.asleep ?? false, inBed: priv?.inBed ?? 0, inBedOf: priv?.inBedOf ?? 0 };
+  }
+
   // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
   faith(): number {
     return this.state.players.get(this.selfId)?.priv?.faith ?? 0;
@@ -379,6 +410,18 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.room.send('act.light', { on });
   }
 
+  invMove(from: number, to: number): void {
+    this.room.send('inv.move', { from, to });
+  }
+
+  invSelect(slot: number): void {
+    this.room.send('inv.select', { slot });
+  }
+
+  craftGrid(size: 2 | 3, cells: Array<string | null>): void {
+    this.room.send('craft.grid', { size, cells });
+  }
+
   minigameResult(taskId: string, answer: unknown): void {
     this.room.send('minigame.result', { taskId, answer });
   }
@@ -394,4 +437,19 @@ export class ColyseusWorldFeed implements WorldFeed {
   dispose(): void {
     this.bus.all.clear();
   }
+}
+
+/**
+ * The ghost flag after a read of the own seat (round 10, C1b; GDD 3.22). A `killed` or a false roster `alive` makes a
+ * ghost, the lobby clears it, and a seat on the line is no ghost: its `alive` may read false after a meeting, and when
+ * the morning train brings it back the flag its `killed` set is cleared.
+ */
+export function ghostAfter(
+  was: { ghost: boolean; line: boolean },
+  now: { phase: number; alive: boolean | undefined; onLine: boolean },
+): { ghost: boolean; line: boolean } {
+  if (now.phase === 0) return { ghost: false, line: false };
+  if (now.onLine) return { ghost: false, line: true };
+  if (was.line) return { ghost: now.alive === false, line: false };
+  return { ghost: was.ghost || now.alive === false, line: false };
 }

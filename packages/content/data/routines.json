@@ -19,13 +19,26 @@
         "proofingCabinet"
       ]
     },
+    "gather": {
+      "phases": ["day"],
+      "kinds": ["lumber", "stump", "timberSet", "boulder", "rockPile", "orePile"]
+    },
+    "trade": { "phases": ["day"], "kinds": ["counter"] },
     "social": {
       "phases": ["day", "night"],
       "kinds": ["noticeBoard", "dartboard", "bell", "lamp", "decor"]
     },
     "rest": { "phases": ["night"], "kinds": ["lanternPost"] }
   },
-  "holds": {},
+  "holds": {
+    "lumber": "interact",
+    "stump": "interact",
+    "timberSet": "interact",
+    "boulder": "interact",
+    "rockPile": "interact",
+    "orePile": "interact",
+    "counter": "shop"
+  },
   "ignore": [
     "dressing",
     "kitChest",
@@ -37,13 +50,15 @@
     "plate",
     "deadLoaf",
     "ledger",
-    "counter",
     "bank",
     "altar",
     "mailbag",
     "rack",
     "hq",
-    "blackMarket"
+    "blackMarket",
+    "bed",
+    "cot",
+    "innBed"
   ],
   "lightKinds": ["lanternPost"],
   "townsfolk": {
@@ -52,6 +67,7 @@
       "look": "villager",
       "named": true,
       "fixed": false,
+      "guard": true,
       "stations": ["ledger", "noticeBoard", "window", "pump"]
     },
     "tallyman": {
@@ -60,6 +76,14 @@
       "named": true,
       "fixed": false,
       "stations": ["rack", "noticeBoard", "pump", "basin"]
+    },
+    "constable": {
+      "look": "constable",
+      "named": true,
+      "fixed": false,
+      "guard": true,
+      "count": 2,
+      "stations": ["noticeBoard", "bell", "pump"]
     },
     "stallholder": { "look": "villager", "named": false, "fixed": true, "stations": ["shop"] },
     "villager": { "look": "villager", "named": false, "fixed": false, "stations": [] }

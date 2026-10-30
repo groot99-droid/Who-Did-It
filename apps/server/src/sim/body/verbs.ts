@@ -1,5 +1,5 @@
-import { type Ability, abilities, items, roles } from '@wdi/content';
-import { ErrorCode, type PlayerState, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { type Ability, abilities, roles } from '@wdi/content';
+import { type PlayerState, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { livingActor } from '../Actions';
 import { resolveHandle } from '../Avatars';
@@ -30,9 +30,10 @@ export function handleBodyAbility(
     case 'antidote':
       return handleCure(room, sessionId, payload.abilityId, payload);
     case 'eat':
-      return handleEat(room, sessionId);
+    case 'eatHerbBread':
+      return handleEat(room, sessionId, payload.abilityId);
     default:
-      reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+      reject(room, sessionId, 'NFY');
   }
 }
 
@@ -55,28 +56,23 @@ export function openVerb(room: PartyRoom, sessionId: string, id: string): Verb |
   const player = room.state.players.get(sessionId);
   if (!def || !player) return null;
   if (def.scope === 'role' && !roles.roles[player.priv.role.roleId]?.abilities.includes(id)) {
-    reject(room, sessionId, ErrorCode.cannot, `no ${def.name.toLowerCase()}`);
+    reject(room, sessionId, 'NOT_YOUR_POWER');
     return null;
   }
   const actor = livingActor(room, sessionId);
   if (!actor) return null;
   const body = bodyOf(room, sessionId);
   if (!body) {
-    reject(room, sessionId, ErrorCode.cannot, 'not now');
+    reject(room, sessionId, 'DOWN_OR_STUNNED');
     return null;
   }
   const tick = room.state.tick;
   if (tick < (player.priv.cooldownEndTick.get(id) ?? 0)) {
-    reject(room, sessionId, ErrorCode.cooldown, 'not ready');
+    reject(room, sessionId, 'COOLDOWN');
     return null;
   }
   if (def.requires !== undefined && count(player, def.requires) < 1) {
-    reject(
-      room,
-      sessionId,
-      ErrorCode.cannot,
-      `no ${items.items[def.requires]?.name.toLowerCase() ?? def.requires}`,
-    );
+    reject(room, sessionId, 'NEED_ITEM', { need: def.requires });
     return null;
   }
   return { def, player, actor, body, tick };
@@ -109,11 +105,11 @@ export function seatInReach(room: PartyRoom, sessionId: string, v: Verb, handle:
     target.sceneIdx !== v.actor.sceneIdx ||
     !bodyOf(room, targetId)
   ) {
-    reject(room, sessionId, ErrorCode.cannot, 'no target');
+    reject(room, sessionId, 'NO_TARGET');
     return null;
   }
   if (!inReach(v, target.x, target.y)) {
-    reject(room, sessionId, ErrorCode.outOfRange, 'too far');
+    reject(room, sessionId, 'TOO_FAR', { of: 'person' });
     return null;
   }
   return targetId;

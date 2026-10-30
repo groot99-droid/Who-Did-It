@@ -2,8 +2,10 @@ import { abilities, roles } from '@wdi/content';
 import { ItemStack, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { countRow } from './Flow';
+import { settle } from './Inventory';
 import { nightOf } from './nightMemory';
 import { simOf } from './RoomSim';
+import { isOnLine } from './Train';
 
 // Inherit (GDD 3.2, 3.3; round-5 `deck/wire.md` 5). Session 5G owns this file. When a death or an ejection leaves no
 // living Killer and a living Accomplice, the Accomplice takes the Knife: it turns into the `heir` card (the Accomplice's
@@ -22,8 +24,9 @@ export function runInherit(room: PartyRoom): void {
   const mem = nightOf(room);
   let accomplice: string | null = null;
   for (const [id, player] of room.state.players) {
-    if (sim.players.get(id)?.dead !== false) continue; // dead (even secretly) or not seated in the sim
     const roleId = player.priv?.role.roleId;
+    if (holdsKnife(roleId) && isOnLine(room, id)) return; // round 10, C1: a Killer on the line comes back
+    if (sim.players.get(id)?.dead !== false) continue; // dead (even secretly) or not seated in the sim
     if (holdsKnife(roleId)) return; // a Killer lives
     if (roleId === 'accomplice' && !mem.inherited.has(id)) accomplice ??= id;
   }
@@ -37,6 +40,7 @@ export function runInherit(room: PartyRoom): void {
     knife.defId = 'knife';
     knife.qty = 1;
     player.priv.inventory.slots.push(knife);
+    settle(player); // round 10, A12: the Knife takes a free slot
   }
   const tick = room.state.tick;
   const bonusS = abilities.abilities.inherit?.params?.killCooldownBonusS ?? 0;

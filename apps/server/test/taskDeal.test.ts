@@ -58,7 +58,7 @@ describe('the deal at Start', () => {
   it('deals each Village seat tasksEach real tasks and the Cabal as many fake ones, from the pool, no repeats', async () => {
     const party = await lobbyOf(colyseus, 4);
     await start(party);
-    const each = balance.byCount['4'].tasksEach;
+    const each = Math.min(balance.byCount['4'].tasksEach, TASK_IDS.length); // the deal caps at the pool (A5)
     expect(party.room.state.taskBar).toBe(0);
     let cabal = 0;
     for (const h of party.humans) {
@@ -106,7 +106,7 @@ describe('the deal at Start', () => {
       ),
     ]);
     dealTasks(party.room, dealt);
-    const each = balance.byCount['4'].tasksEach;
+    const each = Math.min(balance.byCount['4'].tasksEach, TASK_IDS.length); // the deal caps at the pool (A5)
     const drifter = listOf(party.room.state.players.get(a!.id)!);
     expect(drifter).toHaveLength(each);
     expect(drifter.every((t) => t.fake)).toBe(true);
@@ -140,8 +140,9 @@ describe('the bar', () => {
     const fake = [...party.room.state.players.values()].flatMap((p) =>
       [...p.priv.tasks].filter((t) => t.fake),
     );
-    expect(real.length).toBe(3 * balance.byCount['4'].tasksEach);
-    expect(fake.length).toBe(balance.byCount['4'].tasksEach);
+    const each = Math.min(balance.byCount['4'].tasksEach, TASK_IDS.length); // the deal caps at the pool (A5)
+    expect(real.length).toBe(3 * each);
+    expect(fake.length).toBe(each);
     for (const t of fake) t.done = true;
     recomputeTaskBar(party.room);
     expect(party.room.state.taskBar).toBe(0);

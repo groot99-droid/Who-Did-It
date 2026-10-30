@@ -75,19 +75,19 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 | Lobby | Leader creates party; Start with >= 1 human (NPCs fill to 4, 3.12) | – |
 | Role reveal | Server deals the deck and the traits; cover roles pick a look (3.17) | 20 s, then 3-2-1 |
 | Grace | Spawn spread around the hub (3.13); kills disabled; guided clue; the map's opening cutscene plays inside it (3.18) | 30 s, plus the length of the map's opening (its intro track: HollowMere 117 s, BlackPine 80 s; at most `phases.openingS`, 120 s) |
-| Day | Free roam; light radius 7 tiles; the Knife is sheathed | 120 s |
-| Dusk | Vignette, "Night falls in 10 s"; the Knife, Impersonate and the night powers wake; missing-person check | 10 s |
-| Night | Light radius 3.5 tiles; wolves active; the hunt | 100 s |
+| Day | Free roam; light radius 7 tiles; the Knife is sheathed | 480 s (8 min; round 10, A5) |
+| Dusk | Vignette, "Night falls in 30 s"; the Knife, Impersonate and the night powers wake; missing-person check | 30 s |
+| Night | Light radius 3.5 tiles; wolves active; the hunt | 300 s (5 min; round 10, A5) |
 | Meeting: discussion | Body report, Emergency Bell, or missing-person roll-call | 60 / 75 / 90 s (4-5 / 6-7 / 8-10) |
 | Meeting: vote | Open from 15 s into the discussion (`meeting.minVoteS`, 3.8); ends early when all living players have voted | 25 s after discussion |
 | Reveal | Tally with names; ejected role revealed | 8 s (held for an ejected Gamekeeper's Last Shot) |
 | Immunity | No kills, no noise; everyone spread at the hub; then a new day (M3: the day restarts in full and the cycle count rises) | 15 s |
-| Final Night | The day that would start cycle 6 begins with no winner yet | 45 s hunt, then the trial: a 120 s discussion and the vote |
+| Final Night | The day that would start cycle 6 begins with no winner yet | 135 s hunt, then the trial: a 120 s discussion and the vote |
 | Game over | Winner, every role and look, the undealt cards, the summary; then the lobby again with the same code and seats | 20 s |
 
-(M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle (day, dusk and night) is 230 s; a 20-25 minute match is 5 cycles with meetings and the Final Night (round 8, DECISIONS A171: the owner's length). Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
+(M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle (day, dusk and night) is 810 s; a match is 12 cycles and the Final Night, about 170 minutes of world time (round 10, A5: the owner's "days should now last 8 minutes and nights last 5, keep the game play as it was before but prolong everything"; the match length is followup-4 2.8, which supersedes round 8's 5 cycles of A171). Round 10 scales every clock by the factor of `world-mode.md` 7: D = 4 for what runs by day, N = 3 for what runs after dark, C = 3.5 for what runs through the cycle, and keeps a person's own actions (holds, reach, movement, mini-games), the pauses and every count per cycle. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
 
-(M5a) **The Knife works only after dark**: at dusk, at night and in the Final Night hunt, never in grace, day or immunity. Since tasks (M4d) and quests (M5b) give the day work, the day (120 s) is a little longer than the night (100 s; round 8, A171). Impersonate and the night powers follow the same clock (3.2, 3.17).
+(M5a) **The Knife works only after dark**: at dusk, at night and in the Final Night hunt, never in grace, day or immunity. Since tasks (M4d) and quests (M5b) give the day work, the day (480 s) is a little longer than the night (300 s; round 10, A5). Impersonate and the night powers follow the same clock (3.2, 3.17).
 
 (M5a) The Emergency Bell rings only in grace and day; after dark only a body report or the missing-person roll-call opens a meeting.
 
@@ -95,9 +95,11 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 
 **Hunger** (M5a). A day starts a new round (`round` + 1). When a day starts round r, a living Killer whose last Knife strike was in round r − 1 − `hunger.cyclesWithoutKill` or earlier (round 0 when they never struck) is **Hungry**: from then on, every `hunger.trailEveryS` (1 s) in which they move, a glowing footprint (`hungerPrints`, showing their own height, gone after 30 s) appears on their tile, in every phase and whatever look they wear. With the default of 2, a Killer who never strikes is Hungry from the day of round 3. Any accepted strike, a voided one included, ends Hunger; an Accomplice who inherits the Knife counts as having struck in that round (3.2). Glowing footprints cannot be collected; anyone in the scene sees them.
 
-**Final Night** (M5a). When the server would start a day whose round is above `finalNight.afterCycle` (5; round 8, A171), after a night or after the immunity of a meeting, and nobody has won, the Final Night begins instead of that day. Everyone stays where they stand under night lighting; every Knife's cooldown is cut to at most `finalNight.killCooldownS` (20 s) and the Knife rests that long after each strike; the night powers wake for one more use; clues keep spawning. The hunt is short: it lasts `finalNight.huntS` (45 s; round 8, DECISIONS A171); a body report ends it at once (`finalNight.reportEndsHunt`; the Bell is silent after dark). Then Nightshade resolves, everyone moves to the square and the trial opens, the forced meeting (reason `final`): a discussion of `finalNight.trialS` (120 s, whatever the party size, longer than any other meeting's; the content check refuses a shorter one), then the vote of `phases.voteS` with no Skip (`finalNight.skipAllowed`) and the Case Board open. The trial runs through the same phases and events as any meeting. The plurality is ejected and revealed; a tie ejects nobody (`finalNight.tieEjectsNobody`). The match always ends there (3.8). A death during the hunt runs the win check as usual, so parity can still end the match first.
+**Final Night** (M5a). When the server would start a day whose round is above `finalNight.afterCycle` (12; round 10, A5, followup-4 2.8), after a night or after the immunity of a meeting, and nobody has won, the Final Night begins instead of that day. Everyone stays where they stand under night lighting; every Knife's cooldown is cut to at most `finalNight.killCooldownS` (60 s) and the Knife rests that long after each strike; the night powers wake for one more use; clues keep spawning. The hunt is short: it lasts `finalNight.huntS` (135 s; round 10, A5); a body report ends it at once (`finalNight.reportEndsHunt`; the Bell is silent after dark). Then Nightshade resolves, everyone moves to the square and the trial opens, the forced meeting (reason `final`): a discussion of `finalNight.trialS` (120 s, whatever the party size, longer than any other meeting's; the content check refuses a shorter one), then the vote of `phases.voteS` with no Skip (`finalNight.skipAllowed`) and the Case Board open. The trial runs through the same phases and events as any meeting. The plurality is ejected and revealed; a tie ejects nobody (`finalNight.tieEjectsNobody`). The match always ends there (3.8). A death during the hunt runs the win check as usual, so parity can still end the match first.
 
-**The Daily Train** (round 7, HollowMere only; DECISIONS A113). A map whose file names a `station` (a spawn on its hub: HollowMere's platform `overworld.platform` on the overworld's east edge) has a Train. On every day, `train.arriveAtS` (5 s) after the day begins, the Train arrives: the seats on the hub within `train.hearTiles` (20 tiles) of the platform hear `train_arrive`, and every seat's chat log gets the system line of UI.md 14.30. `train.deliveryAfterS` (8 s) later it delivers, with `train_brake` to the same seats when the world is in play. A meeting that opens before the arrival takes that day's Train with it; once arrived, the delivery follows whatever the phase. No Train in grace, at dusk, at night, in the Final Night or in the quick mode. The arrival and the delivery are the sim events `train.arrive` and `train.delivery`, which name no seat; the vendettas run on them (3.20). BlackPine has no Train.
+**The Daily Train** (round 7, HollowMere only; DECISIONS A113). A map whose file names a `station` (a spawn on its hub: HollowMere's platform `overworld.platform` on the overworld's east edge) has a Train. On every day, `train.arriveAtS` (20 s) after the day begins, the Train arrives: the seats on the hub within `train.hearTiles` (20 tiles) of the platform hear `train_arrive`, and every seat's chat log gets the system line of UI.md 14.30. `train.deliveryAfterS` (32 s) later it delivers, with `train_brake` to the same seats when the world is in play. A meeting that opens before the arrival takes that day's Train with it; once arrived, the delivery follows whatever the phase. No Train in grace, at dusk, at night, in the Final Night or in the quick mode. The arrival and the delivery are the sim events `train.arrive` and `train.delivery`, which name no seat; the vendettas run on them (3.20). BlackPine has no Train.
+
+**The day's dead and the Dusk Train** (round 10, C1; `docs/round9/world-mode.md` 6, followup-4 2.6). The morning Train brings back the day's dead: a seat killed in grace, the day or immunity by a creature's bite or a shot is **on the line** (3.22) until the next day's arrival, when it steps off at the platform and every seat's log reads the line of UI.md 14.47; the Final Night brings back every seat still on the line. A death after dark, the Knife, Nightshade, the vote and a vanished seat are for good, as is any death on a map without a Train. A second train, the **Dusk Train**, leaves `train.dusk.leaveAtS` (15 s) into every dusk: the sim event `train.dusk`, the whistle to the seats near the platform and a system line; it brings nobody back (the Hitman boards it, 3.33).
 
 ### 3.4 Investigation and clues
 
@@ -116,8 +118,9 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 | Silhouette | Height + scarf | – | Child |
 | Ledger | Last house entered per player | Per meeting | Butler |
 | Dropped items | The dead player's inventory | Never | Anyone |
+| Scratches (round 10, D5c; on the tile of a lock a pick opened) | That a lock was picked, never by whom: `value` and `dir` are 0 for every picker | 2 cycles | Anyone |
 
-Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
+Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb. **Round 10, B2:** the Constables verify every collectible clue at `law.speedMult` times a Detective's rate and brief its kind, scene and trait to everyone `law.briefingAfterS` after it appears (3.31).
 
 **Blood is held by the server** (round 8, 8L, A170): a client receives a figure's Blood only while it stands within the Blood clue's range of that figure (`clues.json` `blood.params.visibleTiles`), or when it is a ghost; nobody further away is sent it at all, and the client draws it only within the same range. The killer's own client always knows it is bloody.
 
@@ -143,7 +146,7 @@ Inventory: 24 slots (the round-10 screen splits them into a hotbar of 6 and a pa
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 
-**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); BlackPine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. **Shutter the windows (7M).** The co-op task is dealt like the others. Any seat within `coopRadiusTiles` of the shutters may hold E there, with or without the task on its list; the shared progress runs each tick that `coopPlayers` or more hold, pauses while fewer do, and starts again from nothing once everyone has let go. At `holdS` the task completes for every holder whose own list has it undone (a real one moves the bar, a fake one writes its alibi only) and the helpers earn nothing. Every holder sees the shared progress and the pause. **Fetching (7M).** At a task's source prop the same hold is the pick-up: it puts the task's deliverable (its tool, `toolQty` of it) in your pockets, once at a time (not while you carry that many, not without a free slot), and the puzzle at the target takes it back when the task is done. A fake list's holder goes through the same motion at the same shelf and takes nothing; inventories are private, so nothing public tells the two apart. The `taskBar` invariant (A133) holds the bar to what the lists say (so a fake task never moved it and the ghost cap held), lets no NPC seat hold a list, and matches every `taskDone` of the match log to a finished entry on its seat's list.
+**The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); BlackPine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9; round 10, A5: 29 to 48 for the 12-cycle match, capped by the pool until the chores and quests of D9 widen it) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. **Shutter the windows (7M).** The co-op task is dealt like the others. Any seat within `coopRadiusTiles` of the shutters may hold E there, with or without the task on its list; the shared progress runs each tick that `coopPlayers` or more hold, pauses while fewer do, and starts again from nothing once everyone has let go. At `holdS` the task completes for every holder whose own list has it undone (a real one moves the bar, a fake one writes its alibi only) and the helpers earn nothing. Every holder sees the shared progress and the pause. **Fetching (7M).** At a task's source prop the same hold is the pick-up: it puts the task's deliverable (its tool, `toolQty` of it) in your pockets, once at a time (not while you carry that many, not without a free slot), and the puzzle at the target takes it back when the task is done. A fake list's holder goes through the same motion at the same shelf and takes nothing; inventories are private, so nothing public tells the two apart. The `taskBar` invariant (A133) holds the bar to what the lists say (so a fake task never moved it and the ghost cap held), lets no NPC seat hold a list, and matches every `taskDone` of the match log to a finished entry on its seat's list.
 
 **Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
@@ -203,13 +206,13 @@ The Drifter and the Accomplice may be among the two undealt cards; a Killer neve
 
 | Players | Cabal in play | Kill CD | Discussion | Tasks each | Extra rules |
 |---|---|---|---|---|---|
-| 4 (practice) | Killer | 60 s | 60 s | 3 | Cabal needs living Village <= 1 |
-| 5 | Killer | 60 s | 60 s | 3 | As above; Doctor added; the Drifter may be dealt |
-| 6-7 | Killer (+ Accomplice at 7, if dealt) | 35 s | 75 s | 4 | Parity; Watchman added; the Drifter may be dealt at 6 |
-| 8-9 | Killer (+ Accomplice, if dealt) | 30 s | 90 s | 4 | Herbalist at 8, Gamekeeper at 9 |
-| 10 | 2 Killers | 40 s each, 15 s global lock | 90 s | 5 | Suspect sets decide |
+| 4 (practice) | Killer | 180 s | 60 s | 29 | Cabal needs living Village <= 1 |
+| 5 | Killer | 180 s | 60 s | 29 | As above; Doctor added; the Drifter may be dealt |
+| 6-7 | Killer (+ Accomplice at 7, if dealt) | 105 s | 75 s | 38 | Parity; Watchman added; the Drifter may be dealt at 6 |
+| 8-9 | Killer (+ Accomplice, if dealt) | 90 s | 90 s | 38 | Herbalist at 8, Gamekeeper at 9 |
+| 10 | 2 Killers | 120 s each, 45 s global lock | 90 s | 48 | Suspect sets decide |
 
-The Knife works only after dark (3.3), about 110 s of each 230 s cycle, so a cooldown buys at most two strikes per Killer per night at 4-5, four at 6-9 and three at 10. (M5a) The soak checks these values: the median match length at 6-10 seats is 20-25 min (round 8, A171: the owner's length; `pnpm auto --matches 50` at 6, 8 and 10 seats, timed from grace) and, on the owner's human playtests rather than all-NPC runs (NPCs rarely eject the Killer; A171), at most one third of matches reach the Final Night (`phases.nightS` is the M5a value; `phases.dayS` and `finalNight.afterCycle` are round 8's). The practice table (4 seats) ends early, mostly by its Cabal win, and stays short of 20 min; the phases are not stretched for it. Snowball guard: when living Village <= Cabal + 2, kill CD +10 s and the next kill spawns all 3 trait clues; when only one Killer remains with >= 6 alive, kill CD -5 s. All of these are `balance.json` values; the first playable ships plain plurality with Skip and enables the anti-stall rules one per playtest.
+The Knife works only after dark (3.3), about 330 s of each 810 s cycle (round 10, A5: the cooldowns are three times the old ones, so the strikes per night are unchanged), so a cooldown buys at most two strikes per Killer per night at 4-5, four at 6-9 and three at 10. (M5a) The soak checks these values: the median match length at 6-10 seats is 20-25 min (round 8, A171: the owner's length; `pnpm auto --matches 50` at 6, 8 and 10 seats, timed from grace) and, on the owner's human playtests rather than all-NPC runs (NPCs rarely eject the Killer; A171), at most one third of matches reach the Final Night (`phases.nightS` is the M5a value; `phases.dayS` and `finalNight.afterCycle` are round 8's). The practice table (4 seats) ends early, mostly by its Cabal win, and stays short of 20 min; the phases are not stretched for it. Snowball guard: when living Village <= Cabal + 2, kill CD +30 s and the next kill spawns all 3 trait clues; when only one Killer remains with >= 6 alive, kill CD -15 s. All of these are `balance.json` values; the first playable ships plain plurality with Skip and enables the anti-stall rules one per playtest.
 
 ### 3.10 V1 cut list
 
@@ -233,7 +236,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 
 - **Seats.** Start is enabled with at least 1 human. With fewer than `players.min` players the server adds NPCs up to `players.min` when Start is accepted, before it deals, so the full deck row is always dealt (M3c; the A28 cut row is gone); the leader may add NPCs by hand in the lobby with "Add NPC" up to `players.max` and remove them again, the newest seat first (M3c). A human joining a full lobby takes an NPC's seat, the newest first (M3c). (M5a) An NPC seat is never Ready the moment it appears: a seat added with Add NPC, and every NPC seat when a match returns to the lobby, turns Ready 2-9 s later (`npc.ready.delayS`), each on its own draw, the way a human clicks.
 - **Same game.** NPCs are dealt from the same deck and can hold any card, the Killer included; their cards are as secret as a human's. Rules, the practice label at 4 (3.1, 3.9) and any ranking depend only on the total player count, never on how many seats are NPCs. (M5a) In the main mode an NPC walks as its card's character like every seat; an NPC cover role wears the look it was shown and never Impersonates (3.17); an NPC holding a night power uses it as 3.2 says, at the moment "Meetings, the role card and night powers" below gives.
-- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; there are none in M5a, so at every station it simply stands, idle). Its ready and vote ticks are spread over the spans a human uses (below). (Round 8, 8T) An NPC never writes in the named chat; it writes meeting notes (3.8), which carry no speaker, so a
+- **Hidden seats.** Nothing a client receives marks a seat as an NPC: `isNpc` lives in room memory only, and NPCs take human-style names from a name pool, are never the party leader, and carry an id of the same shape as a session id; the party publishes only how many seats are NPCs, never which (M3c). (M5a) **Everything an NPC shows is something a human can do the same way in the same place.** It walks at walking speed and never runs or sneaks. It never turns on the spot: it faces where it last stepped, and it ends every approach to a station with a step toward the station. It starts a hold only with the verb a human uses (`act.hold`), so it plays the `interact` animation only while a hold the server accepted from it runs, and it works with that animation only at stations where a human could start the same hold (`routines.json` `holds`; round 10, D1: the gather classes and the counters, Chores below). Its ready and vote ticks are spread over the spans a human uses (below). (Round 8, 8T) An NPC never writes in the named chat; it writes meeting notes (3.8), which carry no speaker, so a
   table cannot tell its notes from a human's: each NPC seat, whatever its card, means to write 1 to 3 notes a meeting
   (`talk.npc.notesPerMeeting`), at ticks drawn over 0.05-0.8 (`talk.npc.windowFrac`) of the discussion plus the vote
   time from its own `talk:<seatId>` stream, and a note the limits refuse waits for the next tick. Its lines come from
@@ -250,7 +253,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
 
 - **Routines (M5a, main mode).** In a world phase an NPC runs a routine instead of the M3c wander.
   - **Persona.** When the match is dealt, each NPC draws a **home**, one interior scene of the map that is open at the party's size and lit at night (see Night; no two NPCs share a home while the map has enough), and **3 favourite stations** (`npc.routine.favouriteStations`), in 3 different scenes where the map allows.
-  - **Stations.** A station is a prop whose kind `routines.json` lists under an activity: **work** (the task benches and sources, the pump, the flour bin, the oven, the basins, the goat, the fence, the shutters) by day; **social** (the notice board, the dartboard, the bell, the lamps, the furniture and decorations) by day and by night; **rest** (the lantern posts) by night. Grace, day and immunity are the **day** class of phases; dusk, night and the Final Night hunt the **night** class (`routines.json` `phaseClasses`). Props of any other kind (the kit chest, the teaching clue, keys, gas pockets, locked doors, the frozen round-4 bakery props) are never stations.
+  - **Stations.** A station is a prop whose kind, or whose class in the logic table (3.14, round 10 D1), `routines.json` lists under an activity; a prop's class wins over its kind: **work** (the task benches and sources, the pump, the flour bin, the oven, the basins, the goat, the fence, the shutters) by day; **gather** (the lumber, stump, timber-set, boulder, rock-pile and ore-pile classes) by day; **trade** (the shop counters) by day; **social** (the notice board, the dartboard, the bell, the lamps, the furniture and decorations) by day and by night; **rest** (the lantern posts) by night. Grace, day and immunity are the **day** class of phases; dusk, night and the Final Night hunt the **night** class (`routines.json` `phaseClasses`). Props of any other kind or class (the kit chest, the teaching clue, keys, gas pockets, locked doors, the frozen round-4 bakery props) are never stations.
   - **Choosing.** Whenever an activity ends, the NPC draws the next one from its phase class's weights:
 
     | Class | work | stroll | idle |
@@ -258,10 +261,15 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
     | Day (`npc.routine.weights.day`) | 0.5 | 0.3 | 0.2 |
     | Night (`npc.routine.weights.night`) | 0.2 | 0.3 | 0.5 |
 
-  - **Work.** The NPC walks to a station and stays 12-30 s (`npc.routine.stationDwellS`): about 2 stations in a 60 s day. A station qualifies when its activity is open in the phase class, its prop and scene are present and open at the party's size, its scene belongs to the map and is reachable, at night its scene is lit, it is not the station the NPC just left, and no other NPC is at it or heading for it. Until the NPC's **scene dwell** has run (30-90 s, `npc.routine.sceneDwellS`, drawn at every scene entry and at every placement on the square) only stations of its own scene qualify; once it has run, only stations of scenes one open door away do, so the NPC moves on one scene at a time and never passes through a scene without its dwell (a Killer NPC's hunt, below, is the exception). It takes a favourite when one qualifies, else a qualifying station at random; when no station of another scene qualifies it falls back to its own scene's, and when none qualifies at all it strolls instead. It stands at the centre of a floor tile orthogonally next to the station, inside the verb reach (1.5 tiles, 3.7), and takes one last step toward the station, so it faces it. If another seat already stands on that tile when it arrives, it idles where it is and picks again. Where `routines.json` `holds` names a hold for that kind of prop, it works in cycles: it starts that hold with the human verb and, when the hold ends, pauses 1-3 s (`npc.routine.workPauseS`) before the next; a refused hold ends the cycles for that visit and it just stands. Where `holds` names none (every station in M5a), it stands there, idle, for the whole dwell.
+  - **Work.** The NPC walks to a station and, where `holds` names a hold for it, works it for up to 12-30 s (`npc.routine.stationDwellS`); a station with no hold is a **stop** of an idle's length (`npc.routine.idleS`), which counts as its stand between actions. A station qualifies when its activity is open in the phase class, its prop and scene are present and open at the party's size, its scene belongs to the map and is reachable, at night its scene is lit, it is not the station the NPC just left, no other NPC is at it or heading for it, no other seat is running a hold on its prop, and the NPC can work it now (Chores). Until the NPC's **scene dwell** has run (30-90 s, `npc.routine.sceneDwellS`, drawn at every scene entry and at every placement on the square) only stations of its own scene qualify; once it has run, only stations of scenes one open door away do, so the NPC moves on one scene at a time and never passes through a scene without its dwell (a Killer NPC's hunt, below, is the exception). It takes a favourite when one qualifies, else a qualifying station at random; when no station of another scene qualifies it falls back to its own scene's, and when none qualifies at all it strolls instead. It stands at the centre of a floor tile orthogonally next to the station, inside the verb reach (1.5 tiles, 3.7), and takes one last step toward the station, so it faces it. If another seat already stands on that tile when it arrives, it idles where it is and picks again. Where `routines.json` `holds` names a hold for that class or kind of prop, it works in cycles: it starts that hold with the human verb and, when the hold ends, pauses 1-3 s (`npc.routine.workPauseS`) before the next; a refused hold ends the visit on the next tick (round 10, D1; before it, the NPC stood out the dwell).
+  - **Chores (round 10, D1; living-world.md 1.8).** An NPC seat is never idle: its routine is a chain of real actions a watcher reads as a player's, and it idles only between actions.
+    - **Gather.** At a logic-table prop it holds `act.hold {action: 'interact'}` through the same resolver as a human (3.14). The station qualifies only while some mode runs with the tools the seat holds and the prop is not spent, so it meets the same walls as a human: no axe, no chopping, and bare hands break only rubble. The drops land in its own pack.
+    - **Trade.** At a shop counter it opens the shop with `act.hold {action: 'shop'}` and sells, with `act.sell`, everything it holds that the shop buys, then pauses 1-3 s (`workPauseS`) and moves on. A counter qualifies only while the seat holds something its shop buys, so an NPC sells only what it gathered, crafted or bought, and an empty pack never walks to a counter.
+    - **Nothing waits on it.** When another seat, human or NPC, runs a hold on the prop it is working, the seat finishes its own hold, starts no other, and steps off after a 1-3 s pause (`workPauseS`, never on the same tick); no NPC picks a prop another seat is holding.
+    - **Between actions.** A stand (an idle, a stop, a leg pause) is never followed by another: the next choice after one is an action, the idle band of the draw read as work or stroll by their weights (no extra draw), and a walk that cannot start after a stand turns into a second of the M3c wander (Fallback) rather than an idle. An idle that runs out is followed on the same tick.
   - **Stroll.** The NPC walks to a random floor tile of its own scene 3-10 tiles away along a path (`npc.routine.strollTiles`).
-  - **Idle.** The NPC stands still 2-8 s (`npc.routine.idleS`), facing where it last walked.
-  - **Legs and pauses.** A walk inside one scene that ends at a portal, and a stroll, is a **leg**; after a leg the NPC idles 2-8 s with chance 0.6 (`npc.routine.idleChanceAfterLeg`); the last walk to a station ends in work, not in an idle. An NPC that has walked 12 s (`npc.routine.maxWalkS`) without standing still for 2 s (`idleS` minimum) stops and idles 2-8 s, then goes on with what it was doing. A goal it has no path to, whose crossing is refused, or on which it moves less than a quarter tile in 2 s (`npc.routine.stuckS`) is dropped: it idles and picks again, never the same station.
+  - **Idle.** The NPC stands still 2-6 s (`npc.routine.idleS`; 2-8 s before round 10, D1), facing where it last walked.
+  - **Legs and pauses.** A walk inside one scene that ends at a portal, and a stroll, is a **leg**; after a leg the NPC idles 2-6 s with chance 0.6 (`npc.routine.idleChanceAfterLeg`); the last walk to a station ends in work, not in an idle. An NPC that has walked 12 s (`npc.routine.maxWalkS`) without standing still for 2 s (`idleS` minimum) stops and idles 2-6 s, then goes on with what it was doing. A goal it has no path to, whose crossing is refused, or on which it moves less than a quarter tile in 2 s (`npc.routine.stuckS`) is dropped: it idles (or, just after a stand, wanders a second) and picks again, never the same station.
   - **Clues.** The first time an NPC sees a clue it has not collected (inside its vision radius, 3.7), it decides with chance 0.5 (`npc.react.collectChance`) to collect it; at its next choice, if it is still in the clue's scene and the clue is still there, it walks to the clue and holds Collect exactly as a human does (2 s, 3.4), and the entry goes to a Notebook nothing reads. It never tries during immunity, when no verb works.
   - **Fallback.** In a scene with neither a qualifying station nor a stroll tile, the NPC walks as in M3c: a new heading every 1-3 s (`npc.wander.stepMinS` to `npc.wander.stepMaxS`), aimed at the nearest portal with chance 0.25 (`npc.wander.portalSteerChance`), a portal in reach taken with chance 0.4 (`npc.wander.portalChance`), until it reaches a scene with somewhere to go.
   - **Targets.** An NPC walks for about a third of a day. The server tests hold every NPC to walking at most 60% and at least 10% of a day, to a still stretch of at least 2 s in every 20 s of day, and to no portal crossing before its scene dwell has run (outside the exceptions below).
@@ -405,6 +413,9 @@ it.
 | Lockpicks | 1 Tin Ore | a basin | 3 s |
 | Lantern | 1 Tin Ore, 1 Pine Resin | an oven | 4 s |
 | Crowbar | 2 Tin Ore, 1 Timber | an oven | 4 s |
+| Axe | 2 Timber, 1 Stone | a basin | 4 s |
+| Pickaxe | 1 Timber, 2 Tin Ore | a basin | 4 s |
+| Hammer | 1 Timber, 1 Tin Ore | a basin | 3 s |
 
 Basins stand in the apothecary, Crumb's Ovens, the bunkhouse and the forge; ovens in Crumb's Ovens and the bunkhouse,
 so both maps craft every tool at the Small profile. The Torch is a carried light like the Lantern (radius 4, 3.5) and
@@ -418,8 +429,45 @@ by kind, and the content check refuses a scene that places a prop with no decisi
 (a kind, a stem, a resource node or a locked portal), and no prop belongs to two classes, so a hold on it has one answer.
 An **interaction** is a verb on a class, with its modes best first: the tool a mode needs (a capability tag and tier,
 or bare hands), a hold or a mini-game, its drops or loot, the wear and the noise, and a failure line per refusal
-reason. Today the table registers the live kinds as classes and holds no interaction, so nothing plays differently; the
-resolver (A10) and the tool walls (A11) give it behaviour.
+reason. A tool is an item with capability tags (`cut`, `break`, `dig`, `pick`, `pry`, `skin`), each with a tier, and
+optionally a number of uses.
+
+**Interacting** (round 10, A10) is a hold (E) on a prop, beside the older verbs. The server finds the prop's class and
+its interaction (the one the held item named, else the first the seat can run), then the first mode whose tool the seat
+holds; a seat with none is refused `NEED_TOOL`, naming the plainest tool that would do. A prop already changed is
+refused `NOTHING_THERE` until it comes back; an interaction not built yet answers `NFY`. Moving, a phase change, a lost
+tool or a full pack cancel the hold with nothing done. At its end the drops land (their amounts drawn from the `loot`
+stream), the tool loses `wear` uses and breaks when its uses run out, the prop takes its new state (public to the
+scene, never who changed it) until its respawn, and the mode's noise sounds. An NPC seat's hold runs through the same
+rules.
+
+**Tool walls** (round 10, A11). The piles of the world open only to their tool; bare hands get nothing, and the
+refusal `NEED_TOOL` names the tool. Tools carry tags and uses: the Axe (`cut` 1, 20 uses), the Pickaxe (`break` 1 and
+`dig` 1, 20), the Hammer (`pry` 1, 40), the Crowbar (`pry` 1, 20), the Spade (`dig` 1, 20) and the Lockpicks (`pick` 1);
+none is role-bound, and the content check refuses a wall that no neutral tool can run, or whose tool no seat can come by
+(a recipe's product or a loot-table item; logic-table 10.1).
+
+| Prop (stems) | Tool | Hold | Drops | Wear | Comes back |
+|---|---|---|---|---|---|
+| Woodpile, firewood, log, fallen log, log basket | Axe | 4 s | 2 to 3 Logs | 1 | 300 s |
+| Stump | Axe | 3 s | 1 Log, Resin half the time | 1 | 900 s |
+| Mine timber set | Axe 5 s, 2 Logs; or Crowbar 6 s, 1 Log | | | 1 | 600 s |
+| Boulder | Pickaxe | 6 s | 2 to 3 Stone, Tin Ore a quarter of the time | 2 | 1200 s |
+| Rock pile | Pickaxe | 4 s | 2 Stone | 1 | 600 s |
+| Rubble | Pickaxe as the rock pile, or bare hands | 12 s | 1 Stone | 0 | 600 s |
+| Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
+| Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
+
+**Logs** are the raw wood of a pile; they stack as a material and become Timber only at a saw (round 10, D3): the mill's
+head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
+Timber in 8 s, bare-handed, by day, with no tool wear and no noise yet. A seat with no Log is refused `NEED_ITEM`. The Timber nodes
+still give Timber directly (they are the camp's cut stacks). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**The bakery's parts and the Herb Bread** (round 10, D4a; owner answer LT1). Dishes are made in parts at the stations of Crumb's Ovens, on Hollowmere only (a recipe's optional `maps` lists where its stations stand). Flour (bought at the bakery's counter) is mixed into Dough at the dough mixer (2 Flour, 4 s), proofed at the proofing cabinet (8 s), and Herbs are chopped into Herb filling at the cold shelves (2 Herbs, 3 s). The brick oven then bakes a Wake Loaf from Proofed dough (5 s) or Herb Bread from Proofed dough and Herb filling (6 s). Anyone may make any step; no step marks the Baker. Eating the Herb Bread (the `eatHerbBread` ability, a `consumes` verb like `eat`) cures what any food cures and gives the private **Resistant** effect (`effects.json`, `dish`, no status bit): a Poisoned that starts while it lasts runs half as long (`poisonFactor`). It lasts 780 s, about to the next dawn; eating another dish replaces a running dish buff, so one runs at a time. Nightshade's poison (3.2) is a different mechanism and ignores it. The proofing time is a short hold, not a tenth of a day, and the water is not modelled: there is no filled bucket. The rest of the dishes wait for their fillings (D4b).
+
+**Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
+Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
+Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
+The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's, through the same resolver: it breaks rubble by hand, the cleared pile stays no station until its time has run, and a seat that finds one spent walks on. No seat is dealt a free tool, since a seat working a tool-walled pile before any human could own the tool would tell an NPC; an NPC comes by a tool as any seat does (a card's start kit, or buying it at the general store; a later step, D2b).
 
 ### 3.15 Mobs
 
@@ -433,10 +481,10 @@ they are drawn from the scene state for everyone in the scene.
 
 | Creature | Where | Speed | Senses | Flees light within | Attack | Bite (3.22) | Health | Kills |
 |---|---|---|---|---|---|---|---|---|
-| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 25, Bleeding 50% | 36 | yes, cause `wolf` |
-| Boar | the Fenwood, BlackPine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 18, Bleeding 30% | 48 | yes, cause `creature` |
-| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 6 | 10 | yes, cause `creature` |
-| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 5, Poisoned 50% | 8 | yes, cause `creature` |
+| Wolf | the forests' wolf loops, dusk and night | 3.6 tiles/s | 6 tiles | 4 tiles | after 1 s in reach | 12, Bleeding 35% | 36 | yes, cause `wolf` |
+| Boar | the Fenwood, BlackPine Woods, day and dusk | 3.2 tiles/s | 4 tiles | 2 tiles | after 1.5 s in reach | 9, Bleeding 20% | 48 | yes, cause `creature` |
+| Bat | the caves | 4 tiles/s | 5 tiles | 3 tiles | after 2 s in reach | 3 | 10 | yes, cause `creature` |
+| Rat | the caves past the Tin Gallery mouth | 2.5 tiles/s | 3 tiles | 2 tiles | after 2 s in reach | 2, Poisoned 30% | 8 | yes, cause `creature` |
 
 **Behaviour.** A creature idles or roams its loop; it chases a living seat it senses and can see (3.7) for at most
 6 s (`mobs.chaseS`), then returns to its spawner and starts no new chase for as long; it flees any lit flame within
@@ -446,7 +494,7 @@ tile paths whose every tile lies inside its leash, so it never strays further; a
 pulled in to its edge, and at each point it pauses as a wandering NPC does (`npc.wander.stepMinS` to `stepMaxS`). A
 seat in transit or a ghost is never sensed, and nothing it senses depends on a card. (6G; round 8, 8A) Its attack
 lands its row's bite (`mobs.json` `dmg`, each effect by its chance) each time the seat has stayed in reach (1.5
-tiles, 3.7) and in sight for its attack time; a bite is a row of the damage table of 3.22, so the health it takes
+tiles, 3.7) and in sight for its attack time (round 10, A6: bites are about half what they were, so a whole wolf chase of `mobs.chaseS` leaves about 28% health, and a second chase before healing still kills; the attack times are unchanged); a bite is a row of the damage table of 3.22, so the health it takes
 regenerates and its Bleeding or Poisoned is cured like any other hit's. A bite that takes a seat to zero health is a
 death, cause `wolf` for a wolf and `creature` for the boar, the bat and the rat (the owner's answer, DECISIONS A134:
 creatures kill): the body is left where it fell and the kill scream rings (3.7), with no clue of a killer, so the
@@ -550,6 +598,11 @@ the tap as they add a step to the others.
 
 **Looks.** Every card of a deck is a character, a row of `looks.json`: a portrait (the role card, the meeting roster, the reveals, the end screen) and, for a non-cover card, a world character drawn in the 8 directions under `char/<lookId>/<anim>/<dir>` at the seat's height scale with its scarf tinted. The three cover cards (Killer, Accomplice, Drifter) have portraits only and no world character: nobody ever walks as a Killer. Look ids are public and name the character (`vicar`, `baker`), and every client loads the characters and portraits of the match's whole deck before the role card closes, so what a client loads never depends on its own card.
 
+**Figure looks (round 10, B1).** Besides the cards' looks and the villager family, `looks.json` `figures` holds
+the looks of figures that are not seats and not townsfolk: the `constable` (3.31) alone. A figure look has no card
+and no portrait, and a cover can never take one. Its atlas keys are `char/constable/<anim>/<dir>`; until its art
+lands the client draws its fallback villager body in its place; the wire always says `constable`.
+
 **The public look.** `Player.look` holds each seat's look id. It is empty for every seat during the role card and is written for every seat in the same tick when the card closes: a non-cover seat's look is its card's, a cover seat's is the look it picked. From then on the roster, the nameplate, the meeting portraits and a seat's body all show that look, for the whole match.
 
 **The cover pick.** On the role card every seat sees the deck list and the look it will walk as. A cover role sees, instead of its own look, a picker whose **hints** are undealt cards, the first one selected from the start. Each cover role is shown every undealt non-cover card that no other cover role needs. A lone cover role sees them all (both, at 4 players); Cabal mates share theirs and pick in turn (the server refuses a look a mate wears); the Drifter sees only its own. A cover role that never picks wears its first hint. Every cover role always has at least one (3.9), and wearing a hint doubles nobody. The picker also offers the deck's other non-cover characters: wearing a dealt character's look is allowed and puts two seats in the same look, which the table will read as a counter-claim: one of the two is a cover. A cover role may change its pick as often as it likes until the card closes; Cabal members see each other's picks live. The cover is fixed for the match. While the card is up, Ready is held privately (the roster's Ready ticks stay clear), so a long pick tells nobody anything; the card ends when every seat is Ready or after 20 s (`phases.roleRevealS`).
@@ -581,7 +634,7 @@ Round 6 (ROADMAP M5c). Cutscenes are data (`packages/content/data/cutscenes/`) p
 
 **Video steps (round 7, 7A, DECISIONS A101).** A cutscene may play one of the game's videos (a row of `assets/video/manifest.json`): full frame, under the cutscene's captions and its Skip, with the video's own sound at the player's music volume (muted if the browser refuses sound without a tap). The cutscene ends when the video ends, or at its `maxS` if that comes first. A video that cannot play (no row, no file, a decode error) is dropped and the rest of the cutscene plays over the world. The memorials use it (DECISIONS A113); captions meant to sit over the picture start with it (`withPrevious`).
 
-**Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote, a wolf or, since round 8 (8A, 3.22), another creature's bite (`creature`), Bleeding (`bled`) or Poisoned (`sickened`) is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
+**Death cutscenes (6J).** A seat that dies by the knife, poison, the Gamekeeper's shot, a vote, a wolf or, since round 8 (8A, 3.22), another creature's bite (`creature`; Bleeding and Poisoned no longer kill, round 10, A6) is told so in its private `killed`, which names the cutscene of that cause (`cutsceneId`); a vanishing has none. The client plays it before the ghost handoff: a sound, one whispered line, and the last frame held for four seconds at most, skippable like the opening. The id is the victim's own news, so it reveals nothing the `cause` beside it does not. A seat voted out hears it while the meeting has the World asleep, so its cutscene plays when the World is rebuilt after the meeting.
 
 **Music (6L).** Each map plays one playlist per class, chosen by the phase and mapped in `music.json`: `loading` from the map's load to the opening (no map lists one since round 7: the lobby piece plays on through the load, so a load that finishes after the opening has started can never cut its piece off), `opening` with the opening cutscene, `lobby` between matches, `day` (dawn included), `dusk`, `night`, `meeting` (the discussion, the vote, the reveal and the immunity beat), `finalNight` and `gameOver`. A phase that stays in its class changes nothing, so a track is never restarted. **The opening piece (round 7, 7A, DECISIONS A101)** is the map's intro track of speech and music: it starts when the opening's `cutscene` message arrives, plays once and whole, never loops, and is silent at its end; the class the phase wants by then (the `day`, even while grace still runs) cross-fades in only when the piece ends or the seat skips the opening. A seat that skips also skips the rest of the piece. Port-au-Levain's piece waits for its map (round 8). Playlists cross-fade; their tracks, gains and fade seconds are in `audio/music/manifest.json`. Music is fetched only after Start (the lobby warms the first track of the picked map's day theme, never more) and has its own budget (ASSETS 6.8), separate from effects. Every player has a music slider, an effects slider and a mute (UI 14.22), kept on their own device and never sent; a class with no playlist, or a playlist with no track, is silence. No role, cover or secret is a class: the server sends nothing, and the pick depends only on public phases.
 
@@ -745,18 +798,20 @@ the health (A89). A Weakened striker's fist lands half its damage.
 | Fists (`strike`, every card) | 8 | Dazed 10%, Weakened 20% | knocked out |
 | Mugging blow (3.24) | 8 | as fists | knocked out |
 | Slingshot (`slingshot`, the Child) | 4 | Stunned | knocked out |
-| Wolf bite | 25 | Bleeding 50% | death, cause `wolf` |
-| Boar bite | 18 | Bleeding 30% | death, cause `creature` |
-| Bat bite | 6 | none | death, cause `creature` |
-| Rat bite | 5 | Poisoned 50% | death, cause `creature` |
-| Bleeding | 1.5 per second | none | death, cause `bled` |
-| Poisoned | 0.5 per second | Weakened, 2% per second | death, cause `sickened` |
+| Wolf bite | 12 | Bleeding 35% | death, cause `wolf` |
+| Boar bite | 9 | Bleeding 20% | death, cause `creature` |
+| Bat bite | 3 | none | death, cause `creature` |
+| Rat bite | 2 | Poisoned 30% | death, cause `creature` |
+| Bleeding | 1.5 per second | none | stops at 1 health (Wounded) |
+| Poisoned | 0.5 per second | Weakened, 2% per second | stops at 1 health (Wounded) |
 
-A death by `bled` or `sickened` leaves the body where the seat fell, with no scream, no killer and no clue; a death by
-`creature` is like `wolf` (3.15). Each of the three has its death cutscene (3.18), one whispered line as the others. The
+**Effects stop at 1 health** (round 10, A6). Bleeding and Poisoned drain health but never to zero: they leave the seat Wounded (under `body.woundedBelow`) until cured, and cure on the normal items. Only the Knife, Nightshade, the Last Shot, the vote and a creature's bite end a life, so the causes `bled` and `sickened` and their two death cutscenes retire. A death by
+`creature` is like `wolf` (3.15), with its death cutscene (3.18), one whispered line as the others. The
 dead seat's body row empties with the ghost handoff. Bodies tick only in the
 world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
 roll on the body's own stream, never a secret one.
+
+**On the line** (round 10, C1; `docs/round9/world-mode.md` 6, `phases.md` 6). A seat that dies by day to a bite or a shot, on a map with a Train (3.3), leaves the world until the next morning's arrival. Its purse drops where it fell as coins, a find for whoever reaches the body, and its hotbar, pack and belt are lost with the body (3.30's `strip`; until the town chest holds lost property, they lie nowhere); bound kit (`onDeath: kept`), the three equipment slots and the bank stay. Its role card, cover, vendetta, notebook and quests are kept. BlackPine has no Train (3.3), so its daylight deaths stay final; whether it gets a station is an open question for the owner. It gets no ghost view: its `killed` message names no role, its view holds no scene and no figure, the ghost channel neither reaches it nor takes its lines, and it moves and acts on nothing; only its own `Private.onLine` says it waits. A dying Gamekeeper on the line fires no Last Shot, a Killer on the line passes no Knife (3.2), and the win check counts a seat on the line as living, since it comes back. At the arrival the Undertaker's cart takes its body, and the seat stands on the platform with `respawn.hp` (50) health, full stamina and no effects; its cooldowns resume where they stood, and its public `alive` is true again.
 
 **Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
 the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`,
@@ -859,7 +914,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   seat in a world phase other than the immunity window buys and sells while the counter stays within
   `doors.reachTiles`. A purchase is refused, and nothing changes, when the purse or the inventory falls short. The
   bakery sells flour and the Wake Loaf, the apothecary bandages and salts, the general store (HollowMere's tavern bar, BlackPine's
-  lodge) rope, lantern oil, candles and planks, and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
+  lodge) rope, lantern oil, candles, planks and the three tools (the Axe, the Pickaxe and the Hammer, round 10 D2), and the Gamekeeper's stall (HollowMere's forest edge, BlackPine's
   lodge) snares and torches. The market (HollowMere's square, BlackPine's camp) sells nothing and buys timber, stone,
   resin, herbs, mushrooms and tin ore. No shop trades a role's kit, and an item a shop both sells and buys pays
   less than it asks.
@@ -885,6 +940,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+
+- **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
+  (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
+  another. While a fare is owed, the town's wages and sales into the seat's purse pay `respawn.wageMult` (half) of
+  their amount; the half Scrip a payment leaves is carried to the next (two 3-Scrip tasks pay 1, then 2), and the
+  cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
+  counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
+  there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
+  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's
+  dear stall and the Clerk's labour errand come with C2b.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
@@ -985,6 +1050,19 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
+**Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
+guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
+`townsfolk` (`guard`, with `count` figures, the Constables 2) spawns after the counted townsfolk, so it never takes
+a place of `townsfolk.count`. Its **post** is the first prop on the map of its row's kinds (the second Constable
+starts from the row's second kind, so the two keep different posts); it walks only its row's props in the post's
+scene within `guard.leashTiles`, and by night it stands at its post. It has the reduced body of a figure. A seat's
+fist or slingshot (3.22) lands on a guard's body like a seat's: at zero health it is knocked out for `body.koS` and
+stands down. A guard still standing turns on the seat that struck it and swings the fist's row at it on the strike's
+cooldown while that seat stays in its scene, within its leash and on its feet, for `guard.angerS`; then it walks back
+to its post. Its blows knock out, never kill. A guard reads only who struck it, never a card, and never mugs. The
+Knife does not reach a guard yet (C5). A Constable wears the `constable` look (3.17); the Clerk keeps the villager's.
+`figureNotSeat` accepts the `figures` looks of `looks.json` beside the villager family.
+
 **The mugging (8E, A180).** A Hungry, Angry or Desperate figure or NPC seat that is alone with one seat rolls each
 second for a mugging, on its own stream (`townsfolk:<figure>`, or the NPC's choices stream) and only while in such a
 mood, so a calm match draws nothing new. "Alone" is the A100 room rule (3.12): any scene but the map's hub, the only
@@ -1041,19 +1119,175 @@ Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds
 
 ### 3.29 The lock-pick mini-game
 
-Round 10, D5 (`docs/round9/gdd-map.md` 2.3). Not built yet: the step that builds it writes this section.
+Round 10, D5 (`docs/round9/gdd-map.md` 2.3; `docs/round9/logic-table.md` 8.5; owner answer LT2). D5a is the rules and
+the server; D5b the screen; D5c the scratch clue and the fine.
+
+**What opens it.** A locked door (the `lockedDoor` class, 3.14) with a Lockpicks in the pack: `act.hold {action:
+'interact'}` on it opens the mini-game in place of a hold, and the Lockpicks (`tool.pick`) is the tool of the wall. A seat
+without one is refused `NEED_TOOL`. The manor study door (`mu.study_door`) is the one lock placed; the curfew doors wait
+for rent in kind (D7).
+
+**The lock.** It has pins by tier (`balance.minigames.lockpick.pinsByTier`: 3, 4, 5; every placed lock is tier 1), each with
+a set point along its lift, dealt on the `locks` stream when the lock is first picked in a match and kept for the match.
+The picker's client alone gets `minigameStart {kind: 'lockpick', public: {pins, setPoints, band, snapAt, minAttemptS,
+maxAttempts}}`: the set points are a puzzle, as the tap bands are, so the click can be felt. A pick of a lower tier than the
+lock has a narrower band (`lowerTierBandMult`). The attempt sounds as the interaction's noise from its start (3.7).
+
+**The answer** is a trace of attempts `{t, pin, lift, tension}` that the server replays (`rules/minigames.ts
+lockpickOutcome`): a lift within `band` of the pin's set point sets it, a tension of `snapAt` or more snaps the pick, and
+all pins set opens the lock. Times ascend and keep `minAttemptS` apart and a trace holds at most `maxAttempts`, so no
+trace is faster than a hand. A trace that leaves a pin unset or is malformed is `BAD_REQUEST` and the board stays open.
+
+**Opening and snapping.** An opened lock becomes the public prop state `open` (3.14; it names no one). A snapped pick
+spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way. Nothing else changes in public view: the
+opened lock leaves a Scratches clue (3.4), the same whoever picked, and the interaction's `fineChance` (rolled on the
+`locks` stream, a stream no client sees) may fine the picker `economy.json` `trespassFine` Scrip, taken as any fine is. NPC seats do not pick yet (their routine reaches
+only props a mode of no mini-game works, 3.12 Chores).
+
+**The screen** (round 10, D5b). The picker's dialog draws one column per pin and a tension gauge with the snap line, and never the set points: a pin that is lifted into its band under light tension clicks (a tone, a buzz, a jolt). Letting go of the pick records an attempt; the trace of attempts is the answer, and the board ends when every pin is set or the pick snaps.
 
 ### 3.30 The inventory and crafting
 
-Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4). Not built yet: the step that builds it writes this section.
+Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4; `docs/round9/logic-table.md` 8.6; DECISIONS A245). A12 builds the
+slots and their rules on the server; A13 writes the screen and the crafting grid into this section.
+
+**The slots.** A seat's inventory is `items.inventorySlots` general slots plus a belt and three gear slots, all in its
+private view only (nobody else's client receives them):
+
+| Area | Slots | Holds |
+| --- | --- | --- |
+| Hotbar | the first `balance.inventory.hotbar` general slots | anything; the selected one is the held item |
+| Pack | the rest of `items.inventorySlots` | anything |
+| Belt | `balance.inventory.belt` | items of kind `tool` only |
+| Head, body, weapon | one each | an item whose `equip` names that slot (none until D6) |
+
+A stack names its own slot, and one slot holds one stack. An item stacks up to `balance.resources.stackMax` of its kind
+(materials and food); any other kind stacks 1.
+
+**Adding.** A gain (a gather, a craft, a quest reward, a pickup) tops up the seat's open stacks of that item first, then
+opens new ones: a tool on the belt first, then the hotbar, then the pack; anything else in the hotbar, then the pack.
+A gain that does not all fit changes nothing and refuses `PACK_FULL`. A take empties the newest stacks first.
+
+**Moving and holding.** `inv.move` moves a stack into an empty slot, onto a stack of the same item as far as it fits,
+or swaps it with the stack there when each slot takes the other's item; anything else refuses `BAD_REQUEST`, since the
+screen offers only the moves that land. `inv.select` picks the held hotbar slot. Both are consumed in `step()`.
+
+**The screen** (A13b, UI.md 14.44). The inventory screen (I) draws the hotbar, the pack, the belt and the head, body
+and weapon slots as grids with the crafting square beside them. Pick a stack, then a slot: the slots that would refuse
+the move are dimmed, so the screen offers only the moves that land. The hotbar strip is on screen during a match and its
+slots, or the keys 1 to 6, select the held one. The square previews the product and Take sends `craft.grid`.
+
+**A dropped body.** When a body is dropped (the train's return, a robbery), it loses the hotbar, the pack, the belt and
+the purse. Bound kit (`onDeath: kept`), the gear slots and the bank stay with the seat. A match's end empties the
+inventory and the held slot resets to the first.
+
+**The crafting grid** (A13a). `craft.grid {size, cells}` sends the grid row by row: `size` 2 (the pocket square, always
+there) or 3 (within reach of a workbench), each cell an item id or empty, one unit per cell. The server matches a hand
+recipe (one with no station): a recipe is **shapeless** (the cells hold exactly its inputs, in any places) unless it
+carries a `shape`, rows of item ids that the cells must show, anywhere in the grid and mirrored (the Torch is a Pine
+Resin over a Timber; the Snare is shapeless). A pattern wider than the pocket square needs a workbench too. The check
+runs in this order: a malformed grid refuses `BAD_REQUEST`; a role-bound item in any cell refuses `GRID_BOUND` whatever
+the recipes say (and no recipe takes one); a 3 by 3 grid or a wide pattern away from a workbench refuses `NEED_STATION`
+(workbench); nothing matching refuses `GRID_NO_RECIPE`; cells the seat does not hold refuse `NEED_MATERIALS`; a product
+that does not fit refuses `PACK_FULL`. On a match the inputs go and the product arrives as one change inside `step()`,
+with no hold. Station recipes (the basin's Axe, the oven's Lantern) stay at their stations and the older `craft` hold.
 
 ### 3.31 Law enforcement and petitions
 
-Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5). Not built yet: the step that builds it writes this section.
+Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5; `docs/round9/world-mode.md` 3.1, `followup-4.md` 2.1 and 2.2).
+
+**The Constables (B1, A229).** The county's law: two figures per map, never seats (3.24), with no card, no vote, no
+task list and no part in any win, wearing the `constable` look (3.17). They are guards (3.24): each keeps a post at
+the square (HollowMere's notice board and bell, BlackPine's camp board and bell) within `guard.leashTiles`, has
+health, and fights back when struck. They read only what the world shows, never a card. The petition and the
+manhunt are B3 and B4.
+
+**The briefing (B2, A249; seams.md 3 row 8).** The Constables read every clue the world makes that a seat could
+collect (`clues.json` `collectible`: footprints, thread, felt, drag smears, fur, claw marks, the Wet Bucket and the
+rest; not a body, a time of death, drips or a Hungry Killer's glowing trail, and not the teaching clue). They read
+it the way a collector does, `clues.collectHoldS / law.speedMult` after it appears (`law.speedMult` 2 times a
+Detective's rate), from their posts, since they never leave their leash (F4 2.2). `law.briefingAfterS` (30 s) after
+the clue appeared they post a **briefing**: one public line in every seat's log (the `system` chat channel, the
+templates of `laws.json` `briefing`, UI 14.50) naming the clue's kind, its scene and, only for a clue whose Reader
+is Anyone (3.4: footprints and thread), the trait the clue object holds ("Constables' briefing: footprints in
+Crumb's Ovens, tall."). A role's reading (the felt's hat, the prints) is never briefed. A briefing never names a
+seat, a handle, a card or a time, never says Forged or Verified, writes no Notebook entry and changes no clue: a
+planted clue is briefed like any other, and Inspect keeps its edge. A clue collected, erased, decayed or evicted
+before its time is not briefed, and the same words twice within `law.briefingAfterS` post once. While no Constable is
+alive there is no briefing (proposed; a knocked-out Constable is alive, and until C5 nothing kills a guard). It opens
+no screen, pauses nothing and waits on nobody. The server keeps the posted
+briefings in order for the police board, which shows them with the petition form (B3).
+
+**Walk with me (B8, A269; seams.md 3 row 10).** In the night phases (dusk, night, the Final Night) a living seat
+may ask a figure in inspect reach (`relations.inspect.rangeTiles`; a seat or a townsperson, by its handle) to walk with
+it until dawn. Every ask draws one delay from `pairing.answerS` (5 to 9 s, long enough to read and answer) and one
+yes roll from the `pairing` stream, whoever is asked, and the answer reaches the asker at that delay, so its timing
+never tells a person from an NPC (R6). A human target sees a private prompt until then: an early answer is held, and
+no answer is a no. An NPC seat or a townsperson says yes on the roll, `pairing.yesChance`, times
+`pairing.scaredMult` while its mood is Scared (the needs never read a card). A guard (3.24) keeps its post and always
+says no, and since no seat wears a guard's look, its no says nothing about a person. A target that is already
+asking, asked or paired says no at the delay like any other. A no is an answer, never a refusal (`failures.md` 10):
+the asker sees the same line whoever said it. A pair lasts until dawn, a death, a cancel (`pair.answer` with
+`yes: false`), or `pairing.apartS` with the two in different scenes. A townsperson or an NPC-seat partner follows
+its asker within `pairing.followTiles`, through doors like any walk; a human partner is never moved. While the two
+share a scene, a paired seat is not alone for the NPC Killer's strike roll and its kill-opportunity timer (3.12),
+but only against a third party: a pair is no shield against a partner who is the Killer. The mugging's alone rule
+already counts any figure in the room. Only the two seats learn of a pair, in `Private.pair` (a phase and the other
+figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
+inspect panel's section is B8b.
 
 ### 3.32 Sleeping
 
-Round 10, A7 (`docs/round9/gdd-map.md` 2.6). Not built yet: the step that builds it writes this section.
+Round 10, A7 (`docs/round9/gdd-map.md` 2.6; `docs/round9/world-mode.md` 7.3; `docs/round9/followup-4.md` 2.4 and
+2.11). A7a builds beds, homes and the night skip; A7b adds what each bed restores and Exhaustion.
+
+**Homes.** At the start of a match each human seat draws a home from the `homes` stream, never from its card: an
+interior an NPC could call home (3.12) that has a `bed`, distinct from the NPC homes and from each other while the map
+has enough, then shared. Only the seat itself learns its home (`Private.home`).
+
+**Beds.** A bed is a prop of kind `bed` (one in each home interior), `cot` (the chapel's) or `innBed` (the tavern's back
+room). A seat lies down with the `sleep` hold at a bed within reach, at dusk or at night; any other phase refuses
+`PHASE_CLOSED`, and there is no sleeping in the Final Night's hunt.
+
+| Bed | Who may sleep there | Refusal |
+| --- | --- | --- |
+| Home `bed` | the seat whose home it is, while its house is not boarded | another seat's bed: `NO_BED`; a boarded house: `BOARDED_HOME` |
+| Chapel `cot` | anyone, free | none |
+| Tavern `innBed` | anyone, for `balance.sleep.innBedScrip` from the purse | a short purse: `NEED_SCRIP` |
+
+Until D7 boards houses, a house counts as boarded while its seat is Indebted (3.23).
+
+**Asleep.** A sleeper stays in its bed. Its first input wakes it and does nothing else: a move wakes it without a
+step, and any other act wakes it and is refused `ASLEEP`, which is never shown; chat is not an act. A hit wakes it
+after the damage lands. Dawn wakes every sleeper, and a sleeper who dies or leaves is gone from the count. While a seat
+sleeps, its own view shows how many active players are in bed and of how many, never who.
+
+**The skip.** Active players are the living, placed, connected humans. NPC seats never count, so nothing waits on
+one. When every active player has been asleep for `balance.sleep.confirmS` of the night, the night ends as a normal
+dawn does: the next day, or the Final Night when the round calls for it. A human who stays awake, a Killer or anyone,
+holds the night open. Still waits: the county jail (B5) and the line (the respawn step) will leave their seats out of
+the active players.
+
+**What a night in bed restores (A7b).** A seat still asleep when the night turns to day is restored by its bed; one
+who woke in the night gets nothing.
+
+| Bed | Stamina | Also |
+| --- | --- | --- |
+| Home `bed` | to `balance.sleep.restore.bed` of the maximum (all of it) | nothing |
+| Tavern `innBed` | to `restore.innBed` (all of it) | cures `sleep.innBedCures`: Slowed, Stunned, Poisoned and Famished, and counts as a meal |
+| Chapel `cot` | up to `restore.cot` (half), never lowering it | `sleep.cotFaith` Faith (P: 5, up to the Faith maximum), withheld from a seat the chapel bars |
+
+**Exhaustion (A7b).** In the night, when every active player but one is asleep, that one is the holdout. A holdout
+alone for `balance.sleep.holdoutGraceS` (60 s) is **Exhausted** from the next dawn to the next dusk: maximum stamina
+and its regeneration are both halved (`effects.json` `exhausted`). Going to bed after the grace does not undo it. A
+card with a power that works in the night (`abilities.json` `phases`) and a seat on a manhunt are never Exhausted. The
+effect lives in the seat's own view only, with no sign on the figure. Still waits: the chapel's bar (the Defrocked
+sentence) and the manhunt (B4).
+
+**The screen** (A8, UI.md 14.46). At a bed in reach at dusk or at night the prompt offers to lie down. A sleeper's view
+dims to its bedroom and shows how many active players are in bed and of how many, never who. A move, a key or a hit
+wakes it. A sleeper who wakes because the night ended sees "You slept through", whether the night was skipped or ran
+out.
 
 ### 3.33 The Hitman's arrival
 

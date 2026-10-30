@@ -49,12 +49,20 @@ describe('recipeRows', () => {
     const lockpicks = rows.find((r) => r.id === 'lockpicks')!;
     expect(lockpicks.missing).toEqual([]);
     expect(rows.map((r) => r.id).sort()).toEqual([
+      'axe',
       'crowbar',
+      'dough',
+      'hammer',
+      'herbBread',
+      'herbFilling',
       'lantern',
       'lockpicks',
+      'pickaxe',
+      'proofedDough',
       'snare',
       'spade',
       'torch',
+      'wakeLoaf',
     ]);
   });
   it('counts a quantity across stacks and asks for the rest', () => {

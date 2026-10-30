@@ -10,18 +10,9 @@ const Seconds = z.number().positive();
 
 /**
  * `DeathCause` of the protocol, as the index keys it; `vanished` never has a cutscene. Round 8 (8A, GDD 3.22) adds
- * the body's causes: `creature` (a boar, bat or rat bite), `bled` (Bleeding) and `sickened` (Poisoned).
+ * `creature` (a boar, bat or rat bite); round 10 (A6) retires `bled` and `sickened`.
  */
-export const CutsceneDeathCause = z.enum([
-  'knife',
-  'ejected',
-  'poison',
-  'shot',
-  'wolf',
-  'creature',
-  'bled',
-  'sickened',
-]);
+export const CutsceneDeathCause = z.enum(['knife', 'ejected', 'poison', 'shot', 'wolf', 'creature']);
 export type CutsceneDeathCause = z.infer<typeof CutsceneDeathCause>;
 
 export const CutsceneKind = z.enum(['opening', 'death', 'memorial']);

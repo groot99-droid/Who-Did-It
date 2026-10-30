@@ -17,6 +17,16 @@ export const C2S = {
   light: 'act.light',
   /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
   mug: 'act.mug',
+  /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
+  invMove: 'inv.move',
+  /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
+  invSelect: 'inv.select',
+  /** Round 10, A13 (GDD 3.30): the crafting grid's cells; `sim/Craft.ts`. */
+  craftGrid: 'craft.grid',
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): ask a figure in reach to walk with you; `sim/law/Pairing.ts`. */
+  pairAsk: 'pair.ask',
+  /** Round 10, B8: answer an ask (`yes`), or end a pair (`yes: false` while paired). */
+  pairAnswer: 'pair.answer',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -111,9 +121,13 @@ export type HoldAction =
   // Round 8 (GDD 3.23, 8D): the chapel altar, the Train's mailbag, the tally rack.
   | 'altar'
   | 'mailbag'
-  | 'rack';
+  | 'rack'
+  // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
+  | 'interact'
+  // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
+  | 'sleep';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.
@@ -122,11 +136,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
 /**
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
- * (GDD 3.22, Session 8A; append-only): `creature` is a kill by any other creature, `bled` and `sickened` are
- * Bleeding and Poisoned at zero health.
+ * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
+ * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
  */
-export type DeathCause =
-  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'bled' | 'sickened';
+/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
@@ -222,7 +236,8 @@ export interface C2SPayloads {
    */
   'act.ability': { abilityId: string; targetId?: string };
   /** Re-validated every tick. */
-  'act.hold': { action: HoldAction; targetId: string; on: boolean };
+  /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
+  'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
   'act.hide': { spotId: string };
   'act.check': { spotId: string };
   'act.burst': { spotId: string };
@@ -298,6 +313,24 @@ export interface C2SPayloads {
    * `fight` are refused until the fists land (DECISIONS A180).
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
+  /**
+   * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
+   * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
+   * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
+   */
+  'inv.move': { from: number; to: number };
+  /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
+  'inv.select': { slot: number };
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. */
+  'pair.ask': { targetId: string };
+  'pair.answer': { yes: boolean };
+  /**
+   * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
+   * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
+   * inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches,
+   * `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench.
+   */
+  'craft.grid': { size: 2 | 3; cells: Array<string | null> };
 }
 
 export interface S2CPayloads {
@@ -434,6 +467,11 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.hq': 5,
   'act.payRent': 5,
   'act.mug': 5,
+  'inv.move': 10,
+  'inv.select': 10,
+  'craft.grid': 5,
+  'pair.ask': 2,
+  'pair.answer': 2,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

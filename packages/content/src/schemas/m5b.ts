@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, LookId, Seconds, Tiles } from './common.js';
+import { ToolTag } from './interactions.js';
 
 // M5b content (GDD 3.14 to 3.16, round 6, Session 6E; docs/round6/m5b-data.md 1): resources, recipes, mobs, quests and
 // the main-mode mini-games. Pre-seeded by 6Z as empty records with these shapes; 6E fills the rows and may widen a
@@ -22,6 +23,8 @@ export const Resource = z.strictObject({
   respawnS: Seconds,
   /** An item the gatherer must hold (a spade for ore), or none. */
   tool: Id.optional(),
+  /** Round 10 (A11): a held item with this capability tag cuts the gather hold to `gatherS` (bare hands still gather). */
+  fastTool: z.strictObject({ tag: ToolTag, gatherS: Seconds }).optional(),
   sprite: SpriteKey,
 });
 export type Resource = z.infer<typeof Resource>;
@@ -38,6 +41,13 @@ export const Recipe = z.strictObject({
   /** The prop kind of the station the craft hold needs, or null for anywhere. */
   station: PropKind.nullable(),
   craftS: Seconds,
+  /**
+   * Round 10 (A13): rows of item ids (null = an empty cell) the crafting grid must show, as in Minecraft: the pattern
+   * is matched wherever it sits in the grid, and mirrored. Absent = shapeless: the grid matches the set of inputs.
+   */
+  shape: z.array(z.array(Id.nullable()).min(1)).min(1).optional(),
+  /** Round 10, D4a: the maps this recipe is made on (its stations stand only there); absent = every map. */
+  maps: z.array(Id).min(1).optional(),
 });
 export type Recipe = z.infer<typeof Recipe>;
 
@@ -97,7 +107,7 @@ export const QuestsFile = z.strictObject({
 export type QuestsFile = z.infer<typeof QuestsFile>;
 
 /** Mirrors the protocol's `MinigameKind`: the five station mini-games (GDD 3.16; `tap` is round 7's, 7M). */
-export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap']);
+export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap', 'lockpick']);
 
 export const MinigameDef = z.strictObject({
   id: Id,

@@ -15,7 +15,7 @@ import {
 } from '@wdi/shared';
 import { ClueKind, NotebookStatus } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
-import type { HoldAction } from '@wdi/shared/protocol';
+import { refusalFrame, type HoldAction, type RefusalReason } from '@wdi/shared/protocol';
 import type {
   AvatarSnap,
   BodySnap,
@@ -131,6 +131,19 @@ const SPEED = (tilesPerS: number) => (tilesPerS * TILE_PX) / TICK_RATE;
 const BOT_NAMES = ['Ada', 'Bo', 'Cy', 'Dee', 'Eli', 'Fay'];
 /** Public looks of the mock roster, own seat first (all non-cover characters of `looks.json`). */
 const MOCK_LOOKS = ['tinner', 'detective', 'vicar', 'doctor', 'baker', 'fisher', 'lamplighter'];
+
+/** The reason a mock refusal of this legacy code and word stands for (the real server sends reasons itself). */
+function mockReason(code: number, msg: string): RefusalReason {
+  if (code === 424) return 'COOLDOWN';
+  if (code === 425) return 'PHASE_CLOSED';
+  if (code === 426) return 'BUSY';
+  if (code === 427) return 'TOO_FAR';
+  if (code === 428) return 'BOARDED';
+  if (code === 423) return 'LOCKED';
+  if (/target|no one/.test(msg)) return 'NO_TARGET';
+  if (/already/.test(msg)) return 'ALREADY_DONE';
+  return 'NOTHING_THERE';
+}
 
 export class MockWorldFeed implements WorldFeed {
   readonly bus: Emitter<WorldFeedEvents> = mitt<WorldFeedEvents>();
@@ -392,6 +405,10 @@ export class MockWorldFeed implements WorldFeed {
     return this.ghost;
   }
 
+  onLine(): boolean {
+    return false; // the mock has no train
+  }
+
   kill(targetId: string): void {
     this.ability('kill', targetId);
   }
@@ -570,6 +587,11 @@ export class MockWorldFeed implements WorldFeed {
 
   sell(_shopId: string, _itemId: string, _qty: number): void {}
 
+  // Round 10 (A7): the mock town has no bed to lie in.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    return { asleep: false, inBed: 0, inBedOf: 0 };
+  }
+
   // Round 8, 8D: the mock town has no altar, station or bank, so no Faith and nothing built.
   faith(): number {
     return 0;
@@ -596,6 +618,21 @@ export class MockWorldFeed implements WorldFeed {
   light(on: boolean): void {
     this.m5b.light(on);
   }
+
+  selectedSlot(): number {
+    return this.m5b.selected;
+  }
+
+  invMove(from: number, to: number): void {
+    this.m5b.invMove(from, to);
+  }
+
+  invSelect(slot: number): void {
+    this.m5b.selected = slot;
+  }
+
+  /** The mock does not craft from the grid; the list in the crafting panel still works. */
+  craftGrid(_size: 2 | 3, _cells: Array<string | null>): void {}
 
   minigameResult(_taskId: string, _answer: unknown): void {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
@@ -649,8 +686,9 @@ export class MockWorldFeed implements WorldFeed {
       this.bus.emit('vfx', { sceneId: me.scene, x: Math.round(me.x), y: Math.round(me.y), kind: 'disguise' });
   }
 
+  /** The offline mock speaks in legacy codes and words; the frame it sends carries the reason they stand for. */
   private fail(code: number, msg: string): void {
-    this.bus.emit('error', { code, msg });
+    this.bus.emit('error', refusalFrame(mockReason(code, msg), undefined, { msg }));
   }
 
   private place(b: Actor, scene: string, spawn: { x: number; y: number; facing: string }): void {

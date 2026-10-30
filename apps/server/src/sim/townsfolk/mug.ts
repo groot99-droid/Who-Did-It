@@ -1,9 +1,10 @@
 import { balance, clues } from '@wdi/content';
-import { ClueKind, ErrorCode, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
+import { ClueKind, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { decaySeconds, spawnClue } from '../Clues';
 import { balanceOf, movePurse, purseBand } from '../economy/purse';
 import { emitSim } from '../events/bus';
+import { isGuard } from '../law/Guards';
 import { hubOf } from '../MapSites';
 import { lightBurns } from '../mobs/light';
 import { isNpcSeat } from '../Npc';
@@ -129,7 +130,7 @@ function muggers(room: PartyRoom): Mugger[] {
   const tick = room.state.tick;
   const out: Mugger[] = [];
   for (const f of figuresOf(room).values()) {
-    if (f.dead || f.handle === null || tick < f.busyUntilTick) continue;
+    if (f.dead || f.handle === null || tick < f.busyUntilTick || isGuard(f)) continue; // a guard never mugs (B1)
     out.push({ id: f.id, figure: f, brain: f.brain, sceneIdx: f.sceneIdx, x: f.x, y: f.y });
   }
   const mem = npcMemory(room);
@@ -355,11 +356,11 @@ function end(room: PartyRoom, mg: Mugging, outcome: MugOutcome): void {
  */
 export function handleMug(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const mg = memoryOf(room).byTarget.get(sessionId);
-  if (!mg || mg.state !== 'prompt') return reject(room, sessionId, ErrorCode.cannot, 'not now');
+  if (!mg || mg.state !== 'prompt') return reject(room, sessionId, 'NOTHING_THERE');
   const choice = payload.choice;
   if (choice !== 'pay' && choice !== 'flee' && choice !== 'fight') {
-    return reject(room, sessionId, ErrorCode.cannot, 'bad choice');
+    return reject(room, sessionId, 'BAD_REQUEST');
   }
-  if (choice !== 'pay') return reject(room, sessionId, ErrorCode.cannot, 'not yet');
+  if (choice !== 'pay') return reject(room, sessionId, 'NFY', { feature: 'fighting back' });
   take(room, mg, 'paid');
 }

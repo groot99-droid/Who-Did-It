@@ -1,9 +1,10 @@
 import { tasks } from '@wdi/content';
-import { ErrorCode, S2C, TICK_RATE, coopDone, coopProgress, coopTicks } from '@wdi/shared';
+import { S2C, TICK_RATE, coopDone, coopProgress, coopTicks } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
 import { isVerbPhase, reject } from './World';
+import { refusal, type Refusal } from './refusal';
 
 /**
  * The co-op hold (round 7, 7M; GDD 3.5 "Shutter the windows", A133 (11)). A task of kind `coop` has no puzzle: its
@@ -41,12 +42,12 @@ const coopTask = (taskId: string): CoopTask | undefined => {
 };
 
 /** Why `p` cannot hold `task` now, or null: the same check starts the hold and keeps it. */
-function coopProblem(room: PartyRoom, p: PlayerSim, task: CoopTask): { code: ErrorCode; msg: string } | null {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (!p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+function coopProblem(room: PartyRoom, p: PlayerSim, task: CoopTask): Refusal | null {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (!p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   if (!task.targets.some((n) => atNode(p, n, task.coopRadiusTiles ?? 2)))
-    return { code: ErrorCode.outOfRange, msg: 'too far' };
+    return refusal('TOO_FAR', { of: 'task' });
   return null;
 }
 
@@ -69,9 +70,9 @@ export function handleCoopHold(room: PartyRoom, sessionId: string, taskId: strin
   const p = simOf(room).players.get(sessionId);
   const task = coopTask(taskId);
   if (!p) return;
-  if (!task) return reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+  if (!task) return reject(room, sessionId, 'BAD_REQUEST');
   const problem = coopProblem(room, p, task);
-  if (problem) return reject(room, sessionId, problem.code, problem.msg);
+  if (problem) return reject(room, sessionId, problem);
   if (p.hold?.action === 'task' && p.hold.targetId === taskId) return;
   // The first hand on the shutters after everyone let go starts from nothing.
   if (holdersOf(room, task).length === 0) sharedOf(room, taskId).ticks = 0;

@@ -7,7 +7,7 @@ import { StatusBit } from './animIds';
 // height, under which key) are what is tested.
 interface Made {
   name: string;
-  look: { height: number; scarf: number; hat: number };
+  look: { height: number; scarf: number; hat: number; lookId?: string };
   isSelf: boolean;
   pos: [number, number][];
   poses: [string, number, number | boolean][];
@@ -44,6 +44,7 @@ vi.mock('./PlayerView', () => ({
 }));
 
 import { EntityView, MASK_GLYPH } from './EntityView';
+import { figureName } from '../ui/copy';
 
 const SELF = 'me';
 const row = (id: string, name: string, scarf: number, hat: number, presence = false): PlayerSnap => ({
@@ -215,6 +216,25 @@ describe('EntityView (GDD 3.17)', () => {
     expect(ann.poses.at(-1)).toEqual(['s', 1, bits]);
     // Never the transit flag alone: the limp and the bleeding would be lost on the way to the view.
     expect(ann.poses.every(([, , status]) => typeof status === 'number')).toBe(true);
+  });
+
+  it('draws a villager figure with its look and its figure name, reading nothing from the roster', () => {
+    const v = view();
+    v.update(roster, 0, [avatar('h-c', 'villagerclerk', { height: 1 }), avatar('h-v', 'villager')], 'h-me');
+    expect(v.has('h-c')).toBe(true);
+    const names = live().map((m) => [m.name, m.look.lookId]);
+    expect(names).toContainEqual([figureName('villagerclerk'), 'villagerclerk']);
+    expect(names).toContainEqual([figureName('villager'), 'villager']);
+    // A ghost viewer's mask needs a seat; a figure has none.
+    v.setGhost(true);
+    v.update(roster, 1, [avatar('h-c', 'villagerclerk')], 'h-me');
+    expect(live().some((m) => m.name === figureName('villagerclerk'))).toBe(true);
+  });
+
+  it('draws nothing for a look that is neither a seat nor a figure', () => {
+    const v = view();
+    v.update(roster, 0, [avatar('h-x', 'sorcerer')], 'h-me');
+    expect(v.has('h-x')).toBe(false);
   });
 
   it('skips an avatar whose roster row is unknown', () => {

@@ -1,13 +1,5 @@
 import { abilities, balance, roles } from '@wdi/content';
-import {
-  ErrorCode,
-  NotebookEntry,
-  NotebookStatus,
-  S2C,
-  TICK_RATE,
-  TILE_PX,
-  type PlayerState,
-} from '@wdi/shared';
+import { NotebookEntry, NotebookStatus, S2C, TICK_RATE, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { bodyBlocksAct } from './body/run';
 import { type PlayerSim, simOf } from './RoomSim';
@@ -19,6 +11,9 @@ import { handleBankHold } from './economy/bank';
 import { handleShopHold } from './economy/shops';
 import { handleGather, tickGather } from './Resources';
 import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
+import { refusal, type Refusal } from './refusal';
+import { handleInteract, tickInteract } from './interact/resolve';
+import { handleSleepHold } from './Sleep';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -32,20 +27,15 @@ function inReach(p: PlayerSim, x: number, y: number): boolean {
 }
 
 /** Why a collect hold cannot run this tick, or null (also the check that starts it). */
-function holdProblem(
-  room: PartyRoom,
-  sessionId: string,
-  p: PlayerSim,
-  clueId: string,
-): { code: ErrorCode; msg: string } | null {
-  if (!isVerbPhase(room.state.phase)) return { code: ErrorCode.wrongPhase, msg: 'not now' };
-  if (p.dead || !p.placed) return { code: ErrorCode.cannot, msg: 'not now' };
-  if (room.state.tick < p.busyUntilTick) return { code: ErrorCode.busy, msg: 'busy' };
+function holdProblem(room: PartyRoom, sessionId: string, p: PlayerSim, clueId: string): Refusal | null {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  if (room.state.tick < p.busyUntilTick) return refusal('BUSY');
   const clue = clueFor(room, p, clueId);
-  if (!clue) return { code: ErrorCode.cannot, msg: 'nothing there' };
-  if (!inReach(p, clue.x, clue.y)) return { code: ErrorCode.outOfRange, msg: 'too far' };
+  if (!clue) return refusal('NOTHING_THERE');
+  if (!inReach(p, clue.x, clue.y)) return refusal('TOO_FAR', { of: 'clue' });
   if (simOf(room).clueMeta.get(clueId)?.collectors.has(sessionId)) {
-    return { code: ErrorCode.cannot, msg: 'already in your notebook' };
+    return refusal('ALREADY_DONE', { what: 'notebook' });
   }
   return null;
 }
@@ -61,7 +51,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     p.hold = null;
     return;
   }
-  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, ErrorCode.cannot, 'not now'); // round 8, 8A
+  if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
   // Round 6 (locked call sites): the M5b holds go to their owners' files (6F); each refuses until it lands.
   if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {
     if (action === 'gather') handleGather(room, sessionId, targetId);
@@ -83,13 +73,19 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     return;
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
+  if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
+  // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
+  if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
+    const via = typeof payload.via === 'string' && payload.via.length <= 64 ? payload.via : undefined;
+    return handleInteract(room, sessionId, targetId, via);
+  }
   if (action !== 'collect' || typeof targetId !== 'string' || targetId.length === 0 || targetId.length > 64) {
-    reject(room, sessionId, ErrorCode.cannot, 'cannot do that');
+    reject(room, sessionId, 'NFY', { feature: 'this action' });
     return;
   }
   const problem = holdProblem(room, sessionId, p, targetId);
   if (problem) {
-    reject(room, sessionId, problem.code, problem.msg);
+    reject(room, sessionId, problem);
     return;
   }
   // Pressing again on the same clue keeps the original start; another target restarts.
@@ -115,6 +111,10 @@ export function runHolds(room: PartyRoom): void {
     if (hold.action === 'gather' || hold.action === 'craft') {
       if (hold.action === 'gather') tickGather(room, sessionId, p);
       else tickCraft(room, sessionId, p);
+      continue;
+    }
+    if (hold.action === 'interact') {
+      tickInteract(room, sessionId, p); // round 10, A10
       continue;
     }
     if (isCivicHold(hold.action)) {

@@ -14,7 +14,7 @@ import type { MobSnap, NodeSnap, QuestSnap, TaskSnap } from '../world';
 
 const REACH_PX = balanceJson.doors.reachTiles * TILE_PX;
 const SLOTS = itemsJson.inventorySlots;
-const STACK_MAX = balanceJson.resources.stackMax;
+const STACK_MAX = balanceJson.resources.stackMax.material; // round 10, A12: the mock stacks materials only
 const RESOURCES = resourcesJson.resources as Record<
   string,
   { id: string; gatherS: number; yield: number; respawnS: number; tool?: string }
@@ -157,6 +157,20 @@ export class MockM5b {
 
   inventory(): StackSnap[] {
     return this.stacks.map((s) => ({ ...s }));
+  }
+
+  /** The held hotbar slot of the mock. */
+  selected = 0;
+
+  /** Round 10 (A13): the mock keeps stacks in a list; a move re-numbers the slot, a swap trades the two. */
+  invMove(from: number, to: number): void {
+    this.stacks.forEach((s, i) => (s.slot ??= i)); // from here on every stack names its slot
+    const at = (n: number) => this.stacks.findIndex((s) => s.slot === n);
+    const a = at(from);
+    if (a < 0 || from === to) return;
+    const b = at(to);
+    if (b >= 0) this.stacks[b] = { ...(this.stacks[b] as StackSnap), slot: from };
+    this.stacks[a] = { ...(this.stacks[a] as StackSnap), slot: to };
   }
 
   get lanternLit(): boolean {

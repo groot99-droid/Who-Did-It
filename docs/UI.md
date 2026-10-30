@@ -1750,3 +1750,118 @@ Lines are in `apps/client/src/ui/copy/refusals.ts` (`REFUSAL_COPY`, `refusalLine
   that makes it read "Nothing happens." before release (FM1).
 - No line names a role or an ability (rule 4; the test reads `roles.json` and `abilities.json`). A per-interaction
   `fail` line of `interactions.json` wins over these when the refusal names its interaction (A4).
+
+### 14.44 The inventory screen and the crafting square (10H, round 10)
+
+Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar.*`, `grid.*`). Item names come from
+`items.json`; no line names a role. The screen (key I, the Pockets button) draws the slots of GDD 3.30 as grids:
+
+| Key | Line |
+| --- | --- |
+| `inv.hotbar`, `inv.pack`, `inv.belt` | Hotbar, Pack, Belt |
+| `inv.head`, `inv.body`, `inv.weapon` | Head, Body, Weapon |
+| `inv.pick` | Pick a stack, then a slot that takes it. |
+| `inv.slots` | {n} of {max} slots (the count of used slots over the whole layout) |
+| `grid.title`, `grid.size2`, `grid.size3` | Craft; 2 by 2; 3 by 3 (workbench) |
+| `grid.hint` | Pick a stack, then a square. Take what comes out. |
+| `grid.bound` | That stays with you. It cannot be worked. |
+| `hotbar.label` | Hotbar |
+
+- **Moves.** Click a stack to pick it; the slots that would refuse the move (`inv.move`: the belt takes tools, a gear
+  slot its own gear, a full stack of the same item) are dimmed and cannot be clicked, so a move offered lands. Click the
+  picked stack again to put it down.
+- **The hotbar strip** is always on screen during a match: a tap or the keys 1 to 6 select the held slot
+  (`inv.select`); the held slot has a border. The same strip is the touch control.
+- **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
+  square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
+  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
+- The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.
+
+### 14.45 Showing a refusal (10G, round 10)
+
+`World.ts` shows the server's reason, never its `msg` (the `lastVerb` guess and `refuse.generic` are gone):
+
+- **Which line.** The interaction's own `fail` line for the reason when the frame names an interaction
+  (`interactions.json`, `refusalText` in `apps/client/src/ui/copy/refusals.ts`), else the general line of 14.43. A
+  server that sends no reason still gets the deck line of its code (14.3), and a bare 422 reads "Nothing happens".
+- **Silent reasons** show nothing in a release build; an unknown reason reads "Nothing happens" (a development build
+  reads `Bug: unhandled refusal <reason>`).
+- **`NFY`** goes through the same log line, drawn apart: muted and italic, so a tester can tell "the game is unfinished"
+  from "you are missing something". `NFY_SHOWN` (14.43) is the release switch.
+- The refused prompt keeps its shake (`refusedIn`, UI.md 9), and the door sound still follows the legacy code.
+
+### 14.46 Sleeping (10H, round 10)
+
+Lines are in `apps/client/src/ui/copy/sleep.ts` (`SLEEP_COPY`). No line names a seat: a sleeper learns how many are in
+bed, never who (GDD 3.32).
+
+| Key | Line |
+| --- | --- |
+| `prompt.bed` | Press E: lie down |
+| `prompt.cot` | Press E: lie down on the cot |
+| `prompt.innBed` | Press E: rent the bed ({n} Scrip) |
+| `asleep.title` | Asleep |
+| `asleep.count` | {n} of {m} in bed |
+| `asleep.hint` | Move to wake. |
+| `asleep.through` | You slept through. |
+
+- **The prompt** shows at a bed, cot or inn bed in reach at dusk or at night, and E sends `act.hold {action: 'sleep'}`. The
+  server's refusals (`NO_BED`, `BOARDED_HOME`, `NEED_SCRIP`, `PHASE_CLOSED`, `TOO_FAR`) read their lines from 14.43.
+- **The overlay** follows `Private.asleep`: the view dims to the bedroom, the count line reads `Private.inBed` of
+  `Private.inBedOf` (hidden while the server writes none), and the hint says how to wake. It takes no pointer, so the stick and
+  the keys still reach the server, where the first input wakes the sleeper and is refused `ASLEEP` without a line.
+- **"You slept through"** shows for five seconds when the sleeper wakes outside dusk and night (a hit or a move wakes it inside
+  them). A night skip and a natural dawn read the same, and both are true for the sleeper; phases.md 13.4's "every client"
+  is every sleeper.
+
+### 14.47 The train's returns (10C, round 10)
+
+Session 10C, C1 (DECISIONS A230). The server's lines go on the `chat.msg` `system` channel to every seat, like the
+arrival line of 14.30. C1b adds the On-the-line screen (`ui/OnTheLine.ts`): a full-screen dark carriage over the
+world while `Private.onLine` is true, through a meeting too (a seat on the line does not attend, phases.md 4), with
+the time to the morning train, how the seat died and what it keeps; when
+the train brings the seat back the screen lifts and a 3 s toast says so. The manifest is the log line below.
+
+| Line | Text | Where |
+|---|---|---|
+| a seat back on the morning train (server, `Train.ts` `trainReturnLine`) | {name} steps off the train. | `chat.msg` `system`, every seat, at the arrival |
+| the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
+| the screen's title (`line.title`) | On the line | On the line, top band |
+| the time to the train (`line.train`) | The train in {time} | On the line, top band, as m:ss |
+| how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
+| what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
+| back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
+
+### 14.48 The lock-pick and the Resistant effect (10D, round 10)
+
+Session 10D. D5b draws the lock-pick inside the mini-game dialog of 14.19.6 (`view/minigames/lockpick.ts`), for the
+`minigameStart` with `kind: 'lockpick'` the picker alone receives (GDD 3.29): one column per pin, the lifted pin drawn
+as a block, a tension gauge with the snap line. The set points are felt, never drawn: a click (a short tone, a buzz on
+a phone) and a jolt of the pin when a lifted pin crosses its band under light tension. Pointer: press a pin and drag
+it up and down; hold the pick button for tension and let go to try the pin. Keyboard: Left and Right choose the pin,
+Up and Down lift it, Space or Enter holds and lets go. The answer is the trace the server replays. D4a adds the effect
+Resistant (`icon_effect_resistant`), named by the data and with no copy of its own.
+
+| Line | Text | Where |
+|---|---|---|
+| the hint (`minigame.lockpick.hint`) | Choose a pin, lift it, then press the pick lightly and let go when you feel a click. Press too hard and the pick snaps. | the dialog, above the board |
+| the pick button (`minigame.lockpick.press`) | Hold the pick | the dialog, below the board |
+| progress (`minigame.lockpick.progress`) | {set} of {pins} pins set | the status line |
+| a miss (`minigame.lockpick.miss`) | It slips back. | the status line |
+| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line; the server's `PICK_SNAPPED` refusal follows |
+| the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
+
+### 14.50 The law (10B, round 10)
+
+The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
+`apps/server/src/sim/law/Briefing.ts` and, with D9, by a Constable's tips) and sends them on the `system` chat
+channel, the same words to every client (GDD 3.31):
+
+| Moment | Line |
+|---|---|
+| A briefing, an Anyone clue with a trait | Constables' briefing: {clue} in {scene}, {trait}. |
+| A briefing, no trait | Constables' briefing: {clue} in {scene}. |
+
+`{clue}` is the clue's `clues.json` name in lower case, `{scene}` the scene's name and `{trait}` the trait's
+`traits.json` label in lower case. A line never names a seat, a handle, a card or a time, and never says Forged
+or Verified.

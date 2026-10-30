@@ -47,7 +47,7 @@
       "scope": "role",
       "kind": "active",
       "target": "ground",
-      "cooldownS": 60,
+      "cooldownS": 180,
       "castS": 2,
       "consumes": "plantKit",
       "effect": "Places a footprint trail or a thread with the traits you choose. Inspect marks it Forged.",
@@ -111,7 +111,7 @@
       "scope": "role",
       "kind": "active",
       "target": "player",
-      "cooldownS": 60,
+      "cooldownS": 180,
       "castS": 0,
       "rangeTiles": 1.5,
       "consumes": "bandage",
@@ -245,7 +245,7 @@
       "scope": "role",
       "kind": "active",
       "target": "ground",
-      "cooldownS": 20,
+      "cooldownS": 60,
       "noise": "run",
       "effect": "Emits fake noise rings where you stand.",
       "ships": "V1",
@@ -610,6 +610,18 @@
       "effect": "Eats a food item: cures Famished and Weakened; a Wake Loaf also restores stamina to full.",
       "ships": "V1",
       "gddRef": "3.22"
+    },
+    "eatHerbBread": {
+      "id": "eatHerbBread",
+      "name": "Eat Herb Bread",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "herbBread",
+      "effect": "Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long for the rest of the day.",
+      "ships": "V1",
+      "gddRef": "3.14"
     }
   }
 }

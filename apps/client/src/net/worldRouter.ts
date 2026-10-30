@@ -69,6 +69,7 @@ export function installWorldRouter(
   };
 
   const onMeetingStart = () => {
+    if (world?.onLine()) return; // round 10, C1b: a seat on the line does not attend (phases.md 4)
     meetingOpen = true;
     stopInput();
     if (game.scene.isActive('World')) game.scene.sleep('World');

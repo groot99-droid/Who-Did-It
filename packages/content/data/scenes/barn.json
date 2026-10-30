@@ -89,7 +89,8 @@
     { "id": "ba.water_bucket_1", "kind": "dressing", "x": 18, "y": 5 },
     { "id": "ba.hay_bale_4", "kind": "dressing", "x": 14, "y": 4 },
     { "id": "ba.scarecrow", "kind": "dressing", "x": 1, "y": 10 },
-    { "id": "ba.log_basket", "kind": "dressing", "x": 18, "y": 10 }
+    { "id": "ba.log_basket", "kind": "dressing", "x": 18, "y": 10 },
+    { "id": "ba.bed", "kind": "bed", "x": 18, "y": 4 }
   ],
   "gates": [],
   "paths": [],

@@ -12,9 +12,13 @@ import { schema, t } from '@colyseus/schema';
 // sessions fill them (docs/round6/seams.md 1.1). Version 4 (round 7, A104): `Player.profile`,
 // `Private.vendetta` (A112). Version 5 (round 7, A115): the quick mode's fields are gone. Version 6 (round 8,
 // A135, docs/round8/seams.md 1): `Private.body` (8A); the later round-8 rows (`purse`, `bank`, `faith`, `hq`, 8L's
-// `Avatar.nearBits`) join version 6 without another bump.
+// `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
+// `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
+// join version 7.
+// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 adds `Private.onLine`
+// (row 6), B8 adds `Private.pair` (row 10) and C2 `Private.fare` (row 11) to version 7.
 
-export const SCHEMA_VERSION = 6;
+export const SCHEMA_VERSION = 7;
 
 /**
  * View tags (Visibility.ts): `presence` and `priv` are the numeric tags 1 and 2, granted one by one; `ghost`
@@ -102,6 +106,12 @@ export const Node = schema(
  * Round 6 (M5b, GDD 3.15): a creature of the scene, public like a prop, with no seat and no handle. `kind` is a
  * `mobs.json` id, `state` its FSM state index (`sim/mobs/ai.ts`). Empty until Session 6G fills it.
  */
+/**
+ * Round 10 (A10; logic-table.md 3.4): a prop whose state the logic table changed (`cut`, `rubble`, `searched`, `open`,
+ * `broken`), public to the scene; a prop with no entry is `whole`. `untilTick` is when it comes back (0 = never). It
+ * never says who changed it.
+ */
+export const PropState = schema({ id: str(), state: str(), untilTick: u32() }, 'PropState');
 export const Mob = schema(
   { id: str(), kind: str(), x: i16(), y: i16(), yaw: f32(), animId: u8(), state: u8() },
   'Mob',
@@ -149,6 +159,8 @@ export const SceneState = schema(
     nodes: t.map(Node),
     /** Round 6 (M5b): creatures, public to the scene; empty until Session 6G. */
     mobs: t.map(Mob),
+    /** Round 10 (A10): the logic table's prop states, public to the scene. */
+    propStates: t.map(PropState),
   },
   'SceneState',
 );
@@ -160,8 +172,13 @@ export const SceneState = schema(
  * before it evolved, '' for every card today. Own view only, like the rest of `Private`.
  */
 export const Role = schema({ roleId: str(), team: u8(), evolvedFrom: str() }, 'Role');
-export const ItemStack = schema({ defId: str(), qty: u8() }, 'ItemStack');
-export const Inventory = schema({ slots: t.array(ItemStack) }, 'Inventory');
+/** `slot` (round 10, A12, GDD 3.30): where the stack sits, a slot number of `rules/inventory.ts` `slotLayout`. */
+export const ItemStack = schema({ defId: str(), qty: u8(), slot: u8() }, 'ItemStack');
+/**
+ * `slots` lists the occupied slots only, each stack naming its own `slot`; `selected` is the hotbar slot whose item
+ * is held (round 10, A12, schema version 7). Own view only, like the rest of `Private`.
+ */
+export const Inventory = schema({ slots: t.array(ItemStack), selected: u8() }, 'Inventory');
 export const NotebookEntry = schema(
   {
     id: str(),
@@ -196,6 +213,13 @@ export const BodyState = schema(
   'BodyState',
 );
 
+/**
+ * Round 10, B8 (GDD 3.31, seams.md 3 row 10): this seat's Walk with me. `state` is a `PairPhase`; `handle` the other
+ * figure's avatar handle in this seat's scene, '' while it is elsewhere (handles re-roll on every entry), never a
+ * seat id. Own view only: nothing public shows a pair.
+ */
+export const PairState = schema({ state: u8(), handle: str() }, 'PairState');
+
 export const Private = schema(
   {
     role: Role,
@@ -227,6 +251,22 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10 (GDD 3.32, A7): this seat's home, a scene id whose `bed` is its own; '' before the match. */
+    home: str(),
+    /** Round 10 (GDD 3.32, A7): whether this seat lies asleep in a bed; only its owner learns it. */
+    asleep: bool(),
+    /**
+     * Round 10 (GDD 3.32, A7): while this seat sleeps, how many active players are in bed (`inBed`) of how many
+     * there are (`inBedOf`), never a name; both 0 while it is awake, so an awake seat learns nothing (PH 13.4).
+     */
+    inBed: u8(),
+    inBedOf: u8(),
+    /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
+    onLine: bool(),
+    /** Round 10, B8 (schema version 7): Walk with me. */
+    pair: PairState,
+    /** Round 10 (GDD 3.23, C2): the Scrip this seat owes the line for its returns; only its owner sees it. */
+    fare: u16(),
   },
   'Private',
 );

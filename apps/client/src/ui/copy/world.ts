@@ -33,12 +33,9 @@ export const WORLD_COPY = {
   'refuse.busy': 'Your hands are full',
   'refuse.cooldown': 'Not ready yet',
   'refuse.reach': 'Too far',
-  'refuse.nothing': 'Nothing happens',
-  'refuse.reported': 'Someone already reported this body',
   'refuse.bell': 'The bell is spent for you',
   'refuse.locked': 'Locked',
   'refuse.closed': 'Boarded up',
-  'refuse.generic': 'That did not work',
   'refuse.nobody': 'Nobody close enough',
 
   // 14.4 HUD and log
@@ -74,6 +71,7 @@ export const WORLD_COPY = {
   'notebook.entry.footprints': 'Footprints, {stride}: {height}',
   'notebook.entry.thread': 'Thread, {wool} wool: {scarf}',
   'notebook.entry.felt': 'Felt: {hat}',
+  'notebook.entry.scratch': 'Scratches round a lock',
   'notebook.entry.other': 'Clue',
   'notebook.meta': '{scene}, {time}',
   'notebook.status.claimed': 'Claimed',
@@ -91,4 +89,15 @@ export const WORLD_COPY = {
   // 14.8 Ghost (the world side)
   'ghost.label': 'You are a ghost',
   'ghost.walk': 'Walk anywhere. Only ghosts can see you.',
+
+  // 14.47 On the line (round 10, C1b)
+  'line.title': 'On the line',
+  'line.train': 'The train in {time}',
+  'line.cause.wolf': 'A wolf took you.',
+  'line.cause.creature': 'Something in the dark took you.',
+  'line.cause.shot': 'A shot took you.',
+  'line.cause.other': 'You fell by day.',
+  'line.kept':
+    'Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost.',
+  'line.back': 'You are back.',
 } as const satisfies Record<string, string>;

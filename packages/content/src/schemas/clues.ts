@@ -32,6 +32,8 @@ export const Clue = z.strictObject({
     'wolf',
     'wounded',
     'hunger',
+    /** Round 10 (D5c): a lock was picked here. */
+    'picked',
   ]),
   /** A physical object in a scene that can be collected (hold E) into the Notebook. */
   inWorld: z.boolean(),
@@ -56,6 +58,8 @@ export const Clue = z.strictObject({
     'static',
     /** Round 8 (GDD 3.24, 8E): left by a mugging. */
     'mugging',
+    /** Round 10 (D5c, GDD 3.29): left by a lock a pick opened. */
+    'pick',
   ]),
   params: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number()).optional(),
   description: z.string().min(1),

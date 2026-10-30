@@ -15,6 +15,10 @@ import { handlePayRent } from './economy/rent';
 import { handleHq } from './economy/hq';
 import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
+import { handleCraftGrid } from './Craft';
+import { handleInvMove, handleInvSelect } from './InventoryMoves';
+import { handlePairAnswer, handlePairAsk } from './law/Pairing';
+import { wakeOnInput } from './Sleep';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -59,6 +63,8 @@ export function runCommands(room: PartyRoom): void {
     const player = room.state.players.get(cmd.sessionId);
     if (!player) continue;
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
+    // Round 10, A7 (GDD 3.32): a sleeper's first input wakes it and is refused, silently; chat is not an act.
+    if (cmd.type !== C2S.say && wakeOnInput(room, cmd.sessionId, true)) continue;
     switch (cmd.type) {
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);
@@ -115,6 +121,23 @@ export function runCommands(room: PartyRoom): void {
       // Round 8 (8E, GDD 3.24): the answer to a mugging prompt.
       case C2S.mug:
         handleMug(room, cmd.sessionId, payload);
+        break;
+      // Round 10, A12 (GDD 3.30): the inventory screen's moves.
+      case C2S.invMove:
+        handleInvMove(room, cmd.sessionId, payload);
+        break;
+      case C2S.invSelect:
+        handleInvSelect(room, cmd.sessionId, payload);
+        break;
+      case C2S.craftGrid: // round 10, A13 (GDD 3.30)
+        handleCraftGrid(room, cmd.sessionId, payload);
+        break;
+      // Round 10, B8 (GDD 3.31): Walk with me.
+      case C2S.pairAsk:
+        handlePairAsk(room, cmd.sessionId, payload);
+        break;
+      case C2S.pairAnswer:
+        handlePairAnswer(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

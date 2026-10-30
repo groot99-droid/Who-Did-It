@@ -94,7 +94,10 @@ describe('M5b art (SPRITES 12)', () => {
 
   it('draws a held tool for every recipe of recipes.json', () => {
     const { recipes } = json<{ recipes: Record<string, { out: string }> }>(join(DATA, 'recipes.json'));
-    for (const r of Object.values(recipes)) expect(TOOL_IDS, r.out).toContain(r.out);
+    const { items } = json<{ items: Record<string, { kind: string }> }>(join(DATA, 'items.json'));
+    // A dish or a part (kind food, round 10 D4a) is eaten, not held, so it has no held-tool art.
+    for (const r of Object.values(recipes))
+      if (items[r.out]?.kind !== 'food') expect(TOOL_IDS, r.out).toContain(r.out);
     expect(snakeOf('tinOre')).toBe('tin_ore');
   });
 

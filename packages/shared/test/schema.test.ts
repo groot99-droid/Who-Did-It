@@ -35,7 +35,7 @@ describe('shared basics', () => {
 
   it('builds state with defaults', () => {
     const s = new GameState();
-    expect(SCHEMA_VERSION).toBe(6);
+    expect(SCHEMA_VERSION).toBe(7);
     expect(s.schemaVersion).toBe(SCHEMA_VERSION);
     expect(s.settings).toBeInstanceOf(Settings);
     expect('mode' in s.settings).toBe(false);
@@ -98,6 +98,8 @@ describe('shared basics', () => {
       knockedOut: 10,
       indebted: 11,
       charm: 12, // reserved for 7M's well (6Z, 2026-10-24; GDD 3.22)
+      exhausted: 13, // round 10, A7b (GDD 3.32), appended
+      resistant: 14, // round 10, D4a (GDD 3.14), appended
     });
   });
 });

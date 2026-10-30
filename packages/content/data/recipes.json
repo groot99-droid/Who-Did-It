@@ -7,7 +7,8 @@
       "qty": 1,
       "in": [{ "item": "timber", "qty": 1 }, { "item": "resin", "qty": 1 }],
       "station": null,
-      "craftS": 2
+      "craftS": 2,
+      "shape": [["resin"], ["timber"]]
     },
     "snare": {
       "id": "snare",
@@ -48,6 +49,75 @@
       "in": [{ "item": "tinOre", "qty": 2 }, { "item": "timber", "qty": 1 }],
       "station": "oven",
       "craftS": 4
+    },
+    "axe": {
+      "id": "axe",
+      "out": "axe",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 2 }, { "item": "stone", "qty": 1 }],
+      "station": "basin",
+      "craftS": 4
+    },
+    "pickaxe": {
+      "id": "pickaxe",
+      "out": "pickaxe",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 1 }, { "item": "tinOre", "qty": 2 }],
+      "station": "basin",
+      "craftS": 4
+    },
+    "hammer": {
+      "id": "hammer",
+      "out": "hammer",
+      "qty": 1,
+      "in": [{ "item": "timber", "qty": 1 }, { "item": "tinOre", "qty": 1 }],
+      "station": "basin",
+      "craftS": 3
+    },
+    "dough": {
+      "id": "dough",
+      "out": "dough",
+      "qty": 1,
+      "in": [{ "item": "flour", "qty": 2 }],
+      "station": "doughMixer",
+      "craftS": 4,
+      "maps": ["hollowmere"]
+    },
+    "proofedDough": {
+      "id": "proofedDough",
+      "out": "proofedDough",
+      "qty": 1,
+      "in": [{ "item": "dough", "qty": 1 }],
+      "station": "proofingCabinet",
+      "craftS": 8,
+      "maps": ["hollowmere"]
+    },
+    "herbFilling": {
+      "id": "herbFilling",
+      "out": "herbFilling",
+      "qty": 1,
+      "in": [{ "item": "herb", "qty": 2 }],
+      "station": "coldShelves",
+      "craftS": 3,
+      "maps": ["hollowmere"]
+    },
+    "wakeLoaf": {
+      "id": "wakeLoaf",
+      "out": "wakeLoaf",
+      "qty": 1,
+      "in": [{ "item": "proofedDough", "qty": 1 }],
+      "station": "brickOven",
+      "craftS": 5,
+      "maps": ["hollowmere"]
+    },
+    "herbBread": {
+      "id": "herbBread",
+      "out": "herbBread",
+      "qty": 1,
+      "in": [{ "item": "proofedDough", "qty": 1 }, { "item": "herbFilling", "qty": 1 }],
+      "station": "brickOven",
+      "craftS": 6,
+      "maps": ["hollowmere"]
     }
   }
 }

@@ -105,6 +105,10 @@ const RULES: PlacementRules = {
     barrel: 'free',
     bottle_crate: 'free',
     rug: 'floor',
+    // Round 10 (A7, GDD 3.32): a bed is where a seat lies down, flat on the floor beside the bed dressing.
+    bed: 'floor',
+    cot: 'floor',
+    innBed: 'floor',
     sawdust: 'floor',
     // Widow Vane's.
     tea_table: 'free',
