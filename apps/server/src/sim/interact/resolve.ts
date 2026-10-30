@@ -211,6 +211,8 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
   if (problem) return refuse(room, sessionId, problem, interactionId);
   const mode = interactions.interactions[interactionId as string]?.modes[modeIdx as number];
   // A mode with a mini-game (the lock-pick, round 10 D5) opens it in place of a hold.
+  if (mode?.minigame !== undefined && mode.minigame !== 'lockpick')
+    return refuse(room, sessionId, { reason: 'NFY', args: { feature: 'this action' } }, interactionId);
   if (t && mode?.minigame === 'lockpick')
     return startLockpick(
       room,

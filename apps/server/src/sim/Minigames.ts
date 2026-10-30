@@ -155,6 +155,10 @@ function lockResult(
   }
   const trace =
     typeof answer === 'object' && answer !== null ? (answer as { trace?: unknown }).trace : undefined;
+  // No hand is faster than the clock: a trace cannot end later than the seconds the board has been open.
+  const last = Array.isArray(trace) ? (trace.at(-1) as { t?: unknown } | undefined)?.t : undefined;
+  if (typeof last === 'number' && last > (room.state.tick - open.startTick) / TICK_RATE)
+    return reject(room, sessionId, 'BAD_REQUEST');
   const outcome = lockpickOutcome(open.puzzle.public as LockpickPublic, trace);
   if (outcome === 'invalid' || outcome === 'incomplete') return reject(room, sessionId, 'BAD_REQUEST');
   openOf(room).delete(sessionId);

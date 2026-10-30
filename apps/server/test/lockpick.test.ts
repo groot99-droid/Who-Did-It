@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { C2S, S2C, type LockAttempt, type LockpickPublic, type RefusalFrame } from '@wdi/shared';
+import { C2S, S2C, TICK_RATE, type LockAttempt, type LockpickPublic, type RefusalFrame } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
 import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
 import { sleep } from './simHelpers';
@@ -16,8 +16,8 @@ beforeEach(async () => colyseus.cleanup());
 
 const DOOR = 'mu.study_door';
 
-async function atDoor(picks: number): Promise<Party> {
-  const p = await standardParty(colyseus, 'S1');
+async function atDoor(picks: number, humans = 1): Promise<Party> {
+  const p = await standardParty(colyseus, 'S1', false, humans);
   pauseClock(p.room);
   const human = p.humans[0]!;
   placeSeat(p, human.id, 'manor_upper', 6, 9);
@@ -39,7 +39,8 @@ const refusals = (p: Party): RefusalFrame[] =>
   p.humans[0]!.log.filter((m) => m.type === 'error').map((m) => m.payload as RefusalFrame);
 const doorState = (p: Party) => p.room.state.scenes.get('manor_upper')!.propStates.get(DOOR)?.state;
 
-async function answer(p: Party, trace: LockAttempt[]): Promise<void> {
+async function answer(p: Party, trace: LockAttempt[], waitS = 4): Promise<void> {
+  advance(p, Math.round(waitS * TICK_RATE));
   await send(p.humans[0]!, 'minigame.result', { taskId: DOOR, answer: { trace } }, 80);
   advance(p, 1);
   await sleep(80);
@@ -96,5 +97,29 @@ describe('the lock-pick', () => {
     await pick(p);
     const second = (starts(p).at(-1)!.payload as { public: LockpickPublic }).public;
     expect(second.setPoints).toEqual(first.setPoints);
+  });
+
+  it('refuses a perfect trace sent the moment the board opens, then opens the door once the time has passed', async () => {
+    const p = await atDoor(1);
+    await pick(p);
+    const pub = (starts(p)[0]!.payload as { public: LockpickPublic }).public;
+    await answer(p, honest(pub), 0);
+    expect(refusals(p).at(-1)).toMatchObject({ reason: 'BAD_REQUEST' });
+    expect(doorState(p)).toBeUndefined();
+    await answer(p, honest(pub), 4);
+    expect(doorState(p)).toBe('open');
+  });
+
+  it('tells nobody else: a second human gets no minigameStart and a noise with no seat id', async () => {
+    const p = await atDoor(1, 2);
+    const other = p.humans[1]!;
+    placeSeat(p, other.id, 'manor_upper', 7, 9);
+    advance(p, 1);
+    await pick(p);
+    expect(other.log.filter((m) => m.type === S2C.minigameStart)).toHaveLength(0);
+    const heard = other.log.filter((m) => m.type === S2C.noise);
+    expect(heard.length).toBeGreaterThan(0);
+    for (const m of heard)
+      expect(Object.keys(m.payload as object).sort()).toEqual(['kind', 'sceneId', 'x', 'y']);
   });
 });
