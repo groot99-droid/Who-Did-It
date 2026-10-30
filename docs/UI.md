@@ -506,6 +506,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
+| `inventory`, `crafting`, `asleep`, `line`, `lockpick` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
@@ -1780,6 +1781,14 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   picked stack again to put it down.
 - **The hotbar strip** is always on screen during a match: a tap or the keys 1 to 6 select the held slot
   (`inv.select`); the held slot has a border. The same strip is the touch control.
+- **The bottom band (10Y, round 10).** The key row (Pockets, Craft, Chores), the hotbar and the body panel stack
+  bottom-left, keys at the bottom, so none covers another, the toasts or the stick. On a phone the stick holds the
+  corner and the touch cluster the right, so the keys sit two by two beside the cluster without their key caps, the
+  hotbar and the body panel start above the cluster, and the toasts above the body panel (`match.css`, the m5b
+  section). The interact prompt (centred) clears the key row on a desktop and the body panel on a phone, and the toasts
+  start above the prompt. The shops' layer (8C) is a second `.wdi-m5b` after the first, so its counter prompt is hidden
+  while a board is open, or it would paint over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png`
+  show the band; `lockpick-390w.png` the board over it.
 - **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
   square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
   refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
@@ -1842,6 +1851,7 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
 | a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
+| the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 
@@ -1859,7 +1869,7 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | the pick button (`minigame.lockpick.press`) | Hold the pick | the dialog, below the board |
 | progress (`minigame.lockpick.progress`) | {set} of {pins} pins set | the status line |
 | a miss (`minigame.lockpick.miss`) | It slips back. | the status line |
-| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line; the server's `PICK_SNAPPED` refusal follows |
+| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
 ### 14.50 The law (10B, round 10)

@@ -29,7 +29,22 @@ beforeEach(async () => colyseus.cleanup());
 const NEAR_PX = clues.clues.blood!.params!.visibleTiles! * TILE_PX;
 const NIGHT = balance.vision.nightTiles;
 /** Payload keys that would carry a seat's secret. */
-const SECRET_KEYS = new Set(['roleId', 'role', 'team', 'cover', 'coverId', 'cooldowns', 'priv', 'notebook']);
+// `unique` and `total` are Paint The Town Red's counts (C5a, seams.md row 18): an object naming another seat beside
+// them would carry a Killer's tally before game over. Generic names: a future message that names a seat beside a
+// `total` of its own must rename it or extend the audit.
+const SECRET_KEYS = new Set([
+  'roleId',
+  'role',
+  'team',
+  'cover',
+  'coverId',
+  'cooldowns',
+  'priv',
+  'notebook',
+  'paintTown',
+  'unique',
+  'total',
+]);
 /** Payload keys that name a seat. */
 const SEAT_KEYS = new Set(['id', 'seat', 'seatId', 'playerId', 'targetId']);
 
