@@ -14,11 +14,13 @@ import { loadGivers, type GiverSpot } from '../view/GiverView';
 import { reachPx } from '../view/body/verbs'; // round 8, 8A
 import { nearestAvatar } from '../view/targets'; // round 8, 8A
 import { fill } from './copy';
+import { aName } from './copy/refusals';
 import { M5B_COPY as C } from './copy/m5b';
 import { TASK_COPY as TC } from './copy/tasks';
 import { mountChores, mountWorkBar } from './Chores';
 import { mountCrafting } from './Crafting';
 import { h, isTyping, overlayRoot } from './dom';
+import { refused } from './theme/motion';
 import { mountHotbar, type Hotbar } from './Hotbar';
 import { itemName, mountInventory, stacksOf, type Panel } from './Inventory';
 import { LAYOUT, slotsIn } from './slots';
@@ -118,12 +120,21 @@ export function promptFor(
   if (t.kind === 'giver') return fill(C['prompt.giver'], { name: NPC_NAME(t.npc) });
   const coins = coinsPrompt(t.resource); // Round 8, 8C (GDD 3.23): dropped coins are no `resources.json` row
   if (coins) return coins;
-  const res = RES[t.resource];
-  const what = res?.name ?? t.resource;
-  const tool = res?.tool;
-  return tool && !hasTool(tool)
-    ? fill(C['prompt.gather.tool'], { tool: itemName(tool), what })
+  const what = RES[t.resource]?.name ?? t.resource;
+  const tool = blockedBy(t, hasTool);
+  return tool
+    ? fill(C['prompt.gather.tool'], { tool: aName(tool), what })
     : fill(C['prompt.gather'], { what });
+}
+
+/**
+ * The tool a node wants that the player lacks, or null (round 10, 10Y; UI.md 14.51, failures.md 6.2 and FM7): the
+ * prompt greys on it and a press shakes it and sends nothing, so the refusal is prevented, never asked for.
+ */
+export function blockedBy(t: Target | null, hasTool: (item: string) => boolean): string | null {
+  if (t?.kind !== 'node') return null;
+  const tool = RES[t.resource]?.tool;
+  return tool && !hasTool(tool) ? tool : null;
 }
 
 /** The board a `?minigame=<kind>` run opens (a dev flag, like the server's `minigameStart` without a server). */
@@ -305,7 +316,7 @@ class Layer implements M5bLayer {
   /** `?minigame=<kind>`: opens that kind's board at once and judges the answer in place (a demo and test hook). */
   private devMinigame(): void {
     const kind = new URLSearchParams(location.search).get('minigame') as MinigameKind | null;
-    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap'].includes(kind)) return;
+    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap', 'lockpick'].includes(kind)) return;
     const board = devBoard(kind);
     const verdict = (taskId: string, answer: unknown) => {
       const ok = checkMinigame(board.puzzle, answer);
@@ -418,8 +429,8 @@ class Layer implements M5bLayer {
     if (toggle && this.hold) return this.cancelHold(true);
     if (!down) return this.cancelHold(true, 'gather');
     if (!t || this.hold || this.feed.dead()) return;
+    if (blockedBy(t, (item) => this.has(item))) return refused(this.prompt); // greyed: the shake, no request
     const res = RES[t.resource];
-    if (res?.tool && !this.has(res.tool)) return;
     this.begin('gather', t.id, coinsCastMs(t.resource) ?? (res?.gatherS ?? 3) * 1000); // Round 8, 8C: coins' cast
   }
 
@@ -626,6 +637,9 @@ class Layer implements M5bLayer {
     if (label.textContent !== (text ?? '')) label.textContent = text ?? '';
     this.bar.style.width = `${Math.round(this.progress() * 100)}%`;
     this.prompt.dataset.kind = this.hold ? 'hold' : (this.target?.kind ?? '');
+    const blocked = !hd && blockedBy(this.target, (item) => this.has(item)) !== null;
+    this.prompt.classList.toggle('is-blocked', blocked);
+    this.prompt.setAttribute('aria-disabled', String(blocked));
   }
 
   private coopPlayers(taskId: string): number {

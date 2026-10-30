@@ -402,7 +402,13 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
-  "law": { "speedMult": 2, "briefingAfterS": 30, "gddRef": "3.31" },
+  "law": {
+    "speedMult": 2,
+    "briefingAfterS": 30,
+    "cuffHoldS": 3,
+    "fileWindowS": 300,
+    "gddRef": "3.31"
+  },
   "sleep": {
     "confirmS": 3,
     "innBedScrip": 2,
@@ -419,13 +425,16 @@
     "clearTargetDays": 2,
     "priceMult": 1.5,
     "errandS": 30,
+    "stockMult": 0.5,
     "gddRef": "3.22"
   },
+  "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
   "armor": {
     "tierMult": { "body": [0.8, 0.65, 0.5], "head": [0.9, 0.8] },
     "cap": 0.5,
     "gddRef": "3.22"
   },
+  "townWork": { "stallStockPerSeat": 1, "stallStockMin": 4, "gddRef": "3.23" },
   "pairing": {
     "answerS": { "min": 5, "max": 9 },
     "yesChance": 0.5,
@@ -442,5 +451,6 @@
     "constableAtHumans": 5,
     "constableMatches": 2,
     "gddRef": "3.31"
-  }
+  },
+  "manhunt": { "durationS": 120, "gddRef": "3.31" }
 }

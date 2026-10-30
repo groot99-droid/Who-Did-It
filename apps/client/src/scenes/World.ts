@@ -8,7 +8,7 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
-import { TouchControls } from '../input/TouchControls';
+import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
   REG_ROLE_CHIP,
@@ -20,7 +20,9 @@ import {
   type WorldFeed,
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
+import { RefusalHints } from '../ui/copy/refusalHint';
 import { NOTHING_HAPPENS, interactionFails, isNfy, refusalText } from '../ui/copy/refusals';
+import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
@@ -169,6 +171,8 @@ export class World extends Phaser.Scene {
   private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
+  /** Round 10, 10Y (UI.md 14.51): when each NEED_* refusal last showed, for the second one's hint. */
+  private readonly hints = new RefusalHints();
   private bodyHud!: BodyHud; // round 8, 8A
   private lighting!: Lighting;
   private sheet!: NotebookSheet;
@@ -286,9 +290,10 @@ export class World extends Phaser.Scene {
     if (flags.touch || isTouchDevice()) {
       this.touch = new TouchControls(overlayRoot(), {
         onUse: (on) => this.useKey(on),
-        onAct: () => this.abilityKey('Q'),
+        onAbility: (id) => this.useAbility(id), // round 10, 10Y (A334): one disc per active Q, R or F
         onStrike: () => this.strikeKey(), // round 8, 8A
       });
+      this.touch.setAbilities(abilityDiscs(getNet(this).roleCard));
       input.attachTouch(this.touch);
     }
 
@@ -296,7 +301,14 @@ export class World extends Phaser.Scene {
     const onNoise = (n: NoisePulse) => this.ring(n);
     const onError = (e: ErrorPayload) => {
       const line = this.refusal(e);
-      if (line !== null) this.hud.say(line, undefined, isNfy(e.reason) ? 'nfy' : undefined);
+      // Round 10, 10Y (UI.md 14.51): the second identical NEED_* in 30 s adds where the thing is found.
+      const hint = line === null ? null : this.hints.take(e, performance.now());
+      if (line !== null)
+        this.hud.say(
+          hint ? `${line} ${hint}` : line,
+          hint ? 4000 : undefined,
+          isNfy(e.reason) ? 'nfy' : undefined,
+        );
       refusedIn(overlayRoot()); // round 8, 8H (locked): the refused prompt shakes (UI.md 9)
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
@@ -540,10 +552,19 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
-  /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
+  /** Q, R or F: the card's ability on that key. */
   private abilityKey(slot: string): void {
-    if (this.feed.dead()) return;
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
+    if (row) this.useAbility(row.id);
+  }
+
+  /**
+   * The card's ability by id, aimed at the nearest living player in reach: the one path of a key, a touch disc
+   * (round 10, 10Y, A334) and, later, a card button (rolecards.md R1). Only an active ability goes out (1.2 A2).
+   */
+  private useAbility(id: string): void {
+    if (this.feed.dead()) return;
+    const row = getNet(this).roleCard?.abilities.find((a) => a.id === id);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
     if (def.target === 'seat') return this.pickSeat(row.id, row.name);
@@ -769,7 +790,7 @@ export class World extends Phaser.Scene {
     this.wasDead = dead;
     this.entities.setGhost(dead);
     this.hud.setGhost(dead);
-    this.touch?.setActEnabled(!dead);
+    this.touch?.setAbilitiesEnabled(!dead);
     if (dead) {
       this.endUse();
       this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);
@@ -885,13 +906,8 @@ export class World extends Phaser.Scene {
     const at = toScreen(n.x, n.y);
     // HUD words are screen frame: "from the north" is up on the screen (SPRITES 10.4).
     const dir = meObj ? dirFromVector(at.x - meObj.x, at.y - meObj.y) : null;
-    const line = /bell/i.test(n.kind)
-      ? C['log.bell']
-      : scream
-        ? C['log.scream']
-        : /run|step/i.test(n.kind)
-          ? C['log.steps']
-          : C['log.door'];
+    // One line per kind, and never the door's for a kind this client does not know (10Y, A254).
+    const line = C[noiseLine(n.kind)];
     const label = fill(line, { dir: dir === null ? '' : C[`dir.${dir}` as keyof typeof C] });
     this.hud.say(label);
     if (scream) this.audio.play('scream');

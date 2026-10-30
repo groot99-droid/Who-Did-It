@@ -16,8 +16,8 @@ import { schema, t } from '@colyseus/schema';
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
-// `Private.pair` (row 10), C2 `Private.fare` (row 11), and B3 `GameState.petition` and `Private.petitionSigned`
-// (row 13) to version 7.
+// `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
+// (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), and C5 `Private.paintTown` (row 18) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -57,8 +57,8 @@ export const Phase = {
 export type PhaseId = (typeof Phase)[keyof typeof Phase];
 
 export const DoorState = { open: 0, closed: 1, locked: 2, broken: 3 } as const;
-/** 0 = nobody has won yet. */
-export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3 } as const;
+/** 0 = nobody has won yet. Round 10 (C5, seams.md row 18): `paintTown`, the two Killers' shared win. Append-only. */
+export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3, paintTown: 4 } as const;
 export const Team = { village: 0, cabal: 1, neutral: 2 } as const;
 
 // --- Public roster ---------------------------------------------------------------------------
@@ -270,6 +270,13 @@ export const Private = schema(
     fare: u16(),
     /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
     petitionSigned: bool(),
+    /**
+     * Round 10, B4 (seams.md 3 row 14): for the hunt's opener and signers only, the scene where a figure drawn as the
+     * accused was last seen by the rumour ledger's rule; '' until the first sighting and when no manhunt runs.
+     */
+    huntScene: str(),
+    /** Round 10, C5 (seams.md 3 row 18): this seat is a Killer of Paint The Town Red. Set at the deal; own view only. */
+    paintTown: bool(),
   },
   'Private',
 );
@@ -357,6 +364,12 @@ export const Petition = schema(
   'Petition',
 );
 
+/**
+ * Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, one at a time. `accused` the passed petition's seat, ''
+ * when `state` is none; `state` a `ManhuntState`. Nothing names the seat a cuff held.
+ */
+export const Manhunt = schema({ accused: str(), untilTick: u32(), state: u8() }, 'Manhunt');
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -382,6 +395,8 @@ export const GameState = schema(
     hq: t.map('uint8'),
     /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): the open petition, public. */
     petition: Petition,
+    /** Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, public. */
+    manhunt: Manhunt,
   },
   'GameState',
 );

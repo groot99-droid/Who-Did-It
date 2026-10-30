@@ -2,6 +2,7 @@ import balance from '@wdi/content/data/balance.json';
 import type { CoverState } from '../net/world';
 import type { RoleRevealPayload, TraitIds } from '../net/protocol';
 import { LOOKS_COPY, fill } from './copy';
+import { VENDETTA_COPY, vendettaGoal } from './copy/vendettas';
 import './match.css';
 import { h, icon, isTyping, type Screen } from './dom';
 import { type PortraitTextures, drawPortrait, isCoverRole, lookName, roleLook } from './portrait';
@@ -41,8 +42,12 @@ export interface RoleCardOptions {
   onPickCover?(lookId: string): void;
   /** Live picks, own and Cabal mates' (`Private.coverLook`, `mateLooks`); polled while the picker is on screen. */
   cover?(): CoverState;
+  /** `Private.vendetta` (GDD 3.20), polled while the card is mounted: it may land after the card (round 10, A354). */
+  vendetta?(): string;
   /** Loaded textures, for the picker's portraits; none draws the initial of the look's name. */
   textures?: PortraitTextures | null;
+  /** Round 10, C5: Paint The Town Red's target, 0 outside it (`WorldFeed.paintTarget`); polled with the card. */
+  paintTarget?(): number;
 }
 
 /** The deck strip's one card: the role's name, and the look it walks as when it has one. */
@@ -79,6 +84,24 @@ export function coverChoices(
   for (const hint of hints) add(hint, true);
   for (const card of deck) add(card, false);
   return out;
+}
+
+/**
+ * The vendetta lines of a card (GDD 3.20 "On the card"; round 10, 10Y, A354). `value` is `Private.vendetta`: a
+ * holder's own id, or the Accomplice's Killers' ids joined by commas. A holder reads its goal under the Vendetta
+ * label; a mate reads "Your Killer's vendetta: …" per Killer. An empty or unknown id (an inherited name) gives no
+ * line, so nothing is ever shown for a seat the server gave nothing.
+ */
+export function vendettaLines(value: string, holder: boolean): Array<{ label: string; goal: string }> {
+  return value
+    .split(',')
+    .map((id) => vendettaGoal(id.trim()))
+    .filter((goal): goal is string => goal !== null)
+    .map((goal) =>
+      holder
+        ? { label: `${VENDETTA_COPY['vendetta.label']}: `, goal }
+        : { label: '', goal: fill(VENDETTA_COPY['vendetta.mate'], { goal }) },
+    );
 }
 
 export interface RoleCardScreen extends Screen {
@@ -126,6 +149,7 @@ export function mountRoleCard(
     );
   };
 
+  const goal = h('p', { class: 'wdi-card__goal', 'data-testid': 'card-goal' }, role.goal);
   // GDD 3.17: the look this seat walks as, the deck, and for a cover role the picker.
   const hints = role.coverHints ?? [];
   const walkLead =
@@ -139,6 +163,27 @@ export function mountRoleCard(
     h('ul', { class: 'wdi-card__deckcards' }, ...(role.deck ?? []).map(deckChip)),
   );
   const picker = hints.length > 0 ? mountCoverPicker(role, opts) : null;
+
+  // GDD 3.20: the vendetta under the goal, from the private view; a card with the Knife holds its own, any other
+  // card (the Accomplice) reads its Killers'. Hidden until the view carries one.
+  const vendettaBox = h('div', {
+    class: 'wdi-card__vendettas',
+    'data-testid': 'card-vendetta',
+    hidden: true,
+  });
+  const holdsKnife = role.abilities.some((a) => a.id === 'kill');
+  let shownVendetta = '';
+  const paintVendetta = (value: string) => {
+    if (value === shownVendetta) return;
+    shownVendetta = value;
+    const lines = vendettaLines(value, holdsKnife);
+    vendettaBox.replaceChildren(
+      ...lines.map((l) =>
+        h('p', { class: 'wdi-card__vendetta' }, l.label !== '' && h('strong', {}, l.label), l.goal),
+      ),
+    );
+    vendettaBox.hidden = lines.length === 0;
+  };
 
   const front = h(
     'article',
@@ -157,7 +202,8 @@ export function mountRoleCard(
     ),
     picker?.el,
     role.deck !== undefined && role.deck.length > 0 && deckStrip,
-    h('p', { class: 'wdi-card__goal' }, role.goal),
+    goal,
+    vendettaBox,
     abilities.length > 0 && h('ul', { class: 'wdi-card__abilities' }, ...abilities),
     items.length > 0 && h('ul', { class: 'wdi-card__inventory' }, ...items),
     h('p', { class: 'wdi-card__text' }, role.cardText),
@@ -202,8 +248,16 @@ export function mountRoleCard(
   );
   root.append(card, chip);
 
-  // The picker keeps itself in step with the server's picks (own and mates') for as long as the card is mounted.
+  // Round 10, C5 (GDD 3.8): a Paint The Town Red Killer's goal is the shared target, once its private view says so.
+  const paint = (n: number) => {
+    if (n > 0) goal.textContent = fill(LOOKS_COPY['card.paint.goal'], { n });
+  };
+
+  // The picker, the paint target and the vendetta keep in step with the private view for as long as the card is
+  // mounted (own and mates' picks; the target; a vendetta that lands after the card).
   const pickerPoll = picker && opts.cover ? pollCover(picker, opts.cover) : null;
+  const paintPoll = opts.paintTarget ? pollEvery(opts.paintTarget, paint) : null;
+  const vendettaPoll = opts.vendetta ? pollEvery(opts.vendetta, paintVendetta) : null;
 
   let open = false;
   let timers: number[] = [];
@@ -268,6 +322,8 @@ export function mountRoleCard(
     destroy: () => {
       clearTimers();
       pickerPoll?.();
+      paintPoll?.();
+      vendettaPoll?.();
       document.removeEventListener('keydown', onKey);
       card.remove();
       chip.remove();
@@ -395,7 +451,12 @@ function mountCoverPicker(role: RoleRevealPayload, opts: RoleCardOptions): Cover
 
 /** Re-reads the live picks twice a second while the card is mounted; returns the stop. */
 function pollCover(picker: CoverPicker, read: () => CoverState): () => void {
-  const sync = () => picker.sync(read());
+  return pollEvery(read, (c) => picker.sync(c));
+}
+
+/** Reads a value of the private view now and twice a second while the card is mounted; returns the stop. */
+function pollEvery<T>(read: () => T, apply: (value: T) => void): () => void {
+  const sync = () => apply(read());
   sync();
   const id = window.setInterval(sync, 500);
   return () => window.clearInterval(id);

@@ -471,6 +471,13 @@ export const BalanceFile = z.strictObject({
     /** C2b: an owing seat's look makes its shop ask this much more; the Clerk's errand is held this long. */
     priceMult: z.number().min(1),
     errandS: z.number().positive(),
+    /** C3: an owing look's stall stocks this much of its day's stock. */
+    stockMult: Frac,
+  }),
+  /** Round 10 (C3, GDD 3.23): a stall's day's stock of each item, one per seat and at least `stallStockMin`. */
+  townWork: Section({
+    stallStockPerSeat: z.number().positive(),
+    stallStockMin: z.number().int().nonnegative(),
   }),
   /**
    * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
@@ -484,6 +491,11 @@ export const BalanceFile = z.strictObject({
     }),
     cap: Frac,
   }),
+  /**
+   * Round 10 (C5, GDD 3.8): Paint The Town Red. `winUnique` is a fraction: the Killers' combined unique kills must reach
+   * ceil(`winUnique` x the NPC seats at the deal), at least 1.
+   */
+  paintTown: Section({ winUnique: Frac }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
@@ -591,6 +603,8 @@ export const BalanceFile = z.strictObject({
     constableAtHumans: z.number().int().positive(),
     constableMatches: z.number().int().positive(),
   }),
+  /** Round 10, B4 (GDD 3.31): a manhunt runs `durationS` from the warrant's turn. */
+  manhunt: Section({ durationS: Seconds }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
@@ -599,9 +613,16 @@ export const BalanceFile = z.strictObject({
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
   /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
-   * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears.
+   * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
+   * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
+   * last `fileWindowS` (B3c).
    */
-  law: Section({ speedMult: z.number().positive(), briefingAfterS: Seconds }),
+  law: Section({
+    speedMult: z.number().positive(),
+    briefingAfterS: Seconds,
+    cuffHoldS: Seconds,
+    fileWindowS: Seconds,
+  }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

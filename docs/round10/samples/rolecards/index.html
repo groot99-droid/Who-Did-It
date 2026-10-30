@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Role Cards Mock</title>
+<meta name="description" content="Who Did It, round 10 (10R): the trifold role card and the Daybook, a clickable mock filled from packages/content." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ---- Proposed tokens (docs/round10/rolecards.md 6). Reused game tokens keep their hex: ink, bone, slate, mustard,
+   moon, blood. The rest is the proposed `dossier` set, DOM only, like round 7's night set. ---- */
+:root {
+  --wdi-ink: #12141c; --wdi-bone: #d9d2c2; --wdi-slate: #2c3240; --wdi-mustard: #f2b33d;
+  --wdi-moon: #7fa8ff; --wdi-blood: #b3121f; --wdi-night: #0a0924; --wdi-lantern: #ffb457; --wdi-teal: #2ec4b6;
+  --d-paper: #eceef2; --d-card: #fbfbfc; --d-ink: var(--wdi-ink); --d-soft: #586072; --d-rule: #d3d8e0;
+  --d-well: #f1ebdd; --d-mustard-text: #8c600a; --d-mustard: var(--wdi-mustard); --d-on-mustard: var(--wdi-ink);
+  --d-moss: #2f6b45; --d-brick: #9e3b2a; --d-focus: #2d5fa8; --d-sheet: var(--wdi-slate); --d-line: var(--wdi-ink);
+  --f-display: 'Alegreya SC', Georgia, serif; --f-text: 'Alegreya Sans', system-ui, sans-serif;
+  --f-label: 'IBM Plex Mono', ui-monospace, monospace;
+  --dur: 220ms; --dur-fold: 520ms; --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  color-scheme: light;
+}
+:root[data-theme='dark'] {
+  --d-paper: #2a303d; --d-card: #343b4a; --d-ink: var(--wdi-bone); --d-soft: #a9afbc; --d-rule: #4a5264;
+  --d-well: #3d4352; --d-mustard-text: var(--wdi-mustard); --d-moss: #8fcba2; --d-brick: #ec917a;
+  --d-focus: var(--wdi-moon); --d-line: var(--wdi-bone);
+  color-scheme: dark;
+}
+@media (prefers-reduced-motion: reduce) { :root { --dur: 0ms; --dur-fold: 0ms; } }
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { display: flex; flex-direction: column; height: 100dvh; background: var(--wdi-night); color: var(--d-ink); font: 400 17px/1.5 var(--f-text); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--d-focus); outline-offset: 2px; }
+.mono { font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.num { font-family: var(--f-label); font-variant-numeric: tabular-nums; }
+[hidden] { display: none !important; }
+
+/* ---- the mock's own controls (not part of the design) ---- */
+.mockbar { flex: none; z-index: 50; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center;
+  padding: 8px 16px; background: var(--d-card); border-bottom: 2px solid var(--d-line); font-size: 15px; }
+.mockbar h1 { margin: 0 8px 0 0; font: 700 20px/1.1 var(--f-display); }
+.mockbar label { display: inline-flex; gap: 6px; align-items: center; }
+.mockbar select, .mockbar button { min-height: 36px; border: 1px solid var(--d-rule); border-radius: 6px; background: var(--d-paper); color: var(--d-ink); padding: 0 10px; }
+.mockbar .note { color: var(--d-soft); font-size: 14px; margin-left: auto; }
+.stage { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.stage[data-view='phone'] { display: grid; place-items: center; padding: 16px; }
+
+/* ---- the world behind (a stand-in: night ground and a few tiles) ---- */
+.world { position: absolute; inset: 0; background:
+  radial-gradient(ellipse at 40% 55%, rgb(255 180 87 / 0.18), transparent 45%),
+  repeating-linear-gradient(30deg, rgb(127 168 255 / 0.05) 0 2px, transparent 2px 46px),
+  repeating-linear-gradient(-30deg, rgb(127 168 255 / 0.05) 0 2px, transparent 2px 46px),
+  linear-gradient(#141a2e, #0a0924); }
+.phone { position: relative; width: 390px; height: min(844px, 100%); max-width: 100%; border-radius: 36px; overflow: hidden;
+  border: 10px solid #000; box-shadow: 0 30px 80px rgb(0 0 0 / 0.5); container-type: inline-size; }
+.desk { position: absolute; inset: 0; container-type: inline-size; }
+
+/* ---- the HUD that stays (doc 5.2) ---- */
+.hud { position: absolute; inset: 0; pointer-events: none; color: var(--wdi-bone); font-size: 14px; }
+.hud > * { pointer-events: auto; }
+.hud-goal { position: absolute; left: 12px; top: 12px; display: flex; gap: 8px; align-items: center; max-width: min(360px, 60%);
+  padding: 6px 12px 6px 6px; border-radius: 999px; background: rgb(18 20 28 / 0.78); border: 1px solid rgb(217 210 194 / 0.3); cursor: pointer; text-align: left; }
+.hud-goal .disc { color: var(--wdi-ink); width: 32px; height: 32px; border-radius: 50%; background: var(--wdi-bone); display: grid; place-items: center; flex: none; }
+.hud-goal b { display: block; font: 700 15px/1.1 var(--f-display); }
+.hud-goal span { display: block; font-size: 13px; line-height: 1.25; color: rgb(217 210 194 / 0.85); }
+.hud-clock { position: absolute; left: 50%; top: 12px; translate: -50% 0; padding: 4px 14px; border-radius: 999px; background: rgb(18 20 28 / 0.8); text-align: center; }
+.hud-clock .num { font-size: 20px; color: var(--wdi-lantern); }
+.hud-tr { position: absolute; right: 12px; top: 12px; display: flex; gap: 8px; }
+.hud-btn { min-width: 44px; min-height: 44px; border-radius: 10px; border: 1px solid rgb(217 210 194 / 0.35); background: rgb(18 20 28 / 0.8); color: var(--wdi-bone); display: inline-flex; gap: 6px; align-items: center; justify-content: center; padding: 0 10px; cursor: pointer; }
+.hud-btn kbd, .kbd { font-family: var(--f-label); font-size: 12px; border: 1px solid currentColor; border-radius: 4px; padding: 0 5px; min-width: 20px; display: inline-block; text-align: center; line-height: 18px; }
+.hud-btn .badge { width: 8px; height: 8px; border-radius: 50%; background: var(--wdi-mustard); }
+.hud-body { position: absolute; left: 12px; bottom: 96px; width: 200px; }
+.bar { height: 8px; border-radius: 4px; background: rgb(217 210 194 / 0.2); overflow: hidden; margin: 4px 0; }
+.bar i { display: block; height: 100%; }
+.hud-purse { position: absolute; right: 12px; bottom: 96px; padding: 4px 12px; border-radius: 999px; background: rgb(18 20 28 / 0.8); }
+.hotbar { position: absolute; left: 50%; bottom: 16px; translate: -50% 0; display: flex; gap: 6px; }
+.hotbar button { width: 52px; height: 52px; border-radius: 8px; background: rgb(18 20 28 / 0.75); border: 1px solid rgb(217 210 194 / 0.3); color: var(--wdi-bone); font-size: 11px; line-height: 1.1; padding: 2px; position: relative; }
+.hotbar button.on { border: 2px solid var(--wdi-mustard); }
+.hotbar button .n { position: absolute; left: 4px; top: 2px; font-family: var(--f-label); font-size: 11px; opacity: 0.8; }
+.touch { position: absolute; inset: auto 0 0 0; height: 0; }
+.stick { position: absolute; left: 20px; bottom: 120px; width: 120px; height: 120px; border-radius: 50%; border: 2px solid rgb(217 210 194 / 0.4); background: rgb(18 20 28 / 0.4); }
+.stick::after { content: ''; position: absolute; inset: 34px; border-radius: 50%; background: var(--wdi-bone); }
+.stick small { position: absolute; left: 0; right: 0; bottom: -22px; text-align: center; color: rgb(217 210 194 / 0.85); font-size: 12px; }
+.sneak-toggle { position: absolute; left: 148px; bottom: 124px; }
+.cluster { position: absolute; right: 16px; bottom: 112px; display: grid; grid-template-columns: repeat(3, 60px); gap: 10px; direction: rtl; }
+.disc { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--wdi-ink); background: var(--wdi-bone); color: var(--wdi-ink); display: grid; place-content: center; text-align: center; font-size: 11px; line-height: 1.1; direction: ltr; }
+.disc b { font: 700 16px/1 var(--f-label); }
+.disc.primary { background: var(--wdi-mustard); width: 72px; height: 72px; }
+.desk .touch, .desk .sneak-toggle { display: none; }
+.phone .hud-body, .phone .hud-purse { bottom: 248px; }
+.phone .hud-body { width: 150px; }
+.phone .hotbar { bottom: 78px; }
+.phone .hotbar button { width: 44px; height: 44px; font-size: 9px; }
+.phone .hud-goal { max-width: 230px; }
+.phone .hud-goal span { display: none; }
+
+/* ---- the trifold (doc 2) ---- */
+.scrim { position: absolute; inset: 0; background: rgb(10 9 36 / 0.55); z-index: 10; }
+.card { position: absolute; z-index: 11; inset: 16px; display: flex; flex-direction: column; background: var(--d-paper);
+  border: 2px solid var(--d-line); border-radius: 8px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); overflow: hidden; }
+.card::before { content: ''; position: absolute; inset: 5px; border: 2px solid var(--fac); border-radius: 4px; pointer-events: none; z-index: 2; }
+.card[data-faction='village'] { --fac: var(--wdi-moon); --on-fac: var(--wdi-ink); }
+.card[data-faction='cabal'] { --fac: var(--wdi-blood); --on-fac: var(--wdi-bone); }
+.card[data-faction='neutral'] { --fac: var(--wdi-mustard); --on-fac: var(--wdi-ink); }
+.motif { position: absolute; width: 26px; height: 26px; z-index: 3; color: var(--d-line); pointer-events: none; }
+.motif.tl { left: 9px; top: 9px; } .motif.tr { right: 9px; top: 9px; transform: scaleX(-1); }
+.motif.bl { left: 9px; bottom: 9px; transform: scaleY(-1); } .motif.br { right: 9px; bottom: 9px; transform: scale(-1, -1); }
+.topbar { position: relative; z-index: 4; display: flex; align-items: center; gap: 12px; padding: 14px 20px 12px 44px; background: var(--d-card); border-bottom: 2px solid var(--d-line); }
+.stripe { display: inline-flex; gap: 8px; align-items: center; padding: 4px 12px 4px 4px; border-radius: 999px; background: var(--fac); color: var(--on-fac); font-weight: 700; }
+.stripe .glyph { width: 26px; height: 26px; border-radius: 50%; background: var(--wdi-bone); color: var(--wdi-ink); display: grid; place-items: center; }
+.topbar .title { font: 700 26px/1 var(--f-display); margin: 0; }
+.topbar .spacer { flex: 1; }
+.meter { position: absolute; left: 0; right: 0; bottom: -2px; height: 4px; background: transparent; }
+.meter i { display: block; height: 100%; background: var(--d-mustard); transform-origin: left; }
+.meter i.run { animation: drain var(--hold) linear forwards; }
+@keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+.btn { min-height: 44px; padding: 0 16px; border-radius: 6px; border: 1px solid var(--d-line); background: var(--d-card); color: var(--d-ink); font-weight: 700; cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.btn.primary { background: var(--d-mustard); color: var(--d-on-mustard); border-color: var(--d-on-mustard); }
+.btn.sm { min-height: 36px; padding: 0 10px; font-weight: 500; }
+.secs { font-family: var(--f-label); font-size: 13px; color: var(--d-soft); }
+.panels { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1.1fr 1.15fr; perspective: 2200px; }
+.panel { min-height: 0; overflow: auto; padding: 22px 26px 32px; background: var(--d-paper); position: relative; scrollbar-width: thin; }
+.panel + .panel { border-left: 1px dashed var(--d-rule); box-shadow: inset 14px 0 18px -16px rgb(0 0 0 / 0.25); }
+.panel:nth-child(1) { transform-origin: right center; } .panel:nth-child(3) { transform-origin: left center; }
+.card.folded .panel:nth-child(1) { transform: rotateY(-178deg); } .card.folded .panel:nth-child(3) { transform: rotateY(178deg); }
+.card .panel:nth-child(1), .card .panel:nth-child(3) { transition: transform var(--dur-fold) var(--ease); backface-visibility: hidden; }
+.eyebrow { margin: 0 0 4px; color: var(--d-soft); }
+h2.sec { font: 700 22px/1.15 var(--f-display); margin: 22px 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--d-line); display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+h2.sec:first-child { margin-top: 0; }
+h3.sub { font: 700 15px/1.2 var(--f-label); text-transform: uppercase; letter-spacing: 0.08em; color: var(--d-soft); margin: 18px 0 8px; }
+.box { background: var(--d-card); border: 1px solid var(--d-rule); border-radius: 8px; padding: 12px 14px; }
+.box + .box { margin-top: 10px; }
+.well { background: var(--d-well); border-radius: 8px; padding: 10px 14px; margin: 12px 0; }
+.well .mono { color: var(--d-mustard-text); display: block; margin-bottom: 2px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--f-label); font-size: 12px; padding: 1px 7px; border-radius: 4px; background: var(--d-ink); color: var(--d-card); white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; padding: 1px 9px; border-radius: 999px; border: 1px solid currentColor; white-space: nowrap; }
+.pill.moss { color: var(--d-moss); } .pill.brick { color: var(--d-brick); } .pill.mustard { color: var(--d-mustard-text); } .pill.soft { color: var(--d-soft); }
+.portrait { display: grid; grid-template-columns: 112px 1fr; gap: 16px; align-items: start; }
+.portrait .pic { aspect-ratio: 2 / 3; border-radius: 6px; background: var(--d-sheet); color: var(--wdi-bone); display: grid; place-items: center; border: 2px solid var(--d-line); font: 700 40px/1 var(--f-display); position: relative; overflow: hidden; }
+.portrait .pic small { position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; font: 400 10px/1 var(--f-label); opacity: 0.8; }
+.traits { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.trait { display: inline-flex; gap: 6px; align-items: center; padding: 2px 10px 2px 6px; border-radius: 999px; background: var(--d-card); border: 1px solid var(--d-rule); font-size: 15px; }
+.lore { font-size: 18px; line-height: 1.45; font-style: italic; margin: 14px 0 0; }
+.deck { display: flex; flex-wrap: wrap; gap: 6px; }
+.deck .pill { color: var(--d-ink); }
+.deck .pill.cover { border-style: dashed; }
+.deck .pill.self { background: var(--d-ink); color: var(--d-card); }
+.goal { font: 500 21px/1.3 var(--f-text); margin: 0; }
+ol.routes { list-style: none; padding: 0; margin: 0; counter-reset: r; }
+ol.routes li { counter-increment: r; display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+ol.routes li:first-child { border-top: 0; }
+ol.routes li::before { content: counter(r); font: 700 20px/1 var(--f-display); color: var(--d-mustard-text); padding-top: 2px; }
+ul.plain { list-style: none; padding: 0; margin: 0; }
+ul.plain li { padding: 6px 0 6px 26px; position: relative; }
+ul.plain li::before { content: ''; position: absolute; left: 4px; top: 15px; width: 12px; height: 2px; background: var(--d-brick); }
+ul.check li::before { width: 12px; height: 12px; top: 11px; border: 2px solid var(--d-ink); background: none; border-radius: 2px; }
+ul.check li.done::before { background: var(--d-moss); border-color: var(--d-moss); }
+.beware { border-left: 4px solid var(--d-mustard); background: var(--d-well); border-radius: 0 8px 8px 0; padding: 10px 14px; }
+.act { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+.act:first-of-type { border-top: 0; }
+.act .name { font-weight: 700; font-size: 17px; }
+.act .how { display: flex; gap: 6px; justify-content: flex-end; align-items: flex-start; flex-wrap: wrap; }
+.act .line { grid-column: 1 / -1; color: var(--d-ink); font-size: 16px; }
+.act .meta { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.key { font-family: var(--f-label); font-size: 13px; font-weight: 500; min-width: 28px; height: 28px; padding: 0 7px; border: 1px solid var(--d-ink); border-bottom-width: 3px; border-radius: 6px; display: inline-grid; place-items: center; background: var(--d-card); }
+.tapk { font-family: var(--f-label); font-size: 12px; height: 28px; padding: 0 9px; border-radius: 999px; background: var(--d-ink); color: var(--d-card); display: inline-grid; place-items: center; }
+.inputs-only-key .tapk, .inputs-only-touch .key { display: none; }
+.cd { position: relative; }
+.src { display: none; }
+.show-src .src { display: inline-flex; margin-left: 6px; vertical-align: 2px; background: var(--d-well); color: var(--d-mustard-text); }
+.picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.picker button { border: 1px solid var(--d-rule); background: var(--d-card); border-radius: 8px; padding: 8px; text-align: left; cursor: pointer; min-height: 64px; }
+.picker button[aria-pressed='true'] { border: 2px solid var(--d-ink); box-shadow: inset 0 0 0 2px var(--d-mustard); }
+.picker button b { display: block; font-size: 15px; }
+.picker button span { font-size: 13px; color: var(--d-soft); }
+.pager { display: none; }
+.tabs3 { display: none; }
+
+/* phone: one panel at a time (doc 2.3) */
+@container (max-width: 760px) {
+  .card { inset: 0; border-radius: 0; border-width: 0; }
+  .card::before, .motif { display: none; }
+  .topbar { padding: 12px 12px 10px 12px; flex-wrap: wrap; gap: 8px; }
+  .topbar .title { font-size: 22px; }
+  .topbar .secs { display: none; }
+  .tabs3 { display: flex; width: 100%; gap: 4px; order: 5; }
+  .tabs3 button { flex: 1; min-height: 40px; border: 0; border-bottom: 3px solid transparent; background: none; font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--d-soft); cursor: pointer; }
+  .tabs3 button[aria-selected='true'] { color: var(--d-ink); border-bottom-color: var(--d-mustard); }
+  .panels { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; perspective: none; scrollbar-width: none; }
+  .panels::-webkit-scrollbar { display: none; }
+  .panel { flex: 0 0 100%; scroll-snap-align: start; scroll-snap-stop: always; padding: 18px 16px 24px; }
+  .panel + .panel { border-left: 0; box-shadow: none; }
+  .card.folded .panel { transform: none; }
+  .pager { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: var(--d-card); border-top: 2px solid var(--d-line); }
+  .pager .dots { display: flex; gap: 8px; }
+  .pager .dots i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--d-ink); }
+  .pager .dots i.on { background: var(--d-ink); }
+  .portrait { grid-template-columns: 84px 1fr; }
+  .portrait .pic { font-size: 30px; }
+  .card.opening { animation: rise var(--dur-fold) var(--ease); }
+}
+@keyframes rise { from { transform: translateY(40px); opacity: 0; } }
+
+/* ---- the Daybook (doc 5) ---- */
+.daybook { position: absolute; z-index: 12; top: 64px; right: 12px; bottom: 12px; width: min(620px, calc(100% - 24px)); display: flex; flex-direction: column;
+  background: var(--d-paper); border: 2px solid var(--d-line); border-radius: 8px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); overflow: hidden; }
+.daybook.opening { animation: slide var(--dur) var(--ease); }
+@keyframes slide { from { transform: translateX(24px); opacity: 0; } }
+.db-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--d-card); border-bottom: 2px solid var(--d-line); }
+.db-head h2 { margin: 0; font: 700 24px/1 var(--f-display); }
+.db-tabs { display: flex; gap: 2px; padding: 0 12px; background: var(--d-card); border-bottom: 1px solid var(--d-rule); overflow-x: auto; scrollbar-width: none; }
+.db-tabs button { flex: none; min-height: 44px; padding: 0 12px; border: 0; border-bottom: 3px solid transparent; background: none; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; color: var(--d-soft); font-family: var(--f-label); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+.db-tabs button[aria-selected='true'] { color: var(--d-ink); border-bottom-color: var(--d-mustard); }
+.db-tabs .kbd { font-size: 11px; line-height: 16px; }
+.db-tabs .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--d-mustard-text); }
+.db-body { flex: 1; overflow: auto; padding: 16px; }
+.db-foot { padding: 8px 16px; border-top: 1px solid var(--d-rule); background: var(--d-card); color: var(--d-soft); font-size: 14px; display: flex; gap: 8px; align-items: center; }
+.slots { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.slot { aspect-ratio: 1; border: 1px solid var(--d-rule); border-radius: 6px; background: var(--d-card); font-size: 12px; line-height: 1.15; padding: 4px; position: relative; overflow: hidden; text-align: left; cursor: pointer; }
+.slot.empty { background: transparent; border-style: dashed; cursor: default; }
+.slot .q { position: absolute; right: 4px; bottom: 2px; font-family: var(--f-label); font-size: 12px; }
+.slot.bound::after { content: 'Bound'; position: absolute; left: 3px; bottom: 2px; font: 400 9px/1 var(--f-label); text-transform: uppercase; color: var(--d-mustard-text); }
+.slot[aria-pressed='true'] { border: 2px solid var(--d-ink); box-shadow: inset 0 0 0 2px var(--d-mustard); }
+.slot.held { border-color: var(--d-mustard-text); }
+.inv-grid { display: grid; grid-template-columns: 1fr 200px; gap: 16px; }
+.craft { display: grid; grid-template-columns: repeat(2, 56px); gap: 6px; }
+.craft .slot { width: 56px; }
+.row { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--d-rule); }
+.row:first-child { border-top: 0; }
+.big { font: 700 32px/1 var(--f-label); font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stats .box { text-align: center; }
+.chore { display: grid; grid-template-columns: 22px 1fr auto; gap: 10px; padding: 10px 0; border-top: 1px solid var(--d-rule); }
+.chore:first-child { border-top: 0; }
+.tick { width: 18px; height: 18px; border: 2px solid var(--d-ink); border-radius: 3px; margin-top: 3px; }
+.tick.done { background: var(--d-moss); border-color: var(--d-moss); }
+.steps { color: var(--d-soft); font-size: 15px; }
+.progress { height: 10px; border-radius: 5px; background: var(--d-rule); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--d-mustard); }
+@container (max-width: 760px) {
+  .daybook { inset: 0; width: auto; border-radius: 0; border: 0; }
+  .db-tabs { order: 9; border-top: 2px solid var(--d-line); border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .db-tabs button { flex: 1 0 auto; flex-direction: column; gap: 0; font-size: 11px; min-height: 52px; padding: 4px 8px; }
+  .db-tabs .kbd { display: none; }
+  .inv-grid { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .db-foot { display: none; }
+}
+@media (max-width: 760px) {
+  .mockbar { padding: 6px 10px; gap: 6px 10px; font-size: 14px; }
+  .mockbar h1, .mockbar .note, .mockbar .wide { display: none; }
+  .mockbar select { max-width: 150px; }
+  .stage[data-view='phone'] { padding: 0; }
+  .phone { width: 100%; height: 100%; border: 0; border-radius: 0; box-shadow: none; }
+}
+.legend { position: absolute; z-index: 5; left: 16px; bottom: 16px; max-width: 420px; background: var(--d-card); color: var(--d-ink); border: 1px solid var(--d-rule); border-radius: 8px; padding: 10px 14px; font-size: 14px; }
+.phone .legend, .stage[data-view='phone'] .legend { display: none; }
+</style>
+</head>
+<body>
+<header class="mockbar" role="banner">
+  <h1>Role Cards Mock</h1>
+  <label>Mode <select id="m-match"><option value="world">World mode</option><option value="paint">Paint The Town Red</option><option value="main">Today (until B6)</option></select></label>
+  <label>Role <select id="m-role">
+    <option value="detective">Detective (Village)</option>
+    <option value="killer">Killer (Cabal, Zealot)</option>
+    <option value="drifter">Drifter (Neutral, cover)</option>
+    <option value="baker">Baker (Village, profession)</option>
+  </select></label>
+  <label class="wide">View <select id="m-view"><option value="desktop">Desktop</option><option value="phone">Phone (390 px)</option></select></label>
+  <label>Paper <select id="m-theme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+  <label>Moment <select id="m-mode"><option value="reveal">Match start (the reveal)</option><option value="play">In play (reopened)</option></select></label>
+  <label><input type="checkbox" id="m-src" /> Show sources</label>
+  <button type="button" id="m-replay">Replay</button>
+  <span class="note">Every role, ability, item and number below is read from <span class="mono">packages/content</span>; lines marked <span class="mono">proposed</span> are drafts for the owner.</span>
+</header>
+<main class="stage" id="stage" data-view="desktop"></main>
+<script>
+const CONTENT = {"roles":{"gddRef":"3.1","factions":{"village":{"name":"Village","color":"moon","icon":"shield","membersKnowEachOther":false},"cabal":{"name":"Cabal","color":"blood","icon":"dagger","membersKnowEachOther":true},"neutral":{"name":"Neutral","color":"lantern","icon":"mask","membersKnowEachOther":false}},"roles":{"killer":{"id":"killer","name":"Killer","faction":"cabal","cover":true,"look":"killer","ships":"V1","firstPlayable":true,"goal":"Kill until the Cabal matches the village (one villager left at {byCount.villageAtMostOne.sizes}), and never get voted out.","winsWith":"cabal","win":"Parity at {byCount.parity.from}+ players, living Village at most 1 at {byCount.villageAtMostOne.sizes}, or the Final Night vote fails.","parity":"cabal","startKit":[{"item":"knife","qty":1},{"item":"skeletonKey","qty":1},{"item":"bloodyRag","qty":2},{"item":"bucket","qty":1}],"abilities":["kill","impersonate","dragBody"],"cardText":"Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it.","beware":"Clues match your own traits whatever face you wear; your height never changes; Blood shows within {clues.clues.blood.params.visibleTiles} tiles; a guarded target voids your kill.","bellPulls":1,"gddRef":"3.2"},"accomplice":{"id":"accomplice","name":"Accomplice","faction":"cabal","cover":true,"look":"accomplice","ships":"V1","firstPlayable":false,"goal":"Cover for the Killer and take the knife if they fall.","winsWith":"cabal","win":"As the Killer.","parity":"cabal","startKit":[{"item":"plantKit","qty":3},{"item":"crowbar","qty":1}],"abilities":["plantClue","crowbar","inherit"],"cardText":"You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment.","beware":"Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test.","bellPulls":1,"gddRef":"3.2"},"heir":{"id":"heir","name":"Accomplice, Knife-bearer","faction":"cabal","cover":false,"look":null,"ships":"V1","firstPlayable":false,"goal":"Carry on the Killer's work alone: strike after dark, keep your cover.","winsWith":"cabal","win":"As the Killer.","parity":"cabal","startKit":[{"item":"plantKit","qty":3},{"item":"crowbar","qty":1},{"item":"knife","qty":1}],"abilities":["kill","plantClue","crowbar"],"cardText":"The Knife has passed to you. The Killer is gone and the village does not know it yet; finish what they started.","beware":"Your Hunger clock starts in the round you inherit; your cover is still a claim someone may test.","bellPulls":1,"gddRef":"3.2"},"detective":{"id":"detective","name":"Detective","faction":"village","cover":false,"look":"detective","ships":"V1","firstPlayable":true,"goal":"Verify the clues that narrow the suspects.","winsWith":"village","win":"All Cabal dead or ejected.","parity":"village","startKit":[{"item":"magnifier","qty":1},{"item":"notebook","qty":1},{"item":"lens","qty":3},{"item":"fingerprintKit","qty":1}],"abilities":["inspect","dustCompare"],"cardText":"Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest.","beware":"Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in {abilities.abilities.inspect.params.droppedMagnifierCastS} s.","bellPulls":1,"gddRef":"3.2"},"doctor":{"id":"doctor","name":"Doctor","faction":"village","cover":false,"look":"doctor","ships":"V1","firstPlayable":true,"goal":"Keep people alive and read the dead.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"medkit","qty":2},{"item":"bandage","qty":2},{"item":"salts","qty":1}],"abilities":["bandage","autopsy","salts"],"cardText":"Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis.","beware":"{Word:decks.killers.max}-Killer games outpace your bandages.","bellPulls":1,"gddRef":"3.2"},"butler":{"id":"butler","name":"Butler","faction":"village","cover":false,"look":null,"ships":"V1","firstPlayable":false,"goal":"Control the doors and say who went where.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"masterKeyring","qty":1},{"item":"candle","qty":2}],"abilities":["lockUnlock","ledger"],"cardText":"You know every door in HollowMere. Control the wings, read the ledger, say who went where.","beware":"Universal access makes you the obvious suspect; Skeleton Key use looks like yours.","bellPulls":1,"gddRef":"3.2"},"child":{"id":"child","name":"Child","faction":"village","cover":false,"look":null,"ships":"V1","firstPlayable":false,"goal":"Hide, watch, and remember who you saw.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"slingshot","qty":1},{"item":"chalk","qty":1},{"item":"candle","qty":1}],"abilities":["silentHide","witness","slingshot"],"cardText":"You are small and quiet. Hide, watch, remember.","beware":"Top kill target; vision {balance.vision.childDeltaTiles} tile; cannot pick up items.","bellPulls":1,"gddRef":"3.2"},"townsfolk":{"id":"townsfolk","name":"Townsfolk","faction":"village","cover":false,"look":null,"ships":"V1","firstPlayable":true,"goal":"Do your chores in pairs and vote with evidence.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1},{"item":"chalk","qty":1},{"item":"rope","qty":1}],"abilities":["tasks","chalk","rope"],"cardText":"Do your chores with others to build alibis, mark what you see, vote with evidence.","beware":"Weak alone; strong in pairs.","bellPulls":2,"gddRef":"3.2"},"drifter":{"id":"drifter","name":"Drifter","faction":"neutral","cover":true,"look":"drifter","ships":"V1","firstPlayable":false,"goal":"Get yourself voted out.","winsWith":"self","win":"Get ejected (solo win; the match continues and the end screen lists you among the winners).","parity":"nobody","startKit":[{"item":"replicaKnife","qty":1},{"item":"bloodyRag","qty":1}],"abilities":["actShifty","fakeBlood"],"cardText":"You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you.","beware":"A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone.","bellPulls":1,"gddRef":"3.2"},"ranger":{"id":"ranger","name":"Ranger","faction":"village","cover":false,"look":null,"ships":"V1.5","firstPlayable":false,"goal":"Hunt the wolves and make your {word:abilities.abilities.arrest.usesPerMatch} arrest count.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"crossbow","qty":1},{"item":"bolt","qty":2},{"item":"snare","qty":2},{"item":"torch","qty":1}],"abilities":["shoot","arrest","snare"],"cardText":"You hunt wolves. {Word:abilities.abilities.arrest.usesPerMatch} arrest per match: be right.","beware":"Bolts are loud (noise {balance.noise.bolt}).","bellPulls":1,"gddRef":"3.2"},"thief":{"id":"thief","name":"Thief","faction":"neutral","cover":false,"look":null,"ships":"V1.5","firstPlayable":false,"goal":"Escape by the sea door at the back of the cave holding 3 Heirlooms.","winsWith":"self","win":"Escape by the sea door at the back of the cave holding 3 Heirlooms.","parity":"village","startKit":[{"item":"lockpicks","qty":5},{"item":"sack","qty":1},{"item":"smokeBomb","qty":1}],"abilities":["pickpocket","lockpick","smoke"],"cardText":"Nobody's hero.","beware":"Thefts look like Killer activity; counts as Village for parity.","bellPulls":1,"gddRef":"3.2"},"medium":{"id":"medium","name":"Medium","faction":"village","cover":false,"look":null,"ships":"V2","firstPlayable":false,"goal":"Hear the dead.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"seanceChalk","qty":1},{"item":"candle","qty":3}],"abilities":["seance"],"cardText":"You hear the dead.","beware":"Cabal ghosts may lie.","bellPulls":1,"gddRef":"3.2"},"vicar":{"id":"vicar","name":"Vicar","faction":"village","cover":false,"look":"vicar","ships":"V1","firstPlayable":false,"goal":"Learn {word:balance.nightPowers.perNight} soul's faction each night and steer the vote.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"candle","qty":2},{"item":"pocketWatch","qty":1}],"abilities":["confession"],"cardText":"Everyone in HollowMere confesses to you sooner or later. Each night, learn where {word:balance.nightPowers.perNight} soul stands, then choose how much to say.","beware":"Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name.","bellPulls":1,"gddRef":"3.2"},"watchman":{"id":"watchman","name":"Watchman","faction":"village","cover":false,"look":"watchman","ships":"V1","firstPlayable":false,"goal":"Stand guard over {word:balance.nightPowers.perNight} neighbour each night.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1}],"abilities":["keepWatch"],"cardText":"You walk the lanes after dark. Each night, choose {word:balance.nightPowers.perNight} door to stand by; if a blade comes for that soul tonight, it fails.","beware":"You cannot watch yourself or the same soul two nights running; poison and the Gamekeeper's shot go past you.","bellPulls":1,"gddRef":"3.2"},"herbalist":{"id":"herbalist","name":"Herbalist","faction":"village","cover":false,"look":"herbalist","ships":"V1","firstPlayable":false,"goal":"Save one life and end one, {times:roles.roles.herbalist.startKit.0.qty} each, and be right both times.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"remedy","qty":1},{"item":"nightshade","qty":1},{"item":"candle","qty":1}],"abilities":["remedy","poison"],"cardText":"{Word:roles.roles.herbalist.startKit.0.qty} bottle saves, {word:roles.roles.herbalist.startKit.1.qty} bottle ends. Pour the first where the knife will fall and the second only where you are certain.","beware":"Nightshade kills a villager as readily as a killer, and a Remedy cannot stop it.","bellPulls":1,"gddRef":"3.2"},"gamekeeper":{"id":"gamekeeper","name":"Gamekeeper","faction":"village","cover":false,"look":"gamekeeper","ships":"V1","firstPlayable":false,"goal":"If you fall, take the right one with you.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"fowlingPiece","qty":1},{"item":"lantern","qty":1}],"abilities":["lastShot"],"cardText":"Vane paid you to keep the wood. If they come for you, you will not go alone; make sure the one you take is the one who came.","beware":"You never see the blow that fells you, and the face that walked up may have been borrowed; a wasted shot kills a friend.","bellPulls":1,"gddRef":"3.2"},"lamplighter":{"id":"lamplighter","name":"Lamplighter","faction":"village","cover":false,"look":"lamplighter","plays":"townsfolk","ships":"V1","firstPlayable":true,"goal":"Do your chores in pairs and vote with evidence.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1},{"item":"chalk","qty":1},{"item":"rope","qty":1}],"abilities":["tasks","chalk","rope"],"cardText":"You light the lanterns that keep the wolves off the square. Work beside others, mark what you see, vote with evidence.","beware":"Weak alone; strong in pairs.","bellPulls":2,"gddRef":"3.2"},"baker":{"id":"baker","name":"Baker","faction":"village","cover":false,"look":"baker","plays":"townsfolk","ships":"V1","firstPlayable":true,"goal":"Do your chores in pairs and vote with evidence.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1},{"item":"chalk","qty":1},{"item":"rope","qty":1}],"abilities":["tasks","chalk","rope"],"cardText":"Up before anyone, flour to the elbows. Do your chores in company, mark what you see, vote with evidence.","beware":"Weak alone; strong in pairs.","bellPulls":2,"gddRef":"3.2"},"fisher":{"id":"fisher","name":"Fisher","faction":"village","cover":false,"look":"fisher","plays":"townsfolk","ships":"V1","firstPlayable":true,"goal":"Do your chores in pairs and vote with evidence.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1},{"item":"chalk","qty":1},{"item":"rope","qty":1}],"abilities":["tasks","chalk","rope"],"cardText":"The fog keeps the boats in. Mend the nets beside a neighbour, mark what you see, vote with evidence.","beware":"Weak alone; strong in pairs.","bellPulls":2,"gddRef":"3.2"},"tinner":{"id":"tinner","name":"Tinner","faction":"village","cover":false,"look":"tinner","plays":"townsfolk","ships":"V1","firstPlayable":true,"goal":"Do your chores in pairs and vote with evidence.","winsWith":"village","win":"Village.","parity":"village","startKit":[{"item":"lantern","qty":1},{"item":"pocketWatch","qty":1},{"item":"chalk","qty":1},{"item":"rope","qty":1}],"abilities":["tasks","chalk","rope"],"cardText":"The mine is shut; your hands are not. Work in pairs, mark what you see, vote with evidence.","beware":"Weak alone; strong in pairs.","bellPulls":2,"gddRef":"3.2"}},"decks":{"4":{"practice":true,"cards":["killer","detective","vicar","lamplighter","baker","fisher"],"gddRef":"3.9"},"5":{"practice":false,"cards":["killer","drifter","detective","vicar","doctor","lamplighter","baker"],"gddRef":"3.9"},"6":{"practice":false,"cards":["killer","drifter","detective","vicar","doctor","watchman","lamplighter","baker"],"gddRef":"3.9"},"7":{"practice":false,"cards":["killer","accomplice","detective","vicar","doctor","watchman","lamplighter","baker","fisher"],"gddRef":"3.9"},"8":{"practice":false,"cards":["killer","accomplice","detective","vicar","doctor","watchman","herbalist","lamplighter","baker","fisher"],"gddRef":"3.9"},"9":{"practice":false,"cards":["killer","accomplice","detective","vicar","doctor","watchman","herbalist","gamekeeper","lamplighter","baker","fisher"],"gddRef":"3.9"},"10":{"practice":false,"cards":["killer","killer","detective","vicar","doctor","watchman","herbalist","gamekeeper","lamplighter","baker","fisher","tinner"],"gddRef":"3.9"}}},"abilities":{"gddRef":"3.2","abilities":{"kill":{"id":"kill","name":"Kill","scope":"role","kind":"active","target":"player","requires":"knife","castS":0,"rangeTiles":1.5,"noise":"killScream","phases":["dusk","night","finalNight"],"effect":"Resolved on the validated tick; cooldown by player count (balance.json); spawns the kill clues and gives the killer Blood.","ships":"V1","gddRef":"3.2"},"killerLock":{"id":"killerLock","name":"Lock door","scope":"role","kind":"active","target":"door","cooldownS":20,"castS":3,"minPlayers":6,"params":{"expiresS":45},"effect":"Locks a house door from the outside only; the lock expires. Any door unlocks from the inside.","ships":"V1.5","gddRef":"3.2"},"dragBody":{"id":"dragBody","name":"Drag body","scope":"role","kind":"hold","target":"body","params":{"speedFactor":0.5},"effect":"Hold E to drag at reduced speed; dropping it into a body spot hides it; leaves a drag smear.","ships":"V1","gddRef":"3.2"},"plantClue":{"id":"plantClue","name":"Plant Clue","scope":"role","kind":"active","target":"ground","cooldownS":180,"castS":2,"consumes":"plantKit","effect":"Places a footprint trail or a thread with the traits you choose. Inspect marks it Forged.","ships":"V1","gddRef":"3.2"},"crowbar":{"id":"crowbar","name":"Crowbar","scope":"role","kind":"hold","target":"door","requires":"crowbar","castS":5,"noise":"crowbar","effect":"Breaks a locked door; the door stays broken.","ships":"V1","gddRef":"3.2"},"inherit":{"id":"inherit","name":"Inherit","scope":"role","kind":"passive","target":"none","params":{"killCooldownBonusS":10},"effect":"When the last Killer dies or is ejected the Knife passes to you with a longer kill cooldown; your Hunger clock starts in the round you inherit.","ships":"V1","gddRef":"3.2"},"inspect":{"id":"inspect","name":"Inspect","scope":"role","kind":"hold","target":"clue","castS":3,"requires":"magnifier","consumes":"lens","params":{"lensPerMeeting":1,"lensMax":3,"droppedMagnifierCastS":6},"effect":"Reveals a clue's hidden attribute, exposes forgeries and marks it Verified. A dropped Magnifier lets anyone Inspect, slower.","ships":"V1","gddRef":"3.2"},"dustCompare":{"id":"dustCompare","name":"Dust / Compare","scope":"role","kind":"hold","target":"clue","castS":2,"requires":"fingerprintKit","usesPerMatch":2,"effect":"Dust lifts a print (limited charges); Compare any two prints: Match / No match. Never gives a name.","ships":"V1","gddRef":"3.2"},"bandage":{"id":"bandage","name":"Bandage","scope":"role","kind":"active","target":"player","cooldownS":180,"castS":0,"rangeTiles":1.5,"consumes":"bandage","params":{"protectS":60,"knockbackTiles":1,"blackoutS":1.5,"witnessRadiusTiles":3},"effect":"Not self. The target survives the next kill attempt within the window; both are knocked back, the target's screen blacks out and gets the attacker's height as Claimed; witnesses get height + scarf as Claimed; the attacker still gains Blood.","ships":"V1","gddRef":"3.2"},"autopsy":{"id":"autopsy","name":"Autopsy","scope":"role","kind":"hold","target":"body","castS":8,"params":{"timeOfDeathErrorS":45},"effect":"Posts time of death (within the error) and cause (knife / wolf / poison / shot) as Verified.","ships":"V1","gddRef":"3.2"},"salts":{"id":"salts","name":"Salts","scope":"role","kind":"active","target":"player","castS":0,"rangeTiles":1.5,"consumes":"salts","effect":"Cures Slowed and Poisoned.","ships":"V1","gddRef":"3.22"},"lockUnlock":{"id":"lockUnlock","name":"Lock / Unlock","scope":"role","kind":"active","target":"door","cooldownS":10,"castS":0,"requires":"masterKeyring","effect":"Locks or unlocks any house door instantly. Locks keep people out, never in.","ships":"V1","gddRef":"3.2"},"ledger":{"id":"ledger","name":"Ledger","scope":"role","kind":"passive","target":"none","effect":"At each meeting, privately lists for each living player the last house they entered this cycle (house only, no time).","ships":"V1","gddRef":"3.2"},"silentHide":{"id":"silentHide","name":"Silent hide","scope":"role","kind":"active","target":"spot","castS":0,"effect":"Hide instantly and without noise; crawlspaces fit only you and adults cannot Check them.","ships":"V1","gddRef":"3.2"},"witness":{"id":"witness","name":"Witness","scope":"role","kind":"passive","target":"none","params":{"radiusTiles":6},"effect":"With line of sight to a kill within range, \"The Child saw it\" posts the killer's height + scarf as Verified at the next meeting.","ships":"V1","gddRef":"3.2"},"slingshot":{"id":"slingshot","name":"Slingshot","scope":"role","kind":"active","target":"player","cooldownS":30,"castS":0,"rangeTiles":5,"requires":"slingshot","effect":"A small hit from range that Stuns (balance.json body.damage.slingshot); at zero health the target is knocked out.","ships":"V1","gddRef":"3.22"},"tasks":{"id":"tasks","name":"Tasks","scope":"role","kind":"passive","target":"none","effect":"Your chores fill the village bar; each one writes a Claimed alibi entry (time + scene).","ships":"V1","gddRef":"3.2"},"chalk":{"id":"chalk","name":"Chalk","scope":"role","kind":"active","target":"ground","castS":0,"requires":"chalk","effect":"Draws a floor mark visible to everyone.","ships":"V1","gddRef":"3.2"},"rope":{"id":"rope","name":"Rope","scope":"role","kind":"active","target":"player","castS":0,"rangeTiles":1.5,"requires":"rope","effect":"Frees a snared player.","ships":"V1","gddRef":"3.2"},"actShifty":{"id":"actShifty","name":"Act Shifty","scope":"role","kind":"active","target":"ground","cooldownS":60,"noise":"run","effect":"Emits fake noise rings where you stand.","ships":"V1","gddRef":"3.2"},"fakeBlood":{"id":"fakeBlood","name":"Fake Blood","scope":"role","kind":"active","target":"self","usesPerMatch":1,"params":{"durationS":30},"effect":"Shows Blood on your sprite in the world (meetings show portraits).","ships":"V1","gddRef":"3.2"},"shoot":{"id":"shoot","name":"Shoot","scope":"role","kind":"active","target":"none","requires":"crossbow","consumes":"bolt","noise":"bolt","effect":"Kills a wolf.","ships":"V1.5","gddRef":"3.2"},"arrest":{"id":"arrest","name":"Arrest","scope":"role","kind":"active","target":"player","requires":"crossbow","consumes":"bolt","noise":"bolt","usesPerMatch":1,"effect":"Cuffs the target and drags them to the square; the next meeting opens with them as a Case Closed suspect.","ships":"V1.5","gddRef":"3.2"},"snare":{"id":"snare","name":"Snare","scope":"role","kind":"active","target":"ground","consumes":"snare","params":{"holdS":4},"effect":"Holds whoever steps in and logs the name.","ships":"V1.5","gddRef":"3.2"},"pickpocket":{"id":"pickpocket","name":"Pickpocket","scope":"role","kind":"active","target":"player","cooldownS":40,"effect":"Takes one item from a player.","ships":"V1.5","gddRef":"3.2"},"lockpick":{"id":"lockpick","name":"Lockpick","scope":"role","kind":"hold","target":"door","castS":2,"consumes":"lockpicks","noise":"lockpick","effect":"Opens a locked door.","ships":"V1.5","gddRef":"3.2"},"smoke":{"id":"smoke","name":"Smoke","scope":"role","kind":"active","target":"ground","consumes":"smokeBomb","params":{"durationS":4},"effect":"A smoke cloud blocks sight.","ships":"V1.5","gddRef":"3.2"},"seance":{"id":"seance","name":"Seance","scope":"role","kind":"hold","target":"body","castS":8,"requires":"seanceChalk","effect":"The ghost picks 1 of 8 phrases.","ships":"V2","gddRef":"3.2"},"skeletonKey":{"id":"skeletonKey","name":"Skeleton Key","scope":"item","kind":"hold","target":"door","castS":3,"requires":"skeletonKey","noise":"skeletonKey","effect":"Opens any locked door and leaves a print on it.","ships":"V1","gddRef":"3.5"},"rag":{"id":"rag","name":"Clean","scope":"item","kind":"hold","target":"clue","castS":3,"consumes":"bloodyRag","noise":"rag","effect":"Erases one clue.","ships":"V1","gddRef":"3.4"},"wash":{"id":"wash","name":"Wash","scope":"item","kind":"hold","target":"water","castS":3,"requires":"bucket","effect":"Washes Blood off at the well or a basin and leaves a Wet Bucket clue.","ships":"V1","gddRef":"3.4"},"heal":{"id":"heal","name":"Medkit","scope":"item","kind":"active","target":"player","castS":0,"rangeTiles":1.5,"consumes":"medkit","effect":"Restores body.healHp health and stops Bleeding; self or a seat in reach.","ships":"V1","gddRef":"3.22"},"light":{"id":"light","name":"Light","scope":"item","kind":"active","target":"self","castS":0,"effect":"Toggles a carried light; wolves flee it, but off is stealthier.","ships":"V1","gddRef":"3.5"},"collect":{"id":"collect","name":"Collect","scope":"universal","kind":"hold","target":"clue","castS":2,"effect":"Stand on a clue and hold E: it enters the Notebook with trait, scene and time.","ships":"V1","gddRef":"3.4"},"report":{"id":"report","name":"Report body","scope":"universal","kind":"active","target":"body","rangeTiles":2,"effect":"Starts a meeting; everyone moves to the square; the body stays.","ships":"V1","gddRef":"3.3"},"bell":{"id":"bell","name":"Emergency Bell","scope":"universal","kind":"active","target":"none","rangeTiles":2,"phases":["grace","day"],"effect":"Rings the bell on the square to call a meeting; pulls per match come from the role.","ships":"V1","gddRef":"3.3"},"hide":{"id":"hide","name":"Hide","scope":"universal","kind":"active","target":"spot","castS":1,"noise":"hide","effect":"Enter a free hiding spot; you see a slit view and keep one action, Burst Out.","ships":"V1","gddRef":"3.7"},"check":{"id":"check","name":"Check","scope":"universal","kind":"hold","target":"spot","castS":2,"effect":"Opens a spot; checking an occupied spot writes a Verified entry for the hider naming you and the time.","ships":"V1","gddRef":"3.7"},"burstOut":{"id":"burstOut","name":"Burst Out","scope":"universal","kind":"active","target":"none","castS":0,"noise":"burst","params":{"stunS":1},"effect":"Leave a spot instantly, stunning whoever is Checking it.","ships":"V1","gddRef":"3.7"},"sneak":{"id":"sneak","name":"Sneak","scope":"universal","kind":"hold","target":"self","effect":"Shift: silent footsteps at reduced speed.","ships":"V1","gddRef":"3.7"},"impersonate":{"id":"impersonate","name":"Impersonate","scope":"role","kind":"active","target":"seat","castS":0,"phases":["dusk","night","finalNight"],"effect":"Your character shows a living seat's name, look, scarf and hat glyph at your own height for balance.json impersonate.durationS. The face changes only unseen: at once if no other living seat is in your scene, otherwise at your next door; cancelled at no cost if it has not changed within impersonate.applyWindowS or when it is used again or day breaks first. A Knife strike drops it in place with a puff; a meeting or your death ends it; using it again, the time running out or daybreak drop it the next time you are alone in your scene or pass a door. The cooldown runs from the drop. Not self.","ships":"V1","gddRef":"3.17"},"confession":{"id":"confession","name":"Hear Confession","scope":"role","kind":"active","target":"seat","castS":0,"phases":["dusk","night","finalNight"],"nightPower":true,"effect":"Your Notebook gets the seat's faction (Village, Cabal or Neutral) as Verified. Not self.","ships":"V1","gddRef":"3.2"},"keepWatch":{"id":"keepWatch","name":"Keep Watch","scope":"role","kind":"active","target":"seat","castS":0,"phases":["dusk","night","finalNight"],"nightPower":true,"effect":"The seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target and your Notebook records it. Not self, and not the seat you watched the night before (balance.json nightPowers.watchRepeatAllowed).","ships":"V1","gddRef":"3.2"},"remedy":{"id":"remedy","name":"Remedy","scope":"role","kind":"active","target":"seat","castS":0,"consumes":"remedy","phases":["dusk","night","finalNight"],"nightPower":true,"allowSelf":true,"effect":"The seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. It does not stop Nightshade or a shot.","ships":"V1","gddRef":"3.2"},"poison":{"id":"poison","name":"Nightshade","scope":"role","kind":"active","target":"seat","castS":0,"consumes":"nightshade","phases":["dusk","night","finalNight"],"nightPower":true,"effect":"The seat dies when the night ends, a meeting opens or the Final Night hunt ends, wherever it stands; its body lies there with no trait clue. Not self.","ships":"V1","gddRef":"3.2"},"lastShot":{"id":"lastShot","name":"Last Shot","scope":"role","kind":"passive","target":"seat","requires":"fowlingPiece","noise":"shot","params":{"aimS":10},"effect":"When you are killed, poisoned or ejected you may pick one living seat within the aim time, before you learn any role; it dies too. Accepted only while you aim. Not self.","ships":"V1","gddRef":"3.2"},"strike":{"id":"strike","name":"Strike","scope":"universal","kind":"active","target":"player","cooldownS":2,"castS":0,"rangeTiles":1.2,"effect":"Fists, every card, every world phase: a small hit that costs stamina (balance.json body.strikeStamina, body.damage.strike). At zero health the target is knocked out, never killed. Public: the swing plays for everyone in sight; no clue unless blood is drawn.","ships":"V1","gddRef":"3.22"},"antidote":{"id":"antidote","name":"Antidote","scope":"universal","kind":"active","target":"player","cooldownS":10,"castS":0,"rangeTiles":1.5,"requires":"remedy","effect":"The Remedy by day, whoever holds it (the Herbalist's, kept): cures Poisoned on a seat in reach.","ships":"V1","gddRef":"3.22"},"eat":{"id":"eat","name":"Eat","scope":"item","kind":"active","target":"self","castS":0,"consumes":"wakeLoaf","effect":"Eats a food item: cures Famished and Weakened; a Wake Loaf also restores stamina to full.","ships":"V1","gddRef":"3.22"},"eatHerbBread":{"id":"eatHerbBread","name":"Eat Herb Bread","scope":"item","kind":"active","target":"self","castS":0,"consumes":"herbBread","effect":"Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long for the rest of the day.","ships":"V1","gddRef":"3.14"},"skin":{"id":"skin","name":"Skin","scope":"item","kind":"active","target":"self","cooldownS":3,"castS":0,"rangeTiles":1.5,"requires":"skinningKnife","effect":"Skins the nearest fallen creature in reach that has not been skinned, for the hide and game its row names (mobs.json skin). Wears the knife one use. Public to nobody: no noise, no clue, no animation beyond the swing of any use.","ships":"V1","gddRef":"3.22"}}},"items":{"gddRef":"3.5","inventorySlots":24,"items":{"knife":{"id":"knife","name":"Knife","kind":"weapon","roleBound":true,"onDeath":"kept","use":"kill","tooltip":"Kill.","ships":"V1","gddRef":"3.5"},"skeletonKey":{"id":"skeletonKey","name":"Skeleton Key","kind":"key","roleBound":false,"onDeath":"drops","use":"skeletonKey","tooltip":"Open any locked door; leaves a print.","ships":"V1","gddRef":"3.5"},"masterKeyring":{"id":"masterKeyring","name":"Master Keyring","kind":"key","roleBound":true,"onDeath":"kept","use":"lockUnlock","tooltip":"Lock or unlock any door.","ships":"V1","gddRef":"3.5"},"bloodyRag":{"id":"bloodyRag","name":"Bloody Rag","kind":"tool","roleBound":false,"onDeath":"drops","use":"rag","tooltip":"Erase one clue.","ships":"V1","gddRef":"3.5"},"bucket":{"id":"bucket","name":"Bucket","kind":"tool","roleBound":false,"onDeath":"drops","use":"wash","tooltip":"Wash Blood off at water.","ships":"V1","gddRef":"3.5"},"plantKit":{"id":"plantKit","name":"Plant Kit","kind":"charge","roleBound":false,"onDeath":"drops","use":"plantClue","tooltip":"Fake a trait clue.","ships":"V1","gddRef":"3.5"},"crowbar":{"id":"crowbar","name":"Crowbar","kind":"tool","roleBound":false,"onDeath":"drops","use":"crowbar","tooltip":"Break a locked door; it stays broken.","ships":"V1","gddRef":"3.5","tool":{"pry":1},"uses":20},"magnifier":{"id":"magnifier","name":"Magnifier","kind":"tool","roleBound":true,"onDeath":"inspectStation","use":"inspect","tooltip":"Inspect a clue.","ships":"V1","gddRef":"3.5"},"notebook":{"id":"notebook","name":"Notebook","kind":"tool","roleBound":true,"onDeath":"kept","tooltip":"Auto-logs what you collect and learn.","ships":"V1","gddRef":"3.5"},"lens":{"id":"lens","name":"Lens","kind":"charge","roleBound":false,"onDeath":"drops","tooltip":"One Inspect.","ships":"V1","gddRef":"3.5"},"fingerprintKit":{"id":"fingerprintKit","name":"Fingerprint Kit","kind":"tool","roleBound":false,"onDeath":"drops","use":"dustCompare","tooltip":"Dust and Compare prints.","ships":"V1","gddRef":"3.5"},"medkit":{"id":"medkit","name":"Medkit","kind":"medical","roleBound":false,"onDeath":"drops","use":"heal","tooltip":"Heal, and stop the bleeding.","ships":"V1","gddRef":"3.5"},"bandage":{"id":"bandage","name":"Bandage","kind":"medical","roleBound":false,"onDeath":"drops","use":"bandage","tooltip":"The target survives the next kill attempt; stops bleeding.","ships":"V1","gddRef":"3.5"},"salts":{"id":"salts","name":"Salts","kind":"medical","roleBound":false,"onDeath":"drops","use":"salts","tooltip":"Cure Slowed or Poisoned.","ships":"V1","gddRef":"3.5"},"lantern":{"id":"lantern","name":"Lantern","kind":"light","roleBound":false,"onDeath":"drops","use":"light","lightRadiusTiles":4,"tooltip":"Carried light; wolves flee it. Off is stealthier.","ships":"V1","gddRef":"3.5"},"candle":{"id":"candle","name":"Candle","kind":"light","roleBound":false,"onDeath":"drops","use":"light","lightRadiusTiles":2,"tooltip":"Small carried light; wolves flee it.","ships":"V1","gddRef":"3.5"},"pocketWatch":{"id":"pocketWatch","name":"Pocket Watch","kind":"tool","roleBound":false,"onDeath":"drops","tooltip":"Shows the time.","ships":"V1","gddRef":"3.5"},"chalk":{"id":"chalk","name":"Chalk","kind":"tool","roleBound":false,"onDeath":"drops","use":"chalk","tooltip":"Floor marks visible to all.","ships":"V1","gddRef":"3.5"},"rope":{"id":"rope","name":"Rope","kind":"tool","roleBound":false,"onDeath":"drops","use":"rope","tooltip":"Free a snared player.","ships":"V1","gddRef":"3.5"},"slingshot":{"id":"slingshot","name":"Slingshot","kind":"weapon","roleBound":true,"onDeath":"kept","use":"slingshot","tooltip":"Stun a player.","ships":"V1","gddRef":"3.5"},"replicaKnife":{"id":"replicaKnife","name":"Replica Knife","kind":"weapon","roleBound":true,"onDeath":"kept","tooltip":"Looks like a knife. It is not.","ships":"V1","gddRef":"3.5"},"oil":{"id":"oil","name":"Oil","kind":"deliverable","roleBound":false,"onDeath":"drops","tooltip":"Task: light the lanterns.","ships":"V1","gddRef":"3.5"},"wrench":{"id":"wrench","name":"Wrench","kind":"deliverable","roleBound":false,"onDeath":"drops","tooltip":"Task: fix the well pump.","ships":"V1","gddRef":"3.5"},"planks":{"id":"planks","name":"Planks","kind":"deliverable","roleBound":false,"onDeath":"drops","tooltip":"Task: mend the fence.","ships":"V1","gddRef":"3.5"},"letter":{"id":"letter","name":"Letter","kind":"deliverable","roleBound":false,"onDeath":"drops","tooltip":"Task: deliver the letter.","ships":"V1","gddRef":"3.5"},"flour":{"id":"flour","name":"Flour","kind":"deliverable","roleBound":false,"onDeath":"drops","tooltip":"Task: fetch the flour.","ships":"V1","gddRef":"3.5"},"forgedAlibi":{"id":"forgedAlibi","name":"Forged Alibi","kind":"tool","roleBound":false,"onDeath":"drops","tooltip":"V1.5 Accomplice kit.","ships":"V1.5","gddRef":"3.5"},"handcuffs":{"id":"handcuffs","name":"Handcuffs","kind":"tool","roleBound":false,"onDeath":"drops","tooltip":"V1.5.","ships":"V1.5","gddRef":"3.5"},"crossbow":{"id":"crossbow","name":"Crossbow","kind":"weapon","roleBound":true,"onDeath":"kept","use":"shoot","tooltip":"Shoot wolves; one Arrest.","ships":"V1.5","gddRef":"3.5"},"bolt":{"id":"bolt","name":"Bolt","kind":"charge","roleBound":false,"onDeath":"drops","tooltip":"Crossbow ammunition.","ships":"V1.5","gddRef":"3.5"},"snare":{"id":"snare","name":"Snare","kind":"tool","roleBound":false,"onDeath":"drops","use":"snare","tooltip":"Holds a player who steps in.","ships":"V1.5","gddRef":"3.5"},"torch":{"id":"torch","name":"Torch","kind":"light","roleBound":false,"onDeath":"drops","use":"light","lightRadiusTiles":4,"tooltip":"Carried light, crafted from timber and resin; wolves flee it.","ships":"V1","gddRef":"3.5"},"lockpicks":{"id":"lockpicks","name":"Lockpicks","kind":"charge","roleBound":false,"onDeath":"drops","use":"lockpick","tooltip":"Open a locked door.","ships":"V1.5","gddRef":"3.5","tool":{"pick":1}},"sack":{"id":"sack","name":"Sack","kind":"tool","roleBound":false,"onDeath":"drops","tooltip":"Carries Heirlooms.","ships":"V1.5","gddRef":"3.5"},"smokeBomb":{"id":"smokeBomb","name":"Smoke Bomb","kind":"tool","roleBound":false,"onDeath":"drops","use":"smoke","tooltip":"Blocks sight.","ships":"V1.5","gddRef":"3.5"},"heirloom":{"id":"heirloom","name":"Heirloom","kind":"valuable","roleBound":false,"onDeath":"drops","tooltip":"The Thief needs three.","ships":"V1.5","gddRef":"3.5"},"studyKey":{"id":"studyKey","name":"Study Key","kind":"key","roleBound":false,"onDeath":"drops","tooltip":"Opens the locked study in Vane Manor.","ships":"V1.5","gddRef":"3.5"},"seanceChalk":{"id":"seanceChalk","name":"Seance Chalk","kind":"tool","roleBound":true,"onDeath":"kept","use":"seance","tooltip":"Hold a seance at a body.","ships":"V2","gddRef":"3.5"},"remedy":{"id":"remedy","name":"Remedy","kind":"medical","roleBound":true,"onDeath":"kept","use":"remedy","tooltip":"One seat survives the next knife before the next meeting.","ships":"V1","gddRef":"3.5"},"nightshade":{"id":"nightshade","name":"Nightshade","kind":"charge","roleBound":true,"onDeath":"kept","use":"poison","tooltip":"One seat dies when the night ends.","ships":"V1","gddRef":"3.5"},"fowlingPiece":{"id":"fowlingPiece","name":"Fowling Piece","kind":"weapon","roleBound":true,"onDeath":"kept","use":"lastShot","tooltip":"Your last shot, when you fall.","ships":"V1","gddRef":"3.5"},"spade":{"id":"spade","name":"Spade","kind":"tool","roleBound":false,"onDeath":"drops","tooltip":"Dig tin ore out of a seam.","ships":"V1","gddRef":"3.14","tool":{"dig":1},"uses":20},"timber":{"id":"timber","name":"Timber","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Crafting: torches, snares, spades, crowbars.","ships":"V1","gddRef":"3.14"},"stone":{"id":"stone","name":"Stone","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Crafting: spades.","ships":"V1","gddRef":"3.14"},"tinOre":{"id":"tinOre","name":"Tin Ore","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Crafting: lanterns, lockpicks, crowbars. Needs a spade.","ships":"V1","gddRef":"3.14"},"resin":{"id":"resin","name":"Pine Resin","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Crafting: torches and lanterns.","ships":"V1","gddRef":"3.14"},"herb":{"id":"herb","name":"Herbs","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Crafting: snares; wanted by quest givers.","ships":"V1","gddRef":"3.14"},"mushroom":{"id":"mushroom","name":"Mushrooms","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Wanted by quest givers.","ships":"V1","gddRef":"3.14"},"strongbox":{"id":"strongbox","name":"Strongbox","kind":"valuable","roleBound":false,"onDeath":"drops","tooltip":"The manor's strongbox, heavy with the Train's delivery.","ships":"V1","gddRef":"3.20"},"dough":{"id":"dough","name":"Dough","kind":"food","roleBound":false,"onDeath":"drops","tooltip":"Mixed flour. Proof it, then bake it.","ships":"V1","gddRef":"3.14"},"proofedDough":{"id":"proofedDough","name":"Proofed dough","kind":"food","roleBound":false,"onDeath":"drops","tooltip":"Risen dough, ready for the oven.","ships":"V1","gddRef":"3.14"},"herbFilling":{"id":"herbFilling","name":"Herb filling","kind":"food","roleBound":false,"onDeath":"drops","tooltip":"Chopped herbs from the cold room, for bread.","ships":"V1","gddRef":"3.14"},"herbBread":{"id":"herbBread","name":"Herb Bread","kind":"food","roleBound":false,"onDeath":"drops","use":"eatHerbBread","buff":"resistant","tooltip":"Eat it to take poison more lightly until the buff wears off.","ships":"V1","gddRef":"3.14"},"quiltedCoat":{"id":"quiltedCoat","name":"Quilted coat","kind":"armour","roleBound":false,"onDeath":"drops","equip":"body","armor":{"tier":1},"tooltip":"A padded coat. Worn on the body, it takes a fifth off the damage you take.","ships":"V1","gddRef":"3.22"},"leatherJerkin":{"id":"leatherJerkin","name":"Leather jerkin","kind":"armour","roleBound":false,"onDeath":"drops","equip":"body","armor":{"tier":2,"resist":{"bleeding":0.5},"staminaRegenMult":0.9},"tooltip":"Hide, stitched. Worn on the body, it cuts the damage you take and halves how fast you bleed; it tires you a little.","ships":"V1","gddRef":"3.22"},"wakeLoaf":{"id":"wakeLoaf","name":"Wake Loaf","kind":"food","roleBound":false,"onDeath":"drops","use":"eat","tooltip":"Bakery bread: cures Famished and restores stamina.","ships":"V1","gddRef":"3.22"},"indulgence":{"id":"indulgence","name":"Indulgence","kind":"valuable","roleBound":false,"onDeath":"drops","tooltip":"Clears one rumour naming your look: burn your own notice with it, or present it at a meeting.","ships":"V1","gddRef":"3.23"},"parishSeal":{"id":"parishSeal","name":"Parish Seal","kind":"valuable","roleBound":false,"onDeath":"drops","tooltip":"Present it at a meeting: the vote begins again, and for a short while no vote may name you.","ships":"V1","gddRef":"3.23"},"logs":{"id":"logs","name":"Logs","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Raw wood from a pile or a tree. Crafting waits for the mill.","ships":"V1","gddRef":"3.14"},"axe":{"id":"axe","name":"Axe","kind":"tool","roleBound":false,"onDeath":"drops","tool":{"cut":1},"uses":20,"tooltip":"Chops woodpiles, logs and stumps. Wears with use.","ships":"V1","gddRef":"3.14"},"pickaxe":{"id":"pickaxe","name":"Pickaxe","kind":"tool","roleBound":false,"onDeath":"drops","tool":{"break":1,"dig":1},"uses":20,"tooltip":"Breaks boulders and rock piles; digs a tin seam. Wears with use.","ships":"V1","gddRef":"3.14"},"hammer":{"id":"hammer","name":"Hammer","kind":"tool","roleBound":false,"onDeath":"drops","tool":{"pry":1},"uses":40,"tooltip":"Pries open a nailed crate. Wears with use.","ships":"V1","gddRef":"3.14"},"skinningKnife":{"id":"skinningKnife","name":"Skinning Knife","kind":"tool","roleBound":false,"onDeath":"drops","use":"skin","tool":{"skin":1},"uses":20,"tooltip":"Skins a fallen wolf or boar for hide and game. Wears with use. It is a tool, not a weapon.","ships":"V1","gddRef":"3.22"},"hide":{"id":"hide","name":"Hide","kind":"material","roleBound":false,"onDeath":"drops","tooltip":"Wolf and boar hide. Stitched into a Leather jerkin.","ships":"V1","gddRef":"3.22"},"game":{"id":"game","name":"Game","kind":"food","roleBound":false,"onDeath":"drops","tooltip":"Raw wolf or boar meat. A stew or a pie wants it; it is no meal as it is.","ships":"V1","gddRef":"3.22"}}},"balance":{"gddRef":"3.9","tickHz":20,"players":{"min":4,"max":10,"gddRef":"3.1"},"lobby":{"nameMin":2,"nameMax":16,"codeLength":5,"codeAlphabet":"ABCDEFGHJKLMNPQRSTUVWXYZ23456789","startMinHumans":1,"gddRef":"2"},"party":{"profileCodeLength":8,"friendsMax":50,"invitedMax":50,"listMax":50,"listRefreshS":3,"gddRef":"3.21"},"phases":{"roleRevealS":20,"countdownS":3,"graceS":30,"dayS":480,"duskS":30,"nightS":300,"voteS":25,"revealS":8,"immunityS":15,"gameOverS":20,"openingS":120,"gddRef":"3.3"},"byCount":{"4":{"killCooldownS":180,"globalKillLockS":0,"discussionS":60,"tasksEach":29,"cabalWin":"villageAtMostOne","profile":"small","gddRef":"3.9"},"5":{"killCooldownS":180,"globalKillLockS":0,"discussionS":60,"tasksEach":29,"cabalWin":"villageAtMostOne","profile":"small","gddRef":"3.9"},"6":{"killCooldownS":105,"globalKillLockS":0,"discussionS":75,"tasksEach":38,"cabalWin":"parity","profile":"small","gddRef":"3.9"},"7":{"killCooldownS":105,"globalKillLockS":0,"discussionS":75,"tasksEach":38,"cabalWin":"parity","profile":"medium","gddRef":"3.9"},"8":{"killCooldownS":90,"globalKillLockS":0,"discussionS":90,"tasksEach":38,"cabalWin":"parity","profile":"medium","gddRef":"3.9"},"9":{"killCooldownS":90,"globalKillLockS":0,"discussionS":90,"tasksEach":38,"cabalWin":"parity","profile":"large","gddRef":"3.9"},"10":{"killCooldownS":120,"globalKillLockS":45,"discussionS":90,"tasksEach":48,"cabalWin":"parity","profile":"large","gddRef":"3.9"}},"meeting":{"minVoteS":15,"endsWhenAllVoted":true,"secretVotes":true,"skipAllowed":true,"wrongEjectionDiscussionBonusS":15,"noEjectionStreak":2,"forcedVoteDivisor":3,"presentPerPlayer":1,"suspectSetMax":3,"gddRef":"3.8"},"finalNight":{"afterCycle":12,"huntS":135,"trialS":120,"killCooldownS":60,"skipAllowed":false,"tieEjectsNobody":true,"reportEndsHunt":true,"gddRef":"3.8"},"impersonate":{"applyWindowS":10,"durationS":45,"cooldownS":135,"gddRef":"3.17"},"nightPowers":{"perNight":1,"watchRepeatAllowed":false,"gddRef":"3.2"},"snowball":{"villageMargin":2,"killCooldownPenaltyS":30,"nextKillTraitClues":3,"lastKillerMinAlive":6,"lastKillerCooldownDeltaS":-15,"gddRef":"3.9"},"hunger":{"cyclesWithoutKill":2,"trailEveryS":1,"gddRef":"3.8"},"disconnect":{"deathAfterS":60,"gddRef":"3.8"},"clues":{"traitCluesPerKill":2,"firstBodyTraitClues":2,"capPerScene":40,"collectHoldS":2,"gddRef":"3.4"},"body":{"maxHp":100,"regenHpPerS":2,"regenAfterS":8,"maxStamina":100,"runCostPerS":12,"staminaRegenPerS":6,"fatigueRecover":25,"woundedBelow":30,"famishedAfterS":1680,"koS":20,"koWakeHp":20,"koPurseShare":0.5,"strikeStamina":15,"healHp":40,"creatureCorpseS":10,"damage":{"strike":{"dmg":8,"effects":{"dazed":0.1,"weakened":0.2},"kills":false},"mugging":{"dmg":8,"effects":{"dazed":0.1,"weakened":0.2},"kills":false},"slingshot":{"dmg":4,"effects":{"stunned":1},"kills":false}},"gddRef":"3.22"},"movement":{"walkTilesPerS":3,"runTilesPerS":4.5,"sneakFactor":0.6,"gddRef":"3.7"},"vision":{"dayTiles":7,"nightTiles":3.5,"childDeltaTiles":-1,"lanternTiles":2,"gddRef":"3.7"},"noise":{"walk":2,"run":6,"door":4,"killScream":8,"rag":4,"skeletonKey":5,"crowbar":10,"bolt":10,"lockpick":5,"hide":2,"burst":6,"oneWayDrop":9,"goat":4,"wispRattle":2,"shot":10,"shout":8,"portalFactor":0.5,"gddRef":"3.7"},"doors":{"swingS":3,"transitS":0.6,"sceneFadeS":0.4,"gddRef":"3.7","reachTiles":1.5},"tasks":{"cabalFakeList":true,"ghostShareCap":0.25,"martyrWeight":10,"martyrS":2100,"gddRef":"3.5"},"wolves":{"count":3,"fleeLightTiles":4,"gateClearingTiles":6,"intrudersWhenFenceBroken":1,"gddRef":"3.6"},"npc":{"difficultyMinNpcs":4,"defaultDifficulty":"normal","difficulty":{"easy":{"killChancePer10s":0.25,"reportDelayS":5,"plantsPerNight":0,"suspectVoteChance":0.5},"normal":{"killChancePer10s":0.4,"reportDelayS":3,"plantsPerNight":1,"suspectVoteChance":0.75},"hard":{"killChancePer10s":0.6,"reportDelayS":1.5,"plantsPerNight":2,"suspectVoteChance":1}},"wander":{"stepMinS":1,"stepMaxS":3,"portalSteerChance":0.25,"portalChance":0.4},"routine":{"weights":{"day":{"work":0.5,"stroll":0.3,"idle":0.2},"night":{"work":0.2,"stroll":0.3,"idle":0.5}},"stationDwellS":{"min":12,"max":30},"workPauseS":{"min":1,"max":3},"idleS":{"min":2,"max":6},"idleChanceAfterLeg":0.6,"strollTiles":{"min":3,"max":10},"sceneDwellS":{"min":30,"max":90},"favouriteStations":3,"maxWalkS":12,"stuckS":2},"react":{"startleS":{"min":0.5,"max":1.5},"afterPlacementIdleS":{"min":3,"max":8},"collectChance":0.5},"night":{"leaveDelayS":{"min":0,"max":45}},"vote":{"windowFrac":{"min":0.3,"max":0.9}},"ready":{"delayS":{"min":2,"max":9}},"aloneKill":{"afterS":90,"sightTiles":20},"nightPower":{"windowFrac":{"min":0.1,"max":0.8},"lastShotS":{"min":2,"max":8}},"hive":{"staggerS":{"min":0.3,"max":2.5},"memoryS":10},"body":{"pullTiles":10,"shoutTiles":5,"bellTiles":2},"stuckInvariantS":20,"gddRef":"3.12"},"moods":{"threshold":0.5,"desperateNeeds":2,"moodHoldS":5,"hunger":{"riseS":1680,"homeFallS":60,"mealRelief":1,"famishedMul":2},"fear":{"body":0.4,"chase":0.5,"struck":0.3,"ejection":0.2,"darkRiseS":270,"fallS":420},"anger":{"struck":0.4,"robbed":0.6,"taxed":0.3,"ejectionRelief":0.5,"mealRelief":0.3,"fallS":630},"want":{"lightPurse":10,"lightRiseS":840,"debtRiseS":420,"wage":0.4,"sale":0.2},"mug":{"chancePerS":{"light":0.01,"heavy":0.04},"moodMul":1,"fearMul":1,"nightMul":2,"weakMul":1.5,"longAloneS":30,"longAloneMul":1.5,"lightMul":0.25,"reachTiles":1.25,"approachS":10,"threatS":1.5,"answerS":6,"share":0.3,"chaseS":5,"cooldownS":420},"weights":{"hungry":{"work":1.6,"stroll":1,"idle":0.6},"scared":{"work":0.6,"stroll":0.5,"idle":2},"angry":{"work":0.8,"stroll":1.8,"idle":0.6},"desperate":{"work":0.5,"stroll":2,"idle":0.6}},"gddRef":"3.24"},"townsfolk":{"count":{"small":3,"medium":4,"large":6},"walkTilesPerS":2.5,"stationDwellS":{"min":20,"max":60},"idleS":{"min":2,"max":6},"idleChance":0.5,"height":1,"gddRef":"3.24"},"resources":{"poolActiveFrac":0.5,"stackMax":{"material":16,"food":4},"gddRef":"3.14"},"mobs":{"maxPerScene":3,"chaseS":6,"gddRef":"3.15"},"quests":{"maxActive":2,"gddRef":"3.16"},"minigames":{"crates":{"steps":3,"bandFrac":0.2},"pour":{"steps":2,"ratePerS":0.35,"bandFrac":0.12},"slide":{"steps":4},"stoke":{"stokePerTap":0.15,"ratePerS":0.08,"bandFrac":0.18,"holdS":3},"tap":{"steps":3,"periodS":1.4,"bandFrac":0.18},"lockpick":{"pinsByTier":[3,4,5],"bandFrac":0.12,"lowerTierBandMult":0.6,"snapAt":0.85,"minAttemptS":0.3,"maxAttempts":40},"gddRef":"3.16"},"reader":{"spinesMin":3,"spinesMax":5,"pageMaxChars":600,"gddRef":"3.26"},"train":{"arriveAtS":20,"deliveryAfterS":32,"hearTiles":20,"dusk":{"leaveAtS":15},"gddRef":"3.3"},"ui":{"transitionS":{"fade":0.4,"iris":0.6,"wipe":0.7},"loading":{"showAfterS":0.3,"tipEveryS":4},"gddRef":"3.13"},"ghosts":{"wispsPerCycle":1,"gddRef":"3.7"},"vendettas":{"conversion":{"shareS":160},"sabotage":{"tamperS":6,"stations":2,"undoTasks":1},"heist":{"crackS":8},"contract":{"offTargetRestS":90},"gddRef":"3.20"},"economy":{"heavyPurse":20,"taskWage":3,"heistShare":0.5,"coinPickupS":1,"gddRef":"3.23"},"chat":{"maxChars":200,"quickChatRadiusTiles":5,"quickChat":[{"id":"followMe","text":"Follow me"},{"id":"whereWereYou","text":"Where were you?"},{"id":"sawSomething","text":"I saw something"},{"id":"help","text":"Help!"},{"id":"clear","text":"Clear"},{"id":"suspicious","text":"Suspicious"},{"id":"wait","text":"Wait"},{"id":"go","text":"Go"}],"gddRef":"3.5"},"talk":{"noteGapS":6,"notesPerMeeting":4,"npc":{"notesPerMeeting":{"min":1,"max":3},"windowFrac":{"min":0.05,"max":0.8},"herringsPerMeeting":{"min":1,"max":3},"smallTalkChance":0.15},"model":{"timeoutS":4,"callsPerMatch":60,"tokensPerMatch":120000,"maxTokens":512,"maxChars":140,"transcriptLines":20},"gddRef":"3.8"},"inventory":{"hotbar":6,"belt":2,"gddRef":"3.30"},"guard":{"leashTiles":6,"angerS":20,"gddRef":"3.24"},"law":{"speedMult":2,"briefingAfterS":30,"gddRef":"3.31"},"sleep":{"confirmS":3,"innBedScrip":2,"restore":{"bed":1,"cot":0.5,"innBed":1},"innBedCures":["slowed","stunned","poisoned","famished"],"cotFaith":5,"holdoutGraceS":60,"gddRef":"3.32"},"respawn":{"hp":50,"fareDebt":6,"wageMult":0.5,"clearTargetDays":2,"priceMult":1.5,"errandS":30,"gddRef":"3.22"},"armor":{"tierMult":{"body":[0.8,0.65,0.5],"head":[0.9,0.8]},"cap":0.5,"gddRef":"3.22"},"pairing":{"answerS":{"min":5,"max":9},"yesChance":0.5,"scaredMult":1.6,"followTiles":2,"apartS":20,"gddRef":"3.31"},"petition":{"othersPct":0.3,"openS":60,"cooldownS":120,"maxEntries":4,"constableAtHumans":5,"constableMatches":2,"gddRef":"3.31"}},"clues":{"gddRef":"3.4","clues":{"body":{"id":"body","name":"Body","reveals":"cause","inWorld":true,"collectible":false,"decay":{"kind":"never"},"reader":"anyone","plantable":false,"source":"kill","description":"Cause headline; reporting it starts a meeting; a hidden body screams again when its spot is Checked.","ships":"V1","gddRef":"3.4"},"footprints":{"id":"footprints","name":"Footprints","reveals":"height","inWorld":true,"collectible":true,"decay":{"kind":"seconds","seconds":315},"reader":"anyone","params":{"rangerDecayS":630,"trailTiles":5},"plantable":true,"source":"kill","description":"A trail toward the exit; the stride spacing gives the height.","ships":"V1","gddRef":"3.4"},"thread":{"id":"thread","name":"Thread","reveals":"scarf","inWorld":true,"collectible":true,"decay":{"kind":"never"},"reader":"anyone","plantable":true,"source":"kill","description":"Snagged on a door or furniture; the colour gives the scarf.","ships":"V1","gddRef":"3.4"},"felt":{"id":"felt","name":"Snagged felt","reveals":"hat","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"detective","readWith":"dustCompare","plantable":false,"source":"kill","description":"On the exit door frame; the Detective's Dust reads the hat.","ships":"V1","gddRef":"3.4"},"blood":{"id":"blood","name":"Blood","reveals":"bloody","inWorld":false,"collectible":false,"decay":{"kind":"seconds","seconds":210},"reader":"anyone","params":{"visibleTiles":3},"plantable":false,"source":"kill","description":"On the killer's sprite, visible within range; washed off at the well or a basin.","ships":"V1","gddRef":"3.4"},"wetBucket":{"id":"wetBucket","name":"Wet Bucket","reveals":"washed","inWorld":true,"collectible":true,"decay":{"kind":"seconds","seconds":315},"reader":"anyone","plantable":false,"source":"wash","description":"Left where someone washed Blood off.","ships":"V1","gddRef":"3.4"},"fingerprint":{"id":"fingerprint","name":"Fingerprint","reveals":"fingerprint","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"detective","readWith":"dustCompare","params":{"touchersKept":3},"plantable":false,"source":"kill","description":"The last touchers of doors, items and bodies, kept server-side; Compare gives Match / No match.","ships":"V1","gddRef":"3.4"},"dragSmear":{"id":"dragSmear","name":"Drag smear","reveals":"trail","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"anyone","plantable":false,"source":"drag","description":"A trail from the kill tile to the body spot; Verified when Inspected.","ships":"V1","gddRef":"3.4"},"timeOfDeath":{"id":"timeOfDeath","name":"Time of death","reveals":"timeOfDeath","inWorld":false,"collectible":false,"decay":{"kind":"instant"},"reader":"doctor","readWith":"autopsy","plantable":false,"source":"ability","description":"From an Autopsy, within the error window.","ships":"V1","gddRef":"3.4"},"silhouette":{"id":"silhouette","name":"Silhouette","reveals":"heightScarf","inWorld":false,"collectible":false,"decay":{"kind":"instant"},"reader":"child","readWith":"witness","plantable":false,"source":"ability","description":"\"The Child saw it\": height and scarf.","ships":"V1","gddRef":"3.4"},"ledgerLine":{"id":"ledgerLine","name":"Ledger","reveals":"lastHouse","inWorld":false,"collectible":false,"decay":{"kind":"meeting"},"reader":"butler","readWith":"ledger","plantable":false,"source":"ability","description":"The last house each living player entered this cycle.","ships":"V1","gddRef":"3.4"},"droppedItems":{"id":"droppedItems","name":"Dropped items","reveals":"inventory","inWorld":true,"collectible":false,"decay":{"kind":"never"},"reader":"anyone","plantable":false,"source":"death","description":"The dead player's inventory, except role-bound items.","ships":"V1","gddRef":"3.4"},"fur":{"id":"fur","name":"Fur","reveals":"wolf","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"anyone","plantable":false,"source":"wolfKill","description":"Wolf kills leave fur, never footprints.","ships":"V1","gddRef":"3.4"},"clawMarks":{"id":"clawMarks","name":"Claw marks","reveals":"wolf","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"anyone","plantable":false,"source":"wolfKill","description":"Wolf kills leave claw marks.","ships":"V1","gddRef":"3.4"},"dripTrail":{"id":"dripTrail","name":"Drip trail","reveals":"wounded","inWorld":true,"collectible":false,"decay":{"kind":"seconds","seconds":20},"reader":"anyone","plantable":false,"source":"wound","description":"A Wounded player leaves drips while Wounded.","ships":"V1","gddRef":"3.4"},"hungerPrints":{"id":"hungerPrints","name":"Glowing footprints","reveals":"hunger","inWorld":true,"collectible":false,"decay":{"kind":"seconds","seconds":30},"reader":"anyone","plantable":false,"source":"hunger","description":"A Hungry Killer leaves a glowing footprint showing their own height on the tiles they cross, until they strike.","ships":"V1","gddRef":"3.4"},"landingPrints":{"id":"landingPrints","name":"Landing footprints","reveals":"height","inWorld":true,"collectible":true,"decay":{"kind":"seconds","seconds":315},"reader":"anyone","plantable":false,"source":"drop","description":"A one-way drop leaves a footprint trail at the landing.","ships":"V1","gddRef":"3.4"},"teaching":{"id":"teaching","name":"Long-stride footprints","reveals":"height","inWorld":true,"collectible":true,"decay":{"kind":"never"},"reader":"anyone","plantable":false,"source":"static","description":"The grace-phase teaching clue beside the well: \"Footprints, long stride: Tall\".","ships":"V1","gddRef":"3.4"},"scuffle":{"id":"scuffle","name":"Scuffle","reveals":"height","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":1},"reader":"anyone","plantable":false,"source":"mugging","description":"Scuffed ground where a mugging happened; the stride of the prints gives the mugger's height.","ships":"V1","gddRef":"3.24"},"scratch":{"id":"scratch","name":"Scratches","reveals":"picked","inWorld":true,"collectible":true,"decay":{"kind":"cycles","cycles":2},"reader":"anyone","plantable":false,"source":"pick","description":"Bright scratches round a lock a pick opened. They say a lock was picked, never by whom.","ships":"V1","gddRef":"3.29"}}},"tasks":{"gddRef":"3.5","tasks":{"lightLanterns":{"id":"lightLanterns","name":"Light the lanterns","kind":"fetch","tool":"oil","toolQty":1,"source":{"scene":"tavern_back","prop":"tk.oil_barrel"},"targets":[{"scene":"overworld","prop":"ov.lantern_0"},{"scene":"overworld","prop":"ov.lantern_1"},{"scene":"overworld","prop":"ov.lantern_2"},{"scene":"overworld","prop":"ov.lantern_3"}],"holdS":2,"nightOnly":true,"effect":"Fill a square lantern with oil from the tavern back room.","ships":"V1","gddRef":"3.5"},"fixPump":{"id":"fixPump","name":"Fix the well pump","kind":"fetch","tool":"wrench","toolQty":1,"source":{"scene":"apoth_shop","prop":"as.bench"},"targets":[{"scene":"overworld","prop":"ov.pump"}],"holdS":2,"nightOnly":false,"effect":"Fix the pump with the wrench from the apothecary bench.","ships":"V1","gddRef":"3.5"},"deliverLetter":{"id":"deliverLetter","name":"Deliver a letter","kind":"fetch","tool":"letter","toolQty":1,"source":{"scene":"widow_parlour","prop":"wp.letter_box"},"targets":[{"scene":"tavern_bar","prop":"tb.dartboard"}],"holdS":2,"nightOnly":false,"effect":"Take the letter from the widow's letter box to the tavern dartboard.","ships":"V1","gddRef":"3.5"},"mendFence":{"id":"mendFence","name":"Mend the fence","kind":"fetch","tool":"planks","toolQty":2,"source":{"scene":"forest","prop":"fo.planks"},"targets":[{"scene":"overworld","prop":"ov.fence"}],"holdS":2,"nightOnly":false,"effect":"Mend the fence with planks from the edge of Gallows Wood; while mended, wolves cannot enter the village.","ships":"V1","gddRef":"3.5"},"fetchFlour":{"id":"fetchFlour","name":"Fetch the flour","kind":"fetch","tool":"flour","toolQty":1,"source":{"scene":"bakery","prop":"bk.flour_sacks"},"targets":[{"scene":"tavern_bar","prop":"tb.flour_bin"}],"holdS":2,"nightOnly":false,"effect":"Carry a sack of flour from Crumb's Ovens to the tavern.","ships":"V1","gddRef":"3.5"},"shutterWindows":{"id":"shutterWindows","name":"Shutter the windows","kind":"coop","coopPlayers":2,"coopRadiusTiles":2,"targets":[{"scene":"tavern_bar","prop":"tb.shutters"}],"holdS":4,"nightOnly":false,"effect":"Both players within range hold E; progress pauses when one releases.","ships":"V1","gddRef":"3.5"},"mixDough":{"id":"mixDough","name":"Mix the dough","kind":"fetch","tool":"flour","toolQty":1,"source":{"scene":"bakery","prop":"bk.flour_sacks"},"targets":[{"scene":"crumb_mixing","prop":"cm.mixer"}],"holdS":2,"nightOnly":false,"effect":"Pour flour from Crumb's sacks into the mixer in the mixing room.","ships":"V1","gddRef":"3.5"},"stokeOven":{"id":"stokeOven","name":"Stoke the oven","kind":"fetch","tool":"timber","toolQty":1,"source":{"scene":"forest","prop":"fo.planks"},"targets":[{"scene":"crumb_oven","prop":"co.brick_oven"}],"holdS":2,"nightOnly":false,"effect":"Feed timber from the woodpile at the edge of Gallows Wood into the brick oven.","ships":"V1","gddRef":"3.5"},"stockColdRoom":{"id":"stockColdRoom","name":"Stock the cold room","kind":"fetch","tool":"bucket","toolQty":1,"source":{"scene":"overworld","prop":"ov.pump"},"targets":[{"scene":"crumb_cold","prop":"cf.cold_shelves"}],"holdS":2,"nightOnly":false,"effect":"Carry a bucket of well water to the cold room's shelves for the ice trays.","ships":"V1","gddRef":"3.5"},"proofLoaves":{"id":"proofLoaves","name":"Proof the loaves","kind":"fetch","tool":"candle","toolQty":1,"source":{"scene":"widow_bedroom","prop":"wb.candle"},"targets":[{"scene":"crumb_proofing","prop":"cp.proofer"}],"holdS":2,"nightOnly":false,"effect":"Bring a candle from the widow's bedroom to warm the proofing cabinet.","ships":"V1","gddRef":"3.5"}}},"quests":{"gddRef":"3.16","npcs":{"harbourmaster":{"id":"harbourmaster","name":"Harbourmaster Pell","look":"villager"},"moll":{"id":"moll","name":"Mother Moll","look":"villager"},"foreman":{"id":"foreman","name":"Foreman Hask","look":"villager"},"smith":{"id":"smith","name":"Ada Kerrow","look":"villager"},"collier":{"id":"collier","name":"The Collier","look":"villager"}},"quests":{"caulkTheSkiff":{"id":"caulkTheSkiff","giver":"harbourmaster","kind":"fetch","wants":[{"item":"resin","qty":2},{"item":"timber","qty":1}],"reward":[{"item":"lantern","qty":1}],"scrip":6,"copyId":"quest.caulkTheSkiff"},"mollsHerbs":{"id":"mollsHerbs","giver":"moll","kind":"fetch","wants":[{"item":"herb","qty":4}],"reward":[{"item":"bandage","qty":1}],"scrip":4,"copyId":"quest.mollsHerbs"},"mollsMushrooms":{"id":"mollsMushrooms","giver":"moll","kind":"fetch","wants":[{"item":"mushroom","qty":3}],"reward":[{"item":"salts","qty":1}],"scrip":4,"copyId":"quest.mollsMushrooms"},"stackTheYard":{"id":"stackTheYard","giver":"foreman","kind":"fetch","wants":[{"item":"timber","qty":4}],"reward":[{"item":"crowbar","qty":1}],"scrip":6,"copyId":"quest.stackTheYard"},"smithsOre":{"id":"smithsOre","giver":"smith","kind":"fetch","wants":[{"item":"tinOre","qty":3}],"reward":[{"item":"lantern","qty":1}],"scrip":5,"copyId":"quest.smithsOre"},"colliersStone":{"id":"colliersStone","giver":"collier","kind":"fetch","wants":[{"item":"stone","qty":3}],"reward":[{"item":"torch","qty":1}],"scrip":5,"copyId":"quest.colliersStone"},"mollsBrew":{"id":"mollsBrew","giver":"moll","kind":"fetch","after":"mollsMushrooms","wants":[{"item":"herb","qty":2},{"item":"mushroom","qty":2}],"reward":[{"item":"bandage","qty":2}],"scrip":6,"copyId":"quest.mollsBrew"},"smithsTemper":{"id":"smithsTemper","giver":"smith","kind":"fetch","after":"smithsOre","wants":[{"item":"tinOre","qty":2},{"item":"timber","qty":1}],"reward":[{"item":"hammer","qty":1}],"scrip":6,"copyId":"quest.smithsTemper"}}},"economy":{"gddRef":"3.23","stakes":{"tiers":{"modest":{"min":8,"max":14},"comfortable":{"min":24,"max":34}},"byLook":{"detective":"comfortable","doctor":"comfortable","baker":"comfortable","vicar":"modest","watchman":"modest","herbalist":"modest","gamekeeper":"modest","lamplighter":"modest","fisher":"modest","tinner":"modest"},"default":"modest"},"shops":{"bakery":{"prop":"bk.shop_counter","owner":"baker","sells":["flour","wakeLoaf"],"buys":[]},"apothecary":{"prop":"as.shop_counter","owner":"herbalist","sells":["bandage","salts"],"buys":[]},"store":{"prop":"tb.shop_counter","sells":["rope","oil","candle","planks","axe","pickaxe","hammer","quiltedCoat","skinningKnife"],"buys":[]},"market":{"prop":"ov.shop_market","sells":[],"buys":["timber","stone","resin","herb","mushroom","tinOre"]},"gamekeeper":{"prop":"fo.shop_stall","owner":"gamekeeper","sells":["snare","torch","skinningKnife"],"buys":[]},"bpStore":{"prop":"bl.shop_store","sells":["rope","oil","candle","planks","axe","pickaxe","hammer","quiltedCoat","skinningKnife"],"buys":[]},"bpGamekeeper":{"prop":"bl.shop_stall","owner":"gamekeeper","sells":["snare","torch","skinningKnife"],"buys":[]},"bpMarket":{"prop":"bc.shop_market","sells":[],"buys":["timber","stone","resin","herb","mushroom","tinOre"]}},"prices":{"flour":{"ask":2},"wakeLoaf":{"ask":3},"bandage":{"ask":4},"salts":{"ask":5},"rope":{"ask":3},"oil":{"ask":2},"candle":{"ask":1},"planks":{"ask":3},"axe":{"ask":8},"pickaxe":{"ask":10},"hammer":{"ask":6},"quiltedCoat":{"ask":12},"skinningKnife":{"ask":7},"snare":{"ask":4},"torch":{"ask":3},"timber":{"pay":1},"stone":{"pay":1},"resin":{"pay":2},"herb":{"pay":2},"mushroom":{"pay":2},"tinOre":{"pay":3}},"rent":{"maps":["hollowmere"],"amount":6,"dueAtDayFrac":0.5},"quota":{"maps":["blackpine"],"qty":2,"items":["timber","stone"],"fine":8,"racks":["bs.rack_tally"]},"trespassFine":3,"curfew":{"hollowmere":["tavern_bar","widow_parlour","bakery","apoth_shop","manor_hall","barn"],"blackpine":["bp_lodge","bp_office","bp_smithy"]},"faith":{"altars":["ov.altar_shrine","ch.altar_main","bc.altar_shrine"],"perScrip":1,"donateMax":20,"max":200,"indulgence":{"faith":10,"scrip":4},"seal":{"faith":20,"scrip":8},"sealShieldS":20,"holdMax":1},"notices":{"mailbags":["ov.mailbag_platform"],"blackMarkets":["tk.shop_black_market","bl.shop_black_market"],"slipsPerBag":3,"maxHeld":4,"fencePrice":6,"sampleS":10,"gazetteAfterRounds":1},"hq":{"stations":{"crumbOvens":{"look":"baker","props":{"hollowmere":"bk.hq_ovens","blackpine":"bl.hq_ovens"},"tiers":[{"scrip":10,"materials":[{"item":"flour","qty":2}],"perks":{"shopDiscount":0.8}},{"scrip":20,"materials":[{"item":"timber","qty":2},{"item":"stone","qty":1}],"perks":{"fenceGain":1.5}},{"scrip":35,"materials":[{"item":"stone","qty":2},{"item":"tinOre","qty":1}],"perks":{"staminaRegen":1.2,"famishedImmune":1}}]},"chapel":{"look":"vicar","props":{"hollowmere":"ov.hq_chapel","blackpine":"bc.hq_chapel"},"tiers":[{"scrip":10,"materials":[{"item":"candle","qty":2}],"perks":{"faithGain":1.25}},{"scrip":20,"materials":[{"item":"timber","qty":2},{"item":"resin","qty":1}],"perks":{"indulgenceFaith":0.5}},{"scrip":35,"materials":[{"item":"stone","qty":2},{"item":"tinOre","qty":1}],"perks":{"sealShield":1.5}}]},"surgery":{"look":"doctor","props":{"hollowmere":"as.hq_surgery","blackpine":"bl.hq_infirmary"},"tiers":[{"scrip":10,"materials":[{"item":"herb","qty":2}],"perks":{"shopDiscount":0.8}},{"scrip":20,"materials":[{"item":"herb","qty":2},{"item":"mushroom","qty":1}],"perks":{"healGain":1.25}},{"scrip":35,"materials":[{"item":"resin","qty":2},{"item":"tinOre","qty":1}],"perks":{"hpRegen":1.2}}]},"lodge":{"look":"gamekeeper","props":{"hollowmere":"fo.hq_lodge","blackpine":"bw.hq_lodge"},"tiers":[{"scrip":10,"materials":[{"item":"timber","qty":2}],"perks":{"shopDiscount":0.8}},{"scrip":20,"materials":[{"item":"timber","qty":2},{"item":"resin","qty":1}],"perks":{"rentDue":0.5}},{"scrip":35,"materials":[{"item":"stone","qty":2},{"item":"tinOre","qty":1}],"perks":{"creatureDmg":0.8}}]},"office":{"look":"detective","props":{"hollowmere":"ov.hq_office","blackpine":"bo.hq_office"},"tiers":[{"scrip":10,"materials":[{"item":"candle","qty":1}],"perks":{"slipsExtra":1}},{"scrip":20,"materials":[{"item":"timber","qty":2},{"item":"tinOre","qty":1}],"perks":{"noticesHeld":2}},{"scrip":35,"materials":[{"item":"stone","qty":2},{"item":"tinOre","qty":1}],"perks":{"slipsExtra":2}}]},"store":{"look":"lamplighter","props":{"hollowmere":"ov.hq_store","blackpine":"bc.hq_store"},"tiers":[{"scrip":10,"materials":[{"item":"oil","qty":1}],"perks":{"shopDiscount":0.8}},{"scrip":20,"materials":[{"item":"timber","qty":2},{"item":"resin","qty":1}],"perks":{"quotaDue":0.5}},{"scrip":35,"materials":[{"item":"stone","qty":2},{"item":"tinOre","qty":1}],"perks":{"lightGain":1.25}}]}}}},"vendettas":{"gddRef":"3.20","vendettas":{"zealot":{"id":"zealot","role":"killer","kind":"conversion","needsCard":"vicar","triggers":[{"on":"meeting"}],"emits":["vendetta.conversion.sown","vendetta.conversion.doubt","vendetta.conversion.lapsed"],"fires":"vendetta.conversion.doubt"},"activist":{"id":"activist","role":"killer","kind":"sabotage","triggers":[],"emits":["vendetta.sabotage.tampered","vendetta.sabotage.wrecked"],"fires":"vendetta.sabotage.wrecked"},"bandit":{"id":"bandit","role":"killer","kind":"heist","maps":["hollowmere"],"needsScene":"manor_hall","triggers":[{"on":"train.delivery"}],"emits":["vendetta.heist.loaded","vendetta.heist.cracked"],"fires":"vendetta.heist.cracked"},"hitman":{"id":"hitman","role":"killer","kind":"contract","maps":["hollowmere"],"triggers":[{"on":"train.arrive"},{"on":"kill"},{"on":"death"}],"emits":["vendetta.contract.offered","vendetta.contract.accepted","vendetta.contract.done","vendetta.contract.lapsed"],"fires":"vendetta.contract.done"}}},"looks":{"detective":{"name":"the Detective","role":"detective"},"doctor":{"name":"the Doctor","role":"doctor"},"vicar":{"name":"the Vicar","role":"vicar"},"watchman":{"name":"the Watchman","role":"watchman"},"herbalist":{"name":"the Herbalist","role":"herbalist"},"gamekeeper":{"name":"the Gamekeeper","role":"gamekeeper"},"lamplighter":{"name":"the Lamplighter","role":"lamplighter"},"baker":{"name":"the Baker","role":"baker"},"fisher":{"name":"the Fisher","role":"fisher"},"tinner":{"name":"the Tinner","role":"tinner"},"killer":{"name":"the Killer","role":"killer"},"accomplice":{"name":"the Accomplice","role":"accomplice"},"drifter":{"name":"the Drifter","role":"drifter"}}};
+
+// ---- Data wins, card generated (A168): the token filler of packages/content/src/cardText.ts, ported. ----
+const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const TIMES = ['never', 'once', 'twice'];
+const styled = (style, n) => {
+  if (!style) return String(n);
+  if (style === 'times') return TIMES[n] ?? `${n} times`;
+  const w = Number.isInteger(n) ? (WORDS[n] ?? String(n)) : String(n);
+  return style === 'Word' ? w[0].toUpperCase() + w.slice(1) : w;
+};
+const sizesOf = (rule) => Object.entries(CONTENT.balance.byCount).filter(([, r]) => r.cabalWin === rule).map(([n]) => +n).sort((a, b) => a - b);
+function token(path, style) {
+  // A match token, filled by the client from the match (seams row 18): the Paint The Town Red target is
+  // ceil(winUnique × the NPC seats at the deal), at least 1; every seat but the two Killers is an NPC.
+  if (path === 'paintTown.target') {
+    const f = CONTENT.balance.paintTown?.winUnique;
+    if (typeof f !== 'number') throw new Error('paintTown.winUnique lands in C5');
+    return styled(style, Math.max(1, Math.ceil(f * (CONTENT.roles.decks[SAMPLE[ui.role].deck].cards.length - 2))));
+  }
+  if (path === 'decks.killers.max') {
+    const k = (cards) => cards.filter((id) => CONTENT.roles.roles[id]?.abilities.includes('kill')).length;
+    return styled(style, Math.max(...Object.values(CONTENT.roles.decks).map((d) => k(d.cards))));
+  }
+  const m = /^byCount\.(\w+)\.(from|sizes)$/.exec(path);
+  if (m) { const s = sizesOf(m[1]); return m[2] === 'from' ? styled(style, s[0]) : s[0] === s.at(-1) ? String(s[0]) : `${s[0]}-${s.at(-1)}`; }
+  let at = CONTENT;
+  for (const k of path.split('.')) at = at && typeof at === 'object' ? at[k] : undefined;
+  if (typeof at !== 'number') throw new Error(`card token {${path}} is not a number in the data`);
+  return styled(style, at);
+}
+const fill = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (_, s, p) => token(p, s));
+/** As `fill`, but a key that a later step adds (paintTown, C5) shows as its name instead of failing. */
+const fillLater = (t) => t.replace(/\{(?:(word|Word|times):)?([A-Za-z0-9_.]+)\}/g, (m, s, p) => { try { return token(p, s); } catch { return `[${p}]`; } });
+
+// ---- Proposed copy (docs/round10/rolecards.md 4): new roles.json fields, tokens for every number. ----
+// World mode replaces the main mode at B6 (no vote, no parity, no faction tally; world-mode.md 2); Paint The Town Red is
+// the two-human mode (world-mode.md 1.6). Each card's `modes` holds the rows of each; `today` is GDD 3.8 until B6.
+const MODES = {
+  world: {
+    detective: { goal: 'Prove who holds the Knife, and bring the case to the law.', wins: ['A murder conviction stops the Killer, and you filed the evidence, signed the petition or made the cuff: Law.', 'At the end trial, the case you filed convicts the Killer: Verdict.'], loses: ['The Killer completes the vendetta first, or reaches the end trial unconvicted.'], tag: 'world-mode.md 2, 3' },
+    killer: { goal: 'Complete your vendetta before the law catches you.', wins: ['Your vendetta completes: its steps are below.', 'You reach the end trial unconvicted, the vendetta unfinished: Unseen, a lesser win.'], loses: ['A murder conviction, a death after dark, or your vendetta foiled.'], tag: 'world-mode.md 2, 3' },
+    drifter: { tips: ['Look guilty enough for a petition, not so guilty that nobody bothers.', 'Act Shifty rings fake footsteps where you stand.', 'Fake Blood shows on you in the world for {abilities.abilities.fakeBlood.params.durationS} s, once a match.'], goal: 'Get yourself convicted and hanged.', wins: ['A trial sentences you to death: Gallows. You win alone.'], loses: ['The Killer, Nightshade or a shot takes you first.', 'The end trial closes before any court hangs you.'], tag: 'world-mode.md 2' },
+    baker: { goal: 'Keep the town fed, and bring what you see to the law.', wins: ['The Wake Loaves are baked every morning: Trade.', 'The chores bar fills before the Killer’s vendetta completes: Town, for everyone who finished a chore.', 'A murder conviction you signed for or cuffed: Law.'], loses: ['The Killer completes the vendetta first.'], tag: 'world-mode.md 2, 3' },
+  },
+  paint: {
+    killer: { goal: 'Paint the town red before you are caught.', wins: ['Between you, kill {paintTown.target} different townspeople who hold a card. The townsfolk who only walk the lanes don’t count, and a kill of someone the train brought back adds to your total, not to the count.', 'Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.'], loses: ['You are both convicted of murder, or the end trial closes first.'], tag: 'world-mode.md 1.6' },
+  },
+};
+const PROPOSED = {
+  detective: {
+    lore: 'The mainland sent you when Lord Vane was found dead. HollowMere calls you the outsider and keeps its doors shut.',
+    goal: 'Prove who holds the Knife.',
+    wins: ['Every Cabal member is dead or voted out.', 'The chores bar reaches 100%.', 'The Final Night vote takes a Cabal member.'],
+    loses: ['The Cabal matches the living village, or one villager is left at {byCount.villageAtMostOne.sizes} players.', 'The Final Night vote takes nobody, or someone else.'],
+    tips: ['Collect every clue you pass. Inspect the ones that matter: each costs a Lens.', 'Your Verified clues go on the Case Board, where everyone can read them.', 'Compare two prints to learn if they match. It never gives a name.'],
+    beware: ['You are the first one they will come for.', 'A Bloody Rag can wipe a clue before you reach it.', 'A planted clue still costs a Lens to expose.', 'If you die, anyone can pick up your Magnifier and Inspect in {abilities.abilities.inspect.params.droppedMagnifierCastS} s.'],
+  },
+  killer: {
+    lore: 'Lord Vane was the first. You walk the lanes in someone else’s coat, and the fog keeps your secrets until the lamps go out.',
+    goal: 'Thin the village after dark, and never be voted out.',
+    wins: ['Living Cabal at least match the living village ({byCount.parity.from}+ players), or one villager is left at {byCount.villageAtMostOne.sizes}.', 'The Final Night vote takes nobody, or someone who is not Cabal.'],
+    loses: ['You are voted out, killed or poisoned, and no Cabal member carries on.', 'The chores bar reaches 100%.'],
+    tips: ['The Knife works only at dusk, at night and in the Final Night hunt.', 'Strike when the room is empty. Clean one clue, then wash at the well.', 'Impersonate a living seat to walk under their name for {balance.impersonate.durationS} s.'],
+    beware: ['Every clue shows your own height and scarf, whatever face you wear.', 'Blood shows on you within {clues.clues.blood.params.visibleTiles} tiles until you wash.', 'A Bandaged or watched target survives your strike.', 'Go {word:balance.hunger.cyclesWithoutKill} full days without striking and you leave glowing footprints.'],
+    vendetta: { id: 'zealot', title: 'Zealot', line: 'You despise the Vicar and want his flock.', steps: ['Stay near the Vicar while his flock gathers.', 'Let doubt take the flock at a meeting.'] },
+  },
+  drifter: {
+    lore: 'You came in on the last train with nothing but a borrowed name. Whatever you are running from, the rope looks like rest.',
+    goal: 'Get yourself voted out.',
+    wins: ['A vote ejects you. You win alone, the match goes on, and the end screen lists you among the winners.'],
+    loses: ['The Killer, Nightshade or a shot takes you first.', 'The match ends before anyone votes you out.'],
+    tips: ['Look guilty enough to be voted out, not so guilty that nobody bothers.', 'Act Shifty rings fake footsteps where you stand.', 'Fake Blood shows on you in the world for {abilities.abilities.fakeBlood.params.durationS} s, once a match.'],
+    beware: ['A calm village never votes. Stir it.', 'You wear a cover, like the Cabal, but you are alone.', 'You do not count toward either side’s numbers.'],
+  },
+  baker: {
+    lore: 'Up before anyone, flour to the elbows. Crumb’s Ovens feeds HollowMere, and an empty shelf is the first sign something is wrong.',
+    goal: 'Work your chores in company, and vote with evidence.',
+    wins: ['Every Cabal member is dead or voted out.', 'The chores bar reaches 100%.', 'The Final Night vote takes a Cabal member.'],
+    loses: ['The Cabal matches the living village, or one villager is left at {byCount.villageAtMostOne.sizes} players.', 'The Final Night vote takes nobody, or someone else.'],
+    tips: ['Every chore you finish writes your alibi: the time and the place.', 'Work beside someone. Two alibis are stronger than one.', 'You can ring the Emergency Bell {word:roles.roles.baker.bellPulls} times a match; most cards ring it once.'],
+    beware: ['Alone, you are easy prey. In pairs, you are hard to fool.'],
+  },
+};
+// Short, plain lines for the ability rows (proposed; abilities.json `effect` stays the rules text).
+const ABILITY_LINE = {
+  kill: 'Strike a figure in reach. They die at once and leave a body and clues.',
+  impersonate: 'Walk under a living seat’s name and look. Your height stays your own.',
+  dragBody: 'Drag a body at half speed. Drop it in a body spot to hide it.',
+  inspect: 'Read what a clue hides and expose a forgery. Costs a Lens.',
+  dustCompare: 'Lift a print, or compare two: Match or No match.',
+  actShifty: 'Ring fake footsteps where you stand.',
+  fakeBlood: 'Show Blood on yourself in the world.',
+  tasks: 'Your chores fill the village bar and write your alibi.',
+  chalk: 'Draw a floor mark everyone can see.',
+  rope: 'Free a snared player in reach.',
+};
+
+// ---- The one action table (doc 3): the input code binds these ids; the card and the touch HUD draw them. ----
+const ACTIONS = [
+  { id: 'move', group: 'move', label: 'Walk', keys: ['W', 'A', 'S', 'D'], alt: 'or the arrows', touch: 'Stick', line: 'Move. Doors take you through when you walk into them with E.' },
+  { id: 'run', group: 'move', label: 'Run', keys: ['Space'], hold: true, touch: 'Push the stick to its rim', line: 'Faster, louder, and it spends stamina.' },
+  { id: 'sneak', group: 'move', label: 'Sneak', keys: ['Shift'], hold: true, touch: 'Sneak toggle', line: 'Silent footsteps at a slower walk.' },
+  { id: 'use', group: 'verb', label: 'Use', keys: ['E'], touch: 'Use', primary: true, line: 'Whatever is in reach, as the prompt says: a door, a clue (hold to collect), a body (report), the bell, a shop, a bed, a chore, a person.' },
+  { id: 'slot1', group: 'slot', slot: 0, keys: ['Q'], touch: 'Q' },
+  { id: 'slot2', group: 'slot', slot: 1, keys: ['R'], touch: 'R' },
+  { id: 'slot3', group: 'slot', slot: 2, keys: ['F'], touch: 'F' },
+  { id: 'strike', group: 'verb', label: 'Strike', keys: ['X'], touch: 'Strike', line: 'Fists. A small hit that costs stamina. It knocks out, never kills.', ability: 'strike' },
+  { id: 'hotbar', group: 'verb', label: 'Hold an item', keys: ['1', '–', '6'], touch: 'Tap the hotbar', line: 'Pick what is in your hand. Use acts with it.' },
+  { id: 'card', group: 'screen', label: 'Role card', keys: ['Tab'], touch: 'Tap the goal chip', line: 'This card.' },
+  { id: 'daybook', group: 'screen', label: 'Daybook', keys: ['I'], touch: 'Daybook button', line: 'Pockets, chores, quests, notebook, purse.' },
+  { id: 'daybook.chores', group: 'screen', label: 'Daybook: Chores', keys: ['K'], touch: 'Chores tab' },
+  { id: 'daybook.quests', group: 'screen', label: 'Daybook: Quests', keys: ['J'], touch: 'Quests tab' },
+  { id: 'daybook.notebook', group: 'screen', label: 'Daybook: Notebook', keys: ['N'], touch: 'Notebook tab' },
+  { id: 'daybook.craft', group: 'screen', label: 'Daybook: Craft', keys: ['C'], touch: 'Pockets tab' },
+  { id: 'talk', group: 'verb', label: 'Ask for work', keys: ['T'], touch: 'Use, at a giver', line: 'At a quest giver: see what they want.' },
+  { id: 'close', group: 'screen', label: 'Close', keys: ['Esc'], touch: 'Close', line: 'Closes the open screen.' },
+];
+
+// ---- Sample private state for the mock only (what the seat's own Private view would carry). ----
+const SAMPLE = {
+  you: 'Bo', traits: { height: 'tall', scarf: 'green', hat: 'bowler' },
+  detective: { deck: '8', look: 'detective', mates: [], cover: null, lens: 2,
+    hotbar: [['magnifier', 1], ['lens', 2], ['fingerprintKit', 1], ['lantern', 1], null, null], pack: [['notebook', 1], ['resin', 2], ['herb', 3]], belt: [['axe', 1], null],
+    tasks: [['fetchFlour', 'done'], ['fixPump', 'carry'], ['deliverLetter', 'todo'], ['shutterWindows', 'todo']], fake: false,
+    quests: [['mollsHerbs', 3]], purse: 14, bank: 20, fare: 0, faith: 5,
+    notes: [['Footprints, long stride', 'Tall', 'Crumb’s Ovens', '3:12', 'verified'], ['Thread on the door', 'Green scarf', 'The Drowned Lantern, back room', '3:40', 'claimed'], ['Thread on the door', 'Green scarf', 'The Drowned Lantern, back room', '3:41', 'corroborated'], ['Footprints', 'Short', 'Apothecary loft', '5:02', 'forged']] },
+  killer: { deck: '8', look: 'herbalist', mates: ['Wren'], cover: { hints: ['herbalist'], picked: 'herbalist' }, vendetta: 'zealot',
+    hotbar: [['knife', 1], ['bloodyRag', 2], ['bucket', 1], ['skeletonKey', 1], null, null], pack: [['timber', 1]], belt: [null, null],
+    tasks: [['lightLanterns', 'todo'], ['mendFence', 'done'], ['stokeOven', 'todo']], fake: true,
+    quests: [], purse: 9, bank: 0, fare: 0, faith: 0,
+    notes: [['A show of work: Mend the fence', '', 'The square', '2:10', 'claimed']] },
+  drifter: { deck: '6', look: 'lamplighter', mates: [], cover: { hints: ['lamplighter'], picked: 'lamplighter' },
+    hotbar: [['replicaKnife', 1], ['bloodyRag', 1], null, null, null, null], pack: [], belt: [null, null],
+    tasks: [['fetchFlour', 'todo'], ['fixPump', 'todo']], fake: true, quests: [], purse: 6, bank: 0, fare: 0, faith: 0, notes: [] },
+  baker: { deck: '8', look: 'baker', mates: [], cover: null,
+    hotbar: [['lantern', 1], ['pocketWatch', 1], ['chalk', 1], ['rope', 1], ['wakeLoaf', 2], null], pack: [['flour', 1], ['timber', 2]], belt: [null, null],
+    tasks: [['mixDough', 'done'], ['proofLoaves', 'done'], ['stockColdRoom', 'carry'], ['stokeOven', 'todo'], ['shutterWindows', 'todo']], fake: false,
+    quests: [['caulkTheSkiff', 1]], purse: 3, bank: 11, fare: CONTENT.balance.respawn.fareDebt, faith: 12, notes: [['Chore done: Mix the dough', '', 'Crumb’s mixing room', '1:30', 'claimed']] },
+};
+const TRAIT = { height: { short: 'Short', mid: 'Medium height', tall: 'Tall' }, scarf: { red: 'Red scarf', green: 'Green scarf', blue: 'Blue scarf' }, hat: { cap: 'Cap', bowler: 'Bowler hat', bare: 'Bare head' } };
+const SCARF_SHAPE = { red: '◆', green: '●', blue: '■' };
+const FACTION = { village: 'Village', cabal: 'Cabal', neutral: 'Neutral' };
+const SCENE = { tavern_back: 'The Drowned Lantern, back room', overworld: 'the square', apoth_shop: 'the Apothecary', widow_parlour: 'the widow’s parlour', tavern_bar: 'The Drowned Lantern', forest: 'Gallows Wood', bakery: 'Crumb’s Ovens', crumb_mixing: 'Crumb’s mixing room', crumb_oven: 'Crumb’s oven', crumb_cold: 'Crumb’s cold room', widow_bedroom: 'the widow’s bedroom', crumb_proofing: 'Crumb’s proofing room' };
+const PHASE_WORD = { dusk: 'dusk', night: 'night', finalNight: 'the Final Night' };
+
+// ---- tiny DOM helper ----
+function h(tag, attrs, ...kids) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === false || v == null) continue;
+    if (k === 'class') el.className = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2), v); else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const c of kids.flat()) if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(String(c)));
+  return el;
+}
+const svg = (inner, size = 18) => { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('viewBox', '0 0 24 24'); s.setAttribute('width', size); s.setAttribute('height', size); s.setAttribute('aria-hidden', 'true'); s.innerHTML = inner; return s; };
+const GLYPH = {
+  village: '<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  cabal: '<path d="M14 3l1 9-3 3-3-3 1-9zM8 15h8M12 15v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+  neutral: '<path d="M4 8c3-2 13-2 16 0-1 7-4 10-8 10S5 15 4 8zM8.5 11h2M13.5 11h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  card: '<path d="M6 3h9l3 3v15H6zM9 9h6M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  warn: '<path d="M12 4l9 16H3zM12 10v4M12 17v.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>',
+};
+const MOTIF = { village: '<path d="M2 24V2H24M8 24V8H24" fill="none" stroke="currentColor" stroke-width="2"/>', cabal: '<path d="M2 2L22 22M2 12L12 22M12 2L22 12" fill="none" stroke="currentColor" stroke-width="2"/>', neutral: '<path d="M2 24A22 22 0 0 1 24 2M10 24A14 14 0 0 1 24 10" fill="none" stroke="currentColor" stroke-width="2"/>' };
+const src = (text) => h('span', { class: 'chip src' }, text);
+
+// ---- state ----
+const ui = { matchMode: 'world', role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, daybook: null, picked: null, holding: 0, ready: false };
+const R = () => CONTENT.roles.roles[ui.role];
+const P = () => {
+  const base = PROPOSED[ui.role];
+  const m = ui.matchMode === 'main' ? null : MODES[ui.matchMode]?.[ui.role];
+  if (!m) return { ...base, tag: 'GDD 3.8' };
+  return { ...base, ...m, vendetta: ui.matchMode === 'paint' ? null : base.vendetta };
+};
+const S = () => SAMPLE[ui.role];
+const itemName = (id) => CONTENT.items.items[id]?.name ?? id;
+const lookName = (id) => CONTENT.looks[id]?.name ?? id;
+const cardName = (id) => CONTENT.roles.roles[id]?.name ?? id;
+
+/** The card's ability rows: active and hold abilities take the slots in card order (doc 3.3); passives take none. */
+function abilityRows() {
+  let slot = 0;
+  return R().abilities.map((id) => {
+    const a = CONTENT.abilities.abilities[id];
+    const passive = a.kind === 'passive';
+    const at = passive ? -1 : slot++;
+    const action = passive ? null : ACTIONS.find((x) => x.group === 'slot' && x.slot === at);
+    let cd = a.cooldownS ?? 0;
+    if (id === 'kill') cd = CONTENT.balance.byCount[S().deck].killCooldownS;
+    return { id, a, passive, action, cd };
+  });
+}
+
+function keyCaps(action, hold) {
+  const out = [];
+  for (const k of action.keys) out.push(k === '–' ? h('span', { class: 'secs' }, 'to') : h('span', { class: 'key' }, k));
+  if (hold) out.push(h('span', { class: 'secs' }, 'hold'));
+  out.push(h('span', { class: 'tapk' }, action.touch));
+  return out;
+}
+
+function panelWho() {
+  const r = R(), p = P(), s = S();
+  const deck = CONTENT.roles.decks[s.deck].cards;
+  const cover = r.cover;
+  const look = ui.picked ?? s.look;
+  const traits = ['height', 'scarf', 'hat'].map((ax) => h('span', { class: 'trait' }, ax === 'scarf' ? SCARF_SHAPE[SAMPLE.traits.scarf] : '', TRAIT[ax][SAMPLE.traits[ax]]));
+  const kids = [
+    h('p', { class: 'eyebrow mono' }, 'Who you are'),
+    h('div', { class: 'portrait' },
+      h('div', { class: 'pic', 'aria-hidden': 'true' }, r.name[0], h('small', {}, `portrait_${r.look ?? r.id}`)),
+      h('div', {},
+        h('h2', { class: 'sec', style: 'border:0;margin:0 0 4px;padding:0' }, r.name, src('roles.json name')),
+        h('p', { style: 'margin:0' }, cover ? 'Nobody sees your card. The town sees ' : 'The town sees ', h('b', {}, lookName(look)), '.', src(cover ? 'Private.coverLook' : 'Player.look')),
+        h('div', { class: 'traits', 'aria-label': `Your traits: ${['height', 'scarf', 'hat'].map((ax) => TRAIT[ax][SAMPLE.traits[ax]]).join(', ')}` }, traits),
+        h('p', { class: 'secs', style: 'margin:6px 0 0' }, 'Traits come with your seat, not your card, and every clue you leave shows them.'))),
+    h('p', { class: 'lore' }, p.lore, src('proposed: roles.json lore')),
+  ];
+  if (cover && ui.mode === 'reveal') {
+    const hints = new Set(s.cover.hints);
+    const choices = [...s.cover.hints, ...deck.filter((c) => !CONTENT.roles.roles[c].cover && !hints.has(c))].filter((c, i, a) => a.indexOf(c) === i);
+    kids.push(h('h2', { class: 'sec' }, 'Choose your cover', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'until Ready')),
+      h('p', { style: 'margin:0 0 10px' }, 'Pick the face you walk in for the whole match. An undealt card is safe; a dealt one means two of that figure walk the town.'),
+      h('div', { class: 'picker', role: 'group', 'aria-label': 'Your cover' }, choices.map((c) => {
+        const l = CONTENT.roles.roles[c].look;
+        return h('button', { type: 'button', 'aria-pressed': String(l === look), onclick: () => { ui.picked = l; render(); } }, h('b', {}, cardName(c)), h('span', {}, hints.has(c) ? 'Undealt: safe' : 'Dealt: a double'));
+      })));
+  }
+  if (s.mates.length) kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, ui.matchMode === 'paint' ? 'The other Killer' : 'Your Cabal'), s.mates.join(', '), ui.matchMode === 'paint' ? ' paints the town with you. Your picks show to each other live.' : ' knows you. Your picks show to each other live.'));
+  kids.push(h('h2', { class: 'sec' }, 'The deck', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, `${deck.length} cards · public`)),
+    h('div', { class: 'deck' }, deck.map((c) => h('span', { class: `pill${CONTENT.roles.roles[c].cover ? ' cover' : ''}${c === ui.role ? ' self' : ''}`, title: fill(CONTENT.roles.roles[c].goal) }, cardName(c)))),
+    h('p', { class: 'secs', style: 'margin:8px 0 0' }, 'Everyone sees this list. Two cards stay undealt. Dashed cards wear another card’s face.', src('roles.json decks')));
+  return h('section', { class: 'panel', id: 'p0', 'aria-labelledby': 't0', role: 'region' }, kids);
+}
+
+function panelWin() {
+  const r = R(), p = P(), s = S();
+  const kids = [
+    h('p', { class: 'eyebrow mono' }, 'How you win'),
+    h('p', { class: 'goal' }, fillLater(p.goal), src('proposed: roles.json goal')),
+    h('h2', { class: 'sec' }, ui.matchMode === 'paint' ? 'You two win when' : ui.matchMode === 'world' ? 'You win when' : r.winsWith === 'self' ? 'You win alone when' : `The ${FACTION[r.faction]} wins when`, h('span', { class: `pill ${r.faction === 'cabal' ? 'brick' : r.faction === 'neutral' ? 'mustard' : 'moss'}` }, r.winsWith === 'self' ? 'solo' : FACTION[r.faction])),
+    h('ol', { class: 'routes' }, p.wins.map((w) => h('li', {}, h('span', {}, fillLater(w), src(p.tag))))),
+  ];
+  if (p.vendetta) {
+    const v = p.vendetta;
+    kids.push(h('h2', { class: 'sec' }, `Your vendetta: ${v.title}`, h('span', { class: 'chip' }, CONTENT.vendettas.vendettas[v.id].kind)),
+      h('p', { style: 'margin:0 0 6px' }, v.line, src('Private.vendetta')),
+      h('ul', { class: 'plain check' }, v.steps.map((t) => h('li', {}, t))),
+      h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Proposed'), 'Today the vendetta line reaches no screen. Its steps and their ticks join the card when the vendetta build carries them (doc 1.3).'));
+  }
+  kids.push(h('h2', { class: 'sec' }, ui.matchMode === 'main' ? 'You lose when' : 'You miss out when'), h('ul', { class: 'plain' }, p.loses.map((t) => h('li', {}, fillLater(t)))));
+  kids.push(h('h2', { class: 'sec' }, 'Beware'), h('div', { class: 'beware', role: 'note' }, h('ul', { class: 'plain', style: 'margin:0' }, p.beware.map((t) => h('li', {}, fill(t)))), src('proposed: roles.json beware')));
+  kids.push(h('h2', { class: 'sec' }, 'How to play it'), h('ul', { class: 'plain check' }, p.tips.map((t) => h('li', {}, fill(t)))));
+  return h('section', { class: 'panel', id: 'p1', 'aria-labelledby': 't1', role: 'region' }, kids);
+}
+
+/** How a kit item is used: through its ability's slot when the card has one, else held and used with E. */
+function kitHow(it, rows) {
+  if (!it.use) return '';
+  const row = rows.find((x) => x.id === it.use && x.action);
+  if (row) return [h('span', { class: 'key' }, row.action.keys[0]), h('span', { class: 'tapk' }, row.action.touch)];
+  return [h('span', { class: 'secs' }, 'in hand'), h('span', { class: 'key' }, 'E'), h('span', { class: 'tapk' }, 'Use')];
+}
+
+function panelDo() {
+  const r = R(), s = S();
+  const rows = abilityRows();
+  const kids = [h('p', { class: 'eyebrow mono' }, 'What you can do'), h('h2', { class: 'sec' }, 'Your card', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, `${rows.length} of 3`))];
+  for (const row of rows) {
+    const a = row.a;
+    const meta = [];
+    if (a.phases) meta.push(h('span', { class: 'pill soft' }, a.phases.includes('dusk') && a.phases.includes('night') ? 'After dark' : a.phases.map((x) => PHASE_WORD[x] ?? x).join(', ')));
+    if (row.cd) meta.push(h('span', { class: 'pill soft' }, `Rests ${row.cd} s`));
+    if (a.castS) meta.push(h('span', { class: 'pill soft' }, `${a.castS} s hold`));
+    if (a.usesPerMatch) meta.push(h('span', { class: 'pill soft' }, `${styled('times', a.usesPerMatch)} a match`));
+    if (a.consumes) meta.push(h('span', { class: 'pill soft' }, `Uses a ${itemName(a.consumes)}`));
+    if (a.requires) meta.push(h('span', { class: 'pill soft' }, `Needs the ${itemName(a.requires)}`));
+    if (row.passive) meta.push(h('span', { class: 'pill mustard' }, 'Always on'));
+    if (ui.mode === 'play' && row.id === 'kill') meta.push(h('span', { class: 'pill brick' }, 'Ready in 0:42'));
+    kids.push(h('div', { class: 'act' },
+      h('span', { class: 'name' }, a.name),
+      h('span', { class: 'how' }, row.passive ? h('span', { class: 'pill mustard' }, 'No key') : keyCaps(row.action, a.kind === 'hold')),
+      h('span', { class: 'line' }, ABILITY_LINE[row.id] ?? a.effect, src('proposed line; abilities.json')),
+      h('span', { class: 'meta' }, meta)));
+  }
+  kids.push(h('h2', { class: 'sec' }, 'Your kit', src('roles.json startKit · items.json')));
+  for (const k of r.startKit) {
+    const it = CONTENT.items.items[k.item];
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, it.name, k.qty > 1 ? h('span', { class: 'num' }, ` ×${k.qty}`) : ''),
+      h('span', { class: 'how' }, it.roleBound ? h('span', { class: 'pill mustard' }, 'Bound') : '', kitHow(it, rows)),
+      h('span', { class: 'line' }, it.tooltip)));
+  }
+  kids.push(h('h2', { class: 'sec' }, 'Everyone can', src('doc 3: the action table')));
+  for (const a of ACTIONS.filter((x) => x.group === 'move' || x.group === 'verb')) {
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, a.label), h('span', { class: 'how' }, keyCaps(a, a.hold)), h('span', { class: 'line' }, a.line)));
+  }
+  kids.push(h('h3', { class: 'sub' }, 'Screens'));
+  for (const a of ACTIONS.filter((x) => x.group === 'screen')) {
+    kids.push(h('div', { class: 'act' }, h('span', { class: 'name' }, a.label), h('span', { class: 'how' }, keyCaps(a)), a.line ? h('span', { class: 'line' }, a.line) : ''));
+  }
+  kids.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, 'Proposed'), 'Bell pulls, Lens charges and cooldowns read the live private view when the card is reopened in play.'));
+  return h('section', { class: 'panel', id: 'p2', 'aria-labelledby': 't2', role: 'region' }, kids);
+}
+
+const PANEL_NAMES = ['Who', 'Win', 'Do'];
+
+function mountCard(host) {
+  const r = R();
+  const scrim = h('div', { class: 'scrim', onclick: () => ui.mode === 'play' && closeCard() });
+  const holdS = CONTENT.balance.phases.roleRevealS;
+  const meter = h('div', { class: 'meter', 'aria-hidden': 'true' }, h('i', { class: ui.mode === 'reveal' && !ui.ready ? 'run' : '', style: `--hold:${holdS}s`, onanimationend: () => { ui.ready = true; closeCard(); } }));
+  const action = ui.mode === 'reveal'
+    ? h('button', { type: 'button', class: 'btn primary', id: 'ready', onclick: () => { ui.ready = true; closeCard(); } }, ui.ready ? 'Ready ✓' : 'Ready')
+    : h('button', { type: 'button', class: 'btn', onclick: closeCard }, 'Close', h('span', { class: 'kbd' }, 'Tab'));
+  const tabs = h('div', { class: 'tabs3', role: 'tablist', 'aria-label': 'Card panels' }, PANEL_NAMES.map((n, i) => h('button', { type: 'button', role: 'tab', id: `t${i}`, 'aria-controls': `p${i}`, 'aria-selected': String(i === ui.panel), onclick: () => goPanel(i) }, n)));
+  const top = h('div', { class: 'topbar' },
+    h('span', { class: 'stripe' }, h('span', { class: 'glyph' }, svg(GLYPH[r.faction])), FACTION[r.faction]),
+    h('h1', { class: 'title', id: 'card-title' }, r.name),
+    h('span', { class: 'spacer' }),
+    ui.mode === 'reveal' ? h('span', { class: 'secs' }, `The match starts when everyone is Ready, or in ${holdS} s`) : h('span', { class: 'secs' }, 'The world runs on behind this card'),
+    action, tabs, meter);
+  const panels = h('div', { class: 'panels' }, panelWho(), panelWin(), panelDo());
+  const prev = h('button', { type: 'button', class: 'btn sm', onclick: () => goPanel(ui.panel - 1) }, '‹ Back');
+  const next = h('button', { type: 'button', class: 'btn sm', onclick: () => goPanel(ui.panel + 1) }, 'Next ›');
+  const dots = h('div', { class: 'dots', 'aria-hidden': 'true' }, PANEL_NAMES.map((_, i) => h('i', { class: i === ui.panel ? 'on' : '' })));
+  const pager = h('nav', { class: 'pager', 'aria-label': 'Turn the card' }, prev, dots, next);
+  const motifs = ['tl', 'tr', 'bl', 'br'].map((c) => { const m = svg(MOTIF[r.faction], 26); m.setAttribute('class', `motif ${c}`); return m; });
+  const card = h('div', { class: `card folded opening ${ui.sources ? 'show-src' : ''} ${ui.view === 'phone' ? 'inputs-only-touch' : 'inputs-only-key'}`, 'data-faction': r.faction, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'card-title' }, motifs, top, panels, pager);
+  host.append(scrim, card);
+  requestAnimationFrame(() => requestAnimationFrame(() => card.classList.remove('folded')));
+  panels.addEventListener('scroll', () => {
+    const i = Math.round(panels.scrollLeft / Math.max(1, panels.clientWidth));
+    if (i !== ui.panel) { ui.panel = i; syncPager(card); }
+  }, { passive: true });
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' && e.target.closest('.tabs3, .pager')) goPanel(ui.panel + 1);
+    if (e.key === 'ArrowLeft' && e.target.closest('.tabs3, .pager')) goPanel(ui.panel - 1);
+  });
+  setTimeout(() => (card.querySelector('#ready') ?? card.querySelector('.btn'))?.focus({ preventScroll: true }), 30);
+}
+function syncPager(card) {
+  card.querySelectorAll('.dots i').forEach((d, i) => d.classList.toggle('on', i === ui.panel));
+  card.querySelectorAll('.tabs3 button').forEach((b, i) => b.setAttribute('aria-selected', String(i === ui.panel)));
+}
+function goPanel(i) {
+  ui.panel = Math.max(0, Math.min(2, i));
+  const panels = document.querySelector('.panels');
+  if (!panels) return;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  panels.scrollTo({ left: ui.panel * panels.clientWidth, behavior: reduce ? 'auto' : 'smooth' });
+  if (getComputedStyle(panels).display !== 'flex') document.getElementById(`p${ui.panel}`)?.focus?.();
+  syncPager(document.querySelector('.card'));
+}
+function closeCard() { ui.cardOpen = false; render(); setTimeout(() => document.querySelector('.hud-goal')?.focus(), 0); }
+function openCard() { ui.cardOpen = true; ui.daybook = null; ui.mode = 'play'; document.getElementById('m-mode').value = 'play'; render(); }
+
+// ---- the Daybook ----
+const DB_TABS = [
+  { id: 'pockets', label: 'Pockets', key: 'I' }, { id: 'chores', label: 'Chores', key: 'K' }, { id: 'quests', label: 'Quests', key: 'J' },
+  { id: 'notebook', label: 'Notebook', key: 'N' }, { id: 'purse', label: 'Purse', key: '' }, { id: 'self', label: 'You', key: '' },
+];
+function slotBtn(stack, extra = '') {
+  if (!stack) return h('div', { class: `slot empty ${extra}`, 'aria-label': 'Empty slot' });
+  const it = CONTENT.items.items[stack[0]];
+  return h('button', { type: 'button', class: `slot ${it?.roleBound ? 'bound' : ''} ${extra}`, title: it?.tooltip ?? '', 'aria-label': `${it?.name ?? stack[0]}${stack[1] > 1 ? `, ${stack[1]}` : ''}` }, it?.name ?? stack[0], stack[1] > 1 ? h('span', { class: 'q' }, stack[1]) : '');
+}
+function dbPockets() {
+  const s = S();
+  const pack = [...s.pack]; while (pack.length < (CONTENT.items.inventorySlots - CONTENT.balance.inventory.hotbar)) pack.push(null);
+  const held = s.hotbar[ui.holding];
+  const it = held && CONTENT.items.items[held[0]];
+  return [
+    h('div', { class: 'inv-grid' },
+      h('div', {},
+        h('h2', { class: 'sec' }, 'Hotbar', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, '1 – 6 picks the held one')),
+        h('div', { class: 'slots' }, s.hotbar.map((st, i) => slotBtn(st, i === ui.holding ? 'held' : ''))),
+        h('h2', { class: 'sec' }, 'Pack', h('span', { class: 'num', style: 'font-size:13px;color:var(--d-soft)' }, `${s.pack.length} of ${(CONTENT.items.inventorySlots - CONTENT.balance.inventory.hotbar)}`)),
+        h('div', { class: 'slots' }, pack.map((st) => slotBtn(st))),
+        h('h2', { class: 'sec' }, 'Belt and gear'),
+        h('div', { class: 'slots' }, s.belt.map((st) => slotBtn(st)), ['Head', 'Body', 'Weapon'].map((g) => h('div', { class: 'slot empty', 'aria-label': `${g}: empty` }, h('span', { class: 'secs' }, g))))),
+      h('div', {},
+        h('h2', { class: 'sec' }, 'In hand'),
+        it ? h('div', { class: 'box' }, h('b', {}, it.name), h('p', { style: 'margin:4px 0 8px' }, it.tooltip), it.use ? h('button', { type: 'button', class: 'btn sm primary' }, 'Use', h('span', { class: 'kbd' }, 'E')) : h('span', { class: 'secs' }, 'Nothing to use.')) : h('p', { class: 'secs' }, 'Empty hand.'),
+        h('h2', { class: 'sec' }, 'Craft', h('span', { class: 'kbd' }, 'C')),
+        h('div', { class: 'craft' }, [0, 1, 2, 3].map(() => h('div', { class: 'slot empty' }))),
+        h('p', { class: 'secs' }, 'The pocket square, 2 by 2. A workbench in reach opens 3 by 3.'))),
+  ];
+}
+function dbChores() {
+  const s = S();
+  const done = s.tasks.filter((t) => t[1] === 'done').length;
+  const out = [h('div', { class: 'box' }, h('div', { class: 'row', style: 'border:0;padding:0 0 6px' }, h('b', {}, 'The village’s work'), h('span', { class: 'num' }, '42%')), h('div', { class: 'progress', role: 'progressbar', 'aria-valuenow': '42', 'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-label': 'The village’s work' }, h('i', { style: 'width:42%' })), h('p', { class: 'secs', style: 'margin:6px 0 0' }, 'Public: everyone sees the same bar. At 100% the village wins.'))];
+  out.push(h('h2', { class: 'sec' }, s.fake ? 'A show of work' : 'Your chores', h('span', { class: 'num', style: 'font-size:14px' }, `${done} of ${s.tasks.length}`)));
+  if (s.fake) out.push(h('p', { class: 'secs', style: 'margin:-4px 0 8px' }, 'Your list writes alibis but never fills the bar. Only you can see this line.'));
+  for (const [id, st] of s.tasks) {
+    const t = CONTENT.tasks.tasks[id];
+    const where = [...new Set(t.targets.map((x) => SCENE[x.scene] ?? x.scene))].join(' or ');
+    const steps = t.kind === 'coop' ? `Takes ${t.coopPlayers} hands, at ${where}.` : st === 'carry' ? `Carrying the ${itemName(t.tool)}. Bring it to ${where}.` : `Fetch the ${itemName(t.tool)} from ${SCENE[t.source.scene] ?? t.source.scene}, bring it to ${where}.`;
+    out.push(h('div', { class: 'chore' }, h('span', { class: `tick ${st === 'done' ? 'done' : ''}`, 'aria-hidden': 'true' }), h('div', {}, h('b', {}, t.name), h('div', { class: 'steps' }, st === 'done' ? 'Done. Your alibi is in the Notebook.' : steps)), h('span', {}, t.nightOnly ? h('span', { class: 'pill soft' }, 'After dark') : st === 'carry' ? h('span', { class: 'pill mustard' }, 'Next') : '')));
+  }
+  return out;
+}
+function dbQuests() {
+  const s = S();
+  if (!s.quests.length) return [h('p', { class: 'secs' }, 'Nobody has given you work. Givers stand in the world; press T beside one.')];
+  return [h('h2', { class: 'sec' }, 'Your work', h('span', { class: 'num', style: 'font-size:14px' }, `${s.quests.length} of ${CONTENT.balance.quests.maxActive}`)), ...s.quests.map(([id, have]) => {
+    const q = CONTENT.quests.quests[id];
+    const total = q.wants.reduce((n, w) => n + w.qty, 0);
+    return h('div', { class: 'box' }, h('div', { class: 'row', style: 'border:0;padding:0' }, h('b', {}, CONTENT.quests.npcs[q.giver].name), h('span', { class: 'num' }, `${have} of ${total}`)),
+      h('p', { style: 'margin:4px 0' }, 'Wants ', q.wants.map((w) => `${w.qty} ${itemName(w.item)}`).join(', '), '. Pays ', q.reward.map((w) => `${w.qty > 1 ? w.qty + ' ' : 'a '}${itemName(w.item)}`).join(', '), ` and ${q.scrip} Scrip.`),
+      h('div', { class: 'progress' }, h('i', { style: `width:${Math.round((100 * have) / total)}%` })));
+  })];
+}
+function dbNotebook() {
+  const s = S();
+  if (!s.notes.length) return [h('p', { class: 'secs' }, 'Nothing yet. Hold E on a glowing clue to collect it.')];
+  const tone = { verified: 'moss', corroborated: 'moss', claimed: 'soft', forged: 'brick' };
+  return [h('h2', { class: 'sec' }, 'Notebook', h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'only you can read this')), ...s.notes.map(([what, trait, where, at, st]) => h('div', { class: 'row' }, h('div', {}, h('b', {}, what), trait ? ` · ${trait}` : '', h('div', { class: 'steps' }, `${where}, ${at}`)), h('span', { class: `pill ${tone[st]}` }, st === 'forged' ? '✕ forged' : st === 'claimed' ? 'claimed' : `✓ ${st}`)))];
+}
+function dbPurse() {
+  const s = S(), e = CONTENT.economy;
+  const out = [h('div', { class: 'stats' },
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'On you'), h('div', { class: 'big' }, s.purse), h('div', { class: 'secs' }, 'Scrip. A mugging or a knockout can take it.')),
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'In the bank'), h('div', { class: 'big' }, s.bank), h('div', { class: 'secs' }, 'Safe from thieves.')),
+    h('div', { class: 'box' }, h('div', { class: 'mono' }, 'Faith'), h('div', { class: 'big' }, s.faith), h('div', { class: 'secs' }, `Of ${e.faith.max}, from the altars.`)))];
+  out.push(h('h2', { class: 'sec' }, 'What you owe'));
+  out.push(h('div', { class: 'row' }, h('div', {}, h('b', {}, 'Rent'), h('div', { class: 'steps' }, `Due by midday at the bank counter. Miss it and you are Indebted.`)), h('span', { class: 'num big', style: 'font-size:22px' }, e.rent.amount)));
+  out.push(h('div', { class: 'row' }, h('div', {}, h('b', {}, 'The line’s fare'), h('div', { class: 'steps' }, s.fare ? `You came back on the morning train. Pay it with the rent, or clear it at the Clerk’s ledger.` : 'Nothing owed.')), h('span', { class: 'num big', style: 'font-size:22px' }, s.fare)));
+  if (s.fare) out.push(h('div', { class: 'well' }, h('span', { class: 'mono' }, 'While you owe'), `Your pay is halved (×${CONTENT.balance.respawn.wageMult}) and your stall charges more.`));
+  return out;
+}
+function dbSelf() {
+  return [h('h2', { class: 'sec' }, 'Your body'),
+    h('div', { class: 'row' }, h('span', {}, 'Health'), h('span', { class: 'num' }, `100 of ${CONTENT.balance.body.maxHp}`)),
+    h('div', { class: 'row' }, h('span', {}, 'Stamina'), h('span', { class: 'num' }, `72 of ${CONTENT.balance.body.maxStamina}`)),
+    h('div', { class: 'row' }, h('span', {}, 'Effects'), h('span', { class: 'secs' }, 'None. A chip appears on the HUD when one starts.')),
+    h('h2', { class: 'sec' }, 'Your home'),
+    h('p', {}, 'The widow’s cottage. Its bed is yours to sleep in at dusk and at night.', src('Private.home')),
+    h('h2', { class: 'sec' }, 'Your seat'),
+    h('p', {}, 'Your name, traits and look are what everyone sees. Your card, this book and your cooldowns are yours alone.')];
+}
+function mountDaybook(host) {
+  const tab = ui.daybook;
+  const body = { pockets: dbPockets, chores: dbChores, quests: dbQuests, notebook: dbNotebook, purse: dbPurse, self: dbSelf }[tab]();
+  const tabs = h('div', { class: 'db-tabs', role: 'tablist', 'aria-label': 'Daybook' }, DB_TABS.map((t) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(t.id === tab), id: `db-${t.id}`, onclick: () => { ui.daybook = t.id; render(); } }, t.label, t.id === 'purse' && S().fare ? h('i', { class: 'dot', 'aria-label': 'something owed' }) : '', t.key ? h('span', { class: 'kbd' }, t.key) : '')));
+  const book = h('section', { class: `daybook opening ${ui.sources ? 'show-src' : ''}`, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'db-title' },
+    h('div', { class: 'db-head' }, h('h2', { id: 'db-title' }, 'Daybook'), h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'yours alone'), h('span', { style: 'flex:1' }), h('button', { type: 'button', class: 'btn sm', onclick: () => { ui.daybook = null; render(); } }, 'Close', h('span', { class: 'kbd' }, 'Esc'))),
+    tabs, h('div', { class: 'db-body', role: 'tabpanel', 'aria-labelledby': `db-${tab}` }, body),
+    h('div', { class: 'db-foot' }, 'The world runs on. You can still walk; a hit closes the book.'));
+  host.append(book);
+  tabs.addEventListener('keydown', (e) => {
+    const i = DB_TABS.findIndex((t) => t.id === ui.daybook);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { ui.daybook = DB_TABS[(i + (e.key === 'ArrowRight' ? 1 : DB_TABS.length - 1)) % DB_TABS.length].id; render(); document.getElementById(`db-${ui.daybook}`)?.focus(); }
+  });
+}
+
+// ---- the HUD and the touch cluster, drawn from the same action table ----
+function mountHud(host) {
+  const r = R(), s = S(), p = P();
+  const hud = h('div', { class: 'hud' },
+    h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fillLater(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fillLater(p.goal)))),
+    h('div', { class: 'hud-clock' }, h('div', { class: 'num' }, '06:40'), h('div', { class: 'mono' }, 'Day')),
+    h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.daybook = ui.daybook ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Daybook (I)' }, 'Daybook', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
+    h('div', { class: 'hud-body' }, h('div', { class: 'mono' }, 'Health'), h('div', { class: 'bar' }, h('i', { style: 'width:100%;background:var(--wdi-teal)' })), h('div', { class: 'mono' }, 'Stamina'), h('div', { class: 'bar' }, h('i', { style: 'width:72%;background:var(--wdi-lantern)' }))),
+    h('div', { class: 'hud-purse num' }, `${s.purse} Scrip`),
+    h('nav', { class: 'hotbar', 'aria-label': 'Hotbar' }, s.hotbar.map((st, i) => h('button', { type: 'button', class: i === ui.holding ? 'on' : '', onclick: () => { ui.holding = i; render(); } }, h('span', { class: 'n' }, i + 1), st ? itemName(st[0]) : ''))));
+  const slots = abilityRows().filter((x) => !x.passive);
+  const discs = [ACTIONS.find((a) => a.id === 'use'), ...slots.map((x) => x.action), ACTIONS.find((a) => a.id === 'strike')];
+  const touch = h('div', { class: 'touch' },
+    h('div', { class: 'stick' }, h('small', {}, 'Push to the rim to run')),
+    h('button', { type: 'button', class: 'disc sneak-toggle', 'aria-pressed': 'false' }, h('b', {}, '⇣'), 'Sneak'),
+    h('div', { class: 'cluster' }, discs.map((a) => {
+      const label = a.group === 'slot' ? slots.find((x) => x.action === a).a.name : a.touch;
+      return h('button', { type: 'button', class: `disc ${a.primary ? 'primary' : ''}` }, h('b', {}, a.keys[0]), label);
+    })));
+  hud.append(touch);
+  host.append(hud);
+}
+
+// ---- render ----
+function render() {
+  document.documentElement.dataset.theme = ui.theme;
+  const stage = document.getElementById('stage');
+  stage.dataset.view = ui.view;
+  stage.replaceChildren();
+  const frame = h('div', { class: ui.view === 'phone' ? 'phone' : 'desk' });
+  frame.append(h('div', { class: 'world', 'aria-hidden': 'true' }));
+  stage.append(frame);
+  mountHud(frame);
+  if (ui.cardOpen) mountCard(frame);
+  if (ui.daybook) mountDaybook(frame);
+  if (!ui.cardOpen && !ui.daybook && ui.view === 'desktop') frame.append(h('div', { class: 'legend' }, h('b', {}, 'In play. '), 'Tab or the goal chip reopens the card. I or the Daybook button opens the Daybook; K, J, N and C open it at a tab. Esc closes.'));
+  if (ui.cardOpen && ui.view === 'phone') setTimeout(() => { const ps = document.querySelector('.panels'); if (ps) ps.scrollLeft = ui.panel * ps.clientWidth; }, 0);
+}
+
+for (const [id, key] of [['m-match', 'matchMode'], ['m-role', 'role'], ['m-view', 'view'], ['m-theme', 'theme'], ['m-mode', 'mode']]) {
+  document.getElementById(id).addEventListener('change', (e) => {
+    ui[key] = e.target.value;
+    if (key === 'matchMode' && ui.matchMode === 'paint') { ui.role = 'killer'; document.getElementById('m-role').value = 'killer'; }
+    if (key === 'role' && ui.matchMode === 'paint' && ui.role !== 'killer') { ui.matchMode = 'world'; document.getElementById('m-match').value = 'world'; }
+    if (key === 'role' || key === 'matchMode') { ui.picked = null; ui.holding = 0; }
+    if (key === 'role' || key === 'mode' || key === 'matchMode') { ui.cardOpen = true; ui.daybook = null; ui.ready = false; ui.panel = 0; }
+    render();
+  });
+}
+document.getElementById('m-src').addEventListener('change', (e) => { ui.sources = e.target.checked; render(); });
+document.getElementById('m-replay').addEventListener('click', () => { ui.mode = 'reveal'; document.getElementById('m-mode').value = 'reveal'; ui.cardOpen = true; ui.ready = false; ui.daybook = null; ui.panel = 0; render(); });
+document.addEventListener('keydown', (e) => {
+  if (e.target.closest('select, input')) return;
+  if (e.key === 'Tab' && !e.shiftKey && !e.target.closest('.card, .daybook')) { e.preventDefault(); ui.cardOpen ? closeCard() : openCard(); return; }
+  if (e.key === 'Escape') { if (ui.daybook) { ui.daybook = null; render(); } else if (ui.cardOpen && ui.mode === 'play') closeCard(); return; }
+  const tab = { i: 'pockets', k: 'chores', j: 'quests', n: 'notebook', c: 'pockets' }[e.key.toLowerCase()];
+  if (tab && !e.ctrlKey && !e.metaKey) { ui.daybook = ui.daybook === tab ? null : tab; ui.cardOpen = false; render(); }
+  if (/^[1-6]$/.test(e.key) && !ui.cardOpen) { ui.holding = +e.key - 1; render(); }
+});
+if (matchMedia('(max-width: 760px)').matches) { ui.view = 'phone'; document.getElementById('m-view').value = 'phone'; }
+render();
+</script>
+</body>
+</html>

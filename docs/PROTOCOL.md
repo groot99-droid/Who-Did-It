@@ -67,7 +67,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
@@ -80,7 +80,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.result` | `{ targetId: string; lookId: string; signs: string[]; health: InspectHealth; purse: InspectPurse; light: boolean; tool?: string; }` | Private, round 8 (GDD 3.22): the inspected avatar's drawn look and what the eye reads of it. `signs` are copy ids of `ui/copy/inspect.ts` taken only from the avatar's public status bits; `light` is a burning light in hand. Never a card, a cover, a vendetta or an inventory. |
 | `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
-| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
+| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number; left?: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop with an `owner` gives each stock row how many it has `left` today, the same for every opener. |
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 
@@ -212,7 +212,9 @@ export type HoldAction =
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
-  | 'sleep';
+  | 'sleep'
+  // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
+  | 'cuff';
 ```
 
 ```ts
