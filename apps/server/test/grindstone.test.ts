@@ -1,11 +1,25 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { interactions } from '@wdi/content';
-import { C2S, TICK_RATE, type RefusalFrame } from '@wdi/shared';
+import { balance, interactions } from '@wdi/content';
+import { C2S, Phase, TICK_RATE, type RefusalFrame } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
-import { wornOf } from '../src/sim/interact/resolve';
+import { wear, wornOf } from '../src/sim/interact/resolve';
+import { mapScenesOf } from '../src/sim/MapSites';
+import { workable } from '../src/sim/npc/chores';
+import { npcMemory } from '../src/sim/npc/memory';
+import { type Station, stationsOf } from '../src/sim/npc/routine';
 import { simOf } from '../src/sim/RoomSim';
-import { advance, bootNpcServer, pauseClock, placeSeat, standardParty, type Party } from './npcHelpers';
+import {
+  type Party,
+  advance,
+  allTownsfolk,
+  bootNpcServer,
+  holdPhase,
+  npcIdsOf,
+  pauseClock,
+  placeSeat,
+  standardParty,
+} from './npcHelpers';
 import { sleep } from './simHelpers';
 
 // Round 10, x9 (A313; GDD 3.14): the grindstone restores a worn tool. A bare-handed hold of `holdS` at the lumber
@@ -107,5 +121,65 @@ describe('the grindstone (x9)', () => {
     await hold(p, STONE);
     expect(refusals(p).at(-1)).toMatchObject({ reason: 'ALREADY_DONE', interaction: 'sharpenTools' });
     expect(count(seat, 'lockpicks')).toBe(1);
+  });
+});
+
+// Review change (6Z, 2026-10-30; GDD 3.12 "Hidden seats"): a verb a seat can be seen doing is one NPC seats also do,
+// or a figure at the wheel would mark a human. The stone is a chore station (`routines.json`: `grindstone` under
+// `gather`, hold `interact`): a seat with a worn tool works it by its chores; one with whole tools never walks to it.
+describe('the grindstone as an NPC chore (x9 review)', () => {
+  const { routine } = balance.npc;
+  const weights = routine.weights as { day: { work: number; stroll: number; idle: number } };
+  const savedDay = { ...weights.day };
+  afterEach(() => void Object.assign(weights.day, savedDay));
+
+  /** One NPC alive on the stone's stand, working only, the stone its favourite; white-box on the BlackPine map. */
+  async function npcAtStone(): Promise<{ party: Party; id: string; st: Station }> {
+    const party = await standardParty(colyseus, 'S1');
+    allTownsfolk(party.room);
+    party.room.state.settings.map = 'blackpine';
+    const [id] = npcIdsOf('S1') as [string];
+    const human = party.humans[0]!.id;
+    for (const [seat, p] of simOf(party.room).players) p.dead = seat !== id && seat !== human;
+    const st = stationsOf(mapScenesOf(party.room), simOf(party.room).profile).find(
+      (s) => s.propId === STONE,
+    )!;
+    expect(st).toMatchObject({ cls: 'grindstone', activity: 'gather' });
+    placeSeat(party, id, st.scene, st.stands[0]!.x, st.stands[0]!.y);
+    party.room.state.players.get(id)!.priv.inventory.slots.clear();
+    Object.assign(weights.day, { work: 1, stroll: 0, idle: 0 });
+    npcMemory(party.room).brain(id).persona = { home: 'bp_smithy', favourites: [STONE] };
+    holdPhase(party, Phase.day, 3600);
+    return { party, id, st };
+  }
+
+  it('sends a seat with a worn Axe to the stone, which it works through the human verb until the Axe is whole', async () => {
+    const { party, id, st } = await npcAtStone();
+    const seat = party.room.state.players.get(id)!;
+    const p = simOf(party.room).players.get(id)!;
+    addStack(seat, 'axe', 1);
+    wear(party.room, id, seat, 'axe', 1);
+    expect(wornOf(party.room, id, 'axe')).toBe(1);
+    expect(workable(party.room, seat, st)).toBe(true);
+    let held = '';
+    for (let i = 0; i < 40 * TICK_RATE && wornOf(party.room, id, 'axe') > 0; i++)
+      advance(party, 1, () => void (p.hold && (held = `${p.hold.action}:${p.hold.targetId}`)));
+    expect(held).toBe(`interact:${STONE}`);
+    expect(wornOf(party.room, id, 'axe')).toBe(0);
+    expect(count(seat, 'axe')).toBe(1);
+    expect(workable(party.room, seat, st)).toBe(false);
+  });
+
+  it('keeps a seat with whole tools away: the stone never qualifies and it starts no hold there', async () => {
+    const { party, id, st } = await npcAtStone();
+    const seat = party.room.state.players.get(id)!;
+    const p = simOf(party.room).players.get(id)!;
+    addStack(seat, 'axe', 1);
+    expect(workable(party.room, seat, st)).toBe(false);
+    let atStone = 0;
+    advance(party, 30 * TICK_RATE, () => void (p.hold?.targetId === STONE && atStone++));
+    expect(atStone).toBe(0);
+    // Its other chores may have worn the Axe by now (a tree takes a use): the stone qualifies exactly then.
+    expect(workable(party.room, seat, st)).toBe(wornOf(party.room, id, 'axe') > 0);
   });
 });

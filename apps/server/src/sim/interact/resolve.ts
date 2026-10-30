@@ -144,6 +144,7 @@ export function interactReady(
       it.target === t.classId &&
       it.status === 'live' &&
       it.phases.includes(cls) &&
+      (it.handler !== 'sharpen' || hasWorn(room, player)) && // the stone has work only for a worn tool (x9)
       it.modes.some(
         (m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined && !missingInput(player, m),
       ),
