@@ -10,6 +10,7 @@ describe('pnpm auto arguments', () => {
       difficulty: 'normal',
       seats: 6,
       json: false,
+      views: false,
     });
     expect(
       parseArgs([
@@ -24,6 +25,7 @@ describe('pnpm auto arguments', () => {
         '--seats',
         '10',
         '--json',
+        '--views',
       ]),
     ).toEqual({
       matches: 50,
@@ -32,6 +34,7 @@ describe('pnpm auto arguments', () => {
       difficulty: 'hard',
       seats: 10,
       json: true,
+      views: true,
     });
   });
 

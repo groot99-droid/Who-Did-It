@@ -7,6 +7,7 @@ import { createServer } from '../src/server';
 import type { FixedSeeds } from '../src/sim/seeds';
 import { type AutoOptions, applyClock, autoOf, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
 import { runInvariants } from '../src/sim/auto/invariants';
+import { attachShadowViews } from '../src/sim/auto/shadowViews';
 import { onSim } from '../src/sim/events/bus';
 import { matchLog } from '../src/services/MatchLog';
 import { advance } from './npcHelpers';
@@ -31,11 +32,18 @@ export interface AutoResult {
    * two runs with the same seeds and seat ids give the same digest. Seat ids only, never avatar handles.
    */
   digest: string;
+  /**
+   * Round 10, x14 (A453): with `views`, the avatars compared between each seat's decoded state and the server
+   * (`sim/auto/shadowViews.ts`); 0 when the shadows were off.
+   */
+  decodedChecks: number;
 }
 
 export interface AutoRunOptions extends AutoOptions {
   maxTicks?: number;
   invariantsEvery?: number;
+  /** Round 10, x14 (A453): decode a shadow view per seat every tick and check it (`pnpm auto -- --views`). */
+  views?: boolean;
 }
 
 export { AUTO_STREAMS } from '../src/sim/auto/Auto';
@@ -83,10 +91,12 @@ function tickLine(room: PartyRoom): string {
 
 /** Plays one all-NPC match headless to its end (or `maxTicks`), then disposes the room. */
 export async function runAutoMatch(colyseus: ColyseusTestServer, opts: AutoRunOptions): Promise<AutoResult> {
-  const { maxTicks = defaultMaxTicks(opts.seats), invariantsEvery = 20, ...autoOpts } = opts;
+  const { maxTicks = defaultMaxTicks(opts.seats), invariantsEvery = 20, views = false, ...autoOpts } = opts;
   const room = (await colyseus.createRoom('party', {})) as unknown as PartyRoom;
+  let shadows: ReturnType<typeof attachShadowViews> | undefined;
   try {
     enableAuto(room, autoOpts);
+    shadows = views ? attachShadowViews(room) : undefined;
     applyClock(room, { paused: true });
     queueAutoStart(room);
     const events: SimEventWire[] = [];
@@ -103,6 +113,8 @@ export async function runAutoMatch(colyseus: ColyseusTestServer, opts: AutoRunOp
         failures.push({ name: 'step', tick: room.state.tick, detail: String((err as Error)?.stack ?? err) });
         break;
       }
+      // A room with no client patches nothing on its own; the shadows decode a frame on every tick (x14).
+      if (shadows && shadows.encodedTick !== room.state.tick) room.broadcastPatch();
       if (!dealt && room.state.phase !== Phase.lobby) {
         dealt = true;
         room.state.players.forEach((p, id) => hash.update(`deal ${id}=${p.priv?.role.roleId ?? ''}\n`));
@@ -120,8 +132,10 @@ export async function runAutoMatch(colyseus: ColyseusTestServer, opts: AutoRunOp
       seeds: auto?.options.seeds ?? {},
       npcIds: auto?.options.npcIds ?? [],
       digest: hash.digest('hex'),
+      decodedChecks: shadows?.checks ?? 0,
     };
   } finally {
+    shadows?.dispose();
     await room.disconnect();
   }
 }
