@@ -943,6 +943,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
 
+- **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
+  (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
+  another. While a fare is owed, the town's wages and sales into the seat's purse pay `respawn.wageMult` (half) of
+  their amount; the half Scrip a payment leaves is carried to the next (two 3-Scrip tasks pay 1, then 2), and the
+  cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
+  counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
+  there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
+  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's
+  dear stall and the Clerk's labour errand come with C2b.
+
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
   the chapel and a wayside altar on each map's hub. Faith plus Scrip buys, at an altar (`act.faith {kind}`):

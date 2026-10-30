@@ -453,7 +453,13 @@ export const BalanceFile = z.strictObject({
     dusk: z.strictObject({ leaveAtS: z.number().nonnegative() }),
   }),
   /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */
-  respawn: Section({ hp: z.number().int().positive() }),
+  /** C2 (GDD 3.23): the fare a return owes the line, the pay cut while it is owed, and the target to clear it. */
+  respawn: Section({
+    hp: z.number().int().positive(),
+    fareDebt: z.number().int().positive(),
+    wageMult: Frac,
+    clearTargetDays: z.number().positive(),
+  }),
   /**
    * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
    * slot; the factors of the worn items and the Lodge's `creatureDmg` perk multiply, and the damage never falls below
