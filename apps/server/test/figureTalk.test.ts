@@ -4,7 +4,7 @@ import { Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { ledgerOf } from '../src/sim/economy/rumours';
-import { briefingsOf } from '../src/sim/law/Briefing';
+import { type Briefing, briefingsOf } from '../src/sim/law/Briefing';
 import { simOf } from '../src/sim/RoomSim';
 import { type Figure, figuresOf } from '../src/sim/townsfolk/figures';
 import { sceneKey } from '../src/sim/World';
@@ -131,9 +131,10 @@ describe('talk.ask', () => {
     const party = await world();
     const [a] = party.humans as [Human];
     const f = figureBeside(party, a.id, 'constable');
-    (briefingsOf(party.room) as { tick: number; sceneId: string; line: string }[]).push({
+    (briefingsOf(party.room) as Briefing[]).push({
       tick: 1,
       sceneId: 'overworld',
+      kind: 0,
       line: "Constables' briefing: footprints in the square.",
     });
     await ask(party, a, f, 'town');
