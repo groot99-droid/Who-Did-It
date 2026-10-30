@@ -136,3 +136,7 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
   The plan waits on the owner's approval and on CL3a, which way the shadows fall (default: a sun at 25°, turned 45°).
 - The owner approved the plan on 2026-10-30, with CL3a's default (A236, `owner-answers.md`). It builds after round
   10's final sweep (10Z) has merged. SC2, BU4 and RN3 keep their fallbacks until the owner answers them.
+- On 2026-10-30 the owner made round 11 Blender only: "for me round 11 is blender only really, every gameplay feature
+  (except bosses) should be added" (A256). Some gameplay items were left for round 11: recipe teaching, the
+  one-per-match branch, tin mail, and the town work of the cards with no work. Round 10 builds them now, from
+  `docs/round10/scope.md`. This plan is unchanged.
