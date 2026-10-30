@@ -610,6 +610,18 @@
       "effect": "Eats a food item: cures Famished and Weakened; a Wake Loaf also restores stamina to full.",
       "ships": "V1",
       "gddRef": "3.22"
+    },
+    "eatHerbBread": {
+      "id": "eatHerbBread",
+      "name": "Eat Herb Bread",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "herbBread",
+      "effect": "Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long for the rest of the day.",
+      "ships": "V1",
+      "gddRef": "3.14"
     }
   }
 }

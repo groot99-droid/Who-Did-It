@@ -26,6 +26,8 @@ export const Item = z.strictObject({
   /** Ability in abilities.json this item performs, if any. */
   use: Id.optional(),
   lightRadiusTiles: Tiles.optional(),
+  /** Round 10, D4a (GDD 3.14): the dish buff (an `effects.json` id) eating this item gives. */
+  buff: Id.optional(),
   /** Round 10, A12 (GDD 3.30): the equipment slot this item fits; none fits one until armour and weapons (D6). */
   equip: z.enum(['head', 'body', 'weapon']).optional(),
   /** Round 10 (A10; logic-table.md 3.3): the capability tags this tool carries, each with its tier. */

@@ -461,6 +461,8 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
 Timber in 8 s, bare-handed, by day, with no tool wear and no noise yet. A seat with no Log is refused `NEED_ITEM`. The Timber nodes
 still give Timber directly (they are the camp's cut stacks). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**The bakery's parts and the Herb Bread** (round 10, D4a; owner answer LT1). Dishes are made in parts at the stations of Crumb's Ovens, on Hollowmere only (a recipe's optional `maps` lists where its stations stand). Flour (bought at the bakery's counter) is mixed into Dough at the dough mixer (2 Flour, 4 s), proofed at the proofing cabinet (8 s), and Herbs are chopped into Herb filling at the cold shelves (2 Herbs, 3 s). The brick oven then bakes a Wake Loaf from Proofed dough (5 s) or Herb Bread from Proofed dough and Herb filling (6 s). Anyone may make any step; no step marks the Baker. Eating the Herb Bread (the `eatHerbBread` ability, a `consumes` verb like `eat`) cures what any food cures and gives the private **Resistant** effect (`effects.json`, `dish`, no status bit): a Poisoned that starts while it lasts runs half as long (`poisonFactor`). It lasts 780 s, about to the next dawn; eating another dish replaces a running dish buff, so one runs at a time. Nightshade's poison (3.2) is a different mechanism and ignores it. The proofing time is a short hold, not a tenth of a day, and the water is not modelled: there is no filled bucket. The rest of the dishes wait for their fillings (D4b).
+
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
 Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
@@ -1129,6 +1131,8 @@ trace is faster than a hand. A trace that leaves a pin unset or is malformed is 
 spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way. Nothing else changes in public view: the
 scratch clue and the small fine the interaction names arrive with D5c. NPC seats do not pick yet (their routine reaches
 only props a mode of no mini-game works, 3.12 Chores).
+
+**The screen** (round 10, D5b). The picker's dialog draws one column per pin and a tension gauge with the snap line, and never the set points: a pin that is lifted into its band under light tension clicks (a tone, a buzz, a jolt). Letting go of the pick records an attempt; the trace of attempts is the answer, and the board ends when every pin is set or the pick snaps.
 
 ### 3.30 The inventory and crafting
 

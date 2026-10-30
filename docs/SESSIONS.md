@@ -3954,6 +3954,27 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     payer), the dear stall (`economy.json` `owner`, its schema and `shops.ts`), two lines in `rent.ts`, the `errand`
     branch in `Hold.ts`, and the NPC errand in `routines.json` and `sim/npc/routine.ts`.
   - **Row 12, D5c, the scratch.** The clue is the same whoever picks, and B2's briefing reads it like any clue.
+- 2026-10-30: D5a (#353) merged at 791cc77, #354 (rows 11 and 12) at 36881d3 and B2 (#344) at 40f664f. C2's rulings:
+  an owing seat's pay halves exactly, by a per-seat remainder in `fare.ts`, so two 3-Scrip tasks pay 1 and then 2, and
+  the two-day check moves to C2b, since only the errand clears a fare in two days. For the playtest: at 4 or 5 humans
+  an owing seat cannot make rent from tasks, so it is Indebted until the errand clears the fare. On 10B's plan for B3,
+  wire row 13, petitions:
+  - One petition is open in the town at a time, as the plan says. The opener of one that lapses waits
+    `petition.cooldownS` too, so an anonymous seat cannot keep the slot full. The owner may prefer one per accused.
+  - A petition shows only what the opener's Notebook shows, and only clue entries: a confession or a role's reading
+    attached would tell a true wearer of a look from a cover. A Verified and a Corroborated entry both show as backed.
+  - A jailed seat is not free and a seat on the line is not living, so neither counts or signs. Briefings are not
+    evidence. NPC seats sign later, under an R6-style timing rule.
+- 2026-10-30: #356 (row 13 and the log above) merged at ed5e79c and D4a (#357) at 01a2c9c, after a clean 50-match
+  bot run of 6Z's on it. D5b's grants: `registry.ts`, the `pub` line of `MinigameModal.ts` and `copy/minigames.ts`.
+  Row 10 gains `declined`, the asker's state after a no: it is the same whoever answered, so it tells nothing about
+  the target. On D4a:
+  - It used fewer of its grants than planned. The buff is a field of the eaten item, not of the recipe; a recipe row
+    already names its station, so there is no `parts` list; and the stem stations wait for D4b's shaping table.
+  - Its other edits outside 10D's paths were granted on review: the m5b tests of `tools/sprites`, the client and the
+    content, which list the recipes; `docs/SPRITES.md`; the `EffectId` pin; and the icons.
+  - The plan's dish buff "until dawn" is a fixed 780 s, so a dish eaten at night can carry into the next day. That is
+    for the owner and 10X to judge.
 
 ## Round 11 (planning, started 2026-10-29)
 

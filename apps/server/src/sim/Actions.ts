@@ -73,6 +73,7 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'salts':
     case 'antidote':
     case 'eat':
+    case 'eatHerbBread':
       return handleBodyAbility(room, sessionId, payload);
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });

@@ -46,6 +46,8 @@ export const Recipe = z.strictObject({
    * is matched wherever it sits in the grid, and mirrored. Absent = shapeless: the grid matches the set of inputs.
    */
   shape: z.array(z.array(Id.nullable()).min(1)).min(1).optional(),
+  /** Round 10, D4a: the maps this recipe is made on (its stations stand only there); absent = every map. */
+  maps: z.array(Id).min(1).optional(),
 });
 export type Recipe = z.infer<typeof Recipe>;
 
