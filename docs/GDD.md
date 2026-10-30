@@ -156,7 +156,7 @@ Round 8 (3.22, DECISIONS A134, A136) replaced the two-hit-point model: a seat ha
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2, an NPC's shout for a body 8 (round 8, 3.12); noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2, an NPC's shout for a body 8 (round 8, 3.12), an axe's chop 8 and a pickaxe's smash 10 at the tool walls (round 10, x2, 3.14; proposals for the balance lab); noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -486,7 +486,9 @@ still give Timber directly (they are the camp's cut stacks). A worn tool breaks 
 
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
-Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
+Chopping sounds (round 10, x2): an Axe on a woodpile, a stump or a mine timber set rings `chop` (8 tiles) when the hold ends,
+a Pickaxe on a boulder, a rock pile or an ore pile `smash` (10); the Crowbar's pry sounds at 10 (`crowbar`) and bare hands on
+rubble and the saws stay silent (3.7).
 The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's, through the same resolver: it breaks rubble by hand, the cleared pile stays no station until its time has run, and a seat that finds one spent walks on. No seat is dealt a free tool, since a seat working a tool-walled pile before any human could own the tool would tell an NPC; an NPC comes by a tool as any seat does (a card's start kit, or buying it at the general store; a later step, D2b).
 
 ### 3.15 Mobs
@@ -1034,7 +1036,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
-  names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
+  names a look, never a seat or a card. The county jail's cell is never sampled (3.27). Each Train delivery fills the mailbag beside the platform (HollowMere) with
   `notices.slipsPerBag` ledger slips from the sightings since the last bag, night first, one per look; an uncollected
   bag is replaced. Collecting it (`act.hold`, `clues.collectHoldS` within verb reach) turns the slips into Blackmail
   Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
@@ -1122,6 +1124,17 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
+**Talk to a figure** (round 10, D9c; `living-world.md` 1.5, seams.md 3 row 16). A seat in reach (`figureTalk.reachTiles`)
+of a figure (a townsperson, a named figure or a Constable) asks it about the town or the time (`talk.ask {targetId,
+ask}`, G and H on the client). A seat's handle, human or NPC, an unknown handle and a figure in another scene refuse as
+no target; a ghost refuses as not in play; too far refuses as too far; each asker may ask the same figure again after
+`figureTalk.cooldownS`. The answer is one system chat line to the asker alone, `figureTalk.delayS` after the ask.
+`town` is a tip off the rumour ledger (3.23) naming a drawn look and a scene, never a seat, a handle or a card; `time`
+is a template remark; a Constable reads the latest briefing line (3.31) instead; with nothing to tell, a figure says so.
+The line is drawn from the figure and the tick it is due, with no random number, so two askers of one figure in one
+tick hear the same words. Nothing public marks a talk: no bubble, no turn of the figure, no event to another client.
+The lines are `talk.json` `figures`.
+
 **Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
 guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
 `townsfolk` (`guard`, with `count` figures, the Constables 2) spawns after the counted townsfolk, so it never takes
@@ -1198,8 +1211,9 @@ cell. It stays there until the next morning train, the first arrival of a later 
 station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
-Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. A death in jail takes the
-usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. Only its cellmates see
+it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. A death in
+jail takes the usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
 with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
 no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
 
