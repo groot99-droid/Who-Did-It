@@ -93,24 +93,30 @@ shadows only**:
 
 - one ink mask per building and multi-tile prop, rendered on the shadow catcher with the casters hidden from the
   camera;
-- packed into `shd_<mapId>`, one frame per building with the building's own key and pivot;
+- packed into `shd_<mapId>` (look.md 5.3.1): one white alpha mask per map, one frame per building with the
+  building's own key and pivot, tinted `ink` at run time, the pixels under the building's own silhouette cut before
+  packing;
 - drawn by the client in the ground band at `DEPTH.shadow` (-19, over the decals at -20, so a footprint in shadow is
   darkened) under every y-sorted sprite;
 - its alpha set by the day part: full by day, faded at dusk, none at night, where the darkness layer covers it.
 
-In 8-bit the mask is hard (alpha 0 or 255, the finish's rule) and the client draws it at a constant alpha. In low poly
-and HD it keeps its soft edge. Figures cast no long shadow: they keep the client's ellipse.
+In 8-bit the mask is hard (alpha 0 or 255, the finish's rule, drawn `nearest`) in the 8-bit manifest. In low poly it
+keeps its soft edge (drawn `linear`) in the low-poly manifest. HD takes low poly's mask through its fallback order
+(HD-1), since a soft single-colour mask gains nothing at HD's density. `palette.test.ts` and the tone check exempt the
+`shd_` keys, as they do `gen_light`. Figures cast no long shadow: they keep the client's ellipse.
 
 **What it costs.**
 
 - **Render.** About 45 s a building frame at the display scale, once for 8-bit and low poly together (both finish the
   same raw render), and about four times that for HD. HollowMere's 9 buildings and its few multi-tile props come to about
   a quarter of an hour for 8-bit and low poly, and under an hour for HD.
-- **Pages.** At full packed density the layer is about 0.94 of a map's building page: about 0.47 page-equivalents on
-  HollowMere. That puts low poly at about 9.19, over the cap of 9 (look.md 5.3). The plan's default packs the layer at
-  **half resolution per axis** (the client draws it at twice the size), about 0.12 a map: low poly about 8.84, under 9.
-  The page cap is 11B's (look.md 5.3), and its answer is folded in at section 5.
-- **HD.** The layer is inside HD's own cap of 18 (BU1).
+- **Pages.** The numbers are 11B's, in look.md 5.3.1.
+  - At full packed density the layer would break the cap of 9 in low poly.
+  - So it is packed at **half the style's density per axis**, and the client draws it at twice its texel size.
+  - Its cap is 1024² a map, and HollowMere and BlackPine both fit under it with low poly still under 9.
+  - It loads with its map and is not lazy: the worst case is counted with the exterior loaded, which is when it
+    draws.
+- **HD.** The layer is inside HD's own cap of 18 (BU1; look.md 5.3.1).
 
 ## 4. Tooling and passes
 
@@ -133,30 +139,32 @@ that 6Z takes, or asks the owner to take; the pull request ships the lock and th
 |---|---|---|---|
 | **L1. `emit`: the render** | builders tag glowing parts `wdi_emit` (the `emissive` role of M1 tags itself), `static_common.py` and `build_buildings.py` render the mask, `tools/sprites/pack-static.ts` packs `emit_<atlas>` (only frames with a lit pixel, trimmed, the beauty's key and pivot), manifests, SPRITES 6 and 10.13 | A frame's mask lies inside its beauty alpha; an atlas with no emitter writes no page; packed within look.md 5.3's cap (512² a map, 256² shared); determinism | M1 |
 | **L2. `emit`: the client** | `apps/client/src/view/Lighting.ts` (each lit statics' mask erased from the darkness texture at night, at its sprite's place), `assets.ts` (load `emit_*` with the map), SPRITES 10.11, `GDD.md` 3.13 | A lit window's pixels stay clear at night and dark by day; a missing `emit_*` page draws nothing; `budget.test.ts` counts the page in the resident sum | L1 |
-| **L3. The long shadows: the render** | `rig_common.SHADOW_SUN` (25°, turned 45°; section 3), `build_buildings.py` (a shadow pass for buildings and multi-tile props: the catcher on, the casters hidden from the camera), `tools/sprites` (`shd_<mapId>` packed at half resolution, hard alpha in 8-bit, soft in low poly and HD), SPRITES 10.5 and 10.14 | The shadow sun lights no colour pass (a beauty frame is identical with and without it); the layer's frames carry the building's keys and pivots; half resolution; determinism | T1 |
+| **L3. The long shadows: the render** | `rig_common.SHADOW_SUN` (25°, turned 45°; section 3), `build_buildings.py` (a shadow pass for buildings and multi-tile props: the catcher on, the casters hidden from the camera), `tools/sprites` (`shd_<mapId>` at half density, the silhouette cut; hard in the 8-bit manifest, soft in the low-poly one), `test/budget.test.ts` (the `shd_` cap of 1024² a map, look.md 5.3.1), `test/palette.test.ts` (the `shd_` exemption), SPRITES 10.5 and 10.14 | The shadow sun lights no colour pass (a beauty frame is identical with and without it); the layer's frames carry the building's keys and pivots; half density; within its cap; determinism | T1 |
 | **L4. The long shadows: the client** | `apps/client/src/view/StaticView.ts` (or a new `ShadowView.ts`), `view/iso.ts` `DEPTH.shadow` (-19), `metrics.json` `lighting.shadow` (alpha by day part), SPRITES 10.6 and 10.11, `GDD.md` 3.13 | Drawn under every y-sorted sprite and over the decals; full by day, faded at dusk, none at night; scaled by 2 from its half-resolution frame; the occluder fade leaves it alone; `budget.test.ts` counts it | L3 |
 
 ## 5. Session 11M: materials and styles (11B's half)
 
-These are 11B's designs (look.md 3, 4, 5, 8). This section is _proposed_ until 11B confirms the split, models and order
-(asked 2026-10-30); 11B's answer replaces it.
+These are 11B's designs (look.md 3, 4, 5, 8). 11B confirmed the split, the models and the order on 2026-10-30. The
+order: T1 (the 5.4 remap and its test) first, then M1, M2a, M2b, M2c, M4 and M3, then the look gate (section 6), then
+M5 and M6. M5 and M6 do not block the gate.
 
 | PR | Files | Tests | Depends on | Model |
 |---|---|---|---|---|
-| **M1. One material graph** | `tools/blender/materials/finish.py` (new: role, tint, style and class to a material; the flat roles `flat`, `skin`, `glass`, `emissive`, `ink`), `roles.py` | Every role and flat role builds in every style; the finish picks the shader, never the model (look.md 3.1) | nothing | Opus |
+| **M1. One material graph** | `tools/blender/materials/finish.py` (new: role, tint, style and class to a material; the flat roles `flat`, `skin`, `glass`, `emissive`, `ink`), `roles.py` | Every role and flat role builds in every style; the finish picks the shader, never the model (look.md 3.1) | T1 | Opus |
 | **M2a. Roles in the env and props builders** | `env/kitbash.py` (`T`, `F` become role calls), `env/*_props.py`, `build_props.py` | Every slot of every prop names a role and a tint; the flat fallback table still dresses an unmigrated model | M1 | Sonnet |
 | **M2b. Roles in buildings, kit and ground** | `build_buildings.py`, `build_kit.py`, `kit_import.py` (imported slots renamed to roles), `build_ground.py` | As M2a; Kenney meshes come in dressed by role | M1, T2 | Sonnet |
-| **M2c. Garment roles for figures** | `looks_spec.py` (a role per garment, `face` for HD), `look_parts.py` | Every look's slots name a role; 8-bit and low poly figures still render flat (ST2, ST3) | M1 | Opus |
-| **M3. The tone check (ST7)** | `tools/sprites/tone.ts`, `test/tone.test.ts` | look.md 3.3's three rules on low poly and HD pages: dominant colours near the palette, saturated share at most 10 %, nothing darker than ink | nothing | Sonnet |
+| **M2c. Garment roles for figures** | `looks_spec.py` (a role per garment for HD only, and the HD `face` role of look.md 6.2; never through `FIGURE_ROLES`, look.md 4.3), `look_parts.py` | Every look's slots name a role; 8-bit and low poly figures still render flat (ST2, ST3) | M1 | Opus |
+| **M3. The tone check (ST7)** | `tools/sprites/tone.ts`, `test/tone.test.ts` (the `shd_` keys exempt) | look.md 3.3's three rules on low poly and HD pages: dominant colours near the palette, saturated share at most 10 %, nothing darker than ink. The thresholds may move on the first real pages | nothing | Opus |
 | **M4. The finish constants** | `rig_common.HD` and the per-style AO and catcher (look.md 4.4), `taaSamples` 8 (RN2), `rock_face` at 2k in HD only (ST6), no sky under HD figures (ST5), ASSETS 6.2 | The constants per style; unit tests of the style switch | nothing | Sonnet |
-| **M5. HD-1 and the HD caps** | `apps/client/src/view/assets.ts` and `artStyle.ts` (HD falls back hd, low poly, 8-bit, ST4), `tools/sprites/test/budget.test.ts` (the HD cap of 18, BU1) and `media.test.ts` (80 MB kept, BU2), SPRITES 5, ASSETS 6.8 | A missing HD key draws its low-poly entry; the HD sum is checked once `assets/hd/` has a manifest | nothing | Opus |
+| **M5. HD-1 and the HD caps** | `apps/client/src/view/assets.ts` and `artStyle.ts` (HD falls back hd, low poly, 8-bit, ST4), `tools/sprites/test/budget.test.ts` (the HD cap of 18, BU1, counting the environment, the low-poly looks, `emit` and `shd_`) and `media.test.ts` (80 MB kept, BU2), SPRITES 5, ASSETS 6.8 | A missing HD key draws its low-poly entry; the HD sum is checked once `assets/hd/` has a manifest | nothing | Opus |
 | **M6. The V2 export (SC3)** | `save_masters.py` (a GLB per master: role slots with `extras`, `wdi_part`, LODs 0.5 and 0.25), a model budget check in `glb_inspect.py`'s grammar (look.md 8.2) | A built look and a building export with their slots, parts, LODs and rig; an over-budget model fails | M2a, M2c | Sonnet |
 
 ## 6. The look gate
 
 **G. One room and one figure in every style, to the owner.** This is round 8's form (`docs/round8/hd-look/`). 11L
 renders HollowMere's tavern square and the Baker through the made-over pipeline, with `emit` and the long shadows, in
-8-bit, low poly and HD (HD-1: the low-poly Baker in the HD world). The sheet goes to the owner as a docs pull request
+8-bit, low poly and HD (HD-1: the low-poly Baker in the HD world). It includes one `shd_` crop, hard in 8-bit and soft
+in low poly, so the owner judges the shadow too. The sheet goes to the owner as a docs pull request
 under `docs/round11/samples/gate/`. It settles three of the open defaults:
 
 - whether 8-bit takes AO (look.md 4.4);
@@ -165,7 +173,7 @@ under `docs/round11/samples/gate/`. It settles three of the open defaults:
 
 No bulk render starts until the owner signs it off.
 
-- **Depends on:** T1, M1, M2a, M2b, M2c, M4, L1, L3.
+- **Depends on:** T1, M1, M2a, M2b, M2c, M3, M4, L1, L3.
 
 ## 7. The art drops
 
@@ -173,7 +181,7 @@ The contents and counts come from `assets.md`. These are the order and the rules
 
 | Drop | Session | What | Depends on |
 |---|---|---|---|
-| **W1 to Wn. Each map's world** | 11W, one session per map (HollowMere first; the shared `props`, `clues` and `vfx` ride with it) | Ground, kit, buildings and multi-tile props with their `emit` and `shd` layers, props, in three styles; one drop per class and map | G, T5, L2, L4 |
+| **W1 to Wn. Each map's world** | 11W, one session per map (HollowMere first; the shared `props`, `clues` and `vfx` ride with it) | Ground, kit, buildings and multi-tile props with their `emit` and `shd` layers, props, in three styles; one drop per class and map | G, T5, L2, L4, M5 (HD's fallback to the low-poly figures) |
 | **F1 to Fn. The figures** | 11F, four sessions in parallel, each on its own looks | The deck's looks, the villager family and the `constable`, with the overlays; 8-bit and low poly only (HD-1); groups of three to five looks a drop | G, T5, the HollowMere world drops (figures are judged on the new ground) |
 | **K1. Mobs** | 11K | The creatures into the rig as figures (SC1) | the F drops |
 | **K2. Nodes and givers** | 11K | The resource nodes and the quest givers as props and figures | K1 |
@@ -192,10 +200,10 @@ The contents and counts come from `assets.md`. These are the order and the rules
 
 ```
 T1 ── T4 ── T5;  T2;  T3
-M1 ── M2a, M2b (and T2), M2c ── M6;  M3;  M4;  M5
+T1 ── M1 ── M2a, M2b (and T2), M2c;  M3;  M4
 M1 ── L1 ── L2;  T1 ── L3 ── L4
-T1, M1, M2a-c, M4, L1, L3 ── G
-G, T5, L2, L4 ── W (HollowMere first) ── F ── K1 ── K2 ── K3
+T1, M1, M2a-c, M3, M4, L1, L3 ── G ── M5;  M2a, M2c ── M6 (M5 and M6 come after G in 11B's order; neither blocks it)
+G, T5, L2, L4, M5 ── W (HollowMere first) ── F ── K1 ── K2 ── K3
 SC2 confirmed, M2b ── X1 (optional)
 everything ── Z1
 ```
