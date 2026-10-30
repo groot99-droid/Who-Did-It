@@ -109,7 +109,11 @@ describe('shops', () => {
     const open = h.log.find((m) => m.type === S2C.shopOpen)?.payload;
     expect(open).toEqual({
       shopId: 'bakery',
-      stock: economy.shops.bakery!.sells.map((itemId) => ({ itemId, price: economy.prices[itemId]!.ask })),
+      stock: economy.shops.bakery!.sells.map((itemId) => ({
+        itemId,
+        price: economy.prices[itemId]!.ask,
+        left: expect.any(Number),
+      })),
       buys: [],
     });
     // Nobody else hears of it.
