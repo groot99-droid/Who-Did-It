@@ -39,8 +39,7 @@ function knockBack(room: PartyRoom, p: PlayerSim, ux: number, uy: number, tiles:
  * avatars, as for an aiming Gamekeeper) and its Notebook gets the attacker's height as Claimed; a living witness within
  * `witnessRadiusTiles` of the striker gets height and scarf as Claimed. The strike has already dropped the striker's
  * disguise (GDD 3.17), so the figure they saw is the true one and no entry says more than the drawn figure did.
- * Then both are knocked back `knockbackTiles` along the strike's line, the target away from the attacker and the
- * attacker the other way (round 10, x10, A393); the witnesses are read at the strike's spot, before the push.
+ * `Kill.ts` parts the pair after this (`knockBackPair`), so the witnesses are read at the strike's spot.
  */
 export function onBandagedStrike(room: PartyRoom, attackerId: string, targetId: string): void {
   const sim = simOf(room);
@@ -59,13 +58,26 @@ export function onBandagedStrike(room: PartyRoom, attackerId: string, targetId: 
     claim(room, id, ClueKind.footprints, traits.height);
     claim(room, id, ClueKind.thread, traits.scarf);
   }
-  // The strike's line; two seats on one spot part along the attacker's facing (`yaw` as `Movement.ts` writes it).
+}
+
+/**
+ * A voided Knife strike parts the pair (GDD 3.2; round 10, x10, A393): the target is knocked back
+ * `bandage.params.knockbackTiles` along the strike's line, from the attacker through the target, and the attacker the
+ * same the other way. Every protection that voids the strike does it (a Bandage, a Watch, a Remedy; `Kill.ts`), so the
+ * striker cannot tell from the push which one held; the Charm is not a void (it leaves Wounded) and does not. Two seats
+ * on one spot part along the attacker's facing (`yaw` as `Movement.ts` writes it).
+ */
+export function knockBackPair(room: PartyRoom, attackerId: string, targetId: string): void {
+  const sim = simOf(room);
+  const attacker = sim.players.get(attackerId);
+  const target = sim.players.get(targetId);
+  if (!attacker || !target) return;
   const yaw = room.state.players.get(attackerId)?.presence.yaw ?? 0;
   const dx = target.x - attacker.x;
   const dy = target.y - attacker.y;
   const len = Math.hypot(dx, dy);
   const [ux, uy] = len > 0 ? [dx / len, dy / len] : [Math.sin(yaw), -Math.cos(yaw)];
-  const tiles = params?.knockbackTiles ?? 0;
+  const tiles = abilities.abilities.bandage?.params?.knockbackTiles ?? 0;
   knockBack(room, target, ux, uy, tiles);
   knockBack(room, attacker, -ux, -uy, tiles);
 }
