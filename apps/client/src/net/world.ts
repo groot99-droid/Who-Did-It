@@ -255,6 +255,8 @@ export interface WorldFeed {
   sell(shopId: string, itemId: string, qty: number): void;
   /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
   faith(): number;
+  /** Round 10 (A7, GDD 3.32): whether this seat sleeps and, while it does, how many active players are in bed of how many. */
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number };
   /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */
   hqTiers(): Record<string, number>;
   /** Round 8, 8D: one of the civic acts at the altar, the black market, a station or a bank counter. */

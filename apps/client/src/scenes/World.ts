@@ -41,6 +41,7 @@ import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
 import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
+import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
 import { type LineScreen, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
@@ -158,6 +159,7 @@ export class World extends Phaser.Scene {
   private m5b: M5bLayer | null = null;
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
   private civic: CivicLayer | null = null; // round 8, 8D
+  private sleepLayer: SleepLayer | null = null; // round 10, A8
   private purse: PurseHud | null = null; // round 8, 8C (locked)
   private mug: MugPrompt | null = null;
   private cutscenes!: CutscenePlayer;
@@ -247,6 +249,7 @@ export class World extends Phaser.Scene {
     this.m5b = mountM5bLayer(this);
     this.shop = mountShopLayer(this); // round 8, 8C (locked)
     this.civic = mountCivicLayer(this); // round 8, 8D
+    this.sleepLayer = mountSleepLayer(this); // round 10, A8
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -370,6 +373,7 @@ export class World extends Phaser.Scene {
       this.m5b?.destroy();
       this.shop?.destroy(); // round 8, 8C (locked)
       this.civic?.destroy(); // round 8, 8D
+      this.sleepLayer?.destroy(); // round 10, A8
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
       this.line?.destroy(); // round 10, C1b
@@ -490,6 +494,7 @@ export class World extends Phaser.Scene {
   private useKey(down: boolean): void {
     if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
     if (this.civic?.use(down)) return; // round 8, 8D: an altar, the mailbag, a rack, the back room, a station, a bank
+    if (this.sleepLayer?.use(down)) return; // round 10, A8: a bed in reach at dusk or night
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();

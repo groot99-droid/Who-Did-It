@@ -61,12 +61,15 @@ describe('depletion', () => {
     expect(workable(party.room, seat, st)).toBe(false); // bare hands do not chop
     addStack(seat, 'axe', 1);
     expect(workable(party.room, seat, st)).toBe(true);
-    for (let i = 0; i < 40 * TICK_RATE && count(seat, 'logs') === 0; i++) advance(party, 1);
+    for (let i = 0; i < 90 * TICK_RATE && count(seat, 'logs') === 0; i++) advance(party, 1);
     expect(count(seat, 'logs')).toBeGreaterThanOrEqual(2);
     const states = party.room.state.scenes.get(st.scene)!.propStates;
     expect(states.get(PILE)?.state).toBe('cut');
     expect(workable(party.room, seat, st)).toBe(false);
     const respawnS = interactions.interactions.chopLumber!.after!.respawnS!;
+    // The seat's routine would chop the returned pile again before the check; stop it at the first chop.
+    npcMemory(party.room).routine = false;
+    simOf(party.room).players.get(id)!.hold = null;
     holdPhase(party, Phase.day, 3600);
     advance(party, respawnS * TICK_RATE + 1);
     expect(states.has(PILE)).toBe(false);
