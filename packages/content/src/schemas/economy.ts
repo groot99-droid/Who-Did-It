@@ -66,7 +66,13 @@ const FaithPrice = z.strictObject({ faith: Count, scrip: Scrip });
 /** A stake tier: the purse a seat starts with is drawn uniformly in [min, max]. */
 const StakeTier = z.strictObject({ min: Scrip, max: Scrip }).refine((t) => t.min <= t.max, 'min > max');
 
-const Shop = z.strictObject({ prop: PrefixedId, sells: z.array(Id), buys: z.array(Id) });
+/** `owner` (round 10, C2b): the `looks.json` look whose character keeps the shop; a shop with no character has none. */
+const Shop = z.strictObject({
+  prop: PrefixedId,
+  sells: z.array(Id),
+  buys: z.array(Id),
+  owner: Id.optional(),
+});
 
 const Price = z
   .strictObject({ ask: Scrip.positive().optional(), pay: Scrip.positive().optional() })

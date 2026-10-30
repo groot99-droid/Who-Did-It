@@ -4,7 +4,7 @@
 export const M5B_COPY = {
   // 14.19.1 Hold prompts (beside the Hold E clue prompt of 14.1)
   'prompt.gather': 'Hold E: gather {what}',
-  'prompt.gather.tool': 'Needs a {tool} to gather {what}',
+  'prompt.gather.tool': 'Gather {what} (needs {tool})', // greyed (round 10, 10Y; UI.md 14.51)
   'prompt.gather.cancel': 'Release to stop',
   'prompt.giver': 'Press E: speak to {name}',
   'toast.gather.cancel': 'You stopped gathering.',
@@ -73,10 +73,14 @@ export const M5B_COPY = {
   'quest.mollsHerbs.done': 'There. A bandage for your trouble.',
   'quest.mollsMushrooms': 'Three mushrooms from the deep wood, and I will pay in salts.',
   'quest.mollsMushrooms.done': 'Sharp eyes. Take the salts.',
+  'quest.mollsBrew': 'Come, help me brew. Two herb, two mushroom, and I will bind you a pair of bandages.',
+  'quest.mollsBrew.done': 'Two bandages, wrapped. Mind the fog.',
   'quest.stackTheYard': 'Four lengths of timber for the yard stack, and the crowbar is yours.',
   'quest.stackTheYard.done': 'Square as a church. Pry carefully.',
   'quest.smithsOre': 'Three tin ore from the seam. I will make you a lantern for it.',
   'quest.smithsOre.done': 'Good ore. This burns bright.',
+  'quest.smithsTemper': 'Two more ore and a length of timber, and I will temper you a hammer.',
+  'quest.smithsTemper.done': 'Tempered, and still warm. Mind the head.',
   'quest.colliersStone': 'Three good stones for the clamp, and take a torch with you.',
   'quest.colliersStone.done': 'It will hold. Keep that torch up.',
 
