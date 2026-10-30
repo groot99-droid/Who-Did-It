@@ -42,7 +42,7 @@ const summaryOf = (winner: Outcome, town: string): string =>
       : `The Cabal holds ${town}. The Village is lost.`;
 
 /** Game over: the phase, the winner, the gameOver message and the match-log line (A30). */
-export function endMatch(room: PartyRoom, outcome: Outcome): void {
+export function endMatch(room: PartyRoom, outcome: Outcome, opts: { unseen?: boolean } = {}): void {
   // Round 10, C5: in Paint The Town Red the Killers win only by painting the town; the end trial closing without
   // it (the Final Night's Cabal verdict) is the Village's (GDD 3.8).
   const winner = isPaintTown(room) && outcome === 'cabal' ? 'village' : outcome;
@@ -58,6 +58,7 @@ export function endMatch(room: PartyRoom, outcome: Outcome): void {
     ...gameOverExtras(room),
     ...(isPaintTown(room) && { paintTown: paintGameOver(room) }),
     ...(hitmanGameOver(room) && { hitman: hitmanGameOver(room) }), // round 10, C4b (seams.md 3 row 21)
+    ...(opts.unseen === true && winner === 'cabal' && { unseen: true }), // round 10, B6d (row 35)
   });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];

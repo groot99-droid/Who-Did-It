@@ -20,6 +20,7 @@ import { handleCraftGrid } from './Craft';
 import { handleInvMove, handleInvSelect } from './InventoryMoves';
 import { handlePairAnswer, handlePairAsk } from './law/Pairing';
 import { handlePetitionOpen, handlePetitionSign } from './law/Petition';
+import { handleFile } from './law/EndTrial';
 import { handlePresent } from './law/Tribunal';
 import { wakeOnInput } from './Sleep';
 
@@ -155,6 +156,9 @@ export function runCommands(room: PartyRoom): void {
       // Round 10, B6a (GDD 3.8): presenting at the Tribunal.
       case C2S.present:
         handlePresent(room, cmd.sessionId, payload);
+        break;
+      case C2S.trialFile: // round 10, B6d: a case at the end trial
+        handleFile(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check and burst arrive with M4+; queued and ignored until then.

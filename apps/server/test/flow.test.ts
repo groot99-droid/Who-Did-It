@@ -1,6 +1,16 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, deckFor } from '@wdi/content';
-import { C2S, ErrorCode, Phase, SKIP_VOTE, TICK_RATE, Winner } from '@wdi/shared';
+import {
+  C2S,
+  ClueKind,
+  ErrorCode,
+  NotebookEntry,
+  NotebookStatus,
+  Phase,
+  TICK_RATE,
+  TribunalStep,
+  Winner,
+} from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   bootFlowServer,
@@ -12,11 +22,10 @@ import {
   skipPhase,
   startParty,
   until,
-  vote,
-  voteAll,
 } from './flowHelpers';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { flowOf } from '../src/sim/Flow';
+import { endTrialOpen, handleFile } from '../src/sim/law/EndTrial';
 import { simOf } from '../src/sim/RoomSim';
 import { opts, sleep } from './simHelpers';
 
@@ -184,59 +193,93 @@ describe('the Final Night (GDD 3.3, 3.8)', () => {
     m.room.state.round = 0;
   });
 
-  it('opens the forced meeting with reason final when the hunt runs out', async () => {
+  // Round 10, B6d (6Z's grant): the end trial replaced the forced meeting and its vote (GDD 3.8, seams.md 3 row 35).
+  /** The end trial's next step at once (its own clock, not the phase's). */
+  const skipStep = async (m: Awaited<ReturnType<typeof toFinalNight>>) => {
+    m.room.state.tribunal.untilTick = m.room.state.tick;
+    await sleep(150);
+  };
+  /** Steps the end trial until the match is over. */
+  const runOut = async (m: Awaited<ReturnType<typeof toFinalNight>>) => {
+    for (let i = 0; i < 20 && m.room.state.phase !== Phase.gameOver; i++) await skipStep(m);
+  };
+  const killerIdx = (m: Awaited<ReturnType<typeof toFinalNight>>) =>
+    [0, 1, 2, 3, 4].find((i) => seat(m, i).priv!.role.roleId === 'killer')!;
+  /**
+   * Two filers' murder cases against `of`, each with one Verified entry fitting its public traits
+   * (`meeting.presentPerPlayer` is 1): two matches, `trial.murderAt`.
+   */
+  const fileAgainst = (m: Awaited<ReturnType<typeof toFinalNight>>, filers: number[], of: number): void => {
+    const t = seat(m, of).traits;
+    const fit: [number, number][] = [
+      [ClueKind.footprints, t.height],
+      [ClueKind.thread, t.scarf],
+    ];
+    filers.forEach((by, i) => {
+      const notebook = seat(m, by).priv!.notebook;
+      const e = new NotebookEntry();
+      e.id = `entry_f${notebook.length + 1}`;
+      [e.clueKind, e.value] = fit[i]!;
+      e.sceneId = 1;
+      e.status = NotebookStatus.verified;
+      notebook.push(e);
+      handleFile(m.room, idOf(m, by), { accused: idOf(m, of), charge: 'murder', entries: [e.id] });
+    });
+  };
+
+  it('opens the end trial, its gathering first, when the hunt runs out', async () => {
     const m = await toFinalNight();
     await skipPhase(m);
-    expect(m.room.state.phase).toBe(Phase.meetingDiscussion);
-    expect(m.room.state.meeting.reason).toBe('final');
-    expect(events(m.bots[1]!, 'meetingStart').at(-1)).toMatchObject({ reason: 'final' });
+    expect(m.room.state.phase).toBe(Phase.tribunal);
+    expect(m.room.state.tribunal.step).toBe(TribunalStep.gathering);
+    expect(endTrialOpen(m.room)).toBe(true);
   });
 
   it('ends the hunt at once on a body report (finalNight.reportEndsHunt)', async () => {
     const m = await toFinalNight();
     request(m, 1, 2);
-    expect(await until(() => m.room.state.phase === Phase.meetingDiscussion)).toBe(true);
-    expect(m.room.state.meeting.reason).toBe('final');
-    expect(m.room.state.meeting.callerId).toBe(idOf(m, 1));
+    expect(await until(() => m.room.state.phase === Phase.tribunal)).toBe(true);
+    expect(m.room.state.tribunal.step).toBe(TribunalStep.gathering);
   });
 
-  it('refuses a Skip vote in the forced meeting and keeps the seat unvoted', async () => {
+  it('refuses a filing outside the filing window, and nothing is voted', async () => {
     const m = await toFinalNight();
-    await skipPhase(m);
-    const before = events(m.bots[1]!, 'error').length;
-    vote(m, 1, SKIP_VOTE);
-    expect(await until(() => events(m.bots[1]!, 'error').length > before)).toBe(true);
-    expect(events(m.bots[1]!, 'error').at(-1)).toMatchObject({ code: ErrorCode.cannot });
+    await skipPhase(m); // the gathering
+    handleFile(m.room, idOf(m, 1), { accused: idOf(m, 2), charge: 'murder', entries: [] });
+    await sleep(150);
+    expect(events(m.bots[1]!, 'error').at(-1)).toMatchObject({ reason: 'PHASE_CLOSED' });
     expect(seat(m, 1).hasVoted).toBe(false);
-    vote(m, 1, idOf(m, 2));
-    expect(await until(() => seat(m, 1).hasVoted)).toBe(true);
   });
 
-  it('ends the match for the Cabal when the vote ties or nobody votes', async () => {
+  it('ends the match for the Cabal, the Killer Unseen, when no case is filed', async () => {
     const m = await toFinalNight();
-    await skipPhase(m); // the hunt ends: the forced meeting opens
-    await skipPhase(m); // discussion -> vote
-    await skipPhase(m); // vote ends with no ballots: nobody ejected
-    expect(m.room.state.phase).toBe(Phase.reveal);
     await skipPhase(m);
+    await runOut(m);
     expect(m.room.state.phase).toBe(Phase.gameOver);
     expect(m.room.state.winner).toBe(Winner.cabal);
+    expect(events(m.bots[0]!, 'gameOver').at(-1)).toMatchObject({ unseen: true });
   });
 
-  it('ends the match for the Village when the vote ejects a Cabal member', async () => {
+  it('ends the match for the Village when the end trial convicts the Killer of murder', async () => {
     const m = await toFinalNight();
+    const k = killerIdx(m);
     await skipPhase(m);
-    await voteAll(m, [0, 1, 2, 3, 4], (i) => idOf(m, i === 0 ? 1 : 0));
-    await skipPhase(m);
-    expect(m.room.state.phase).toBe(Phase.gameOver);
+    await skipStep(m); // the gathering -> the filing
+    fileAgainst(m, [0, 1, 2, 3, 4].filter((i) => i !== k).slice(0, 2), k);
+    await runOut(m);
     expect(m.room.state.winner).toBe(Winner.village);
+    expect(events(m.bots[0]!, 'gameOver').at(-1)).not.toHaveProperty('unseen');
   });
 
-  it('ends the match for the Cabal when the vote ejects a villager', async () => {
+  it('ends the match for the Cabal when the end trial hangs a villager', async () => {
     const m = await toFinalNight();
+    const k = killerIdx(m);
+    const [v, ...rest] = [0, 1, 2, 3, 4].filter((i) => i !== k);
     await skipPhase(m);
-    await voteAll(m, [0, 1, 2, 3, 4], () => idOf(m, 2));
-    await skipPhase(m);
+    await skipStep(m);
+    fileAgainst(m, rest.slice(0, 2), v!);
+    await runOut(m);
+    expect(simOf(m.room).players.get(idOf(m, v!))!.dead).toBe(true);
     expect(m.room.state.winner).toBe(Winner.cabal);
   });
 });

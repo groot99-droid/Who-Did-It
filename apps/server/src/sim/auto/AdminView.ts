@@ -106,6 +106,8 @@ export const ADMIN_EVENT_KINDS = [
   'phase',
   'start',
   'end',
+  'endTrial.open', // round 10, B6d: the Final Night's end trial (GDD 3.8)
+  'endTrial.verdict',
 ] as const;
 
 /** Failures kept for the log pane until Reset; past it the oldest go (the page shows the newest). */

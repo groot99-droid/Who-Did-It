@@ -33,6 +33,8 @@ export const C2S = {
   petitionOpen: 'petition.open',
   /** Round 10, B3: sign the open petition. */
   petitionSign: 'petition.sign',
+  /** Round 10, B6d (GDD 3.8, seams.md 3 row 35): file a case at the Final Night's end trial. */
+  trialFile: 'trial.file',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -347,6 +349,7 @@ export interface C2SPayloads {
   /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
   'petition.open': { accused: string; charge: string; entries: string[] };
   'petition.sign': { id: string };
+  'trial.file': { accused: string; charge: string; entries: string[] };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
@@ -386,6 +389,8 @@ export interface S2CPayloads {
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
     hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
+    /** Round 10, B6d (row 35): the Killer reached the end trial's close unconvicted (the Unseen victory). */
+    unseen?: boolean;
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -509,6 +514,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
+  'trial.file': 2,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).
