@@ -3,6 +3,7 @@ import { TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { applyClock, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
+import { registeredInvariants } from '../src/sim/auto/invariants';
 import { attachShadowViews, shadowViewsOf } from '../src/sim/auto/shadowViews';
 import { isWorldPhase } from '../src/sim/World';
 import { bootAutoServer, runAutoMatch } from './autoHelpers';
@@ -50,6 +51,7 @@ describe('the decoded views of an auto match', () => {
       expect(isWorldPhase(room.state.phase)).toBe(true);
       expect(decodedAvatars().length).toBeGreaterThan(0);
       expect(shadowViewsOf(room)).toBe(shadows);
+      expect(registeredInvariants()).toContain('decodedViews'); // registered by the attach, not on import
       expect(shadows.check()).toBeNull();
       expect(shadows.checks).toBeGreaterThan(0);
 

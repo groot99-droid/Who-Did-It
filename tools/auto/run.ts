@@ -16,7 +16,7 @@ import {
   runAutoMatch,
 } from '../../apps/server/test/autoHelpers';
 import { npcIdsFor, parseArgs, seedWordsFor } from './args';
-import './checks';
+import { assertChecks } from './checks';
 
 const opts = parseArgs(process.argv.slice(2).filter((a) => a !== '--'));
 if (opts === null) {
@@ -52,6 +52,7 @@ try {
       views: opts.views,
     });
     const ms = Math.round(performance.now() - t0);
+    if (opts.views) assertChecks(true); // the decoded-view check registers when the shadows attach (x14)
     if (r.failures.length > 0) failed++;
     if (opts.json) {
       const { events: _events, ...rest } = r;

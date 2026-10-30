@@ -178,6 +178,7 @@ function secretKeyOutside(value: unknown, own: string, path: string): string | n
 }
 
 const shadowViews = new WeakMap<PartyRoom, ShadowViews>();
+let registered = false;
 
 /** The shadows of `room`, when the harness attached them. */
 export const shadowViewsOf = (room: PartyRoom): ShadowViews | undefined => shadowViews.get(room);
@@ -189,6 +190,12 @@ export const shadowViewsOf = (room: PartyRoom): ShadowViews | undefined => shado
 export function attachShadowViews(room: PartyRoom): ShadowViews {
   const existing = shadowViews.get(room);
   if (existing) return existing;
+  // Round 10, x14 (A453): the check joins the other invariants the first time shadows attach (`--views`), never on
+  // import, so the default registry stays the list of auto-admin.md 5 and `invariants.test.ts`.
+  if (!registered) {
+    registered = true;
+    registerInvariant('decodedViews', (r) => shadowViewsOf(r)?.check() ?? null);
+  }
   const shadows = new ShadowViews(room);
   for (const sessionId of room.state.players.keys()) {
     const view = createPlayerView(room, sessionId);
@@ -203,6 +210,3 @@ export function attachShadowViews(room: PartyRoom): ShadowViews {
   shadowViews.set(room, shadows);
   return shadows;
 }
-
-// Round 10, x14 (A453): the check runs with the other invariants, and only where the harness attached shadows.
-registerInvariant('decodedViews', (room) => shadowViewsOf(room)?.check() ?? null);
