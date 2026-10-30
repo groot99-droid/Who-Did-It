@@ -3787,8 +3787,8 @@ once. A session's decisions go under its reserved row and its copy under its UI.
 | **10C. Death's cost and arrivals** | Opus | 800k | `claude/r10-tier-800k` | C1 to C7 | when A6 merges |
 | **10D. The living world** | Sonnet | 500k | base | D2 to D9 | when A11 and D1 merge |
 | **10E. Achievements and story** | Sonnet | 500k | base | E1, E2 | when B6 merges |
-| **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
-| **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
+| **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
+| **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Z. The final sweep** | Fable | 800k | `claude/r10-tier-800k` | S6 | last |
 
 A session is spawned with the prompt "You are session 10X of docs/SESSIONS.md Round 10 (model, compaction size).
@@ -3843,8 +3843,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - **10D. The living world** (plan 4). D2 to D9 in the plan's order, D7 after A7 and D5, D8 after B5; the chores and
   quests the 12-cycle match needs (F4 2.8) join D9.
 - **10E. Achievements and story** (plan 4). E1, then E2.
-- **10X. Fixes: server and rules** (Fable). Starts when 10B, 10C and 10D have opened their last PR. One fix per PR,
-  each with a test that failed before it:
+- **10X. Fixes: server and rules** (Fable). Started early, by the owner, on 2026-10-30 (the log below); the plan had it
+  start when 10B, 10C and 10D had opened their last PR. One fix per PR, each with a test that failed before it:
   1. the lists the round's PRs left for later (10G's refusal list first), and every parked review finding;
   2. flaky and skipped tests, and the `pnpm auto` invariants at 50 matches;
   3. `NFY` tags whose system has shipped, and the "still waits" lines of `GDD.md` (the Bandage knockback);
@@ -4009,6 +4009,15 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     and off the line. Asleep and knocked-out humans count as free, so no living client receives that scene.
   - B4's grants: the `cuff` case in `sim/Hold.ts` with its interrupts; row 14 in `packages/shared`, with
     `PROTOCOL.md` regenerated; the `manhunt` block of `balance.json` and `law.cuffHoldS`.
+- 2026-10-30: the owner ruled on B5: "keep the default for B5, jail and try them". The seat a manhunt cuffs is held in
+  the county jail cell and tried by the Tribunal on the passed petition's charge and entries. That includes an
+  impersonator cuffed while drawn as the accused, and nothing unmasks at the cuff. Before its code, B5 proposes the
+  wire for what the cell and the trial draw for a cuffed impersonator.
+- 2026-10-30: the owner started 10X and 10Y early, while 10B, 10C and 10D were still building. 6Z merged the base into
+  `claude/r10-tier-300k` (473f233) and spawned both on Fable at 300k: 10X on `claude/r10-x1-refusals` and 10Y on
+  `claude/r10-y1-refusal-lines`. Each carries the fix list the round's reviews parked, on its side. Until the build
+  sessions finish, a fix in a path a live session owns, or in a file an open PR touches, goes to 6Z first. Their copy
+  goes under UI.md 14.51 (10Y) and 14.52 (10X), added to seams.md 5.
 
 ## Round 11 (planning, started 2026-10-29)
 
