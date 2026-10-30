@@ -119,7 +119,7 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 | Ledger | Last house entered per player | Per meeting | Butler |
 | Dropped items | The dead player's inventory | Never | Anyone |
 
-Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb.
+Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb. **Round 10, B2:** the Constables verify every collectible clue at `law.speedMult` times a Detective's rate and brief its kind, scene and trait to everyone `law.briefingAfterS` after it appears (3.31).
 
 **Blood is held by the server** (round 8, 8L, A170): a client receives a figure's Blood only while it stands within the Blood clue's range of that figure (`clues.json` `blood.params.visibleTiles`), or when it is a ghost; nobody further away is sent it at all, and the client draws it only within the same range. The killer's own client always knows it is bloody.
 
@@ -1193,8 +1193,24 @@ Round 10, B1 to B4 (`docs/round9/gdd-map.md` 2.5; `docs/round9/world-mode.md` 3.
 **The Constables (B1, A229).** The county's law: two figures per map, never seats (3.24), with no card, no vote, no
 task list and no part in any win, wearing the `constable` look (3.17). They are guards (3.24): each keeps a post at
 the square (HollowMere's notice board and bell, BlackPine's camp board and bell) within `guard.leashTiles`, has
-health, and fights back when struck. They read only what the world shows, never a card. The briefing, the
-petition and the manhunt are B2 to B4; until then a Constable keeps its post.
+health, and fights back when struck. They read only what the world shows, never a card. The petition and the
+manhunt are B3 and B4.
+
+**The briefing (B2, A249; seams.md 3 row 8).** The Constables read every clue the world makes that a seat could
+collect (`clues.json` `collectible`: footprints, thread, felt, drag smears, fur, claw marks, the Wet Bucket and the
+rest; not a body, a time of death, drips or a Hungry Killer's glowing trail, and not the teaching clue). They read
+it the way a collector does, `clues.collectHoldS / law.speedMult` after it appears (`law.speedMult` 2 times a
+Detective's rate), from their posts, since they never leave their leash (F4 2.2). `law.briefingAfterS` (30 s) after
+the clue appeared they post a **briefing**: one public line in every seat's log (the `system` chat channel, the
+templates of `laws.json` `briefing`, UI 14.50) naming the clue's kind, its scene and, only for a clue whose Reader
+is Anyone (3.4: footprints and thread), the trait the clue object holds ("Constables' briefing: footprints in
+Crumb's Ovens, tall."). A role's reading (the felt's hat, the prints) is never briefed. A briefing never names a
+seat, a handle, a card or a time, never says Forged or Verified, writes no Notebook entry and changes no clue: a
+planted clue is briefed like any other, and Inspect keeps its edge. A clue collected, erased, decayed or evicted
+before its time is not briefed, and the same words twice within `law.briefingAfterS` post once. While no Constable is
+alive there is no briefing (proposed; a knocked-out Constable is alive, and until C5 nothing kills a guard). It opens
+no screen, pauses nothing and waits on nobody. The server keeps the posted
+briefings in order for the police board, which shows them with the petition form (B3).
 
 ### 3.32 Sleeping
 
