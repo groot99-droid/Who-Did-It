@@ -8,6 +8,7 @@ import { curfewBars, duesOf, isIndebted } from '../src/sim/economy/rent';
 import { matchEvents } from '../src/sim/auto/log';
 import { addStack, count } from '../src/sim/Inventory';
 import { act, errorCodes, playerOf, setPhase, sleep, teleport } from './killHelpers';
+import { until } from './flowHelpers';
 import { type Match, lastEvent, startMatch } from './simHelpers';
 
 /** Round 8 (GDD 3.23), Session 8D: rent, the quota, Indebted and the curfew door. */
@@ -49,16 +50,33 @@ async function inDay(n: number, map: string, scrip: number): Promise<Match> {
     movePurse(m.room, b.id, TOWN, playerOf(m, b).priv.purse, 'buy');
     movePurse(m.room, TOWN, b.id, scrip, 'stake');
   }
-  m.room.state.round = 1;
-  setPhase(m, Phase.day);
-  await sleep(100);
+  await toDay(m, 1);
   return m;
+}
+
+/**
+ * Round 10, x15 (6Z's grant of 2026-10-30): each wait here is on the room's own bookkeeping (`duesOf`), never on the
+ * wall clock, so a loaded run that steps late cannot land an assertion before `runRent` has run.
+ */
+const settled = async (cond: () => boolean): Promise<void> => expect(await until(cond)).toBe(true);
+
+/** Opens the day shift of `round`: the quota falls due on its first tick. */
+async function toDay(m: Match, round: number): Promise<void> {
+  m.room.state.round = round;
+  setPhase(m, Phase.day);
+  await settled(() => duesOf(m.room).shiftRound === round);
 }
 
 /** The rent falls due at once (the shift opened long ago). */
 async function rentDue(m: Match): Promise<void> {
   duesOf(m.room).shiftStartTick = -1e6;
-  await sleep(100);
+  await settled(() => duesOf(m.room).rentRound === m.room.state.round);
+}
+
+/** Dusk settles the shift: the fines, the seizures, Indebted. */
+async function toDusk(m: Match): Promise<void> {
+  setPhase(m, Phase.dusk);
+  await settled(() => duesOf(m.room).settledRound === m.room.state.round);
 }
 
 const kinds = (m: Match, seat: string) =>
@@ -86,8 +104,7 @@ describe('rent (GDD 3.23)', () => {
     expect(balanceOf(m.room, a.id)).toBe(20 - economy.rent.amount);
 
     // Unpaid by dusk: Indebted, privately, until it pays.
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     expect(isIndebted(m.room, a.id)).toBe(false);
     expect(isIndebted(m.room, b.id)).toBe(true);
     expect(playerOf(m, b).priv.body.effects.map((e) => e.id)).toEqual([EffectId.indebted]);
@@ -105,11 +122,8 @@ describe('rent (GDD 3.23)', () => {
     await act(a, 'act.payRent', {});
     expect(errorCodes(a)).toContain(ErrorCode.cannot);
     expect(balanceOf(m.room, a.id)).toBe(economy.rent.amount - 1);
-    setPhase(m, Phase.dusk);
-    await sleep(100);
-    m.room.state.round = 2;
-    setPhase(m, Phase.day);
-    await sleep(100);
+    await toDusk(m);
+    await toDay(m, 2);
     await rentDue(m);
     expect(duesOf(m.room).debt.get(a.id)).toBe(2 * economy.rent.amount);
   });
@@ -134,8 +148,7 @@ describe('the curfew door (GDD 3.23)', () => {
     teleport(m, b, 'manor_hall', bank.x + 1, bank.y);
     await act(b, 'act.payRent', {});
     expect(curfewBars(m.room, a.id, 'tavern_bar')).toBe(false); // not yet dusk
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     const curfew = economy.curfew.hollowmere!;
     expect(curfewBars(m.room, a.id, curfew[0]!)).toBe(true);
     expect(curfewBars(m.room, a.id, 'overworld')).toBe(false);
@@ -171,8 +184,7 @@ describe('the curfew door (GDD 3.23)', () => {
     const m = await inDay(2, 'hollowmere', 0);
     const [a, b] = m.bots as [Match['bots'][0], Match['bots'][0]];
     await rentDue(m);
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     teleport(m, a, 'overworld', 28, 35);
     teleport(m, b, 'overworld', 28, 36);
     await sleep(300);
@@ -211,8 +223,7 @@ describe('the quota (GDD 3.23)', () => {
     expect(errorCodes(a)).toContain(ErrorCode.cannot);
 
     movePurse(m.room, TOWN, b.id, economy.quota.fine, 'stake');
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     expect(isIndebted(m.room, a.id)).toBe(false);
     expect(balanceOf(m.room, b.id)).toBe(0);
     expect(isIndebted(m.room, b.id)).toBe(false);
