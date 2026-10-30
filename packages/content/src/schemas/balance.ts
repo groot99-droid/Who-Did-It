@@ -608,8 +608,22 @@ export const BalanceFile = z.strictObject({
   }),
   /** Round 10, B4 (GDD 3.31): a manhunt runs `durationS` from the warrant's turn. */
   manhunt: Section({ durationS: Seconds }),
-  /** Round 10, B5 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell. */
-  jail: Section({ walkS: Seconds }),
+  /** Round 10, B5 and D8 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell, where it may work out. */
+  jail: Section({
+    walkS: Seconds,
+    /** D8: the gym's tap board, and the Strength it gives (damage added to a strike, for the match). */
+    gym: z.strictObject({ difficulty: z.number().int().min(1).max(5), damage: z.number().int().positive() }),
+    /** D8: the yard fight's crates board (right and inside `boardS` wins), what a loss costs, what a win pays. */
+    yard: z.strictObject({
+      difficulty: z.number().int().min(1).max(5),
+      boardS: Seconds,
+      maxHpLoss: z.number().int().positive(),
+      maxHpFloor: z.number().int().positive(),
+      purse: z.number().int().positive(),
+    }),
+    /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
+    scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
+  }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat

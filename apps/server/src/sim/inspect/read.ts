@@ -1,6 +1,7 @@
 import { balance, relations } from '@wdi/content';
 import type { AvatarState, InspectHealth, InspectPurse, PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { bodyOf } from '../body/state';
 import { hpOf } from '../mobs/hurt';
 
 // What the eye reads of an avatar (GDD 3.22 "Inspect", docs/round8/body.md 7), Session 8B. The signs come only from
@@ -50,7 +51,8 @@ export const lightOf = (avatar: AvatarState): boolean => (avatar.statusBits & LA
 
 /** The seat's health as a fraction of its whole (8A's body, `balance.body`: the line 8B left to change). */
 function healthFraction(room: PartyRoom, seat: string): number {
-  return hpOf(room, seat) / Math.max(1, balance.body.maxHp);
+  // Round 10, D8: a seat's whole is its own maximum, which a lost yard fight lowers; the loss never shows on the face.
+  return hpOf(room, seat) / Math.max(1, bodyOf(room, seat)?.maxHp ?? balance.body.maxHp);
 }
 
 export function healthBand(room: PartyRoom, seat: string): InspectHealth {
