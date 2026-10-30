@@ -53,6 +53,8 @@ export const SCENE_IDS = [
   'crumb_mixing',
   'crumb_oven',
   'crumb_proofing',
+  // Round 10 (B5, A369): the county jail's cell, a `jail` scene outside every map's graph (WORLD 4.4).
+  'cj_cell',
 ] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
@@ -293,7 +295,8 @@ export const Scene = z.strictObject({
   /** Visibility, Ledger and noise scope; equals `id` in V1 (WORLD 4.3). */
   zoneId: WorldId,
   profile: Profile,
-  kind: z.enum(['exterior', 'interior']),
+  /** `jail` (round 10, B5): the county jail's cell, in no map, with no portals; placed in by the server only. */
+  kind: z.enum(['exterior', 'interior', 'jail']),
   /** Default: `village` for an exterior, `house` for an interior. */
   biome: Biome.optional(),
   /** Night in every phase (GDD 3.13); required on every `cave`. */
