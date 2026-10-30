@@ -1332,9 +1332,9 @@ who woke in the night gets nothing.
 **Exhaustion (A7b).** In the night, when every active player but one is asleep, that one is the holdout. A holdout
 alone for `balance.sleep.holdoutGraceS` (60 s) is **Exhausted** from the next dawn to the next dusk: maximum stamina
 and its regeneration are both halved (`effects.json` `exhausted`). Going to bed after the grace does not undo it. A
-card with a power that works in the night (`abilities.json` `phases`) and a seat on a manhunt are never Exhausted. The
-effect lives in the seat's own view only, with no sign on the figure. Still waits: the chapel's bar (the Defrocked
-sentence) and the manhunt (B4).
+card with a power that works in the night (`abilities.json` `phases`) and a seat on a running manhunt (its accused, its
+opener or a signer, 3.31) are never Exhausted. The effect lives in the seat's own view only, with no sign on the
+figure. Still waits: the chapel's bar (the Defrocked sentence).
 
 **The screen** (A8, UI.md 14.46). At a bed in reach at dusk or at night the prompt offers to lie down. A sleeper's view
 dims to its bedroom and shows how many active players are in bed and of how many, never who. A move, a key or a hit
