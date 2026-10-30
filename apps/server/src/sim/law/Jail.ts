@@ -133,6 +133,7 @@ export function runJail(room: PartyRoom): void {
       // A death in jail takes the usual death path; the pin and the hold end with it.
       m.held.delete(seat);
       if (player) player.priv.jailUntilTick = 0;
+      if (p) p.busyUntilTick = Math.min(p.busyUntilTick, tick); // a ghost walks free, mid-walk too
       continue;
     }
     if (room.state.phase === Phase.finalNight) {

@@ -4,6 +4,8 @@ import { C2S, ManhuntState, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { hurt } from '../src/sim/body/damage';
+import { emitSim } from '../src/sim/events/bus';
+import { isJailed } from '../src/sim/law/Jail';
 import { cuffedOf, handleCuffHold } from '../src/sim/law/Manhunt';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
 import { simOf } from '../src/sim/RoomSim';
@@ -87,7 +89,7 @@ function disguise(party: Party, seat: string, as: string): void {
 const cuffTicks = S(balance.law.cuffHoldS);
 
 describe('the manhunt (GDD 3.31)', () => {
-  it('opens on a passed warrant, the same row for every client; a cuff holds the seat until dawn', async () => {
+  it('opens on a passed warrant, the same row for every client; a cuff jails the seat until the morning train', async () => {
     const party = await world();
     const [a, , c, d] = ids(party);
     warrant(party, d);
@@ -103,12 +105,14 @@ describe('the manhunt (GDD 3.31)', () => {
     advance(party, cuffTicks + 1);
     expect(row(party).state).toBe(ManhuntState.cuffed);
     expect(cuffedOf(party.room).map((x) => [x.seat, x.accused])).toEqual([[d, d]]);
-    expect(simOf(party.room).players.get(d)!.busyUntilTick).toBeGreaterThan(party.room.state.tick + S(3600));
-    // Dawn after a night releases the hold; the next warrant may run.
-    holdPhase(party, Phase.night, 60);
-    advance(party, 1);
-    holdPhase(party, Phase.day, 3600);
-    advance(party, 1);
+    // B5: the cuffed seat walks to the county jail; the morning train of a later round releases it, and the next
+    // warrant may run.
+    expect(isJailed(party.room, d)).toBe(true);
+    advance(party, S(balance.jail.walkS) + 1);
+    const round = party.room.state.round + 1;
+    emitSim(party.room, { tick: party.room.state.tick, kind: 'train.arrive', data: { round } });
+    advance(party, 2);
+    expect(isJailed(party.room, d)).toBe(false);
     expect(row(party).state).toBe(ManhuntState.none);
     expect(simOf(party.room).players.get(d)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
     // A seat killed while held walks free as a ghost.
@@ -120,7 +124,7 @@ describe('the manhunt (GDD 3.31)', () => {
     advance(party, cuffTicks + 1);
     expect(row(party).state).toBe(ManhuntState.cuffed);
     simOf(party.room).players.get(c)!.dead = true;
-    advance(party, 1);
+    advance(party, 2);
     expect(row(party).state).toBe(ManhuntState.none);
     expect(simOf(party.room).players.get(c)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
   });

@@ -7,6 +7,7 @@ import { emitSim } from '../src/sim/events/bus';
 import { onMeetingOpenDisguise, settleDisguise } from '../src/sim/Impersonate';
 import { CELL, isJailed, isPinned } from '../src/sim/law/Jail';
 import { cuffSeat } from '../src/sim/law/Manhunt';
+import { handleKill } from '../src/sim/Kill';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
 import { stationOf } from '../src/sim/MapSites';
 import { simOf } from '../src/sim/RoomSim';
@@ -23,6 +24,7 @@ import {
   pauseClock,
   placeSeat,
   send,
+  setRole,
   start,
   stateOf,
   toWorld,
@@ -101,6 +103,20 @@ const inCell = (party: Party, seat: string) =>
   simOf(party.room).players.get(seat)!.sceneIdx === sceneIndex(CELL);
 
 describe('the county jail (GDD 3.27)', () => {
+  it("refuses a jailed Killer's Knife with IN_JAIL", async () => {
+    const party = await world();
+    const [, b, c] = ids(party);
+    hunt(party, b);
+    setRole(party.room, b, 'killer');
+    cuffSeat(party.room, b);
+    advance(party, S(balance.jail.walkS) + 1);
+    holdPhase(party, Phase.night, 300);
+    handleKill(party.room, b, { targetId: avatarMemory(party.room).handleOf.get(c) });
+    await sleep(150);
+    const reasons = party.humans[1]!.log.map((m) => (m.payload as { reason?: string }).reason);
+    expect(reasons).toContain('IN_JAIL');
+  });
+
   it('walks the cuffed seat into the cell, holds it there, and lets the morning train set it down', async () => {
     const party = await world();
     const [, , c, d] = ids(party);
@@ -172,6 +188,8 @@ describe('the county jail (GDD 3.27)', () => {
     expect(lookOf(party, b)).toBe(d);
     // Set down at the station still in the face; the usual rule applies after.
     train(party);
+    expect(simOf(party.room).players.get(b)!.sceneIdx).toBe(sceneIndex(stationOf(party.room)!.sceneId));
+    expect(lookOf(party, b)).toBe(d); // the figure off the train is the face the manifest names
     expect(isPinned(party.room, b)).toBe(false);
     expect(avatarMemory(party.room).disguise.get(b)?.as).toBe(d);
   });
@@ -204,6 +222,9 @@ describe('the county jail (GDD 3.27)', () => {
     cuffSeat(party.room, b);
     expect(avatarMemory(party.room).disguise.has(b)).toBe(false);
     advance(party, S(balance.jail.walkS) + 1);
+    // The cell door is a scene entry, where a pending face would apply: none does.
+    expect(inCell(party, b)).toBe(true);
+    expect(lookOf(party, b)).toBe(b);
     simOf(party.room).players.get(b)!.dead = true;
     advance(party, 1);
     expect(isJailed(party.room, b)).toBe(false);
