@@ -576,6 +576,20 @@ export const BalanceFile = z.strictObject({
     apartS: Seconds,
   }),
   /**
+   * Round 10, B3 (GDD 3.31, F4 2.1): petitions. A petition needs ceil(`othersPct` x the living, free humans, every
+   * seat counted) other signatures within `openS`, the bar fixed at open; a lapse gives the accused and the opener
+   * `cooldownS`; at most `maxEntries` entries attach; at `constableAtHumans` humans or fewer when it opens, a
+   * Constable signs once on `constableMatches` backed matches.
+   */
+  petition: Section({
+    othersPct: Chance,
+    openS: Seconds,
+    cooldownS: Seconds,
+    maxEntries: z.number().int().positive(),
+    constableAtHumans: z.number().int().positive(),
+    constableMatches: z.number().int().positive(),
+  }),
+  /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
    * stays within the leash.

@@ -944,6 +944,16 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+- **Rent in kind and the boarded house** (round 10, D7; owner answer EP3). `act.payRent` takes the purse first and,
+  for what is left, goods at the market's `pay` price (`economy.json` `prices`), cheapest first, whole goods only (the Clerk keeps the
+  change); it refuses
+  (`NEED_SCRIP`) when purse and goods together fall short, and takes nothing. At dusk a seat that still owes has goods
+  taken to the debt's value from its pack, the same way, and what it still owes after that is its Indebted debt as
+  before; a seat Indebted has its house boarded up, so it cannot lie down in the home bed (`BOARDED_HOME`, 3.32). The
+  chapel cot and the tavern bed are free of it. Holding a Crowbar or a Hammer, lying down on the boarded bed pries the
+  boards for the night with a crowbar's noise (`noise.crowbar`); they go back at dawn and the debt stands. Paying the
+  debt takes the boards off. Not built: a Notice for trespass on the own house if a witness sees, and picking the
+  curfew doors (they stay doors).
 
 - **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
   (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
@@ -1266,6 +1276,27 @@ but only against a third party: a pair is no shield against a partner who is the
 already counts any figure in the room. Only the two seats learn of a pair, in `Private.pair` (a phase and the other
 figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
 inspect panel's section is B8b.
+
+**The petition (B3a, A289; seams.md 3 row 13; F4 2.1).** A living, free human (placed, not on the line, 3.22, and
+not jailed, 3.27) opens a **petition** at a notice board in reach, naming a seat of the public roster (by character:
+a sighting of a figure wearing B's look accuses B, never through an impersonation), a charge from `laws.json`
+`crimes` (the crimes of `world-mode.md` 5; their sentences are B6's), and up to `petition.maxEntries` (4) of its own
+clue entries. A night-power entry, a Forged entry or the teaching entry never attaches. One petition is open in the
+whole town at a time (`PETITION_OPEN`); after a lapse the accused and the opener wait `petition.cooldownS` (120 s)
+before naming or opening again (`PETITION_GRACE`). The petition needs ceil(`petition.othersPct` (0.3) times the
+living, free humans, the opener and the accused counted) other signatures within `petition.openS` (60 s): 1 at 3
+humans, 2 at 4 to 6, 3 at 7 to 10. The bar is fixed when the petition opens and holds for its window, and so is whether the Constables may sign, so it never
+moves at a death; a person and an NPC seat give the same bar as the accused. Any living, free human but the opener
+and the accused may sign, once, and a signature stands once given: the count never drops when a signer dies, goes
+on the line or is jailed. At `petition.constableAtHumans` (5) humans or fewer, the Constables sign once, as one
+signature, when the petition's public entries hold `petition.constableMatches` (2) backed matches against the
+accused's public traits; they never read whether a clue was planted, a role's reading or a card. With enough names
+the petition passes and leaves a warrant for the manhunt (B4); at its clock's end it lapses. The public row
+(`GameState.petition`) shows the accused, the charge, the counts and each entry as anyone may read it: the kind, the
+scene, whether it is backed (Verified or Corroborated, one mark for both), and the trait only for a kind whose
+Reader is Anyone (footprints, thread); never the opener or a signer. Only the signer learns it signed
+(`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
+evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
 
 ### 3.32 Sleeping
 
