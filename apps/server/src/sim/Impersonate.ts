@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, rehandle } from './Avatars';
 import { reject } from './World';
 import { simOf } from './RoomSim';
+import { isPinned } from './law/Jail';
 
 // Impersonate (GDD 3.17, round-5 `deck-wire.md` 4.5). A Killer asks for a living seat's face; it changes only unseen
 // (alone in the scene, or inside a scene entry), drops in place on a Knife strike, and is room memory only: the
@@ -58,7 +59,7 @@ function dropDisguise(room: PartyRoom, seat: string, rehandleSeat: boolean): boo
 export function settleDisguise(room: PartyRoom, seat: string): void {
   const memory = avatarMemory(room);
   const disguise = memory.disguise.get(seat);
-  if (!disguise) return;
+  if (!disguise || isPinned(room, seat)) return; // round 10, B5: pinned from the cuff until release (Jail.ts)
   if (simOf(room).players.get(seat)?.dead) {
     memory.disguise.delete(seat);
     return;
@@ -86,6 +87,7 @@ export function runImpersonation(room: PartyRoom): void {
       memory.disguise.delete(seat);
       continue;
     }
+    if (isPinned(room, seat)) continue; // round 10, B5: no expiry and no alone drop while jailed
     if (!disguise.applied) {
       if (disguise.dropRequested || tick >= disguise.applyByTick || !phaseOk) {
         memory.disguise.delete(seat); // cancelled at no cooldown
@@ -114,7 +116,8 @@ export function endImpersonation(room: PartyRoom, seat: string): boolean {
 
 /** From `openMeeting`, before the placements: every disguise ends, with no `vfx`; the placements re-roll every handle. */
 export function onMeetingOpenDisguise(room: PartyRoom): void {
-  for (const seat of [...avatarMemory(room).disguise.keys()]) dropDisguise(room, seat, false);
+  for (const seat of [...avatarMemory(room).disguise.keys()])
+    if (!isPinned(room, seat)) dropDisguise(room, seat, false); // round 10, B5: a pinned face stays
 }
 
 /**

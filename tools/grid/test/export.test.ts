@@ -133,12 +133,19 @@ const prop = (o: Record<string, unknown>, name: string) =>
   (o.properties as Array<{ name: string; value: unknown }>).find((p) => p.name === name)?.value;
 
 describe('grid exporter', () => {
-  it('finds every scene of every map', () => {
+  it('finds every scene of every map, and the jail scene that is in none', () => {
     const mapsDir = join(SCENES_DIR, '../maps');
     const listed = readdirSync(mapsDir).flatMap(
       (f) => (JSON.parse(readFileSync(join(mapsDir, f), 'utf8')) as { scenes: string[] }).scenes,
     );
-    expect(scenes.map((s) => s.id).sort()).toEqual(listed.sort());
+    // Round 10, B5a: the county jail's cell is exported like any scene but sits in no map (WORLD 4.3).
+    expect(scenes.filter((s) => s.kind === 'jail').map((s) => s.id)).toEqual(['cj_cell']);
+    expect(
+      scenes
+        .filter((s) => s.kind !== 'jail')
+        .map((s) => s.id)
+        .sort(),
+    ).toEqual(listed.sort());
   });
 
   it('checks the nav tile and the ground cell separately', () => {
