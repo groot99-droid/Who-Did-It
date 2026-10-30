@@ -46,7 +46,12 @@ async function hitmanDay() {
   onDeliveryArrival(m.room, m.room.state.round);
   const botOf = (id: string) => m.bots.find((b) => b.id === id)!;
   const hitman = m.bots.find((b) => isTurned(m.room, b.id))!;
-  const mark = botOf(openContract(m.room, hitman.id)!.target);
+  // The mark is drawn at random; shooting the match's only Killer would end it at once (the Village wins), so a
+  // mark drawn on Bot0 is moved to another seat.
+  const contract = openContract(m.room, hitman.id)!;
+  if (contract.target === m.bots[0]!.id)
+    contract.target = m.bots.find((b) => b !== hitman && b !== m.bots[0])!.id;
+  const mark = botOf(contract.target);
   const bystander = m.bots.find((b) => b !== hitman && b !== mark && b.id !== m.bots[0]!.id)!;
   const st = stationOf(m.room)!;
   teleport(m, hitman, 'overworld', st.x, st.y);
@@ -171,13 +176,15 @@ describe('the Dusk Train (GDD 3.33, F4 b6)', () => {
     const { m, hitman, mark } = await hitmanDay();
     shoot(m, hitman, mark);
     onDuskArrival(m.room, m.room.state.round);
-    await openMeeting(m, 1);
+    // A living caller that is neither the Hitman nor his (random) mark, who died to the shot.
+    const caller = m.bots.findIndex((b) => b !== hitman && !dead(m, b));
+    await openMeeting(m, caller);
     const unplaced = () => !simOf(m.room).players.get(hitman.id)!.placed;
     expect(unplaced()).toBe(true); // a meeting never places him again
     expect(simOf(m.room).views.get(hitman.id)?.scene ?? null).toBeNull(); // and his view holds no scene
     const living = m.bots.flatMap((b, i) => (dead(m, b) ? [] : [i]));
     await voteAll(m, living, () => hitman.id);
-    const result = eventsOf(m.bots[1]!, 'voteResult').at(-1) as {
+    const result = eventsOf(m.bots[caller]!, 'voteResult').at(-1) as {
       tally: Record<string, number>;
       ejectedId?: string;
     };
