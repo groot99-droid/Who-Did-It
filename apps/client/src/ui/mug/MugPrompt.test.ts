@@ -68,7 +68,7 @@ describe('mountMugPrompt', () => {
         bus,
         avatars: () => [avatar('h1', 'villager_tallyman')],
         snapshot: () => [],
-        clock: () => ({ tick, phase: 3, phaseEndsTick: 0, startTick: 0 }),
+        clock: () => ({ tick, phase: 3, phaseEndsTick: 0, startTick: 0, round: 1 }),
       },
       (choice) => sent.push(choice),
     );

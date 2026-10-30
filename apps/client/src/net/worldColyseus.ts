@@ -94,6 +94,8 @@ interface GameStateLike {
   phase: number;
   phaseEndsTick: number;
   startTick: number;
+  /** The public day count (`GameState.round`), read by On the line for the last cycle (round 10, y13). */
+  round: number;
   players: Collection<PlayerState> & { get(id: string): PlayerState | undefined };
   scenes: { forEach(cb: (s: SceneStateLike, id: string) => void): void };
 }
@@ -273,7 +275,13 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   clock() {
     const s = this.state;
-    return { tick: s.tick, phase: s.phase, phaseEndsTick: s.phaseEndsTick, startTick: s.startTick };
+    return {
+      tick: s.tick,
+      phase: s.phase,
+      phaseEndsTick: s.phaseEndsTick,
+      startTick: s.startTick,
+      round: s.round,
+    };
   }
 
   sendMove(cmd: MoveCmd): void {

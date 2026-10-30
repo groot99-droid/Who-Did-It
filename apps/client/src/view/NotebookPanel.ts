@@ -59,7 +59,8 @@ function entryIcon(e: NotebookSnap): HTMLElement {
 /**
  * The player's own Notebook (GDD 3.4): one row per entry with the clue icon, the trait value, where and
  * when (`m:ss` from the match start) and a status chip. Mounted in the World's sheet and, at integration,
- * in the Meeting's Notebook tab: `new NotebookPanel(parent, feed)`, `update()` each frame, `destroy()`.
+ * in the Meeting's Notebook tab: `new NotebookPanel(parent, feed)`, `update()` each frame, `destroy()`. On the line
+ * (round 10, y13; phases.md 6) it is `readOnly`: a contract note draws no Accept.
  */
 export class NotebookPanel {
   readonly root: HTMLElement;
@@ -70,6 +71,7 @@ export class NotebookPanel {
   constructor(
     parent: HTMLElement,
     private readonly feed: WorldFeed,
+    private readonly readOnly = false,
   ) {
     this.list = h('div', { class: 'wdi-notebook__list' });
     this.root = h(
@@ -140,7 +142,7 @@ export class NotebookPanel {
       h('span', { class: 'wdi-icon-disc' }, icon('glyphs/glyph_lens')),
       h('span', {}, fill(VENDETTA_COPY['vendetta.note.contract'], { name: nameOf(e.of ?? '') })),
     );
-    if (open) {
+    if (open && !this.readOnly) {
       const accept = h(
         'button',
         { type: 'button', class: 'wdi-btn', 'data-testid': 'contract-accept' },
