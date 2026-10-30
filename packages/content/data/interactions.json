@@ -66,7 +66,7 @@
           "holdS": 4,
           "drops": [{ "item": "logs", "qty": [2, 3] }],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         }
       ],
       "after": { "state": "cut", "respawnS": 300 },
@@ -94,7 +94,7 @@
             { "item": "resin", "qty": [1, 1], "chance": 0.5 }
           ],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         }
       ],
       "after": { "state": "cut", "respawnS": 900 },
@@ -118,7 +118,7 @@
           "holdS": 5,
           "drops": [{ "item": "logs", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         },
         {
           "tool": { "tag": "pry", "tier": 1 },
@@ -152,7 +152,7 @@
             { "item": "tinOre", "qty": [1, 1], "chance": 0.25 }
           ],
           "wear": 2,
-          "noise": null
+          "noise": "smash"
         }
       ],
       "after": { "state": "rubble", "respawnS": 1200 },
@@ -177,7 +177,7 @@
           "holdS": 4,
           "drops": [{ "item": "stone", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "smash"
         },
         {
           "tool": null,
@@ -209,7 +209,7 @@
           "holdS": 4,
           "drops": [{ "item": "tinOre", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "smash"
         }
       ],
       "after": { "state": "cleared", "respawnS": 600 },
