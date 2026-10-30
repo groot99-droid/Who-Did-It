@@ -4033,6 +4033,13 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     - the stalls keep a daily stock;
     - the chapel earns no Faith while the Vicar's look is gone;
     - the rows with no system yet carry an NFY note.
+  - D7 (#369, rent in kind and the boarded house) was reviewed OK. NPC rent goes to 10X after D7 merges.
+  - D9 is split three ways:
+    - D9a: the two chains (Moll, Ada Kerrow) through a quest `after` field. Step 2 pays items or Scrip, since nothing
+      teaches recipes yet; recipe teaching, the one-per-match branch and tin mail wait for round 11.
+    - D9b: widening the task deal's pool waits for the balance lab, because it changes how many tasks a seat is dealt
+      and the playtest measures pacing.
+    - D9c: Talk, on row 16.
 
 ## Round 11 (planning, started 2026-10-29)
 
