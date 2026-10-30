@@ -300,6 +300,7 @@
       "chaseS": 5,
       "fightS": 9,
       "fightHitS": 1.5,
+      "npcAnswer": { "pay": 0.5, "flee": 0.25, "fight": 0.25 },
       "cooldownS": 420
     },
     "weights": {

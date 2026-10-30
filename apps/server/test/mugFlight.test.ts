@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
 import { Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
@@ -114,7 +114,48 @@ function atPrompt(party: Party, human: string): void {
 
 const outcomeOf = (heard: SimEvent[]) => heard.find((e) => e.kind === 'mug.end')?.data?.outcome;
 
+/** Forces an NPC seat's drawn answer by the weights (the draw itself is one uniform on the seat's own stream). */
+function npcAnswers(w: { pay: number; flee: number; fight: number }): void {
+  Object.assign(m.npcAnswer, w);
+}
+const npcDefault = { ...m.npcAnswer };
+afterEach(() => npcAnswers(npcDefault));
+
+/** Steps until an NPC seat's mugging reaches `state` (the draw is taken when the threat ends). */
+function untilState(party: Party, target: string, state: string): boolean {
+  for (let i = 0; i < ticksOf(180 + m.approachS + m.threatS + 2); i++) {
+    advance(party, 1);
+    if (muggingOf(party.room, target)?.state === state) return true;
+  }
+  return false;
+}
+
 describe('the mugging, Flee and Fight (S4)', () => {
+  it('an NPC seat target that draws Flee runs from its mugger on the chase path', async () => {
+    npcAnswers({ pay: 0, flee: 1, fight: 0 });
+    const { party, target, mugger } = await world({ apart: 1, npcTarget: true });
+    const room = party.room;
+    expect(untilState(party, target, 'chase')).toBe(true);
+    // The mugger lags (as a human target gets a head start): the target mid-run, the mugger at its east end.
+    placeSeat(party, target, 'cellar', RUN.x + 3, RUN.y);
+    placeFigure(party, mugger, 'cellar', RUN.x + 5, RUN.y);
+    const p = simOf(room).players.get(target)!;
+    const [x0, y0, s0] = [p.x, p.y, p.sceneIdx];
+    advance(party, 3);
+    const moved = p.sceneIdx !== s0 || Math.hypot(p.x - x0, p.y - y0) > TILE_PX / 8;
+    expect(moved).toBe(true);
+  });
+
+  it('an NPC seat target that draws Fight stands and trades blows on the exchange path', async () => {
+    npcAnswers({ pay: 0, flee: 0, fight: 1 });
+    const { party, target, mugger } = await world({ apart: 1, npcTarget: true });
+    const room = party.room;
+    expect(untilState(party, target, 'fight')).toBe(true);
+    advance(party, ticksOf(m.fightHitS) * 2 + 2);
+    expect(bodyOf(room, target)!.hp).toBeLessThan(bodyOf(room, target)!.maxHp);
+    expect(bodyOf(room, mugger.id)!.hp).toBeLessThan(bodyOf(room, mugger.id)!.maxHp);
+  });
+
   it('Fight trades blows both ways and the mugger gives up at fightS, the purse kept', async () => {
     const { party, human, mugger, heard } = await world({ apart: 1 });
     const room = party.room;

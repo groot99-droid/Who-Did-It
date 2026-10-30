@@ -284,6 +284,9 @@ describe('a mugging', () => {
     const { party, human } = await world({ apart: 1, purse: 0 });
     expect(untilMugged(party, human, 30)).toBe(false);
     // An NPC seat as the target, alone with the figure: it pays, and is angry at the figure.
+    const w = balance.moods.mug.npcAnswer;
+    const kept = { ...w };
+    Object.assign(w, { pay: 1, flee: 0, fight: 0 });
     const { party: p2, target: npc, mugger, heard } = await world({ apart: 1, npcTarget: true });
     const room = p2.room;
     expect(untilMugged(p2, npc)).toBe(true);
@@ -291,6 +294,7 @@ describe('a mugging', () => {
     expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: npc, outcome: 'paid' });
     expect(balanceOf(room, npc)).toBe(21);
     expect(needsOf(npcMemory(room).brain(npc)).angryAt).toBe(mugger.id);
+    Object.assign(w, kept);
     // A meeting (no world phase) drops a mugging under way.
     const third = await world({ apart: 1 });
     expect(untilMugged(third.party, third.human)).toBe(true);

@@ -387,6 +387,12 @@ export const BalanceFile = z.strictObject({
       /** Round 10, S4: a Fight lasts `fightS`; the two sides trade a blow every `fightHitS`. */
       fightS: Seconds,
       fightHitS: Seconds,
+      /** Round 10, S4: the weights of an NPC seat's answer to a mugging (drawn once on its own `npcPlay` stream). */
+      npcAnswer: z.strictObject({
+        pay: z.number().nonnegative(),
+        flee: z.number().nonnegative(),
+        fight: z.number().nonnegative(),
+      }),
       cooldownS: Seconds,
     }),
     weights: z.strictObject({
