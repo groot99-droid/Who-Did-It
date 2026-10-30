@@ -98,6 +98,7 @@ describe('shared basics', () => {
       knockedOut: 10,
       indebted: 11,
       charm: 12, // reserved for 7M's well (6Z, 2026-10-24; GDD 3.22)
+      exhausted: 13, // round 10, A7b (GDD 3.32), appended
     });
   });
 });
