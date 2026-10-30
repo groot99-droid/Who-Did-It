@@ -1883,6 +1883,16 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
+**The jail's games (D8).** The cell's three props answer the Use key like any prop, with the label of their interaction and
+the board of 14.19.6 (a tap, crates, a pour); no new key and no new screen. Their lines are the data's (`interactions.json`):
+
+| Line | Text | Where |
+|---|---|---|
+| the gym (`jailLift`) | Work out | the prompt on the weights |
+| the yard (`jailSpar`) | Fight in the yard | the prompt on the sparring post |
+| scrubbing (`jailScrub`) | Scrub the cells | the prompt on the pail |
+| a game already played | You have lifted enough for one day. / Nobody in the yard wants another round today. / The floor is clean enough for today. | the refusal, one per game |
+
 ### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by

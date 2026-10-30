@@ -5,6 +5,7 @@ import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
 import { type MobBody, mobBodies } from '../Mobs';
 import { guardTarget, strikeGuard } from '../law/Guards';
+import { strengthOf } from '../JailGames';
 import { MobState } from '../mobs/ai';
 import { figureOfHandle } from '../townsfolk/figures';
 import { reject } from '../World';
@@ -68,16 +69,17 @@ export function handleStrike(room: PartyRoom, sessionId: string, payload: Record
     }
   }
   const factor = factorOf(v.body, (d) => d.strikeFactor);
+  // Round 10, D8: the jail's gym adds its Strength to a fist (GDD 3.27).
+  const spec = { ...b.damage.strike, dmg: b.damage.strike.dmg + strengthOf(room, sessionId) };
   v.body.stamina = Math.max(0, v.body.stamina - b.strikeStamina);
   startCooldown(
     v,
     factorOf(v.body, (d) => d.strikeCooldownFactor),
   );
   showClip(v.body, AnimId.strike, v.tick);
-  if (mob) hurtCreature(room, mob, Math.max(0, Math.round(b.damage.strike.dmg * factor)), sessionId);
-  else if (guard) strikeGuard(room, guard, b.damage.strike, sessionId, 'strike', factor);
-  else if (targetId !== null)
-    hurt(room, targetId, b.damage.strike, { source: 'strike', by: sessionId, factor });
+  if (mob) hurtCreature(room, mob, Math.max(0, Math.round(spec.dmg * factor)), sessionId);
+  else if (guard) strikeGuard(room, guard, spec, sessionId, 'strike', factor);
+  else if (targetId !== null) hurt(room, targetId, spec, { source: 'strike', by: sessionId, factor });
 }
 
 /**

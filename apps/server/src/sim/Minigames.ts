@@ -32,6 +32,8 @@ import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
 import { decaySeconds, spawnClue } from './Clues';
+import { JAIL_GAMES, type JailGame, addStrength, loseMaxHp, markPlayed, playedToday } from './JailGames';
+import { shaveSentence } from './law/Jail';
 import { addStack, canAdd, count, take } from './Inventory';
 import { movePurse, TOWN } from './economy/purse';
 import { emitNoise } from './Noise';
@@ -51,6 +53,8 @@ interface Open {
   startTick: number;
   /** Round 10, D5: a lock-pick on a prop (`taskId` is the prop's id), not a station task. */
   lock?: { sceneId: SceneId; propId: string; interactionId: string };
+  /** Round 10, D8: a jail game on a prop of the cell (`taskId` is the prop's id). */
+  jail?: { game: JailGame; sceneId: SceneId };
 }
 
 /** The open puzzles of the match, keyed by the match's `MatchSeeds` (a new object at every Start), then by seat. */
@@ -185,6 +189,76 @@ function lockResult(
   if (mode?.fineChance !== undefined && room.seeds.get('locks', 'fine')() < mode.fineChance) {
     movePurse(room, sessionId, TOWN, economy.trespassFine, 'fine'); // never more than the purse holds
   }
+}
+
+// The county jail's games (round 10, D8; GDD 3.27): the same boards as the stations', opened from a prop of the cell.
+// Once a day each; the gym adds Strength, the yard fight costs maximum health or pays a little, scrubbing pays a wage and
+// takes time off the sentence. The seat's own stream `minigame` draws the board, as for a station task.
+
+/** Why this seat cannot work the open jail game now, or null. */
+function jailProblem(room: PartyRoom, p: PlayerSim, propId: string, jail: NonNullable<Open['jail']>) {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  const at = lockCenter(jail.sceneId, propId);
+  if (!at || p.sceneIdx !== sceneIndex(jail.sceneId)) return refusal('NO_TARGET');
+  if (Math.hypot(p.x - at.x, p.y - at.y) > balance.doors.reachTiles * TILE_PX)
+    return refusal('TOO_FAR', { of: 'pile' });
+  return null;
+}
+
+/**
+ * Opens the jail game `minigame` on prop `propId` (called by the resolver's `handleInteract` after its checks): once a
+ * day, then the board is spent whether or not it is finished. Returns false when it is not a jail game.
+ */
+export function startJailGame(
+  room: PartyRoom,
+  sessionId: string,
+  minigame: string,
+  t: { sceneId: SceneId; id: string },
+): boolean {
+  const game = JAIL_GAMES[minigame];
+  if (!game) return false;
+  const p = simOf(room).players.get(sessionId);
+  if (!p) return true;
+  const jail = { game, sceneId: t.sceneId };
+  const problem = jailProblem(room, p, t.id, jail);
+  const refused = problem ?? (playedToday(room, sessionId, game) ? refusal('NOTHING_THERE') : null);
+  if (refused) {
+    reject(room, sessionId, refused);
+    return true;
+  }
+  markPlayed(room, sessionId, game);
+  const rng = room.seeds.get('minigame', sessionId);
+  const b = balance.jail[game];
+  const kind = game === 'gym' ? 'tap' : game === 'yard' ? 'crates' : 'pour';
+  const puzzle = generateMinigame(kind, b.difficulty, rng, balance.minigames);
+  openOf(room).set(sessionId, { taskId: t.id, puzzle, startTick: room.state.tick, jail });
+  room.clients.getById(sessionId)?.send(S2C.minigameStart, { taskId: t.id, kind, public: puzzle.public });
+  return true;
+}
+
+/** The answer to an open jail game. The yard fight is one round: a wrong or a slow answer loses it. */
+function jailResult(room: PartyRoom, sessionId: string, p: PlayerSim, open: Open, answer: unknown): void {
+  const jail = open.jail!;
+  const problem = jailProblem(room, p, open.taskId, jail);
+  if (problem) {
+    openOf(room).delete(sessionId);
+    return reject(room, sessionId, problem);
+  }
+  const right = checkMinigame(open.puzzle, answer);
+  if (jail.game === 'yard') {
+    openOf(room).delete(sessionId);
+    const inTime = room.state.tick - open.startTick <= Math.round(balance.jail.yard.boardS * TICK_RATE);
+    if (right && inTime) movePurse(room, TOWN, sessionId, balance.jail.yard.purse, 'wage');
+    else loseMaxHp(room, sessionId);
+    return;
+  }
+  if (!right) return reject(room, sessionId, 'BAD_REQUEST');
+  openOf(room).delete(sessionId);
+  if (jail.game === 'gym') return addStrength(room, sessionId);
+  const s = balance.jail.scrub;
+  movePurse(room, TOWN, sessionId, s.wage, 'wage');
+  shaveSentence(room, sessionId, s.offDayFrac * balance.phases.dayS * TICK_RATE);
 }
 
 /** The `scratch` clue on the picked prop's tile: value and dir 0, so it shows nothing of the picker. */
@@ -349,6 +423,7 @@ export function handleMinigameResult(
     return;
   }
   if (open.lock) return lockResult(room, sessionId, player, p, open, answer);
+  if (open.jail) return jailResult(room, sessionId, p, open, answer);
   const problem = taskProblem(room, p, player, taskId);
   if (problem) {
     openOf(room).delete(sessionId);
