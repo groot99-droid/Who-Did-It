@@ -77,7 +77,16 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
         h('span', { class: 'wdi-m5b__name' }, itemName(r.itemId)),
         h('span', { class: 'wdi-hint' }, fill(C['shop.price'], { n: r.price })),
         h('span', { class: 'wdi-hint' }, fill(C['shop.have'], { n: r.have })),
-        side === 'buy' && !r.can ? h('span', { class: 'wdi-hint wdi-m5b__lack' }, C['shop.short']) : null,
+        r.left === undefined
+          ? null
+          : h(
+              'span',
+              { class: 'wdi-hint' },
+              r.left > 0 ? fill(C['shop.left'], { n: r.left }) : C['shop.soldOut'],
+            ),
+        side === 'buy' && !r.can && r.left !== 0
+          ? h('span', { class: 'wdi-hint wdi-m5b__lack' }, C['shop.short'])
+          : null,
       ),
       button,
     );
@@ -117,7 +126,7 @@ export function mountShop(parent: HTMLElement, deps: ShopDeps): ShopPanel {
       if (root.hidden || !open) return;
       const coins = deps.purse();
       const rows = shopRows(open, coins, deps.inventory());
-      const sig = `${coins}#${[...rows.stock, ...rows.buys].map((r) => `${r.have}${r.can ? 1 : 0}`).join(',')}`;
+      const sig = `${coins}#${[...rows.stock, ...rows.buys].map((r) => `${r.have}${r.can ? 1 : 0}${r.left ?? ''}`).join(',')}`;
       if (sig === shown) return;
       shown = sig;
       purse.textContent = fill(C['shop.purse'], { n: coins });
