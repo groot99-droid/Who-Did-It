@@ -15,6 +15,18 @@ async function toWorld(page: import('@playwright/test').Page, query = '') {
   await expect(page.getByTestId('hud-clock')).toBeVisible();
 }
 
+// Round 10, 10Y (A354): the Killer's vendetta line under the goal line, read from the private view. A real room has
+// the view from the join, so the line is there at mount; the mock builds its world feed on Ready, so the card's poll
+// fills it once the village is up, and Tab reopens the card to read it.
+test("the Killer's vendetta is on the card", async ({ page }) => {
+  await toWorld(page);
+  await page.keyboard.press('Tab');
+  await expect(page.getByTestId('rolecard')).toBeVisible();
+  await expect(page.getByTestId('card-vendetta')).toContainText('Vendetta: Bandit: crack');
+  await page.keyboard.press('Tab');
+  await expect(page.getByTestId('rolecard')).toBeHidden();
+});
+
 test('the village shows the HUD, six bots in view, and the player can walk', async ({ page }, info) => {
   await toWorld(page, '&fps=1');
   await expect(page.getByTestId('hud-fps')).toContainText('7 in view');
@@ -31,7 +43,7 @@ test('the touch controls appear with ?touch=1', async ({ page }) => {
   await toWorld(page, '&touch=1');
   await expect(page.locator('.wdi-stick')).toBeVisible();
   await expect(page.getByTestId('touch-use')).toBeVisible();
-  await expect(page.getByTestId('touch-act')).toBeVisible();
+  await expect(page.getByTestId('touch-ability-Q')).toHaveText(/Kill/); // round 10, 10Y (A334): the card's discs
 });
 
 /**
