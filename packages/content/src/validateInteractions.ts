@@ -18,6 +18,9 @@ import {
  * prop in a scene file is caught; every `live` kind is a class; every class, drop, loot table and mini-game an
  * interaction names exists; a tool wall has its `NEED_TOOL` line.
  */
+/** Mini-game kinds an interaction plays with no `minigames.json` row, which are rows of a station task (round 10, D5). */
+const STATIONLESS_MINIGAMES: readonly string[] = ['lockpick'];
+
 export function checkInteractions(
   c: {
     interactions: InteractionsFile;
@@ -107,7 +110,8 @@ export function checkInteractions(
       if (
         m.minigame !== undefined &&
         it.status === 'live' &&
-        !Object.hasOwn(c.minigames.minigames, m.minigame)
+        !Object.hasOwn(c.minigames.minigames, m.minigame) &&
+        !STATIONLESS_MINIGAMES.includes(m.minigame)
       )
         err(`${where}: unknown mini-game ${m.minigame}`);
       for (const stem of m.only ?? [])

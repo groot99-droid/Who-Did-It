@@ -421,6 +421,19 @@ export const BalanceFile = z.strictObject({
     slide: z.strictObject({ steps: Count }),
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
     tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
+    /**
+     * Round 10 (D5, GDD 3.29): the lock-pick. `pinsByTier` is the pins of a tier 1, 2 and 3 lock; a pin sets when the
+     * lift is within `bandFrac` of its set point (`lowerTierBandMult` of that for a pick of a lower tier); a tension
+     * of `snapAt` snaps the pick; attempts come `minAttemptS` apart at the least, at most `maxAttempts` of them.
+     */
+    lockpick: z.strictObject({
+      pinsByTier: z.array(Count).length(3),
+      bandFrac: Frac,
+      lowerTierBandMult: Frac,
+      snapAt: Frac,
+      minAttemptS: Seconds,
+      maxAttempts: Count,
+    }),
   }),
   /**
    * Round 8 (GDD 3.26, 7M): the shelf reader. A shelf of books shows `spinesMin` to `spinesMax` spines (owner, A200
@@ -528,6 +541,11 @@ export const BalanceFile = z.strictObject({
    * stays within the leash.
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
+  /**
+   * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
+   * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears.
+   */
+  law: Section({ speedMult: z.number().positive(), briefingAfterS: Seconds }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

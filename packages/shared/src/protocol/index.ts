@@ -123,7 +123,7 @@ export type HoldAction =
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
   | 'sleep';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.

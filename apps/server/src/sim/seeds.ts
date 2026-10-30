@@ -22,7 +22,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `purse`: each seat's starting stake, keyed by seat id (round 8, GDD 3.23);
  * - `talk`: an NPC seat's meeting notes, keyed by seat id (round 8, 8T, GDD 3.8), so a note moves no other stream;
  * - `townsfolk`: the ambient townsfolk figures (round 8, 8E, GDD 3.24), keyed by figure id, never a secret draw;
- * - `homes`: each human seat's home (round 10, A7, GDD 3.32), drawn in seat order and never from the card.
+ * - `homes`: each human seat's home (round 10, A7, GDD 3.32), drawn in seat order and never from the card;
+ * - `locks`: each lock's pin set points (round 10, D5, GDD 3.29), keyed by prop id; the picker's client is sent them.
  */
 export type StreamName =
   | 'deal'
@@ -43,7 +44,8 @@ export type StreamName =
   | 'talk'
   | 'townsfolk'
   | 'loot' // round 10, A10: an interaction's drops (docs/round10/seams.md 1)
-  | 'homes';
+  | 'homes'
+  | 'locks'; // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

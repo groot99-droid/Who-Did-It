@@ -327,6 +327,14 @@
     "slide": { "steps": 4 },
     "stoke": { "stokePerTap": 0.15, "ratePerS": 0.08, "bandFrac": 0.18, "holdS": 3 },
     "tap": { "steps": 3, "periodS": 1.4, "bandFrac": 0.18 },
+    "lockpick": {
+      "pinsByTier": [3, 4, 5],
+      "bandFrac": 0.12,
+      "lowerTierBandMult": 0.6,
+      "snapAt": 0.85,
+      "minAttemptS": 0.3,
+      "maxAttempts": 40
+    },
     "gddRef": "3.16"
   },
   "reader": { "spinesMin": 3, "spinesMax": 5, "pageMaxChars": 600, "gddRef": "3.26" },
@@ -393,6 +401,7 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
+  "law": { "speedMult": 2, "briefingAfterS": 30, "gddRef": "3.31" },
   "sleep": {
     "confirmS": 3,
     "innBedScrip": 2,
