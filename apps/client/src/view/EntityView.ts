@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import { REG_WORLD, type AvatarSnap, type PlayerSnap, type WorldFeed } from '../net/world';
 import { type PlayerLook, PlayerView, dirFromYaw } from './PlayerView';
-import { REMOTE_DELAY_MS, SELF_DELAY_MS, SampleBuffer } from './interpolation';
+import { REMOTE_DELAY_MS, SELF_DELAY_MS, SampleBuffer, TickClock } from './interpolation';
 import { StatusBit } from './animIds';
 import { looks } from '@wdi/content';
 import { figureName } from '../ui/copy';
@@ -18,8 +18,13 @@ const FIGURE_LOOKS: ReadonlySet<string> = new Set([
   ...Object.keys((looks as { figures?: Record<string, unknown> }).figures ?? {}),
 ]);
 
-/** What the view reads of the feed besides the roster; the World's registry feed provides it. */
-export type AvatarSource = Pick<WorldFeed, 'avatars' | 'selfHandle'> & Partial<Pick<WorldFeed, 'bus'>>;
+/**
+ * What the view reads of the feed besides the roster; the World's registry feed provides it. With a `clock`, the
+ * samples are stamped by its tick (`TickClock`); without one (the admin and Studio views, whose sim runs at a
+ * scale) they are stamped by the frame time.
+ */
+export type AvatarSource = Pick<WorldFeed, 'avatars' | 'selfHandle'> &
+  Partial<Pick<WorldFeed, 'bus' | 'clock'>>;
 
 interface Tracked {
   view: PlayerView;
@@ -40,6 +45,7 @@ export class EntityView {
   private ghost = false;
   /** How far in the past other figures are drawn; the admin views shrink it with the sim speed (`remoteDelayMs`). */
   private delayMs = REMOTE_DELAY_MS;
+  private readonly clock = new TickClock();
   private readonly off: Array<() => void> = [];
 
   /**
@@ -94,13 +100,16 @@ export class EntityView {
   }
 
   /**
-   * Feeds one snapshot taken at wall time `now` (ms) and redraws everybody. `avatars` and `selfHandle` default to
-   * the feed's own.
+   * Feeds one snapshot seen at wall time `now` (ms) and redraws everybody at `now` less the delay. `avatars` and
+   * `selfHandle` default to the feed's own. The samples are stamped by the feed's tick when it has a clock (A294),
+   * else by `now`.
    */
   update(snaps: PlayerSnap[], now: number, avatars?: AvatarSnap[], selfHandle?: string): void {
     const src = this.source();
     const list = avatars ?? src?.avatars() ?? [];
     const own = selfHandle ?? src?.selfHandle() ?? '';
+    const tick = src?.clock?.().tick;
+    const at = tick === undefined ? now : this.clock.stamp(tick, now);
     const roster = new Map(snaps.map((s) => [s.id, s]));
     const selfSnap = roster.get(this.selfId);
     const selfPr = selfSnap?.presence ?? null;
@@ -120,7 +129,7 @@ export class EntityView {
       const t = this.ensure(this.selfId, `${face.id}:${face.look}:${look.height}`, face.name, look, true);
       t.view.setBlood((selfPr.statusBits & StatusBit.bloody) !== 0);
       t.view.setGhost(this.ghost);
-      this.pose(t, selfPr, now, SELF_DELAY_MS);
+      this.pose(t, selfPr, at, now, SELF_DELAY_MS);
     }
 
     for (const a of list) {
@@ -133,7 +142,7 @@ export class EntityView {
         const name = this.label?.(a.handle) ?? figureName(a.lookOf);
         const look = { height: a.height, scarf: 0, hat: 0, lookId: a.lookOf };
         const t = this.ensure(a.handle, `figure:${a.lookOf}:${a.height}:${name}`, name, look, false);
-        this.drawAvatar(t, a, selfPr, now);
+        this.drawAvatar(t, a, selfPr, at, now);
         continue;
       }
       present.add(a.handle);
@@ -148,7 +157,7 @@ export class EntityView {
         ...(shown.look ? { lookId: shown.look } : {}),
       };
       const t = this.ensure(a.handle, `${a.lookOf}:${shown.look}:${a.height}:${name}`, name, look, false);
-      this.drawAvatar(t, a, selfPr, now);
+      this.drawAvatar(t, a, selfPr, at, now);
     }
 
     for (const [id, t] of this.tracked) {
@@ -171,12 +180,18 @@ export class EntityView {
   }
 
   /** Blood, ghost and pose of one avatar's sprite. */
-  private drawAvatar(t: Tracked, a: AvatarSnap, selfPr: { x: number; y: number } | null, now: number): void {
+  private drawAvatar(
+    t: Tracked,
+    a: AvatarSnap,
+    selfPr: { x: number; y: number } | null,
+    at: number,
+    now: number,
+  ): void {
     const bloody = (a.statusBits & StatusBit.bloody) !== 0;
     const near = selfPr !== null && Math.hypot(a.x - selfPr.x, a.y - selfPr.y) <= BLOOD_SIGHT_PX;
     t.view.setBlood(bloody && near);
     t.view.setGhost((a.statusBits & StatusBit.ghost) !== 0);
-    this.pose(t, a, now, this.delayMs);
+    this.pose(t, a, at, now, this.delayMs);
   }
 
   /** The sprite under `id`, rebuilt when what it shows changed. */
@@ -193,13 +208,15 @@ export class EntityView {
     return t;
   }
 
+  /** Records the sample at `at` (the tick's stamp, or the frame time) and draws the state `delay` ms before `now`. */
   private pose(
     t: Tracked,
     p: { x: number; y: number; yaw: number; animId: number; statusBits: number },
+    at: number,
     now: number,
     delay: number,
   ): void {
-    t.samples.push({ t: now, x: p.x, y: p.y, yaw: p.yaw, animId: p.animId });
+    t.samples.push({ t: at, x: p.x, y: p.y, yaw: p.yaw, animId: p.animId });
     const s = t.samples.at(now - delay);
     if (s) {
       t.view.setPosition(s.x, s.y);
