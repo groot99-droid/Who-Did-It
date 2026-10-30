@@ -508,7 +508,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
-| `inventory`, `crafting`, `asleep`, `line`, `lockpick` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
+| `inventory`, `crafting`, `asleep`, `line`, `lockpick`, `band` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the HUD's rows and the band on a phone (14.51.4), the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
 | `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.51.1 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
@@ -938,8 +938,10 @@ giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
-(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
-missing inputs is listed with `craft.need` and its button disabled. Quests lists every offer in reach, then the quests
+(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs and where it is made. A station recipe carries a Make / Stop
+button, disabled with `craft.need` while inputs are missing; a hand recipe (no station: the Torch, the Snare, the
+Leather jerkin) carries `craft.square` instead, which closes the panel and opens Pockets on the crafting square where
+it is made (round 10, 10Y, A374, 14.51.3). Quests lists every offer in reach, then the quests
 the seat holds (taken, done) with `have of total`; Take the work and Hand it in are live only beside the giver, and a
 third quest shows `quest.full`.
 
@@ -978,6 +980,7 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 | `craft.key`                 | C                                                                                    |
 | `craft.station`             | At the {station}                                                                     |
 | `craft.anywhere`            | Anywhere                                                                             |
+| `craft.square`              | To the square                                                                        |
 | `craft.make`                | Make                                                                                 |
 | `craft.stop`                | Stop                                                                                 |
 | `craft.need`                | Needs {list}                                                                         |
@@ -1762,6 +1765,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.overview.enter` | Open {scene} | the Studio Overview (9W) |
 | `studio.overview.kind.exterior` | World | the Studio Overview (9W) |
 | `studio.overview.kind.interior` | Room | the Studio Overview (9W) |
+| `studio.overview.kind.jail` | Cell | the Studio Overview (9W); the county jail's cell (round 10, B5a) |
 | `studio.overview.links` | Doors as a list | the Studio Overview (9W) |
 | `studio.overview.to` | Scene that {portal} leads to | the Studio Overview (9W) |
 | `studio.overview.spawn` | Spawn that {portal} lands on | the Studio Overview (9W) |
@@ -1821,12 +1825,14 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   corner and the touch cluster the right, so the keys sit two by two beside the cluster without their key caps, the
   hotbar and the body panel start above the cluster, and the toasts above the body panel (`match.css`, the m5b
   section). The interact prompt (centred) clears the key row on a desktop and the body panel on a phone, and the toasts
-  start above the prompt. The shops' layer (8C) is a second `.wdi-m5b` after the first, so its counter prompt is hidden
-  while a board is open, or it would paint over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png`
-  show the band; `lockpick-390w.png` the board over it.
-- **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
-  square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
-  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
+  start above the prompt; the floor the stack rests on and the heights it adds are in 14.51.4. The shops' layer (8C)
+  is a second `.wdi-m5b` after the first, so its counter prompt is hidden while a board is open, or it would paint
+  over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png` show the band; `lockpick-390w.png` the
+  board over it.
+- **The crafting square** shows the product the shared match gives as a preview in the out slot, beside the cells
+  behind an arrow (14.51.4); Take sends `craft.grid` and empties the square. A role-bound item cannot be placed
+  (`grid.bound` on hover); the 3 by 3 button asks the server, which refuses `NEED_STATION` (workbench) away from one.
+  The refusals read their lines from 14.43. The Craft panel's hand rows (14.19, 14.51.3) land here.
 - The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.
 
 ### 14.45 Showing a refusal (10G, round 10)
@@ -1912,6 +1918,11 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
+**Talk (D9c).** G asks the nearest avatar in reach about the town and H asks the time (`talk.ask`, GDD 3.24); a toast
+says the ask went out ("You ask what the town is saying." / "You ask the time."), and the answer arrives as a system
+line in the chat log (`from` the figure's name). The words live in `ui/talk/talk.ts`. A seat answers nothing: the
+server refuses it like no target.
+
 ### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
@@ -1982,3 +1993,39 @@ lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy 
 is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
 mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
 Tab shows it; a real room has the private view from the join).
+
+#### 14.51.3 The hand recipes point to the square (y8)
+
+Owner answer (b) on `docs/round10/rolecards.md` 1.2 (DECISIONS A374): the Craft panel (14.19.3, `ui/Crafting.ts`)
+stays, and a recipe with no station is made only in the crafting square (14.44, GDD 3.30). Its row keeps its
+inputs, `craft.anywhere` and the `craft.need` / `craft.ready` line, but its button (`craft-<id>`, still the test id)
+reads `craft.square` and is a ghost button that is never disabled: a press closes the panel and opens Pockets, whose
+square is at the foot (`CraftingDeps.openSquare`, wired in `M5bLayer.ts`). The Make / Stop button and the `craft` hold
+are unchanged for the station recipes. `isHandRecipe(row)` decides; `ui/Crafting.test.ts` checks both kinds of row with
+the fake DOM. The server still accepts a `craft` hold for a hand recipe until 10X narrows it (A374).
+
+#### 14.51.4 The phone's top rows, the band's floor and the out slot (10Y, y9)
+
+CSS only (`apps/client/src/ui/theme/components.css`, the phone block; `apps/client/src/ui/match.css`, the m5b
+section): no line changes. Checked by `apps/client/e2e/screens.spec.ts` ("the HUD and the bottom band") at 390 x 844
+with the touch controls and at 1280 x 720 (`docs/ui/band-390w.png`, `docs/ui/band-1280x720.png`): the clock and the
+chip, the hotbar and the cluster, the prompt and the body panel, the toasts and the prompt never overlap, and the out
+slot lies beside the cells.
+
+- **The top rows on a phone.** The goal chip and the Notebook button own the top row (the chip takes what leaves the
+  button its 44px); the clock sits in the second row at the right (`--wdi-hud-row2` is that row's top), the
+  village's work bar (14.38.3) under the clock, the art switch and the gear in one row under the bar with the gear
+  in the corner, and the log under them, since its lines come and go and it is the one row that grows. Side by side
+  at 56vw, the clock painted over the end of the goal line and over the Notebook button; stacked under the log, the
+  switch and the gear reached a stack of three toasts, and four log lines pushed them further.
+- **The band's floor.** `--wdi-band-floor` is the bottom of the hotbar: over the key row (36px) on a desktop, over
+  the touch cluster (232px) on a phone, or over the cluster and the card's ability discs (14.51.1: 308px) when the
+  row has one, over the two rows the keys wrap to (80px) in a narrow window without touch.
+  The body panel sits 3rem above it; on touch and in a narrow window the prompt sits above the panel (73px) and the
+  toasts above the prompt (50px); on a desktop the prompt clears the key row and the toasts the panel. The panel and
+  the prompt had been counted as 60 and 48, so the prompt brushed the panel. On a phone the stack shows its newest
+  toasts, as many whole ones as fit between the controls' row and the prompt: three (a fourth reached the art
+  switch), two over the ability discs. 14.44's band bullet is the rule; this is its measure.
+- **The out slot** of the crafting square (14.44) sits beside the cells behind an arrow, dashed and a size larger
+  (3.5rem), so it no longer reads as a tenth cell under the first column (`crafting-390w.png`,
+  `crafting-1280x720.png`).
