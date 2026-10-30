@@ -104,6 +104,15 @@
       "cures": [],
       "gddRef": "3.23"
     },
-    "charm": { "id": "charm", "name": "Charmed", "durationS": 0, "cures": [], "gddRef": "3.22" }
+    "charm": { "id": "charm", "name": "Charmed", "durationS": 0, "cures": [], "gddRef": "3.22" },
+    "exhausted": {
+      "id": "exhausted",
+      "name": "Exhausted",
+      "durationS": 0,
+      "staminaRegenFactor": 0.5,
+      "maxStaminaFactor": 0.5,
+      "cures": [],
+      "gddRef": "3.32"
+    }
   }
 }
