@@ -499,12 +499,6 @@ export const BalanceFile = z.strictObject({
    * ceil(`winUnique` x the NPC seats at the deal), at least 1.
    */
   paintTown: Section({ winUnique: Frac }),
-  /**
-   * Round 10 (GDD 3.24, T6): the mood hooks. A seat or figure whose mood is not Calm narrows its next work trip with
-   * this chance (`moodPool`): Scared to its home or a lit scene, Hungry to the bakery, Angry to the scene of the seat it
-   * is angry at, Desperate to a scene nobody stands in.
-   */
-  moodHooks: Section({ chance: Chance }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
