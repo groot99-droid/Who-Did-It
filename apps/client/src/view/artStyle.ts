@@ -103,6 +103,17 @@ export function onArtStyleChanged(cb: Listener): () => void {
 type Switcher = (id: string) => Promise<void>;
 let switcher: Switcher | null = null;
 let pending = false;
+let locked = false;
+
+/**
+ * Round 10, S5 (`docs/round9/world-mode.md` 10, A534): the style is fixed from Start to game over. The world router
+ * locks it on `roleReveal` and lifts the lock at game over, at the return to the lobby and on a lost connection.
+ */
+export function lockArtStyle(on: boolean): void {
+  locked = on;
+}
+
+export const isArtStyleLocked = (): boolean => locked;
 
 /** The Phaser side registers how textures are swapped (`view/artSwap.ts`); without it a pick applies at next load. */
 export function registerSwitcher(fn: Switcher | null): void {
@@ -113,12 +124,14 @@ export const isSwitching = (): boolean => pending;
 
 /**
  * Switches to a shipped style this device may show. Resolves true when the style is now in place (or already was),
- * false when the id is not shipped or is gated here, a switch is running, or the swap failed: the old style then stays.
+ * false when the id is not shipped or is gated here, a switch is running, a match runs (S5), or the swap failed: the
+ * old style then stays.
  */
 export async function requestArtStyle(id: string): Promise<boolean> {
   if (!isAvailableStyle(id)) return false;
   if (pending) return false;
   if (id === currentStyleId()) return true;
+  if (locked) return false;
   pending = true;
   try {
     if (switcher) await switcher(id);
@@ -140,5 +153,6 @@ export function resetArtStyleForTests(): void {
   current = null;
   switcher = null;
   pending = false;
+  locked = false;
   listeners.clear();
 }

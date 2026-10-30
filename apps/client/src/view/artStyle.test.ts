@@ -8,7 +8,9 @@ import {
   STORAGE_KEY,
   currentStyleId,
   isAvailableStyle,
+  isArtStyleLocked,
   isShippedStyle,
+  lockArtStyle,
   onArtStyleChanged,
   queryStyle,
   readStoredStyle,
@@ -160,6 +162,22 @@ describe('requestArtStyle', () => {
     expect(await requestArtStyle('nope')).toBe(false);
     expect(await requestArtStyle(currentStyleId())).toBe(true);
     expect(swap).not.toHaveBeenCalled();
+  });
+
+  it('refuses a change while a match runs, and still answers for the style shown (S5)', async () => {
+    const swap = vi.fn(() => Promise.resolve());
+    registerSwitcher(swap);
+    const heard: string[] = [];
+    onArtStyleChanged((id) => heard.push(id));
+    lockArtStyle(true);
+    expect(isArtStyleLocked()).toBe(true);
+    expect(await requestArtStyle('lowpoly')).toBe(false);
+    expect(await requestArtStyle(currentStyleId())).toBe(true);
+    expect(swap).not.toHaveBeenCalled();
+    expect(heard).toEqual([]);
+    lockArtStyle(false);
+    expect(await requestArtStyle('lowpoly')).toBe(true);
+    expect(heard).toEqual(['lowpoly']);
   });
 
   it('refuses a second switch while one runs', async () => {

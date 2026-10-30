@@ -14,9 +14,9 @@ import './artStyle.css';
 
 // The segmented "8-bit | Low poly | HD" control (A79, UI.md 14.18). The options come from `style.json` `artStyles`;
 // a style this device cannot hold (HD's gate, A164) shows disabled with the reason ("Needs a larger screen"), and
-// each reserved id shows disabled with a "coming later" hint. Mounted in the lobby and in the match; every copy
-// follows the one pick. A radio group: arrow keys move and select among the enabled options, Tab leaves, Space
-// and Enter select.
+// each reserved id shows disabled with a "coming later" hint. Mounted in the lobby only (round 10, S5, A534: the pick
+// is fixed from Start to game over, and a match names it read only in its settings panel); every copy follows the one
+// pick. A radio group: arrow keys move and select among the enabled options, Tab leaves, Space and Enter select.
 
 /** The hint line of a gated style, by the gate's verdict. */
 const gateHint = (verdict: NonNullable<ReturnType<typeof styleGate>>): string =>
@@ -70,7 +70,7 @@ export interface ArtStyleSwitch extends Screen {
   readonly el: HTMLElement;
 }
 
-export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean } = {}): ArtStyleSwitch {
+export function mountArtStyleSwitch(root: HTMLElement): ArtStyleSwitch {
   const labelId = `art-style-label-${Math.random().toString(36).slice(2, 8)}`;
   const hintId = `${labelId}-hint`;
   const radios = new Map<string, HTMLButtonElement>();
@@ -170,10 +170,7 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
 
   const el = h(
     'div',
-    {
-      class: opts.compact ? 'wdi-artstyle wdi-artstyle--compact' : 'wdi-artstyle',
-      'data-testid': 'art-style',
-    },
+    { class: 'wdi-artstyle', 'data-testid': 'art-style' },
     h('span', { class: 'wdi-label wdi-artstyle__label', id: labelId }, C['artStyle.label']),
     group,
     hints.length > 0
@@ -188,20 +185,6 @@ export function mountArtStyleSwitch(root: HTMLElement, opts: { compact?: boolean
     destroy() {
       off();
       el.remove();
-    },
-  };
-}
-
-/** The in-match placement for the DOM-only match screens (the meeting): a small fixed control at the bottom left. */
-export function mountMatchArtSwitch(root: HTMLElement): ArtStyleSwitch {
-  const wrap = h('div', { class: 'wdi-artcorner' });
-  root.append(wrap);
-  const sw = mountArtStyleSwitch(wrap, { compact: true });
-  return {
-    el: wrap,
-    destroy() {
-      sw.destroy();
-      wrap.remove();
     },
   };
 }

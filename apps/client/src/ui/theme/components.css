@@ -1641,8 +1641,8 @@
     transform: none;
   }
 
-  /* Under the clock (44px) and the work bar (30px), so no log line hides. The art switch and the gear share one
-     row under the work bar, the gear in the corner, and the log comes under them: stacked under the log, the
+  /* Under the clock (44px) and the work bar (30px), so no log line hides. The gear sits in the corner under the work
+     bar (the art switch that shared its row left in S5), and the log comes under it: stacked under the log, the
      gear reached a stack of three toasts, and four log lines pushed it further. */
   .wdi-hud__tr {
     top: calc(var(--wdi-hud-row2) + 44px + var(--wdi-space-2) + 30px + var(--wdi-space-2));
@@ -2165,6 +2165,13 @@ body.wdi-cutscene-slam .wdi-hud-chip {
 
 .wdi-settings__row--mute {
   grid-template-columns: auto 1fr;
+}
+
+/* Round 10, S5 (UI.md 14.51.6): the art style read only in a match; the line under it sends to the lobby. */
+.wdi-settings__note {
+  grid-column: 1 / -1;
+  font-size: var(--wdi-text-xs);
+  color: var(--wdi-text-muted);
 }
 
 .wdi-settings__slider {

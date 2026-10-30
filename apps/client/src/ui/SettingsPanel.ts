@@ -1,19 +1,21 @@
+import { currentStyleId } from '../view/artStyle';
 import { readAudioSettings, writeAudioSettings, type AudioSettings } from '../view/audioSettings';
-import { SETTINGS_COPY as S, fill } from './copy';
+import { SETTINGS_COPY as S, fill, styleName } from './copy';
 import { h } from './dom';
 import './match.css';
 
 /**
  * The settings gear (round 6, docs/round6/cutscene-music.md 3, UI.md 14.22): a button that opens two volume sliders
  * (music, sound effects) and a mute, persisted by `view/audioSettings.ts`. Mounted on the landing, the lobby and the
- * HUD (locked slots); the pick is per player and never sent.
+ * HUD (locked slots); the pick is per player and never sent. In a match (`inMatch`, round 10, S5, UI.md 14.51.6) a
+ * read-only row above the sliders names the art style, which is fixed from Start to game over, and sends to the lobby.
  */
 
 /** A slider's 0 to 100 position as a 0 to 1 volume, and back. */
 export const toVolume = (percent: number): number => Math.min(1, Math.max(0, Math.round(percent) / 100));
 export const toPercent = (volume: number): number => Math.round(Math.min(1, Math.max(0, volume)) * 100);
 
-export function mountSettingsPanel(root: HTMLElement): { destroy(): void } {
+export function mountSettingsPanel(root: HTMLElement, opts: { inMatch?: boolean } = {}): { destroy(): void } {
   let settings: AudioSettings = readAudioSettings();
   const uid = Math.random().toString(36).slice(2, 8);
 
@@ -58,6 +60,15 @@ export function mountSettingsPanel(root: HTMLElement): { destroy(): void } {
       'aria-label': S['settings.title'],
       hidden: true,
     },
+    opts.inMatch
+      ? h(
+          'div',
+          { class: 'wdi-settings__row wdi-settings__row--art', 'data-testid': 'settings-art-style' },
+          h('span', {}, S['settings.artStyle']),
+          h('span', { class: 'wdi-settings__value' }, styleName(currentStyleId())),
+          h('span', { class: 'wdi-settings__note' }, S['settings.artStyle.lobby']),
+        )
+      : null,
     row('music', S['settings.music']),
     row('sfx', S['settings.sfx']),
     h(

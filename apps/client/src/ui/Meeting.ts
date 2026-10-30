@@ -34,8 +34,6 @@ export interface MeetingOptions {
 export interface MeetingScreen extends Screen {
   /** Re-reads the feed; cheap enough to call every frame. */
   update(): void;
-  /** Draws every seat's portrait again from the current textures (after an art-style switch, A79). */
-  repaintPortraits(): void;
   /** Adds a tab beside Report and Chat; `mount` fills its panel. */
   addTab(id: string, label: string, mount: (panel: HTMLElement) => MeetingTab): void;
 }
@@ -377,12 +375,6 @@ export function mountMeeting(root: HTMLElement, opts: MeetingOptions): MeetingSc
   update();
   return {
     update,
-    repaintPortraits: () => {
-      for (const seat of seats.values()) {
-        const canvas = seat.button.querySelector('canvas');
-        if (canvas) opts.drawPortrait(canvas, seat.player.traits, seat.player.name);
-      }
-    },
     addTab: (id, label, mount) => {
       const panel = h('div', { class: 'wdi-stack' });
       addPanel(id, label, panel);
