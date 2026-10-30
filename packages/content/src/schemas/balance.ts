@@ -19,6 +19,9 @@ export const NOISE_KEYS = [
   'wispRattle',
   'shot',
   'shout',
+  // Round 10, x2 (A253): an axe's chop and a pickaxe's smash at the tool walls (GDD 3.7, 3.14).
+  'chop',
+  'smash',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -230,6 +233,15 @@ export const BalanceFile = z.strictObject({
     sceneFadeS: Seconds,
     /** A door is usable from this many tiles of its tile centre (GDD 3.7). */
     reachTiles: z.number().positive(),
+  }),
+  /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  figureTalk: Section({
+    /** A figure answers from this many tiles. */
+    reachTiles: z.number().positive(),
+    /** Every answer comes this long after the ask. */
+    delayS: Seconds,
+    /** Each asker may ask the same figure again after this long. */
+    cooldownS: Seconds,
   }),
   tasks: Section({
     cabalFakeList: z.boolean(),
@@ -596,6 +608,22 @@ export const BalanceFile = z.strictObject({
   }),
   /** Round 10, B4 (GDD 3.31): a manhunt runs `durationS` from the warrant's turn. */
   manhunt: Section({ durationS: Seconds }),
+  /** Round 10, B5 and D8 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell, where it may work out. */
+  jail: Section({
+    walkS: Seconds,
+    /** D8: the gym's tap board, and the Strength it gives (damage added to a strike, for the match). */
+    gym: z.strictObject({ difficulty: z.number().int().min(1).max(5), damage: z.number().int().positive() }),
+    /** D8: the yard fight's crates board (right and inside `boardS` wins), what a loss costs, what a win pays. */
+    yard: z.strictObject({
+      difficulty: z.number().int().min(1).max(5),
+      boardS: Seconds,
+      maxHpLoss: z.number().int().positive(),
+      maxHpFloor: z.number().int().positive(),
+      purse: z.number().int().positive(),
+    }),
+    /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
+    scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
+  }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
@@ -605,9 +633,15 @@ export const BalanceFile = z.strictObject({
   /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
    * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
-   * (B4); a Constable's takes `cuffHoldS / speedMult`.
+   * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
+   * last `fileWindowS` (B3c).
    */
-  law: Section({ speedMult: z.number().positive(), briefingAfterS: Seconds, cuffHoldS: Seconds }),
+  law: Section({
+    speedMult: z.number().positive(),
+    briefingAfterS: Seconds,
+    cuffHoldS: Seconds,
+    fileWindowS: Seconds,
+  }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

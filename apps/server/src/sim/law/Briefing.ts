@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { systemLine } from '../economy/rumours';
 import { emitSim, onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
+import { runJail } from './Jail';
 import { runManhunt } from './Manhunt';
 import { runPetition } from './Petition';
 import { figuresOf } from '../townsfolk/figures';
@@ -30,11 +31,15 @@ interface Pending {
   dueTick: number;
 }
 
-/** One posted briefing, kept in order for the police board (B3). */
+/** One posted briefing, kept in order for the police board (B3) and the Constables' own petitions (B3c). */
 export interface Briefing {
   tick: number;
   sceneId: SceneId;
   line: string;
+  /** The clue's `ClueKind`, and the trait axis and value the line named (an "anyone" clue read in time), if any. */
+  kind: number;
+  axis?: keyof typeof traits.axes;
+  value?: number;
 }
 
 interface LawMemory {
@@ -75,11 +80,16 @@ function memoryOf(room: PartyRoom): LawMemory {
 /** The briefings posted this match, oldest first (the police board of B3 reads them). */
 export const briefingsOf = (room: PartyRoom): readonly Briefing[] => memoryOf(room).posted;
 
+/** The trait axis an "anyone" clue names (traits.json), else undefined. */
+function axisOf(key: string): keyof typeof traits.axes | undefined {
+  if (clueDefs.clues[key]?.reader !== 'anyone') return undefined;
+  return (Object.keys(traits.axes) as (keyof typeof traits.axes)[]).find((a) => traits.axes[a].clue === key);
+}
+
 /** The trait a clue names: only an "anyone" clue whose kind is a trait axis's clue (traits.json), else undefined. */
 function traitOf(key: string, value: number): string | undefined {
-  if (clueDefs.clues[key]?.reader !== 'anyone') return undefined;
-  const axis = Object.values(traits.axes).find((a) => a.clue === key);
-  return axis?.values[value]?.label.toLowerCase();
+  const axis = axisOf(key);
+  return axis === undefined ? undefined : traits.axes[axis].values[value]?.label.toLowerCase();
 }
 
 const fill = (template: string, words: Record<string, string>): string =>
@@ -102,6 +112,7 @@ export function briefingLine(p: Pick<Pending, 'sceneId' | 'kind' | 'value'>, rea
 export function runLaw(room: PartyRoom): void {
   runPetition(room); // round 10, B3: petitions
   runManhunt(room); // round 10, B4: the manhunt
+  runJail(room); // round 10, B5: the county jail
   const memory = memoryOf(room);
   if (room.state.phase === Phase.lobby) {
     memory.pending = [];
@@ -124,7 +135,15 @@ export function runLaw(room: PartyRoom): void {
     const last = memory.said.get(line);
     if (last !== undefined && tick - last < window) continue;
     memory.said.set(line, tick);
-    memory.posted.push({ tick, sceneId: p.sceneId, line });
+    const read = p.readTick <= tick;
+    const axis = read ? axisOf(KIND_KEY.get(p.kind) ?? '') : undefined;
+    memory.posted.push({
+      tick,
+      sceneId: p.sceneId,
+      line,
+      kind: p.kind,
+      ...(axis !== undefined && { axis, value: p.value }),
+    });
     systemLine(room, line);
     const trait = traitOf(KIND_KEY.get(p.kind) ?? '', p.value);
     emitSim(room, {

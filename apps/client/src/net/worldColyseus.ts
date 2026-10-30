@@ -58,6 +58,8 @@ interface PlayerState {
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
+    /** Round 7 (GDD 3.20): the own vendetta id, or the Accomplice's Killers' ids joined by commas. */
+    vendetta?: string;
   };
 }
 interface AvatarState {
@@ -203,6 +205,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     const mates: Record<string, string> = {};
     priv?.mateLooks?.forEach((look, seat) => (mates[seat] = look));
     return { look: priv?.coverLook ?? '', mates };
+  }
+
+  vendetta(): string {
+    return this.state.players.get(this.selfId)?.priv?.vendetta ?? '';
   }
 
   doors(): DoorSnap[] {
@@ -444,6 +450,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   inspect(targetId: string): void {
     this.room.send('act.inspect', { targetId });
+  }
+
+  talk(targetId: string, ask: 'town' | 'time'): void {
+    this.room.send('talk.ask', { targetId, ask });
   }
 
   mug(choice: 'pay' | 'fight' | 'flee'): void {

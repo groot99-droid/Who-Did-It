@@ -38,6 +38,7 @@ import type {
   CivicAct,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
+import { MOCK_VENDETTA } from '../fixtures';
 import { TASKS } from '../../ui/tasks';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -369,6 +370,10 @@ export class MockWorldFeed implements WorldFeed {
     return { look: '', mates: {} };
   }
 
+  vendetta(): string {
+    return MOCK_VENDETTA;
+  }
+
   doors(): DoorSnap[] {
     const me = this.actors.get(this.selfId);
     const scene = me ? this.content.scenes[me.scene] : undefined;
@@ -646,6 +651,9 @@ export class MockWorldFeed implements WorldFeed {
   minigameResult(_taskId: string, _answer: unknown): void {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
+
+  /** Round 10 (D9c): the mock has no figures to answer. */
+  talk(_targetId: string, _ask: 'town' | 'time'): void {}
 
   /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
   inspect(targetId: string): void {

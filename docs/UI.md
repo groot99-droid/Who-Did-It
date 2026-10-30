@@ -1213,7 +1213,7 @@ Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the t
 
 ### 14.29 Vendettas (7H)
 
-Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
+Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`; drawn since round 10, 10Y, A354, 14.51.2) reads `Private.vendetta` (GDD 3.20) through the world feed's `vendetta()`: a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
 
 | Key                        | Text                                                         |
 | -------------------------- | ------------------------------------------------------------ |
@@ -1733,6 +1733,7 @@ Lines are in `apps/client/src/ui/copy/studio.ts` (`STUDIO_COPY`); the page is `s
 | `studio.overview.enter` | Open {scene} | the Studio Overview (9W) |
 | `studio.overview.kind.exterior` | World | the Studio Overview (9W) |
 | `studio.overview.kind.interior` | Room | the Studio Overview (9W) |
+| `studio.overview.kind.jail` | Cell | the Studio Overview (9W); the county jail's cell (round 10, B5a) |
 | `studio.overview.links` | Doors as a list | the Studio Overview (9W) |
 | `studio.overview.to` | Scene that {portal} leads to | the Studio Overview (9W) |
 | `studio.overview.spawn` | Spawn that {portal} lands on | the Studio Overview (9W) |
@@ -1882,6 +1883,22 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
+**Talk (D9c).** G asks the nearest avatar in reach about the town and H asks the time (`talk.ask`, GDD 3.24); a toast
+says the ask went out ("You ask what the town is saying." / "You ask the time."), and the answer arrives as a system
+line in the chat log (`from` the figure's name). The words live in `ui/talk/talk.ts`. A seat answers nothing: the
+server refuses it like no target.
+
+**The jail's games (D8).** The cell's three props answer the Use key like any prop, with the label of their interaction and
+the board of 14.19.6 (a tap, crates, a pour); no new key and no new screen. Their lines are the data's (`interactions.json`):
+
+| Line | Text | Where |
+|---|---|---|
+| the gym (`jailLift`) | Work out | the prompt on the weights |
+| the yard (`jailSpar`) | Fight in the yard | the prompt on the sparring post |
+| scrubbing (`jailScrub`) | Scrub the cells | the prompt on the pail |
+| the yard's hint (`jailSpar`) | Win and take 2 Scrip. Lose, or walk away from the fight, and your health bar stays smaller. Once a day. | the prompt's hint line |
+| a game already played | You have lifted enough for one day. / Nobody in the yard wants another round today. / The floor is clean enough for today. | the refusal, one per game |
+
 ### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
@@ -1936,3 +1953,19 @@ find their row, then call it by ability id), a disc and, later, a card button; a
 (`setAbilitiesEnabled`). Run and Sneak stay as they are until the owner answers Q-C3. `e2e/touch.spec.ts` checks
 the discs and their fit at 390 x 844 (`docs/ui/touch-390w.png`); `TouchControls.test.ts` the discs of the mock
 net's card (Q and R, no F for the hold) and of a card with three active abilities.
+
+#### 14.51.2 The vendetta on the card (y7)
+
+Round 10's role-card audit found that the vendetta lines of 14.29 reached no screen: the role card never read
+`Private.vendetta`, so a Killer never saw its vendetta and the Accomplice never saw its Killer's
+(`docs/round10/rolecards.md` 1.2 A4; DECISIONS A354). The world feed (`net/world.ts`) now has `vendetta()`, the own
+private view's value and nothing else (Colyseus and the mock, whose Killer holds `bandit`); `scenes/RoleReveal.ts`
+hands it to the card, which reads it at mount and twice a second after, as it does the cover picks, since the
+private view can land after the `roleReveal` message. `vendettaLines(value, holder)` in `ui/RoleCard.ts` turns the
+value into lines: a card that holds the Knife reads its own goal under the `vendetta.label` ("Vendetta: Bandit:
+crack the manor's strongbox after dark, alone."); any other card (the Accomplice) reads `vendetta.mate` per Killer
+("Your Killer's vendetta: …"); an empty value or an id with no goal line (an inherited name) draws nothing. The
+lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy key is new, no other seat's view
+is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
+mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
+Tab shows it; a real room has the private view from the join).
