@@ -400,7 +400,8 @@ noise and leaves no clue, and nobody's role changes what a node gives.
 slots (`stackMax`); a tool takes a slot of its own (3.5). Materials drop on death like every non-bound item.
 
 **Crafting** is a hold at a **station**, a prop of the recipe's kind within the verb reach; a recipe with no station
-crafts anywhere. The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
+(a **hand recipe**: the Torch, the Snare, the Leather jerkin) is made in the crafting grid (A13a, below) and the
+client offers it no hold (round 10, A374; the server's `craft` still takes one until 10X narrows it). The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
 takes nothing, and a craft whose inputs are gone by the end of the hold gives nothing. The tool takes the slot the
 inputs free, so a full inventory can still craft. (6F) Every tool is role-neutral: anyone may craft one, and a crafted tool says nothing about who made
 it.

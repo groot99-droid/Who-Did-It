@@ -903,8 +903,10 @@ giver is in reach. A toast (`m5b-toast`, `aria-live="polite"`)
 reports a gather, a craft or a quest for a few seconds.
 
 **Panels.** Pockets lists the stacks with the slot count and, for a light in the pocket, a Light / Douse button
-(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs, where it is made and a Make / Stop button; a recipe
-missing inputs is listed with `craft.need` and its button disabled. Quests lists every offer in reach, then the quests
+(`act.light`); since round 8 (8A, 14.32) a row whose item any holder may use also carries a Use button. Craft lists the recipes with what each needs and where it is made. A station recipe carries a Make / Stop
+button, disabled with `craft.need` while inputs are missing; a hand recipe (no station: the Torch, the Snare, the
+Leather jerkin) carries `craft.square` instead, which closes the panel and opens Pockets on the crafting square where
+it is made (round 10, 10Y, A374, 14.54). Quests lists every offer in reach, then the quests
 the seat holds (taken, done) with `have of total`; Take the work and Hand it in are live only beside the giver, and a
 third quest shows `quest.full`.
 
@@ -943,6 +945,7 @@ Frozen test ids: `m5b`, `m5b-inv`, `m5b-craft`, `m5b-quests`, `m5b-prompt`, `m5b
 | `craft.key`                 | C                                                                                    |
 | `craft.station`             | At the {station}                                                                     |
 | `craft.anywhere`            | Anywhere                                                                             |
+| `craft.square`              | To the square (the button of a hand recipe; round 10, A374, 14.54)                    |
 | `craft.make`                | Make                                                                                 |
 | `craft.stop`                | Stop                                                                                 |
 | `craft.need`                | Needs {list}                                                                         |
@@ -1782,7 +1785,8 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   (`inv.select`); the held slot has a border. The same strip is the touch control.
 - **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
   square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
-  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
+  refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43. The Craft panel's hand
+  rows (14.19, 14.54) land here.
 - The Light, Douse and Use buttons of 14.19.2 and 14.32 sit in a row under the grid for each stack that has the verb.
 
 ### 14.45 Showing a refusal (10G, round 10)
@@ -1902,3 +1906,13 @@ centred, it hid the log's first line.
   `NEED_*` never hint.
 - **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
   until then.
+
+### 14.54 The hand recipes point to the square (10Y, round 10)
+
+Owner answer (b) on `docs/round10/rolecards.md` 1.2 (DECISIONS A374): the Craft panel (14.19.3, `ui/Crafting.ts`)
+stays, and a recipe with no station is made only in the crafting square (14.44, GDD 3.30). Its row keeps its
+inputs, `craft.anywhere` and the `craft.need` / `craft.ready` line, but its button (`craft-<id>`, still the test id)
+reads `craft.square` and is a ghost button that is never disabled: a press closes the panel and opens Pockets, whose
+square is at the foot (`CraftingDeps.openSquare`, wired in `M5bLayer.ts`). The Make / Stop button and the `craft` hold
+are unchanged for the station recipes. `isHandRecipe(row)` decides; `ui/Crafting.test.ts` checks both kinds of row with
+the fake DOM. The server still accepts a `craft` hold for a hand recipe until 10X narrows it (A374).
