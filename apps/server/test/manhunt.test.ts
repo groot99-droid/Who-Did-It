@@ -163,6 +163,7 @@ describe('the manhunt (GDD 3.31)', () => {
     expect(row(party).state).toBe(ManhuntState.none);
     expect(simOf(party.room).players.get(d)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
     // A seat killed while held walks free as a ghost.
+    placeSeat(party, a, 'overworld', 34, 21); // B6a: the Tribunal gathered the opener on the square
     warrant(party, c);
     placeSeat(party, a, 'overworld', 36, 22);
     placeSeat(party, c, 'overworld', 37, 22);
