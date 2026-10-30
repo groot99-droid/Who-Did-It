@@ -431,6 +431,12 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     const where = `quests.json ${q.id}`;
     if (q.kind === 'contract') err(`${where}: contract quests wait for round 7`);
     if (!Object.hasOwn(quests.npcs, q.giver)) err(`${where}: unknown giver ${q.giver}`);
+    // A chain step follows another quest of the same giver, one step at a time (round 10, D9).
+    if (q.after !== undefined) {
+      const before = quests.quests[q.after];
+      if (!before || before.giver !== q.giver) err(`${where}: after ${q.after} is no quest of ${q.giver}`);
+      else if (before.after !== undefined) err(`${where}: a chain has two steps, ${q.after} has one before it`);
+    }
     const have = inHand.get(standsOn.get(q.giver) ?? '');
     for (const w of q.wants) {
       if (!isItem(w.item)) err(`${where}: wants unknown item ${w.item}`);
