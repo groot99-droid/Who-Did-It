@@ -47,6 +47,9 @@ interface PlayerState {
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
     faith?: number; // round 8, 8D
+    asleep?: boolean; // round 10, A7
+    inBed?: number;
+    inBedOf?: number;
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -357,6 +360,12 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   sell(shopId: string, itemId: string, qty: number): void {
     this.room.send('act.sell', { shopId, itemId, qty });
+  }
+
+  // Round 10 (A7, GDD 3.32): the own sleep state; the counts are written only while asleep.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    const priv = this.state.players.get(this.selfId)?.priv;
+    return { asleep: priv?.asleep ?? false, inBed: priv?.inBed ?? 0, inBedOf: priv?.inBedOf ?? 0 };
   }
 
   // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
