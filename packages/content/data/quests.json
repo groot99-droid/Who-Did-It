@@ -61,6 +61,26 @@
       "reward": [{ "item": "torch", "qty": 1 }],
       "scrip": 5,
       "copyId": "quest.colliersStone"
+    },
+    "mollsBrew": {
+      "id": "mollsBrew",
+      "giver": "moll",
+      "kind": "fetch",
+      "after": "mollsMushrooms",
+      "wants": [{ "item": "herb", "qty": 2 }, { "item": "mushroom", "qty": 2 }],
+      "reward": [{ "item": "bandage", "qty": 2 }],
+      "scrip": 6,
+      "copyId": "quest.mollsBrew"
+    },
+    "smithsTemper": {
+      "id": "smithsTemper",
+      "giver": "smith",
+      "kind": "fetch",
+      "after": "smithsOre",
+      "wants": [{ "item": "tinOre", "qty": 2 }, { "item": "timber", "qty": 1 }],
+      "reward": [{ "item": "hammer", "qty": 1 }],
+      "scrip": 6,
+      "copyId": "quest.smithsTemper"
     }
   }
 }

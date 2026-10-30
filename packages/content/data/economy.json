@@ -17,8 +17,18 @@
     "default": "modest"
   },
   "shops": {
-    "bakery": { "prop": "bk.shop_counter", "sells": ["flour", "wakeLoaf"], "buys": [] },
-    "apothecary": { "prop": "as.shop_counter", "sells": ["bandage", "salts"], "buys": [] },
+    "bakery": {
+      "prop": "bk.shop_counter",
+      "owner": "baker",
+      "sells": ["flour", "wakeLoaf"],
+      "buys": []
+    },
+    "apothecary": {
+      "prop": "as.shop_counter",
+      "owner": "herbalist",
+      "sells": ["bandage", "salts"],
+      "buys": []
+    },
     "store": {
       "prop": "tb.shop_counter",
       "sells": [
@@ -41,6 +51,7 @@
     },
     "gamekeeper": {
       "prop": "fo.shop_stall",
+      "owner": "gamekeeper",
       "sells": ["snare", "torch", "skinningKnife"],
       "buys": []
     },
@@ -61,6 +72,7 @@
     },
     "bpGamekeeper": {
       "prop": "bl.shop_stall",
+      "owner": "gamekeeper",
       "sells": ["snare", "torch", "skinningKnife"],
       "buys": []
     },
