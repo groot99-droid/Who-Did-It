@@ -1500,10 +1500,19 @@ the Hitman: the mail turns a townsman into one.
   kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
   frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
   his death), and a boarded Hitman joins `alsoWon`.
-- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
-  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
-  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
-  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
-  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
-  black-wax mailbag and the crow on the station roof; a turned NPC seat
-  stopping its routine.
+- **The dormant role** (C4c). From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
+  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
+  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own.
+- **Hardships** (C4c; F4 b2 to b5). At every morning delivery, the same tick as the turning, the secret stream
+  `hardship` strikes `hardship.atOnce` (1 or 2) seats, each with a kind (robbed, a failed harvest, fined, rent, illness,
+  a lost shipment), and each runs thin and dear exactly as the dormant role for `hardship.recoverS` (one day). The pool
+  reads only public facts: a seat shown alive on the roster whose look owns a stall and that has no hardship running,
+  human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
+  the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
+  stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger.
+- Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
+  contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
+  station (10B); the Clerk's ledger of rent hardships (C4d); the cold station and the dark window (a home's window
+  state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.

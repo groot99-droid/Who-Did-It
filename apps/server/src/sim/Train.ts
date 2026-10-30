@@ -12,6 +12,7 @@ import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
 import { isNpcSeat } from './Npc';
 import { isPaintTown } from './paintTown';
+import { onDeliveryHardship } from './economy/hardship';
 import { onDeliveryArrival, onDuskArrival } from './vendettas/arrival';
 import { enterScene } from './Portals';
 import { simOf } from './RoomSim';
@@ -182,6 +183,7 @@ export function runTrain(room: PartyRoom): void {
     train.delivered = true;
     announce(room, 'train.delivery', 'train_brake', train.round);
     onDeliveryArrival(room, train.round); // round 10, C4: the Hitman's letter (GDD 3.33)
+    onDeliveryHardship(room, train.round); // round 10, C4c: the same delivery strikes its hardships
   }
 }
 

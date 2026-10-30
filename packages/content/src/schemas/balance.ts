@@ -512,6 +512,17 @@ export const BalanceFile = z.strictObject({
     ),
     days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
     contractDays: z.number().int().positive(),
+    /** The turned seat's stall stocks this of a day's stock; it equals `respawn.stockMult` (F4 b1, C4c). */
+    dormantOutput: Frac,
+  }),
+  /**
+   * Round 10, C4c (GDD 3.33, F4 b2 to b5): at every morning delivery, `atOnce` (inclusive) seats wearing a stall's look
+   * are struck by a hardship, each of a `kinds` row, and run thin and dear for `recoverS`, as the Hitman's turned seat.
+   */
+  hardship: Section({
+    atOnce: z.tuple([z.number().int().nonnegative(), z.number().int().positive()]),
+    recoverS: Seconds,
+    kinds: z.array(z.enum(['robbed', 'harvest', 'fined', 'rent', 'illness', 'shipment'])).min(1),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
