@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<!-- Exhausted: a face up all night, eyes shut and drooping, the sleep it missed rising off it. -->
+<defs>
+  <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
+  <radialGradient id="g1" data-flat="#C08A66" gradientUnits="userSpaceOnUse" cx="18" cy="21" r="19"><stop offset="0" stop-color="#DDB08E"/><stop offset="1" stop-color="#C08A66"/></radialGradient>
+</defs>
+<rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
+<circle cx="20" cy="28" r="15" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M11,26 Q14.5,29 18,26" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M22,26 Q25.5,29 29,26" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M12,31 Q14.5,32.5 17,31" fill="none" stroke="#7E1119" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M23,31 Q25.5,32.5 28,31" fill="none" stroke="#7E1119" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M16,37 L24,37" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M33,6 L41,6 L33,14 L41,14" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M38,18 L43,18 L38,23 L43,23" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse class="hd" cx="13" cy="18" rx="3" ry="1.6" fill="#FFF1DC" opacity="0.7"/>
+</svg>

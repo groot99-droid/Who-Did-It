@@ -730,3 +730,44 @@
     min-height: var(--wdi-touch);
   }
 }
+
+/* Round 10 (A8, UI.md 14.46): the asleep overlay dims the world to the bedroom and never takes a pointer, so the
+   stick and the keys still wake the sleeper; the dawn line sits above it. */
+.wdi-sleep .wdi-sleep__veil {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  background-color: color-mix(in srgb, var(--wdi-night) 80%, transparent);
+  color: var(--wdi-night-text);
+  font-family: var(--wdi-font-pixel-text);
+  text-align: center;
+  pointer-events: none;
+}
+
+.wdi-sleep .wdi-sleep__title,
+.wdi-sleep .wdi-sleep__count,
+.wdi-sleep .wdi-sleep__hint {
+  margin: 0;
+}
+
+.wdi-sleep .wdi-sleep__hint {
+  opacity: 0.7;
+}
+
+.wdi-sleep .wdi-sleep__through {
+  position: fixed;
+  top: var(--wdi-space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: var(--wdi-space-2) var(--wdi-space-3);
+  pointer-events: none;
+}
+
+.wdi-sleep .wdi-sleep__veil[hidden],
+.wdi-sleep .wdi-sleep__through[hidden] {
+  display: none;
+}

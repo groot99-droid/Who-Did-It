@@ -387,7 +387,15 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
-  "sleep": { "confirmS": 3, "innBedScrip": 2, "gddRef": "3.32" },
+  "sleep": {
+    "confirmS": 3,
+    "innBedScrip": 2,
+    "restore": { "bed": 1, "cot": 0.5, "innBed": 1 },
+    "innBedCures": ["slowed", "stunned", "poisoned", "famished"],
+    "cotFaith": 5,
+    "holdoutGraceS": 60,
+    "gddRef": "3.32"
+  },
   "pairing": {
     "answerS": { "min": 5, "max": 9 },
     "yesChance": 0.5,

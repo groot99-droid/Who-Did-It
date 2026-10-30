@@ -104,6 +104,8 @@ export const EffectId = {
   knockedOut: 10,
   indebted: 11,
   charm: 12,
+  /** Round 10, A7 (GDD 3.32): the last holdout of a night, the next day; private, no status bit. */
+  exhausted: 13,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];
