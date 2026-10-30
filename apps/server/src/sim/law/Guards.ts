@@ -11,6 +11,7 @@ import { simOf } from '../RoomSim';
 import type { Figure, FigureAct } from '../townsfolk/figures';
 import { walkFigure } from '../townsfolk/walk';
 import { reject, sceneIndex, tileCentre } from '../World';
+import { cuffSeat, quarryIn } from './Manhunt';
 
 /**
  * The guard figures (round 10, B1; GDD 3.24, F4 2.2): the two Constables of every map and the Company Clerk. A
@@ -28,6 +29,9 @@ interface GuardState {
   foe: string | null;
   foeUntilTick: number;
   nextSwingTick: number;
+  /** A Constable's cuff in progress (B4): the seat and the ticks it has held it in reach. */
+  cuffing: string | null;
+  cuffTicks: number;
 }
 
 const guards = new WeakMap<Figure, GuardState>();
@@ -74,7 +78,7 @@ export function bindGuard(f: Figure): void {
       : null;
   if (!post) return;
   f.home = post.scene;
-  guards.set(f, { post, foe: null, foeUntilTick: 0, nextSwingTick: 0 });
+  guards.set(f, { post, foe: null, foeUntilTick: 0, nextSwingTick: 0, cuffing: null, cuffTicks: 0 });
 }
 
 /** By night a guard stands at its post (the `home` act, so it never wanders off its leash). */
@@ -101,7 +105,7 @@ export function stepGuard(room: PartyRoom, f: Figure): boolean {
     f.act = null;
     return true;
   }
-  if (g.foe === null) return false;
+  if (g.foe === null) return huntStep(room, f, g);
   const tick = room.state.tick;
   const foe = simOf(room).players.get(g.foe);
   const foeBody = bodyOf(room, g.foe);
@@ -133,6 +137,45 @@ export function stepGuard(room: PartyRoom, f: Figure): boolean {
     g.nextSwingTick = tick + Math.round((strike?.cooldownS ?? 1) * TICK_RATE);
     showClip(body, AnimId.strike, tick);
     hurt(room, g.foe, balance.body.damage.strike, { source: 'guard' });
+  }
+  return true;
+}
+
+/**
+ * A Constable on a manhunt (B4, seams.md 3 row 14): a figure drawn as the accused in its scene and leash, by the face
+ * only (`quarryIn`), is walked to and cuffed after `law.cuffHoldS / law.speedMult` in reach. The Clerk never cuffs.
+ */
+function huntStep(room: PartyRoom, f: Figure, g: GuardState): boolean {
+  if (f.kind !== 'constable' || f.dead) return false;
+  const sim = simOf(room);
+  const quarry = quarryIn(room, f.sceneIdx).find((id) => {
+    const p = sim.players.get(id)!;
+    return withinLeash(g, p.sceneIdx, p.x, p.y);
+  });
+  const was = g.cuffing;
+  if (quarry !== g.cuffing) g.cuffTicks = 0;
+  g.cuffing = quarry ?? null;
+  if (quarry === undefined) {
+    if (was !== null) f.act = null; // back to its post's route
+    return false;
+  }
+  const p = sim.players.get(quarry)!;
+  const walked = walkFigure(room, f, p.x, p.y, balance.doors.reachTiles * TILE_PX * 0.9);
+  if (walked === 'stuck') {
+    g.cuffing = null;
+    f.act = null;
+    return false;
+  }
+  if (walked !== 'arrived') {
+    g.cuffTicks = 0;
+    return true;
+  }
+  f.yaw = Math.atan2(p.x - f.x, -(p.y - f.y));
+  if (++g.cuffTicks >= Math.round((balance.law.cuffHoldS / balance.law.speedMult) * TICK_RATE)) {
+    g.cuffing = null;
+    g.cuffTicks = 0;
+    f.act = null;
+    cuffSeat(room, quarry);
   }
   return true;
 }
@@ -188,6 +231,7 @@ export function strikeGuard(
   const g = guards.get(f);
   const out = hurt(room, f.id, row, { source, by, factor });
   if (!g) return;
+  g.cuffTicks = 0; // a strike stops a Constable's cuff (B4)
   if (out === 'hurt') {
     g.foe = by;
     g.foeUntilTick = room.state.tick + Math.round(balance.guard.angerS * TICK_RATE);
