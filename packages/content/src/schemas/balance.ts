@@ -19,6 +19,9 @@ export const NOISE_KEYS = [
   'wispRattle',
   'shot',
   'shout',
+  // Round 10, x2 (A253): an axe's chop and a pickaxe's smash at the tool walls (GDD 3.7, 3.14).
+  'chop',
+  'smash',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
