@@ -59,11 +59,14 @@ describe('NPC talk from the model (GDD 3.25)', () => {
     advance(party, 2);
     expect(lines(party).filter((l) => l.source === 'model')).toEqual([]);
     for (const prompt of fake.prompts) expect(prompt).not.toMatch(/townsfolk|killer|cabal|detective/i);
+    // Round 10, x3 (A273): the count is read before the answer. The last advance can start another note's call on
+    // some seeds (`standardParty` leaves the talk stream unfixed), which counts in `prompts` but was never answered.
+    const answered = fake.prompts.length;
     fake.answer({ text: '"The well was busy at dusk."', tokens: 50 });
     await sleep(0);
     advance(party, 1);
     const said = lines(party).filter((l) => l.source === 'model');
-    expect(said).toHaveLength(fake.prompts.length);
+    expect(said).toHaveLength(answered);
     for (const line of said) expect(line.text).toBe('The well was busy at dusk.');
   });
 
