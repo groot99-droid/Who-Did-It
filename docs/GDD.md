@@ -556,6 +556,13 @@ dropped. A quest that is done stays on the list and counts as done for the match
 against `quests.maxActive`. The lobby and the role card clear every seat's quests. Quests of kind `contract` are the
 round-7 vendetta seam and are refused in round 6.
 
+**Chains** (round 10, D9; `living-world.md` 1.3). A quest row may name an `after`: another quest of the same giver
+that the seat must have turned in before the giver offers it (the server refuses with `NOTHING_THERE`; the quest log
+shows it only then). A chain has two steps. Mother Moll's second step, Brew with Moll (2 Herb and 2 Mushroom, two
+Bandages and 6 Scrip), follows her mushrooms; Ada Kerrow's, Temper (2 Tin Ore and a Timber, a Hammer and 6 Scrip),
+follows her ore. Recipe teaching, the one-per-match branch and tin mail wait for round 11: there is no
+recipe-learning system yet, so each chain is a plain second errand. Nothing new on the wire.
+
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
 opens it, the server keeps the solution, and the task completes only when the client's answer checks. The five
 kinds are crates, pour, slide and stoke, first made for the quick mode (3.11), and the tap (round 7, 7M, A151): a

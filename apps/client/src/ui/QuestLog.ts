@@ -14,6 +14,8 @@ interface QuestDef {
   wants: Array<{ item: string; qty: number }>;
   reward: Array<{ item: string; qty: number }>;
   copyId: string;
+  /** Round 10, D9: the quest of the same giver to turn in first. */
+  after?: string;
 }
 const DEFS = quests.quests as Record<string, QuestDef>;
 const NPCS = quests.npcs as Record<string, { name: string }>;
@@ -67,6 +69,7 @@ export function questRows(
   }
   for (const d of Object.values(DEFS)) {
     if (d.kind !== 'fetch' || !nearNpcs.has(d.giver) || mine.some((q) => q.id === d.id)) continue;
+    if (d.after !== undefined && !mine.some((q) => q.id === d.after && q.done)) continue; // a chain step waits
     rows.push(row(d, 'offer'));
   }
   return rows;
