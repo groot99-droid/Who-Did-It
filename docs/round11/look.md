@@ -49,7 +49,7 @@ the cap of 9.
 | Buildings, multi-tile props | `build_buildings.py` | flat ramps and `BldTex_*` walls |
 | Props | `build_props.py`, `env/*_props.py` | flat ramps |
 | Characters | `build_looks.py`, `look_parts.py`, `looks_spec.py` (15 looks) | flat ramps (`Look_<ramp>_<step>`), the three passes |
-| Mobs, givers, nodes (M5b) | `m5b*.ts`, drawn in code | none (2D) |
+| Mobs, givers, nodes (M5b) | `m5b*.ts`, drawn in code; into the rig last (`pipeline.md` P9) | none (2D) |
 | Effects | `build_vfx.py` for the boot `vfx` page; round 8's effects are runtime particles (A162) | flat |
 | Portraits, cards, concepts | Higgsfield (ASSETS 6.4) through the pixel finish | generated |
 | Round 10's greybox frames (beds, tools, the `constable` until its art) | greybox, or the `villager` on the client | none |
@@ -384,7 +384,7 @@ manifest (today the test skips styles with no manifest, so HD has never been che
   the head is not one flat band.
 - **The villager family and the `constable`.** The five family looks are re-rendered like the deck's. The `constable`
   (round 10, B1) is the only new look: until its art lands it draws `villager` on the client (seams.md 2). _Proposed_:
-  its spec goes into `looks_spec.py` with the round-10 build that owns it (10B), on the same base and passes, carrying no
+  its spec goes into `looks_spec.py` with the round-10 fix that renders it (10Y; 10B owns only its `looks.json` row), on the same base and passes, carrying no
   card's signature prop; the makeover then re-renders it with the rest. It counts in the resident sum like the family
   (it is resident on every map with the Constables), so it adds about 0.375 (8-bit) to 0.5 (low poly) to 5.3's
   figures.
@@ -523,8 +523,9 @@ _proposed_.
 9. **Which Android is the test phone, and is 30 fps the floor?** Default: **the owner's own Android, 30 fps** in the
    busiest scene with ten players, 8-bit and low poly.
 10. **Which classes stay outside Blender?** Default: **the UI icons (their SVG masters, SPRITES 9), the card
-    portraits and concepts (Higgsfield), the DOM screens, the M5b mobs, givers and nodes drawn in code, and the
-    runtime particle effects of A162**; everything that stands in the world is made in Blender.
+    portraits and concepts (Higgsfield), the DOM screens and the runtime particle effects of A162**; everything that
+    stands in the world is made in Blender, including the code-drawn mobs, nodes, givers, tools and greybox frames,
+    which move into the rig last (`pipeline.md` P9; 6Z's ruling of 2026-10-30).
 11. **Textures: 1k for every sprite render, 2k kept for V2?** Default: **yes** (3.2), with `rock_face` at 2k in HD.
 12. **A tone check for low poly and HD?** Default: **yes**, the three rules of 3.3.
 13. **V2 export with every master (GLB, role slots, LODs 0.5 and 0.25)?** Default: **yes** (section 8).
