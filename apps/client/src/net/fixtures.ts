@@ -5,6 +5,9 @@ import type { LobbyPlayer, RoleRevealPayload } from './protocol';
  * `roleReveal` payload of ARCHITECTURE 5.5. Cooldowns are 0 on purpose: balance numbers
  * live in `balance.json`, not here.
  */
+/** The mock Killer's vendetta (`Private.vendetta`, GDD 3.20), read by the role card through the world feed. */
+export const MOCK_VENDETTA = 'bandit';
+
 export const MOCK_ROLE_REVEAL: RoleRevealPayload = {
   roleId: 'killer',
   team: 'cabal',
