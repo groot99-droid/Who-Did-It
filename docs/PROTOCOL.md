@@ -45,7 +45,9 @@
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
 | `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
-| `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
+| `pair.ask` | `{ targetId: string }` | 2/s | `targetId` is the asked figure's avatar handle in the asker's scene. |
+| `pair.answer` | `{ yes: boolean }` | 2/s | - |
+| `inv.select` | `{ slot: number }` | 10/s | - |
 | `craft.grid` | `{ size: 2 \| 3; cells: Array<string \| null> }` | 5/s | Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches, `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
