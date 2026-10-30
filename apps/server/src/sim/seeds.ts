@@ -45,7 +45,8 @@ export type StreamName =
   | 'townsfolk'
   | 'loot' // round 10, A10: an interaction's drops (docs/round10/seams.md 1)
   | 'homes'
-  | 'locks'; // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
+  | 'locks' // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
+  | 'pairing'; // round 10, B8: Walk with me's answer delays and rolls (public-safe, seams.md 1)
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];
