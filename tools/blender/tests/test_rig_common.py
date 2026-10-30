@@ -272,3 +272,40 @@ class ArtStyles(unittest.TestCase):
         # The clear threshold sits under the lit measurement and above the light band's stop.
         self.assertGreater(rc.HD["catcherHaze"], 0)
         self.assertGreater(rc.HD["catcherLit"] - rc.HD["catcherHaze"], hi)
+
+
+class ImportedCopies(unittest.TestCase):
+    """`remap_copies` on a fake `bpy.data` collection: the remap of pipeline.md 5.4, checked without Blender."""
+
+    class Block:
+        def __init__(self, name):
+            self.name = name
+            self.remapped_to = None
+
+        def user_remap(self, other):
+            self.remapped_to = other
+
+    def _blocks(self, *names):
+        return [self.Block(n) for n in names]
+
+    def test_copy_names(self):
+        for name, is_copy in (("WDI_Toon.001", True), ("WDI_Toon.1000", True), ("WDI_Toon", False),
+                              ("WDI_Toon.01", False), ("WDI_Toon.001.002", False), ("WDI_ToonX.001", False),
+                              ("OutlineInk.001", False)):
+            self.assertEqual(rc.is_copy_of(name, "WDI_Toon"), is_copy, name)
+
+    def test_copies_are_remapped_onto_the_rigs_own_and_dropped(self):
+        blocks = self._blocks("WDI_Toon", "WDI_Toon.001", "OutlineInk", "WDI_Toon.002", "WDI_ToonX", "WDI_Toon.extra")
+        own, first, second = blocks[0], blocks[1], blocks[3]
+        self.assertEqual(rc.remap_copies(blocks, "WDI_Toon"), ["WDI_Toon.001", "WDI_Toon.002"])
+        self.assertIs(first.remapped_to, own)
+        self.assertIs(second.remapped_to, own)
+        self.assertEqual([b.name for b in blocks], ["WDI_Toon", "OutlineInk", "WDI_ToonX", "WDI_Toon.extra"])
+        self.assertIsNone(own.remapped_to)
+        self.assertEqual(rc.remap_copies(blocks, "OutlineInk"), [])
+
+    def test_without_the_rigs_own_nothing_is_touched(self):
+        blocks = self._blocks("WDI_Toon.001")
+        self.assertEqual(rc.remap_copies(blocks, "WDI_Toon"), [])
+        self.assertEqual([b.name for b in blocks], ["WDI_Toon.001"])
+        self.assertIsNone(blocks[0].remapped_to)
