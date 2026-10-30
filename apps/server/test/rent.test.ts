@@ -55,28 +55,34 @@ async function inDay(n: number, map: string, scrip: number): Promise<Match> {
 }
 
 /**
- * Round 10, x15 (6Z's grant of 2026-10-30): each wait here is on the room's own bookkeeping (`duesOf`), never on the
- * wall clock, so a loaded run that steps late cannot land an assertion before `runRent` has run.
+ * Round 10, x15 (6Z's grant of 2026-10-30): each wait here is on the room's own bookkeeping (`duesOf`) and then on the
+ * tick after it, never on the wall clock. `runRent` runs after `runEvents` in the step (`runEconomy` is the last
+ * stage), so the events it emits (`quota.due`, `rent.due`, `rent.seized`) reach the match log on the next tick; a
+ * loaded run that steps late cannot land an assertion before both have happened.
  */
-const settled = async (cond: () => boolean): Promise<void> => expect(await until(cond)).toBe(true);
+async function settled(m: Match, cond: () => boolean): Promise<void> {
+  expect(await until(cond)).toBe(true);
+  const seen = m.room.state.tick;
+  expect(await until(() => m.room.state.tick > seen)).toBe(true);
+}
 
 /** Opens the day shift of `round`: the quota falls due on its first tick. */
 async function toDay(m: Match, round: number): Promise<void> {
   m.room.state.round = round;
   setPhase(m, Phase.day);
-  await settled(() => duesOf(m.room).shiftRound === round);
+  await settled(m, () => duesOf(m.room).shiftRound === round);
 }
 
 /** The rent falls due at once (the shift opened long ago). */
 async function rentDue(m: Match): Promise<void> {
   duesOf(m.room).shiftStartTick = -1e6;
-  await settled(() => duesOf(m.room).rentRound === m.room.state.round);
+  await settled(m, () => duesOf(m.room).rentRound === m.room.state.round);
 }
 
 /** Dusk settles the shift: the fines, the seizures, Indebted. */
 async function toDusk(m: Match): Promise<void> {
   setPhase(m, Phase.dusk);
-  await settled(() => duesOf(m.room).settledRound === m.room.state.round);
+  await settled(m, () => duesOf(m.room).settledRound === m.room.state.round);
 }
 
 const kinds = (m: Match, seat: string) =>
