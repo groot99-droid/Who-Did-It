@@ -46,9 +46,7 @@ export function hurt(room: PartyRoom, target: string, row: DamageRow, hit: Hit):
   // The wearer's armour (round 10, D6a, GDD 3.22); the Knife never comes here, so it ignores armour.
   const dmg = Math.max(
     0,
-    Math.round(
-      row.dmg * (hit.factor ?? 1) * damageFactor(room, target, !(hit.source in balance.body.damage)),
-    ),
+    Math.round(row.dmg * (hit.factor ?? 1) * damageFactor(room, target, hit.cause !== undefined)),
   );
   body.hp = Math.max(0, body.hp - dmg);
   body.lastHurtTick = tick;
