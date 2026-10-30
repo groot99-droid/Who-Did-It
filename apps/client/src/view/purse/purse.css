@@ -25,3 +25,14 @@
 .wdi-purse__change {
   font-weight: 700;
 }
+
+/* Round 10, C2b (UI.md 14.47): the fare this seat owes the line, under its own purse. */
+.wdi-purse__fare {
+  display: block;
+  font-size: var(--wdi-text-xs, 0.75rem);
+  opacity: 0.85;
+}
+
+.wdi-purse__fare[hidden] {
+  display: none;
+}
