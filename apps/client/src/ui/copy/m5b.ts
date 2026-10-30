@@ -42,6 +42,7 @@ export const M5B_COPY = {
   'craft.key': 'C',
   'craft.station': 'At the {station}',
   'craft.anywhere': 'Anywhere',
+  'craft.square': 'To the square',
   'craft.make': 'Make',
   'craft.stop': 'Stop',
   'craft.need': 'Needs {list}',
