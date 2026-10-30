@@ -285,12 +285,44 @@ When a set is over a budget, the build round applies these in order and stops at
 | a baked contact shadow and AO | 0 (baked into the body pass, as HD's catcher already is) | 0 | 0 | fits |
 | `emit` (11A, statics only: lamp flames, lit windows) | none | none | **cap: 512² a map (0.0625) plus 256² shared (0.016)** | fits; counted in the resident sum in every phase |
 | a depth pass | as normal | as normal | as normal | would break the cap |
+| the long-shadow layer (CL3, `pipeline.md` 4.3) | none | none | **cap: 1024² a map (0.25)**; expected 0.14 (Hollowmere), 0.09 (Blackpine) | fits as a shared mask at half density (5.3.1) |
 
   So any per-pixel run-time lighting pass (normal, depth) does not fit the cap of 9 for figures, and costs another
   1.8 per map for the environment. 11A's pass list (`pipeline.md` 4) keeps body, scarf and blood, adds `emit` for
   statics and proposes no normal, depth, shadow-layer or separate AO pass; this table is the budget for it. With
   `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is about 8.14 + 0.08 +
   0.5 = 8.72, under 9. The sprite materials need no roughness or normal maps at run time: those are V2's (3.2, 8.1).
+
+#### 5.3.1 The long-shadow layer (CL3)
+
+The owner answered CL3 "yes" (`docs/round11/owner-answers.md`): the buildings' long shadows come in round 11, as the
+shadow layer of `pipeline.md` 4.3, a ground sprite the client draws under every y-sorted sprite and fades at dusk.
+Which light casts them is `round11-plan.md`'s (11A). This is its budget.
+
+- **What it would cost as one more environment page per style.** 11A measured a shadow at about three quarters of its
+  building's own area (on the tavern). Hollowmere's building pages are 2048 x 1024 plus 1024² (0.75), so its layer
+  would be about 0.56 page-equivalents, Blackpine's about 0.38. On low-poly Hollowmere that is 8.72 + 0.56 = 9.28,
+  **over the cap of 9**. On 8-bit Hollowmere it would be 7.73 + 0.08 + 0.375 + 0.56 = 8.75, which fits. On HD, at four
+  times the area, it would be 2.25 against the HD cap of 18 (5.4): 10.8 + 5.9 + 0.32 + 2.25 = 19.3, also over.
+- **What it is instead: one shared mask at half density.** The layer carries no texture and no colour of its own. It
+  is ink at partial alpha, soft-edged, and the client tints it and fades it. So it ships as:
+  - one alpha mask per map, `shadow_<map>` (white, alpha carries the shadow), tinted `ink` at run time;
+  - rendered at half the 8-bit packed density (about 22.6 px a ground metre) and drawn at twice its texel size with
+    `linear` filtering in every style, so its soft edge needs no extra texels;
+  - in the 8-bit manifest only, so low poly and HD take it by A80's per-key fallback: the same page, at the same cost,
+    in every style;
+  - left unfinished in 8-bit too: no alpha cut, no palette snap. Like `gen_light` (SPRITES 10.11) it is a mask, not
+    art, and `palette.test.ts` exempts the `shadow_` keys. The colour on screen is the ink token, blended by alpha, as
+    the darkness layer already blends;
+  - packed only where it shows: the pixels under the building's own silhouette are cut before packing, because the
+    building is drawn over them.
+- **The cost:** a quarter of the area above, at most. Hollowmere about 0.14, Blackpine about 0.09, in every style;
+  cut to the visible part it is less, by how much depends on 11A's choice of light. The cap is 1024² a map (0.25).
+  Worst case at the cap: low-poly Hollowmere 8.72 + 0.25 = 8.97, under 9; at the expected 0.14, 8.86. HD: 17.0 + 0.25
+  = 17.3 of 18. Bytes: a soft single-colour mask compresses to tens of KB a map; it loads with its map and counts in
+  the first load for Hollowmere, which keeps the 8-bit first load near 11 of 12 MiB.
+- **What gives** if a map's layer outgrows its cap: by 5.1, first the cut to the visible part, then a lower density
+  (a quarter of the 8-bit density still reads as a soft shadow), never a second page.
 
 ### 5.4 HD: the figures do not fit, and three ways out
 
