@@ -62,6 +62,7 @@ describe('recipeRows', () => {
       'proofedDough',
       'snare',
       'spade',
+      'stew',
       'torch',
       'wakeLoaf',
     ]);

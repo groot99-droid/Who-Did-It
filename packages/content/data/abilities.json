@@ -611,6 +611,18 @@
       "ships": "V1",
       "gddRef": "3.22"
     },
+    "eatStew": {
+      "id": "eatStew",
+      "name": "Eat Stew",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "stew",
+      "effect": "Eats the Stew: cures Famished and Weakened.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "eatHerbBread": {
       "id": "eatHerbBread",
       "name": "Eat Herb Bread",

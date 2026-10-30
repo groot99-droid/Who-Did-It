@@ -235,6 +235,45 @@
    "repeat": 0
   },
   {
+   "key": "node_berries/break",
+   "frames": [
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/000"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/001"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/002"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/003"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/004"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/005"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/006"
+    },
+    {
+     "key": "nodes",
+     "frame": "node_berries/break/007"
+    }
+   ],
+   "frameRate": 12,
+   "repeat": 0
+  },
+  {
    "key": "node_logs/break",
    "frames": [
     {

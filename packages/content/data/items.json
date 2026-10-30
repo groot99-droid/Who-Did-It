@@ -682,6 +682,27 @@
       "ships": "V1",
       "gddRef": "3.22"
     },
+    "berries": {
+      "id": "berries",
+      "name": "Berries",
+      "kind": "material",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Picked bare-handed in the woods. Sold at the market.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "stew": {
+      "id": "stew",
+      "name": "Stew",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eatStew",
+      "tooltip": "Hot food from an oven: cures Famished and Weakened.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "hide": {
       "id": "hide",
       "name": "Hide",
@@ -698,7 +719,7 @@
       "kind": "food",
       "roleBound": false,
       "onDeath": "drops",
-      "tooltip": "Raw wolf or boar meat. A stew or a pie wants it; it is no meal as it is.",
+      "tooltip": "Raw wolf or boar meat. A stew wants it; it is no meal as it is.",
       "ships": "V1",
       "gddRef": "3.22"
     }

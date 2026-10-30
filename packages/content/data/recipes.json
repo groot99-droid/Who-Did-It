@@ -119,6 +119,18 @@
       "craftS": 6,
       "maps": ["hollowmere"]
     },
+    "stew": {
+      "id": "stew",
+      "out": "stew",
+      "qty": 1,
+      "in": [
+        { "item": "game", "qty": 1 },
+        { "item": "herb", "qty": 1 },
+        { "item": "mushroom", "qty": 1 }
+      ],
+      "station": "oven",
+      "craftS": 4
+    },
     "leatherJerkin": {
       "id": "leatherJerkin",
       "out": "leatherJerkin",
