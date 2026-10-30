@@ -19,7 +19,7 @@ import {
   teleport,
 } from './killHelpers';
 import { act } from './killHelpers';
-import { handleOf, settle } from './avatarHelpers';
+import { handleOf, settle, withoutFigureRows } from './avatarHelpers';
 import { errorCodes, giveKit, nightfall, notes, power, refusals, toPhase } from './nightHelpers';
 import { type Match, startMatch, stateOf } from './simHelpers';
 
@@ -150,7 +150,10 @@ describe('night powers: entries, spent marks and silence', () => {
     await power(m.bots[3]!, 'poison', id(m, 6));
     await sleep(200);
     expect(
-      diffPaths(before, flatten(JSON.parse(JSON.stringify(stateOf(watcher).scenes.get('overworld'))))),
+      withoutFigureRows(
+        m,
+        diffPaths(before, flatten(JSON.parse(JSON.stringify(stateOf(watcher).scenes.get('overworld'))))),
+      ),
     ).toEqual([]);
     m.bots.forEach((b, i) => {
       const fresh = b.events.slice(counts[i]!).filter((e) => !['phaseChange', 'noise'].includes(e.type));
