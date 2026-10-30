@@ -16,7 +16,7 @@ import {
   startParty,
   until,
 } from './flowHelpers';
-import { avatarsHeld } from './avatarHelpers';
+import { avatarsHeld, seatAvatarsHeld } from './avatarHelpers';
 import { setPhase, teleport } from './killHelpers';
 import { type Match, sleep, stateOf } from './simHelpers';
 
@@ -27,8 +27,9 @@ afterAll(async () => release());
 beforeEach(async () => colyseus.cleanup());
 
 /** The seats whose avatar this bot's client currently holds (its own excluded), by room memory's handle map. */
+// Round 10, x5 (A353): the figures of the scene are held too; the seats seen are the seat avatars.
 const seen = (m: Match, i: number): string[] =>
-  avatarsHeld(m.bots[i]!)
+  seatAvatarsHeld(m, m.bots[i]!)
     .map((a) => avatarMemory(m.room).seatOf.get(a.handle) as string)
     .filter((id) => id !== m.bots[i]!.id)
     .sort();
