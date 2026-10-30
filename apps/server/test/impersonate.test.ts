@@ -5,7 +5,8 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import { avatarMemory } from '../src/sim/Avatars';
 import { markDead } from '../src/sim/Death';
 import { enterScene } from '../src/sim/Portals';
-import { avatarsHeld, handleOf, settle } from './avatarHelpers';
+import { figureOfHandle } from '../src/sim/townsfolk/figures';
+import { avatarsHeld, handleOf, seatAvatarsHeld, settle } from './avatarHelpers';
 import {
   bootFlowServer,
   events,
@@ -106,16 +107,17 @@ describe('the face changes only unseen', () => {
     teleport(m, m.bots[1]!, 'overworld', 33, 22);
     settle(m, m.bots[1]!);
     await sleep(300);
-    const before = m.bots.map((b) =>
-      JSON.stringify(stateOf(b).toJSON(), (k, v) => (k === 'tick' ? undefined : v)),
-    );
+    // Round 10, x5 (A353): the scene's figures share the view and walk between the two snapshots, so they are left out.
+    const snapshot = (b: (typeof m.bots)[number]) =>
+      JSON.stringify(stateOf(b).toJSON(), (k, v) =>
+        k === 'tick' || figureOfHandle(m.room, k) !== undefined ? undefined : v,
+      );
+    const before = m.bots.map(snapshot);
     const rosters = [1, 2, 3, 4].map((i) => roster(m, 2, i));
     await impersonate(m, idOf(m, 3));
     await sleep(300);
     expect(disguise(m)?.applied).toBe(false);
-    const after = m.bots.map((b) =>
-      JSON.stringify(stateOf(b).toJSON(), (k, v) => (k === 'tick' ? undefined : v)),
-    );
+    const after = m.bots.map(snapshot);
     expect(after).toEqual(before);
     expect([1, 2, 3, 4].map((i) => roster(m, 2, i))).toEqual(rosters);
     for (const b of m.bots) expect(events(b, 'vfx')).toEqual([]);
@@ -363,7 +365,9 @@ describe('what an observer sees (P6, P10)', () => {
       const memory = avatarMemory(m.room);
       const ids = [...m.room.state.players.keys()];
       const norm = (id: string | undefined): string => `S${ids.indexOf(id ?? '')}`;
-      const rows = avatarsHeld(m.bots[2]!)
+      // Round 10, x5 (A353): the scene's figures share the view and walk on the clock, so two runs hold them at
+      // different spots; only their rows are left out, the seats' rows compare as before.
+      const rows = seatAvatarsHeld(m, m.bots[2]!)
         .map((a) => ({
           seat: norm(memory.seatOf.get(a.handle)),
           lookOf: norm(a.avatar.lookOf),
