@@ -8,6 +8,20 @@ export class FakeNode {
   readonly dataset: Record<string, string> = {};
   className = '';
   hidden = false;
+  disabled = false;
+  /** The class list over `className`, the two calls the touch discs make. */
+  readonly classList = {
+    add: (c: string) => {
+      if (!this.classList.contains(c)) this.className = `${this.className} ${c}`.trim();
+    },
+    remove: (c: string) => {
+      this.className = this.className
+        .split(' ')
+        .filter((k) => k !== c)
+        .join(' ');
+    },
+    contains: (c: string) => this.className.split(' ').includes(c),
+  };
   text = '';
   parent: FakeNode | null = null;
   constructor(readonly tag: string) {}
@@ -50,6 +64,11 @@ export class FakeNode {
   click(): void {
     for (const fn of this.listeners.get('click') ?? []) fn();
   }
+  /** Fires `type` with `event` (a pointerdown, a keydown) on this node. */
+  fire(type: string, event: unknown = {}): void {
+    for (const fn of this.listeners.get(type) ?? []) (fn as (e: unknown) => void)(event);
+  }
+  setPointerCapture(): void {}
   get childElementCount(): number {
     return this.children.length;
   }
