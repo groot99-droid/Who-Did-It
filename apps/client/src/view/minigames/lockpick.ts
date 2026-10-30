@@ -15,6 +15,8 @@ const TENSION_DOWN = 1.2;
 const FEEL_FROM = 0.15;
 /** How far a key moves the selected pin. */
 const LIFT_STEP = 0.02;
+/** A snapped board holds this long before it reports, so the line can be read before the modal sends. */
+const SNAP_HOLD_MS = 1000;
 
 export type LockResult = 'wait' | 'miss' | 'set' | 'snap';
 
@@ -247,22 +249,28 @@ export const lockpickGame: MiniGameFactory = (host) => {
   window.addEventListener('keyup', keyup);
 
   let reported = false;
+  let hold = 0;
   const halt = loop((dt) => {
+    const held = model.pressed;
     if (model.tick(dt)) {
       joltS = 0.2;
       click();
     }
+    // A pick held past the snap line lets go inside the tick: the player hears it here, not on a release.
+    if (held && !model.pressed && model.snapped) say(C['minigame.lockpick.snap']);
     joltS = Math.max(0, joltS - dt);
     draw();
     if (model.done && !reported) {
       reported = true;
-      host.onDone();
+      if (model.snapped) hold = window.setTimeout(() => host.onDone(), SNAP_HOLD_MS);
+      else host.onDone();
     }
   });
   draw();
   return {
     answer: () => ({ trace: model.trace.map((a) => ({ ...a })) }),
     destroy() {
+      window.clearTimeout(hold);
       halt();
       window.removeEventListener('keydown', keydown);
       window.removeEventListener('keyup', keyup);
