@@ -80,7 +80,9 @@ the later session builds on the merged earlier one and does not reshape it.
 - **Decisions.** 10A A225, 10F A226, 10H A227, 10G A228, 10B A229, 10C A230, 10D A231, 10E A232, 10X A233, 10Y A234,
   10Z A235. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
   A226, A246, A266 and so on. Rows stay in number order in the table.
-- **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.46, 10C 14.47, 10D 14.48, 10E 14.49.
+- **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.50, 10C 14.47, 10D 14.48, 10E 14.49. 14.46 is
+  A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client cites it, so 10B's
+  copy moved to 14.50 (2026-10-30). Sections stay in number order in section 14.
 
 ## 6. Invariants and checks
 
