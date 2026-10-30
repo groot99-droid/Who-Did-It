@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { content, interactions } from '../src/index.js';
 
-// Round 10, x4 (A293): an item's tooltip tells the truth the data tells. Logs said "Crafting waits for the mill" after
+// Round 10, x8 (A293): an item's tooltip tells the truth the data tells. Logs said "Crafting waits for the mill" after
 // D3 shipped the saws (GDD 3.14), so the tooltip is pinned to the interactions that consume the item.
 
 /** The live interactions with a mode that consumes `item`, by target. */
