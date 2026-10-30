@@ -1,11 +1,13 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { Phase, TICK_RATE } from '@wdi/shared';
+import { Phase, TICK_RATE, TribunalStep } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { bootFlowServer, events, request, skipPhase, startParty, until } from './flowHelpers';
+import { sleep } from './simHelpers';
 
-// Round 8 (8M, DECISIONS A171; GDD 3.3): the Final Night is a short hunt, then the trial, a forced meeting with its
-// own discussion `finalNight.trialS`, longer than any ordinary meeting. The phases and events are the usual ones.
+// Round 8 (8M, DECISIONS A171; GDD 3.3): the Final Night is a short hunt, then the trial, with its own window
+// `finalNight.trialS`, longer than any ordinary meeting. Round 10, B6d (6Z's grant; seams.md 3 row 35): the trial is
+// the end trial, whose filing window takes `finalNight.trialS` after a 3 s gathering (GDD 3.8).
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -21,6 +23,14 @@ async function toFinalNight(n: number) {
 }
 
 const left = (m: Awaited<ReturnType<typeof toFinalNight>>) => m.room.state.phaseEndsTick - m.room.state.tick;
+/** The end trial's clock: what is left of its current step. */
+const stepLeft = (m: Awaited<ReturnType<typeof toFinalNight>>) =>
+  m.room.state.tribunal.untilTick - m.room.state.tick;
+/** The gathering ends: the filing window opens. */
+async function toFiling(m: Awaited<ReturnType<typeof toFinalNight>>): Promise<void> {
+  m.room.state.tribunal.untilTick = m.room.state.tick;
+  await until(() => m.room.state.tribunal.step === TribunalStep.filing);
+}
 
 describe('the trial after the Final Night hunt (GDD 3.3)', () => {
   it('is longer than every ordinary discussion', () => {
@@ -30,30 +40,32 @@ describe('the trial after the Final Night hunt (GDD 3.3)', () => {
   });
 
   for (const n of [5, 8]) {
-    it(`opens with a discussion of finalNight.trialS at ${n} seats when the hunt runs out`, async () => {
+    it(`opens with a filing window of finalNight.trialS at ${n} seats when the hunt runs out`, async () => {
       const m = await toFinalNight(n);
       await skipPhase(m);
-      expect(m.room.state.phase).toBe(Phase.meetingDiscussion);
-      expect(m.room.state.meeting.reason).toBe('final');
-      expect(Math.abs(left(m) - balance.finalNight.trialS * TICK_RATE)).toBeLessThanOrEqual(4);
+      expect(m.room.state.phase).toBe(Phase.tribunal);
+      await toFiling(m);
+      expect(Math.abs(stepLeft(m) - balance.finalNight.trialS * TICK_RATE)).toBeLessThanOrEqual(4);
     });
   }
 
   it('opens the same way when a body report ends the hunt', async () => {
     const m = await toFinalNight(5);
     request(m, 1, 2);
-    expect(await until(() => m.room.state.phase === Phase.meetingDiscussion)).toBe(true);
-    expect(Math.abs(left(m) - balance.finalNight.trialS * TICK_RATE)).toBeLessThanOrEqual(4);
+    expect(await until(() => m.room.state.phase === Phase.tribunal)).toBe(true);
+    await toFiling(m);
+    expect(Math.abs(stepLeft(m) - balance.finalNight.trialS * TICK_RATE)).toBeLessThanOrEqual(4);
   });
 
-  it('runs on the existing phase events: the hunt, the discussion, then the vote of phases.voteS', async () => {
+  it('runs on the phase events: the hunt, the end trial, then game over', async () => {
     const m = await toFinalNight(5);
     await skipPhase(m);
-    await skipPhase(m);
-    expect(m.room.state.phase).toBe(Phase.meetingVote);
-    expect(Math.abs(left(m) - balance.phases.voteS * TICK_RATE)).toBeLessThanOrEqual(4);
+    for (let i = 0; i < 20 && m.room.state.phase !== Phase.gameOver; i++) {
+      m.room.state.tribunal.untilTick = m.room.state.tick;
+      await sleep(150);
+    }
     const changes = events(m.bots[1]!, 'phaseChange').map((e) => e.phase);
-    expect(changes.slice(-3)).toEqual([Phase.finalNight, Phase.meetingDiscussion, Phase.meetingVote]);
+    expect(changes.slice(-3)).toEqual([Phase.finalNight, Phase.tribunal, Phase.gameOver]);
   });
 
   it('leaves an ordinary meeting on the discussion of the party size', async () => {

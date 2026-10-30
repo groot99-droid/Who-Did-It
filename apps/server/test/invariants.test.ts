@@ -122,7 +122,7 @@ describe('the sim event bus', () => {
     const a = await run();
     const b = await run();
     const kinds = new Set(a.events.map((e) => e.kind));
-    for (const kind of ['start', 'phase', 'meeting', 'vote', 'end']) expect(kinds).toContain(kind);
+    for (const kind of ['start', 'phase', 'endTrial.open', 'end']) expect(kinds).toContain(kind);
     expect(a.events[0]?.kind).toBe('start');
     expect(a.events.at(-1)?.kind).toBe('end');
     const seats = new Set(fixedIds);
