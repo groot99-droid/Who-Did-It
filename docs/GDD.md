@@ -1224,6 +1224,18 @@ rule applies after that (it drops when the seat is alone or passes a door). What
 the drawn figures show: the true accused seen in town after a public "cuffed", two of one face in the cell, and a
 hanging's roster flip (B6).
 
+**The jail's games (D8).** The cell holds three props, and each opens a board for the seat standing at it, once a day
+(a round) and per game; the board is spent when it opens. Working out at the weights is a tap board and adds
+`jail.gym.damage` (_proposed_ 2) to the seat's fist and slingshot damage for the rest of the match (one Strength: a second
+workout adds nothing). The yard fight, at the sparring
+post, is a crates board of one round: a right answer inside `jail.yard.boardS` (_proposed_ 20 s) wins `jail.yard.purse`
+(_proposed_ 2 Scrip) from the town; a wrong or a slow one loses (a board left unanswered past `boardS` is lost too), and a loss takes `jail.yard.maxHpLoss` (_proposed_ 10)
+off the seat's maximum health for the rest of the match, never under `jail.yard.maxHpFloor` (_proposed_ 80). Scrubbing,
+at the pail, is a pour board that pays `jail.scrub.wage` (_proposed_ 1 Scrip). The hour off the sentence the owner's
+design names is not yet built: every sentence ends at the next morning train (3.27 above), so an early release waits on
+the owner. Nothing here is public: the tally is the server's, and the only signs are a harder
+fist, a smaller health bar and the purse.
+
 ### 3.28 Accounts and achievements
 
 Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds it writes this section.
