@@ -619,7 +619,7 @@
       "target": "self",
       "castS": 0,
       "consumes": "herbBread",
-      "effect": "Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long for the rest of the day.",
+      "effect": "Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long until the next dawn.",
       "ships": "V1",
       "gddRef": "3.14"
     },
