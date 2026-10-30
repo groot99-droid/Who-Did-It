@@ -411,5 +411,14 @@
     "holdoutGraceS": 60,
     "gddRef": "3.32"
   },
-  "respawn": { "hp": 50, "gddRef": "3.22" }
+  "respawn": { "hp": 50, "gddRef": "3.22" },
+  "petition": {
+    "othersPct": 0.3,
+    "openS": 60,
+    "cooldownS": 120,
+    "maxEntries": 4,
+    "constableAtHumans": 5,
+    "constableMatches": 2,
+    "gddRef": "3.31"
+  }
 }
