@@ -4289,6 +4289,21 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: two failures that no open pull request caused. The rent test's flake is a fixed `sleep(100)` before
   an assertion that waits on the tick; 10X fixes it in x15. The m5b e2e specs fail on the base itself, and CI runs no
   e2e, so nothing caught them; 10Y fixes them.
+- 2026-10-30: seams row 22, the Tribunal (B6a), from 10B's draft with 6Z's edits. 10B takes the end trial as B6d,
+  merged before B6c's removal.
+  - The accused is the warrant's seat throughout. A held seat that is not the accused presents nothing, so no
+    presenter names it.
+  - `backed` follows the presenter's Notebook, never the server's knowledge of a plant (GDD 3.2).
+  - A role's reading weighs only as its reader's own entry holds it. In the warrant it weighs none, so no weight
+    shows that the anonymous opener holds one.
+  - A clue already on the scales is refused, the warrant's included, so no clue counts twice.
+  - An attendee's impersonation ends at the open, as at a meeting. The held seat's stays pinned (row 19).
+  - The departed Hitman keeps the screen and may present, and is never placed. `jailUntilTick` keeps the estimate
+    until the verdict.
+  - Two secrecy calls. A death sentence shows the held seat's true role, so a seat hanged in another's face is shown
+    as itself (`phases.md` 4). A fine is public as the fine assessed, never the purse. `fineJail` shows that the
+    purse fell short; a silent shortfall would show it anyway, since the seat would be missing at the Return.
+  - Rows 15 and 19 now name the Tribunal.
 
 ## Round 11 (planning, started 2026-10-29)
 
