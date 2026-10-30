@@ -1510,9 +1510,20 @@ the Hitman: the mail turns a townsman into one.
   human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
   the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
   stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
-  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger.
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger; it boards no house (a boarding would
+  tell it from the Hitman's look without the ledger), so a struck human keeps their bed.
+- **The Clerk's rent ledger** (C4d; F4 b5 and 2.7). Reading the Clerk's books on HollowMere (`bk.ledger`, in reach,
+  in a world phase, alive and out of jail) shows the reader alone every rent hardship of the match so far, oldest
+  first: the day it struck and the look the struck seat wore then. It never shows a seat, a name, a card, a cover, a
+  hardship of another kind or a real boarding (3.23's, the seat's own economy), and every reader at a moment sees the
+  same rows. Reading it takes the trip; nothing public carries it, the read has no hold, clip or noise, and the server
+  keeps nothing of who read. The rows are the town's lead: a dark, dear look that isn't in the ledger went dark for a
+  reason other than rent. NPC seats read it too, as a person would: at each trip they pick, a draw on their own
+  stream sends one to stand at the books for the errand's length, holding nothing, with the chance
+  `hardship.readLedger.before` until the Hitman's line has gone out and `after` it (P 0 and 0.1), so a stop at the
+  Clerk's books marks no one.
 - Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
   contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
-  station (10B); the Clerk's ledger of rent hardships (C4d); the cold station and the dark window (a home's window
+  station (10B); Blackpine's ledger (it has no `ledger` prop); the cold station and the dark window (a home's window
   state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
   4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.

@@ -110,9 +110,11 @@ describe('hardships (GDD 3.33, F4 b2 to b5)', () => {
     const room = party.room;
     const [a] = [...room.state.players.keys()] as [string];
     looks(party, [a]);
+    forceHardship(room, a, 'robbed');
+    expect(rentHardships(room)).toEqual([]); // a hardship of another kind leaves no row
     forceHardship(room, a, 'rent');
     expect(inHardship(room, a)).toBe(true);
-    expect(rentHardships(room)).toEqual([]); // forced strikes do not write the ledger; a delivery does
+    expect(rentHardships(room)).toEqual([{ look: 'baker', round: room.state.round }]);
   });
 });
 

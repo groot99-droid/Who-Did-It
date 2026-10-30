@@ -80,8 +80,14 @@ export function onDeliveryHardship(room: PartyRoom, round: number): void {
 export const rentHardships = (room: PartyRoom): readonly { look: string; round: number }[] =>
   states.get(room.seeds)?.rents ?? [];
 
-/** Strikes `seat` now (tests): a hardship of `kind` for `hardship.recoverS`. */
+/** Strikes `seat` now (tests), as a delivery would: a hardship of `kind` for `hardship.recoverS`, a rent one in the ledger. */
 export function forceHardship(room: PartyRoom, seat: string, kind: Kind = 'robbed'): void {
-  const until = room.state.tick + Math.round(balance.hardship.recoverS * TICK_RATE);
-  stateOf(room).running.set(seat, { kind, untilTick: until, round: room.state.round });
+  const s = stateOf(room);
+  const round = room.state.round;
+  s.running.set(seat, {
+    kind,
+    untilTick: room.state.tick + Math.round(balance.hardship.recoverS * TICK_RATE),
+    round,
+  });
+  if (kind === 'rent') s.rents.push({ look: room.state.players.get(seat)!.look, round });
 }

@@ -523,6 +523,11 @@ export const BalanceFile = z.strictObject({
     atOnce: z.tuple([z.number().int().nonnegative(), z.number().int().positive()]),
     recoverS: Seconds,
     kinds: z.array(z.enum(['robbed', 'harvest', 'fined', 'rent', 'illness', 'shipment'])).min(1),
+    /**
+     * C4d (seams.md 3 row 37): at each trip an NPC seat picks, the chance it goes to read the Clerk's rent ledger, on its
+     * own stream: `before` the Hitman's arrival line has gone out, `after` it (a public trigger).
+     */
+    readLedger: z.strictObject({ before: Chance, after: Chance }),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({

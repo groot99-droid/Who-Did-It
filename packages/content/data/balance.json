@@ -451,6 +451,7 @@
     "atOnce": [1, 2],
     "recoverS": 480,
     "kinds": ["robbed", "harvest", "fined", "rent", "illness", "shipment"],
+    "readLedger": { "before": 0, "after": 0.1 },
     "gddRef": "3.33"
   },
   "armor": {
