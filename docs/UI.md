@@ -2066,3 +2066,18 @@ line, the book and the bells at 390 x 844 and 1280 x 720 (`docs/ui/line-*.png`),
 |---|---|---|
 | the time to the bells (`line.bells`) | The bells in {time} | On the line, top band, as m:ss, in place of `line.train` when the next day is the Final Night |
 | no work held (`line.quests.none`) | You hold no work. | On the line, the quest list, when the seat holds no quest |
+
+### 14.60 Barks and talk (10M, round 10)
+
+The quick-chat wheel's lines are a content field: the sixteen phrases of `balance.json` `chat.quickChat`, in order, eight
+from round 3 and eight world lines from round 10 (Anyone seen the baker? / Got any food to spare? / Mind the wolves / I
+owe the clerk / Was that the bell? / Wolf! / Keep to the light / Getting dark). The wheel and its bubble are built in M1b;
+this section holds their copy.
+
+#### 14.60.1 Refusing a bark
+
+A bark that the wheel could not have sent (an id outside the pool) is dropped and shows nothing: the refusal for it,
+`UNKNOWN_PHRASE` in `apps/client/src/ui/copy/refusals.ts`, is an empty line like `SAY_SOMETHING`. A second bark inside
+`chat.quickGapS` is `CHAT_RATE` ("Slow down."), and a bark in a meeting, asleep, downed or as a ghost shows the ordinary
+line of its reason.
+
