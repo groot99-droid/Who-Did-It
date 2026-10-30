@@ -1122,6 +1122,17 @@ knockout (3.22, the reduced body) reaches a figure only once the strike hook of 
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
 
+**Talk to a figure** (round 10, D9c; `living-world.md` 1.5, seams.md 3 row 16). A seat in reach (`figureTalk.reachTiles`)
+of a figure (a townsperson, a named figure or a Constable) asks it about the town or the time (`talk.ask {targetId,
+ask}`, G and H on the client). A seat's handle, human or NPC, an unknown handle and a figure in another scene refuse as
+no target; a ghost refuses as not in play; too far refuses as too far; each asker may ask the same figure again after
+`figureTalk.cooldownS`. The answer is one system chat line to the asker alone, `figureTalk.delayS` after the ask.
+`town` is a tip off the rumour ledger (3.23) naming a drawn look and a scene, never a seat, a handle or a card; `time`
+is a template remark; a Constable reads the latest briefing line (3.31) instead; with nothing to tell, a figure says so.
+The line is drawn from the figure and the tick it is due, with no random number, so two askers of one figure in one
+tick hear the same words. Nothing public marks a talk: no bubble, no turn of the figure, no event to another client.
+The lines are `talk.json` `figures`.
+
 **Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
 guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
 `townsfolk` (`guard`, with `count` figures, the Constables 2) spawns after the counted townsfolk, so it never takes

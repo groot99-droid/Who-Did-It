@@ -231,6 +231,15 @@ export const BalanceFile = z.strictObject({
     /** A door is usable from this many tiles of its tile centre (GDD 3.7). */
     reachTiles: z.number().positive(),
   }),
+  /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  figureTalk: Section({
+    /** A figure answers from this many tiles. */
+    reachTiles: z.number().positive(),
+    /** Every answer comes this long after the ask. */
+    delayS: Seconds,
+    /** Each asker may ask the same figure again after this long. */
+    cooldownS: Seconds,
+  }),
   tasks: Section({
     cabalFakeList: z.boolean(),
     ghostShareCap: z.number().min(0).max(1),
