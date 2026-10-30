@@ -90,6 +90,18 @@ describe('the train returns the day’s dead (GDD 3.22)', () => {
     expect(ghostLines(victim)).toEqual([]);
     expect(ghostLines(ghost)).toEqual([{ from: ghost!.id, text: 'boo', channel: 'ghost' }]);
     expect(eventsOf(victim!, 'error')).toEqual([expect.objectContaining({ reason: 'NOT_IN_PLAY' })]);
+    // Nor does the meeting reach it (phases.md 4: a seat on the line does not attend).
+    m.room.state.phase = Phase.meetingDiscussion;
+    m.room.state.phaseEndsTick = m.room.state.tick + 20 * 3600;
+    await act(m.bots[2]!, 'chat.say', { text: 'who?' });
+    expect(eventsOf(victim!, S2C.chatMsg).some((c) => (c as { channel: string }).channel === 'meeting')).toBe(
+      false,
+    );
+    expect(eventsOf(ghost!, S2C.chatMsg)).toContainEqual({
+      from: m.bots[2]!.id,
+      text: 'who?',
+      channel: 'meeting',
+    });
     // Nobody else learns of the line (A170): no private view, no figure, no `onLine` in any message.
     const handle = priv.avatar;
     for (const bot of [m.bots[2]!, ghost!]) {
