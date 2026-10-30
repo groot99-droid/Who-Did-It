@@ -119,7 +119,9 @@ export type HoldAction =
   | 'mailbag'
   | 'rack'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
-  | 'interact';
+  | 'interact'
+  // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
+  | 'sleep';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**

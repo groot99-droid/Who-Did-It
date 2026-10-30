@@ -44,6 +44,8 @@
     "boulder": { "name": "Boulder", "match": { "stems": ["boulder"] } },
     "rockPile": { "name": "Rock pile", "match": { "stems": ["rock_pile", "rubble"] } },
     "orePile": { "name": "Ore pile", "match": { "stems": ["ore_pile"] } },
+    "headSaw": { "name": "Head saw", "match": { "stems": ["head_saw"] } },
+    "sawHorse": { "name": "Saw horse", "match": { "stems": ["saw_horse"] } },
     "lockedDoor": { "name": "Locked door", "match": { "kinds": ["lockedDoor"] } },
     "crateNailed": {
       "name": "Nailed crate",
@@ -242,6 +244,50 @@
       },
       "ships": "V1"
     },
+    "sawLogs": {
+      "verb": "saw",
+      "label": "Saw logs",
+      "target": "headSaw",
+      "handler": "craft",
+      "status": "live",
+      "phases": ["day"],
+      "modes": [
+        {
+          "tool": null,
+          "holdS": 4,
+          "consumes": [{ "item": "logs", "qty": 1 }],
+          "drops": [{ "item": "timber", "qty": [2, 2] }],
+          "wear": 0,
+          "noise": null
+        }
+      ],
+      "ownership": "public",
+      "fail": { "NEED_ITEM": "The saw is idle. It wants logs on the carriage." },
+      "ships": "V1",
+      "hint": "Logs from a pile or a tree become Timber here: one log, two Timber."
+    },
+    "sawLogsByHand": {
+      "verb": "saw",
+      "label": "Saw a log",
+      "target": "sawHorse",
+      "handler": "craft",
+      "status": "live",
+      "phases": ["day"],
+      "modes": [
+        {
+          "tool": null,
+          "holdS": 8,
+          "consumes": [{ "item": "logs", "qty": 1 }],
+          "drops": [{ "item": "timber", "qty": [1, 1] }],
+          "wear": 0,
+          "noise": null
+        }
+      ],
+      "ownership": "public",
+      "fail": { "NEED_ITEM": "Nothing to saw. The horse wants a log across it." },
+      "ships": "V1",
+      "hint": "Slow work by hand: one log, one Timber. The mill's head saw does twice as much."
+    },
     "pickLock": {
       "verb": "pick",
       "label": "Pick the lock",
@@ -285,7 +331,7 @@
         "stump log fallen_log firewood woodpile timber_set log_basket planks tree boulder",
         "rock_pile ore_pile rubble mushrooms berry_bush water_bucket bucket snare wheelbarrow",
         "drying_frame saw_horse grindstone workbench anvil forge kiln mortar_table still",
-        "shaping_table dough_trough peel_rack couche_rack"
+        "shaping_table dough_trough peel_rack couche_rack head_saw"
       ],
       "container": [
         "barrel crates crate tin_crate bottle_crate footlocker blanket_chest wine_cask",
@@ -306,7 +352,7 @@
         "wall_shelf shelf flower_stand feed_trough bar_counter bar_counter_lamp",
         "bar_counter_taps counter_case_x birdcage chair compressor font lectern piano pulpit",
         "scarecrow ship_wheel show_globe tin_cabinet_x writing_desk bunks_n bunks_s clamp",
-        "crepe den drowned_lantern flume gearing hanging_oak head_saw ledger_desk map_table",
+        "crepe den drowned_lantern flume gearing hanging_oak ledger_desk map_table",
         "mess_table ore_cart pegs pump_beam refuge_table rope shelves tally_board telephone",
         "trestle mortar_x"
       ]
