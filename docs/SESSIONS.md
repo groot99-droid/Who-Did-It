@@ -4210,6 +4210,13 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - Defaults for the owner: no Hitman in Paint The Town Red or below the `hitman.byHumans` table; the turned seat is
     living and free and never a cover role; an NPC seat is turned when no human is eligible; the mark is a human
     when one is free.
+- 2026-10-30: 6Z's grants and calls for the next steps. x5 (10X) changes the `seen` and `seenPresence` helpers of
+  `visibility.test.ts` and `sim-portal.test.ts` to `seatAvatarsHeld`, so those suites stay about seats; x5's own
+  tests carry the figures. B5a (10B) gets the jail exclusion in `tools/grid/test/export.test.ts`. B5b gets the holding
+  case of `manhunt.test.ts` and one line in `sim/Kill.ts`, the `IN_JAIL` refusal of a jailed seat's Knife. 6Z
+  approved B5b's two calls, now in row 19: a disguise still channelling at the cuff is cancelled, and at the release
+  the seat steps off the train in the face the manifest names before the usual rule applies. C4a (10C) changes the
+  expected rows of the Killer's draw in `vendettas.test.ts`, which no longer offers the Hitman.
 
 ## Round 11 (planning, started 2026-10-29)
 
