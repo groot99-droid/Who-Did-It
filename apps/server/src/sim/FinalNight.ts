@@ -2,7 +2,7 @@ import { balance, roles } from '@wdi/content';
 import { Phase, type PlayerState, SKIP_VOTE, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf, refuse, setPhase } from './Flow';
-import { openMeeting } from './Meeting';
+import { openEndTrial } from './law/EndTrial';
 import { endMatch, evaluateWin } from './Win';
 
 // The Final Night (GDD 3.3, 3.8; round-5 `deck/wire.md` 5). Session 5G owns this file: `Phases.ts` calls it for the
@@ -27,9 +27,14 @@ export function beginFinalNight(room: PartyRoom): void {
   });
 }
 
-/** The hunt is over (time, or a body report): the forced meeting opens with reason `final`. */
+/**
+ * The hunt is over (time, or a body report): the end trial opens (round 10, B6d; GDD 3.8, seams.md 3 row 35). It
+ * replaced the forced meeting with reason `final`; B6c removes the vote code left below.
+ */
 export function endHunt(room: PartyRoom, callerId = '', bodyOf?: string): void {
-  openMeeting(room, { reason: 'final', callerId, ...(bodyOf !== undefined && { bodyOf }) });
+  void callerId;
+  void bodyOf;
+  openEndTrial(room);
 }
 
 /** The forced meeting is open and its vote has no Skip: a Skip vote is refused and cleared (GDD 3.3). */

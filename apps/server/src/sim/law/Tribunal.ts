@@ -73,7 +73,8 @@ function memoryOf(room: PartyRoom): TribunalMemory {
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
 const KIND_KEY = new Map<number, string>(Object.entries(ClueKind).map(([k, v]) => [v, k]));
-const clueKey = (kind: number, sceneId: number, value: number): string => `${kind}:${sceneId}:${value}`;
+export const clueKey = (kind: number, sceneId: number, value: number): string =>
+  `${kind}:${sceneId}:${value}`;
 
 /** The trait axis any clue kind reveals, whoever may read it (`traits.json`). */
 function traitAxis(kind: number): keyof typeof traits.axes | undefined {
@@ -81,30 +82,36 @@ function traitAxis(kind: number): keyof typeof traits.axes | undefined {
   return (Object.keys(traits.axes) as (keyof typeof traits.axes)[]).find((a) => traits.axes[a].clue === key);
 }
 
-/** How a backed reading of `axis` = `value` weighs against the accused's public traits. */
-function weigh(room: PartyRoom, axis: keyof typeof traits.axes | undefined, value: number): number {
-  const t = room.state.players.get(room.state.tribunal.accused)?.traits;
+/** How a backed reading of `axis` = `value` weighs against `accused`'s public traits. */
+function weigh(
+  room: PartyRoom,
+  accused: string,
+  axis: keyof typeof traits.axes | undefined,
+  value: number,
+): number {
+  const t = room.state.players.get(accused)?.traits;
   if (axis === undefined || !t) return EntryWeight.none;
   return t[axis] === value ? EntryWeight.match : EntryWeight.exclusion;
 }
 
 /** A warrant entry weighs only by what row 13 shows: a reading the row leaves out weighs none. */
 const warrantWeight = (room: PartyRoom, e: WarrantEntry): number =>
-  e.backed ? weigh(room, publicAxis(e.clueKind), e.value) : EntryWeight.none;
+  e.backed ? weigh(room, room.state.tribunal.accused, publicAxis(e.clueKind), e.value) : EntryWeight.none;
 
 /**
  * A presented entry: backed as the presenter's Notebook shows it, never Doubted testimony (GDD 3.20), and a role's
  * reading only when the presenter is its reader.
  */
-function presentedWeight(
+export function presentedWeight(
   room: PartyRoom,
   seat: string,
   e: { clueKind: number; value: number; status: number },
-) {
+  accused = room.state.tribunal.accused,
+): number {
   if (!backedEntry(e) || !countsVote(room, seat)) return EntryWeight.none;
   const reader = clueDefs.clues[KIND_KEY.get(e.clueKind) ?? '']?.reader;
   if (reader !== 'anyone' && reader !== roleIdOf(room.state.players.get(seat)!)) return EntryWeight.none;
-  return weigh(room, traitAxis(e.clueKind), e.value);
+  return weigh(room, accused, traitAxis(e.clueKind), e.value);
 }
 
 function push(room: PartyRoom, e: Scale): void {
@@ -116,9 +123,23 @@ function push(room: PartyRoom, e: Scale): void {
   if (e.weight === EntryWeight.exclusion) t.exclusions++;
 }
 
+/**
+ * The gathering, as a meeting opens (A30, locked order): Nightshade first, then the deaths so far, the disguises
+ * (a held seat's pinned face stays, row 19), the knocked out; the living to the square, the jailed and the line left.
+ */
+export function gather(room: PartyRoom): void {
+  const sim = simOf(room);
+  onMeetingOpenNight(room);
+  room.state.players.forEach((player, id) => {
+    if (sim.players.get(id)?.dead) player.alive = false;
+  });
+  onMeetingOpenDisguise(room);
+  wakeAll(room);
+  placeAtSquare(room, false);
+}
+
 function openTribunal(room: PartyRoom, m: TribunalMemory, cuffed: Cuffed): void {
   const state = room.state;
-  const sim = simOf(room);
   m.tried.add(cuffed);
   m.open = {
     cuffed,
@@ -126,14 +147,7 @@ function openTribunal(room: PartyRoom, m: TribunalMemory, cuffed: Cuffed): void 
     presented: new Map(),
     keys: new Set(),
   };
-  // As a meeting opens (A30, locked order): Nightshade first, then the deaths so far, the disguises, the knocked out.
-  onMeetingOpenNight(room);
-  state.players.forEach((player, id) => {
-    if (sim.players.get(id)?.dead) player.alive = false;
-  });
-  onMeetingOpenDisguise(room); // the held seat's pinned face stays (row 19)
-  wakeAll(room);
-  placeAtSquare(room, false); // the jailed (the dock included) and the line stay where they are
+  gather(room);
   const t = state.tribunal;
   t.accused = cuffed.warrant.accused;
   t.charge = cuffed.warrant.charge;
@@ -159,8 +173,8 @@ function toStep(room: PartyRoom, step: number, seconds: number): void {
   room.state.tribunal.untilTick = room.state.tick + S(seconds);
 }
 
-/** The finding: any exclusion dismisses; murder at `murderAt`, any other charge at `convictAt`. */
-function findingOf(room: PartyRoom): number {
+/** The finding of the case on the row: any exclusion dismisses; murder at `murderAt`, any other at `convictAt`. */
+export function findingOf(room: PartyRoom): number {
   const t = room.state.tribunal;
   if (t.exclusions > 0) return TribunalFinding.dismissed;
   if (t.charge === 'murder')
@@ -168,11 +182,20 @@ function findingOf(room: PartyRoom): number {
   return t.matches >= balance.trial.convictAt ? TribunalFinding.proven : TribunalFinding.dismissed;
 }
 
-const FINES: Record<string, () => number> = {
+export const FINES: Record<string, () => number> = {
   theft: () => balance.trial.theftFine,
   trespass: () => balance.trial.trespassFine,
   rumour: () => balance.trial.rumourFine,
 };
+
+/** A death sentence: the usual death path, for good, and the seat's true role to every client (row 22). */
+export function hang(room: PartyRoom, seat: string): void {
+  const player = room.state.players.get(seat);
+  markDead(room, seat, 'ejected'); // dies for good: the death path, never the line
+  if (!player) return;
+  player.alive = false;
+  room.broadcast(S2C.tribunalVerdict, { roleId: roleIdOf(player) });
+}
 
 /** The verdict: the finding, then the sentence the charge sets, on the seat held. */
 function verdict(room: PartyRoom, open: Open): void {
@@ -184,12 +207,7 @@ function verdict(room: PartyRoom, open: Open): void {
     graceAccused(room, t.accused);
   } else if (t.finding === TribunalFinding.murder) {
     t.sentence = TribunalSentence.death;
-    const player = room.state.players.get(seat);
-    markDead(room, seat, 'ejected'); // dies for good: the death path, never the line
-    if (player) {
-      player.alive = false;
-      room.broadcast(S2C.tribunalVerdict, { roleId: roleIdOf(player) });
-    }
+    hang(room, seat);
   } else {
     const fine = FINES[t.charge]?.();
     if (fine === undefined) t.sentence = TribunalSentence.jail;

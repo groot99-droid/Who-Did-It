@@ -18,7 +18,8 @@ import { schema, t } from '@colyseus/schema';
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
 // `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
 // (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), C5 `Private.paintTown` (row 18), and B5
-// `Private.jailUntilTick` (row 19) to version 7. B6a adds `GameState.tribunal` (row 22) to version 7.
+// `Private.jailUntilTick` (row 19) to version 7. B6a adds `GameState.tribunal` (row 22) and B6d
+// `GameState.endTrial` (row 35) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -404,6 +405,24 @@ export const Tribunal = schema(
   'Tribunal',
 );
 
+/**
+ * Round 10, B6d (GDD 3.8, seams.md 3 row 35): one case filed at the end trial, against one accused. `filers` is a
+ * count; each entry is a `TribunalEntry` whose `presenter` is the filer.
+ */
+export const EndTrialCase = schema(
+  {
+    accused: str(),
+    charge: str(),
+    filers: u8(),
+    entries: t.array(TribunalEntry),
+    matches: u8(),
+    exclusions: u8(),
+  },
+  'EndTrialCase',
+);
+/** Round 10, B6d (row 35): the cases filed at the Final Night's end trial, in filing order. Public. */
+export const EndTrial = schema({ cases: t.array(EndTrialCase) }, 'EndTrial');
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -433,6 +452,8 @@ export const GameState = schema(
     manhunt: Manhunt,
     /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): the Tribunal, public. */
     tribunal: Tribunal,
+    /** Round 10, B6d (GDD 3.8, seams.md 3 row 35): the end trial's filed cases, public. */
+    endTrial: EndTrial,
   },
   'GameState',
 );

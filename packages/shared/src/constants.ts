@@ -53,7 +53,17 @@ export const PairPhase = { none: 0, asking: 1, asked: 2, paired: 3, declined: 4 
 export const ManhuntState = { none: 0, hunting: 1, cuffed: 2 } as const;
 
 /** `GameState.tribunal` (round 10, B6a; GDD 3.8, seams.md 3 row 22). */
-export const TribunalStep = { none: 0, charge: 1, case: 2, defence: 3, verdict: 4, return: 5 } as const;
+export const TribunalStep = {
+  none: 0,
+  charge: 1,
+  case: 2,
+  defence: 3,
+  verdict: 4,
+  return: 5,
+  /** B6d (row 35): the Final Night's end trial gathers, then takes filings, then reads each case as a verdict. */
+  gathering: 6,
+  filing: 7,
+} as const;
 export const TribunalFinding = { none: 0, dismissed: 1, proven: 2, murder: 3 } as const;
 export const TribunalSentence = { none: 0, release: 1, fine: 2, jail: 3, death: 4, fineJail: 5 } as const;
 /** `TribunalEntry.weight`: how an entry on the scales counts against the accused's public traits. */
