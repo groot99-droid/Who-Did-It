@@ -8,6 +8,7 @@ import { balanceOf, movePurse, TOWN } from './purse';
 import { perkMul } from './perks';
 import { nearProp } from './reach';
 import { dropNotice, ledgerOf, systemLine } from './rumours';
+import { propsAtRest } from './townWork';
 
 /**
  * Faith (round 8, GDD 3.23, docs/round8/economy.md 3), Session 8D. Scrip donated at an altar (`act.donate`) earns
@@ -58,6 +59,8 @@ export function handleDonate(room: PartyRoom, seat: string, payload: Record<stri
   if (!priv || typeof amount !== 'number' || !Number.isInteger(amount) || amount <= 0) return;
   if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
   if (!atAltar(room, seat)) return reject(room, seat, 'NO_COUNTER', { kind: 'altar' });
+  if (nearProp(room, seat, [...propsAtRest(room)]))
+    return reject(room, seat, 'COUNTER_CLOSED', { kind: 'altar' }); // C3
   const { max, perScrip, donateMax } = economy.faith;
   if (priv.faith >= max) return reject(room, seat, 'FAITH_FULL');
   const moved = movePurse(room, seat, TOWN, Math.min(amount, donateMax), 'faith');
