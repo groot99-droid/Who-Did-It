@@ -435,7 +435,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (q.after !== undefined) {
       const before = quests.quests[q.after];
       if (!before || before.giver !== q.giver) err(`${where}: after ${q.after} is no quest of ${q.giver}`);
-      else if (before.after !== undefined) err(`${where}: a chain has two steps, ${q.after} has one before it`);
+      else if (before.after !== undefined)
+        err(`${where}: a chain has two steps, ${q.after} has one before it`);
     }
     const have = inHand.get(standsOn.get(q.giver) ?? '');
     for (const w of q.wants) {
