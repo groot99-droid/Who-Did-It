@@ -1445,13 +1445,16 @@ only what the seat holds: a Seal, an Indulgence, each notice.
 
 ### 14.36 Townsfolk (8E)
 
-Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a `villager` look id rather than a seat: its nameplate is `figureName(lookOf)`, the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
+Lines are in `apps/client/src/ui/copy/townsfolk.ts` (`TOWNSFOLK_COPY`, `figureName(lookId)`). An ambient figure (GDD 3.24) is an avatar whose `lookOf` is a look id of the `villagers` family or the `figures` looks of `looks.json` (a Constable, 3.31) rather than a seat: its nameplate is `figureName(lookOf)`, keyed by that look id exactly as the wire carries it (round 10, 10Y, A454: the keys 8E wrote as `figure.villager_clerk` and `figure.villager_tallyman` matched no look, so every figure read "Villager"), the plain `figure.villager` for a look with no line of its own, and it never shows a scarf, a hat glyph or a mask. The plate names what is drawn and nothing more: a figure's post (the Company Clerk, the Tallyman, a stallholder) is not on the wire (A160), and the look each post wears is the server's (`routines.json` `townsfolk` `look`). The meeting text reads the count of townsfolk the creatures took since the last meeting (`meetingStart.figuresLost`, once that field lands) and adds one line below the reason; no count, no line.
 
 | Key | Text | Where |
 |---|---|---|
-| `figure.villager` | Villager | the nameplate of any `villager` look without a line of its own |
-| `figure.villager_clerk` | Company Clerk | the nameplate of HollowMere's Clerk (8F's look) |
-| `figure.villager_tallyman` | Tallyman | the nameplate of BlackPine's Tallyman (8F's look) |
+| `figure.villager` | Villager | the nameplate of the plain `villager` look, and of any figure look without a line of its own |
+| `figure.villagerelder` | Elder | the nameplate of the `villagerelder` look (8F's family) |
+| `figure.villagergoodwife` | Goodwife | the nameplate of the `villagergoodwife` look |
+| `figure.villagerlass` | Lass | the nameplate of the `villagerlass` look |
+| `figure.villagerclerk` | Clerk | the nameplate of the `villagerclerk` look (the Company Clerk, the Tallyman and the stallholders, A161) |
+| `figure.constable` | Constable | the nameplate of the `constable` look (round 10, B1; GDD 3.31) |
 | `meeting.townsfolk.lost.one` | The wolves took one of the townsfolk. | the meeting text when one figure died since the last meeting |
 | `meeting.townsfolk.lost.many` | The wolves took {n} of the townsfolk. | the meeting text when more did; `{n}` is the count |
 
