@@ -3,6 +3,7 @@ import { type DeathCause, Phase, S2C, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { ensureBody, removeBody } from './body/state';
 import { dropCoins } from './economy/coins';
+import { addFare } from './economy/fare';
 import { balanceOf } from './economy/purse';
 import { emitSim } from './events/bus';
 import { strip } from './Inventory';
@@ -113,6 +114,7 @@ function returnLine(room: PartyRoom, round = Infinity): void {
     const cooldowns = player.priv.cooldownEndTick;
     for (const [key, end] of cooldowns) if (end > deathTick) cooldowns.set(key, end + (tick - deathTick));
     emitSim(room, { tick, kind: 'train.return', seat, sceneId: station.sceneId });
+    addFare(room, seat); // C2: the return is owed to the line
     for (const client of room.clients) {
       client.send(S2C.chatMsg, { from: '', text: trainReturnLine(player.name), channel: 'system' });
     }
