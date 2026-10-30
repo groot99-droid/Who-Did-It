@@ -285,12 +285,48 @@ When a set is over a budget, the build round applies these in order and stops at
 | a baked contact shadow and AO | 0 (baked into the body pass, as HD's catcher already is) | 0 | 0 | fits |
 | `emit` (11A, statics only: lamp flames, lit windows) | none | none | **cap: 512² a map (0.0625) plus 256² shared (0.016)** | fits; counted in the resident sum in every phase |
 | a depth pass | as normal | as normal | as normal | would break the cap |
+| the long-shadow layer (CL3, `pipeline.md` 4.3) | none | none | **cap: 1024² a map (0.25)**; expected 0.18 (Hollowmere), 0.12 (Blackpine) | fits as a mask at half density (5.3.1) |
 
   So any per-pixel run-time lighting pass (normal, depth) does not fit the cap of 9 for figures, and costs another
   1.8 per map for the environment. 11A's pass list (`pipeline.md` 4) keeps body, scarf and blood, adds `emit` for
-  statics and proposes no normal, depth, shadow-layer or separate AO pass; this table is the budget for it. With
-  `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is about 8.14 + 0.08 +
-  0.5 = 8.72, under 9. The sprite materials need no roughness or normal maps at run time: those are V2's (3.2, 8.1).
+  statics and proposes no normal, depth or separate AO pass; CL3 adds the shadow layer (5.3.1); this table is the
+  budget for it. With `emit` at its cap and the `constable` resident (6.2), the low-poly worst case on Hollowmere is
+  about 8.14 + 0.08 + 0.5 = 8.72, under 9 (8.97 with the shadow layer at its cap, 5.3.1). The sprite materials need no
+  roughness or normal maps at run time: those are V2's (3.2, 8.1).
+
+#### 5.3.1 The long-shadow layer (CL3)
+
+The owner answered CL3 "yes" (`docs/round11/owner-answers.md`, on 6Z's PR #366): the buildings' long shadows come in
+round 11, as the shadow layer of `pipeline.md` 4.3, a ground sprite the client draws under every y-sorted sprite and
+fades at dusk. Which light casts them is `round11-plan.md`'s (11A). This is its budget.
+
+- **What 11A measured** (on the tavern, a shadow-only sun, the A9 key still shading): at today's 55°, 2% of a
+  building's area shows as shadow; at 25°, 18%; and the trimmed layer is 94% of the building's own area.
+- **What it would cost as a full-density page per style.** Hollowmere's building atlas is 2048 x 1024 plus 1024²
+  (0.75), so its layer would be about 0.70 page-equivalents, Blackpine's (2048 x 1024, 0.5) about 0.47. Low-poly
+  Hollowmere would be 8.72 + 0.70 = 9.42, **over the cap of 9**; 8-bit Hollowmere 8.18 + 0.70 = 8.88, which fits; HD,
+  at four times the area, 17.0 + 2.8 = 19.8, over its cap of 18 (5.4).
+- **What it is instead: a mask at half density.** The layer carries no texture and no colour of its own: it is ink at
+  alpha, which the client tints and fades. So it ships as:
+  - one alpha mask per map, `shd_<map>` (white, the alpha carries the shadow), tinted `ink` at run time;
+  - packed at half the style's packed density per axis (about 22.6 px a ground metre) and drawn at twice its texel
+    size, so it costs a quarter of the area above;
+  - **hard in 8-bit** (alpha cut to 0 or 255, drawn `nearest`, the pixel finish's own edge) in the 8-bit manifest, and
+    **soft in low poly** (partial alpha, drawn `linear`) in the low-poly manifest; HD takes low poly's by its fallback
+    order (5.4, HD-1), since a soft single-colour mask gains nothing from HD's density;
+  - a mask, not art: like `gen_light` (SPRITES 10.11), `palette.test.ts` and the tone check (3.3) exempt the `shd_`
+    keys; the colour on screen is the ink token blended by alpha, as the darkness layer already blends;
+  - packed only where it shows: the pixels under the building's own silhouette are cut before packing (11A's 94% is
+    already trimmed).
+- **The cost:** Hollowmere about 0.18, Blackpine about 0.12, the same in every style. The cap is 1024² a map (0.25).
+  Low-poly Hollowmere 8.72 + 0.18 = 8.90, and 8.97 at the cap, under 9. 8-bit 8.36. HD 17.0 + 0.18 = 17.2 of 18 (an
+  HD-own mask at four times the render would be 17.7, which also fits, but buys nothing). Bytes: a single-colour mask
+  is tens of KB a map; it loads with its map and counts in Hollowmere's first load, which stays near 11 of 12 MiB.
+- **Not lazy per scene.** Loading `shd_<map>` only with the exterior scenes would not lower the worst case: the
+  resident sum is counted with the exterior loaded, which is when the layer draws.
+- **What gives** if a map's layer outgrows its cap: by 5.1, first a tighter trim, then a quarter density (it still
+  reads as a soft shadow in low poly; in 8-bit the edge steps grow to 4 art pixels, so 8-bit keeps half density and
+  takes the cut first), never a second page.
 
 ### 5.4 HD: the figures do not fit, and three ways out
 

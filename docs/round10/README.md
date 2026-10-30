@@ -30,8 +30,8 @@ split by model, because a session runs on one model and the plan gives them both
 | **10C. Death's cost and arrivals** | Opus | 800k | C1 to C5 and C7; C6 after B6 | when A6 merges |
 | **10D. The living world** | Sonnet | 500k | D2 to D9 | when A11 and D1 merge |
 | **10E. Achievements and story** | Sonnet | 500k | E1, E2 | when B6 merges |
-| **10X. Fixes: server and rules** | Fable | 300k | every open issue left on the server, rules and content side | toward the end (below) |
-| **10Y. Fixes: client and screens** | Fable | 300k | every open issue left on the client, copy and art side | toward the end (below) |
+| **10X. Fixes: server and rules** | Fable | 300k | every open issue left on the server, rules and content side | early, on 2026-10-30 (below) |
+| **10Y. Fixes: client and screens** | Fable | 300k | every open issue left on the client, copy and art side | early, on 2026-10-30 (below) |
 | **10Z. The final sweep** | Fable | 800k | S6: `DECISIONS.md`, the `gdd-map.md` check, cross-references, `PROTOCOL.md`, the integration log | last |
 | **6Z. Orchestrator** | Opus | 300k | this contract, merges, spawning, the owner's questions | throughout |
 
@@ -40,6 +40,10 @@ going while those merge. Their work is everything the build leaves open: a revie
 flaky or skipped test, an `NFY` tag whose system has since shipped, a "still waits" line in `GDD.md`, a failing
 `pnpm auto` invariant, the owner's playtest notes, the round-9 leftovers (the Studio NPC editor's save, verified
 end to end), and the stale draft #245. 10Z starts when every other round-10 pull request has merged.
+
+**Started early.** The owner started 10X and 10Y on 2026-10-30, while 10B, 10C and 10D were still building. Until
+those three finish, a fix in a path a live session owns, or in a file an open pull request touches, goes to 6Z first,
+and 6Z hands it to the owning session or grants it.
 
 **Models.** The plan's rule holds: Opus for a pull request that sets a contract, touches role secrecy or needs
 judgement across systems; Sonnet for one that follows a merged contract; Fable, by the owner's call, for the

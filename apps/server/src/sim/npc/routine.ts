@@ -416,6 +416,18 @@ function pickStation(
     }
     if (toward.length > 0) pool = toward;
   }
+  // Round 10, C2b (GDD 3.23): a seat that owes the line works the Clerk's errand as a human would, a routine trip one
+  // hop at a time with the dwells; its ledger is open only while it owes (`workable`).
+  const ledger = base.find((st) => holdOf(st) === 'errand');
+  if (ledger) {
+    let toward: Station[] = [];
+    if (ledger.scene === here) toward = own.filter((st) => st === ledger);
+    else if (dwellRun) {
+      const hop = firstPortalToward(here, sim.profile, (s) => s === ledger.scene, map);
+      toward = hop ? other.filter((st) => st.scene === hop.to) : [];
+    }
+    if (toward.length > 0) pool = toward;
+  }
   let hunt = false;
   if (killer && litOnly) {
     const prey = preyStations(room, mem, brain, player, p);
@@ -752,7 +764,11 @@ function runTravel(
   if (!worked) brain.rested = true;
   brain.act = {
     kind: 'work',
-    untilTick: tick + spanTicks(rng, worked ? balance.npc.routine.stationDwellS : balance.npc.routine.idleS),
+    // Round 10, C2b: the errand's visit lasts its whole hold (`respawn.errandS`) and the pause before it.
+    untilTick:
+      holdOf(st) === 'errand'
+        ? tick + Math.ceil((balance.respawn.errandS + balance.npc.routine.workPauseS.max) * TICK_RATE)
+        : tick + spanTicks(rng, worked ? balance.npc.routine.stationDwellS : balance.npc.routine.idleS),
     stationId: st.propId,
     goal: act.goal,
     faced: true,
