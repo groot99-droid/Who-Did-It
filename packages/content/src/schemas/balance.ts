@@ -19,6 +19,9 @@ export const NOISE_KEYS = [
   'wispRattle',
   'shot',
   'shout',
+  // Round 10, x2 (A253): an axe's chop and a pickaxe's smash at the tool walls (GDD 3.7, 3.14).
+  'chop',
+  'smash',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -230,6 +233,15 @@ export const BalanceFile = z.strictObject({
     sceneFadeS: Seconds,
     /** A door is usable from this many tiles of its tile centre (GDD 3.7). */
     reachTiles: z.number().positive(),
+  }),
+  /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  figureTalk: Section({
+    /** A figure answers from this many tiles. */
+    reachTiles: z.number().positive(),
+    /** Every answer comes this long after the ask. */
+    delayS: Seconds,
+    /** Each asker may ask the same figure again after this long. */
+    cooldownS: Seconds,
   }),
   tasks: Section({
     cabalFakeList: z.boolean(),

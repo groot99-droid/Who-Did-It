@@ -6,6 +6,7 @@ import { handleBank } from './economy/bank';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
+import { handleTalk } from './townsfolk/talk';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { handleInspect } from './inspect';
@@ -78,6 +79,9 @@ export function runCommands(room: PartyRoom): void {
         runAction(room, cmd.sessionId, cmd.type, payload);
         break;
       // Round 6 (locked call sites): the M5b commands go to their owners' files (6H); each refuses until it lands.
+      case C2S.talkAsk: // round 10, D9c (GDD 3.24, seams.md 3 row 16)
+        handleTalk(room, cmd.sessionId, payload);
+        break;
       case C2S.questAccept:
         handleQuestAccept(room, cmd.sessionId, payload);
         break;
