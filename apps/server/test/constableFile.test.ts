@@ -4,8 +4,11 @@ import { balance } from '@wdi/content';
 import { C2S, ClueKind, ManhuntState, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { spawnClue } from '../src/sim/Clues';
+import { handleHold } from '../src/sim/Hold';
+import { briefingsOf } from '../src/sim/law/Briefing';
 import { constableCandidate, fileByConstables, warrantsOf } from '../src/sim/law/Petition';
 import { isNpcSeat } from '../src/sim/Npc';
+import { npcMemory } from '../src/sim/npc/memory';
 import { addNpcSeat } from '../src/sim/npc/seats';
 import { isPaintTown } from '../src/sim/paintTown';
 import {
@@ -16,6 +19,7 @@ import {
   holdPhase,
   lobbyOf,
   pauseClock,
+  placeSeat,
   setRole,
   start,
   toWorld,
@@ -70,11 +74,25 @@ async function paintParty(): Promise<{ party: Party; target: string }> {
   return { party, target };
 }
 
-/** Footprints and a thread in the bakery, briefed after `law.briefingAfterS`. */
+/**
+ * Footprints and a thread in the bakery, briefed after `law.briefingAfterS`. Every NPC seat has already seen both
+ * clues and passed on them: a seat that sights a clue for the first time rolls `npc.react.collectChance` to collect
+ * it (`npc/world.ts`), and a clue collected before the Constables read it is never briefed (`law/Briefing.ts`), the
+ * one way a dealt seed emptied the warrant below (CI, 2026-10-30). Both clues are checked unclaimed once the
+ * briefings have fallen due.
+ */
 function brief(party: Party, height: number, scarf: number): void {
-  spawnClue(party.room, 'bakery', { kind: ClueKind.footprints, value: height, dir: 0, tx: 3, ty: 4 });
-  spawnClue(party.room, 'bakery', { kind: ClueKind.thread, value: scarf, dir: 0, tx: 5, ty: 4 });
+  const ids = [
+    spawnClue(party.room, 'bakery', { kind: ClueKind.footprints, value: height, dir: 0, tx: 3, ty: 4 }),
+    spawnClue(party.room, 'bakery', { kind: ClueKind.thread, value: scarf, dir: 0, tx: 5, ty: 4 }),
+  ];
+  for (const id of party.room.state.players.keys()) {
+    if (!isNpcSeat(party.room, id)) continue;
+    for (const clueId of ids) if (clueId) npcMemory(party.room).brain(id).seenClues.add(clueId);
+  }
   advance(party, S(balance.law.briefingAfterS) + 2);
+  const clues = [...party.room.state.scenes.get('bakery')!.clues.values()];
+  expect(clues.map((c) => c.claimed)).toEqual([false, false]);
 }
 
 describe("the Constables' own petitions (GDD 3.31, B3c)", () => {
@@ -103,6 +121,28 @@ describe("the Constables' own petitions (GDD 3.31, B3c)", () => {
     advance(party, 2);
     expect(warrantsOf(party.room).map((w) => w.accused)).toEqual([target]);
     expect(party.room.state.manhunt.accused).toBe(target);
+  });
+
+  it('brief nothing on a clue an NPC seat collected before they read it, and so file nothing on one axis', async () => {
+    const { party, target } = await paintParty();
+    const foot = spawnClue(party.room, 'bakery', {
+      kind: ClueKind.footprints,
+      value: 2,
+      dir: 0,
+      tx: 3,
+      ty: 4,
+    })!;
+    spawnClue(party.room, 'bakery', { kind: ClueKind.thread, value: 0, dir: 0, tx: 5, ty: 4 });
+    const other = [...party.room.state.players.keys()].find(
+      (id) => isNpcSeat(party.room, id) && id !== target,
+    )!;
+    placeSeat(party, other, 'bakery', 3, 4);
+    handleHold(party.room, other, { action: 'collect', targetId: foot, on: true });
+    advance(party, S(balance.law.briefingAfterS) + 4);
+    expect(party.room.state.scenes.get('bakery')!.clues.get(foot)!.claimed).toBe(true);
+    expect(briefingsOf(party.room).map((b) => b.axis)).toEqual(['scarf']);
+    expect(constableCandidate(party.room)).toBeNull();
+    expect(warrantsOf(party.room)).toEqual([]);
   });
 
   it('never file in world mode, nor on a tie, nor on one briefed trait', async () => {
