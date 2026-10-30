@@ -4582,7 +4582,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: the stop. The owner wrote "Get to the next stopping point then we will pick up all that is left in
   round 10 pt2", and then "When the sessions are done and the pause has commenced, archive the sessions, move the
   information to be done for pt2 to access later".
-  - Every session pushed its work, sent 6Z a handoff, and was archived: 10A to 10Y, and 11A and 11B.
+  - Every session sent 6Z a handoff and was archived: 10A to 10Y, and 11A and 11B. All their work is pushed except
+    10F's S1b (below).
   - `docs/round10/part2.md` is the pickup list: the state at the stop, the merge queue, each session's handoff and
     id, and how to resume.
   - `docs/round10/wave2-briefs.md` keeps the briefs of 10N, 10K, 10T and 10M.
@@ -4590,6 +4591,9 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     - B6d #448 stays one pull request: its source is about 405 changed lines, and the rest is tests and docs.
     - x9's refusal reason `ALREADY_DONE` stands.
     - x13's "Open tells" bullet stays in GDD 3.12.
+    - K3 #440 waits for a fix of the forest walk. In match 30 of its auto 50, a lit NPC strolls into the dark forest
+      and sticks at a wall, a latent fault the base never reaches. Accepting 49 of 50 would leave the bug, and
+      skipping the light rule in the forest would bring back the tell K3 removes.
   - S1b (10F) was never pushed: the session's permission check refused any branch but its own. Its code diff is kept
     in a comment on #429, with the docs to write beside it.
 

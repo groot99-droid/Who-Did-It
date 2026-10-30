@@ -64,13 +64,13 @@ The contract is unchanged. `README.md`, `seams.md` (rows 1 to 37) and `scope.md`
 | #438 | x16, `act()` waits for the room's tick | 10X | WIP at d6a9ade; its checklist is in the body | 10X's fixes |
 | #397 | x14, the decoded-view invariant | 10X | WIP at f2eeb1a; needs a base merge, the full check and `--views 50` | 10X's fixes |
 | #441 | K6a, the snares' server half | 10N | WIP at 10f2680 | with or after K6b |
-| #440 | K3, candles for all and Handcuffs | 10K | PR_440 | when Complete |
+| #440 | K3, candles for all and Handcuffs | 10K | draft at 39c4323d; auto 49 of 50, an NPC stuck in the forest | after the walk fix |
 | #435 | M1a, the barks' server half | 10M | WIP at 91a54863; auto 50 clean, CI and the base merge left | when Complete |
 | #434 | T6a, new places | 10T | Complete at 6d7feb41; CI green, auto 50 clean | after stack12 |
 | #445 | T6b, the mood hooks | 10T | WIP at 4f7aafe6, stacked on #434 | after T6a |
 | #447 | W1a1, fresh seat ids at Start | 10S | WIP at 4a72fcf7; its tests never ran to completion | with W1a2, after B6c |
 | #429 | S1a, containers and loot tables | 10F | Complete at c237b41a, the base merged; auto 50 clean | after stack12 |
-| #448 | B6d, the end trial (row 35) | 10B | B6D_STATE | with B6d2, before B6c |
+| #448 | B6d, the end trial (row 35) | 10B | Complete at 633fa960; full check and auto 50 clean, one `e2e` test to rerun | with B6d2, before B6c |
 | #245 | 8V R3 (round 8) | none | stale draft | 10X closes or revives it |
 
 Branches with no pull request yet:
@@ -85,7 +85,8 @@ Branches with no pull request yet:
    - S3, once it has merged the base for the recipe lists;
    - T6a, then T6b;
    - S1a, then S1b, restored from the comment on #429;
-   - M1a and K3, once each is Complete.
+   - M1a, once it is Complete;
+   - K3, once the forest walk fix (10K's handoff) lets its auto 50 pass.
 3. **10X's test fixes:** x17, x12, x16 and x14, each once the check its description lists as queued has run.
 4. **10C's pair:** C4c and C5c, FULL+AUTO, then C4d.
 5. **B6d with B6d2**, back to back if both are ready, so production never runs B6d's human-only filing for long
@@ -101,14 +102,14 @@ give each step's detail.
 | Session | Model, window | At the stop | Still to build (gate) |
 |---|---|---|---|
 | 10A | Opus, 500k | planning, no code; plans in `handoffs/10A-plans.md` | K1 weapons (C6); T4a windows, stations and the Hitman's props, T4b work rules, T4c silhouettes (C4c, C4d) |
-| 10B | Opus, 800k | B6a merged; B6d WIP (#448) | B6d, B6d2 (before B6c), B6b, B6c, B7 the Inquest, B8b; then T5 (B6b, B6c) |
+| 10B | Opus, 800k | B6a merged; B6d Complete (#448) | B6d2 (with B6d, before B6c), B6b, B6c, B7 the Inquest, B3b, B8b; then T5 (B6b, B6c) |
 | 10C | Opus, 800k | C4c and C5c Complete; C4d WIP | the pair's merge, C4d, C6 (B6, D8), C7 (B6); then V1 to V4, the vendettas (W1b, B7, C5c, C4b; V4 after V1 to V3) |
 | 10D | Sonnet, 500k | S4 Complete | D4b (after S2) |
 | 10E | Sonnet, 500k | not spawned | E1, E2 (spawn when B6c merges) |
 | 10F | Opus, 500k | S1a Complete (#429); S1b a local commit (its handoff) | S1b, D1b (I41, NPC seats at night), D1c (NPC foraging and cooking) |
 | 10G | Sonnet, 300k | done (A2 to A4 merged) | nothing |
 | 10H | Sonnet, 500k | S2 and S3 Complete | no step assigned |
-| 10K | Sonnet, 500k | ROW_10K | K7; K2 and K4 (S3); K5 (K4); K8 (C4c) |
+| 10K | Sonnet, 500k | K3 draft (#440), waiting on a walk fix | K3's checks; K7; K2 and K4 (S3); K5 (K4); K8 (C4c) |
 | 10M | Sonnet, 500k | M1a WIP | M1b (R1, S5), M4, M3 (C6) |
 | 10N | Opus, 800k | K6a WIP, K6b on a branch | K6b, K6c; N2 (V3), T1 (W1b), N1 (W1b, B7), N3 (B4, K6), N4 (S1, T5), N5 (B7), N6 (W1b, B6a, V1a), M2 (B7) |
 | 10R | Opus, 800k | R1 and R2 merged | R1b (before 10V's first hold step), then R3 (after B6c) to R6 (`rolecards.md` 9 and 12) |
@@ -134,11 +135,14 @@ Each session's handoff at the stop, as it sent it to 6Z. A later merge or ruling
 ### 10B
 
 - #427 B6a merged at the stop.
-- #448 B6d, the end trial (row 35), at 633fa960 on `claude/r10-b6d-end-trial`: WIP at the stop.
+- #448 B6d, the end trial (row 35), at 633fa960 on `claude/r10-b6d-end-trial`: Complete at the stop.
   - Its code and tests are done. The base is merged: the conflicts were the schema comment, `Win.ts` and `gameOver`,
     and C4b's `hitman` and B6d's `unseen` are both kept.
   - Lint and typecheck pass, and the full check passed before the base merge.
-  - B6D_RESULT
+  - On 633fa960 the full check (932 server tests) and auto 50 (50 of 50) came back clean, and 10B marked #448
+    Complete.
+  - CI's `e2e` had one lock-pick test red at 1280x720, in the mock client and in no file of B6d's. Its re-run was
+    refused while the workflow ran. The note is on #448, and part 2 reruns it.
 - 6Z's ruling at the stop: B6d stays one pull request. Its source is about 405 changed lines (273 of them the new
   `EndTrial.ts`); the rest is 365 lines of tests and 30 of docs. Splitting the trial from its Tribunal hook would put
   half a rule on production.
@@ -229,7 +233,36 @@ Done: A2 to A4 have merged. Nothing unpushed.
 
 ### 10K
 
-HANDOFF_10K
+- #440 K3, candles for all and Handcuffs, at 39c4323d on `claude/r10-k3-candles`: a draft, not Complete.
+  - Every card's kit gains a Candle. NPC seats light the light they hold by the rule a person follows
+    (`sim/npc/lights.ts`, with a hook in `sim/Npc.ts`), so a lit light no longer marks a human.
+  - Handcuffs in the selected slot cut the cuff hold (`sim/law/Manhunt.ts`), and the general stores sell them
+    (6Z's grant, `economy.json`). DECISIONS A241.
+  - Lint, typecheck and the non-server tests are clean. The server suite's only failures were `herbBreadDawn.test.ts`'s
+    timeouts, which x18 has fixed.
+- Auto 50 on K3: 49 of 50. Match 30 (seed 1, six seats) fails `npcStuck`.
+  - NPC a1m29s5 swaps between tiles (8,14) and (8,15) of the forest (scene 7) at night. It pushes north and doesn't
+    move, beside the wall at (9,14), with nothing in its way.
+  - The same 30 matches on the base are clean. With the light rule off, the match diverges and passes.
+  - 10K's reading: a lit NPC no longer turns back from the dark forest by Fear, so it strolls there and meets a latent
+    mismatch between the nav grid and collision by that wall. The cause is in `sim/npc/walk.ts` or the forest grid,
+    not the light code.
+- 6Z's ruling at the stop: part 2 fixes the forest corner or the walk first (10F's files, or 10X as a server issue),
+  then reruns K3's auto 50.
+  - Accepting 49 of 50 would leave a stuck NPC on production.
+  - Skipping the light rule in the forest would bring back the tell K3 removes.
+- Left of K3:
+  - merge the base: B6a has merged, so the Handcuffs change in `Manhunt.ts` now builds on it;
+  - the walk fix, then the full check and auto 50;
+  - mark it Complete.
+- Open: NPC seats never run the cuff hold, so a cuff by a seat still marks a human. The gap is B4's, not K3's.
+- Next:
+  - K7, crows, the bog wisp and deep mud (no gate);
+  - K2, armour resistances, and K4, recipe teaching, after S3;
+  - K5, skill checks, after K4;
+  - K8, the bog lurker and poison food, after C4c.
+- DECISIONS rows A241, A261 and A281; copy under `UI.md` 14.58.
+- Nothing unpushed: the branch tip is 10K's last commit.
 
 ### 10M
 
