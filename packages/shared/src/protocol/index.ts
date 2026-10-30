@@ -149,7 +149,8 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  */
 /** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
 /** Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by the Train. */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer';
+export type DeathCause =
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
