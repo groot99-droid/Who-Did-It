@@ -54,6 +54,9 @@ function tickBody(room: PartyRoom, id: string, body: Body, p: PlayerSim | undefi
   const ko = body.effects.get('knockedOut');
   if (ko && ko.untilTick > 0 && tick >= ko.untilTick) wake(room, id, body);
   if (!body.figure && p) {
+    // Round 10, A7b: an effect's `maxStaminaFactor` (Exhausted) caps the stamina, and the wire shows the cap.
+    body.maxStamina = Math.round(b.maxStamina * factorOf(body, (d) => d.maxStaminaFactor));
+    if (body.stamina > body.maxStamina) body.stamina = body.maxStamina;
     const running =
       p.input?.sprint === true &&
       !p.input.sneak &&
