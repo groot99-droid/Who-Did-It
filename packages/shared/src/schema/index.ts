@@ -16,7 +16,8 @@ import { schema, t } from '@colyseus/schema';
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
-// `Private.pair` (row 10), and B3 `GameState.petition` and `Private.petitionSigned` (row 13) to version 7.
+// `Private.pair` (row 10), C2 `Private.fare` (row 11), and B3 `GameState.petition` and `Private.petitionSigned`
+// (row 13) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -265,6 +266,8 @@ export const Private = schema(
     onLine: bool(),
     /** Round 10, B8 (schema version 7): Walk with me. */
     pair: PairState,
+    /** Round 10 (GDD 3.23, C2): the Scrip this seat owes the line for its returns; only its owner sees it. */
+    fare: u16(),
     /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
     petitionSigned: bool(),
   },
