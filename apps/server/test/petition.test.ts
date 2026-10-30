@@ -14,8 +14,10 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
+  send,
   setRole,
   start,
+  stateOf,
   toWorld,
 } from './npcHelpers';
 
@@ -165,5 +167,38 @@ describe('petitions (GDD 3.31)', () => {
     handlePetitionOpen(party.room, a, { accused, charge: 'murder', entries: [other, thread] });
     advance(party, 2);
     expect(row(party).signed).toBe(0);
+  });
+
+  it('A170 on the wire: over the two messages, every client decodes the same row, counts only, no opener or signer', async () => {
+    const party = await world();
+    const [a, b] = party.humans.map((h) => h.id) as [string, string];
+    const accused = accusedOf(party);
+    const prints = entry(party, a, ClueKind.footprints, 1, NotebookStatus.verified);
+    const felt = entry(party, a, ClueKind.felt, 2, NotebookStatus.verified);
+    await send(party.humans[0]!, 'petition.open', { accused, charge: 'assault', entries: [prints, felt] });
+    advance(party, 1);
+    await sleep(150);
+    const id = row(party).id;
+    await send(party.humans[1]!, 'petition.sign', { id });
+    // Before the step consumes the sign, read every client's decoded row; then step and read again.
+    const seen: string[] = [];
+    for (const h of party.humans) seen.push(JSON.stringify(stateOf(h).petition));
+    expect(new Set(seen).size).toBe(1);
+    const decoded = JSON.parse(seen[0]!) as { entries: Record<string, unknown>[]; signed: number };
+    for (const e of decoded.entries)
+      expect(Object.keys(e).sort()).toEqual(['backed', 'clueKind', 'sceneId', 'value']);
+    expect(decoded.entries[1]).toMatchObject({ clueKind: ClueKind.felt, value: 0, backed: true }); // a role's reading
+    for (const text of seen) for (const who of [a, b]) expect(text).not.toContain(who);
+    // No message to any client names the opener or the signer beside a petition.
+    for (const h of party.humans)
+      for (const m of h.log) {
+        const text = JSON.stringify(m.payload ?? '');
+        if (text.includes('petition')) for (const who of [a, b]) expect(text).not.toContain(who);
+      }
+    // Only the signer's own view knows it signed.
+    expect(party.room.state.players.get(b)!.priv.petitionSigned).toBe(false); // the sign is not yet consumed
+    advance(party, 1);
+    await sleep(150);
+    expect(warrantsOf(party.room)).toHaveLength(1); // consumed in step(): the one signature passed it
   });
 });
