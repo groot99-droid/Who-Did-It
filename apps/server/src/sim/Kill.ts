@@ -14,7 +14,7 @@ import { isJailed, untilDawnS } from './law/Jail';
 import { spendProtection } from './NightPowers';
 import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
-import { onBandagedStrike } from './Struck';
+import { knockBackPair, onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
 import { guardTarget, returnGuard } from './law/Guards';
 import { isPaintTown, onGuardDeath } from './paintTown';
@@ -120,14 +120,17 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   actor.bloodyUntilTick = tick + (bloodDecay?.kind === 'seconds' ? bloodDecay.seconds : 0) * TICK_RATE;
   player.priv.cooldownEndTick.set('kill', tick + killCooldownTicks(room));
   const sceneId = sceneKey(actor.sceneIdx);
-  // A Watch or a Remedy voids the strike exactly as a Bandage does (GDD 3.2, 5G).
+  // A Watch or a Remedy voids the strike exactly as a Bandage does (GDD 3.2, 5G), the knockback included (round 10,
+  // x10, A393): the striker must not tell from the push which protection held.
   if (spendProtection(room, targetId, sessionId)) {
+    knockBackPair(room, sessionId, targetId);
     reject(room, sessionId, 'VOIDED');
     return;
   }
   if (target.bandagedUntilTick > tick) {
     target.bandagedUntilTick = 0;
     onBandagedStrike(room, sessionId, targetId); // the target's blackout and the Claimed entries (GDD 3.2)
+    knockBackPair(room, sessionId, targetId);
     reject(room, sessionId, 'VOIDED');
     return;
   }
