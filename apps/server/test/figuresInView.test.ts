@@ -54,7 +54,7 @@ describe("figures in a seat's view (round 10, x5, A353)", () => {
     expect(figuresHeld(m, viewer)).toEqual(here);
     for (const a of avatarsHeld(viewer)) {
       if (figureOfHandle(m.room, a.handle) === undefined) continue;
-      expect(a.avatar.seat).toBe(''); // never a seat's field, never the ghost tag
+      expect(a.avatar.seat ?? '').toBe(''); // never a seat's field (tagged, so never sent), never the ghost tag
       expect(a.avatar.lookOf === 'constable' || a.avatar.lookOf.startsWith('villager')).toBe(true);
     }
     // Through to another scene: the old scene's figures leave, the new scene's arrive.
