@@ -225,8 +225,9 @@ export async function standardParty(
   colyseus: ColyseusTestServer,
   set: SeedSet,
   onCard = false,
+  humans = 1,
 ): Promise<Party> {
-  const party = await lobbyOf(colyseus, 1);
+  const party = await lobbyOf(colyseus, humans);
   pauseClock(party.room);
   const lobbyTicks = party.room.state.tick;
   if (lobbyTicks > STANDARD_START_TICK) throw new Error(`standardParty: the lobby took ${lobbyTicks} ticks`);

@@ -5,6 +5,7 @@ import { rehandle } from './Avatars';
 import { beginAim } from './NightPowers';
 import { emitSim } from './events/bus';
 import { simOf } from './RoomSim';
+import { boardLine, returnsOnTrain } from './Train';
 import { sceneKey } from './World';
 
 /**
@@ -12,7 +13,8 @@ import { sceneKey } from './World';
  * until the next meeting), the death queued for the phase stage, the private `killed` message with every
  * seat's role, and the views marked dirty so the living stop receiving the ghost's presence this tick.
  * Round 5 (locked call sites): the victim's avatar is re-handled (5F) and a dying Gamekeeper's aim (5G) defers
- * `killed` until the aim closes.
+ * `killed` until the aim closes. Round 10 (C1): a death the morning Train brings back puts the seat on the line
+ * instead (`Train.ts`): no Last Shot, and its `killed` carries no roles, since a seat that returns sees no ghost view.
  */
 export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, killerId?: string): void {
   const sim = simOf(room);
@@ -26,11 +28,14 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
       : { playerId: victimId, cause, killerId, tick: room.state.tick },
   );
   sim.viewsDirty = true;
-  emitSim(room, { tick: room.state.tick, kind: 'death', seat: victimId, data: { cause, by: killerId } }); // 6B
+  const onLine = returnsOnTrain(room, cause);
+  const data = { cause, by: killerId, ...(onLine && { onLine }) };
+  emitSim(room, { tick: room.state.tick, kind: 'death', seat: victimId, data }); // 6B
   rehandle(room, victimId, false);
-  if (beginAim(room, victimId, cause)) return;
+  if (onLine) boardLine(room, victimId);
+  else if (beginAim(room, victimId, cause)) return;
   const roles: Record<string, string> = {};
-  for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
+  if (!onLine) for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
   // Round 6, 6J (locked call site): the death's cutscene id, from the pure rule over the cutscene index.
   const cutsceneId = deathCutsceneFor(cutscenes, cause);
   room.clients.getById(victimId)?.send(S2C.killed, {

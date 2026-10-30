@@ -15,7 +15,8 @@ import { schema, t } from '@colyseus/schema';
 // `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
-// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` to version 7, and B8 `Private.pair`.
+// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 adds `Private.onLine`
+// (row 6) and B8 adds `Private.pair` (row 10) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -260,6 +261,8 @@ export const Private = schema(
      */
     inBed: u8(),
     inBedOf: u8(),
+    /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
+    onLine: bool(),
     /** Round 10, B8 (schema version 7): Walk with me. */
     pair: PairState,
   },

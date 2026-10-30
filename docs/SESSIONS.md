@@ -3943,6 +3943,17 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   took `UI.md` 14.46, 10B's slot in seams.md 5, for Sleeping. It is merged and cited in the client, so 10B's copy moves
   to 14.50, for B2 and every later B step. C1a (#341) waits for C1b, cut from C1a's head, and the two merge seconds
   apart: C1a alone would bring a seat back on the Train with its verbs still off. 10H is done.
+- 2026-10-30: #350 (round 11's questions) merged at 66b5d88, #352 (the copy move and the log above) at 42b8e19, A7b
+  (#349) at d61e765, C1a (#341) at 9426f9e and C1b (#351) at 5d362b8. 10A is done. D5a's grant: an optional `humans`
+  count on `standardParty` in `test/npcHelpers.ts`, so its leak test seats a second human. Two wire rows for the next
+  steps:
+  - **Row 11, C2, Owing the line.** The fare is private. It is paid at the bank with the rent, or cleared by the Clerk's
+    errand at the ledger. The dear stall follows the roster look, never an impersonation or the card. The stock and
+    output cuts move to C3, whose town work restocks the stalls. An NPC seat owes the line and clears it like a human,
+    so a stall that stays dear never marks an NPC. 10C's grants: one line in `purse.ts` (the cut stays with the
+    payer), the dear stall (`economy.json` `owner`, its schema and `shops.ts`), two lines in `rent.ts`, the `errand`
+    branch in `Hold.ts`, and the NPC errand in `routines.json` and `sim/npc/routine.ts`.
+  - **Row 12, D5c, the scratch.** The clue is the same whoever picks, and B2's briefing reads it like any clue.
 
 ## Round 11 (planning, started 2026-10-29)
 

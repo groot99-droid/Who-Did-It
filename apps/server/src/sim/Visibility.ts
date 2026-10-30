@@ -7,6 +7,7 @@ import { isAiming } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
+import { isOnLine } from './Train';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
@@ -81,7 +82,9 @@ export function reconcileViews(room: PartyRoom): void {
       sim.views.set(client.sessionId, held);
     }
 
-    const want = sceneKey(viewerSim.sceneIdx);
+    // Round 10 (C1): a seat on the line holds no avatar and no scene until the Train brings it back.
+    const onLine = isOnLine(room, client.sessionId);
+    const want = onLine ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
       if (old) view.remove(old);
@@ -96,7 +99,7 @@ export function reconcileViews(room: PartyRoom): void {
       held.scene = want;
     }
 
-    reconcileAvatars(room, client.sessionId, view, viewerSim, world);
+    reconcileAvatars(room, client.sessionId, view, viewerSim, world && !onLine);
   }
 }
 

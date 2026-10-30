@@ -211,7 +211,7 @@ export type HoldAction =
 ```
 
 ```ts
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 ```
 
 ```ts

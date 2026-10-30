@@ -99,6 +99,8 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 
 **The Daily Train** (round 7, HollowMere only; DECISIONS A113). A map whose file names a `station` (a spawn on its hub: HollowMere's platform `overworld.platform` on the overworld's east edge) has a Train. On every day, `train.arriveAtS` (20 s) after the day begins, the Train arrives: the seats on the hub within `train.hearTiles` (20 tiles) of the platform hear `train_arrive`, and every seat's chat log gets the system line of UI.md 14.30. `train.deliveryAfterS` (32 s) later it delivers, with `train_brake` to the same seats when the world is in play. A meeting that opens before the arrival takes that day's Train with it; once arrived, the delivery follows whatever the phase. No Train in grace, at dusk, at night, in the Final Night or in the quick mode. The arrival and the delivery are the sim events `train.arrive` and `train.delivery`, which name no seat; the vendettas run on them (3.20). BlackPine has no Train.
 
+**The day's dead and the Dusk Train** (round 10, C1; `docs/round9/world-mode.md` 6, followup-4 2.6). The morning Train brings back the day's dead: a seat killed in grace, the day or immunity by a creature's bite or a shot is **on the line** (3.22) until the next day's arrival, when it steps off at the platform and every seat's log reads the line of UI.md 14.47; the Final Night brings back every seat still on the line. A death after dark, the Knife, Nightshade, the vote and a vanished seat are for good, as is any death on a map without a Train. A second train, the **Dusk Train**, leaves `train.dusk.leaveAtS` (15 s) into every dusk: the sim event `train.dusk`, the whistle to the seats near the platform and a system line; it brings nobody back (the Hitman boards it, 3.33).
+
 ### 3.4 Investigation and clues
 
 A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded choice; the first body of the match always spawns 2 trait clues and a Dust-able print); a fingerprint on the body; Blood on the killer; and for a dragged body a **drag smear** from kill tile to spot.
@@ -806,6 +808,8 @@ dead seat's body row empties with the ghost handoff. Bodies tick only in the
 world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
 roll on the body's own stream, never a secret one.
 
+**On the line** (round 10, C1; `docs/round9/world-mode.md` 6, `phases.md` 6). A seat that dies by day to a bite or a shot, on a map with a Train (3.3), leaves the world until the next morning's arrival. Its purse drops where it fell as coins, a find for whoever reaches the body, and its hotbar, pack and belt are lost with the body (3.30's `strip`; until the town chest holds lost property, they lie nowhere); bound kit (`onDeath: kept`), the three equipment slots and the bank stay. Its role card, cover, vendetta, notebook and quests are kept. BlackPine has no Train (3.3), so its daylight deaths stay final; whether it gets a station is an open question for the owner. It gets no ghost view: its `killed` message names no role, its view holds no scene and no figure, the ghost channel neither reaches it nor takes its lines, and it moves and acts on nothing; only its own `Private.onLine` says it waits. A dying Gamekeeper on the line fires no Last Shot, a Killer on the line passes no Knife (3.2), and the win check counts a seat on the line as living, since it comes back. At the arrival the Undertaker's cart takes its body, and the seat stands on the platform with `respawn.hp` (50) health, full stamina and no effects; its cooldowns resume where they stood, and its public `alive` is true again.
+
 **Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
 the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`,
 3.15) dies where it stands and lies there for `body.creatureCorpseS` 10 s (A142), then its row goes and its spawner
@@ -1102,7 +1106,29 @@ Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds
 
 ### 3.29 The lock-pick mini-game
 
-Round 10, D5 (`docs/round9/gdd-map.md` 2.3). Not built yet: the step that builds it writes this section.
+Round 10, D5 (`docs/round9/gdd-map.md` 2.3; `docs/round9/logic-table.md` 8.5; owner answer LT2). D5a is the rules and
+the server; D5b the screen; D5c the scratch clue and the fine.
+
+**What opens it.** A locked door (the `lockedDoor` class, 3.14) with a Lockpicks in the pack: `act.hold {action:
+'interact'}` on it opens the mini-game in place of a hold, and the Lockpicks (`tool.pick`) is the tool of the wall. A seat
+without one is refused `NEED_TOOL`. The manor study door (`mu.study_door`) is the one lock placed; the curfew doors wait
+for rent in kind (D7).
+
+**The lock.** It has pins by tier (`balance.minigames.lockpick.pinsByTier`: 3, 4, 5; every placed lock is tier 1), each with
+a set point along its lift, dealt on the `locks` stream when the lock is first picked in a match and kept for the match.
+The picker's client alone gets `minigameStart {kind: 'lockpick', public: {pins, setPoints, band, snapAt, minAttemptS,
+maxAttempts}}`: the set points are a puzzle, as the tap bands are, so the click can be felt. A pick of a lower tier than the
+lock has a narrower band (`lowerTierBandMult`). The attempt sounds as the interaction's noise from its start (3.7).
+
+**The answer** is a trace of attempts `{t, pin, lift, tension}` that the server replays (`rules/minigames.ts
+lockpickOutcome`): a lift within `band` of the pin's set point sets it, a tension of `snapAt` or more snaps the pick, and
+all pins set opens the lock. Times ascend and keep `minAttemptS` apart and a trace holds at most `maxAttempts`, so no
+trace is faster than a hand. A trace that leaves a pin unset or is malformed is `BAD_REQUEST` and the board stays open.
+
+**Opening and snapping.** An opened lock becomes the public prop state `open` (3.14; it names no one). A snapped pick
+spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way. Nothing else changes in public view: the
+scratch clue and the small fine the interaction names arrive with D5c. NPC seats do not pick yet (their routine reaches
+only props a mode of no mini-game works, 3.12 Chores).
 
 ### 3.30 The inventory and crafting
 

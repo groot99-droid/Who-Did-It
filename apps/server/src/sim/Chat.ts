@@ -5,6 +5,7 @@ import { emitSim } from './events/bus';
 import { type MeetingStat, flowOf, refuse } from './Flow';
 import { simOf } from './RoomSim';
 import { bodyBlocksAct } from './body/run';
+import { isOnLine } from './Train';
 
 const SPEAKING_PHASES: readonly number[] = [Phase.meetingDiscussion, Phase.meetingVote, Phase.reveal];
 
@@ -20,6 +21,7 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
   const text =
     typeof payload.text === 'string' ? payload.text.trim().slice(0, balance.chat.maxChars).trim() : '';
   if (text === '') return refuse(room, sessionId, 'SAY_SOMETHING');
+  if (isOnLine(room, sessionId)) return refuse(room, sessionId, 'NOT_IN_PLAY'); // round 10, C1: no ghost chat on the line
   let channel: ChatChannel = 'ghost';
   if (!speaker.dead) {
     if (!SPEAKING_PHASES.includes(room.state.phase)) {
@@ -30,6 +32,8 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
   }
   if (channel === 'meeting') heard(room, room.state.players.get(sessionId)?.name ?? '', text); // round 8, 8T: the meeting so far, for NPC talk
   for (const client of room.clients) {
+    // Round 10, C1: a seat on the line hears neither the ghosts nor the meeting (phases.md 4: it does not attend).
+    if (isOnLine(room, client.sessionId)) continue;
     if (channel === 'ghost' && !sim.players.get(client.sessionId)?.dead) continue;
     client.send(S2C.chatMsg, { from: sessionId, text, channel });
   }

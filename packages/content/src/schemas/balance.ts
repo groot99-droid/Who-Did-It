@@ -421,6 +421,19 @@ export const BalanceFile = z.strictObject({
     slide: z.strictObject({ steps: Count }),
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
     tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
+    /**
+     * Round 10 (D5, GDD 3.29): the lock-pick. `pinsByTier` is the pins of a tier 1, 2 and 3 lock; a pin sets when the
+     * lift is within `bandFrac` of its set point (`lowerTierBandMult` of that for a pick of a lower tier); a tension
+     * of `snapAt` snaps the pick; attempts come `minAttemptS` apart at the least, at most `maxAttempts` of them.
+     */
+    lockpick: z.strictObject({
+      pinsByTier: z.array(Count).length(3),
+      bandFrac: Frac,
+      lowerTierBandMult: Frac,
+      snapAt: Frac,
+      minAttemptS: Seconds,
+      maxAttempts: Count,
+    }),
   }),
   /**
    * Round 8 (GDD 3.26, 7M): the shelf reader. A shelf of books shows `spinesMin` to `spinesMax` spines (owner, A200
@@ -432,7 +445,15 @@ export const BalanceFile = z.strictObject({
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
    */
-  train: Section({ arriveAtS: z.number().nonnegative(), deliveryAfterS: Seconds, hearTiles: Tiles }),
+  /** Round 10 (C1, GDD 3.3): `dusk.leaveAtS`, the Dusk Train's leaving, into dusk. */
+  train: Section({
+    arriveAtS: z.number().nonnegative(),
+    deliveryAfterS: Seconds,
+    hearTiles: Tiles,
+    dusk: z.strictObject({ leaveAtS: z.number().nonnegative() }),
+  }),
+  /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */
+  respawn: Section({ hp: z.number().int().positive() }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
