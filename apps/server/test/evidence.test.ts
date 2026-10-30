@@ -1,11 +1,24 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { roles } from '@wdi/content';
-import { ClueKind, NotebookStatus, Phase } from '@wdi/shared';
+import { ClueKind, NotebookStatus, Phase, besideTile, trailDir } from '@wdi/shared';
 import { createServer } from '../src/server';
+import { nearestPortalTile } from '../src/sim/Clues';
 import { addStack, count, take } from '../src/sim/Inventory';
 import { simOf } from '../src/sim/RoomSim';
-import { act, eventsOf, playerOf, prop, setPhase, simOfBot, sleep, teleport, toDay } from './killHelpers';
+import { navGrid } from '../src/sim/World';
+import {
+  act,
+  eventsOf,
+  playerOf,
+  prop,
+  setPhase,
+  simOfBot,
+  sleep,
+  teleport,
+  tilePx,
+  toDay,
+} from './killHelpers';
 import { type Match, startMatch } from './simHelpers';
 
 // Round 10, V1a (10V; GDD 3.2, 3.4): the Lens Inspect and Plant Clue.
@@ -112,21 +125,20 @@ describe('the Lens Inspect', () => {
     expect(count(town, 'lens')).toBe(0);
   }, 15000);
 
-  it('gives a card with Inspect its Lens back at dawn, up to the max', async () => {
+  it('gives a card with Inspect its Lens back once a day, up to the max', async () => {
     const m = await party();
     const det = playerOf(m, m.bots[1]!);
     take(det, 'lens', 2);
     setPhase(m, Phase.dawn);
     await sleep(200);
+    expect(count(det, 'lens')).toBe(1); // a phase alone refills nothing; the day counter does
+    m.room.state.round++;
+    await sleep(100);
     expect(count(det, 'lens')).toBe(2);
-    setPhase(m, Phase.day);
+    m.room.state.round++;
     await sleep(100);
-    setPhase(m, Phase.dawn);
+    m.room.state.round++;
     await sleep(100);
-    setPhase(m, Phase.day);
-    await sleep(100);
-    setPhase(m, Phase.dawn);
-    await sleep(200);
     expect(count(det, 'lens')).toBe(3);
     expect(det.priv.lensCharges).toBe(3);
     expect(count(playerOf(m, m.bots[2]!), 'lens')).toBe(0);
@@ -134,21 +146,22 @@ describe('the Lens Inspect', () => {
 });
 
 describe('Plant Clue', () => {
-  it('lays a clue no client can tell from a true one; a Lens reads it Forged, a collect Claimed', async () => {
+  it('lays footprints no client can tell from true ones; a Lens reads them Forged, a collect Claimed', async () => {
     const m = await party();
     const scene = m.room.state.scenes.get('overworld')!;
     const before = new Set(scene.clues.keys());
-    await act(m.bots[0]!, 'act.ability', { abilityId: 'plantClue', kind: 'thread', value: 2 });
+    await act(m.bots[0]!, 'act.ability', { abilityId: 'plantClue', kind: 'footprints', value: 2 });
     const planted = [...scene.clues.values()].filter((c) => !before.has(c.id));
     expect(planted).toHaveLength(1);
     const clue = planted[0]!;
+    const portal = nearestPortalTile('overworld', TEACH.x, TEACH.y + 1)!;
     expect(clue.toJSON()).toEqual({
       id: clue.id,
-      kind: ClueKind.thread,
+      kind: ClueKind.footprints,
       value: 2,
-      dir: 0,
-      x: clue.x,
-      y: clue.y,
+      dir: trailDir(TEACH.x, TEACH.y + 1, portal.x, portal.y),
+      x: tilePx(TEACH.x),
+      y: tilePx(TEACH.y + 1),
       claimed: false,
     });
     expect(clue.id).toMatch(/^clue_overworld_\d+$/);
@@ -162,9 +175,37 @@ describe('Plant Clue', () => {
     expect(simOf(m.room).clueMeta.get(clue.id)!.collectors.size).toBe(2);
   });
 
+  it("lays a thread only within reach of a portal, beside it, as a kill's thread lies", async () => {
+    const m = await party();
+    const acc = m.bots[0]!;
+    teleport(m, acc, 'overworld', TEACH.x, TEACH.y + 6);
+    await sleep(200);
+    const far = nearestPortalTile('overworld', TEACH.x, TEACH.y + 6)!;
+    expect(Math.hypot(far.x - TEACH.x, far.y - TEACH.y - 6)).toBeGreaterThan(1.5);
+    await act(acc, 'act.ability', { abilityId: 'plantClue', kind: 'thread', value: 1 });
+    expect(reasons(m, 0)).toEqual(['TOO_FAR']);
+    expect(count(playerOf(m, acc), 'plantKit')).toBe(3);
+    teleport(m, acc, 'overworld', TEACH.x, TEACH.y);
+    await sleep(200);
+    const scene = m.room.state.scenes.get('overworld')!;
+    const before = new Set(scene.clues.keys());
+    await act(acc, 'act.ability', { abilityId: 'plantClue', kind: 'thread', value: 1 });
+    const clue = [...scene.clues.values()].find((c) => !before.has(c.id))!;
+    const portal = nearestPortalTile('overworld', TEACH.x, TEACH.y)!;
+    const grid = navGrid('overworld', simOf(m.room).profile);
+    const at = besideTile(portal, TEACH, (x, y) => !grid.solidAt(x, y));
+    expect(clue.toJSON()).toMatchObject({
+      kind: ClueKind.thread,
+      value: 1,
+      dir: 0,
+      x: tilePx(at.x),
+      y: tilePx(at.y),
+    });
+  });
+
   it('refuses another card, a bad trait, the cooldown and an empty kit', async () => {
     const m = await party();
-    await act(m.bots[2]!, 'act.ability', { abilityId: 'plantClue', kind: 'thread', value: 0 });
+    await act(m.bots[2]!, 'act.ability', { abilityId: 'plantClue', kind: 'footprints', value: 0 });
     expect(reasons(m, 2)).toEqual(['NOT_YOUR_POWER']);
     await act(m.bots[0]!, 'act.ability', { abilityId: 'plantClue', kind: 'felt', value: 0 });
     await act(m.bots[0]!, 'act.ability', { abilityId: 'plantClue', kind: 'footprints', value: 3 });

@@ -79,11 +79,11 @@ describe('collect', () => {
     expect(errorCodes(b)).toEqual([ErrorCode.cannot]);
   });
 
-  it('lets several players collect one clue; a Detective reads it Verified; a Killer Claimed', async () => {
+  it('lets several players collect one clue; a Detective reads it as any card does (round 10, V1a)', async () => {
     const m = await party();
     for (const i of [0, 1, 2]) m.bots[i]!.room.send('act.hold', collect(true));
     await sleep(2600);
-    expect(notebook(m, 1)[0]?.status).toBe(NotebookStatus.verified);
+    expect(notebook(m, 1)[0]?.status).toBe(NotebookStatus.teaching);
     expect(notebook(m, 2)[0]?.status).toBe(NotebookStatus.teaching);
     expect(notebook(m, 0)[0]?.status).toBe(NotebookStatus.teaching);
     expect(simOf(m.room).clueMeta.get('clue_teaching')!.collectors.size).toBe(3);

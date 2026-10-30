@@ -1,12 +1,21 @@
 import { abilities, balance, clues as clueDefs, roles, type SceneId } from '@wdi/content';
-import { ClueKind, NotebookStatus, Phase, S2C, TICK_RATE, TILE_PX, TRAIT_IDS, trailDir } from '@wdi/shared';
+import {
+  ClueKind,
+  NotebookStatus,
+  S2C,
+  TICK_RATE,
+  TILE_PX,
+  TRAIT_IDS,
+  besideTile,
+  trailDir,
+} from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { nearestPortalTile, spawnClue } from '../Clues';
 import { addStack, count, take } from '../Inventory';
 import { refusal, type Refusal } from '../refusal';
 import { type PlayerSim, type RoomSim, simOf } from '../RoomSim';
-import { isVerbPhase, reject, sceneKey } from '../World';
-import { entryFor, hiddenValue, isPlanted, markPlanted, writeClueEntry } from './notebook';
+import { isVerbPhase, navGrid, reject, sceneKey } from '../World';
+import { entryFor, isPlanted, markPlanted, writeClueEntry } from './notebook';
 
 // Round 10, V1a (10V; GDD 3.2 and 3.4): the Lens Inspect and Plant Clue. A plant is a clue like any other on the
 // wire; only the planted mark in room memory (`notebook.ts`) tells it apart, and only a Lens reads that mark, into
@@ -74,17 +83,16 @@ export function tickInspect(room: PartyRoom, sessionId: string, p: PlayerSim): v
   const clue = room.state.scenes.get(sceneKey(p.sceneIdx))?.clues.get(hold.targetId);
   const meta = sim.clueMeta.get(hold.targetId);
   if (!clue || !meta || !take(player, LENS, 1)) return;
+  // The Lens sets only the status: a hidden attribute (the felt's hat) will be a reading entry of its own (6Z).
   const status = isPlanted(meta) ? NotebookStatus.forged : NotebookStatus.verified;
-  const value = hiddenValue(meta) ?? clue.value;
   const entry = entryFor(player, sessionId, meta);
   if (entry) {
     entry.status = status;
-    entry.value = value;
     room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
   } else {
     meta.collectors.add(sessionId);
     clue.claimed = true;
-    writeClueEntry(room, sessionId, player, p, { kind: clue.kind, value }, meta, status);
+    writeClueEntry(room, sessionId, player, p, clue, meta, status);
   }
   player.priv.lensCharges = Math.min(255, count(player, LENS));
 }
@@ -120,31 +128,43 @@ export function handlePlantClue(
   ) {
     return reject(room, sessionId, 'BAD_REQUEST');
   }
-  if (!take(player, def.consumes ?? 'plantKit', 1))
-    return reject(room, sessionId, 'SPENT', { what: 'stock' });
+  // A plant follows its kind's true rule in every wire field (6Z): a kill's Footprints lie on its tile and run
+  // toward the nearest portal, and its Thread lies on the walkable tile beside that portal, so a thread is planted
+  // only within reach of a portal, there.
   const sceneId = sceneKey(p.sceneIdx) as SceneId;
   const tx = Math.floor(p.x / TILE_PX);
   const ty = Math.floor(p.y / TILE_PX);
-  const portal = plant.kind === ClueKind.footprints ? nearestPortalTile(sceneId, tx, ty) : null;
-  const dir = portal ? trailDir(tx, ty, portal.x, portal.y) : plant.kind === ClueKind.footprints ? 4 : 0;
-  const id = spawnClue(room, sceneId, { kind: plant.kind, value, dir, tx, ty });
+  const portal = nearestPortalTile(sceneId, tx, ty);
+  const thread = plant.kind === ClueKind.thread;
+  if (thread && (!portal || Math.hypot(portal.x - tx, portal.y - ty) > balance.doors.reachTiles)) {
+    return reject(room, sessionId, 'TOO_FAR', { of: 'door' });
+  }
+  if (!take(player, def.consumes ?? 'plantKit', 1))
+    return reject(room, sessionId, 'SPENT', { what: 'stock' });
+  const grid = navGrid(sceneId, simOf(room).profile);
+  const at =
+    thread && portal ? besideTile(portal, { x: tx, y: ty }, (x, y) => !grid.solidAt(x, y)) : { x: tx, y: ty };
+  const dir = thread ? 0 : portal ? trailDir(tx, ty, portal.x, portal.y) : 4;
+  const id = spawnClue(room, sceneId, { kind: plant.kind, value, dir, tx: at.x, ty: at.y });
   const meta = id === null ? undefined : simOf(room).clueMeta.get(id);
   if (meta) markPlanted(meta);
   player.priv.cooldownEndTick.set('plantClue', tick + Math.round((def.cooldownS ?? 0) * TICK_RATE));
   p.busyUntilTick = tick + Math.round((def.castS ?? 0) * TICK_RATE);
 }
 
-const lastPhase = new WeakMap<RoomSim, number>();
+const lastRound = new WeakMap<RoomSim, number>();
 
 /**
- * Call site: `runHolds`, every tick. At each dawn a card with Inspect gets `lensPerMeeting` Lenses back, up to
- * `lensMax` (world mode has no daily meeting); `Private.lensCharges` mirrors the Lens count of every seat.
+ * Call site: `runHolds`, every tick. At each new day (`GameState.round`, so a pause in the phases never runs it
+ * twice) a card with Inspect gets `lensPerMeeting` Lenses back, up to `lensMax` (world mode has no daily meeting);
+ * `Private.lensCharges` mirrors the Lens count of every seat.
  */
 export function runEvidence(room: PartyRoom): void {
   const sim = simOf(room);
-  const phase = room.state.phase;
-  const dawn = phase === Phase.dawn && lastPhase.get(sim) !== Phase.dawn;
-  lastPhase.set(sim, phase);
+  const round = room.state.round;
+  const seen = lastRound.get(sim);
+  const dawn = seen !== undefined && round > seen;
+  lastRound.set(sim, round);
   const params = abilities.abilities.inspect?.params;
   for (const [sessionId, player] of room.state.players) {
     if (!player.priv) continue;

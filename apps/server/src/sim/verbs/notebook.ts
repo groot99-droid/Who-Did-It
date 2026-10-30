@@ -5,27 +5,17 @@ import type { ClueMeta, PlayerSim } from '../RoomSim';
 // Round 10, V1 (10V): what the evidence verbs keep about a clue, in room memory only. Keyed by the clue's `ClueMeta`,
 // which every spawn makes new, so nothing outlives its clue or its match. No field here reaches any client.
 
-interface ClueSecret {
-  /** Laid by Plant Clue: a Lens Inspect reads the clue Forged (GDD 3.2). */
-  planted: boolean;
-  /** The value only a Lens reads (GDD 3.4 "hidden attribute"); undefined when the public value is the whole clue. */
-  hidden?: number;
-}
-
-const secrets = new WeakMap<ClueMeta, ClueSecret>();
+/** The clues laid by Plant Clue: a Lens Inspect reads them Forged (GDD 3.2). */
+const planted = new WeakSet<ClueMeta>();
 /** The Notebook entry each seat wrote for a clue: seat id -> entry id. */
 const entries = new WeakMap<ClueMeta, Map<string, string>>();
 
 export function markPlanted(meta: ClueMeta): void {
-  secrets.set(meta, { ...secrets.get(meta), planted: true });
+  planted.add(meta);
 }
 
 export function isPlanted(meta: ClueMeta): boolean {
-  return secrets.get(meta)?.planted === true;
-}
-
-export function hiddenValue(meta: ClueMeta): number | undefined {
-  return secrets.get(meta)?.hidden;
+  return planted.has(meta);
 }
 
 /** The seat's own Notebook entry for the clue, if it wrote one. */
