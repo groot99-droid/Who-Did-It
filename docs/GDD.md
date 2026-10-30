@@ -1089,9 +1089,14 @@ with `desperateNeeds` or more needs over the threshold it is Desperate; with non
 `moodHoldS` before it changes, so a seat does not flicker. A mood shows in two ways only:
 
 - **The routine draw.** The class's work, stroll and idle weights (3.12) are scaled by `moods.weights[mood]` and
-  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more. The
-  richer habits of `townsfolk.md` 1 (home earlier, the bakery, the quiet places, lingering near the one it is angry
-  at) wait on routine hooks that do not exist yet (A140, open).
+  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more.
+- **The mood hooks (round 10, T6b, A262).** When a seat's or a villager's mood is not Calm, its next work trip draws
+  from a narrowed pool with chance `moodHooks.chance` (one draw on its own routine stream, none when Calm). Scared:
+  stations in its home scene or a scene lit at night. Hungry: the bakery's. Desperate: scenes nobody stands in. Angry:
+  its own scene, while a figure drawn with the face that struck or robbed it stands in sight there (the hook keeps the
+  drawn look at the event, never the seat behind it, so an impersonation shows nothing; never near a seat that is
+  dead, jailed or on the line, and never a walk to another scene). A narrowing that finds no station leaves the
+  pool whole. The hooks read needs, the home and public scene state only, and show nothing but where a trip goes.
 - **The idle.** While it stands still a Scared seat cowers, a Hungry or Desperate one fidgets, an Angry one stomps
   (the `cower`, `fidget` and `stomp` clips of 3.22); a Calm seat shows the plain idle. A client receives the clip id
   and nothing else, so a mood is a thing to notice, never a word.

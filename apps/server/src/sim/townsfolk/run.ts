@@ -6,6 +6,7 @@ import { guardNightAct, stepGuard } from '../law/Guards';
 import { followAct } from '../law/Pairing';
 import { mapScenesOf } from '../MapSites';
 import { tickNeeds } from '../npc/needs';
+import { moodPool } from '../npc/moodHooks';
 import { type Station, phaseClassOf, spanTicks } from '../npc/routine';
 import { firstPortalToward } from '../npc/walk';
 import { simOf } from '../RoomSim';
@@ -159,7 +160,8 @@ function pickStation(room: PartyRoom, f: Figure): Station | null {
   }
   const rng = figureRng(room, f);
   const last = f.act?.station?.propId;
-  const pool = f.stations.filter((s) => s.propId !== last);
+  const open = f.stations.filter((s) => s.propId !== last);
+  const pool = moodPool(room, f.brain, f.id, f.home, f, open, rng); // round 10, T6b: the mood hooks
   const u = rng();
   return pool[Math.min(pool.length - 1, Math.floor(u * pool.length))] ?? null;
 }
