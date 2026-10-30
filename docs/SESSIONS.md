@@ -4586,6 +4586,12 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - `docs/round10/part2.md` is the pickup list: the state at the stop, the merge queue, each session's handoff and
     id, and how to resume.
   - `docs/round10/wave2-briefs.md` keeps the briefs of 10N, 10K, 10T and 10M.
+  - 6Z's rulings at the stop, each in its session's handoff in `part2.md`:
+    - B6d #448 stays one pull request: its source is about 405 changed lines, and the rest is tests and docs.
+    - x9's refusal reason `ALREADY_DONE` stands.
+    - x13's "Open tells" bullet stays in GDD 3.12.
+  - S1b (10F) was never pushed: the session's permission check refused any branch but its own. Its code diff is kept
+    in a comment on #429, with the docs to write beside it.
 
 ## Round 11 (planning, started 2026-10-29)
 

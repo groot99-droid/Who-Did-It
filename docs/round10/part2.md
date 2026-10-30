@@ -11,8 +11,9 @@ and, as the stop began:
 > When the sessions are done and the pause has commenced, archive the sessions, move the information to be done for
 > pt2 to access later
 
-6Z stopped once stack11 (C4b, B6a, R1, R2) and the pull request that adds this file had merged. Every session pushed
-its work, sent 6Z a handoff, and was archived. This file is the pickup list for part 2:
+6Z stopped once stack11 (C4b, B6a, R1, R2) and the pull request that adds this file had merged. Every session sent 6Z
+a handoff and was archived with its work pushed, except 10F's S1b, which is kept as a diff in a comment on #429. This
+file is the pickup list for part 2:
 - the state at the stop and the open pull requests;
 - the merge queue;
 - each session's remaining steps and handoff;
@@ -65,27 +66,31 @@ The contract is unchanged. `README.md`, `seams.md` (rows 1 to 37) and `scope.md`
 | #441 | K6a, the snares' server half | 10N | WIP at 10f2680 | with or after K6b |
 | #440 | K3, candles for all and Handcuffs | 10K | PR_440 | when Complete |
 | #435 | M1a, the barks' server half | 10M | WIP at 91a54863; auto 50 clean, CI and the base merge left | when Complete |
-| #434 | T6a, new places | 10T | Complete at 6d7feb41; CI green, auto 50 clean | stack12's tail |
+| #434 | T6a, new places | 10T | Complete at 6d7feb41; CI green, auto 50 clean | after stack12 |
 | #445 | T6b, the mood hooks | 10T | WIP at 4f7aafe6, stacked on #434 | after T6a |
 | #447 | W1a1, fresh seat ids at Start | 10S | WIP at 4a72fcf7; its tests never ran to completion | with W1a2, after B6c |
-| #429 | S1a, containers and loot tables | 10F | Complete at c237b41a, the base merged; auto 50 clean | stack12's tail |
+| #429 | S1a, containers and loot tables | 10F | Complete at c237b41a, the base merged; auto 50 clean | after stack12 |
 | #448 | B6d, the end trial (row 35) | 10B | B6D_STATE | with B6d2, before B6c |
 | #245 | 8V R3 (round 8) | none | stale draft | 10X closes or revives it |
 
 Branches with no pull request yet:
 - `claude/r10-k6b-snares-npc` at 8fc6fd2 (10N's K6b, on K6a);
-- S1B_ROW
+- S1b (10F) has no branch: its diff is a comment on #429 (10F's handoff).
 
 ## The merge queue for part 2
 
 1. **stack12:** S4, x9, x13, S2, S5, V1a and y16 on one merged tree, with the full check, auto 50 and every e2e
-   spec. Merge them in that order, each verified against the simulated tree. S3 follows S2 once it has merged the
-   base.
-2. **10X's test fixes:** x17, x12, x16 and x14, each once the check its description lists as queued has run.
-3. **10C's pair:** C4c and C5c, FULL+AUTO, then C4d.
-4. **B6d with B6d2**, back to back if both are ready, so production never runs B6d's human-only filing for long
+   spec. Merge them in that order, each verified against the simulated tree.
+2. **After stack12:**
+   - S3, once it has merged the base for the recipe lists;
+   - T6a, then T6b;
+   - S1a, then S1b, restored from the comment on #429;
+   - M1a and K3, once each is Complete.
+3. **10X's test fixes:** x17, x12, x16 and x14, each once the check its description lists as queued has run.
+4. **10C's pair:** C4c and C5c, FULL+AUTO, then C4d.
+5. **B6d with B6d2**, back to back if both are ready, so production never runs B6d's human-only filing for long
    (`seams.md` 3 row 35). B6c deletes the old vote code after them.
-5. Then each pull request as it completes, in `seams.md` 7's order. A Complete on a base a few merges old follows
+6. Then each pull request as it completes, in `seams.md` 7's order. A Complete on a base a few merges old follows
    `seams.md` 1's rule.
 
 ## Each session's remaining steps
@@ -183,7 +188,10 @@ Each session's handoff at the stop, as it sent it to 6Z. A later merge or ruling
 - #429 S1a, containers and loot tables, at c237b41a: Complete, with the base merged. The full check passed except
   `herbBreadDawn.test.ts`'s timeouts, which x18 has since fixed. Auto 50 was clean.
 - S1b is the local commit ba2167b7: 391 lines, green. The permission check refused its push to any branch but 10F's
-  designated one, and 10F did not work around it. S1B_KEPT
+  designated one, and 10F did not work around it. Its code diff is kept in a comment on #429
+  (https://github.com/groot99-droid/Who-Did-It/pull/429#issuecomment-6528113034). To restore it, save the fenced
+  text to a file and `git apply` it on a branch cut from the base after #429 merges. Then write the GDD 3.14
+  paragraph and the A286 lines the comment lists.
 - Next, each in part 2:
   - S1b, after #429 merges: `sim/interact/loot.ts` deals a container's contents on first use (`containersOf`,
     `isFurniture`, `takeContents`). Add a two-line hook in `resolve.ts`, one line in `Minigames.ts`, and
@@ -396,6 +404,11 @@ Each has a default the build takes until the owner answers.
   - RN3, Blender in the cloud environment.
 - Production, from the lag report: the Railway region (where the players are) and client-side prediction.
 - The HollowMere grindstone, which x9 found missing.
+- Defaults the handoffs flag, each standing until the owner answers:
+  - S4's proposed `moods.mug` values (10D);
+  - the forge's ingot costs, and the forests' `fallen_log` as the thick log (10H, #444);
+  - x14's note on `getFullState`'s 16 KiB stale buffer (10X, #397);
+  - the `meeting.title` word (10Y, A414).
 - A duplicate artifact of 10R's mock, which stays until the owner says.
 - Two more Opus sessions for part 2 (above).
 
