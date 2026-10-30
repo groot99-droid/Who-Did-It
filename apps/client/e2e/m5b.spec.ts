@@ -21,15 +21,18 @@ async function pockets(page: Page) {
 }
 
 /**
- * Holds E (the layer takes it for the nearest node) until the pockets hold `qty` of `item`. The kit's nodes sit at
- * spread distances, so the nearest one is next in the order the run needs them.
+ * Holds E (the layer takes it for the nearest node) until the pockets hold `qty` of `item`: a cell shows its count
+ * above one only (A13b's grid, #335), so one of a thing is the cell alone. The kit's nodes sit at spread distances, so
+ * the nearest one is next in the order the run needs them.
  */
 async function gather(page: Page, item: string, qty: number) {
   await pockets(page);
+  const cell = page.getByTestId(`inventory-item-${item}`);
   await expect(async () => {
     await page.keyboard.down('KeyE');
     try {
-      await expect(page.getByTestId(`inventory-item-${item}`)).toContainText(String(qty), { timeout: 9000 });
+      if (qty > 1) await expect(cell).toContainText(`x${qty}`, { timeout: 9000 });
+      else await expect(cell).toBeVisible({ timeout: 9000 });
     } finally {
       await page.keyboard.up('KeyE');
     }
@@ -81,10 +84,13 @@ test('opens a mini-game board and judges the answer', async ({ page }) => {
   await expect(page.getByTestId('minigame')).toHaveCount(0);
 });
 
-test('E falls through to the World verbs when no node or giver is in reach', async ({ page }) => {
-  await toWorld(page, '');
+test('E falls through to the World verbs when no node, giver or counter is in reach', async ({ page }) => {
+  // The square's spawn has had the Market's counter a tile away since the village was dressed (#238), and a counter
+  // in reach takes E (8C): the seat starts at the forest's back, where nothing is in reach, with the bots parked.
+  await toWorld(page, '&scene=overworld&spawn=forest_back&bots=still');
   await expect(page.getByTestId('m5b')).toBeVisible();
   await expect(page.getByTestId('m5b-prompt')).toBeHidden();
+  await expect(page.getByTestId('shop-prompt')).toBeHidden();
   await page.keyboard.press('KeyE');
   await expect(page.getByText('Nothing to use here')).toBeVisible();
   await expect(page.getByTestId('m5b-toast')).toBeHidden();
