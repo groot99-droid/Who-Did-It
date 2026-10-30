@@ -43,6 +43,8 @@ export interface RoleCardOptions {
   cover?(): CoverState;
   /** Loaded textures, for the picker's portraits; none draws the initial of the look's name. */
   textures?: PortraitTextures | null;
+  /** Round 10, C5: Paint The Town Red's target, 0 outside it (`WorldFeed.paintTarget`); polled with the card. */
+  paintTarget?(): number;
 }
 
 /** The deck strip's one card: the role's name, and the look it walks as when it has one. */
@@ -126,6 +128,7 @@ export function mountRoleCard(
     );
   };
 
+  const goal = h('p', { class: 'wdi-card__goal', 'data-testid': 'card-goal' }, role.goal);
   // GDD 3.17: the look this seat walks as, the deck, and for a cover role the picker.
   const hints = role.coverHints ?? [];
   const walkLead =
@@ -157,7 +160,7 @@ export function mountRoleCard(
     ),
     picker?.el,
     role.deck !== undefined && role.deck.length > 0 && deckStrip,
-    h('p', { class: 'wdi-card__goal' }, role.goal),
+    goal,
     abilities.length > 0 && h('ul', { class: 'wdi-card__abilities' }, ...abilities),
     items.length > 0 && h('ul', { class: 'wdi-card__inventory' }, ...items),
     h('p', { class: 'wdi-card__text' }, role.cardText),
@@ -201,6 +204,14 @@ export function mountRoleCard(
     'Role card (Tab)',
   );
   root.append(card, chip);
+
+  // Round 10, C5 (GDD 3.8): a Paint The Town Red Killer's goal is the shared target, once its private view says so.
+  const paint = () => {
+    const n = opts.paintTarget?.() ?? 0;
+    if (n > 0) goal.textContent = fill(LOOKS_COPY['card.paint.goal'], { n });
+  };
+  paint();
+  const paintPoll = opts.paintTarget ? window.setInterval(paint, 500) : null;
 
   // The picker keeps itself in step with the server's picks (own and mates') for as long as the card is mounted.
   const pickerPoll = picker && opts.cover ? pollCover(picker, opts.cover) : null;
@@ -268,6 +279,7 @@ export function mountRoleCard(
     destroy: () => {
       clearTimers();
       pickerPoll?.();
+      if (paintPoll !== null) window.clearInterval(paintPoll);
       document.removeEventListener('keydown', onKey);
       card.remove();
       chip.remove();
