@@ -1,5 +1,5 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance } from '@wdi/content';
+import { abilities, balance, items } from '@wdi/content';
 import { Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory, avatarOf } from '../src/sim/Avatars';
@@ -70,6 +70,13 @@ const dead = (m: Match, bot: Bot) => simOf(m.room).players.get(bot.id)!.dead;
 describe('the Derringer (GDD 3.33)', () => {
   it('is in the turned seat’s own pack, kept at death; nobody else may use it', async () => {
     const { m, hitman, mark, bystander } = await hitmanDay();
+    // `dayWeapon.ts` names the Derringer by a literal: it must stay a real, role-bound row, kept at death.
+    expect(items.items[DERRINGER_ITEM]).toMatchObject({
+      roleBound: true,
+      onDeath: 'kept',
+      use: DERRINGER_ITEM,
+    });
+    expect(abilities.abilities[DERRINGER_ITEM]?.requires).toBe(DERRINGER_ITEM);
     const player = m.room.state.players.get(hitman.id)!;
     expect(count(player, DERRINGER_ITEM)).toBe(1);
     shoot(m, bystander, mark);
