@@ -22,6 +22,7 @@
       "faction": "cabal",
       "cover": true,
       "look": "killer",
+      "townWork": { "work": "worn" },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Kill until the Cabal matches the village (one villager left at {byCount.villageAtMostOne.sizes}), and never get voted out.",
@@ -46,6 +47,7 @@
       "faction": "cabal",
       "cover": true,
       "look": "accomplice",
+      "townWork": { "work": "worn" },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Cover for the Killer and take the knife if they fall.",
@@ -65,6 +67,7 @@
       "faction": "cabal",
       "cover": false,
       "look": null,
+      "townWork": { "work": "worn" },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Carry on the Killer's work alone: strike after dark, keep your cover.",
@@ -88,6 +91,10 @@
       "faction": "village",
       "cover": false,
       "look": "detective",
+      "townWork": {
+        "work": "none",
+        "nfy": "Inspects and compares clues: clues verify only at the Constables' pace"
+      },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Verify the clues that narrow the suspects.",
@@ -112,6 +119,10 @@
       "faction": "village",
       "cover": false,
       "look": "doctor",
+      "townWork": {
+        "work": "none",
+        "nfy": "Bandages, Salts and autopsies: no healing at the surgery while gone"
+      },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Keep people alive and read the dead.",
@@ -135,6 +146,7 @@
       "faction": "village",
       "cover": false,
       "look": null,
+      "townWork": { "work": "none", "nfy": "Keys and the manor ledger: no ledger slips" },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Control the doors and say who went where.",
@@ -154,6 +166,10 @@
       "faction": "village",
       "cover": false,
       "look": null,
+      "townWork": {
+        "work": "none",
+        "nfy": "Witnesses and errands: fewer witness lines, errands go undone"
+      },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Hide, watch, and remember who you saw.",
@@ -177,6 +193,7 @@
       "faction": "village",
       "cover": false,
       "look": null,
+      "townWork": { "work": "none", "nfy": "Tasks and chores: the chores it carried go undone" },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Do your chores in pairs and vote with evidence.",
@@ -201,6 +218,7 @@
       "faction": "neutral",
       "cover": true,
       "look": "drifter",
+      "townWork": { "work": "worn" },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Get yourself voted out.",
@@ -220,6 +238,10 @@
       "faction": "village",
       "cover": false,
       "look": null,
+      "townWork": {
+        "work": "none",
+        "nfy": "Patrols and snares: the trails go unwatched, snares are not reset"
+      },
       "ships": "V1.5",
       "firstPlayable": false,
       "goal": "Hunt the wolves and make your {word:abilities.abilities.arrest.usesPerMatch} arrest count.",
@@ -244,6 +266,7 @@
       "faction": "neutral",
       "cover": false,
       "look": null,
+      "townWork": { "work": "worn" },
       "ships": "V1.5",
       "firstPlayable": false,
       "goal": "Escape by the sea door at the back of the cave holding 3 Heirlooms.",
@@ -267,6 +290,7 @@
       "faction": "village",
       "cover": false,
       "look": null,
+      "townWork": { "work": "none", "nfy": "Séances: no word from the dead" },
       "ships": "V2",
       "firstPlayable": false,
       "goal": "Hear the dead.",
@@ -286,6 +310,7 @@
       "faction": "village",
       "cover": false,
       "look": "vicar",
+      "townWork": { "work": "faith", "props": ["ch.altar_main"] },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Learn {word:balance.nightPowers.perNight} soul's faction each night and steer the vote.",
@@ -305,6 +330,10 @@
       "faction": "village",
       "cover": false,
       "look": "watchman",
+      "townWork": {
+        "work": "none",
+        "nfy": "Keeps a door each night: that door goes unwatched, the curfew is looser"
+      },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Stand guard over {word:balance.nightPowers.perNight} neighbour each night.",
@@ -324,6 +353,7 @@
       "faction": "village",
       "cover": false,
       "look": "herbalist",
+      "townWork": { "work": "stall" },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "Save one life and end one, {times:roles.roles.herbalist.startKit.0.qty} each, and be right both times.",
@@ -347,6 +377,10 @@
       "faction": "village",
       "cover": false,
       "look": "gamekeeper",
+      "townWork": {
+        "work": "stall",
+        "nfy": "Keeps the woods: wolves press closer at the wood's edge while gone"
+      },
       "ships": "V1",
       "firstPlayable": false,
       "goal": "If you fall, take the right one with you.",
@@ -367,6 +401,10 @@
       "cover": false,
       "look": "lamplighter",
       "plays": "townsfolk",
+      "townWork": {
+        "work": "none",
+        "nfy": "Lights the lantern posts at dusk: posts stay dark, creatures come nearer, Fear rises"
+      },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Do your chores in pairs and vote with evidence.",
@@ -392,6 +430,7 @@
       "cover": false,
       "look": "baker",
       "plays": "townsfolk",
+      "townWork": { "work": "stall" },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Do your chores in pairs and vote with evidence.",
@@ -417,6 +456,10 @@
       "cover": false,
       "look": "fisher",
       "plays": "townsfolk",
+      "townWork": {
+        "work": "none",
+        "nfy": "Fish to the market: the fish stock and the Game Pie's parts run short"
+      },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Do your chores in pairs and vote with evidence.",
@@ -442,6 +485,10 @@
       "cover": false,
       "look": "tinner",
       "plays": "townsfolk",
+      "townWork": {
+        "work": "none",
+        "nfy": "Tin ore to the forge: the tier-2 tools and armour stop"
+      },
       "ships": "V1",
       "firstPlayable": true,
       "goal": "Do your chores in pairs and vote with evidence.",

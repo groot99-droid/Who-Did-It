@@ -1,5 +1,6 @@
 import type Phaser from 'phaser';
 import balance from '@wdi/content/data/balance.json';
+import { refusalFrame, type RefusalArgMap, type RefusalReason } from '@wdi/shared/protocol';
 import { portalTransition, transition } from '../view/Transition';
 import { REG_MEETING, type MeetingFeed } from './meeting';
 import { ColyseusMeetingFeed } from './meetingColyseus';
@@ -181,6 +182,9 @@ export function installWorldRouter(
               }),
             /** The clues of the own scene in pixels, so a spec can walk to one instead of guessing a direction. */
             clues: () => feedMock.clues().map((c) => ({ kind: c.kind, x: c.x, y: c.y })),
+            /** The frame a server's refusal sends (round 10, 10Y): the refusal specs' lines on a phone. */
+            refuse: <R extends RefusalReason>(reason: R, args?: RefusalArgMap[R], interaction?: string) =>
+              feedMock.bus.emit('error', refusalFrame(reason, args, interaction ? { interaction } : {})),
           };
           feedMock.start();
         });

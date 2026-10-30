@@ -4,7 +4,7 @@
 export const M5B_COPY = {
   // 14.19.1 Hold prompts (beside the Hold E clue prompt of 14.1)
   'prompt.gather': 'Hold E: gather {what}',
-  'prompt.gather.tool': 'Needs a {tool} to gather {what}',
+  'prompt.gather.tool': 'Gather {what} (needs {tool})', // greyed (round 10, 10Y; UI.md 14.51)
   'prompt.gather.cancel': 'Release to stop',
   'prompt.giver': 'Press E: speak to {name}',
   'toast.gather.cancel': 'You stopped gathering.',
