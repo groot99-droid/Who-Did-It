@@ -9,7 +9,7 @@ import { createParty } from './fixtures/party';
 
 interface Mock {
   sleep(asleep: boolean, inBed?: number, inBedOf?: number): void;
-  line(on: boolean, cause?: string): void;
+  line(on: boolean, cause?: string, round?: number): void;
 }
 
 async function toWorld(page: Page, query: string) {
@@ -28,10 +28,11 @@ const sleep = (page: Page, asleep: boolean, inBed = 0, inBedOf = 0) =>
     inBed,
     inBedOf,
   ] as const);
-const line = (page: Page, on: boolean, cause?: string) =>
-  page.evaluate(([o, c]) => (window as unknown as { __wdiMock: Mock }).__wdiMock.line(o, c), [
+const line = (page: Page, on: boolean, cause?: string, round?: number) =>
+  page.evaluate(([o, c, r]) => (window as unknown as { __wdiMock: Mock }).__wdiMock.line(o, c, r), [
     on,
     cause,
+    round,
   ] as const);
 
 /** The screen sits inside the viewport, and nothing visible in it is wider than the box it was given. */
@@ -109,10 +110,16 @@ for (const [name, width, height, query] of [
       await line(page, true, 'wolf');
       const screen = page.getByTestId('on-the-line');
       await expect(screen).toBeVisible();
-      await expect(screen).toContainText('A wolf took you.');
+      await expect(screen).toContainText('A wolf took you in HollowMere.'); // y13: the place of the own killed
       await expect(page.getByTestId('line-clock')).toHaveText(/^The train in \d+:\d\d$/);
+      // y13: the book, read only: the Notebook and the quests, and not one button on the screen
+      await expect(screen.getByTestId('notebook')).toBeVisible();
+      await expect(screen.getByTestId('line-quests')).toContainText('You hold no work.');
+      await expect(screen.locator('button')).toHaveCount(0);
       await fits(screen, width, height);
       await page.screenshot({ path: info.outputPath(`line-${name}.png`), animations: 'disabled' });
+      await line(page, true, undefined, 12); // the last cycle (`finalNight.afterCycle`): the bells, not a train
+      await expect(page.getByTestId('line-clock')).toHaveText(/^The bells in \d+:\d\d$/);
       await line(page, false);
       await expect(screen).toHaveCount(0);
       await expect(page.locator('.wdi-toast', { hasText: 'You are back.' })).toBeVisible();

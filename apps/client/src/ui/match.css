@@ -190,12 +190,14 @@
 }
 
 /* ---------------------------------------------------------------- the notebook sheet (N or the HUD button) */
+/* The same night page draws the read-only Notebook on the line (OnTheLine.ts, UI.md 14.51.5). */
 
 .wdi-notebook-sheet {
   background: var(--wdi-veil);
 }
 
-.wdi-notebook-sheet .wdi-notebook {
+.wdi-notebook-sheet .wdi-notebook,
+.wdi-line__book .wdi-notebook {
   color: var(--wdi-night-text);
   border: 0;
   border-radius: 0;
@@ -208,7 +210,9 @@
   box-shadow: none;
 }
 
-.wdi-notebook-sheet .wdi-notebook .wdi-eyebrow {
+.wdi-notebook-sheet .wdi-notebook .wdi-eyebrow,
+.wdi-line__book .wdi-notebook .wdi-eyebrow,
+.wdi-line__quests .wdi-eyebrow {
   font-family: var(--wdi-font-pixel-display);
   font-size: var(--wdi-text-sm);
   font-weight: 400;
@@ -217,22 +221,27 @@
 }
 
 .wdi-notebook-sheet .wdi-notebook .wdi-muted,
-.wdi-notebook-sheet .wdi-notebook .wdi-hint {
+.wdi-notebook-sheet .wdi-notebook .wdi-hint,
+.wdi-line__book .wdi-notebook .wdi-muted,
+.wdi-line__book .wdi-notebook .wdi-hint {
   color: var(--wdi-night-text-muted);
 }
 
-.wdi-notebook-sheet .wdi-notebook__entry.is-new {
+.wdi-notebook-sheet .wdi-notebook__entry.is-new,
+.wdi-line__book .wdi-notebook__entry.is-new {
   box-shadow: inset 3px 0 0 var(--wdi-night-accent);
 }
 
-.wdi-notebook-sheet .wdi-notebook .wdi-chip {
+.wdi-notebook-sheet .wdi-notebook .wdi-chip,
+.wdi-line__book .wdi-notebook .wdi-chip {
   color: var(--wdi-night-text);
   background-color: rgb(var(--wdi-snow-rgb) / 0.08);
   background-image: none;
   border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
 }
 
-.wdi-notebook-sheet .wdi-notebook .wdi-icon-disc {
+.wdi-notebook-sheet .wdi-notebook .wdi-icon-disc,
+.wdi-line__book .wdi-notebook .wdi-icon-disc {
   background-color: rgb(var(--wdi-snow-rgb) / 0.12);
   border-color: rgb(var(--wdi-lilac-rgb) / 0.35);
 }
@@ -955,13 +964,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: safe center;
   gap: var(--wdi-space-4, 16px);
   padding: var(--wdi-space-4, 16px);
+  overflow-y: auto;
   color: var(--wdi-night-text);
   background: var(--wdi-night-bg);
   text-align: center;
   pointer-events: auto;
+}
+
+/* The book under the carriage lines (y13, phases.md 6): the seat's Notebook and its quests, read only; it scrolls on a phone. */
+.wdi-line__book {
+  display: grid;
+  gap: var(--wdi-space-3, 12px);
+  width: min(100%, 36rem);
+  text-align: left;
+}
+
+.wdi-line__quests {
+  padding: var(--wdi-space-3, 12px);
+  color: var(--wdi-night-text);
+}
+
+.wdi-line__quests .wdi-m5b__row {
+  color: var(--wdi-text);
 }
 
 .wdi-line__band {
