@@ -413,17 +413,8 @@
   },
   "respawn": { "hp": 50, "gddRef": "3.22" },
   "armor": {
-    "items": {
-      "quiltedCoat": { "damage": 0.8 },
-      "leatherJerkin": { "damage": 0.65, "bleedDrainFactor": 0.5, "regenFactor": 0.9 },
-      "tinMail": {
-        "damage": 0.5,
-        "bleedDrainFactor": 0.5,
-        "poisonDrainFactor": 0.5,
-        "regenFactor": 0.8,
-        "speedFactor": 0.95
-      }
-    },
+    "tierMult": { "body": [0.8, 0.65, 0.5], "head": [0.9, 0.8] },
+    "cap": 0.5,
     "gddRef": "3.22"
   }
 }

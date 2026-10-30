@@ -455,20 +455,17 @@ export const BalanceFile = z.strictObject({
   /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */
   respawn: Section({ hp: z.number().int().positive() }),
   /**
-   * Round 10, D6a (GDD 3.22, logic-table 8.2): the armour a body-slot item gives, by item id. `damage` multiplies the
-   * damage of every attack but the Knife; the rest are factors on the wearer's Bleeding drain, Poisoned drain,
-   * stamina regeneration and walking speed. A factor left out is 1.
+   * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
+   * slot; the factors of the worn items and the Lodge's `creatureDmg` perk multiply, and the damage never falls below
+   * `cap` of what the row would have dealt.
    */
   armor: Section({
-    items: z.record(
-      z.string().regex(/^[a-z][A-Za-z0-9]*$/),
-      z.strictObject({
-        damage: Frac,
-        bleedDrainFactor: Frac.optional(),
-        poisonDrainFactor: Frac.optional(),
-        regenFactor: Frac.optional(),
-        speedFactor: Frac.optional(),
-      }),
+    tierMult: z.strictObject({
+      body: z.array(Frac).min(1),
+      head: z.array(Frac).min(1),
+    }),
+    cap: Frac,
+  }),
     ),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */

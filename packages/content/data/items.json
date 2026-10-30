@@ -575,6 +575,7 @@
       "roleBound": false,
       "onDeath": "drops",
       "equip": "body",
+      "armor": { "tier": 1 },
       "tooltip": "A padded coat. Worn on the body, it takes a fifth off the damage you take.",
       "ships": "V1",
       "gddRef": "3.22"
@@ -586,18 +587,8 @@
       "roleBound": false,
       "onDeath": "drops",
       "equip": "body",
-      "tooltip": "Hide, stitched. Worn on the body, it cuts the damage you take and your bleeding stops sooner; it tires you a little.",
-      "ships": "V1",
-      "gddRef": "3.22"
-    },
-    "tinMail": {
-      "id": "tinMail",
-      "name": "Tin mail",
-      "kind": "armour",
-      "roleBound": false,
-      "onDeath": "drops",
-      "equip": "body",
-      "tooltip": "Heavy tin rings. Worn on the body, it halves the damage you take, stops bleeding sooner and eases poison; it slows and tires you.",
+      "armor": { "tier": 2, "resist": { "bleeding": 0.5 }, "staminaRegenMult": 0.9 },
+      "tooltip": "Hide, stitched. Worn on the body, it cuts the damage you take and halves how fast you bleed; it tires you a little.",
       "ships": "V1",
       "gddRef": "3.22"
     },
