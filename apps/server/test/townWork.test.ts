@@ -10,6 +10,7 @@ import { handleBuy, handleShopHold } from '../src/sim/economy/shops';
 import { stallStock, stockLeft, workOf } from '../src/sim/economy/townWork';
 import { type Station, stationsOf } from '../src/sim/npc/routine';
 import { mapScenesOf } from '../src/sim/MapSites';
+import { openMeeting } from '../src/sim/Meeting';
 import { simOf } from '../src/sim/RoomSim';
 import {
   type Party,
@@ -105,12 +106,31 @@ describe('a stall sells from its day’s stock (GDD 3.23)', () => {
     addFare(room, BAKER);
     expect(workOf(room, OWNER)).toBe('thin');
     expect(stockLeft(room, SHOP, ITEM)).toBe(Math.floor(full * balance.respawn.stockMult));
-    simOf(room).players.get(BAKER)!.dead = true; // on the line: gone, whatever it owes
+    room.state.players.get(BAKER)!.alive = false; // the roster shows it dead: gone, whatever it owes
     expect(workOf(room, OWNER)).toBe('gone');
     expect(stockLeft(room, SHOP, ITEM)).toBe(0);
     room.state.players.get(BAKER)!.look = 'x'; // an undealt look: no seat wears it, so it is never gone
     expect(workOf(room, OWNER)).toBe('work');
     expect(stockLeft(room, SHOP, ITEM)).toBe(full);
+  });
+});
+
+describe('a kill is private until the meeting (GDD 3.8, A30)', () => {
+  it('keeps a dead wearer’s stall and altar at work until the meeting shows the death', async () => {
+    const { party, human } = await bakeryDay('vicar');
+    const room = party.room;
+    room.state.players.get(OTHER)!.look = OWNER;
+    simOf(room).players.get(OTHER)!.dead = true; // killed by day: only the body shows it
+    simOf(room).players.get(BAKER)!.dead = true;
+    expect((await flourRow(party, human))?.left).toBe(stallStock(room));
+    const priv = room.state.players.get(human)!.priv;
+    movePurse(room, TOWN, human, 2, 'stake');
+    placeSeat(party, human, 'chapel', 9, 2);
+    handleDonate(room, human, { amount: 2 });
+    expect(priv.faith).toBeGreaterThan(0);
+    openMeeting(room, { reason: 'bell', callerId: human });
+    expect(workOf(room, OWNER)).toBe('gone');
+    expect(workOf(room, 'vicar')).toBe('gone');
   });
 });
 
@@ -129,7 +149,7 @@ describe('the work follows the public look, never the card or the drawn figure (
     const disguise = { as: BAKER, applied: true, dropRequested: false, applyByTick: 0, untilTick: 1e9 };
     avatarMemory(room).disguise.set(OTHER, disguise); // another seat drawn as the baker
     expect(await flourRow(party, human)).toEqual(plain);
-    simOf(room).players.get(BAKER)!.dead = true; // the drawn figure never keeps the stall at work
+    room.state.players.get(BAKER)!.alive = false; // the drawn figure never keeps the stall at work
     expect((await flourRow(party, human))?.left).toBe(0);
   });
 });
@@ -140,7 +160,7 @@ describe('Faith at the chapel (GDD 3.23)', () => {
     const room = party.room;
     const priv = room.state.players.get(human)!.priv;
     movePurse(room, TOWN, human, 20, 'stake');
-    simOf(room).players.get(BAKER)!.dead = true;
+    room.state.players.get(BAKER)!.alive = false;
     placeSeat(party, human, 'chapel', 9, 2);
     handleDonate(room, human, { amount: 2 });
     await sleep(150);
@@ -150,7 +170,7 @@ describe('Faith at the chapel (GDD 3.23)', () => {
     handleDonate(room, human, { amount: 2 });
     expect(priv.faith).toBeGreaterThan(0);
     const before = priv.faith;
-    simOf(room).players.get(BAKER)!.dead = false;
+    room.state.players.get(BAKER)!.alive = true;
     placeSeat(party, human, 'chapel', 9, 2);
     handleDonate(room, human, { amount: 2 });
     expect(priv.faith).toBeGreaterThan(before);
