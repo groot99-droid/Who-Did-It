@@ -1327,6 +1327,23 @@ Reader is Anyone (footprints, thread); never the opener or a signer. Only the si
 (`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
 evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
 
+**The manhunt (B4).** A passed petition's warrant waits its turn, and one manhunt runs at a time, for
+`manhunt.durationS` (120 s), a world phase rather than a pause. It is public as `GameState.manhunt` (the accused, its
+clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s) with a
+figure in reach (`act.hold {action: 'cuff'}`), stopped if the cuffer moves, the figure leaves reach, the figure strikes
+or the cuffer is struck. The cuff tests the face the figure is drawn with, never the seat behind it: a figure not
+drawn as the accused is refused (`NOT_HUNTED`), the accused drawn as someone else included. It lands on the seat
+behind the figure, so an impersonator drawn as the accused is cuffed as the accused would be, and nothing public says
+which seat is held (the owner, 2026-10-30: that seat is jailed and tried, B5). The opener and the signers alone see,
+on their maps (`Private.huntScene`), the scene where a figure drawn as the accused was last seen by the rumour ledger's
+rule (3.23: a scene holding at least two figures, every `notices.sampleS`; the lower scene first). The **Constables**
+join: a Constable cuffs a figure drawn as the accused within its leash, by the same test, in `law.cuffHoldS /
+law.speedMult` (1.5 s), and a strike on it stops the cuff. At the clock's end, if no living human but the accused is
+out of jail and off the line (asleep and knocked out still count as free), the Constables cuff the accused where it
+stands; otherwise the case stays on the board and no petition opens for `petition.cooldownS` (120 s). A dead accused
+ends the hunt. The cuffed seat is held where it stands until the next dawn; the county jail and the Tribunal are B5
+and B6.
+
 ### 3.32 Sleeping
 
 Round 10, A7 (`docs/round9/gdd-map.md` 2.6; `docs/round9/world-mode.md` 7.3; `docs/round9/followup-4.md` 2.4 and
@@ -1371,9 +1388,9 @@ who woke in the night gets nothing.
 **Exhaustion (A7b).** In the night, when every active player but one is asleep, that one is the holdout. A holdout
 alone for `balance.sleep.holdoutGraceS` (60 s) is **Exhausted** from the next dawn to the next dusk: maximum stamina
 and its regeneration are both halved (`effects.json` `exhausted`). Going to bed after the grace does not undo it. A
-card with a power that works in the night (`abilities.json` `phases`) and a seat on a manhunt are never Exhausted. The
-effect lives in the seat's own view only, with no sign on the figure. Still waits: the chapel's bar (the Defrocked
-sentence) and the manhunt (B4).
+card with a power that works in the night (`abilities.json` `phases`) and a seat on a running manhunt (its accused, its
+opener or a signer, 3.31) are never Exhausted. The effect lives in the seat's own view only, with no sign on the
+figure. Still waits: the chapel's bar (the Defrocked sentence).
 
 **The screen** (A8, UI.md 14.46). At a bed in reach at dusk or at night the prompt offers to lie down. A sleeper's view
 dims to its bedroom and shows how many active players are in bed and of how many, never who. A move, a key or a hit
