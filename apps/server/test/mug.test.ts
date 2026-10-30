@@ -39,7 +39,7 @@ import {
 /**
  * The mugging (round 8, GDD 3.24, docs/round8/townsfolk.md 3 and 4; Session 8E): the roll rises with the purse band
  * and the mood and is zero with company or a lit light; the walk-up, the threat and the prompt; Pay, the silent
- * take and the escape through a door (Flee and Fight are part two, A180); the cooldown; nothing of it on the wire.
+ * take and the escape through a door (Flee and Fight are in mugFlight.test.ts, round 10, S4); the cooldown; nothing of it on the wire.
  */
 
 /** The cellar is not the hub, is dark by day and has no creature spawner. */
@@ -265,34 +265,36 @@ describe('a mugging', () => {
     expect(balanceOf(second.party.room, second.human)).toBe(21);
   });
 
-  it('takes the share from a silent target when the answer runs out, and refuses a late, odd, fleeing or fighting answer', async () => {
+  it('takes the share from a silent target when the answer runs out, and refuses a late or odd answer', async () => {
     const { party, human, mugger, heard } = await world({ apart: 1 });
     const room = party.room;
     expect(untilMugged(party, human)).toBe(true);
     untilPrompt(party, human);
     const errors = () => party.humans[0]!.log.filter((e) => e.type === 'error').length;
-    handleMug(room, human, { choice: 'fight' }); // the fists are not in yet (A180 part two)
-    handleMug(room, human, { choice: 'flee' }); // nor the chase
     handleMug(room, human, { choice: 'rob' });
     expect(muggingOf(room, human)?.state).toBe('prompt');
     advance(party, ticksOf(m.answerS) + 1);
     expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: human, outcome: 'taken' });
     expect(balanceOf(room, human)).toBe(21);
     handleMug(room, human, { choice: 'pay' }); // no prompt open
-    expect(await until(() => errors() === 4)).toBe(true);
+    expect(await until(() => errors() === 2)).toBe(true);
   });
 
   it('never starts on a target with an empty purse, an NPC seat pays at once, and a meeting drops it', async () => {
     const { party, human } = await world({ apart: 1, purse: 0 });
     expect(untilMugged(party, human, 30)).toBe(false);
     // An NPC seat as the target, alone with the figure: it pays, and is angry at the figure.
+    const w = balance.moods.mug.npcAnswer;
+    const kept = { ...w };
+    Object.assign(w, { pay: 1, flee: 0, fight: 0, silent: 0 });
     const { party: p2, target: npc, mugger, heard } = await world({ apart: 1, npcTarget: true });
     const room = p2.room;
     expect(untilMugged(p2, npc)).toBe(true);
-    for (let i = 0; i < ticksOf(m.threatS + 1) && muggingOf(room, npc); i++) advance(p2, 1);
+    for (let i = 0; i < ticksOf(m.threatS + m.answerS + 1) && muggingOf(room, npc); i++) advance(p2, 1);
     expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: npc, outcome: 'paid' });
     expect(balanceOf(room, npc)).toBe(21);
     expect(needsOf(npcMemory(room).brain(npc)).angryAt).toBe(mugger.id);
+    Object.assign(w, kept);
     // A meeting (no world phase) drops a mugging under way.
     const third = await world({ apart: 1 });
     expect(untilMugged(third.party, third.human)).toBe(true);

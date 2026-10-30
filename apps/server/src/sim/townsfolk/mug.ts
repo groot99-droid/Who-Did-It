@@ -2,6 +2,9 @@ import { balance, clues } from '@wdi/content';
 import { ClueKind, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { decaySeconds, spawnClue } from '../Clues';
+import { hurt } from '../body/damage';
+import { factorOf, hasEffect } from '../body/effects';
+import { bodyOf } from '../body/state';
 import { balanceOf, movePurse, purseBand } from '../economy/purse';
 import { emitSim } from '../events/bus';
 import { isGuard } from '../law/Guards';
@@ -9,6 +12,7 @@ import { hubOf } from '../MapSites';
 import { lightBurns } from '../mobs/light';
 import { isNpcSeat } from '../Npc';
 import { type Brain, npcMemory, playRng } from '../npc/memory';
+import { openPortals, walkThrough, walkTo } from '../npc/walk';
 import { type Needs, hasBodyEffect, moodStrength, needsOf } from '../npc/needs';
 import { phaseClassOf } from '../npc/routine';
 import { type PlayerSim, simOf } from '../RoomSim';
@@ -23,15 +27,15 @@ import { walkFigure } from './walk';
  * with a Weakened or Fatigued target and with a long time alone beside a heavy purse, and falls with the mugger's
  * fear and a lit light in the target's hand (`mugChance`). The mugger walks up, threatens, and the target chooses
  * within `moods.mug.answerS`: Pay loses `share` of the purse (banked Scrip is safe). A human answers with `act.mug`
- * (`handleMug`); an NPC seat pays. This is part one (DECISIONS A180): a silent target is taken for the share, a
- * target that leaves the scene escapes, and `flee` (the chase) and `fight` are refused until 8A's fists land
- * (body.md 4). Every move of Scrip goes through `movePurse` (a figure's take sits in its `@figure:<id>` account),
+ * (`handleMug`); an NPC seat draws its answer once (`npcChoice`). A silent target is taken for the share and a target that leaves the scene escapes.
+ * Round 10, S4 (A180 part two): `flee` is a chase of `chaseS` that takes the share only if the mugger catches the
+ * target, and `fight` an exchange of blows on 8A's fists that the target can lose. Every move of Scrip goes through `movePurse` (a figure's take sits in its `@figure:<id>` account),
  * every mugging leaves a `scuffle` clue, and nothing of it reaches the wire but the prompt and the drawn threat.
  */
 
 export type MugChoice = 'pay' | 'fight' | 'flee';
 export type MugOutcome = 'paid' | 'taken' | 'escaped' | 'lost';
-type MugState = 'approach' | 'threat' | 'prompt';
+type MugState = 'approach' | 'threat' | 'prompt' | 'chase' | 'fight';
 
 /** One mugging under way, room memory only. */
 export interface Mugging {
@@ -41,8 +45,12 @@ export interface Mugging {
   /** The seat mugged. */
   target: string;
   state: MugState;
-  /** When the state runs out: the approach given up, the threat over, the answer due, the chase over. */
+  /** When the state runs out: the approach given up, the threat over, the answer due, the chase or fight over. */
   untilTick: number;
+  /** A fight: the tick of the next exchange of blows. */
+  nextHitTick: number;
+  /** An NPC seat's drawn answer and the tick it lands inside the window (null for a human, or when it stays silent). */
+  npcAnswer: { choice: MugChoice; atTick: number } | null;
 }
 
 interface MugMemory {
@@ -234,6 +242,8 @@ function start(room: PartyRoom, m: Mugger, target: string, inReach: boolean): vo
     target,
     state: inReach ? 'threat' : 'approach',
     untilTick: tick + ticksOf(inReach ? c.threatS : c.approachS),
+    nextHitTick: 0,
+    npcAnswer: null,
   };
   const mem = memoryOf(room);
   mem.byTarget.set(target, mg);
@@ -256,8 +266,11 @@ function advance(room: PartyRoom, mg: Mugging): void {
   const at = muggerAt(room, mg);
   if (mg.figure) mg.figure.moving = false;
   if (!t || t.dead || !t.placed || at === null) return end(room, mg, 'lost');
-  // A target through a door while its answer is due has run; the chase lands with Flee (A180).
-  if (t.sceneIdx !== at.sceneIdx) return end(room, mg, mg.state === 'prompt' ? 'escaped' : 'lost');
+  // A target through a door while its answer is due, in a chase or in a fight has run.
+  if (t.sceneIdx !== at.sceneIdx) {
+    const ran = mg.state === 'prompt' || mg.state === 'chase' || mg.state === 'fight';
+    return end(room, mg, ran ? 'escaped' : 'lost');
+  }
   const reach = c.reachTiles * TILE_PX;
   switch (mg.state) {
     case 'approach': {
@@ -276,9 +289,14 @@ function advance(room: PartyRoom, mg: Mugging): void {
       return;
     case 'prompt':
       hold(room, mg);
-      // A silent target is taken for the share (the strike, once the fists land).
+      // An NPC seat's drawn answer lands at its drawn tick; a silent target is taken for the share when the window ends.
+      if (mg.npcAnswer && tick >= mg.npcAnswer.atTick) return answer(room, mg, mg.npcAnswer.choice);
       if (tick >= mg.untilTick) take(room, mg, 'taken');
       return;
+    case 'chase':
+      return chase(room, mg, t, reach);
+    case 'fight':
+      return fight(room, mg, t, reach);
     default:
   }
 }
@@ -296,15 +314,151 @@ function hold(room: PartyRoom, mg: Mugging): void {
   if (brain) brain.pauseUntilTick = room.state.tick + 2;
 }
 
-/** The threat is over: the target's choice is due; a human gets the prompt, an NPC seat pays (card-blind). */
+/** The threat is over: the target's choice is due; a human gets the prompt, an NPC seat draws pay, flee or fight (card-blind, GDD 3.24). */
 function prompt(room: PartyRoom, mg: Mugging): void {
   mg.state = 'prompt';
   mg.untilTick = room.state.tick + ticksOf(balance.moods.mug.answerS);
-  if (isNpcSeat(room, mg.target)) return take(room, mg, 'paid');
+  // An NPC seat answers as a human might: its choice (or silence) and the tick it lands, drawn now on its own stream.
+  if (isNpcSeat(room, mg.target)) {
+    mg.npcAnswer = npcDraw(room, mg.target);
+    return;
+  }
   const muggerId = mg.figure
     ? (mg.figure.handle ?? '')
     : (room.state.players.get(mg.mugger)?.priv.avatar ?? '');
   room.clients.getById(mg.target)?.send(S2C.mugPrompt, { muggerId, endsTick: mg.untilTick });
+}
+
+/**
+ * Flee (round 10, S4; GDD 3.24): the mugger runs after the target for `chaseS` at its own walking pace and takes the
+ * share only if it comes within reach; a target that outpaces it, or leaves the scene, keeps its purse. An NPC seat
+ * walks by its brain's path finder, a figure by `walkFigure`; neither sees through walls or past a solid tile.
+ */
+function chase(room: PartyRoom, mg: Mugging, t: PlayerSim, reach: number): void {
+  hold(room, mg);
+  if (isNpcSeat(room, mg.target)) npcRun(room, mg, t);
+  const m = muggerAt(room, mg);
+  if (m === null) return end(room, mg, 'lost');
+  const walked = mg.figure
+    ? walkFigure(room, mg.figure, t.x, t.y, reach)
+    : (() => {
+        const p = simOf(room).players.get(mg.mugger);
+        const brain = npcMemory(room).brains.get(mg.mugger);
+        return p && brain ? walkTo(room, brain, p, t.x, t.y, reach) : 'stuck';
+      })();
+  if (walked === 'arrived') return take(room, mg, 'taken');
+  if (walked === 'stuck' || room.state.tick >= mg.untilTick) {
+    leaveScuffle(room, mg);
+    end(room, mg, 'escaped');
+  }
+}
+
+/** The fight is over with nothing taken: the scuffle is left and the target keeps its purse. */
+function gaveUp(room: PartyRoom, mg: Mugging): void {
+  leaveScuffle(room, mg);
+  end(room, mg, 'escaped');
+}
+
+/** The body whose health the mugger loses: a figure's reduced body or the NPC seat's own. */
+const muggerBody = (room: PartyRoom, mg: Mugging) => bodyOf(room, mg.figure ? mg.figure.id : mg.mugger);
+
+/**
+ * Fight (round 10, S4; GDD 3.24): for `fightS` the two stand in reach and trade a blow every `fightHitS`, each on 8A's
+ * fists (`body.damage.strike` from the target, `body.damage.mugging` from the mugger, each cut by the striker's own
+ * Weakened and the other's armour). A target knocked out is taken for the share; a mugger that the next blow would
+ * knock out is beaten off and goes, and one still standing at `fightS` gives up. A target that steps out of reach
+ * turns the fight into a chase. The exchange costs no stamina and the blows are the drawn clips, nothing else.
+ */
+function fight(room: PartyRoom, mg: Mugging, t: PlayerSim, reach: number): void {
+  const tick = room.state.tick;
+  hold(room, mg);
+  if (isNpcSeat(room, mg.target)) npcStand(room, mg);
+  const at = muggerAt(room, mg);
+  const target = bodyOf(room, mg.target);
+  const mine = muggerBody(room, mg);
+  if (at === null || !target || !mine) return end(room, mg, 'lost');
+  if (hasEffect(target, 'knockedOut')) return take(room, mg, 'taken');
+  if (Math.hypot(t.x - at.x, t.y - at.y) > reach * 1.5) {
+    mg.state = 'chase';
+    mg.untilTick = tick + ticksOf(balance.moods.mug.chaseS);
+    return;
+  }
+  if (tick >= mg.untilTick) return gaveUp(room, mg); // the mugger gives up
+  if (tick < mg.nextHitTick) return;
+  mg.nextHitTick = tick + ticksOf(balance.moods.mug.fightHitS);
+  const row = balance.body.damage;
+  const targetFactor = factorOf(target, (d) => d.strikeFactor);
+  const muggerFactor = factorOf(mine, (d) => d.strikeFactor);
+  // Beaten off before the blow that would knock it out lands: a figure has no wake, so it is never knocked out.
+  if (mine.hp - Math.round(row.strike.dmg * targetFactor) <= 0) return gaveUp(room, mg);
+  hurt(room, mg.figure ? mg.figure.id : mg.mugger, row.strike, {
+    source: 'strike',
+    by: mg.target,
+    factor: targetFactor,
+  });
+  hurt(room, mg.target, row.mugging, { source: 'mugging', by: mg.mugger, factor: muggerFactor });
+}
+
+/**
+ * The NPC seat's answer, drawn when the prompt opens on its `npcPlay` stream (card-blind, mood-free, GDD 3.24): a
+ * choice by the `moods.mug.npcAnswer` weights (silence is one) and, for an answer, the tick it lands, uniform between
+ * `npcAnswerMinS` and `answerS`, so a seat never answers on the prompt's first tick nor always waits the window out.
+ */
+export function npcDraw(room: PartyRoom, seat: string): Mugging['npcAnswer'] {
+  const c = balance.moods.mug;
+  const w = c.npcAnswer;
+  const rng = playRng(room, seat);
+  const pick = rng() * (w.pay + w.flee + w.fight + w.silent);
+  const at = room.state.tick + ticksOf(c.npcAnswerMinS + rng() * (c.answerS - c.npcAnswerMinS));
+  if (pick >= w.pay + w.flee + w.fight) return null;
+  return { choice: pick < w.pay ? 'pay' : pick < w.pay + w.flee ? 'flee' : 'fight', atTick: at };
+}
+
+/** An answer lands (a human's `act.mug`, or an NPC seat's draw): Pay is taken at once, Flee and Fight start theirs. */
+function answer(room: PartyRoom, mg: Mugging, choice: MugChoice): void {
+  const c = balance.moods.mug;
+  if (choice === 'pay') return take(room, mg, 'paid');
+  mg.state = choice === 'flee' ? 'chase' : 'fight';
+  mg.untilTick = room.state.tick + ticksOf(choice === 'flee' ? c.chaseS : c.fightS);
+  mg.nextHitTick = room.state.tick;
+}
+
+/**
+ * An NPC seat runs from its mugger as it runs from a creature (`mobs/flee.ts`): to the nearest open portal of the
+ * scene and through it, or straight away from the mugger when there is none. A human target runs on its own.
+ */
+function npcRun(room: PartyRoom, mg: Mugging, t: PlayerSim): void {
+  const brain = npcMemory(room).brains.get(mg.target);
+  const at = muggerAt(room, mg);
+  if (!brain || at === null) return;
+  brain.pauseUntilTick = room.state.tick + 2;
+  let door = null;
+  let best = Infinity;
+  for (const q of openPortals(room, t)) {
+    const d = Math.hypot((q.x + 0.5) * TILE_PX - t.x, (q.y + 0.5) * TILE_PX - t.y);
+    if (d < best) {
+      best = d;
+      door = q;
+    }
+  }
+  if (door && walkThrough(room, brain, t, mg.target, door) !== 'stuck') return;
+  const dx = t.x - at.x;
+  const dy = t.y - at.y;
+  const d = Math.hypot(dx, dy) || 1;
+  // As far as the room lets it: the farthest of a few reaches whose path exists.
+  for (const tiles of [8, 5, 3, 2]) {
+    if (
+      walkTo(room, brain, t, t.x + (dx / d) * tiles * TILE_PX, t.y + (dy / d) * tiles * TILE_PX, TILE_PX) !==
+      'stuck'
+    )
+      return;
+  }
+}
+
+/** An NPC seat in a fight stands and trades blows. */
+function npcStand(room: PartyRoom, mg: Mugging): void {
+  const brain = npcMemory(room).brains.get(mg.target);
+  if (brain) brain.pauseUntilTick = room.state.tick + 2;
 }
 
 /** The share leaves the target's purse for the mugger's (the `rob` event), the scuffle is left, the mugging ends. */
@@ -352,7 +506,7 @@ function end(room: PartyRoom, mg: Mugging, outcome: MugOutcome): void {
 
 /**
  * `act.mug { choice }` from the target (the `Commands.ts` line, consumed in `step()`): only while its prompt
- * is open. `flee` and `fight` are refused until the fists land (A180 part two, body.md 4).
+ * is open. `flee` starts the chase and `fight` the exchange of blows (round 10, S4, A180 part two).
  */
 export function handleMug(room: PartyRoom, sessionId: string, payload: Record<string, unknown>): void {
   const mg = memoryOf(room).byTarget.get(sessionId);
@@ -361,6 +515,5 @@ export function handleMug(room: PartyRoom, sessionId: string, payload: Record<st
   if (choice !== 'pay' && choice !== 'flee' && choice !== 'fight') {
     return reject(room, sessionId, 'BAD_REQUEST');
   }
-  if (choice !== 'pay') return reject(room, sessionId, 'NFY', { feature: 'fighting back' });
-  take(room, mg, 'paid');
+  answer(room, mg, choice);
 }

@@ -298,6 +298,10 @@
       "answerS": 6,
       "share": 0.3,
       "chaseS": 5,
+      "fightS": 9,
+      "fightHitS": 1.5,
+      "npcAnswerMinS": 1.5,
+      "npcAnswer": { "pay": 0.4, "flee": 0.2, "fight": 0.2, "silent": 0.2 },
       "cooldownS": 420
     },
     "weights": {

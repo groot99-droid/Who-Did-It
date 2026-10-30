@@ -384,6 +384,18 @@ export const BalanceFile = z.strictObject({
       answerS: Seconds,
       share: Chance,
       chaseS: Seconds,
+      /** Round 10, S4: a Fight lasts `fightS`; the two sides trade a blow every `fightHitS`. */
+      fightS: Seconds,
+      fightHitS: Seconds,
+      /** Round 10, S4: the weights of an NPC seat's answer to a mugging (drawn once on its own `npcPlay` stream). */
+      /** Round 10, S4: the earliest an NPC seat's answer lands after the prompt opens (a reaction floor). */
+      npcAnswerMinS: Seconds,
+      npcAnswer: z.strictObject({
+        pay: z.number().nonnegative(),
+        flee: z.number().nonnegative(),
+        fight: z.number().nonnegative(),
+        silent: z.number().nonnegative(),
+      }),
       cooldownS: Seconds,
     }),
     weights: z.strictObject({
