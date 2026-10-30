@@ -292,6 +292,13 @@ const styled = (style, n) => {
 };
 const sizesOf = (rule) => Object.entries(CONTENT.balance.byCount).filter(([, r]) => r.cabalWin === rule).map(([n]) => +n).sort((a, b) => a - b);
 function token(path, style) {
+  // A match token, filled by the client from the match (seams row 18): the Paint The Town Red target is
+  // ceil(winUnique × the NPC seats at the deal), at least 1; every seat but the two Killers is an NPC.
+  if (path === 'paintTown.target') {
+    const f = CONTENT.balance.paintTown?.winUnique;
+    if (typeof f !== 'number') throw new Error('paintTown.winUnique lands in C5');
+    return styled(style, Math.max(1, Math.ceil(f * (CONTENT.roles.decks[SAMPLE[ui.role].deck].cards.length - 2))));
+  }
   if (path === 'decks.killers.max') {
     const k = (cards) => cards.filter((id) => CONTENT.roles.roles[id]?.abilities.includes('kill')).length;
     return styled(style, Math.max(...Object.values(CONTENT.roles.decks).map((d) => k(d.cards))));
@@ -318,7 +325,7 @@ const MODES = {
     baker: { goal: 'Keep the town fed, and bring what you see to the law.', wins: ['The Wake Loaves are baked every morning: Trade.', 'The chores bar fills before the Killer’s vendetta completes: Town, for everyone who finished a chore.', 'A murder conviction you signed for or cuffed: Law.'], loses: ['The Killer completes the vendetta first.'], tag: 'world-mode.md 2, 3' },
   },
   paint: {
-    killer: { goal: 'Paint the town red before you are caught.', wins: ['Between you, kill {paintTown.winUnique} different townsfolk. A townsperson the train brings back and you kill again adds to your total, not to the count.', 'Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.'], loses: ['You are both convicted of murder, or the end trial closes first.'], tag: 'world-mode.md 1.6' },
+    killer: { goal: 'Paint the town red before you are caught.', wins: ['Between you, kill {paintTown.target} different townspeople who hold a card. The townsfolk who only walk the lanes don’t count, and a kill of someone the train brought back adds to your total, not to the count.', 'Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.'], loses: ['You are both convicted of murder, or the end trial closes first.'], tag: 'world-mode.md 1.6' },
   },
 };
 const PROPOSED = {

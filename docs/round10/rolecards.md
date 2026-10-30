@@ -536,8 +536,8 @@ The Paint The Town Red copy (draft):
 
 - Goal: Paint the town red before you are caught.
 - Wins:
-  - Between you, kill {paintTown.winUnique} different townsfolk. A townsperson the train brings back and you kill again
-    adds to your total, not to the count.
+  - Between you, kill {paintTown.target} different townspeople who hold a card. The townsfolk who only walk the lanes
+    don't count, and a kill of someone the train brought back adds to your total, not to the count.
   - Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.
 - Loses: You are both convicted of murder, or the end trial closes first.
 - Tips: The ledger ranks you two by total kills.
@@ -561,8 +561,13 @@ that the role switch reopens the card at Win. 10E decides.
 In world mode the second heading reads "You miss out when": a seat that does not win has not lost to a side, since there
 is no side (`world-mode.md` 2). The other cards follow the same pattern, from 4.3's "when built" lines.
 
-The token `{paintTown.winUnique}` reads `balance.json` once C5 adds the key. Until then, R3's token check refuses the
-row, so it cannot ship early. The mock has a Mode select: world mode (the default), Paint The Town Red (the Killer only) and
+`{paintTown.target}` is a match token, not a content path. `paintTown.winUnique` is a fraction (6Z's C5 ruling, seams
+row 18, #382), so printing the key would show "0.5". The client fills the token when the card opens:
+ceil(`winUnique` × the NPC seats at the deal), at least 1. In this mode every seat but the two Killers is an NPC, so the
+NPC seats are the seat count less two, and nothing new goes on the wire. The end screen keeps its own
+`gameOver.paintTown.target`. Only roster NPC seats count (`world-mode.md` 1.6). The ambient townsfolk (GDD 3.24) don't
+count, and the guards count only toward the pillars. R3 registers the token beside the content tokens of `cardText.ts`,
+as a token filled at run time, and its check refuses the row until C5 adds the key, so it cannot ship early. The mock has a Mode select: world mode (the default), Paint The Town Red (the Killer only) and
 today's main mode. It shows a key that is not in the data yet as its name in brackets.
 
 ## 5. The Daybook
