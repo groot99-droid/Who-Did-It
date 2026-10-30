@@ -593,9 +593,10 @@ export function drawHeld(g: SKRSContext2D, tool: string, dir: Dir, hand: Pt): vo
       ]);
       seg(g, c('stone', 5), [11, 42], [18, 37], 2);
       break;
+    case 'ironAxe':
     case 'axe':
       bar(g, c('wood', 4), [-4, -20], [6, 26], 4);
-      poly(g, c('stone', 3), [
+      poly(g, c(tool === 'ironAxe' ? 'slate' : 'stone', 3), [
         [2, 22],
         [16, 18],
         [20, 34],
@@ -603,9 +604,10 @@ export function drawHeld(g: SKRSContext2D, tool: string, dir: Dir, hand: Pt): vo
       ]);
       seg(g, c('stone', 5), [17, 20], [19, 33], 2);
       break;
+    case 'ironPickaxe':
     case 'pickaxe':
       bar(g, c('wood', 4), [-4, -20], [6, 26], 4);
-      poly(g, c('stone', 3), [
+      poly(g, c(tool === 'ironPickaxe' ? 'slate' : 'stone', 3), [
         [-12, 24],
         [14, 20],
         [20, 26],
@@ -623,6 +625,7 @@ export function drawHeld(g: SKRSContext2D, tool: string, dir: Dir, hand: Pt): vo
       ]);
       seg(g, c('stone', 5), [15, 18], [17, 27], 2);
       break;
+    case 'finePick':
     case 'lockpicks':
       g.beginPath();
       g.ellipse(0, 3, 4, 4, 0, 0, Math.PI * 2);
@@ -632,7 +635,8 @@ export function drawHeld(g: SKRSContext2D, tool: string, dir: Dir, hand: Pt): vo
       g.lineWidth = 2;
       g.strokeStyle = c('brass', 1);
       g.stroke();
-      for (const t of [-1, 0, 1]) seg(g, c('stone', 5), [t * 2, 8], [t * 6, 22], 3);
+      for (const t of tool === 'finePick' ? [-1, 0, 1, 2] : [-1, 0, 1])
+        seg(g, c(tool === 'finePick' ? 'slate' : 'stone', 5), [t * 2, 8], [t * 6, 22], 3);
       break;
     case 'crowbar':
       bar(g, c('slate', 1), [-4, -20], [6, 26], 4);

@@ -36,6 +36,9 @@ export const TOOL_IDS = [
   'axe',
   'pickaxe',
   'hammer',
+  'ironAxe',
+  'ironPickaxe',
+  'finePick',
 ] as const;
 export type ToolId = (typeof TOOL_IDS)[number];
 export const NODE_STATES = ['ready', 'spent'] as const;

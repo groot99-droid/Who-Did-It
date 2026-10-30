@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, LookId, Seconds, Tiles } from './common.js';
+import { Profile } from './balance.js';
 import { ToolTag } from './interactions.js';
 
 // M5b content (GDD 3.14 to 3.16, round 6, Session 6E; docs/round6/m5b-data.md 1): resources, recipes, mobs, quests and
@@ -48,6 +49,8 @@ export const Recipe = z.strictObject({
   shape: z.array(z.array(Id.nullable()).min(1)).min(1).optional(),
   /** Round 10, D4a: the maps this recipe is made on (its stations stand only there); absent = every map. */
   maps: z.array(Id).min(1).optional(),
+  /** Round 10, S3: the smallest party profile whose scenes hold the station (the smithy opens at medium); absent = small. */
+  profile: Profile.optional(),
 });
 export type Recipe = z.infer<typeof Recipe>;
 
