@@ -4156,6 +4156,15 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   slot). 10Y's copy goes in `####` subsections of its 14.51, since 14.52 is 10X's (seams.md 5).
 - 2026-10-30: x11, the Herb Bread until dawn (10X), as the owner answered. 6Z granted its `effects.json` row and the
   comment in `sim/body/cures.ts`; the client's effect chip and tooltip must never read "0 s".
+- 2026-10-30: B5's wire note (10B) is seams row 19, the county jail. 6Z ruled on the face: an impersonation worn at
+  the cuff stays pinned until the seat leaves jail or dies, so the cell, the Tribunal and the release show the face
+  that was cuffed. Dropping it at the jail door would unmask the Killer there, against the owner's "nothing unmasks
+  on the spot". Two figures in one face can then be seen at once, as with any impersonation: only the drawn figures
+  tell. B5 is granted the `inJail` stub in `sim/Sleep.ts` and the `jailed` stubs in `sim/law/Petition.ts` and
+  `sim/law/Manhunt.ts`.
+- 2026-10-30: 10X's x14, an invariant for the bot swarm: each seat's view is decoded through a shadow encoder, and
+  every avatar a seat holds must exist on the server at the same place, every avatar the server shows the seat must be
+  held, and no secret field may decode. It runs behind `pnpm auto -- --views`, off by default, after x13.
 
 ## Round 11 (planning, started 2026-10-29)
 
