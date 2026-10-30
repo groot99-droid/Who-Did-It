@@ -1116,7 +1116,29 @@ Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds
 
 ### 3.29 The lock-pick mini-game
 
-Round 10, D5 (`docs/round9/gdd-map.md` 2.3). Not built yet: the step that builds it writes this section.
+Round 10, D5 (`docs/round9/gdd-map.md` 2.3; `docs/round9/logic-table.md` 8.5; owner answer LT2). D5a is the rules and
+the server; D5b the screen; D5c the scratch clue and the fine.
+
+**What opens it.** A locked door (the `lockedDoor` class, 3.14) with a Lockpicks in the pack: `act.hold {action:
+'interact'}` on it opens the mini-game in place of a hold, and the Lockpicks (`tool.pick`) is the tool of the wall. A seat
+without one is refused `NEED_TOOL`. The manor study door (`mu.study_door`) is the one lock placed; the curfew doors wait
+for rent in kind (D7).
+
+**The lock.** It has pins by tier (`balance.minigames.lockpick.pinsByTier`: 3, 4, 5; every placed lock is tier 1), each with
+a set point along its lift, dealt on the `locks` stream when the lock is first picked in a match and kept for the match.
+The picker's client alone gets `minigameStart {kind: 'lockpick', public: {pins, setPoints, band, snapAt, minAttemptS,
+maxAttempts}}`: the set points are a puzzle, as the tap bands are, so the click can be felt. A pick of a lower tier than the
+lock has a narrower band (`lowerTierBandMult`). The attempt sounds as the interaction's noise from its start (3.7).
+
+**The answer** is a trace of attempts `{t, pin, lift, tension}` that the server replays (`rules/minigames.ts
+lockpickOutcome`): a lift within `band` of the pin's set point sets it, a tension of `snapAt` or more snaps the pick, and
+all pins set opens the lock. Times ascend and keep `minAttemptS` apart and a trace holds at most `maxAttempts`, so no
+trace is faster than a hand. A trace that leaves a pin unset or is malformed is `BAD_REQUEST` and the board stays open.
+
+**Opening and snapping.** An opened lock becomes the public prop state `open` (3.14; it names no one). A snapped pick
+spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way. Nothing else changes in public view: the
+scratch clue and the small fine the interaction names arrive with D5c. NPC seats do not pick yet (their routine reaches
+only props a mode of no mini-game works, 3.12 Chores).
 
 ### 3.30 The inventory and crafting
 

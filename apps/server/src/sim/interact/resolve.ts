@@ -23,6 +23,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { addStack, canAdd, count, take } from '../Inventory';
+import { startLockpick } from '../Minigames';
 import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
@@ -179,8 +180,6 @@ function problemOf(
     const need = wall ? toolsFor(wall.tag, wall.tier)[0] : undefined;
     return { problem: { reason: 'NEED_TOOL', args: need && wall ? { need, tier: wall.tier } : {} }, t };
   }
-  if (mode.minigame !== undefined)
-    return { problem: { reason: 'NFY', args: { feature: 'lock-pick mini-game' } }, t };
   const lacking = missingInput(player, mode);
   if (lacking !== undefined) return { problem: { reason: 'NEED_ITEM', args: { need: lacking } }, t };
   if ((mode.drops ?? []).some((d) => !canAdd(player, d.item, d.qty[1])))
@@ -210,6 +209,17 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
   const interactionId = t ? chooseInteraction(player, t, via) : undefined;
   const { problem, modeIdx } = problemOf(room, player, p, targetId, interactionId);
   if (problem) return refuse(room, sessionId, problem, interactionId);
+  const mode = interactions.interactions[interactionId as string]?.modes[modeIdx as number];
+  // A mode with a mini-game (the lock-pick, round 10 D5) opens it in place of a hold.
+  if (mode?.minigame !== undefined && mode.minigame !== 'lockpick')
+    return refuse(room, sessionId, { reason: 'NFY', args: { feature: 'this action' } }, interactionId);
+  if (t && mode?.minigame === 'lockpick')
+    return startLockpick(
+      room,
+      sessionId,
+      { sceneId: t.sceneId, propId: t.id, interactionId: interactionId as string },
+      mode.noise,
+    );
   // Pressing again on the same target keeps the original start; another target restarts.
   if (p.hold?.action === 'interact' && p.hold.targetId === targetId) return;
   p.hold = { action: 'interact', targetId, startTick: room.state.tick };
