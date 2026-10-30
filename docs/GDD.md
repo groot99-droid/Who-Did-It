@@ -940,6 +940,15 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Indebted.** A seat that still owes at dusk becomes Indebted (`EffectId.indebted`, its own view only). No bit is
   drawn; inspect reads "a hunted look". From dusk to dawn the doors from outdoors into its map's `curfew` scenes refuse
   it as a locked door does, so it sleeps rough; a seat already inside still moves between the rooms and can leave. Paying its debt clears it. Forced labour waits for R9's law pipeline.
+- **Rent in kind and the boarded house** (round 10, D7; owner answer EP3). `act.payRent` takes the purse first and,
+  for what is left, goods at the market's `pay` price (`economy.json` `prices`), cheapest first; it refuses
+  (`NEED_SCRIP`) when purse and goods together fall short, and takes nothing. At dusk a seat that still owes has goods
+  taken to the debt's value from its pack, the same way, and what it still owes after that is its Indebted debt as
+  before; a seat Indebted has its house boarded up, so it cannot lie down in the home bed (`BOARDED_HOME`, 3.32). The
+  chapel cot and the tavern bed are free of it. Holding a Crowbar or a Hammer, lying down on the boarded bed pries the
+  boards for the night with a crowbar's noise (`noise.crowbar`); they go back at dawn and the debt stands. Paying the
+  debt takes the boards off. Not built: a Notice for trespass on the own house if a witness sees, and picking the
+  curfew doors (they stay doors).
 
 - **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
   (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
