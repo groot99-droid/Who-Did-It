@@ -8,6 +8,7 @@
  *
  * The night set (palette.json `night`, round 7) is for the DOM UI only; its glass and veil alphas
  * below are the ones docs/UI.md 10 measures, so change them there and in theme.test.ts together.
+ * The dossier set (palette.json `dossier`, round 10) is DOM only too; its roles live in dossier.css.
  *
  * One import (`import './ui/theme/tokens.css'`) gives a screen the fonts, the palette, the type
  * scale, spacing, radii, strokes, shadows and motion. Component classes live in components.css.
@@ -41,6 +42,48 @@
   src: url('../../assets/fonts/press-start-2p-latin-400-normal.woff2') format('woff2');
 }
 
+@font-face {
+  font-family: 'Alegreya SC';
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/alegreya-sc-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/alegreya-sans-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/alegreya-sans-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Alegreya Sans';
+  font-weight: 700;
+  font-display: swap;
+  src: url('../../assets/fonts/alegreya-sans-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url('../../assets/fonts/ibm-plex-mono-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 500;
+  font-display: swap;
+  src: url('../../assets/fonts/ibm-plex-mono-latin-500-normal.woff2') format('woff2');
+}
+
 :root {
   /* ---- palette.json colours (generated block; keep in file order) ---- */
   --wdi-ink: #12141c;
@@ -58,6 +101,22 @@
   --wdi-indigo: #251a6b;
   --wdi-lilac: #c9ceff;
   --wdi-snow: #ffffff;
+  --wdi-vellum: #eceef2;
+  --wdi-sheet: #fbfbfc;
+  --wdi-pencil: #586072;
+  --wdi-rule: #d3d8e0;
+  --wdi-well: #f1ebdd;
+  --wdi-ochre: #8c600a;
+  --wdi-moss: #2f6b45;
+  --wdi-brick: #9e3b2a;
+  --wdi-focus: #2d5fa8;
+  --wdi-carbon: #2a303d;
+  --wdi-graphite: #343b4a;
+  --wdi-ash: #a9afbc;
+  --wdi-seam: #4a5264;
+  --wdi-cellar: #3d4352;
+  --wdi-sage: #8fcba2;
+  --wdi-blush: #ec917a;
 
   /* The same colours as space-separated RGB for alpha use: rgb(var(--wdi-bone-rgb) / 0.72). */
   --wdi-ink-rgb: 18 20 28;
@@ -138,6 +197,10 @@
   /* The night theme's pixel faces (docs/UI.md 3): never below 12 px, never synthesised bold. */
   --wdi-font-pixel-display: 'Press Start 2P', ui-monospace, monospace;
   --wdi-font-pixel-text: 'Pixelify Sans', system-ui, sans-serif;
+  /* The dossier's faces (round 10, docs/UI.md 3): the role card and the Satchel only, through dossier.css. */
+  --wdi-font-dossier-display: 'Alegreya SC', Georgia, serif;
+  --wdi-font-dossier-text: 'Alegreya Sans', system-ui, sans-serif;
+  --wdi-font-dossier-mono: 'IBM Plex Mono', ui-monospace, monospace;
   --wdi-display-xl: 2.75rem; /* 44: party code */
   --wdi-display-lg: 2rem; /* 32: screen titles, role name */
   --wdi-display-md: 1.5rem; /* 24: section titles, portrait names */

@@ -8,6 +8,7 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
+import { SLOT_ACTIONS, cardSlots } from '../input/actions';
 import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
@@ -26,7 +27,7 @@ import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
-import { type TalkAsk, TALK_KEYS, TALK_REACH_TILES, askedLine } from '../ui/talk/talk';
+import { type TalkAsk, TALK_REACH_TILES, askedLine } from '../ui/talk/talk';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
@@ -80,7 +81,6 @@ const COLLECT_MS = A.collect.castS * 1000;
 /** A target player may have moved since the last patch; the server adds the same slack from its ring. */
 const TARGET_SLACK_TILES = 1;
 const ABILITY_DEFS = A as unknown as Record<string, { kind: string; target: string; rangeTiles?: number }>;
-const ABILITY_SLOTS: Record<string, string> = { KeyQ: 'Q', KeyR: 'R', KeyF: 'F' };
 const PHASE_LABEL: Record<number, string> = {
   [Phase.grace]: C['phase.grace'],
   [Phase.day]: C['phase.day'],
@@ -472,13 +472,13 @@ export class World extends Phaser.Scene {
 
   private bindKeys(): void {
     const input = this.input_;
-    input.bind('KeyE', (down) => this.useKey(down));
-    input.bind('KeyN', (down) => down && this.sheet.toggle());
-    for (const [code, slot] of Object.entries(ABILITY_SLOTS))
-      input.bind(code, (down) => down && this.abilityKey(slot));
-    input.bind('KeyX', (down) => down && this.strikeKey()); // round 8, 8A
-    for (const [code, ask] of Object.entries(TALK_KEYS))
-      input.bind(code, (down) => down && this.talkKey(ask)); // round 10, D9c
+    // Round 10, R1: every key through its row of the action table (input/actions.ts, rolecards.md 3).
+    input.bindAction('use', (down) => this.useKey(down));
+    input.bindAction('notebook', (down) => down && this.sheet.toggle());
+    SLOT_ACTIONS.forEach((id, i) => input.bindAction(id, (down) => down && this.abilityKey(i)));
+    input.bindAction('strike', (down) => down && this.strikeKey()); // round 8, 8A
+    input.bindAction('talk.town', (down) => down && this.talkKey('town')); // round 10, D9c
+    input.bindAction('talk.time', (down) => down && this.talkKey('time'));
   }
 
   /**
@@ -560,10 +560,10 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
-  /** Q, R or F: the card's ability on that key. */
-  private abilityKey(slot: string): void {
-    const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
-    if (row) this.useAbility(row.id);
+  /** Q, R or F: the card's ability in that slot; a passive takes no slot (rolecards.md 3.2). */
+  private abilityKey(index: number): void {
+    const slot = cardSlots(getNet(this).roleCard?.abilities)[index];
+    if (slot) this.useAbility(slot.id);
   }
 
   /**

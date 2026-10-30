@@ -117,7 +117,7 @@
     "resistant": {
       "id": "resistant",
       "name": "Resistant",
-      "durationS": 780,
+      "durationS": 0,
       "poisonFactor": 0.5,
       "dish": true,
       "cures": [],

@@ -31,6 +31,8 @@ export const Vendetta = z.strictObject({
   needsCard: Id.optional(),
   /** Drawn only when this scene is open at the party's profile (the Bandit's strongbox). */
   needsScene: z.enum(SCENE_IDS).optional(),
+  /** Never drawn at the deal: it reaches a seat later (round 10, C4: the Hitman's arrival, GDD 3.33). */
+  arrival: z.literal(true).optional(),
   triggers: z.array(Trigger),
   /** Event kinds the vendetta emits, each `vendetta.<kind>.<step>`. */
   emits: z.array(EventKind).min(1),

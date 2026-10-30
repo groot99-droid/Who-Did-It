@@ -142,13 +142,18 @@ describe('MockWorldFeed cutscenes (?cutscene=1, GDD 3.18)', () => {
     expect(events.indexOf('cutscene')).toBeLessThan(events.indexOf('sceneEnter'));
   });
 
-  it('kills a ghost with its cutscene id once the World first reads the feed', () => {
+  // The World's `create` reads the feed before it listens for `killed` (the Notebook sheet reads the roster as it is
+  // built), so the kill lands a macrotask after the first read, as a server's would (10Y, A494).
+  it('kills a ghost with its cutscene id a macrotask after the World first reads the feed', async () => {
     const { feed, events } = make('?cutscene=1&ghost=1');
     const killed: unknown[] = [];
-    feed.bus.on('killed', (k) => killed.push(k));
     feed.start();
     expect(feed.dead()).toBe(false);
     feed.snapshot();
+    feed.bus.on('killed', (k) => killed.push(k)); // bound after the read, as the World binds it
+    expect(events).not.toContain('killed');
+    expect(feed.dead()).toBe(false);
+    await new Promise((r) => setTimeout(r, 0));
     feed.dispose();
     expect(feed.dead()).toBe(true);
     expect(events).toContain('killed');
