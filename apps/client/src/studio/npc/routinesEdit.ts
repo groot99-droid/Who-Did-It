@@ -1,6 +1,7 @@
 // Round 9 (9W, N3): the NPC editor's pure edits on `routines.json`: each returns a new file. Rows keep the file's key
-// order (maps, look, named, fixed, stations) so a save diffs only what changed. Role secrecy: nothing here reads or
-// writes a card; `look` and the seat roles are not touched.
+// order (maps, look, named, fixed, guard, count, stations) so a save diffs only what changed; the optional keys stay
+// when the row has them (round 10, 10Y, DECISIONS A314: the round-9 list dropped B1's `guard` and `count` on any
+// edit). Role secrecy: nothing here reads or writes a card; `look` and the seat roles are not touched.
 import { content, MAP_IDS, RoutinesFile, validateContent, type MapId, type RoutineHold } from '@wdi/content';
 
 export type Edit = { routines: RoutinesFile } | { error: string };
@@ -12,6 +13,8 @@ const ordered = (row: RoutinesFile['townsfolk'][string], over: Partial<typeof ro
     look: r.look,
     named: r.named,
     fixed: r.fixed,
+    ...(r.guard === undefined ? {} : { guard: r.guard }),
+    ...(r.count === undefined ? {} : { count: r.count }),
     stations: r.stations,
   };
 };
