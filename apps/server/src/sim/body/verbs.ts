@@ -30,7 +30,8 @@ export function handleBodyAbility(
     case 'antidote':
       return handleCure(room, sessionId, payload.abilityId, payload);
     case 'eat':
-      return handleEat(room, sessionId);
+    case 'eatHerbBread':
+      return handleEat(room, sessionId, payload.abilityId);
     default:
       reject(room, sessionId, 'NFY');
   }
