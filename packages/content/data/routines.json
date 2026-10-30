@@ -4,20 +4,11 @@
   "activities": {
     "work": {
       "phases": ["day"],
-      "kinds": [
-        "taskSource",
-        "pump",
-        "flourBin",
-        "oven",
-        "basin",
-        "goat",
-        "fence",
-        "window",
-        "coldShelves",
-        "doughMixer",
-        "brickOven",
-        "proofingCabinet"
-      ]
+      "kinds": ["taskSource", "pump", "flourBin", "oven", "basin", "goat", "fence", "window"]
+    },
+    "bake": {
+      "phases": ["day", "night"],
+      "kinds": ["coldShelves", "doughMixer", "brickOven", "proofingCabinet"]
     },
     "gather": {
       "phases": ["day"],
