@@ -7,13 +7,13 @@ import { describe, expect, it } from 'vitest';
 // is its text, verbatim. A row that names several keys, or a text that a sentence describes rather than quotes, is
 // not checked; a line that moved to a later section is written there, not left in its old table.
 
-const modules = import.meta.glob<Record<string, unknown>>('./*.ts', { eager: true });
+/** The copy modules of this folder, eagerly; the tests beside them are left out so they do not run twice. */
+const modules = import.meta.glob<Record<string, unknown>>(['./*.ts', '!./*.test.ts'], { eager: true });
 
 /** Every copy line of this folder by key: a key held by more than one module (`settings.title`) keeps every text. */
 function copyLines(): Map<string, Set<string>> {
   const lines = new Map<string, Set<string>>();
-  for (const [path, mod] of Object.entries(modules)) {
-    if (path.endsWith('.test.ts')) continue;
+  for (const mod of Object.values(modules)) {
     for (const value of Object.values(mod)) {
       if (typeof value !== 'object' || value === null) continue;
       for (const [key, text] of Object.entries(value as Record<string, unknown>)) {
