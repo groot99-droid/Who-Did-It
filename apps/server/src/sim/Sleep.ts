@@ -14,6 +14,7 @@ import { simOf } from './RoomSim';
 import { onSleepPhase, trackHoldout } from './SleepRest';
 import { profileOpen, sceneKey } from './World';
 import { isOnLine } from './Train';
+import { isJailed } from './law/Jail';
 
 /**
  * Sleeping (round 10, A7, GDD 3.32; docs/round9/world-mode.md 7.3). A seat lies down with `act.hold {action:
@@ -23,7 +24,7 @@ import { isOnLine } from './Train';
  * `sleep.confirmS` of the night, the night ends through the normal dawn (`phaseEndsTick`, `Phases.ts`).
  *
  * Active means a living, placed, connected human; an NPC seat never counts, so nothing waits on one. The jail (B5)
- * is not built yet, so `inJail` says no; `onTheLine` is C1's `isOnLine` (a seat waiting for the morning train).
+ * is B5's (`inJail`); `onTheLine` is C1's `isOnLine` (a seat waiting for the morning train).
  * Homes and sleepers are room memory keyed by the match's `MatchSeeds`; the homes draw only from the `homes` stream.
  */
 
@@ -53,8 +54,8 @@ function sleepersOf(room: PartyRoom): Sleepers {
 
 const subscribed = new WeakSet<PartyRoom>();
 
-/** Not built yet (B5): no seat is in the county jail. */
-const inJail = (_room: PartyRoom, _seat: string): boolean => false;
+/** B5: a seat in the county jail, or on its way there (`law/Jail.ts`). */
+const inJail = (room: PartyRoom, seat: string): boolean => isJailed(room, seat);
 /** Not built yet (the respawn step): no seat is on the line. */
 const onTheLine = (room: PartyRoom, seat: string): boolean => isOnLine(room, seat); // round 10, C1
 

@@ -100,7 +100,7 @@ interface ArgsOf {
   PHASE_CLOSED: { until?: RefusalUntil };
   NOT_IN_PLAY: { why?: 'ghost' | 'transit' };
   COOLDOWN: { readyInS?: number };
-  SPENT: { what?: 'power' | 'stock' };
+  SPENT: { what?: 'power' | 'stock' | 'match' };
   LOBBY_RULE: { rule?: RefusalLobbyRule };
   TOO_FAR: { of?: RefusalTarget };
   ALREADY_DONE: { what?: 'report' | 'notebook' | 'built' };
@@ -121,6 +121,8 @@ interface ArgsOf {
   NOT_YOURS: { what?: 'task' | 'build' };
   CHAT_RATE: { readyInS?: number };
   PETITION_GRACE: { readyInS?: number };
+  /** Round 10, B5: the seconds until the train that releases the seat (seams.md 3 row 19). */
+  IN_JAIL: { untilDawn?: number };
   GRID_BOUND: { item?: string };
   NEEDS_PART: { missing?: string[] };
 }
