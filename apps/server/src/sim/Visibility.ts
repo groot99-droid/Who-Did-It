@@ -137,7 +137,13 @@ function reconcileAvatars(
   for (const handle of [...held.ghost]) {
     if (ghostViewer && wanted.has(handle)) continue;
     const avatar = avatarOf(room, handle);
-    if (avatar) view.remove(avatar, VIEW_TAG.ghost);
+    if (avatar) {
+      view.remove(avatar, VIEW_TAG.ghost);
+      // Round 10, x4 (A333): in @colyseus/schema 5.0.36 `remove(obj, tag)` also hides the whole object from the
+      // view (StateView.ts:752), so an avatar the viewer keeps is added back with the default tag, which re-sends
+      // only the untagged fields it already holds.
+      if (wanted.has(handle) && held.plain.has(handle)) view.add(avatar);
+    }
     held.ghost.delete(handle);
   }
   for (const handle of [...held.near]) {
@@ -194,6 +200,9 @@ function syncNear(room: PartyRoom, held: HeldAvatars, view: StateView, viewerSim
       held.near.add(handle);
     } else if (!near && held.near.has(handle)) {
       view.remove(avatar, VIEW_TAG.near);
+      // Round 10, x4 (A333): schema 5.0.36's `remove(obj, tag)` also hides `obj` (StateView.ts:752); without this
+      // add-back the viewer's copy froze where it left the ring and never caught up or left (the production bug).
+      view.add(avatar);
       held.near.delete(handle);
     }
   }

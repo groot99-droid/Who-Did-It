@@ -16,3 +16,5 @@ export * from './minigames';
 export * from './inventory';
 // Round 10, A13 (GDD 3.30): the crafting grid's match.
 export * from './craftGrid';
+// Round 10, C5 (GDD 3.8): Paint The Town Red's target.
+export * from './paintTown';

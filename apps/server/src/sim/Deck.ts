@@ -3,9 +3,10 @@ import { dealDeck } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
 import { initBodies } from './body/state';
+import { beginPaintTown, humansOf, paintDeal, paintsTown } from './paintTown';
 import { drawVendettas } from './vendettas/state';
 
-// The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Session 5G owns this file; the hook
+// The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Round 10, 10C owns this file; the hook
 // below is called from its locked site in `rooms/handlers/lobby.ts`.
 
 /** The deck for a party of `seats`: the party size is clamped to the rows `roles.json` holds (4 to 10). */
@@ -39,6 +40,7 @@ export function fixedDealFits(fixed: Record<string, string>, seats: number): boo
  */
 export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<string, string> {
   const flow = flowOf(room);
+  if (paintsTown(room, ids)) return dealPaintTown(room, ids); // round 10, C5 (GDD 3.8)
   const cards = deckCardsFor(ids.length);
   const fixed = flow.fixedDeal;
   flow.fixedDeal = null;
@@ -60,6 +62,25 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
   flow.deck = cards;
   flow.undealt = deal.undealt;
   drawVendettas(room, dealt); // round 7, 7H: one vendetta per Killer seat, on its own stream (GDD 3.20)
+  initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
+  return dealt;
+}
+
+/**
+ * Paint The Town Red's deal (round 10, C5; world-mode.md 1.6): the deck gains a second Killer (`paintDeck`), both
+ * humans take the Killer cards, and the NPC seats are dealt the rest on the same stream, the Vicar always
+ * (`paintDeal`). No vendetta, and a pending
+ * `debug.deal` is dropped.
+ */
+function dealPaintTown(room: PartyRoom, ids: readonly string[]): Map<string, string> {
+  const flow = flowOf(room);
+  flow.fixedDeal = null;
+  const humans = humansOf(room, ids);
+  const npcs = ids.filter((id) => !humans.includes(id));
+  const { cards, dealt, undealt } = paintDeal(humans, npcs, deckCardsFor(ids.length), room.seeds.get('deal'));
+  flow.deck = cards;
+  flow.undealt = undealt;
+  beginPaintTown(room, humans, npcs.length);
   initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
   return dealt;
 }

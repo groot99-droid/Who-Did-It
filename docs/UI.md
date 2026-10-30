@@ -219,6 +219,8 @@ the hazard glow, pulsing.
 paper knob. Buttons are 64 px paper discs with the key in Oswald 20 px over a 12 px caps label;
 `--primary` is the 80 px mustard Use button. They sit bottom-right in a two-by-two cluster, the
 stick bottom-left. Round 8 (8A) adds a fifth disc, Strike (X, `touch-strike`), at the end of the cluster (14.32).
+Round 10 (10Y, A334) takes the Act disc out of the cluster: the card's abilities each get a disc, Q, R and F, in a
+row over the cluster (14.51.1).
 
 **Portraits** (`.wdi-portraits`, `.wdi-portrait`). A grid of paper tiles at least 132 px wide
 (104 on phones): a 2:3 picture slot on slate, the name in display-sm, the trait icons in a row,
@@ -506,9 +508,12 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
+| `inventory`, `crafting`, `asleep`, `line`, `lockpick` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
+| `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.51.1 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
+| `studio-npc-1280x720` (10Y, round 10; from `e2e/studio.spec.ts`, not a static page) | the Studio's NPC editor on the mock room after a save: the clerk's stations with the pump first, the note and the draft-PR line | 14.42, DECISIONS A314 |
 
 Owner sign-off requested on the role card and the meeting screen before the frames are final.
 
@@ -577,8 +582,9 @@ disc carries the key instead.
 | `prompt.ability` | Q / R / F | {ability} {target} | an ability row of the card with a living player in reach; `{ability}` is the card row's `name` ("Kill", "Bandage") |
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
-Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.act` Act, `touch.run` Run, `touch.sneak`
-Sneak; the Strike disc's label is 8A's `body.strike` (14.32).
+Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.run` Run, `touch.sneak` Sneak; the Strike disc's label
+is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.51.1, round 10, 10Y; `touch.act`
+Act went with the Act disc).
 
 ### 14.3 Refusals (a toast after a refused action, N)
 
@@ -1780,6 +1786,14 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   picked stack again to put it down.
 - **The hotbar strip** is always on screen during a match: a tap or the keys 1 to 6 select the held slot
   (`inv.select`); the held slot has a border. The same strip is the touch control.
+- **The bottom band (10Y, round 10).** The key row (Pockets, Craft, Chores), the hotbar and the body panel stack
+  bottom-left, keys at the bottom, so none covers another, the toasts or the stick. On a phone the stick holds the
+  corner and the touch cluster the right, so the keys sit two by two beside the cluster without their key caps, the
+  hotbar and the body panel start above the cluster, and the toasts above the body panel (`match.css`, the m5b
+  section). The interact prompt (centred) clears the key row on a desktop and the body panel on a phone, and the toasts
+  start above the prompt. The shops' layer (8C) is a second `.wdi-m5b` after the first, so its counter prompt is hidden
+  while a board is open, or it would paint over the modal. `docs/ui/inventory-390w.png` and `inventory-1280x720.png`
+  show the band; `lockpick-390w.png` the board over it.
 - **The crafting square** shows the product the shared match gives as a preview; Take sends `craft.grid` and empties the
   square. A role-bound item cannot be placed (`grid.bound` on hover); the 3 by 3 button asks the server, which
   refuses `NEED_STATION` (workbench) away from one. The refusals read their lines from 14.43.
@@ -1842,6 +1856,12 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
 | a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
+| the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
+| the Paint The Town Red winner (`over.paintTown`, C5b) | The Killers paint the town red | the end screen's title, `Winner.paintTown` |
+| the tally's title (`over.paint.title`, C5b) | Paint The Town Red | the end screen, above the roles, in that mode only |
+| the target (`over.paint.target`, C5b) | The town needed {n} different kills | the end screen, under the tally's title |
+| a Killer's row (`over.paint.row`, C5b) | {name}: {unique} different, {total} in all | the end screen, one per Killer, ranked by total |
+| the Killers' goal (`card.paint.goal`, C5b) | Paint The Town Red: with the other Killer, kill {n} different townsfolk before you are both caught. | the role card's goal line, while `Private.paintTown` is set; {n} is `paintTarget` over the roster |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 
@@ -1859,7 +1879,7 @@ Resistant (`icon_effect_resistant`), named by the data and with no copy of its o
 | the pick button (`minigame.lockpick.press`) | Hold the pick | the dialog, below the board |
 | progress (`minigame.lockpick.progress`) | {set} of {pins} pins set | the status line |
 | a miss (`minigame.lockpick.miss`) | It slips back. | the status line |
-| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line; the server's `PICK_SNAPPED` refusal follows |
+| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line, on a release past the snap line and when a held pick snaps on its own (10Y); the server's `PICK_SNAPPED` refusal follows |
 | the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
 
 ### 14.50 The law (10B, round 10)
@@ -1902,3 +1922,17 @@ centred, it hid the log's first line.
   `NEED_*` never hint.
 - **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
   until then.
+
+#### 14.51.1 The ability discs on a phone (y6)
+
+Round 10's role-card audit found that a phone had only the Act disc, Q, so Impersonate, Salts, Chalk, Rope and Fake
+Blood were out of reach there (`docs/round10/rolecards.md` 1.2 A3; DECISIONS A334). `input/TouchControls.ts` now
+draws one disc per active ability of the card (`abilityDiscs(card)`: `abilities.json` `kind: 'active'`, in the
+card's slot order), each `touch-ability-<slot>` with the slot letter as its key cap and the row's `name` as its
+label ("Kill", "Lock door", "Fake Blood"; a long name widens the disc into a pill), in a `.wdi-touch-abilities` row
+over the Use, Run, Sneak and Strike cluster. A passive or a hold ability gets no disc, as its key does nothing yet
+(1.2 A1 and A2; 10R's R1 deals the keys by kind). A disc fires `World.useAbility(id)`, the one path of a key (Q, R, F
+find their row, then call it by ability id), a disc and, later, a card button; a ghost's discs grey
+(`setAbilitiesEnabled`). Run and Sneak stay as they are until the owner answers Q-C3. `e2e/touch.spec.ts` checks
+the discs and their fit at 390 x 844 (`docs/ui/touch-390w.png`); `TouchControls.test.ts` the discs of the mock
+net's card (Q and R, no F for the hold) and of a card with three active abilities.
