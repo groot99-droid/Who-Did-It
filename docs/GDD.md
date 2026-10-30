@@ -1134,6 +1134,8 @@ opened lock leaves a Scratches clue (3.4), the same whoever picked, and the inte
 `locks` stream, a stream no client sees) may fine the picker `economy.json` `trespassFine` Scrip, taken as any fine is. NPC seats do not pick yet (their routine reaches
 only props a mode of no mini-game works, 3.12 Chores).
 
+**The screen** (round 10, D5b). The picker's dialog draws one column per pin and a tension gauge with the snap line, and never the set points: a pin that is lifted into its band under light tension clicks (a tone, a buzz, a jolt). Letting go of the pick records an attempt; the trace of attempts is the answer, and the board ends when every pin is set or the pick snaps.
+
 ### 3.30 The inventory and crafting
 
 Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4; `docs/round9/logic-table.md` 8.6; DECISIONS A245). A12 builds the

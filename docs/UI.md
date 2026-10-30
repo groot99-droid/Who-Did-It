@@ -1832,6 +1832,25 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 
+### 14.48 The lock-pick and the Resistant effect (10D, round 10)
+
+Session 10D. D5b draws the lock-pick inside the mini-game dialog of 14.19.6 (`view/minigames/lockpick.ts`), for the
+`minigameStart` with `kind: 'lockpick'` the picker alone receives (GDD 3.29): one column per pin, the lifted pin drawn
+as a block, a tension gauge with the snap line. The set points are felt, never drawn: a click (a short tone, a buzz on
+a phone) and a jolt of the pin when a lifted pin crosses its band under light tension. Pointer: press a pin and drag
+it up and down; hold the pick button for tension and let go to try the pin. Keyboard: Left and Right choose the pin,
+Up and Down lift it, Space or Enter holds and lets go. The answer is the trace the server replays. D4a adds the effect
+Resistant (`icon_effect_resistant`), named by the data and with no copy of its own.
+
+| Line | Text | Where |
+|---|---|---|
+| the hint (`minigame.lockpick.hint`) | Choose a pin, lift it, then press the pick lightly and let go when you feel a click. Press too hard and the pick snaps. | the dialog, above the board |
+| the pick button (`minigame.lockpick.press`) | Hold the pick | the dialog, below the board |
+| progress (`minigame.lockpick.progress`) | {set} of {pins} pins set | the status line |
+| a miss (`minigame.lockpick.miss`) | It slips back. | the status line |
+| a snap (`minigame.lockpick.snap`) | The pick snaps. | the status line; the server's `PICK_SNAPPED` refusal follows |
+| the Notebook entry of a Scratches clue (D5c, `notebook.entry.scratch`) | Scratches round a lock | the Notebook list, with the scene and time |
+
 ### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
