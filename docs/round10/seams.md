@@ -108,7 +108,7 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10S | `docs/round10/scope.md`, design only |
 | Wave 1 of `scope.md` | S1 to 10F, S2 and S3 to 10H, S4 and then D4b to 10D, S5 to 10Y, each in its own paths above; a file outside them only with 6Z's grant in the pull request |
 | 10V | its verbs' new files (`apps/server/src/sim/verbs/**`) and their tests. Through section 1 or a grant: `sim/Actions.ts` `handleAbility`, `sim/Hold.ts` `handleHold`, `sim/Commands.ts`, `sim/Portals.ts` (doors), `abilities.json`, `clues.json`, `items.json`, `interactions.json`, and new ids in `scenes/*.json` |
-| Wave 2 of `scope.md` | 10S (W1 to W8, M5), 10N, 10K, 10T, 10M, and 10A (K1, T4), 10B (T5), 10C (V1 to V4): the new files each step creates and the paths `scope.md` 4 names for it. A path this table gives a live session is edited only after that session's last step there has merged, or with 6Z's grant in the pull request (A276) |
+| Wave 2 of `scope.md` | 10S (W1a, W1b, W2 to W8, M5), 10N, 10K, 10T, 10M, and 10A (K1, T4), 10B (T5), 10C (V1 to V4): the new files each step creates and the paths `scope.md` 4 names for it. A path this table gives a live session is edited only after that session's last step there has merged, or with 6Z's grant in the pull request (A276) |
 | 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
 | 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223, A224 and its rows of 5; `docs/round11/README.md` and the Round 11 section |
 

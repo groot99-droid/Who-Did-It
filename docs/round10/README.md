@@ -36,7 +36,7 @@ model, because a session runs on one model and the plan gives them both.
 | **10Y. Fixes: client and screens** | Fable | 300k | every open issue left on the client, copy and art side | early, on 2026-10-30 (below) |
 | **10Z. The final sweep** | Fable | 800k | S6: `DECISIONS.md`, the `gdd-map.md` check, cross-references, `PROTOCOL.md`, the integration log | last |
 | **10R. Role cards and the dashboard** | Opus | 800k | the design: `rolecards.md` and a clickable mock; then the build, R1 to R6 (`rolecards.md` 9 and 12) | 2026-10-30, at the owner's request (below) |
-| **10S. The scope census** | Opus | 800k | `scope.md`: every gameplay feature not yet built or assigned, its design, its wire rows and its pull requests; then world mode, W1 to W8 and M5 (`scope.md` 4.2) | 2026-10-30, at the owner's request (below) |
+| **10S. The scope census** | Opus | 800k | `scope.md`: every gameplay feature not yet built or assigned, its design, its wire rows and its pull requests; then world mode, W1a, W1b, W2 to W8 and M5 (`scope.md` 4.2) | 2026-10-30, at the owner's request (below) |
 | **10V. The missing verbs** | Opus | 500k | V1 the evidence verbs, V2 the cover-up verbs, V3 the hiding spots (`rolecards.md` 11.3) | 2026-10-30, at the owner's request (below) |
 | **10N. The new roles** | Opus | 800k | K6 snares, N2 the Child, T1 the Trades, N1 the Butler, N3 the Ranger, N4 the Thief, N5 the Medium, N6 the toggles, M2 the Wisp (`scope.md` 4) | 2026-10-30, wave 2 |
 | **10K. Kit and the wild** | Sonnet | 500k | K2 to K5, K7, K8 (`scope.md` 4.4) | 2026-10-30, wave 2 |

@@ -3914,23 +3914,26 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   steps its "After" names and for its `seams.md` 3 row, and changes `GDD.md` in the same PR. A session owns the new
   files its steps create and the paths `scope.md` 4 names for them. A path that section 4 of `seams.md` gives a live
   session is edited only after that session's last step there has merged, or with 6Z's grant.
-  - **10S, then world mode** (Opus, 800k). After #420 merges, 10S builds 4.2 in order: W1, the world-mode deal (after
-    B6c and 10C's last step in `sim/Deck.ts`), to W8. Then M5, spectator mode (after W3).
+  - **10S, then world mode** (Opus, 800k). After #420 merges, 10S builds 4.2 in order:
+    - W1a, the hidden seats (after B6c);
+    - W1b, the world-mode deal (after W1a and 10C's last step in `sim/Deck.ts`);
+    - W2 to W8;
+    - then M5, spectator mode (after W3).
   - **10N. The new roles** (Opus, 800k; new). In order:
     - K6, snares and Rope (row 31; no "After", so it starts first);
     - N2, the Child (after 10V's hiding spots);
-    - T1, the Trades as cards (after W1; Q-S2);
+    - T1, the Trades as cards (after W1b; Q-S2);
     - N1, the Butler;
     - N3, the Ranger (after B4 and K6; Q-S1);
     - N4, the Thief (after S1 and T5; row 31's smoke);
     - N5, the Medium (after B7; row 32);
-    - N6, the lobby toggles and Forged Alibi (after W1, B6a and 10V's Inspect);
+    - N6, the lobby toggles and Forged Alibi (after W1b, B6a and 10V's Inspect);
     - M2, the Wisp (after B7; row 34).
 
     Each new card brings its `roles.json` row, its `abilities.json` routes with `status: live` (10R's test), a
     `looks.json` placeholder (`scope.md` 2.10), GDD 3.2 and its `rolecards.md` lines. Its tests cover each ability's
     refusals, plus a secrecy test that another card's client sees nothing of it beyond the drawn figure. A card joins
-    a world-mode roster only after W1 has merged.
+    a world-mode roster only after W1b has merged.
   - **10K. Kit and the wild** (Sonnet, 500k; new). K3, candles for all and Handcuffs, and K7, crows, the bog-wisp and
     deep mud, first. Then:
     - K2, armour's resistances, and K4, recipe teaching (row 29), after S3;
