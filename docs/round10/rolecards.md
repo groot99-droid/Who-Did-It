@@ -520,6 +520,35 @@ The world-mode vendettas (the sigils and the Mass, the Disarray acts, the four r
 steps from the builds that make them. None is in round 10's plan (`round10-plan.md` 4), so the build leaves room for
 them and writes none.
 
+### 4.5 The match's mode
+
+The card never hard-codes one mode's text. Each `wins` and `loses` row in `roles.json` names the modes it holds in
+(`modes: ["main"]`, `["world"]`, `["paint"]`). The card draws only the rows of the match's mode, which the client
+already knows:
+
+| Mode | How the client knows | What panel 2 says |
+| --- | --- | --- |
+| **Main** (today's game) | no world-mode or Paint flag in the private view | 4.2 and 4.3's "today" lines: parity, the vote, the Final Night |
+| **World mode** | B6 retires the vote. If world mode then replaces the main mode outright, the main rows retire with it and no flag is needed. If both modes live on, the card reads whatever flag the build sets. 6Z to confirm which. | No faction tally and no parity (`world-mode.md` 2): the heading reads "You win when", never "The Village wins when". Each seat's own routes, the "when built" lines of 4.3, plus `W-law`, `W-trial` and `W-town`. The Killer's vendetta is its main route, and "Unseen" is the lesser one. The Accomplice shares its Killer's kind. |
+| **Paint The Town Red** (two humans) | `Private.paintTown` (seams row 18, #382) | Both Killers' panel 2 holds one shared route. |
+
+The Paint The Town Red copy (draft):
+
+- Goal: Paint the town red before you are caught.
+- Wins:
+  - Between you, kill {paintTown.winUnique} different townsfolk. A townsperson the train brings back and you kill again
+    adds to your total, not to the count.
+  - Or the Vicar, the Company Clerk and the Constables lie dead at the same moment before the morning train.
+- Loses: You are both convicted of murder, or the end trial closes first.
+- Tips: The ledger ranks you two by total kills.
+
+Panel 1's Cabal well names the other Killer, as today's mates. "The town" here means the NPC seats; nothing on the card
+says which seat is an NPC, since only the deal itself is two humans and the rest NPCs (GDD 3.12, public by the mode).
+
+The token `{paintTown.winUnique}` reads `balance.json` once C5 adds the key. Until then, R3's token check refuses the
+row, so it cannot ship early. The mock shows the main mode only, because world mode and Paint The Town Red have no
+built rules or flags at this base.
+
 ## 5. The Daybook
 
 The name is _proposed_ (Q-D1). A daybook is the period's ledger of the day's business, and it does not collide with
@@ -729,6 +758,32 @@ what each one touches that a live session owns or uses (`seams.md` 4); 6Z sequen
 
 R1 and R2 have no dependency between them. R3 goes after both, then R4, then R5. R4 and R5 each fit under 400 lines
 only by moving the existing panels as they are: their restyle is CSS in R2's file.
+
+### 9.1 Keys that move
+
+Checked against the client at this base. Desktop keys:
+
+- E, Q, R, F, N and X are in `World.bindKeys`, and Q, R and F also in `ABILITY_SLOTS`.
+- I, 1 to 6, C, J, T, K and Esc are in `M5bLayer.onKey`.
+- Tab is in `RoleCard`.
+- W, A, S, D, the arrows, Space and Shift are in `InputController` and `vectors.ts`.
+
+No desktop key changes letter. What moves is what a key opens, and the phone's controls:
+
+| Key or control | Today | After | PR |
+| --- | --- | --- | --- |
+| I | the Pockets panel | the Daybook, at Pockets | R5 |
+| C | the Crafting panel | the Daybook, at Pockets, with the crafting square focused | R5 |
+| J | the Quests panel | the Daybook, at Quests | R5 |
+| K | the Chores panel | the Daybook, at Chores | R5 |
+| N | the Notebook sheet | the Daybook, at the Notebook | R5 |
+| T | the Quests panel, at a giver | the Daybook, at Quests (with the giver's offers) | R5 |
+| Tab | toggles the card everywhere, even inside it (A10) | toggles the card only when the world has focus; inside the card it moves focus | R4 |
+| Q, R, F | fire an active ability only; positional keys, so a passive shows a dead key (A1, A2) | active, hold or seat-list abilities by slot; passives get none | R1 |
+| HUD Notebook button, and the Pockets, Craft, Quests and Chores buttons | five buttons | one Daybook button | R5 |
+| Phone: the Act (Q) disc | Q only | one disc per slot ability, named (A3) | R1 |
+| Phone: the Run and Sneak discs | two discs | run at the stick's rim; a Sneak toggle under the stick (Q-C3) | R1 |
+| Phone: the card | the "Role card" chip button | the card chip ("Your card") | R4 |
 
 ## 10. Questions for the owner
 
