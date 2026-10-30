@@ -3,7 +3,7 @@ import { dealDeck } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
 import { initBodies } from './body/state';
-import { beginPaintTown, humansOf, paintDeck, paintsTown } from './paintTown';
+import { beginPaintTown, humansOf, paintDeal, paintsTown } from './paintTown';
 import { drawVendettas } from './vendettas/state';
 
 // The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Round 10, 10C owns this file; the hook
@@ -68,23 +68,18 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
 
 /**
  * Paint The Town Red's deal (round 10, C5; world-mode.md 1.6): the deck gains a second Killer (`paintDeck`), both
- * humans take the Killer cards, and the NPC seats are dealt the rest on the same stream. No vendetta, and a pending
+ * humans take the Killer cards, and the NPC seats are dealt the rest on the same stream, the Vicar always
+ * (`paintDeal`). No vendetta, and a pending
  * `debug.deal` is dropped.
  */
 function dealPaintTown(room: PartyRoom, ids: readonly string[]): Map<string, string> {
   const flow = flowOf(room);
   flow.fixedDeal = null;
-  const rng = room.seeds.get('deal');
-  const cards = paintDeck(deckCardsFor(ids.length), rng);
   const humans = humansOf(room, ids);
   const npcs = ids.filter((id) => !humans.includes(id));
-  const left = [...cards];
-  for (let i = 0; i < 2; i++) left.splice(left.indexOf('killer'), 1);
-  const deal = dealDeck(npcs, left, () => false, rng);
-  const dealt = new Map<string, string>(humans.map((id) => [id, 'killer']));
-  for (const [id, card] of deal.dealt) dealt.set(id, card);
+  const { cards, dealt, undealt } = paintDeal(humans, npcs, deckCardsFor(ids.length), room.seeds.get('deal'));
   flow.deck = cards;
-  flow.undealt = deal.undealt;
+  flow.undealt = undealt;
   beginPaintTown(room, humans, npcs.length);
   initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
   return dealt;

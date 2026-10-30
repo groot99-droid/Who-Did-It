@@ -1,4 +1,5 @@
 import { balance, roles } from '@wdi/content';
+import { dealDeck } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { townsfolkMemory } from './townsfolk/figures';
 import { isNpcSeat } from './Npc';
@@ -54,6 +55,26 @@ export function paintDeck(cards: readonly string[], rng: () => number): string[]
   }
   if (at >= 0) out[at] = 'killer';
   return out;
+}
+
+/**
+ * The Paint deal over `deck` (a deck row): the deck with its second Killer (`paintDeck`), both humans on the Killer
+ * cards, and the NPC seats dealt the rest on `rng` with the Vicar always dealt (6Z's ruling: it is a pillar, so the
+ * three pillars stand in every match). Pure, so a test can run it over many seeds.
+ */
+export function paintDeal(
+  humans: readonly string[],
+  npcs: readonly string[],
+  deck: readonly string[],
+  rng: () => number,
+): { cards: string[]; dealt: Map<string, string>; undealt: string[] } {
+  const cards = paintDeck(deck, rng);
+  const left = [...cards];
+  for (let i = 0; i < 2; i++) left.splice(left.indexOf('killer'), 1);
+  const deal = dealDeck(npcs, left, (card) => card === 'vicar', rng);
+  const dealt = new Map<string, string>(humans.map((id) => [id, 'killer']));
+  for (const [id, card] of deal.dealt) dealt.set(id, card);
+  return { cards, dealt, undealt: deal.undealt };
 }
 
 /** The deal's start: the two Killer seats and the target, ceil(`paintTown.winUnique` x the NPC seats), at least 1. */
