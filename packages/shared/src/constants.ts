@@ -5,8 +5,8 @@ export const TILE_PX = 64;
 
 /** Server tick rate (ARCHITECTURE 5.6). */
 export const TICK_RATE = 20;
-/** `patchRate` in ms (ARCHITECTURE 5.6). */
-export const PATCH_RATE_MS = 50;
+/** The patch cadence in ms: one patch per tick, sent at the end of the server's fixed step (ARCHITECTURE 5.6, A373). */
+export const PATCH_RATE_MS = 1000 / TICK_RATE;
 /** `Visibility.ts` reconcile every N ticks, i.e. 5 Hz (ARCHITECTURE 5.6). */
 export const VIEW_RECONCILE_EVERY_TICKS = 4;
 
