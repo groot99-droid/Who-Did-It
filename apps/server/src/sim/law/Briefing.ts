@@ -30,11 +30,15 @@ interface Pending {
   dueTick: number;
 }
 
-/** One posted briefing, kept in order for the police board (B3). */
+/** One posted briefing, kept in order for the police board (B3) and the Constables' own petitions (B3c). */
 export interface Briefing {
   tick: number;
   sceneId: SceneId;
   line: string;
+  /** The clue's `ClueKind`, and the trait axis and value the line named (an "anyone" clue read in time), if any. */
+  kind: number;
+  axis?: keyof typeof traits.axes;
+  value?: number;
 }
 
 interface LawMemory {
@@ -75,11 +79,16 @@ function memoryOf(room: PartyRoom): LawMemory {
 /** The briefings posted this match, oldest first (the police board of B3 reads them). */
 export const briefingsOf = (room: PartyRoom): readonly Briefing[] => memoryOf(room).posted;
 
+/** The trait axis an "anyone" clue names (traits.json), else undefined. */
+function axisOf(key: string): keyof typeof traits.axes | undefined {
+  if (clueDefs.clues[key]?.reader !== 'anyone') return undefined;
+  return (Object.keys(traits.axes) as (keyof typeof traits.axes)[]).find((a) => traits.axes[a].clue === key);
+}
+
 /** The trait a clue names: only an "anyone" clue whose kind is a trait axis's clue (traits.json), else undefined. */
 function traitOf(key: string, value: number): string | undefined {
-  if (clueDefs.clues[key]?.reader !== 'anyone') return undefined;
-  const axis = Object.values(traits.axes).find((a) => a.clue === key);
-  return axis?.values[value]?.label.toLowerCase();
+  const axis = axisOf(key);
+  return axis === undefined ? undefined : traits.axes[axis].values[value]?.label.toLowerCase();
 }
 
 const fill = (template: string, words: Record<string, string>): string =>
@@ -124,7 +133,15 @@ export function runLaw(room: PartyRoom): void {
     const last = memory.said.get(line);
     if (last !== undefined && tick - last < window) continue;
     memory.said.set(line, tick);
-    memory.posted.push({ tick, sceneId: p.sceneId, line });
+    const read = p.readTick <= tick;
+    const axis = read ? axisOf(KIND_KEY.get(p.kind) ?? '') : undefined;
+    memory.posted.push({
+      tick,
+      sceneId: p.sceneId,
+      line,
+      kind: p.kind,
+      ...(axis !== undefined && { axis, value: p.value }),
+    });
     systemLine(room, line);
     const trait = traitOf(KIND_KEY.get(p.kind) ?? '', p.value);
     emitSim(room, {

@@ -7,6 +7,7 @@ import { isAiming } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
+import { figureOfHandle } from './townsfolk/figures';
 import { isOnLine } from './Train';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
 
@@ -107,7 +108,8 @@ export function reconcileViews(room: PartyRoom): void {
  * Avatars (GDD 3.17, `deck-wire.md` 4.2): in a world phase a view holds the avatars of the viewer's own scene whose
  * seat is placed, transit tails included; a living viewer skips the avatars of dead seats, a ghost viewer takes all
  * and also receives each one's true `seat`; a seat aiming its Last Shot (5G) and every phase outside the world hold
- * none. Each avatar is added one by one, never with the scene.
+ * none. The living figures of the scene (GDD 3.24) are held like the seats, through the same dark rule and never
+ * with the ghost tag. Each avatar is added one by one, never with the scene.
  */
 function reconcileAvatars(
   room: PartyRoom,
@@ -121,11 +123,21 @@ function reconcileAvatars(
   const held = heldOf(room, sessionId);
   const ghostViewer = viewerSim.dead;
   const wanted = new Set<string>();
+  // Round 10, x5 (A353, A160's open line): the living figures of the scene, under the same dark rule as a seat.
+  const figures = new Set<string>();
   if (world && !isAiming(room, sessionId) && viewerSim.blindUntilTick <= room.state.tick) {
     const scene = room.state.scenes.get(sceneKey(viewerSim.sceneIdx));
     scene?.avatars.forEach((_avatar, handle) => {
       const seat = memory.seatOf.get(handle);
-      const p = seat === undefined ? undefined : sim.players.get(seat);
+      if (seat === undefined) {
+        const f = figureOfHandle(room, handle);
+        if (!f || f.dead || f.sceneIdx !== viewerSim.sceneIdx) return;
+        if (!ghostViewer && !canSee(room, viewerSim, f)) return;
+        wanted.add(handle);
+        figures.add(handle);
+        return;
+      }
+      const p = sim.players.get(seat);
       if (!p?.placed) return;
       if (p.dead && !ghostViewer) return;
       // Round 6, 6G (locked): a living viewer in the dark sees only within its sight; this only ever removes.
@@ -165,7 +177,8 @@ function reconcileAvatars(
       view.add(avatar);
       held.plain.add(handle);
     }
-    if (ghostViewer && !held.ghost.has(handle)) {
+    // A figure never takes the ghost tag (GDD 3.24): a ghost sees it as the living do.
+    if (ghostViewer && !figures.has(handle) && !held.ghost.has(handle)) {
       view.add(avatar, VIEW_TAG.ghost);
       held.ghost.add(handle);
     }
@@ -194,6 +207,8 @@ function syncNear(room: PartyRoom, held: HeldAvatars, view: StateView, viewerSim
   for (const handle of held.plain) {
     const avatar = avatarOf(room, handle);
     if (!avatar) continue;
+    // Round 10, x5 (A353): a figure's row is held plain, never with the near tag (its `nearBits` are never sent).
+    if (figureOfHandle(room, handle) !== undefined) continue;
     const near = viewerSim.dead || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
     if (near && !held.near.has(handle)) {
       view.add(avatar, VIEW_TAG.near);

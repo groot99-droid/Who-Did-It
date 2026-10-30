@@ -5,8 +5,17 @@ import { avatarOf, resolveHandle } from '../src/sim/Avatars';
 import { markDead } from '../src/sim/Death';
 import { handleKill } from '../src/sim/Kill';
 import { enterScene } from '../src/sim/Portals';
+import { simOf } from '../src/sim/RoomSim';
+import { figureOfHandle } from '../src/sim/townsfolk/figures';
 import { StatusBit } from '../src/sim/constants';
-import { avatarsHeld, handleOf, handlesHeld, settle } from './avatarHelpers';
+import {
+  avatarsHeld,
+  handleOf,
+  handlesHeld,
+  seatAvatarsHeld,
+  seatHandlesHeld,
+  settle,
+} from './avatarHelpers';
 import {
   bootFlowServer,
   idOf,
@@ -43,7 +52,17 @@ function expectedHandles(m: Match, viewer: number, seats: number[]): string[] {
     .sort();
 }
 
-const held = (m: Match, i: number) => handlesHeld(m.bots[i]!);
+// Round 10, x5 (A353): the living figures of the viewer's scene share the view, so `held` reads the seats' handles
+// and `onlyFiguresBeside` checks that every handle it leaves out is a living figure of that scene.
+const held = (m: Match, i: number) => seatHandlesHeld(m, m.bots[i]!);
+function onlyFiguresBeside(m: Match, bot: Bot): void {
+  const sceneIdx = simOf(m.room).players.get(bot.id)!.sceneIdx;
+  for (const h of handlesHeld(bot)) {
+    if (seatHandlesHeld(m, bot).includes(h)) continue;
+    const f = figureOfHandle(m.room, h);
+    expect(f && !f.dead && f.sceneIdx === sceneIdx).toBe(true);
+  }
+}
 
 describe('avatars by scene (P1, P2, P4)', () => {
   it('a view holds exactly the avatars of the living placed seats in its own scene, its own included', async () => {
@@ -53,6 +72,7 @@ describe('avatars by scene (P1, P2, P4)', () => {
     await sleep(500);
     const all = [0, 1, 2, 3, 4, 5];
     for (const i of all) expect(held(m, i)).toEqual(expectedHandles(m, i, all));
+    for (const i of all) onlyFiguresBeside(m, m.bots[i]!);
     expect(held(m, 0)).toHaveLength(3);
     expect(held(m, 4)).toHaveLength(3);
     // The own scene is the only SceneState with avatars in the view.
@@ -238,7 +258,8 @@ describe('deaths (P5)', () => {
       for (const a of avatarsHeld(m.bots[i]!)) expect(a.avatar.seat).toBeFalsy();
     }
     // The ghost sees every avatar of its scene, itself included, with the true seat.
-    const ghost = avatarsHeld(m.bots[3]!);
+    const ghost = seatAvatarsHeld(m, m.bots[3]!);
+    onlyFiguresBeside(m, m.bots[3]!);
     expect(ghost.map((a) => a.handle).sort()).toEqual(
       [0, 1, 2, 3, 4].map((i) => seat(m, i).priv.avatar).sort(),
     );
