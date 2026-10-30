@@ -16,8 +16,8 @@ import { schema, t } from '@colyseus/schema';
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
-// `Private.pair` (row 10), C2 `Private.fare` (row 11), and B3 `GameState.petition` and `Private.petitionSigned`
-// (row 13) to version 7.
+// `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
+// (row 13), and B4 `GameState.manhunt` and `Private.huntScene` (row 14) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -270,6 +270,11 @@ export const Private = schema(
     fare: u16(),
     /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
     petitionSigned: bool(),
+    /**
+     * Round 10, B4 (seams.md 3 row 14): for the hunt's opener and signers only, the scene where a figure drawn as the
+     * accused was last seen by the rumour ledger's rule; '' until the first sighting and when no manhunt runs.
+     */
+    huntScene: str(),
   },
   'Private',
 );
@@ -357,6 +362,12 @@ export const Petition = schema(
   'Petition',
 );
 
+/**
+ * Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, one at a time. `accused` the passed petition's seat, ''
+ * when `state` is none; `state` a `ManhuntState`. Nothing names the seat a cuff held.
+ */
+export const Manhunt = schema({ accused: str(), untilTick: u32(), state: u8() }, 'Manhunt');
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -382,6 +393,8 @@ export const GameState = schema(
     hq: t.map('uint8'),
     /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): the open petition, public. */
     petition: Petition,
+    /** Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, public. */
+    manhunt: Manhunt,
   },
   'GameState',
 );
