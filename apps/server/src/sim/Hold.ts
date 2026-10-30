@@ -14,6 +14,7 @@ import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
 import { refusal, type Refusal } from './refusal';
 import { handleInteract, tickInteract } from './interact/resolve';
 import { handleSleepHold } from './Sleep';
+import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
 
 const CLUE_TEACHING = 'clue_teaching';
@@ -75,6 +76,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
   if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
+  if (action === 'errand') return handleErrandHold(room, sessionId, targetId); // round 10, C2b (GDD 3.23)
   if (action === 'cuff') return handleCuffHold(room, sessionId, targetId); // round 10, B4 (GDD 3.31)
   // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
   if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
@@ -121,6 +123,10 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'interact') {
       tickInteract(room, sessionId, p); // round 10, A10
+      continue;
+    }
+    if (hold.action === 'errand') {
+      tickErrandHold(room, sessionId, p); // round 10, C2b: the Clerk's labour errand
       continue;
     }
     if (isCivicHold(hold.action)) {

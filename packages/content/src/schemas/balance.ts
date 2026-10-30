@@ -459,6 +459,9 @@ export const BalanceFile = z.strictObject({
     fareDebt: z.number().int().positive(),
     wageMult: Frac,
     clearTargetDays: z.number().positive(),
+    /** C2b: an owing seat's look makes its shop ask this much more; the Clerk's errand is held this long. */
+    priceMult: z.number().min(1),
+    errandS: z.number().positive(),
   }),
   /**
    * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by

@@ -556,6 +556,13 @@ dropped. A quest that is done stays on the list and counts as done for the match
 against `quests.maxActive`. The lobby and the role card clear every seat's quests. Quests of kind `contract` are the
 round-7 vendetta seam and are refused in round 6.
 
+**Chains** (round 10, D9; `living-world.md` 1.3). A quest row may name an `after`: another quest of the same giver
+that the seat must have turned in before the giver offers it (the server refuses with `NOTHING_THERE`; the quest log
+shows it only then). A chain has two steps. Mother Moll's second step, Brew with Moll (2 Herb and 2 Mushroom, two
+Bandages and 6 Scrip), follows her mushrooms; Ada Kerrow's, Temper (2 Tin Ore and a Timber, a Hammer and 6 Scrip),
+follows her ore. Recipe teaching, the one-per-match branch and tin mail wait for round 11: there is no
+recipe-learning system yet, so each chain is a plain second errand. Nothing new on the wire.
+
 **Mini-games.** Every fetch task of 3.5 plays a mini-game at its target in place of the plain 2 s hold: the hold
 opens it, the server keeps the solution, and the task completes only when the client's answer checks. The five
 kinds are crates, pour, slide and stoke, first made for the quick mode (3.11), and the tap (round 7, 7M, A151): a
@@ -962,8 +969,19 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
   counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
   there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
-  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's
-  dear stall and the Clerk's labour errand come with C2b.
+  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days).
+- **The dear stall** (C2b). A shop with an `owner` look (`economy.json`: the bakery is the Baker's, the apothecary the
+  Herbalist's, the Gamekeeper's stalls his) asks `respawn.priceMult` (1.5x, rounded up) while any seat whose public look
+  is that look owes the line, and charges what it shows. It reads the roster look, never the drawn figure or the card,
+  so an impersonation never moves it and no cover is named; a shop with no character (the stores, the markets) is never
+  dear.
+- **The Clerk's labour errand** (C2b). Holding the action key at the Company Clerk's books (a `ledger` prop:
+  HollowMere's `bk.ledger`) for `respawn.errandS` (30 s), standing still within reach, clears one fare. It is always
+  open, whether or not the Clerk stands there, so a fare never locks a seat out. An NPC seat that owes the line works
+  it too, as a trip of its day routine, and only while it owes. Tasks alone never clear a fare (an owing seat earns
+  about 1.5 Scrip a task against 6 Scrip of rent a day), so the errand is what keeps the two-day target; the
+  balance lab checks both (`packages/content/test/fareCheck.test.ts`). BlackPine has no Train, so it has no fare and
+  no errand.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
