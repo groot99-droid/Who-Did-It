@@ -4018,6 +4018,21 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   `claude/r10-y1-refusal-lines`. Each carries the fix list the round's reviews parked, on its side. Until the build
   sessions finish, a fix in a path a live session owns, or in a file an open PR touches, goes to 6Z first. Their copy
   goes under UI.md 14.51 (10Y) and 14.52 (10X), added to seams.md 5.
+- 2026-10-30, during the owner's game on production (no merges until it ends):
+  - B3a (#364) took the last review fix: whether the Constables may sign is fixed when the petition opens, like the
+    bar.
+  - D6b (#367, stacked on D6a) and C2b (#368) were reviewed OK. C2b merges after the D6 pair and resolves two data
+    files.
+  - 10X's grants: the SPENT copy for `what: 'match'` and the stacked DeathCause comment, after B3a. NPC seats sign
+    petitions (world-mode.md 5, "NPCs may sign, but a petition never waits for one"), built by 10X after B3a: they read
+    only the public entries, sign on a chance, draw once per petition on `npcTiming`, and go through the human path.
+  - 10X's new audit: a seat seen working a pile, a counter or the ledger at night is a human, because those NPC
+    activities are day-only.
+  - C3's ruling and row 15:
+    - a look's work is gone only when a seat wore it at the deal and no living, placed wearer is left;
+    - the stalls keep a daily stock;
+    - the chapel earns no Faith while the Vicar's look is gone;
+    - the rows with no system yet carry an NFY note.
 
 ## Round 11 (planning, started 2026-10-29)
 
