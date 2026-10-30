@@ -599,6 +599,22 @@ export const BalanceFile = z.strictObject({
   /** Round 10, B5 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell. */
   jail: Section({ walkS: Seconds }),
   /**
+   * Round 10, B6a (GDD 3.8): the Tribunal's steps (`chargeS`, `caseS`, `defenceS`, then `phases.revealS` and
+   * `phases.immunityS`), the matches that prove a charge (`convictAt`) and murder (`murderAt`), the grace a dismissed
+   * accused has from a new petition, and the fines a charge sets (B6a: from the charge alone).
+   */
+  trial: Section({
+    chargeS: Seconds,
+    caseS: Seconds,
+    defenceS: Seconds,
+    convictAt: Count,
+    murderAt: Count,
+    acquittalGraceS: Seconds,
+    theftFine: Count,
+    trespassFine: Count,
+    rumourFine: Count,
+  }),
+  /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
    * stays within the leash.

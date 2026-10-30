@@ -193,6 +193,36 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
   - Not built yet: the Knife on the guards and their return on the morning train (C5's guard step), and, until the
     Constables' petitions land (10B), the Constables filing their own petitions with no human on the town side (12,
     R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
+- **The Tribunal** (round 10, B6a; `docs/round9/phases.md` 4, `world-mode.md` 5; seams.md 3 row 22). The trial of
+  the seat a manhunt cuffed (3.31). It opens when that seat is placed in the county jail's cell (3.27), never during
+  the Final Night, as a phase of its own (`Phase.tribunal`) under which the world is paused; when it ends, the world
+  phase it paused resumes with the seconds it had left. Like a meeting it reveals the deaths so far, ends every
+  attendee's impersonation and wakes the knocked out, and every living seat is placed at the meeting spawns, except
+  the held seat, which stays in the cell (the dock) still in the face it was cuffed in, the other jailed seats and the
+  seats on the line.
+  - **The steps:** the charge (`trial.chargeS`, _proposed_ 5 s), the case (`trial.caseS`, 30 s), the defence
+    (`trial.defenceS`, 30 s), the verdict (`phases.revealS`) and the Return (`phases.immunityS`).
+  - **The accused** is the warrant's seat throughout (3.31), never the seat held: a seat cuffed in the accused's face
+    is tried as the accused, and the accused, free on the square, defends.
+  - **The scales** start with the warrant's entries (shown under the Constables' badge, with no opener) and take what
+    the attendees present (`act.present`), up to `meeting.presentPerPlayer` each: in the case, any attendee; in the
+    defence, the accused, and others only an exclusion. A jailed seat other than the accused presents nothing, and a
+    clue already on the scales is refused. Each entry weighs from the accused's public traits only: a backed
+    (Verified or Corroborated, as the presenter's Notebook shows it) trait entry is a match when it fits and an
+    exclusion when it does not. Claimed, Forged-as-shown and Doubted testimony (3.20) weigh nothing; a role's reading
+    (the felt's hat) weighs only when its reader presents it, and a reading in the warrant weighs nothing.
+  - **The verdict.** Any exclusion dismisses. `trial.murderAt` (_proposed_ 2) matches prove murder, and
+    `trial.convictAt` (_proposed_ 2) any other charge; a murder charge short of `murderAt` is dismissed (the petition
+    names no lesser charge).
+  - **The sentence follows the charge**, on the seat held. Murder: death, by the usual death path and for good, the
+    true role shown to everyone (`tribunalVerdict`), so a seat hanged in another's face is shown as itself. Robbery,
+    assault, sabotage and conspiring: jail until the next morning train (3.27). Theft, trespass and a rumour turned to
+    a case: a fine from the charge alone (`trial.theftFine` 6, `trial.trespassFine` 4, `trial.rumourFine` 3 Scrip),
+    taken from the purse and never the bank; a purse short of it gives what it holds and serves the shortfall in jail
+    until the morning train (the verdict says so). A dismissal or a paid fine releases the held seat onto the square
+    at the Return, and a dismissed accused may not be petitioned again for `trial.acquittalGraceS` (30 s). The
+    role-specific sentences (demotion, defrocking, goods returned, the Drifter and the Gamekeeper) are B6b's; the
+    Final Night's end trial is B6d's, and voting retires in B6c.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (Round 8, 8L, A190) **The vote delay.** A vote cast in the first 15 s of a meeting (`meeting.minVoteS`, Final Night's included) is refused with the reason, so a vote agreed before the meeting cannot land before anyone has spoken; the portraits and Skip wait out the delay with a countdown, and a vote is changeable as before once it opens. `minVoteS` stays under the shortest discussion (the content check). It replaces `meeting.voteOpensImmediately`.
@@ -1196,7 +1226,9 @@ cell. It stays there until the next morning train, the first arrival of a later 
 station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
-Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. A death in jail takes the
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. The Tribunal (3.8) opens
+when the seat is placed in the cell; a dismissal or a paid fine releases it onto the square at the Return, and
+`jailUntilTick` keeps the cuff's value until then. A death in jail takes the
 usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
 with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
 no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).

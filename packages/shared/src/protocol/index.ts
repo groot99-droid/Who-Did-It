@@ -105,6 +105,8 @@ export const S2C = {
   shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
+  /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): a death sentence's true role, to every client. */
+  tribunalVerdict: 'tribunalVerdict',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -439,6 +441,11 @@ export interface S2CPayloads {
    * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
    */
   mugPrompt: { muggerId: string; endsTick: number };
+  /**
+   * Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role
+   * of the seat held (the one card that goes out before game over, as an ejection's does).
+   */
+  tribunalVerdict: { roleId: string };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
