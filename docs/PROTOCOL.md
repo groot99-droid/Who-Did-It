@@ -209,7 +209,9 @@ export type HoldAction =
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
-  | 'sleep';
+  | 'sleep'
+  // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
+  | 'cuff';
 ```
 
 ```ts
