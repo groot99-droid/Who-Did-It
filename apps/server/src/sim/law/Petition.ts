@@ -40,6 +40,8 @@ export interface Warrant {
   accused: string;
   charge: string;
   tick: number;
+  /** The opener and the signers: room memory only, the manhunt's `huntScene` goes to them (B4, row 14). */
+  watchers: readonly string[];
 }
 
 interface PetitionMemory {
@@ -49,6 +51,8 @@ interface PetitionMemory {
   /** Seat id -> the tick it may open again (after its own petition lapsed). */
   openerGrace: Map<string, number>;
   warrants: Warrant[];
+  /** No petition opens before this tick: a manhunt ran out, and the case stays on the board (B4). */
+  heldUntil: number;
   seq: number;
 }
 
@@ -58,13 +62,25 @@ function memoryOf(room: PartyRoom): PetitionMemory {
   if (!m)
     memories.set(
       room,
-      (m = { open: null, accusedGrace: new Map(), openerGrace: new Map(), warrants: [], seq: 0 }),
+      (m = {
+        open: null,
+        accusedGrace: new Map(),
+        openerGrace: new Map(),
+        warrants: [],
+        heldUntil: 0,
+        seq: 0,
+      }),
     );
   return m;
 }
 
 /** The passed petitions of the match, oldest first (B4's manhunt). */
 export const warrantsOf = (room: PartyRoom): readonly Warrant[] => memoryOf(room).warrants;
+
+/** A manhunt ran out (B4): no new petition opens for `petition.cooldownS`. */
+export function holdPetitions(room: PartyRoom): void {
+  memoryOf(room).heldUntil = room.state.tick + Math.round(balance.petition.cooldownS * TICK_RATE);
+}
 
 /** Every notice board of every scene: the police boards a petition opens at. */
 const BOARDS: readonly string[] = Object.values(scenes).flatMap((s) =>
@@ -126,7 +142,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
   if (!laws.crimes?.[charge] || ids.length > balance.petition.maxEntries)
     return reject(room, seat, 'BAD_REQUEST');
   if (m.open) return reject(room, seat, 'PETITION_OPEN');
-  const grace = Math.max(m.accusedGrace.get(accused) ?? 0, m.openerGrace.get(seat) ?? 0);
+  const grace = Math.max(m.accusedGrace.get(accused) ?? 0, m.openerGrace.get(seat) ?? 0, m.heldUntil);
   if (tick < grace) return reject(room, seat, 'PETITION_GRACE', { readyInS: readyInS(grace, tick) });
   if (!nearProp(room, seat, BOARDS)) return reject(room, seat, 'TOO_FAR');
   // Only the opener's own clue entries attach: never a night-power entry, a Forged or a teaching one (6Z, row 13).
@@ -218,6 +234,7 @@ export function runPetition(room: PartyRoom): void {
     m.accusedGrace.clear();
     m.openerGrace.clear();
     m.warrants = [];
+    m.heldUntil = 0;
     m.seq = 0;
     return;
   }
@@ -231,7 +248,12 @@ export function runPetition(room: PartyRoom): void {
   write(room, m);
   const row = room.state.petition;
   if (row.signed >= row.needed) {
-    m.warrants.push({ accused: open.accused, charge: open.charge, tick });
+    m.warrants.push({
+      accused: open.accused,
+      charge: open.charge,
+      tick,
+      watchers: [open.opener, ...open.signers],
+    });
     emitSim(room, {
       tick,
       kind: 'petition.passed',
