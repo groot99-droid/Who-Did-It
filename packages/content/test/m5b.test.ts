@@ -13,6 +13,7 @@ const TOOLS = ['lantern', 'crowbar', 'lockpicks', 'snare', 'torch', 'spade', 'ax
 /** Round 10, D4a: the bakery's parts and dishes, made on Hollowmere only. */
 const BAKERY = ['dough', 'proofedDough', 'herbFilling', 'wakeLoaf', 'herbBread'];
 const LEATHER = ['leatherJerkin']; // round 10, D6b: the hide's one recipe
+const COOKING = ['stew']; // round 10, S2: the stew, at an oven
 
 describe('resources and recipes', () => {
   it('has a recipe for each tool, and every node names a resource', () => {
@@ -20,7 +21,7 @@ describe('resources and recipes', () => {
       Object.values(content.recipes.recipes)
         .map((r) => r.out)
         .sort(),
-    ).toEqual([...TOOLS, ...BAKERY, ...LEATHER].sort());
+    ).toEqual([...TOOLS, ...BAKERY, ...LEATHER, ...COOKING].sort());
     for (const scene of Object.values(content.scenes)) {
       for (const n of scene.nodes ?? []) expect(content.resources.resources[n.resource], n.id).toBeDefined();
     }

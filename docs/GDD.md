@@ -392,13 +392,21 @@ Round 6 (ROADMAP M5b). The rows are `resources.json`, `recipes.json` and the `ma
 numbers below are theirs and `balance.resources`'s. Sentences marked (6F) are the server's behaviour and may be
 corrected by Session 6F when it lands.
 
-**Resources.** Six resources grow at the **nodes** of the forests, caves and the BlackPine camp (`nodes` in the scene
+**Resources.** Six resources (and Berries, below) grow at the **nodes** of the forests, caves and the BlackPine camp (`nodes` in the scene
 files): Timber, Stone, Pine Resin, Herbs, Mushrooms and Tin Ore. Every map has all six at every party size: HollowMere's
 Small profile finds them in Gallows Wood and the Tin Gallery mouth, BlackPine's in the woods, the camp and the
 Workings. Nodes that share a `pool` are one pool: at Start the server activates half of each pool's spots, rounded
 up (`poolActiveFrac` 0.5, so a pool of two keeps one), drawn from the `nodes` stream, so a forest is never stripped the same
 way twice; a spot not drawn has no node that match and is not sent to anyone, and a node outside any pool is always
 active. (6F)
+
+**Berries, Game and Stew** (round 10, S2; `logic-table.md` 9.6). A seventh resource, **Berries** (2 s, yield 2, respawn
+75 s), grows in the woods: two spots in each of `forest`, `forest_deep` and `bp_woods`, one pool per scene (so one of the two
+is up). Picking them takes bare hands, like Herbs and Mushrooms; no tool is faster. The market buys Berries (1 Scrip,
+`economy.json`), below the Wake Loaf's ask. **Game** (3.22) has its first use: a **Stew** is made of 1 Game, 1 Herbs and 1
+Mushrooms at an `oven` (the bakery's plain oven on Hollowmere, the lodge stove in BlackPine; the brick oven is another
+station), 4 s, and eating it (`eatStew`, a `consumes` verb like `eat`) cures what any food cures
+(Famished and Weakened). It is not role-bound and carries no buff yet.
 
 | Resource | Gather hold | Yield | Respawn | Needs |
 |---|---|---|---|---|
@@ -919,7 +927,7 @@ or figure of a later round and never holds.
 
 **Armour** (round 10, D6a; owner answer LW8). An item with an `armor` block (`items.json`; kind `armour`) worn in the body or head slot (3.30) is armour. Its `tier` picks a factor from `balance.json` `armor.tierMult` (body 0.80, 0.65, 0.50; head 0.90, 0.80); the factors of the worn items multiply, and for a creature's bite so does the Lodge's `creatureDmg` perk (3.23), and the damage never falls below `armor.cap` (0.5) of what the row would have dealt. It applies to every attack that goes through the damage table (the fists, a mugging, the slingshot, a guard's blow, a creature); only a creature's bite is also cut by the Lodge perk; the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The Leather jerkin (tier 2) also halves how fast a Bleeding drains health (a Bleeding has no timer, so "stops sooner" is a slower drain) and costs stamina regeneration (x0.9); an item may also carry `speedMult`. Armour is private: nothing on the wire shows it, there is no inspect line and the figure is not drawn with it; it is not role-bound and drops on death. The Quilted coat is sold at the general stores; the jerkin waits for hide (skinning, D6b). Not built yet: Warmth at night, a Miner's cap with a lamp, louder footsteps, tin mail and tin helm.
 
-**Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game has no use yet (the stew and the pie, D4b). The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
+**Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game is a Stew's meat (3.14); it is no meal as it is. The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
 
 ### 3.23 The economy
 

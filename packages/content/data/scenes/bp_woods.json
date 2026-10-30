@@ -207,7 +207,9 @@
     { "id": "bw.nd_mush_0", "resource": "mushroom", "x": 30, "y": 29, "pool": "woodMush" },
     { "id": "bw.nd_mush_1", "resource": "mushroom", "x": 6, "y": 31, "pool": "woodMush" },
     { "id": "bw.nd_stone_0", "resource": "stone", "x": 11, "y": 31, "pool": "fordStone" },
-    { "id": "bw.nd_stone_1", "resource": "stone", "x": 17, "y": 29, "pool": "fordStone" }
+    { "id": "bw.nd_stone_1", "resource": "stone", "x": 17, "y": 29, "pool": "fordStone" },
+    { "id": "bw.nd_berries_0", "resource": "berries", "x": 25, "y": 22, "pool": "pineBerries" },
+    { "id": "bw.nd_berries_1", "resource": "berries", "x": 38, "y": 19, "pool": "pineBerries" }
   ],
   "spawners": [
     {

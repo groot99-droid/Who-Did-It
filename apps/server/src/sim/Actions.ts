@@ -74,6 +74,7 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'antidote':
     case 'eat':
     case 'eatHerbBread':
+    case 'eatStew':
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
     default:

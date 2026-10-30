@@ -44,6 +44,14 @@
       "respawnS": 60,
       "sprite": "node_herb"
     },
+    "berries": {
+      "id": "berries",
+      "name": "Berries",
+      "gatherS": 2,
+      "yield": 2,
+      "respawnS": 75,
+      "sprite": "node_berries"
+    },
     "mushroom": {
       "id": "mushroom",
       "name": "Mushrooms",
