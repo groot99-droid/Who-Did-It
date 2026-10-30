@@ -453,7 +453,13 @@ export const BalanceFile = z.strictObject({
     dusk: z.strictObject({ leaveAtS: z.number().nonnegative() }),
   }),
   /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */
-  respawn: Section({ hp: z.number().int().positive() }),
+  /** C2 (GDD 3.23): the fare a return owes the line, the pay cut while it is owed, and the target to clear it. */
+  respawn: Section({
+    hp: z.number().int().positive(),
+    fareDebt: z.number().int().positive(),
+    wageMult: Frac,
+    clearTargetDays: z.number().positive(),
+  }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),

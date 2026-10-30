@@ -411,7 +411,7 @@
     "holdoutGraceS": 60,
     "gddRef": "3.32"
   },
-  "respawn": { "hp": 50, "gddRef": "3.22" },
+  "respawn": { "hp": 50, "fareDebt": 6, "wageMult": 0.5, "clearTargetDays": 2, "gddRef": "3.22" },
   "pairing": {
     "answerS": { "min": 5, "max": 9 },
     "yesChance": 0.5,

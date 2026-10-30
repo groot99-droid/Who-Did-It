@@ -7,6 +7,7 @@ import { mapIdOfRoom, mapScenesOf } from '../MapSites';
 import { simOf } from '../RoomSim';
 import { isVerbPhase, reject, sceneKey } from '../World';
 import { balanceOf, movePurse, TOWN } from './purse';
+import { payFare } from './fare';
 import { perkMul } from './perks';
 import { nearProp } from './reach';
 
@@ -144,12 +145,16 @@ export function handlePayRent(room: PartyRoom, seat: string): void {
   if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
   if (!nearProp(room, seat, banksOf(room))) return reject(room, seat, 'NO_COUNTER', { kind: 'bank' });
   const owed = d.debt.get(seat) ?? 0;
-  if (owed === 0) return reject(room, seat, 'NOTHING_OWED');
+  if (owed === 0) {
+    const why = payFare(room, seat); // round 10, C2: a seat that owes only the fare pays it here
+    return why === null ? undefined : reject(room, seat, why);
+  }
   if (balanceOf(room, seat) < owed) return reject(room, seat, 'NEED_SCRIP');
   if (movePurse(room, seat, TOWN, owed, 'rent') !== owed) return;
   d.debt.delete(seat);
   setIndebted(room, seat, false);
   emitSim(room, { tick: room.state.tick, kind: 'rent.paid', seat, data: { amount: owed } });
+  payFare(room, seat); // round 10, C2: then the whole fare, when the purse covers it too
 }
 
 /** Quota items this seat could hand in at a rack now: 0 outside an open shift, off a quota map, or once it is met. */
