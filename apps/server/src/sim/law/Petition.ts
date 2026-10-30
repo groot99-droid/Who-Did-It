@@ -30,6 +30,8 @@ interface Open {
   constable: boolean;
   /** Fixed at open: a bar that moved at a death would say the dead seat was human (6Z). */
   needed: number;
+  /** Fixed at open, like the bar: a gate that opened mid-petition would say the seat that fell was human (6Z). */
+  constableMay: boolean;
   untilTick: number;
 }
 
@@ -150,6 +152,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
     signers: new Set(),
     constable: false,
     needed: Math.ceil(balance.petition.othersPct * freeHumans(room)),
+    constableMay: freeHumans(room) <= balance.petition.constableAtHumans,
     untilTick: tick + Math.round(balance.petition.openS * TICK_RATE),
   };
   const row = room.state.petition;
@@ -223,8 +226,7 @@ export function runPetition(room: PartyRoom): void {
   if (!simOf(room).players.get(open.accused) || simOf(room).players.get(open.accused)!.dead)
     return close(room, m);
   if (!open.constable) {
-    if (freeHumans(room) <= balance.petition.constableAtHumans && constableSigns(room, open.accused))
-      open.constable = true;
+    if (open.constableMay && constableSigns(room, open.accused)) open.constable = true;
   }
   write(room, m);
   const row = room.state.petition;

@@ -233,4 +233,20 @@ describe('petitions (GDD 3.31)', () => {
     advance(party, 1);
     expect([row(party).signed, row(party).needed]).toEqual([1, 2]);
   });
+
+  it('A170: whether the Constables may sign is fixed at open; a human falling to 5 never opens it', async () => {
+    const party = await world(6);
+    const [a] = party.humans.map((h) => h.id) as [string];
+    const accused = accusedOf(party);
+    const t = party.room.state.players.get(accused)!.traits;
+    const prints = entry(party, a, ClueKind.footprints, t.height, NotebookStatus.verified);
+    const thread = entry(party, a, ClueKind.thread, t.scarf, NotebookStatus.corroborated);
+    handlePetitionOpen(party.room, a, { accused, charge: 'murder', entries: [prints, thread] });
+    advance(party, 1);
+    expect(row(party).signed).toBe(0); // 6 humans: above constableAtHumans
+    simOf(party.room).players.get(party.humans[5]!.id)!.dead = true;
+    advance(party, 2);
+    expect(row(party).signed).toBe(0);
+    expect(warrantsOf(party.room)).toHaveLength(0);
+  });
 });
