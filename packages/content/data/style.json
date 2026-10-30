@@ -79,7 +79,10 @@
       "display": "Oswald",
       "text": "Inter",
       "pixelDisplay": "Press Start 2P",
-      "pixelText": "Pixelify Sans"
+      "pixelText": "Pixelify Sans",
+      "dossierDisplay": "Alegreya SC",
+      "dossierText": "Alegreya Sans",
+      "dossierMono": "IBM Plex Mono"
     },
     "typeScalePx": {
       "displayXl": 44,

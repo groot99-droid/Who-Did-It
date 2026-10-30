@@ -19,6 +19,24 @@
     "lilac": "#C9CEFF",
     "snow": "#FFFFFF"
   },
+  "dossier": {
+    "vellum": "#ECEEF2",
+    "sheet": "#FBFBFC",
+    "pencil": "#586072",
+    "rule": "#D3D8E0",
+    "well": "#F1EBDD",
+    "ochre": "#8C600A",
+    "moss": "#2F6B45",
+    "brick": "#9E3B2A",
+    "focus": "#2D5FA8",
+    "carbon": "#2A303D",
+    "graphite": "#343B4A",
+    "ash": "#A9AFBC",
+    "seam": "#4A5264",
+    "cellar": "#3D4352",
+    "sage": "#8FCBA2",
+    "blush": "#EC917A"
+  },
   "ambient": {
     "day": { "color": "#2C3240", "intensity": 0.6 },
     "night": { "color": "#12141C", "intensity": 0.25 },
