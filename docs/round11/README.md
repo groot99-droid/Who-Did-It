@@ -46,7 +46,8 @@ card portraits, the screens), in the questionnaire below.
 | **11A. The render pipeline** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/pipeline.md`, `docs/round11/samples/pipeline/` | when the playtest gate opens |
 | **11B. Materials, styles and budgets** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/look.md`, `docs/round11/samples/look/` | when the playtest gate opens |
 | **The asset list** | 11B, or a session 6Z spawns | 800k | — | `docs/round11/assets.md` | at the content freeze |
-| **6Z** | — | — | — | this file, `docs/round11/questions.md` when it is sent to the owner | throughout |
+| **The plan** | 11A, with 11B | 800k | — | `docs/round11/round11-plan.md` | when the owner has answered |
+| **6Z** | — | — | — | this file, `docs/round11/questions.md` when it is sent to the owner, `docs/round11/owner-answers.md` | throughout |
 
 Both are Opus, because each sets a contract the build will follow (the round-10 model rule). Both compact at 800k,
 because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/round5/art-plan.md`, `docs/round8/art.md`,
@@ -129,3 +130,5 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
 - The playtest gate opened when round 10's A13b merged (4a8e70f), and 11A and 11B started.
 - 11A's `pipeline.md` (#346) and 11B's `look.md` (#347) are in. Their questions are merged in `questions.md`, sent to
   the owner on 2026-10-30.
+- The owner answered on 2026-10-30 (`owner-answers.md`). Every default holds except CL3, which brings the buildings'
+  long shadows into round 11. 11A writes `round11-plan.md` from the answers, with 11B.
