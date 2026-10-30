@@ -4090,6 +4090,16 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: y1's DECISIONS row A234 had landed after A331; 6Z moved it into number order.
 - 2026-10-30: the owner asked for new role cards and a player dashboard (`docs/round10/README.md`). 6Z started 10R
   (Opus, 800k, from `claude/r10-tier-800k` at 08ddb21) on `claude/r10-r1-rolecards` to design them.
+- 2026-10-30: 6Z's rulings on 10C's C5 plan (Paint The Town Red):
+  - the wire is seams row 18: `Winner.paintTown`, the game-over counts and `Private.paintTown`;
+  - `paintTown.winUnique` keeps its name and holds a fraction, 0.5 of the NPC seats at the deal, rounded up;
+  - in this mode a dead guard returns on the morning train (`world-mode.md` 12, R4), and a guard's death counts only
+    toward the pillars, which are the Vicar's seat, the Clerk guard and both Constables;
+  - a Killer is caught when its seat is dead for good, and B6's hanging is such a death;
+  - the deal turns the row's Accomplice, or else a profession, into the second Killer;
+  - 10C is granted edits in `sim/Kill.ts` (the Knife on a guard, every mode), `sim/law/Guards.ts` and
+    `sim/townsfolk/figures.ts` (a guard's death and return);
+  - the Constables' own petitions when no human is on the town side (`world-mode.md` 1.6, 12 R3) go to 10B.
 
 ## Round 11 (planning, started 2026-10-29)
 
