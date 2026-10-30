@@ -21,7 +21,7 @@
     "apothecary": { "prop": "as.shop_counter", "sells": ["bandage", "salts"], "buys": [] },
     "store": {
       "prop": "tb.shop_counter",
-      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer"],
+      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer", "quiltedCoat"],
       "buys": []
     },
     "market": {
@@ -32,7 +32,7 @@
     "gamekeeper": { "prop": "fo.shop_stall", "sells": ["snare", "torch"], "buys": [] },
     "bpStore": {
       "prop": "bl.shop_store",
-      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer"],
+      "sells": ["rope", "oil", "candle", "planks", "axe", "pickaxe", "hammer", "quiltedCoat"],
       "buys": []
     },
     "bpGamekeeper": { "prop": "bl.shop_stall", "sells": ["snare", "torch"], "buys": [] },
@@ -54,6 +54,7 @@
     "axe": { "ask": 8 },
     "pickaxe": { "ask": 10 },
     "hammer": { "ask": 6 },
+    "quiltedCoat": { "ask": 12 },
     "snare": { "ask": 4 },
     "torch": { "ask": 3 },
     "timber": { "pay": 1 },

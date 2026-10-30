@@ -373,6 +373,14 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (item.buff !== undefined && !effectRows[item.buff as keyof typeof effectRows]?.dish)
       err(`items.json ${item.id}: buff ${item.buff} is no dish buff`);
   }
+  for (const item of Object.values(items.items)) {
+    if ((item.kind === 'armour') !== (item.armor !== undefined))
+      err(`items.json ${item.id}: kind armour and an armor block go together`);
+    if (item.armor && item.equip !== 'body' && item.equip !== 'head')
+      err(`items.json ${item.id}: armour is worn on the body or the head`);
+    else if (item.armor && item.armor.tier > c.balance.armor.tierMult[item.equip as 'body' | 'head'].length)
+      err(`items.json ${item.id}: no armor.tierMult for its tier`);
+  }
   const checkDamageEffects = (where: string, row: { effects: Record<string, number> }) => {
     for (const id of Object.keys(row.effects)) {
       if (!Object.hasOwn(effectRows, id)) err(`${where}: applies unknown effect ${id}`);
