@@ -3,6 +3,7 @@ import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
 import { handleBank } from './economy/bank';
+import { handleLedgerRead } from './economy/ledger';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
@@ -80,6 +81,9 @@ export function runCommands(room: PartyRoom): void {
       // Round 6 (locked call sites): the M5b commands go to their owners' files (6H); each refuses until it lands.
       case C2S.talkAsk: // round 10, D9c (GDD 3.24, seams.md 3 row 16)
         handleTalk(room, cmd.sessionId, payload);
+        break;
+      case C2S.ledgerRead: // round 10, C4d (GDD 3.33, seams.md 3 row 37)
+        handleLedgerRead(room, cmd.sessionId, payload);
         break;
       case C2S.questAccept:
         handleQuestAccept(room, cmd.sessionId, payload);

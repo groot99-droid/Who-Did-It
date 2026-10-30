@@ -86,6 +86,10 @@ export function coverChoices(
   return out;
 }
 
+/** Whether the card holds `value` as its own: a Knife card does, and so does a card the Hitman's mail turned (C4a). */
+export const holdsVendetta = (holdsKnife: boolean, value: string): boolean =>
+  holdsKnife || value === 'hitman';
+
 /**
  * The vendetta lines of a card (GDD 3.20 "On the card"; round 10, 10Y, A354). `value` is `Private.vendetta`: a
  * holder's own id, or the Accomplice's Killers' ids joined by commas. A holder reads its goal under the Vendetta
@@ -165,7 +169,8 @@ export function mountRoleCard(
   const picker = hints.length > 0 ? mountCoverPicker(role, opts) : null;
 
   // GDD 3.20: the vendetta under the goal, from the private view; a card with the Knife holds its own, any other
-  // card (the Accomplice) reads its Killers'. Hidden until the view carries one.
+  // card (the Accomplice) reads its Killers'. Hidden until the view carries one. Round 10, C4a (GDD 3.33): a seat the
+  // Hitman's mail turned holds `hitman` on any card; that row is never dealt, so no Accomplice ever reads it.
   const vendettaBox = h('div', {
     class: 'wdi-card__vendettas',
     'data-testid': 'card-vendetta',
@@ -176,7 +181,7 @@ export function mountRoleCard(
   const paintVendetta = (value: string) => {
     if (value === shownVendetta) return;
     shownVendetta = value;
-    const lines = vendettaLines(value, holdsKnife);
+    const lines = vendettaLines(value, holdsVendetta(holdsKnife, value));
     vendettaBox.replaceChildren(
       ...lines.map((l) =>
         h('p', { class: 'wdi-card__vendetta' }, l.label !== '' && h('strong', {}, l.label), l.goal),

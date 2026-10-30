@@ -30,6 +30,7 @@ import { spawnTeachingClue } from './Clues';
 import { curfewBars } from './economy/rent';
 import { reconcileViews } from './Visibility';
 import { isOnLine } from './Train';
+import { isDeparted } from './vendettas/arrival';
 
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
 
@@ -124,7 +125,7 @@ export function placeNewPlayers(room: PartyRoom): void {
   const starts = startSpawnsOf(room);
   let placedAny = false;
   for (const [sessionId, p] of sim.players) {
-    if (p.placed || isOnLine(room, sessionId)) continue; // round 10, C1: the Train places a returning seat
+    if (p.placed || isOnLine(room, sessionId) || isDeparted(room, sessionId)) continue; // C1, C4b: off the map
     const player = room.state.players.get(sessionId);
     if (!player) continue;
     const site = starts[p.ordinal % starts.length]!;

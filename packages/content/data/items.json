@@ -13,6 +13,17 @@
       "ships": "V1",
       "gddRef": "3.5"
     },
+    "derringer": {
+      "id": "derringer",
+      "name": "Derringer",
+      "kind": "weapon",
+      "roleBound": true,
+      "onDeath": "kept",
+      "use": "derringer",
+      "tooltip": "One shot, by day, at your mark.",
+      "ships": "V1",
+      "gddRef": "3.33"
+    },
     "skeletonKey": {
       "id": "skeletonKey",
       "name": "Skeleton Key",

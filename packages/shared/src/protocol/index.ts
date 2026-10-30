@@ -19,6 +19,8 @@ export const C2S = {
   mug: 'act.mug',
   /** Round 10, D9c (GDD 3.24, seams.md 3 row 16): ask a figure about the town or the time; `sim/townsfolk/talk.ts`. */
   talkAsk: 'talk.ask',
+  /** Round 10, C4d (GDD 3.33, seams.md 3 row 37): read the Clerk's rent ledger; `sim/economy/ledger.ts`. */
+  ledgerRead: 'ledger.read',
   /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
@@ -107,6 +109,8 @@ export const S2C = {
   shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
+  /** Round 10, C4d (GDD 3.33, seams.md 3 row 37), private to the reader: the Clerk's rent ledger. */
+  ledger: 'ledger',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -148,10 +152,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
  * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life; the two ids
- * are never reused.
+ * are never reused. Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by
+ * the Train.
  */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
-/**
+export type DeathCause =
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer'; /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
  */
@@ -331,6 +336,11 @@ export interface C2SPayloads {
    */
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
+   * Round 10, C4d (GDD 3.33, seams.md 3 row 37): `propId` is a `ledger` prop in the reader's reach (HollowMere's
+   * `bk.ledger`). Answered with `ledger`. Refused `TOO_FAR`, `PHASE_CLOSED`, `NOT_IN_PLAY`, `IN_JAIL`.
+   */
+  'ledger.read': { propId: string };
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -371,7 +381,9 @@ export interface S2CPayloads {
   /**
    * `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody
    * held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the
-   * unique count the win needed and each Killer seat's unique and total kills.
+   * unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21):
+   * `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in
+   * `alsoWon`; `stopped` died before boarding).
    */
   gameOver: {
     winner: number;
@@ -380,6 +392,7 @@ export interface S2CPayloads {
     alsoWon?: string[];
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
+    hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -448,6 +461,12 @@ export interface S2CPayloads {
    * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
    */
   mugPrompt: { muggerId: string; endsTick: number };
+  /**
+   * Private to the reader, round 10, C4d (GDD 3.33, seams.md 3 row 37): every rent hardship of the match so far, oldest
+   * first, by the day it struck and the struck seat's `Player.look` then (a `looks.json` id). No seat, handle, name,
+   * card, cover or other hardship; every reader at a tick gets the same rows.
+   */
+  ledger: { propId: string; rows: Array<{ day: number; lookId: string }> };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -491,6 +510,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.payRent': 5,
   'act.mug': 5,
   'talk.ask': 5,
+  'ledger.read': 2,
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,

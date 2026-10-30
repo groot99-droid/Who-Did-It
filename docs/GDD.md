@@ -693,8 +693,8 @@ contract) and `train.delivery` the strongbox (the Bandit's heist).
 
 **The draw (7H).** At the deal, every seat dealt a card that carries vendettas (the Killer; `vendettas.json`
 `role`) draws one, uniformly among the rows the match allows: the Zealot only when a seat is dealt the Vicar, the
-Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit and the Hitman
-only on HollowMere, where the Train runs. A seat with no row allowed draws none. Each seat draws from a stream of
+Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit only on HollowMere,
+where the Train runs. The Hitman's row is never drawn at the deal (round 10, C4a: an `arrival` row, 3.33). A seat with no row allowed draws none. Each seat draws from a stream of
 its own (`vendetta`, keyed by seat), so the draw moves no other draw. The two Killers of a 10-seat deck draw
 apart and may draw the same row. The vendetta stays with its seat: it ends
 when the seat dies or is ejected, and an Accomplice who inherits the Knife (3.2) inherits none.
@@ -733,9 +733,9 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
-- **Contract: the Hitman (7H).** At the first Train arrival of the match the mail brings the Hitman a sealed
-  letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
-  other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
+- **Contract: the Hitman (7H; round 10, C4a, 3.33).** The Hitman's own mail turns him (3.33) and brings him a
+  sealed letter at once (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living
+  seats other than the Hitman and its Cabal mates, a human when one is free, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
   row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
   offer is open; an NPC Hitman accepts at once. The button reads the public roster, so after a private death of
@@ -1464,4 +1464,66 @@ out.
 
 ### 3.33 The Hitman's arrival
 
-Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.
+Round 10, C4 (`docs/round9/world-mode.md` 1.5, followup-4 2.6; seams.md 3 row 20; DECISIONS A350). Nobody is dealt
+the Hitman: the mail turns a townsman into one.
+
+- **The draw.** At the deal of the main mode, on the secret stream `hitman`, the server draws three things and tells
+  nobody: whether he comes, by the human seats at the deal (`hitman.byHumans`: from 0.5 at 3 humans to 1 at 10, never
+  below 3 humans), the day (`hitman.days`: 3 to 5, uniform), and whether a human is turned (`hitman.byHumans`
+  `human`: 0 at 3 humans, 0.15 at 4, 0.25 at 5, 0.4 at 6, rising to 1 at 10). He comes only where the Train runs
+  (3.3; BlackPine has no station, so no delivery), and there is no Hitman in Paint The Town Red (3.8). The Killer
+  never draws the Hitman's row (3.20).
+- **The turning.** On that day's `train.delivery`, the black-wax letter reaches one seat that is living, free (not on
+  the line, 3.22, and not in jail, 3.24), wears its own card's look (never a cover, a Cabal card or the Thief), holds
+  no vendetta, is not a vendetta's partner card (the Zealot's Vicar) and has room for the Derringer, drawn on `hitman`. A human draw turns an eligible human, else an
+  eligible NPC seat; an NPC draw turns an eligible NPC seat only, so `human` is a ceiling (0 at 3 humans turns no
+  human ever). With no seat in that pool he never comes. The turned seat keeps its card (its `roleId`, its abilities,
+  its town work), its look and every public field; it holds the `hitman` vendetta, its own view's `Private.hitman` is
+  set until the lobby, and its mark is mailed to it at once (3.20, a human when one is free). Its side is its own: it
+  shares neither the Village's win nor the Cabal's, and its only victory is the Contract (C4b).
+- **The sign.** At the turning every seat's chat log gets one system line that names nobody, "A stranger's coat was
+  seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
+- **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
+  like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
+  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2), the jail's
+  `IN_JAIL` among them. It may be fired only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads
+  the drawn figure, never the seat behind it, so the real mark drawn as someone else is refused like any figure, and
+  an impersonator drawn as the mark dies in its place while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
+  makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
+- **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day
+  and stands, living, in the station's scene within `train.hearTiles` of the platform boards it: the Contract
+  victory, the same day. He leaves play: unplaced, so his figure leaves every view as any leaving figure does, with
+  no scene, no avatars and no ghost view of his own; his own view's `Private.departed` is set, and the roster keeps
+  him alive. The match goes on and the win check counts him for nobody. Until B6's Tribunal he stays a living seat
+  in every public respect: he may be voted for and ejected as any seat (his boarded win stands), and a departed
+  human may vote and speak at a meeting, whose all-voted early end waits on his vote as on any living seat's. A Hitman who killed but missed that day's Dusk Train does not win. With no
+  kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
+  frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
+  his death), and a boarded Hitman joins `alsoWon`.
+- **The dormant role** (C4c). From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
+  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
+  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own.
+- **Hardships** (C4c; F4 b2 to b5). At every morning delivery, the same tick as the turning, the secret stream
+  `hardship` strikes `hardship.atOnce` (1 or 2) seats, each with a kind (robbed, a failed harvest, fined, rent, illness,
+  a lost shipment), and each runs thin and dear exactly as the dormant role for `hardship.recoverS` (one day). The pool
+  reads only public facts: a seat shown alive on the roster whose look owns a stall and that has no hardship running,
+  human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
+  the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
+  stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger; it boards no house (a boarding would
+  tell it from the Hitman's look without the ledger), so a struck human keeps their bed.
+- **The Clerk's rent ledger** (C4d; F4 b5 and 2.7). Reading the Clerk's books on HollowMere (`bk.ledger`, in reach,
+  in a world phase, alive and out of jail) shows the reader alone every rent hardship of the match so far, oldest
+  first: the day it struck and the look the struck seat wore then. It never shows a seat, a name, a card, a cover, a
+  hardship of another kind or a real boarding (3.23's, the seat's own economy), and every reader at a moment sees the
+  same rows. Reading it takes the trip; nothing public carries it, the read has no hold, clip or noise, and the server
+  keeps nothing of who read. The rows are the town's lead: a dark, dear look that isn't in the ledger went dark for a
+  reason other than rent. NPC seats read it too, as a person would: at each trip they pick, a draw on their own
+  stream sends one to stand at the books for the errand's length, holding nothing, with the chance
+  `hardship.readLedger.before` until the Hitman's line has gone out and `after` it (P 0 and 0.1), so a stop at the
+  Clerk's books marks no one.
+- Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
+  contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
+  station (10B); Blackpine's ledger (it has no `ledger` prop); the cold station and the dark window (a home's window
+  state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.

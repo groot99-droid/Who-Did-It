@@ -12,6 +12,8 @@ import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
 import { isNpcSeat } from './Npc';
 import { isPaintTown } from './paintTown';
+import { onDeliveryHardship } from './economy/hardship';
+import { onDeliveryArrival, onDuskArrival } from './vendettas/arrival';
 import { enterScene } from './Portals';
 import { simOf } from './RoomSim';
 import { isWorldPhase } from './World';
@@ -153,6 +155,7 @@ export function runTrain(room: PartyRoom): void {
     if (state.tick >= duskStart + secondsToTicks(balance.train.dusk.leaveAtS)) {
       train.duskRound = state.round;
       announce(room, 'train.dusk', 'train_arrive', state.round);
+      onDuskArrival(room, state.round); // round 10, C4b: the Hitman boards, or his contract runs out (GDD 3.33)
       for (const client of room.clients) {
         client.send(S2C.chatMsg, { from: '', text: TRAIN_DUSK_LINE, channel: 'system' });
       }
@@ -179,6 +182,8 @@ export function runTrain(room: PartyRoom): void {
   if (train.arrived && !train.delivered && state.tick >= train.deliveryTick) {
     train.delivered = true;
     announce(room, 'train.delivery', 'train_brake', train.round);
+    onDeliveryArrival(room, train.round); // round 10, C4: the Hitman's letter (GDD 3.33)
+    onDeliveryHardship(room, train.round); // round 10, C4c: the same delivery strikes its hardships
   }
 }
 

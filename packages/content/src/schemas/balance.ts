@@ -499,6 +499,36 @@ export const BalanceFile = z.strictObject({
    * ceil(`winUnique` x the NPC seats at the deal), at least 1.
    */
   paintTown: Section({ winUnique: Frac }),
+  /**
+   * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
+   * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
+   * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the
+   * turning day; with no kill by the last one's Dusk Train it lapses (C4b).
+   */
+  hitman: Section({
+    byHumans: z.record(
+      z.enum(['3', '4', '5', '6', '7', '8', '9', '10']),
+      z.strictObject({ comes: Chance, human: Chance }),
+    ),
+    days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
+    contractDays: z.number().int().positive(),
+    /** The turned seat's stall stocks this of a day's stock; it equals `respawn.stockMult` (F4 b1, C4c). */
+    dormantOutput: Frac,
+  }),
+  /**
+   * Round 10, C4c (GDD 3.33, F4 b2 to b5): at every morning delivery, `atOnce` (inclusive) seats wearing a stall's look
+   * are struck by a hardship, each of a `kinds` row, and run thin and dear for `recoverS`, as the Hitman's turned seat.
+   */
+  hardship: Section({
+    atOnce: z.tuple([z.number().int().nonnegative(), z.number().int().positive()]),
+    recoverS: Seconds,
+    kinds: z.array(z.enum(['robbed', 'harvest', 'fined', 'rent', 'illness', 'shipment'])).min(1),
+    /**
+     * C4d (seams.md 3 row 37): at each trip an NPC seat picks, the chance it goes to read the Clerk's rent ledger, on its
+     * own stream: `before` the Hitman's arrival line has gone out, `after` it (a public trigger).
+     */
+    readLedger: z.strictObject({ before: Chance, after: Chance }),
+  }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
