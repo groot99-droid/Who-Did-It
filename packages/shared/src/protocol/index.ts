@@ -320,10 +320,10 @@ export interface C2SPayloads {
    */
   'inv.move': { from: number; to: number };
   /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
-  /** `targetId` is the asked figure's avatar handle in the asker's scene. */
+  'inv.select': { slot: number };
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. */
   'pair.ask': { targetId: string };
   'pair.answer': { yes: boolean };
-  'inv.select': { slot: number };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
