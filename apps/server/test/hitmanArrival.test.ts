@@ -1,10 +1,8 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, economy } from '@wdi/content';
+import { balance } from '@wdi/content';
 import { NoteKind, S2C } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
-import { addFare, askOf, shopIsDear } from '../src/sim/economy/fare';
-import { stockLeft, workOf } from '../src/sim/economy/townWork';
 import { isNpcSeat } from '../src/sim/Npc';
 import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
 import {
@@ -143,26 +141,13 @@ describe('the turning (seams.md 3 row 20)', () => {
   });
 });
 
-describe('the dormant role (GDD 3.33, F4 b1)', () => {
-  it('runs the turned seat’s stall exactly as an owing seat’s: the same left and the same ask', async () => {
-    expect(balance.hitman.dormantOutput).toBe(balance.respawn.stockMult); // a lab change must move both
+describe('the human chance is a ceiling (A350)', () => {
+  it('an NPC draw with no NPC seat eligible turns nobody, even with a human eligible', async () => {
     const party = await mainParty();
-    const room = party.room;
-    const seat = (await turn(party, false))!;
-    for (const [id, p] of room.state.players) if (p.look === 'baker') p.look = id === seat ? 'baker' : 'x';
-    room.state.players.get(seat)!.look = 'baker';
-    expect(workOf(room, 'baker')).toBe('thin');
-    expect(shopIsDear(room, 'bakery')).toBe(true);
-    const dormant = { left: stockLeft(room, 'bakery', 'flour'), ask: askOf(room, 'bakery', 'flour') };
-    expect(dormant.ask).toBe(Math.ceil(economy.prices.flour!.ask! * balance.respawn.priceMult));
-    // The same stall, its wearer now an ordinary seat owing the line.
-    const owing = [...room.state.players.keys()].find((id) => id !== seat && !isTurned(room, id))!;
-    room.state.players.get(seat)!.look = 'x';
-    room.state.players.get(owing)!.look = 'baker';
-    addFare(room, owing);
-    expect({ left: stockLeft(room, 'bakery', 'flour'), ask: askOf(room, 'bakery', 'flour') }).toEqual(
-      dormant,
-    );
+    for (const [id, p] of party.room.state.players)
+      if (isNpcSeat(party.room, id)) p.priv.role.roleId = 'drifter';
+    expect(await turn(party, false)).toBeNull();
+    expect(linesOf(party).flat()).toEqual([]);
   });
 });
 

@@ -1,6 +1,5 @@
 import { balance, economy, roles } from '@wdi/content';
 import type { PartyRoom } from '../../rooms/PartyRoom';
-import { isTurned } from '../vendettas/arrival';
 import { owesFare } from './fare';
 
 /**
@@ -10,13 +9,11 @@ import { owesFare } from './fare';
  * - a look is **gone** when a seat wore it at the deal and no wearer is shown alive on the roster (`Player.alive`,
  *   which a death flips only at the next meeting, A30), so a stall or an altar never reveals a kill before the
  *   meeting. A look no seat wears keeps its work running, so an undealt card's stall stays full;
- * - a look is **thin** while a seat wearing it owes the line (`fare.ts`), or is the Hitman's turned seat (round 10,
- *   C4a: its role goes dormant, GDD 3.33);
+ * - a look is **thin** while a seat wearing it owes the line (`fare.ts`);
  * - else it is **at work**.
  * A `stall` look's shop (`economy.json` `owner`) sells each item from a day's stock: `townWork.stallStock` at work,
- * `respawn.stockMult` of it while thin (`hitman.dormantOutput` for the Hitman's turned seat), none while gone, less
- * what was sold since the day began. A `faith` look's `props` earn no Faith while it is gone (`faith.ts`, one line).
- * The `none` rows are not built yet (their `nfy`).
+ * `respawn.stockMult` of it while thin, none while gone, less what was sold since the day began. A `faith` look's
+ * `props` earn no Faith while it is gone (`faith.ts`, one line). The `none` rows are not built yet (their `nfy`).
  */
 
 export type WorkState = 'work' | 'thin' | 'gone';
@@ -29,7 +26,7 @@ export function workOf(room: PartyRoom, look: string): WorkState {
   for (const [seat, player] of room.state.players) {
     if (player.look !== look) continue;
     worn = true;
-    owes ||= owesFare(room, seat) || isTurned(room, seat);
+    owes ||= owesFare(room, seat);
     if (player.alive) living = true;
   }
   if (!worn) return 'work';
@@ -45,20 +42,6 @@ export function propsAtRest(room: PartyRoom): Set<string> {
     if (workOf(room, role.look) === 'gone') for (const prop of role.townWork.props ?? []) rest.add(prop);
   }
   return rest;
-}
-
-/**
- * The stock multiplier of a thin look: `respawn.stockMult` while a wearer owes the line, `hitman.dormantOutput` while
- * it is the Hitman's turned seat (C4a). The two are equal (F4 b1), so a dormant stall shows exactly an owing one.
- */
-function thinMult(room: PartyRoom, look: string): number {
-  let mult = 1;
-  for (const [seat, player] of room.state.players) {
-    if (player.look !== look) continue;
-    if (owesFare(room, seat)) mult = Math.min(mult, balance.respawn.stockMult);
-    if (isTurned(room, seat)) mult = Math.min(mult, balance.hitman.dormantOutput);
-  }
-  return mult;
 }
 
 /** A stall's day's stock of each item at work: one per seat, at least `stallStockMin`. */
@@ -84,7 +67,7 @@ export function stockLeft(room: PartyRoom, shopId: string, itemId: string): numb
   if (owner === undefined) return undefined;
   const work = workOf(room, owner);
   const full = stallStock(room);
-  const cap = work === 'gone' ? 0 : work === 'thin' ? Math.floor(full * thinMult(room, owner)) : full;
+  const cap = work === 'gone' ? 0 : work === 'thin' ? Math.floor(full * balance.respawn.stockMult) : full;
   return Math.max(0, cap - (soldToday(room).get(`${shopId}/${itemId}`) ?? 0));
 }
 

@@ -490,8 +490,7 @@ export const BalanceFile = z.strictObject({
   /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
-   * (inclusive, uniform), at that day's `train.delivery`. The turned seat's stall stocks `dormantOutput` of a day's
-   * stock, which must equal `respawn.stockMult` so a dormant stall never tells from an owing one (F4 b1).
+   * (inclusive, uniform), at that day's `train.delivery`.
    */
   hitman: Section({
     byHumans: z.record(
@@ -499,7 +498,6 @@ export const BalanceFile = z.strictObject({
       z.strictObject({ comes: Chance, human: Chance }),
     ),
     days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
-    dormantOutput: Frac,
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({

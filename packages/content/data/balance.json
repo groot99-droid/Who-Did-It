@@ -434,7 +434,6 @@
       "10": { "comes": 1, "human": 1 }
     },
     "days": [3, 5],
-    "dormantOutput": 0.5,
     "gddRef": "3.33"
   },
   "armor": {

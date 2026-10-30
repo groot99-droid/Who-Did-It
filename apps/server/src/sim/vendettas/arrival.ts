@@ -1,6 +1,6 @@
 import { balance, roles } from '@wdi/content';
-import { S2C } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { systemLine } from '../economy/rumours';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
@@ -14,11 +14,12 @@ import { holdVendetta, vendettaHolders, vendettaOf } from './state';
  * uniform) and whether a human or an NPC seat is turned. On that day's `train.delivery` the black-wax letter turns
  * one living, free seat (not on the line) that wears its own card's look (no cover, Cabal or Thief card), holds no
  * vendetta and is no vendetta's partner card:
- * a human if the draw says so and one is eligible, else an NPC seat; with none eligible he never comes. The turned
+ * a human if the draw says so and one is eligible, else an eligible NPC seat; with none in that pool he never comes
+ * (so an NPC draw never turns a human, and `human` stays a ceiling). He comes only where the Train runs. The turned
  * seat keeps its card, its look and every public field: it holds the `hitman` vendetta, its own view's
  * `Private.hitman` is set, and its mark reaches only it (`offerContract`). Everyone sees one line that names nobody,
- * the same whoever is turned. From then its look's town work runs thin and dear (`townWork.ts`, `fare.ts`). The
- * draw and the turned seat live here, in room memory keyed by the match's `MatchSeeds`.
+ * the same whoever is turned. The dormant role ships in C4c, with its decoys (6Z). The draw and the turned seat
+ * live here, in room memory keyed by the match's `MatchSeeds`.
  */
 
 export const HITMAN_VENDETTA = 'hitman';
@@ -110,7 +111,5 @@ export function onDeliveryArrival(room: PartyRoom, round: number): void {
   holdVendetta(room, seat, HITMAN_VENDETTA);
   room.state.players.get(seat)!.priv.hitman = true;
   offerContract(room, seat);
-  for (const client of room.clients) {
-    client.send(S2C.chatMsg, { from: '', text: HITMAN_ARRIVE_LINE, channel: 'system' });
-  }
+  systemLine(room, HITMAN_ARRIVE_LINE);
 }

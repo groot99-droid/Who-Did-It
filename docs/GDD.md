@@ -730,8 +730,8 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
-- **Contract: the Hitman (7H; round 10, C4a, 3.33).** The Hitman's own mail turns him (3.33) and brings him a sealed
-  letter at once (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living
+- **Contract: the Hitman (7H; round 10, C4a, 3.33).** The Hitman's own mail turns him (3.33) and brings him a
+  sealed letter at once (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living
   seats other than the Hitman and its Cabal mates, a human when one is free, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
   row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
@@ -1405,23 +1405,22 @@ the Hitman: the mail turns a townsman into one.
 - **The draw.** At the deal of the main mode, on the secret stream `hitman`, the server draws three things and tells
   nobody: whether he comes, by the human seats at the deal (`hitman.byHumans`: from 0.5 at 3 humans to 1 at 10, never
   below 3 humans), the day (`hitman.days`: 3 to 5, uniform), and whether a human is turned (`hitman.byHumans`
-  `human`: 0 at 3 humans, 0.15 at 4, 0.25 at 5, 0.4 at 6, rising to 1 at 10). There is no Hitman in Paint The Town Red
-  (3.8). The Killer never draws the Hitman's row (3.20).
+  `human`: 0 at 3 humans, 0.15 at 4, 0.25 at 5, 0.4 at 6, rising to 1 at 10). He comes only where the Train runs
+  (3.3; BlackPine has no station, so no delivery), and there is no Hitman in Paint The Town Red (3.8). The Killer
+  never draws the Hitman's row (3.20).
 - **The turning.** On that day's `train.delivery`, the black-wax letter reaches one seat that is living, free (not on
-  the line, 3.22) and wears its own card's look (never a cover, a Cabal card or the Thief), holds no vendetta and is
-  not a vendetta's partner card (the Zealot's Vicar): a
-  human if the draw says so and one is eligible, else an NPC seat, drawn on `hitman`. With no seat eligible he never
-  comes. The turned seat keeps its card (its `roleId`, its abilities, its town work), its look and every public field;
-  it holds the `hitman` vendetta, its own view's `Private.hitman` is set until the lobby, and its mark is mailed to it
-  at once (3.20, a human when one is free). Its side is its own: it shares neither the Village's win nor the
-  Cabal's, and its only victory is the Contract (C4b).
+  the line, 3.22), wears its own card's look (never a cover, a Cabal card or the Thief), holds no vendetta and is not
+  a vendetta's partner card (the Zealot's Vicar), drawn on `hitman`. A human draw turns an eligible human, else an
+  eligible NPC seat; an NPC draw turns an eligible NPC seat only, so `human` is a ceiling (0 at 3 humans turns no
+  human ever). With no seat in that pool he never comes. The turned seat keeps its card (its `roleId`, its abilities,
+  its town work), its look and every public field; it holds the `hitman` vendetta, its own view's `Private.hitman` is
+  set until the lobby, and its mark is mailed to it at once (3.20, a human when one is free). Its side is its own: it
+  shares neither the Village's win nor the Cabal's, and its only victory is the Contract (C4b).
 - **The sign.** At the turning every seat's chat log gets one system line that names nobody, "A stranger's coat was
   seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
-- **The dormant role.** From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
-  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
-  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own. A
-  thin, dear stall alone never names him (the hardships of C4c show the same sign).
-- Not built yet: the day weapon, the Dusk Train boarding and the Contract victory (C4b); the hardships and the
-  Clerk's ledger, and the cold station (C4c); the dark window (a home's window state); the turned seat's true look
-  (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station
-  roof; the jail as a bar to the turning (B5); a turned NPC seat stopping its routine.
+- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
+  him: its look runs thin and dear as a seat Owing the line, 3.23); the day weapon, the Dusk Train boarding and the
+  Contract victory (C4b); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
+  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
+  black-wax mailbag and the crow on the station roof; the jail as a bar to the turning (B5); a turned NPC seat
+  stopping its routine.
