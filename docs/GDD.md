@@ -941,7 +941,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 - **Owing the line** (round 10, C2; `docs/round9/world-mode.md` 6, followup-4 2.5). Each return on the morning train
   (3.22) adds `respawn.fareDebt` (6 Scrip) to the seat's fare, owed to the Company, and every further death adds
   another. While a fare is owed, the town's wages and sales into the seat's purse pay `respawn.wageMult` (half) of
-  their amount, rounded down; the rest stays with the town, so no coin is made or lost. `act.payRent` at a bank
+  their amount; the half Scrip a payment leaves is carried to the next (two 3-Scrip tasks pay 1, then 2), and the
+  cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
   counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
   there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
   nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's

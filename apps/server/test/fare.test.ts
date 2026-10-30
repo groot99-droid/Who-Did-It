@@ -89,9 +89,13 @@ describe('Owing the line (GDD 3.23)', () => {
     emitSim(m.room, { tick: m.room.state.tick, kind: 'taskDone', seat: clear!.id });
     await sleep(200);
     const wage = balance.economy.taskWage;
+    // Halves, with the fraction carried: two 3-Scrip wages pay 1, then 2.
     expect(balanceOf(m.room, owing!.id)).toBe(Math.floor(wage * balance.respawn.wageMult));
     expect(balanceOf(m.room, clear!.id)).toBe(wage);
-    expect(movePurse(m.room, TOWN, owing!.id, 5, 'sale')).toBe(Math.floor(5 * balance.respawn.wageMult));
+    emitSim(m.room, { tick: m.room.state.tick, kind: 'taskDone', seat: owing!.id });
+    await sleep(200);
+    expect(balanceOf(m.room, owing!.id)).toBe(wage * 2 * balance.respawn.wageMult);
+    expect(movePurse(m.room, TOWN, owing!.id, 4, 'sale')).toBe(4 * balance.respawn.wageMult);
     // What the seat pays out, and a bank move, are its own coin: never cut.
     expect(movePurse(m.room, owing!.id, `@bank:${owing!.id}`, 1, 'bank')).toBe(1);
   });
