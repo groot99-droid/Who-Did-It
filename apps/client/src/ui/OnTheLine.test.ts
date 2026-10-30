@@ -18,6 +18,14 @@ describe('the time to the morning train', () => {
     expect(lineSecondsLeft(Phase.grace, 5)).toBe(5 + arrive);
     expect(lineSecondsLeft(Phase.day, -3)).toBe(p.duskS + p.nightS + arrive);
   });
+  it('runs through a meeting and its immunity, which open the next day', () => {
+    expect(lineSecondsLeft(Phase.meetingDiscussion, 30)).toBe(
+      30 + p.voteS + p.revealS + p.immunityS + arrive,
+    );
+    expect(lineSecondsLeft(Phase.meetingVote, 20)).toBe(20 + p.revealS + p.immunityS + arrive);
+    expect(lineSecondsLeft(Phase.reveal, 4)).toBe(4 + p.immunityS + arrive);
+    expect(lineSecondsLeft(Phase.immunity, 9)).toBe(9 + arrive);
+  });
   it('reads as minutes and seconds', () => {
     expect(lineClock(0)).toBe('0:00');
     expect(lineClock(65.2)).toBe('1:06');

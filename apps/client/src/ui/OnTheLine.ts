@@ -25,8 +25,17 @@ export function lineSecondsLeft(phase: number, phaseLeftS: number): number {
       return left + p.nightS + arrive;
     case Phase.night:
       return left + arrive;
+    // A meeting ends the day: its phases, then immunity opens a new day and the train comes in (Phases.ts).
+    case Phase.meetingDiscussion:
+      return left + p.voteS + p.revealS + p.immunityS + arrive;
+    case Phase.meetingVote:
+      return left + p.revealS + p.immunityS + arrive;
+    case Phase.reveal:
+      return left + p.immunityS + arrive;
+    case Phase.immunity:
+      return left + arrive;
     default:
-      return left; // a meeting or immunity: its own clock, then the day restarts
+      return left;
   }
 }
 

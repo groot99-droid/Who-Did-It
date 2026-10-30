@@ -96,6 +96,7 @@ export const WORLD_COPY = {
   'line.cause.creature': 'Something in the dark took you.',
   'line.cause.shot': 'A shot took you.',
   'line.cause.other': 'You fell by day.',
-  'line.kept': 'Your card and your Notebook come back with you. Your pack and your purse lie where you fell.',
-  'line.back': 'You are back. You stepped off the morning train.',
+  'line.kept':
+    'Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost.',
+  'line.back': 'You are back.',
 } as const satisfies Record<string, string>;
