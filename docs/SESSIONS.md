@@ -4181,6 +4181,35 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: at 10X's request, a Complete may stand on a base a few merges old, and 6Z runs the full check on the
   true merge before merging (seams.md 1, "Merging"). With one port, a full check and auto 50 take a session about 35
   minutes, and every base merge restarted that clock on each of nine open pull requests.
+- 2026-10-30: merged C5b (#393), 6Z's docs (#396), x4 (#384) and y6 (#390). x4 went in on 6Z's full check of the
+  true merge (every package, the whole server suite and auto 50), the first under the new rule. y6's only conflict
+  was two `DECISIONS.md` rows on one line: 6Z built the keep-both merge and checked it, with the touch and world e2e,
+  and 10Y pushed the same tree. The e2e builds the client against `@wdi/shared` and `@wdi/content` from their dist,
+  so those two are built first.
+- 2026-10-30: 6Z confirmed 10C's default for C5c: a knifed guard leaves no kill clues (its body is the clue), and the
+  Bandage, the Watch and the Charm don't apply to it, since guards are out of the deck (`followup-4.md` 2.2). Its body
+  and its return on the train show only what any figure's do (rows 17 and 18), and a briefing raised by a guard's
+  body names the kind and the scene only. C5c waits for x1 (#370) in `sim/Kill.ts`; 10C starts C4 meanwhile.
+- 2026-10-30: 6Z's rulings on 10C's C4 plan, the Hitman, split in three: C4a the arrival (the `hitman` draw, the
+  turning, the public line and the dormant role), C4b the day weapon and the Dusk Train (the Contract victory and
+  the lapse), C4c the hardships and the Clerk's ledger.
+  - The turned seat keeps its card in public and in private, so every role-keyed system keeps working and no count
+    or win check moves. The Hitman is the held `contract` vendetta, its note and `Private.hitman` (seams row 20). The
+    arrival-only mark that `gdd-map.md` 3.1 puts on `roles.json` goes on the vendetta row instead, since the Hitman
+    is a vendetta in today's data.
+  - His victory is his own: he shares neither side's win, and no `Winner` is added. Like the Drifter's ejection
+    win, he leaves play when he boards the Dusk Train and the match goes on. C4b lists him in `gameOver.alsoWon` and
+    adds an optional game-over field for the end screen (`phases.md` 7); its seams row comes before C4b opens.
+  - The true look (`world-mode.md` 4.4) and the mailbag and crow props are NFY: no step builds `Private.trueLook`,
+    and there is no `hitman` atlas. The dark window is NFY too, until a step gives homes a window state.
+  - The dormant stall and C4c's hardship stall are the owing stall exactly: one rule in `townWork.ts`, and
+    `hitman.dormantOutput` at `respawn.stockMult`'s value, with a test that pins them equal. `world-mode.md`'s
+    proposal predates F4 b1, and a stall emptier than an owing one would tell the two apart.
+  - 6Z merges C4a only when C4b is complete, back to back, since every base merge deploys to production and a
+    Hitman with a contract but no weapon and no train is a dead end. C4b's branch stacks on C4a's.
+  - Defaults for the owner: no Hitman in Paint The Town Red or below the `hitman.byHumans` table; the turned seat is
+    living and free and never a cover role; an NPC seat is turned when no human is eligible; the mark is a human
+    when one is free.
 
 ## Round 11 (planning, started 2026-10-29)
 
