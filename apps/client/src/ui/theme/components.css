@@ -790,6 +790,14 @@
   border-bottom: var(--wdi-stroke-w) solid var(--wdi-stroke);
 }
 
+/* Round 10 (10Y, A354): the vendetta goal under the goal line (UI.md 14.29, 14.51.2). */
+.wdi-card__vendetta {
+  margin: 0;
+  padding: var(--wdi-space-1) var(--wdi-space-3);
+  text-align: center;
+  border-bottom: var(--wdi-stroke-w) solid var(--wdi-stroke);
+}
+
 .wdi-card__abilities {
   list-style: none;
   margin: 0;
