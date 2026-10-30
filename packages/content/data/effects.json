@@ -113,6 +113,15 @@
       "maxStaminaFactor": 0.5,
       "cures": [],
       "gddRef": "3.32"
+    },
+    "resistant": {
+      "id": "resistant",
+      "name": "Resistant",
+      "durationS": 780,
+      "poisonFactor": 0.5,
+      "dish": true,
+      "cures": [],
+      "gddRef": "3.14"
     }
   }
 }
