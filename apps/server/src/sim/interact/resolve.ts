@@ -115,6 +115,10 @@ function stateOf(room: PartyRoom, t: Target) {
   return room.state.scenes.get(t.sceneId)?.propStates.get(t.id);
 }
 
+/** The first item a mode consumes that the seat holds too few of, or undefined when it holds them all. */
+const missingInput = (player: PlayerState, mode: Mode): string | undefined =>
+  mode.consumes?.find((c) => count(player, c.item) < c.qty)?.item;
+
 const spent = (room: PartyRoom, t: Target): boolean => {
   const state = stateOf(room, t);
   return state !== undefined && (state.untilTick === 0 || room.state.tick < state.untilTick);
@@ -139,7 +143,9 @@ export function interactReady(
       it.target === t.classId &&
       it.status === 'live' &&
       it.phases.includes(cls) &&
-      it.modes.some((m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined),
+      it.modes.some(
+        (m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined && !missingInput(player, m),
+      ),
   );
 }
 
@@ -175,6 +181,8 @@ function problemOf(
   }
   if (mode.minigame !== undefined)
     return { problem: { reason: 'NFY', args: { feature: 'lock-pick mini-game' } }, t };
+  const lacking = missingInput(player, mode);
+  if (lacking !== undefined) return { problem: { reason: 'NEED_ITEM', args: { need: lacking } }, t };
   if ((mode.drops ?? []).some((d) => !canAdd(player, d.item, d.qty[1])))
     return { problem: { reason: 'PACK_FULL' }, t };
   return { problem: null, t, modeIdx };
