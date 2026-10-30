@@ -4112,6 +4112,75 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   replaces the main mode at B6, with no flag, so the card covers two modes: world mode and Paint The Town Red.
 - 2026-10-30: the owner answered the Herb Bread question: "6. dawn". The Herb Bread's buff lasts until the next dawn,
   not D4a's fixed 780 s. 10X fixes it after x7.
+- 2026-10-30: 6Z merged y2 (#376), 10R's design (#383), C3a (#378), C3b (#379), B4 (#381), 10R's census (#387) and
+  y4 (#388). Each was checked first on the tree it would land as: lint, typecheck, the content, shared and client
+  suites, and the server test files the change touches. Production (Railway, region `ams`) runs 6625eb8, which
+  carries B4.
+- 2026-10-30: x10, the Bandage's knockback (10X; its row is _proposed_). A Knife strike that a protection voids (the
+  Watch, the Remedy or the Bandage) knocks the striker back whichever one held, through one helper, so the striker
+  cannot tell which. The blackout and Claimed stay the Bandage's own, and the Charm gives no knockback. GDD 3.2 still
+  gives the Bandage its cooldown from before A227; x10 corrects it from the data, and any other stale cooldown in 3.2
+  goes to 10Z's list. 6Z granted the two re-placed strikes in `nightPowers.test.ts`, their assertions unchanged.
+- 2026-10-30: the hand-craft hold retires for hand recipes only (`station: null`), the scope 6Z set when 10X planned
+  it. Station recipes keep the panel's Make (D4a's timed holds). 10Y's y8 points the hand recipes to the crafting
+  square; then 10X narrows the server's craft hold to station recipes, refusing a hand recipe with an existing
+  reason and testing that a station recipe still crafts. Station recipes in the grid would be a design change (D4a,
+  A13), so it goes to the owner with the dashboard's R5.
+- 2026-10-30: 10X's audit of the R6 tells (`living-world.md`: a watcher cannot tell an NPC seat from a player by what
+  it does). Item 3 goes ahead after x11: an NPC's `work` gains the night class at the lit bakery stations, _proposed_,
+  with an `npcTells` case. Items 1 (gathering), 2 (trading), 4 (saws, crates and locks) and 7 (beds) are open tells,
+  not accepted ones. One GDD line names them, and the owner will be asked whether NPCs gain night activity or the
+  tells stay.
+- 2026-10-30: B3c, the Constables' own petitions (10B), in Paint The Town Red only (`world-mode.md` 1.6, 12 R3). A
+  living Constable files when no petition is open and no manhunt runs, at most once per `petition.cooldownS`. Its
+  evidence is its own posted briefings within `law.fileWindowS`, read only on the axes anyone may read, and it files
+  only when exactly one seat's drawn traits match at least `petition.constableMatches` of them. The petition is row
+  13's public row, so there is no new seams row. A test swaps two seats' cards and expects the same filing.
+- 2026-10-30: C5a's review (#391):
+  - the second Killer card replaces the Accomplice, else the Drifter, else a profession (never the Vicar). This is a
+    review change to 6Z's ruling: in the 5- and 6-seat rows a profession swap would leave three covers for two
+    undealt cards;
+  - CI found that the Vicar could be one of the two undealt cards, which made the pillar win impossible in that match.
+    In this mode the Vicar card is always dealt, to an NPC seat (GDD 3.8);
+  - a vote ejection never comes back on the train: the ejection path never reaches `returnsOnTrain`.
+- 2026-10-30: 10C's C5b (the Paint screens) is granted `ui/GameOver.ts`, `ui/meetingText.ts`, the goal line of
+  `ui/RoleCard.ts`, `ui/copy/meeting.ts`, `ui/copy/looks.ts` and the game-over types under `net/`. The target is one
+  pure rule in `@wdi/shared`, `paintTarget`, which the server's deal and the card both call. The card counts the NPC
+  seats as the roster less the two humans, since a seat that leaves during play stays in the roster. 10R's census
+  carries the Paint goal into the new card.
+- 2026-10-30: 10R's census (#387) found abilities on the cards with no server code yet (drag, autopsy, the dust
+  compare). 6Z published the owner's role-card questionnaire (https://claude.ai/artifact/WVZyziyQsptsUs4f3JBTxM): the
+  questions of `rolecards.md` 10 and 11.2. 10R builds nothing until the owner answers Q-A1.
+- 2026-10-30: 10Y's items after y5 are y6 (an ability disc per active ability on a phone), y7 (the vendetta goal on
+  the day's card), y8 (the hand-craft panel) and y9 (the bottom band's CSS on a phone and the crafting square's out
+  slot). 10Y's copy goes in `####` subsections of its 14.51, since 14.52 is 10X's (seams.md 5).
+- 2026-10-30: x11, the Herb Bread until dawn (10X), as the owner answered. 6Z granted its `effects.json` row and the
+  comment in `sim/body/cures.ts`; the client's effect chip and tooltip must never read "0 s".
+- 2026-10-30: B5's wire note (10B) is seams row 19, the county jail. 6Z ruled on the face: an impersonation worn at
+  the cuff stays pinned until the seat leaves jail or dies, so the cell, the Tribunal and the release show the face
+  that was cuffed. Dropping it at the jail door would unmask the Killer there, against the owner's "nothing unmasks
+  on the spot". Two figures in one face can then be seen at once, as with any impersonation: only the drawn figures
+  tell. B5 is granted the `inJail` stub in `sim/Sleep.ts` and the `jailed` stubs in `sim/law/Petition.ts` and
+  `sim/law/Manhunt.ts`.
+- 2026-10-30: 10X's x14, an invariant for the bot swarm: each seat's view is decoded through a shadow encoder, and
+  every avatar a seat holds must exist on the server at the same place, every avatar the server shows the seat must be
+  held, and no secret field may decode. It runs behind `pnpm auto -- --views`, off by default, after x13.
+- 2026-10-30: 10B splits B5 in two. B5a is the cell as content: `cj_cell`, a scene of a new kind, `jail`, that
+  belongs to no map and is listed for every map, with no hub reachability, no portals and its `cj.` ids appended.
+  B5b is the server, `sim/law/Jail.ts`: the walk to the cell (`jail.walkS`), the release on the morning train, and
+  the manifest naming the face that was cuffed. 6Z granted B5a the map checks in `validateWorld.ts`, the scene
+  schema's kind, three edits of `packages/content/test/scenes.test.ts` and the jail exclusion in `world.test.ts`.
+  `mapOf` returns the default map for a jail scene, so the tilemap and the Studio don't throw; a test pins it, and
+  WORLD.md 4.4 says the cell takes the default map's look on both maps. B5b is granted the `isPinned` skips in three
+  functions of `sim/Impersonate.ts` and the `enterScene` export.
+- 2026-10-30: merged y3 (#386), C5a (#391), 6Z's docs (#395) and y5 (#389). 6Z checked each code tree again on the
+  base it merged into. y5 found the Studio's NPC editor dropping B1's `guard` and `count` from any row it saved, which
+  would have ended the Constables' guarding; it keeps them now. 6Z read C5b's own diff (#393: the shared
+  `paintTarget`, the card's goal and the end tally) and found nothing blocking. B3c (#394) swaps its mode stub for
+  `isPaintTown`.
+- 2026-10-30: at 10X's request, a Complete may stand on a base a few merges old, and 6Z runs the full check on the
+  true merge before merging (seams.md 1, "Merging"). With one port, a full check and auto 50 take a session about 35
+  minutes, and every base merge restarted that clock on each of nine open pull requests.
 
 ## Round 11 (planning, started 2026-10-29)
 
