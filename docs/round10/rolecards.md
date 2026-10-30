@@ -910,3 +910,119 @@ You said "paper = what you hold", and later that you might design a new paper st
 Alegreya SC, Alegreya Sans and IBM Plex Mono, all OFL, self-hosted.
 
 - **Proposed default:** yes, on the card and the Daybook only. Oswald and Inter stay everywhere else.
+
+## 11. Ability census (follow-up, 10R, 2026-10-30)
+
+6Z found that A2 goes deeper than the client. `sim/Hold.ts` `handleHold` routes only these holds:
+
+- collect, task, gather, craft;
+- shop, bank, the civic holds;
+- sleep, errand and `interact`.
+
+Any other hold is refused `NFY {feature: 'this action'}` (`Hold.ts:84-86`). `sim/Actions.ts` `handleAbility` does the same
+for any ability it does not route (`Actions.ts` default branch). `act.hide`, `act.check`, `act.burst` and `act.present` are
+in the protocol, but `sim/Commands.ts` queues and ignores them ("arrive with M4+"). So R1's "the hold slots send
+`act.hold`" would only move today's silent dead key to an NFY toast. The census below is what each card would really
+offer at this base (`origin/claude/zen-turing-m1jnw0` after #383).
+
+### 11.1 The census
+
+The census covers every ability a shipped card shows, the kit items with a `use`, and the universal verbs.
+
+- **Server:** built (the file that runs it) or not built (where it falls today).
+- **Client:**
+  - desktop: the key or control that sends it today;
+  - phone: whether the touch HUD reaches it.
+- **Card slot:** the slot it takes on the new card (3.2).
+
+| Ability | Kind | Cards | Server | Client today | Card slot |
+| --- | --- | --- | --- | --- | --- |
+| Kill | active | Killer, heir | built: `Kill.ts` (via `Actions.ts`) | Q; phone: Act | Q |
+| Impersonate | active, seat list | Killer | built: `Impersonate.ts` | R; phone: none | R |
+| Drag body | hold | Killer | **not built**: no drag code; `act.hold drag` → `NFY` | none | F, shown as coming later |
+| Plant Clue | active | Accomplice, heir | **not built**: `Actions.ts` default → `NFY` | Q fires and is refused `NFY`; phone: Act, refused | Q, shown as coming later |
+| Crowbar (break a locked door) | hold | Accomplice, heir | **not built** for doors. The Crowbar is a `pry` tool (`items.json` `tool`), which A10's `pryCrate` interaction and D7's boarded house use | none for doors; E (`interact`) at a nailed crate | R, shown as coming later; its working pry belongs to the kit row |
+| Inherit | passive | Accomplice | built: `Inherit.ts` | — | none (Always on) |
+| Inspect | hold | Detective | **partly built**: the Detective's `collect` marks the clue Verified (`Hold.ts:158`). No Lens, no hidden attribute, no Forged reading | E (collect); Q does nothing | Q. The card says "your collects are Verified" until the Lens lands |
+| Dust / Compare | hold | Detective | **not built**: no fingerprint code | none | R, shown as coming later |
+| Bandage | active | Doctor | built: `Actions.ts` `handleBandage` | Q; phone: Act | Q |
+| Autopsy | hold | Doctor | **not built** | none | R, shown as coming later |
+| Salts | active | Doctor | built: `sim/body/verbs.ts` | F; phone: none | F |
+| Hear Confession, Keep Watch, Remedy, Nightshade | active, seat list | Vicar, Watchman, Herbalist | built: `NightPowers.ts` | Q / R; phone: Act (Q) only | Q / R |
+| Last Shot | passive (picker on death) | Gamekeeper | built: `LastShot.ts` | the picker opens by itself | none (Always on) |
+| Tasks | passive | professions | built: `Tasks.ts`, `Hold.ts` `task` | E at a station | none (Always on) |
+| Chalk | active | professions | **not built**: `Actions.ts` default → `NFY` | R, refused; phone: none | R, shown as coming later |
+| Rope | active | professions | **not built** (no snares yet, V1.5) | F, refused; phone: none | F, shown as coming later |
+| Act Shifty | active | Drifter | **not built**: `NFY` | Q, refused; phone: Act, refused | Q, shown as coming later |
+| Fake Blood | active | Drifter | **not built**: `NFY` | R, refused; phone: none | R, shown as coming later |
+| Skeleton Key (item) | hold | Killer kit | **not built**: "a keyed door stays locked" (`Portals.ts:181`) | none | kit row, coming later |
+| Clean, the Bloody Rag (item) | hold | Killer, Drifter kits | **not built** | none | kit row, coming later |
+| Wash, the Bucket (item) | hold | Killer kit | **not built**: Blood only fades on its own clock | none | kit row, coming later |
+| Medkit (item) | active | Doctor kit | built: `body/verbs.ts` `heal` | Pockets, Use | kit row |
+| Light (Lantern, Candle) | active | many kits | built: `C2S.light`, `mobs/light.ts` | Pockets, Light / Douse | kit row |
+| Eat (Wake Loaf, Herb Bread) | active | any | built: `body/verbs.ts` | Pockets, Use | kit row |
+| Lockpicks (pick a lock) | interaction | any holder | built: A10 `pickLock`, D5 | E at a locked door | kit row |
+| Collect | hold | everyone | built: `Hold.ts` | E | universal |
+| Report body, the Bell | active | everyone | built: `Actions.ts` | E | universal |
+| Strike | active | everyone | built: `body/verbs.ts` | X; phone: Strike | universal |
+| Sneak | movement | everyone | built: `input.move` `sneak` | Shift; phone: Sneak | universal |
+| Hide, Check, Burst Out | active / hold | everyone | **not built**: `act.hide`, `act.check` and `act.burst` are queued and ignored (`Commands.ts` default) | none | universal, shown as coming later |
+| Present a Notebook entry | active | everyone (meetings) | **not built**: `act.present` ignored. B6 retires the meeting | none | dropped with the vote |
+
+**What the census adds to 1.2.**
+
+Fourteen things a shipped card shows have no server behind them:
+
+- Drag body, Plant Clue, Crowbar (doors), Dust / Compare, Autopsy;
+- Chalk, Rope, Act Shifty, Fake Blood;
+- Skeleton Key, Rag, Wash;
+- Hide, Check and Burst Out (counted once);
+- Inspect, built only in part.
+
+The Accomplice's and the Drifter's whole card rests on them. The Accomplice can Inherit, and nothing else of its own
+works. The Drifter has nothing that works but its kit's look.
+
+### 11.2 What the card does with an unbuilt ability (Q-A4)
+
+**Proposed default:** the card shows it, greyed, with a "Coming later" pill and no keycap or disc, and a short line on
+what it will do. It never takes a live key or a phone disc. The slot keys go to the built abilities first, so a Doctor's
+Salts stays on a key while Autopsy waits greyed.
+
+- Each row reads a new `status` on its `abilities.json` row: `live` (the server runs it) or `planned`. This mirrors
+  `interactions.json` `status`.
+- A test keeps the status honest. A `live` row must have a server route: a case in `handleAbility`, a branch in
+  `handleHold` or an interaction. A `planned` row must have none. So a status cannot drift from the code the way the
+  card's keys did.
+- The owner asked that the card map "every action a player can take". A dead key is not one, and hiding the row would
+  leave a card that names its own abilities in its lore with no row for them. A greyed row says honestly what exists and
+  what is coming.
+- **Other choice:** hide planned rows, and show a card only what works.
+
+### 11.3 Owner question
+
+#### Q-A3. When to build the missing V1 abilities
+
+The census finds that these are written in GDD 3.2, 3.4 and 3.7 as V1 and have no server:
+
+- the Killer's Drag body, Skeleton Key, Rag and Wash;
+- the Accomplice's Plant Clue and Crowbar on doors;
+- the Detective's Lens Inspect and Dust / Compare;
+- the Doctor's Autopsy;
+- the professions' Chalk;
+- the Drifter's Act Shifty and Fake Blood;
+- everyone's Hide, Check and Burst Out.
+
+Rope waits for the V1.5 snares. Without them, the Accomplice and the Drifter have almost nothing to do, and world mode's
+evidence (prints, autopsies, forged clues) has fewer sources than its law needs.
+
+- **Proposed default:** build them in round 11, as their own session beside the art makeover. Round 10 is full, and 10X
+  works fixes, not features. The session takes them in three Opus pull requests under 400 lines each, one per system:
+  - the evidence verbs: Inspect with Lenses, Dust / Compare, Autopsy, Plant Clue;
+  - the cover-up verbs: Drag body, Rag, Wash, Skeleton Key, Crowbar on doors;
+  - the hiding spots (Hide, Check, Burst Out), with Chalk, Act Shifty and Fake Blood.
+
+  Each pull request flips its abilities' `status` to `live`, so the card lights them up with no client change. Until
+  then the card shows them greyed (11.2).
+- **Other choices:**
+  - round 10's tail, beside the card's build (10X with 6Z's grant, or a new 10-series session), which delays 10Z;
+  - drop the ones that world mode no longer needs, and rewrite the cards around what exists.
