@@ -27,7 +27,7 @@ export interface AbilityDisc {
 }
 
 /**
- * Round 10 (10Y, A334; UI.md 14.52): the discs a card gets on a phone, one per active ability in the card's slot
+ * Round 10 (10Y, A334; UI.md 14.51.1): the discs a card gets on a phone, one per active ability in the card's slot
  * order, labelled with the row's name. A passive or a hold ability gets none: a key does nothing for them either
  * (`World.useAbility`; rolecards.md 1.2 A2), so the disc would be a dead button.
  */

@@ -4,7 +4,7 @@ import type { RoleRevealPayload } from '../net/protocol';
 import { type FakeNode, installFakeDom } from '../ui/main/fakeDom';
 import { abilityDiscs, TouchControls } from './TouchControls';
 
-// Round 10, 10Y (A334; UI.md 14.52; rolecards.md 1.2 A3): a phone gets one disc per active ability of the card, on
+// Round 10, 10Y (A334; UI.md 14.51.1; rolecards.md 1.2 A3): a phone gets one disc per active ability of the card, on
 // Q, R and F, labelled with the ability's name, each pressing the same path a key presses.
 
 /** A Reverend-shaped card: Q, R and F all active (`salts` R, `fakeBlood` F), as the Vane's or the Reverend's. */

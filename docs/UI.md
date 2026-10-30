@@ -220,7 +220,7 @@ paper knob. Buttons are 64 px paper discs with the key in Oswald 20 px over a 12
 `--primary` is the 80 px mustard Use button. They sit bottom-right in a two-by-two cluster, the
 stick bottom-left. Round 8 (8A) adds a fifth disc, Strike (X, `touch-strike`), at the end of the cluster (14.32).
 Round 10 (10Y, A334) takes the Act disc out of the cluster: the card's abilities each get a disc, Q, R and F, in a
-row over the cluster (14.52).
+row over the cluster (14.51.1).
 
 **Portraits** (`.wdi-portraits`, `.wdi-portrait`). A grid of paper tiles at least 132 px wide
 (104 on phones): a 2:3 picture slot on slate, the name in display-sm, the trait icons in a row,
@@ -508,7 +508,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `rolecard-front`, `rolecard-back` | the Detective's card and the back of the card | 2 step 4, 3.2 |
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
-| `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.52 |
+| `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.51.1 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
@@ -581,7 +581,7 @@ disc carries the key instead.
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
 Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.run` Run, `touch.sneak` Sneak; the Strike disc's label
-is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.52, round 10, 10Y; `touch.act`
+is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.51.1, round 10, 10Y; `touch.act`
 Act went with the Act disc).
 
 ### 14.3 Refusals (a toast after a refused action, N)
@@ -1907,7 +1907,7 @@ centred, it hid the log's first line.
 - **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
   until then.
 
-### 14.52 The ability discs on a phone (10Y, round 10)
+#### 14.51.1 The ability discs on a phone (y6)
 
 Round 10's role-card audit found that a phone had only the Act disc, Q, so Impersonate, Salts, Chalk, Rope and Fake
 Blood were out of reach there (`docs/round10/rolecards.md` 1.2 A3; DECISIONS A334). `input/TouchControls.ts` now
