@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { systemLine } from '../economy/rumours';
 import { emitSim, onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
+import { runPetition } from './Petition';
 import { figuresOf } from '../townsfolk/figures';
 
 /**
@@ -98,6 +99,7 @@ export function briefingLine(p: Pick<Pending, 'sceneId' | 'kind' | 'value'>, rea
 
 /** The law's tick (the locked `runLaw` line of `sim/Step.ts`, after the clue decay): due briefings go out. */
 export function runLaw(room: PartyRoom): void {
+  runPetition(room); // round 10, B3: petitions
   const memory = memoryOf(room);
   if (room.state.phase === Phase.lobby) {
     memory.pending = [];

@@ -71,6 +71,8 @@ export const LawsFile = z.strictObject({
   gddRef: GddRef,
   laws: z.record(Id, LawStage),
   briefing: BriefingLines.optional(),
+  /** Round 10, B3 (GDD 3.31, `world-mode.md` 5): the crimes a petition may charge, by id; B6 adds their sentences. */
+  crimes: z.record(Id, z.strictObject({ name: z.string().min(1) })).optional(),
 });
 export type LawsFile = z.infer<typeof LawsFile>;
 

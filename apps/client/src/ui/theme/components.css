@@ -1604,8 +1604,9 @@
     transform: none;
   }
 
+  /* Under the clock and the village's work bar (match.css; round 10, 10Y, UI.md 14.51), so no log line hides. */
   .wdi-hud__tr {
-    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 56px);
+    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 88px);
   }
 
   .wdi-log {

@@ -448,6 +448,12 @@
   outline-offset: var(--wdi-stroke-w);
 }
 
+/* Round 10, 10Y (UI.md 14.51; failures.md 6.2): a prompt whose tool is missing greys; a press shakes it, nothing is sent. */
+.wdi-m5b .wdi-m5b__prompt.is-blocked {
+  color: var(--wdi-night-text-muted);
+  border-style: dashed;
+}
+
 .wdi-m5b .wdi-m5b__bar {
   height: var(--wdi-space-2);
   background-color: var(--wdi-night);
@@ -702,6 +708,18 @@
 @media (prefers-reduced-motion: reduce) {
   .wdi-m5b .wdi-m5b__work-bar > i {
     transition: none;
+  }
+}
+
+/* On a phone the clock is at the right (components.css), so the bar sits under it there and the log starts below
+   the bar (round 10, 10Y, UI.md 14.51): centred, it hid the log's first line. */
+@media (max-width: 480px) {
+  .wdi-m5b .wdi-m5b__work {
+    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 56px);
+    right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
+    left: auto;
+    width: min(240px, 70vw);
+    transform: none;
   }
 }
 
