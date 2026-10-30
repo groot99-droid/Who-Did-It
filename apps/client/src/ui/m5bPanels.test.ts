@@ -56,6 +56,7 @@ describe('recipeRows', () => {
       'herbBread',
       'herbFilling',
       'lantern',
+      'leatherJerkin',
       'lockpicks',
       'pickaxe',
       'proofedDough',

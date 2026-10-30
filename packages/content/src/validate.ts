@@ -314,7 +314,9 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (r.tool !== undefined && !isItem(r.tool)) err(`resources.json: ${r.id} needs unknown tool ${r.tool}`);
   }
   for (const item of Object.values(items.items)) {
-    if (item.kind === 'material' && !Object.hasOwn(resources.resources, item.id)) {
+    // A material comes from a node, or off a creature's corpse (round 10, D6b).
+    const skinned = Object.values(c.mobs.mobs).some((m) => m.skin && item.id in m.skin);
+    if (item.kind === 'material' && !Object.hasOwn(resources.resources, item.id) && !skinned) {
       err(`items.json: material ${item.id} is no resource`);
     }
   }
@@ -538,8 +540,17 @@ function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; h
   );
   const have = new Set<string>();
   const made = new Set<string>();
+  // A skinned corpse gives its hide and game to whoever can hold a Skinning knife (round 10, D6b).
+  const skinDrops = Object.values(c.mobs.mobs).flatMap((m) => Object.keys(m.skin ?? {}));
   for (let grew = true; grew;) {
     grew = false;
+    if (stock.has('skinningKnife') || have.has('skinningKnife')) {
+      for (const id of skinDrops) {
+        if (have.has(id)) continue;
+        have.add(id);
+        grew = true;
+      }
+    }
     for (const id of nodeResources) {
       const tool = c.resources.resources[id]?.tool;
       if (!have.has(id) && (tool === undefined || have.has(tool))) {

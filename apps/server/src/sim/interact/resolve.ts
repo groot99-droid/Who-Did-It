@@ -263,7 +263,7 @@ export function tickInteract(room: PartyRoom, sessionId: string, p: PlayerSim): 
 }
 
 /** Wears `n` uses off the seat's `tool`; the tool breaks (one is taken) when its `uses` run out. */
-function wear(room: PartyRoom, sessionId: string, player: PlayerState, tool: string, n: number): void {
+export function wear(room: PartyRoom, sessionId: string, player: PlayerState, tool: string, n: number): void {
   const uses = items.items[tool]?.uses;
   if (uses === undefined || n === 0) return;
   const bySeat = WORN.get(room) ?? new Map<string, Map<string, number>>();
