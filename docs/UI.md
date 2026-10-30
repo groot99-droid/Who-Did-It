@@ -219,6 +219,8 @@ the hazard glow, pulsing.
 paper knob. Buttons are 64 px paper discs with the key in Oswald 20 px over a 12 px caps label;
 `--primary` is the 80 px mustard Use button. They sit bottom-right in a two-by-two cluster, the
 stick bottom-left. Round 8 (8A) adds a fifth disc, Strike (X, `touch-strike`), at the end of the cluster (14.32).
+Round 10 (10Y, A334) takes the Act disc out of the cluster: the card's abilities each get a disc, Q, R and F, in a
+row over the cluster (14.51.1).
 
 **Portraits** (`.wdi-portraits`, `.wdi-portrait`). A grid of paper tiles at least 132 px wide
 (104 on phones): a 2:3 picture slot on slate, the name in display-sm, the trait icons in a row,
@@ -507,6 +509,7 @@ screenshots at 1280 x 720 and 390 x 844 in `docs/ui/`:
 | `hud` | chip, night clock, log, stick and buttons, a toast over a dark world | 2 steps 5 to 7 |
 | `refusal` (10Y, round 10; from `e2e/refusals.spec.ts`, not a static page) | the greyed gather prompt and the log with a hinted refusal, the longest `fail` line and an NFY line | 14.51 |
 | `inventory`, `crafting`, `asleep`, `line`, `lockpick` (10Y, round 10; from `e2e/screens.spec.ts`, not static pages) | the Pockets screen and the crafting square over the bottom band, the asleep veil with the bed count, On the line with the train clock, the lock-pick board with a lifted pin | 14.44, 14.46, 14.47, 14.48 |
+| `touch-390w` (10Y, round 10; from `e2e/touch.spec.ts`, not a static page; 390 x 844 only) | the Killer's Kill and Lock door discs over the Use, Run, Sneak and Strike cluster on a phone | 14.51.1 |
 | `meeting` | eight portraits, the tally, chat, claim chips, the vote | 2 step 8, 3.8 |
 | `menu-mockup` (owner, Claude Design, 2026-10-23) | the round-7 menu: title, glass buttons, profile chip, sound toggle over the loop (`docs/round7/ui-reskin.md`) | 2 step 1, 3.21 |
 | `lobby-mockup` (owner, Claude Design, 2026-10-23) | the round-7 lobby in three columns: code and seats, map cards and art style, the deck and Start | 2 step 3 |
@@ -579,8 +582,9 @@ disc carries the key instead.
 | `prompt.ability` | Q / R / F | {ability} {target} | an ability row of the card with a living player in reach; `{ability}` is the card row's `name` ("Kill", "Bandage") |
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
-Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.act` Act, `touch.run` Run, `touch.sneak`
-Sneak; the Strike disc's label is 8A's `body.strike` (14.32).
+Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.run` Run, `touch.sneak` Sneak; the Strike disc's label
+is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.51.1, round 10, 10Y; `touch.act`
+Act went with the Act disc).
 
 ### 14.3 Refusals (a toast after a refused action, N)
 
@@ -1919,3 +1923,17 @@ centred, it hid the log's first line.
   `NEED_*` never hint.
 - **The item icon** beside a `NEED_*` line (6.2) waits for `icon_item_*` art; the line carries the item's name
   until then.
+
+#### 14.51.1 The ability discs on a phone (y6)
+
+Round 10's role-card audit found that a phone had only the Act disc, Q, so Impersonate, Salts, Chalk, Rope and Fake
+Blood were out of reach there (`docs/round10/rolecards.md` 1.2 A3; DECISIONS A334). `input/TouchControls.ts` now
+draws one disc per active ability of the card (`abilityDiscs(card)`: `abilities.json` `kind: 'active'`, in the
+card's slot order), each `touch-ability-<slot>` with the slot letter as its key cap and the row's `name` as its
+label ("Kill", "Lock door", "Fake Blood"; a long name widens the disc into a pill), in a `.wdi-touch-abilities` row
+over the Use, Run, Sneak and Strike cluster. A passive or a hold ability gets no disc, as its key does nothing yet
+(1.2 A1 and A2; 10R's R1 deals the keys by kind). A disc fires `World.useAbility(id)`, the one path of a key (Q, R, F
+find their row, then call it by ability id), a disc and, later, a card button; a ghost's discs grey
+(`setAbilitiesEnabled`). Run and Sneak stay as they are until the owner answers Q-C3. `e2e/touch.spec.ts` checks
+the discs and their fit at 390 x 844 (`docs/ui/touch-390w.png`); `TouchControls.test.ts` the discs of the mock
+net's card (Q and R, no F for the hold) and of a card with three active abilities.
