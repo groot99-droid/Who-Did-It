@@ -96,6 +96,11 @@ export function handleQuestAccept(
     reject(room, sessionId, 'TASK_TAKEN');
     return;
   }
+  // Round 10, D9: a chain step is offered once the step before it has been turned in.
+  if (quest.after !== undefined && !stateOf(player, quest.after)?.done) {
+    reject(room, sessionId, 'NOTHING_THERE');
+    return;
+  }
   const active = player.priv.quests.filter((s) => !s.done).length;
   if (active >= balance.quests.maxActive) {
     reject(room, sessionId, 'TOO_MANY_QUESTS');

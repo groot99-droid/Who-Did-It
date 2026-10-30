@@ -250,6 +250,8 @@ export interface WorldFeed {
   body(): OwnBodySnap | null;
   /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
   purse(): number;
+  /** Round 10 (C2b, GDD 3.23): the Scrip this seat owes the line (`Private.fare`), 0 when it owes none. */
+  fare(): number;
   /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
   buy(shopId: string, itemId: string, qty: number): void;
   sell(shopId: string, itemId: string, qty: number): void;

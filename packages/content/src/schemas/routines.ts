@@ -18,7 +18,16 @@ export const RoutineWorldPhase = z.enum(['grace', 'day', 'dusk', 'night', 'immun
 export type RoutineWorldPhase = z.infer<typeof RoutineWorldPhase>;
 
 /** Mirrors the protocol's `HoldAction` (packages/shared/src/protocol/index.ts); 5H's server code assigns it to one. */
-export const RoutineHold = z.enum(['drag', 'collect', 'task', 'inspect', 'autopsy', 'shop', 'interact']);
+export const RoutineHold = z.enum([
+  'drag',
+  'collect',
+  'task',
+  'inspect',
+  'autopsy',
+  'shop',
+  'interact',
+  'errand',
+]); // errand: round 10, C2b
 export type RoutineHold = z.infer<typeof RoutineHold>;
 
 export const RoutineActivity = z.strictObject({
