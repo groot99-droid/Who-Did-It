@@ -564,7 +564,7 @@
       "onDeath": "drops",
       "use": "eatHerbBread",
       "buff": "resistant",
-      "tooltip": "Eat it to take poison more lightly until the buff wears off.",
+      "tooltip": "Eat it to take poison more lightly until the next dawn.",
       "ships": "V1",
       "gddRef": "3.14"
     },
