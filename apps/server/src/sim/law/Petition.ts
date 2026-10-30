@@ -40,8 +40,10 @@ export interface Warrant {
 
 interface PetitionMemory {
   open: Open | null;
-  /** Seat id -> the tick its grace ends (an accused after a lapse, an opener after its lapse). */
-  graceUntil: Map<string, number>;
+  /** Seat id -> the tick its grace as an accused ends (after a lapse against it). */
+  accusedGrace: Map<string, number>;
+  /** Seat id -> the tick it may open again (after its own petition lapsed). */
+  openerGrace: Map<string, number>;
   warrants: Warrant[];
   seq: number;
 }
@@ -49,7 +51,11 @@ interface PetitionMemory {
 const memories = new WeakMap<PartyRoom, PetitionMemory>();
 function memoryOf(room: PartyRoom): PetitionMemory {
   let m = memories.get(room);
-  if (!m) memories.set(room, (m = { open: null, graceUntil: new Map(), warrants: [], seq: 0 }));
+  if (!m)
+    memories.set(
+      room,
+      (m = { open: null, accusedGrace: new Map(), openerGrace: new Map(), warrants: [], seq: 0 }),
+    );
   return m;
 }
 
@@ -116,7 +122,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
   if (!laws.crimes?.[charge] || ids.length > balance.petition.maxEntries)
     return reject(room, seat, 'BAD_REQUEST');
   if (m.open) return reject(room, seat, 'PETITION_OPEN');
-  const grace = Math.max(m.graceUntil.get(accused) ?? 0, m.graceUntil.get(seat) ?? 0);
+  const grace = Math.max(m.accusedGrace.get(accused) ?? 0, m.openerGrace.get(seat) ?? 0);
   if (tick < grace) return reject(room, seat, 'PETITION_GRACE', { readyInS: readyInS(grace, tick) });
   if (!nearProp(room, seat, BOARDS)) return reject(room, seat, 'TOO_FAR');
   // Only the opener's own clue entries attach: never a night-power entry, a Forged or a teaching one (6Z, row 13).
@@ -203,7 +209,8 @@ export function runPetition(room: PartyRoom): void {
   const tick = room.state.tick;
   if (room.state.phase === Phase.lobby) {
     if (m.open) close(room, m);
-    m.graceUntil.clear();
+    m.accusedGrace.clear();
+    m.openerGrace.clear();
     m.warrants = [];
     m.seq = 0;
     return;
@@ -231,8 +238,8 @@ export function runPetition(room: PartyRoom): void {
   }
   if (tick < open.untilTick) return;
   const until = tick + Math.round(balance.petition.cooldownS * TICK_RATE);
-  m.graceUntil.set(open.accused, until);
-  m.graceUntil.set(open.opener, until);
+  m.accusedGrace.set(open.accused, until);
+  m.openerGrace.set(open.opener, until);
   emitSim(room, { tick, kind: 'petition.lapsed', data: { id: open.id, accused: open.accused } });
   close(room, m);
 }
