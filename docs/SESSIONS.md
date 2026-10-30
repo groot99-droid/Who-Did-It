@@ -3938,6 +3938,11 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   `pairing`, whoever the target is, because a person's held answer and an NPC's think time would be two distributions
   (R6). A pair shields a seat only against a third party, and only while its partner shares its scene (`world-mode.md`
   3.1). B8a builds while B2 is in review; once B2 merges, B3 to B6 come before B8b, since 10E, C6 and C7 wait on B6.
+- 2026-10-30: A7a (#337) merged at f56f3d4, #345 (wire row 10 and the log above) at 807ca30, A8 (#348) at 805ebeb
+  and D3 (#343) at 233709b. A8 went before A7b because it was green first and the owner is waiting on sleeping. A8
+  took `UI.md` 14.46, 10B's slot in seams.md 5, for Sleeping. It is merged and cited in the client, so 10B's copy moves
+  to 14.50, for B2 and every later B step. C1a (#341) waits for C1b, cut from C1a's head, and the two merge seconds
+  apart: C1a alone would bring a seat back on the Train with its verbs still off. 10H is done.
 
 ## Round 11 (planning, started 2026-10-29)
 
