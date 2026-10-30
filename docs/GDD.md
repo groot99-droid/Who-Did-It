@@ -1034,7 +1034,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
-  names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
+  names a look, never a seat or a card. The county jail's cell is never sampled (3.27). Each Train delivery fills the mailbag beside the platform (HollowMere) with
   `notices.slipsPerBag` ledger slips from the sightings since the last bag, night first, one per look; an uncollected
   bag is replaced. Collecting it (`act.hold`, `clues.collectHoldS` within verb reach) turns the slips into Blackmail
   Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
@@ -1196,8 +1196,9 @@ cell. It stays there until the next morning train, the first arrival of a later 
 station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
-Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. A death in jail takes the
-usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. Only its cellmates see
+it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. A death in
+jail takes the usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
 with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
 no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
 
