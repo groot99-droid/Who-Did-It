@@ -284,7 +284,6 @@ export function runPetition(room: PartyRoom): void {
 
 type Entry = InstanceType<typeof PetitionEntry>;
 
-
 const livingConstable = (room: PartyRoom): boolean =>
   [...figuresOf(room).values()].some((f) => f.kind === 'constable' && !f.dead);
 
