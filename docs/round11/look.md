@@ -295,7 +295,7 @@ When a set is over a budget, the build round applies these in order and stops at
 
 #### 5.3.1 The long-shadow layer (CL3)
 
-The owner answered CL3 "yes" (`docs/round11/owner-answers.md`): the buildings' long shadows come in round 11, as the
+The owner answered CL3 "yes" (`docs/round11/owner-answers.md`, on 6Z's PR #366): the buildings' long shadows come in round 11, as the
 shadow layer of `pipeline.md` 4.3, a ground sprite the client draws under every y-sorted sprite and fades at dusk.
 Which light casts them is `round11-plan.md`'s (11A). This is its budget.
 
