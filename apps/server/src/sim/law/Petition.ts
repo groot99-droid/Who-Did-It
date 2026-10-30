@@ -1,13 +1,16 @@
 import { balance, clues as clueDefs, laws, scenes, traits } from '@wdi/content';
-import { ClueKind, NotebookStatus, Phase, PetitionEntry, TICK_RATE } from '@wdi/shared';
+import { ClueKind, ManhuntState, NotebookStatus, Phase, PetitionEntry, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { nearProp } from '../economy/reach';
 import { emitSim } from '../events/bus';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
 import { figuresOf } from '../townsfolk/figures';
+import { isPaintTown } from '../paintTown';
 import { isOnLine } from '../Train';
-import { isVerbPhase, reject } from '../World';
+import { isVerbPhase, reject, sceneIndex } from '../World';
+import { briefingsOf } from './Briefing';
+import { warrantsWaiting } from './Manhunt';
 
 /**
  * Petitions (round 10, B3a; GDD 3.31, `world-mode.md` 3.1 and 5, `followup-4.md` 2.1; seams.md 3 row 13). A living,
@@ -19,6 +22,9 @@ import { isVerbPhase, reject } from '../World';
  * backed matches against the accused's public traits. The public row names the accused, the charge, the counts and
  * the entries as anyone may read them; never the opener or a signer. NPC seats do not sign (6Z: deferred), so a
  * petition never waits on an NPC.
+ *
+ * B3c (world-mode 1.6 and 12 R3; A329): in Paint The Town Red, where no human is on the town side, the Constables file
+ * their own petition on their posted briefings when exactly one roster figure's public traits fit them.
  */
 
 interface Open {
@@ -51,6 +57,8 @@ interface PetitionMemory {
   /** Seat id -> the tick it may open again (after its own petition lapsed). */
   openerGrace: Map<string, number>;
   warrants: Warrant[];
+  /** The tick the Constables may next file their own petition (B3c). */
+  fileAfter: number;
   /** No petition opens before this tick: a manhunt ran out, and the case stays on the board (B4). */
   heldUntil: number;
   seq: number;
@@ -67,6 +75,7 @@ function memoryOf(room: PartyRoom): PetitionMemory {
         accusedGrace: new Map(),
         openerGrace: new Map(),
         warrants: [],
+        fileAfter: 0,
         heldUntil: 0,
         seq: 0,
       }),
@@ -234,12 +243,16 @@ export function runPetition(room: PartyRoom): void {
     m.accusedGrace.clear();
     m.openerGrace.clear();
     m.warrants = [];
+    m.fileAfter = 0;
     m.heldUntil = 0;
     m.seq = 0;
     return;
   }
   const open = m.open;
-  if (!open) return;
+  if (!open) {
+    if (isPaintTown(room)) fileByConstables(room); // Paint The Town Red: no human on the town side
+    return;
+  }
   if (!simOf(room).players.get(open.accused) || simOf(room).players.get(open.accused)!.dead)
     return close(room, m);
   if (!open.constable) {
@@ -252,7 +265,7 @@ export function runPetition(room: PartyRoom): void {
       accused: open.accused,
       charge: open.charge,
       tick,
-      watchers: [open.opener, ...open.signers],
+      watchers: [open.opener, ...open.signers].filter((s) => s !== ''),
     });
     emitSim(room, {
       tick,
@@ -267,4 +280,76 @@ export function runPetition(room: PartyRoom): void {
   m.openerGrace.set(open.opener, until);
   emitSim(room, { tick, kind: 'petition.lapsed', data: { id: open.id, accused: open.accused } });
   close(room, m);
+}
+
+type Entry = InstanceType<typeof PetitionEntry>;
+
+const livingConstable = (room: PartyRoom): boolean =>
+  [...figuresOf(room).values()].some((f) => f.kind === 'constable' && !f.dead);
+
+/**
+ * The seat the Constables' briefings fit (B3c), or null: within `law.fileWindowS`, the trait axes their posted
+ * briefings named; a living roster seat whose public traits match at least `petition.constableMatches` distinct axes
+ * is a candidate, and only a single candidate is named (none or a tie files nothing). It reads the posted briefings
+ * and the public traits only, never a card, a cover or a private view. Exported for the tests.
+ */
+export function constableCandidate(room: PartyRoom): { seat: string; entries: Entry[] } | null {
+  const m = memoryOf(room);
+  const tick = room.state.tick;
+  const since = tick - Math.round(balance.law.fileWindowS * TICK_RATE);
+  const briefed = briefingsOf(room).filter((b) => b.tick >= since && b.axis !== undefined);
+  const fits: { seat: string; entries: Entry[] }[] = [];
+  for (const [id, player] of room.state.players) {
+    const p = simOf(room).players.get(id);
+    if (!p || p.dead || !p.placed || tick < (m.accusedGrace.get(id) ?? 0)) continue;
+    const byAxis = new Map<string, Entry>();
+    for (const b of [...briefed].reverse()) {
+      if (byAxis.has(b.axis!) || player.traits[b.axis!] !== b.value) continue;
+      const e = new PetitionEntry();
+      e.clueKind = b.kind;
+      e.value = b.value!;
+      e.sceneId = sceneIndex(b.sceneId);
+      e.backed = true;
+      byAxis.set(b.axis!, e);
+    }
+    if (byAxis.size >= balance.petition.constableMatches)
+      fits.push({ seat: id, entries: [...byAxis.values()] });
+  }
+  return fits.length === 1 ? fits[0]! : null;
+}
+
+/** The Constables file their own petition (B3c): no opener, `needed` 0, so it passes into a warrant next tick. */
+export function fileByConstables(room: PartyRoom): void {
+  const m = memoryOf(room);
+  const tick = room.state.tick;
+  if (m.open || tick < m.fileAfter || tick < m.heldUntil || !livingConstable(room)) return;
+  if (room.state.manhunt.state !== ManhuntState.none || warrantsWaiting(room) > 0) return;
+  const fit = constableCandidate(room);
+  if (!fit) return;
+  m.fileAfter = tick + Math.round(balance.petition.cooldownS * TICK_RATE);
+  const id = `petition_${++m.seq}`;
+  m.open = {
+    id,
+    accused: fit.seat,
+    charge: 'murder',
+    opener: '',
+    signers: new Set(),
+    constable: false,
+    needed: 0,
+    constableMay: false,
+    untilTick: tick + Math.round(balance.petition.openS * TICK_RATE),
+  };
+  const row = room.state.petition;
+  row.id = id;
+  row.accused = fit.seat;
+  row.charge = 'murder';
+  row.untilTick = m.open.untilTick;
+  row.entries.clear();
+  for (const e of fit.entries.slice(0, balance.petition.maxEntries)) row.entries.push(e);
+  emitSim(room, {
+    tick,
+    kind: 'petition.open',
+    data: { id, accused: fit.seat, charge: 'murder', by: 'constables' },
+  });
+  write(room, m);
 }
