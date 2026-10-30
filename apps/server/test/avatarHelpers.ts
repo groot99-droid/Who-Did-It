@@ -1,6 +1,7 @@
 import type { AvatarState } from '@wdi/shared';
 import type { SceneId } from '@wdi/content';
 import { rehandle } from '../src/sim/Avatars';
+import { figureOfHandle } from '../src/sim/townsfolk/figures';
 import { type Bot, type Match, stateOf } from './simHelpers';
 
 // Round 5 (5F): tests name Kill and Bandage targets by avatar handle, as clients do (GDD 3.17).
@@ -20,6 +21,29 @@ export function avatarsHeld(bot: Bot): Array<{ scene: string; handle: string; av
 /** The handles a bot's client holds, sorted. */
 export const handlesHeld = (bot: Bot): string[] =>
   avatarsHeld(bot)
+    .map((a) => a.handle)
+    .sort();
+
+/** Round 10, x5 (A353): the avatars a bot's client holds that are seats, the figures of the scene left out. */
+export const seatAvatarsHeld = (m: Match, bot: Bot): ReturnType<typeof avatarsHeld> =>
+  avatarsHeld(bot).filter((a) => figureOfHandle(m.room, a.handle) === undefined);
+
+/**
+ * Round 10, x5 (A353, 6Z's grant of 2026-10-30): the diff paths that are not a figure's avatar row
+ * (`scenes.<scene>.avatars.<handle>`, or `avatars.<handle>` when the diff is of one scene, and everything under it,
+ * a row added or removed included), for an outsider's "no field change" diff. Safe while no figure reacts to a
+ * seat's kill or night power (only a creature hurts or kills a figure, `townsfolk/figures.ts`); a step that gives
+ * figures such a reaction must narrow this filter.
+ */
+export const withoutFigureRows = (m: Match, paths: string[]): string[] =>
+  paths.filter((p) => {
+    const row = /^(?:scenes\.[^.]+\.)?avatars\.([^.]+)(?:\.|$)/.exec(p);
+    return row === null || figureOfHandle(m.room, row[1] as string) === undefined;
+  });
+
+/** The seat handles a bot's client holds, sorted (round 10, x5: the figures of the scene left out). */
+export const seatHandlesHeld = (m: Match, bot: Bot): string[] =>
+  seatAvatarsHeld(m, bot)
     .map((a) => a.handle)
     .sort();
 

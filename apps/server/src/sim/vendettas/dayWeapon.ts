@@ -5,6 +5,7 @@ import { avatarOf, resolveHandle } from '../Avatars';
 import { spawnBody } from '../Bodies';
 import { bodyBlocksAct } from '../body/run';
 import { markDead } from '../Death';
+import { isJailed, untilDawnS } from '../law/Jail';
 import { count, take } from '../Inventory';
 import { emitNoise } from '../Noise';
 import { simOf } from '../RoomSim';
@@ -40,6 +41,8 @@ export function handleDerringer(room: PartyRoom, sessionId: string, payload: Rec
   if (!player.priv.hitman || !contract) return reject(room, sessionId, 'NOT_YOUR_POWER');
   if (count(player, DERRINGER) < 1) return reject(room, sessionId, 'NEED_ITEM', { need: DERRINGER });
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED');
+  if (isJailed(room, sessionId))
+    return reject(room, sessionId, 'IN_JAIL', { untilDawn: untilDawnS(room, sessionId) }); // B5, as the Knife
   const handle = payload.targetId;
   const figure = typeof handle === 'string' ? avatarOf(room, handle) : undefined;
   const targetId = resolveHandle(room, sessionId, handle);

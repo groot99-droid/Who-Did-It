@@ -186,10 +186,13 @@
     "wispRattle": 2,
     "shot": 10,
     "shout": 8,
+    "chop": 8,
+    "smash": 10,
     "portalFactor": 0.5,
     "gddRef": "3.7"
   },
   "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7", "reachTiles": 1.5 },
+  "figureTalk": { "reachTiles": 2, "delayS": 1.5, "cooldownS": 30, "gddRef": "3.24" },
   "tasks": {
     "cabalFakeList": true,
     "ghostShareCap": 0.25,
@@ -466,5 +469,6 @@
     "constableMatches": 2,
     "gddRef": "3.31"
   },
-  "manhunt": { "durationS": 120, "gddRef": "3.31" }
+  "manhunt": { "durationS": 120, "gddRef": "3.31" },
+  "jail": { "walkS": 5, "gddRef": "3.27" }
 }
