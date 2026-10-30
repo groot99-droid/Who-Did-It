@@ -3,9 +3,9 @@ import { createParty } from './fixtures/party';
 
 // Public looks and covers (GDD 3.17) end to end against the real server: the role card shows the deck and the
 // look a seat walks as, a cover role gets the picker (hints first, the first one preselected, a click sends
-// `role.cover`) and every other card gets none. It needs the deck deal (Session 5G's `dealMainDeck`), so it runs
-// only with WDI_E2E_LOOKS=1, at integration. The server runs with WDI_DEBUG=1 (playwright.config.ts).
-test.skip(process.env.WDI_E2E_LOOKS !== '1', 'needs the deck deal of Session 5G merged (WDI_E2E_LOOKS=1)');
+// `role.cover`) and every other card gets none. It waited behind WDI_E2E_LOOKS=1 for the deck deal (Session 5G's
+// `dealMainDeck`), long merged, so it runs with the rest (A514, A554). The server runs with WDI_DEBUG=1
+// (playwright.config.ts).
 
 async function startFour(page: Page): Promise<void> {
   await page.addInitScript("sessionStorage.setItem('wdi:introSeen', '1')"); // no opening cinematic (6Q)
