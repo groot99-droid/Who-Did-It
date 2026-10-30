@@ -10,7 +10,9 @@ import {
   ROLE_CARD_SECONDS,
   roleTitle,
   TRAIT_LABELS,
+  vendettaLines,
 } from './RoleCard';
+import { VENDETTA_COPY } from './copy/vendettas';
 
 describe('role card text', () => {
   it('builds the look line from traits', () => {
@@ -100,5 +102,27 @@ describe('cover picker model', () => {
     model.pick('vicar');
     model.sync({ look: 'doctor', mates: {} });
     expect(model.choices().find((c) => c.picked)?.lookId).toBe('doctor');
+  });
+});
+
+describe('vendetta lines (GDD 3.20, round 10 A354)', () => {
+  it("reads a holder's own goal under the Vendetta label", () => {
+    expect(vendettaLines('bandit', true)).toEqual([
+      { label: 'Vendetta: ', goal: VENDETTA_COPY['vendetta.goal.bandit'] },
+    ]);
+  });
+
+  it("reads the Accomplice's Killers' goals, one line each", () => {
+    expect(vendettaLines('zealot,hitman', false)).toEqual([
+      { label: '', goal: `Your Killer’s vendetta: ${VENDETTA_COPY['vendetta.goal.zealot']}` },
+      { label: '', goal: `Your Killer’s vendetta: ${VENDETTA_COPY['vendetta.goal.hitman']}` },
+    ]);
+  });
+
+  it('shows nothing for an empty view, an unknown id or an inherited name', () => {
+    expect(vendettaLines('', true)).toEqual([]);
+    expect(vendettaLines('', false)).toEqual([]);
+    expect(vendettaLines('ada', true)).toEqual([]);
+    expect(vendettaLines('zealot,ada', false)).toHaveLength(1);
   });
 });

@@ -84,6 +84,75 @@ export interface QuestDeps {
   turnIn(questId: string): void;
 }
 
+/** What a live log lets a row do; `null` draws the row read only (On the line, round 10, y13): no Take, no Hand-in. */
+export interface QuestRowActions {
+  /** The quests the seat holds unfinished, against `QUESTS_MAX_ACTIVE`. */
+  active: number;
+  accept(questId: string): void;
+  turnIn(questId: string): void;
+}
+
+/** One row of the log: the giver, the quest's line, what it wants and pays, its progress, and its button when live. */
+export function questRowEl(r: QuestRow, actions: QuestRowActions | null): HTMLLIElement {
+  const body = h(
+    'div',
+    { class: 'wdi-m5b__what' },
+    h('span', { class: 'wdi-m5b__name' }, fill(C['quest.giver'], { name: r.giverName })),
+    h('span', { class: 'wdi-m5b__line' }, questLine(r.copyId, r.state === 'done')),
+    h('span', { class: 'wdi-hint' }, fill(C['quest.wants'], { list: itemList(r.wants) })),
+    h('span', { class: 'wdi-hint' }, fill(C['quest.reward'], { list: itemList(r.reward) })),
+  );
+  if (r.state === 'taken')
+    body.append(
+      h(
+        'span',
+        { class: 'wdi-hint', 'data-testid': `quest-progress-${r.id}` },
+        fill(C['quest.progress'], { have: r.have, total: r.total }),
+      ),
+    );
+  const li = h(
+    'li',
+    {
+      class: 'wdi-m5b__row wdi-m5b__row--quest',
+      'data-testid': `quest-${r.id}`,
+      'data-state': r.state,
+    },
+    body,
+  );
+  if (r.state === 'done') li.append(h('span', { class: 'wdi-m5b__done' }, C['quest.done']));
+  if (!actions) return li;
+  if (r.state === 'offer') {
+    const full = actions.active >= QUESTS_MAX_ACTIVE;
+    const b = h(
+      'button',
+      {
+        type: 'button',
+        class: 'wdi-btn wdi-btn--sm wdi-btn--primary',
+        'data-testid': `quest-accept-${r.id}`,
+        disabled: !r.near || full,
+        title: full ? C['quest.full'] : undefined,
+      },
+      C['quest.accept'],
+    );
+    b.addEventListener('click', () => actions.accept(r.id));
+    li.append(b);
+  } else if (r.state === 'taken') {
+    const b = h(
+      'button',
+      {
+        type: 'button',
+        class: 'wdi-btn wdi-btn--sm wdi-btn--primary',
+        'data-testid': `quest-turnin-${r.id}`,
+        disabled: !r.near || r.have < r.total,
+      },
+      C['quest.turnin'],
+    );
+    b.addEventListener('click', () => actions.turnIn(r.id));
+    li.append(b);
+  }
+  return li;
+}
+
 /** The quest log (UI.md 14.19.4): the offers of the giver beside you and the work you hold. Opens with J, or T at a giver. */
 export function mountQuestLog(parent: HTMLElement, deps: QuestDeps): Panel {
   const list = h('ul', { class: 'wdi-m5b__list', 'data-testid': 'quest-list' });
@@ -133,63 +202,7 @@ export function mountQuestLog(parent: HTMLElement, deps: QuestDeps): Panel {
       list.replaceChildren(
         ...(rows.length === 0
           ? [h('li', { class: 'wdi-m5b__empty', 'data-testid': 'quest-empty' }, C['quest.none'])]
-          : rows.map((r) => {
-              const body = h(
-                'div',
-                { class: 'wdi-m5b__what' },
-                h('span', { class: 'wdi-m5b__name' }, fill(C['quest.giver'], { name: r.giverName })),
-                h('span', { class: 'wdi-m5b__line' }, questLine(r.copyId, r.state === 'done')),
-                h('span', { class: 'wdi-hint' }, fill(C['quest.wants'], { list: itemList(r.wants) })),
-                h('span', { class: 'wdi-hint' }, fill(C['quest.reward'], { list: itemList(r.reward) })),
-              );
-              if (r.state === 'taken')
-                body.append(
-                  h(
-                    'span',
-                    { class: 'wdi-hint', 'data-testid': `quest-progress-${r.id}` },
-                    fill(C['quest.progress'], { have: r.have, total: r.total }),
-                  ),
-                );
-              const li = h(
-                'li',
-                {
-                  class: 'wdi-m5b__row wdi-m5b__row--quest',
-                  'data-testid': `quest-${r.id}`,
-                  'data-state': r.state,
-                },
-                body,
-              );
-              if (r.state === 'offer') {
-                const full = active >= QUESTS_MAX_ACTIVE;
-                const b = h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'wdi-btn wdi-btn--sm wdi-btn--primary',
-                    'data-testid': `quest-accept-${r.id}`,
-                    disabled: !r.near || full,
-                    title: full ? C['quest.full'] : undefined,
-                  },
-                  C['quest.accept'],
-                );
-                b.addEventListener('click', () => deps.accept(r.id));
-                li.append(b);
-              } else if (r.state === 'taken') {
-                const b = h(
-                  'button',
-                  {
-                    type: 'button',
-                    class: 'wdi-btn wdi-btn--sm wdi-btn--primary',
-                    'data-testid': `quest-turnin-${r.id}`,
-                    disabled: !r.near || r.have < r.total,
-                  },
-                  C['quest.turnin'],
-                );
-                b.addEventListener('click', () => deps.turnIn(r.id));
-                li.append(b);
-              } else li.append(h('span', { class: 'wdi-m5b__done' }, C['quest.done']));
-              return li;
-            })),
+          : rows.map((r) => questRowEl(r, { active, accept: deps.accept, turnIn: deps.turnIn }))),
       );
     },
     destroy() {

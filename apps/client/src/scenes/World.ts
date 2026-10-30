@@ -8,7 +8,7 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
-import { TouchControls } from '../input/TouchControls';
+import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
   REG_ROLE_CHIP,
@@ -26,6 +26,7 @@ import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
+import { type TalkAsk, TALK_KEYS, TALK_REACH_TILES, askedLine } from '../ui/talk/talk';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
@@ -46,7 +47,7 @@ import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // rou
 import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
-import { type LineScreen, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
+import { type LineScreen, bellsNext, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -119,11 +120,17 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
-/** Round 10, C1b: per feed, whether its seat was on the line and how it died; a World restart keeps it. */
-const lines = new WeakMap<WorldFeed, { on: boolean; cause: DeathCause | undefined }>();
-const lineOf = (feed: WorldFeed): { on: boolean; cause: DeathCause | undefined } => {
+/** Round 10, C1b: per feed, whether its seat was on the line and how and where it died; a World restart keeps it. */
+interface LineMemory {
+  on: boolean;
+  cause: DeathCause | undefined;
+  /** The own `killed.sceneId` (y13): the place the screen names. */
+  sceneId: string | undefined;
+}
+const lines = new WeakMap<WorldFeed, LineMemory>();
+const lineOf = (feed: WorldFeed): LineMemory => {
   let memory = lines.get(feed);
-  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined }));
+  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined, sceneId: undefined }));
   return memory;
 };
 
@@ -289,9 +296,10 @@ export class World extends Phaser.Scene {
     if (flags.touch || isTouchDevice()) {
       this.touch = new TouchControls(overlayRoot(), {
         onUse: (on) => this.useKey(on),
-        onAct: () => this.abilityKey('Q'),
+        onAbility: (id) => this.useAbility(id), // round 10, 10Y (A334): one disc per active Q, R or F
         onStrike: () => this.strikeKey(), // round 8, 8A
       });
+      this.touch.setAbilities(abilityDiscs(getNet(this).roleCard));
       input.attachTouch(this.touch);
     }
 
@@ -312,8 +320,10 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
-    const onKilled = (m: { cutsceneId?: string; cause?: string }) => {
-      lineOf(this.feed).cause = m.cause as DeathCause | undefined; // round 10, C1b: the screen's centre line
+    const onKilled = (m: { cutsceneId?: string; cause?: string; sceneId?: string }) => {
+      const memory = lineOf(this.feed); // round 10, C1b: the screen's centre line, how and where (y13)
+      memory.cause = m.cause as DeathCause | undefined;
+      memory.sceneId = m.sceneId;
       void this.cutscenes.playDeath(m.cutsceneId).then(() => this.refreshGhost());
     };
     const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
@@ -467,6 +477,8 @@ export class World extends Phaser.Scene {
     for (const [code, slot] of Object.entries(ABILITY_SLOTS))
       input.bind(code, (down) => down && this.abilityKey(slot));
     input.bind('KeyX', (down) => down && this.strikeKey()); // round 8, 8A
+    for (const [code, ask] of Object.entries(TALK_KEYS))
+      input.bind(code, (down) => down && this.talkKey(ask)); // round 10, D9c
   }
 
   /**
@@ -548,10 +560,19 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
-  /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
+  /** Q, R or F: the card's ability on that key. */
   private abilityKey(slot: string): void {
-    if (this.feed.dead()) return;
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
+    if (row) this.useAbility(row.id);
+  }
+
+  /**
+   * The card's ability by id, aimed at the nearest living player in reach: the one path of a key, a touch disc
+   * (round 10, 10Y, A334) and, later, a card button (rolecards.md R1). Only an active ability goes out (1.2 A2).
+   */
+  private useAbility(id: string): void {
+    if (this.feed.dead()) return;
+    const row = getNet(this).roleCard?.abilities.find((a) => a.id === id);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
     if (def.target === 'seat') return this.pickSeat(row.id, row.name);
@@ -564,6 +585,15 @@ export class World extends Phaser.Scene {
     if (row.id === 'kill') {
       this.feed.kill(near);
     } else this.feed.ability(row.id, near);
+  }
+
+  /** Round 10, D9c: G / H, ask the nearest avatar in reach about the town or the time; the server tells a figure from a seat. */
+  private talkKey(ask: TalkAsk): void {
+    if (this.feed.dead()) return;
+    const handle = this.nearestPlayer(TALK_REACH_TILES);
+    if (handle === null) return this.hud.say(C['refuse.nobody']);
+    this.feed.talk(handle, ask);
+    this.hud.toast(askedLine(ask), 'interact');
   }
 
   /** The handle of the avatar nearest to the own in reach: the Kill and the Bandage name a handle (GDD 3.17). */
@@ -746,13 +776,21 @@ export class World extends Phaser.Scene {
    * Round 10, C1b (GDD 3.22, UI.md 14.47): on the line the seat sees the dark carriage and the time to the train, never
    * the world (the server sends it none); when the train brings it back, the screen lifts and says so.
    */
-  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number }): void {
+  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number; round: number }): void {
     const memory = lineOf(this.feed);
     const on = this.feed.onLine();
     if (on) {
       memory.on = true;
-      this.line ??= mountOnTheLine(overlayRoot(), memory.cause);
-      return this.line.update(lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE));
+      this.line ??= mountOnTheLine(overlayRoot(), {
+        cause: memory.cause,
+        sceneId: memory.sceneId,
+        feed: this.feed,
+      });
+      const bells = bellsNext(clock.round); // y13: the last cycle's night ends in the bells, not a train
+      return this.line.update(
+        lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE, bells),
+        bells,
+      );
     }
     this.line?.destroy();
     this.line = null;
@@ -768,7 +806,7 @@ export class World extends Phaser.Scene {
     this.wasDead = dead;
     this.entities.setGhost(dead);
     this.hud.setGhost(dead);
-    this.touch?.setActEnabled(!dead);
+    this.touch?.setAbilitiesEnabled(!dead);
     if (dead) {
       this.endUse();
       this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);

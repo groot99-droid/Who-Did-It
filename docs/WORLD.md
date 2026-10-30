@@ -34,7 +34,7 @@
 
 - It names its hub (the exterior with the Emergency Bell), 10 start spawns and 10 meeting spawns on the hub, the bell, the teaching clue and the kit chest.
 - (Round 7) It may name a `station`: the spawn on the hub where the Daily Train stops (GDD 3.3). HollowMere's is `overworld.platform`, on the plank platform beside a rail spur (`=`) along the overworld's east edge, with the lantern `ov.lt_platform`; Blackpine has none. The station is a spot on the hub, not a scene (DECISIONS A113).
-- Every scene belongs to exactly one map, and every portal leads inside its own map.
+- Every scene belongs to exactly one map, and every portal leads inside its own map. (Round 10, B5) The one exception is a `jail` scene, the county jail's cell `cj_cell`: it is in no map and has no portals.
 - Each map has at least one `forest` and one `cave` scene open at the Small profile.
 - Round 5 ships Hollowmere (below) and Blackpine (4.10).
 
@@ -110,6 +110,7 @@ V1.5: `cottage_fisher`, cave `sea_exit` (the sea door), and the south-east light
 | `bp_office` | Company Office | Medium | 18x11 | house | `bo.door` -> `bp_camp.office` | behind the counter, wardrobe / strongroom | The company store and the manager's office: the payroll ledger, the safe, the dead telephone |
 | `bp_smithy` | The Forge | Medium | 16x11 | house | `bf.door` -> `bp_camp.smithy` | coal bin / – | Forge hearth (Blackpine's warmest light), anvil, quench trough (Blood wash) |
 | `bp_deep` | The Deep Level | Large | 40x28 | cave (dark) | `bd.winze` -> `bp_mine.winze`; `bd.old_adit` -> `bp_woods.old_adit` | refuge bunk, ore pillar / sump | Flooded stope crossed by plank walkways; the old workings; the miners' refuge with a lamp still burning |
+| `cj_cell` | The county jail | Small | 12x8 | house (`kind: jail`) | none: outside every map's graph, in no map (round 10, B5; GDD 3.27) | – / – | The one cell, shared by every map: bars on the window, a bench, a stool, a lamp, ten spawns. The server places a jailed seat here and the morning train takes it out; no portal leads in or out, so V2 reads it as a separate node with no edges. Its art borrows the default map's look on every map (`mapOf` gives a jail scene the default map, on purpose): on BlackPine it draws with HollowMere's palette, which suits an interior, and 11B's look work should expect it. D8 adds the yard, the gym and the scrubbing props |
 
 ### 4.4 Overworld sketch (64x48)
 

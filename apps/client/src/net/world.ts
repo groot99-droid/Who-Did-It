@@ -226,9 +226,15 @@ export interface WorldFeed {
   selfHandle(): string;
   /** A cover role's pick and its mates' picks; `{look: '', mates: {}}` for any other seat. */
   coverState(): CoverState;
+  /**
+   * This seat's own vendetta from the private view (GDD 3.20 "On the card"; round 10, 10Y, A354): a Killer's vendetta
+   * id, for the Accomplice the ids of its Killers' vendettas joined by commas, '' for everyone else.
+   */
+  vendetta(): string;
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
-  clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
+  /** The public clock; `round` (the day count, round 10, y13) tells On the line when the next day is the Final Night. */
+  clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number; round: number };
   /** Bodies of the scene this client is in. */
   bodies(): BodySnap[];
   /** Clues of the scene this client is in. */
@@ -285,6 +291,8 @@ export interface WorldFeed {
   minigameResult(taskId: string, answer: unknown): void;
   /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
   inspect(targetId: string): void;
+  /** Round 10 (D9c): `talk.ask { targetId, ask }`, an avatar handle in reach; the answer is a system chat line. */
+  talk(targetId: string, ask: 'town' | 'time'): void;
   /** Round 8 (8E, GDD 3.24): the answer to a `mugPrompt` (`act.mug`). */
   mug(choice: 'pay' | 'fight' | 'flee'): void;
   /**

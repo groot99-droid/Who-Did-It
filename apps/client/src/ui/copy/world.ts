@@ -24,7 +24,6 @@ export const WORLD_COPY = {
   'prompt.ability': '{ability} {target}',
   'prompt.ability.cooldown': '{ability} in {s} s',
   'touch.use': 'Use',
-  'touch.act': 'Act',
   'touch.run': 'Run',
   'touch.sneak': 'Sneak',
 
@@ -101,11 +100,13 @@ export const WORLD_COPY = {
   // 14.47 On the line (round 10, C1b)
   'line.title': 'On the line',
   'line.train': 'The train in {time}',
-  'line.cause.wolf': 'A wolf took you.',
-  'line.cause.creature': 'Something in the dark took you.',
-  'line.cause.shot': 'A shot took you.',
+  'line.bells': 'The bells in {time}', // y13: the last cycle has no morning train (GDD 3.3)
+  'line.cause.wolf': 'A wolf took you in {place}.', // y13: {place} is the scene of the own killed.sceneId
+  'line.cause.creature': 'Something in the dark took you in {place}.',
+  'line.cause.shot': 'A shot took you in {place}.',
   'line.cause.other': 'You fell by day.',
   'line.kept':
     'Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost.',
   'line.back': 'You are back.',
+  'line.quests.none': 'You hold no work.', // y13: the read-only quest list on the line
 } as const satisfies Record<string, string>;

@@ -38,6 +38,7 @@ import type {
   CivicAct,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
+import { MOCK_VENDETTA } from '../fixtures';
 import { TASKS } from '../../ui/tasks';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -157,6 +158,8 @@ export class MockWorldFeed implements WorldFeed {
   private seed = 12345;
   private phaseIdx = 0;
   private phaseEndsTick = 0;
+  /** The day count, like the public `GameState.round`: 0 in grace, then one per day (round 10, y13). */
+  private round = 0;
   private readonly corpses = new Map<string, MockCorpse>();
   private readonly clueMap = new Map<string, MockClue>();
   private readonly book: NotebookSnap[] = [];
@@ -189,6 +192,7 @@ export class MockWorldFeed implements WorldFeed {
     // parks the bots, ?ghost=1 starts as a ghost: all three exist so tests reach those states fast.
     this.phaseIdx = Math.max(0, PHASE_NAMES.indexOf(q.get('phase') ?? ''));
     this.phaseEndsTick = PHASE_ORDER[this.phaseIdx]!.ticks;
+    this.round = this.phaseIdx >= 1 ? 1 : 0;
     this.still = q.get('bots') === 'still';
     this.ghost = q.get('ghost') === '1';
     this.opening = q.get('cutscene') === '1';
@@ -312,9 +316,15 @@ export class MockWorldFeed implements WorldFeed {
 
   snapshot(): PlayerSnap[] {
     if (this.killPending) {
+      // The first read comes from inside the World's `create` (the Notebook sheet reads the roster as it is built,
+      // round 7, #125), before `create` listens for `killed`: a server's kill only ever reaches a World that
+      // listens, so the mock's lands on the next macrotask, once `create` has returned (round 10, 10Y, A494).
       this.killPending = false;
-      this.ghost = true;
-      this.emitKilled();
+      window.setTimeout(() => {
+        if (this.timer === null) return; // disposed before the kill landed
+        this.ghost = true;
+        this.emitKilled();
+      }, 0);
     }
     const me = this.actors.get(this.selfId);
     const out: PlayerSnap[] = [];
@@ -369,6 +379,10 @@ export class MockWorldFeed implements WorldFeed {
     return { look: '', mates: {} };
   }
 
+  vendetta(): string {
+    return MOCK_VENDETTA;
+  }
+
   doors(): DoorSnap[] {
     const me = this.actors.get(this.selfId);
     const scene = me ? this.content.scenes[me.scene] : undefined;
@@ -385,6 +399,7 @@ export class MockWorldFeed implements WorldFeed {
       phase: PHASE_ORDER[this.phaseIdx]!.id,
       phaseEndsTick: this.phaseEndsTick,
       startTick: 0,
+      round: this.round,
     };
   }
 
@@ -404,6 +419,11 @@ export class MockWorldFeed implements WorldFeed {
 
   dead(): boolean {
     return this.ghost;
+  }
+
+  /** Test hook (round 10, y13): the day count, so a spec reaches the last cycle, when the bells replace the morning train. */
+  setRound(round: number): void {
+    this.round = round;
   }
 
   onLine(): boolean {
@@ -647,6 +667,9 @@ export class MockWorldFeed implements WorldFeed {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
 
+  /** Round 10 (D9c): the mock has no figures to answer. */
+  talk(_targetId: string, _ask: 'town' | 'time'): void {}
+
   /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
   inspect(targetId: string): void {
     const b = [...this.actors.values()].find((a) => a.handle === targetId && a.id !== this.selfId);
@@ -772,6 +795,7 @@ export class MockWorldFeed implements WorldFeed {
   private advancePhase(): void {
     if (this.tick < this.phaseEndsTick) return;
     this.phaseIdx = this.phaseIdx + 1 >= PHASE_ORDER.length ? 1 : this.phaseIdx + 1;
+    if (this.phaseIdx === 1) this.round++; // a new day
     this.phaseEndsTick = this.tick + PHASE_ORDER[this.phaseIdx]!.ticks;
     this.bus.emit('phaseChange', { phase: PHASE_ORDER[this.phaseIdx]!.id, endsTick: this.phaseEndsTick });
   }

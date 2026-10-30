@@ -4,7 +4,7 @@ import { Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { canSee } from '../src/sim/Sight';
-import { avatarsHeld } from './avatarHelpers';
+import { seatAvatarsHeld } from './avatarHelpers';
 import { bootFlowServer, idOf, murder, sim, startParty, until } from './flowHelpers';
 import { setPhase, teleport } from './killHelpers';
 import { type Match, sleep } from './simHelpers';
@@ -20,9 +20,9 @@ beforeEach(async () => colyseus.cleanup());
 
 const NIGHT = balance.vision.nightTiles;
 
-/** The seats whose avatar bot `i` holds, its own excluded. */
+/** The seats whose avatar bot `i` holds, its own excluded (round 10, x5: the figures of the scene left out). */
 const seen = (m: Match, i: number): string[] =>
-  avatarsHeld(m.bots[i]!)
+  seatAvatarsHeld(m, m.bots[i]!)
     .map((a) => avatarMemory(m.room).seatOf.get(a.handle) as string)
     .filter((id) => id !== idOf(m, i))
     .sort();

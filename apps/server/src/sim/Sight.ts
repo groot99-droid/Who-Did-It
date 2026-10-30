@@ -14,9 +14,10 @@ import { navGrid, sceneKey } from './World';
  * blocks sight), and only when it stands within the night radius, `vision.nightTiles`, plus `vision.lanternTiles`
  * for each of the two whose light burns, or inside the pool of a scene light burning now. Any other scene and phase
  * is seen whole, as before. `reconcileAvatars` (sim/Visibility.ts) filters a living viewer's wanted set through it
- * and only ever removes; ghosts and the admin view never come here.
+ * and only ever removes; ghosts and the admin view never come here. Round 10, x5 (A353): a target may also be an
+ * ambient figure (`townsfolk/figures.ts`), a point of a scene with no seat and no light of its own.
  */
-export function canSee(room: PartyRoom, viewer: PlayerSim, target: PlayerSim): boolean {
+export function canSee(room: PartyRoom, viewer: PlayerSim, target: Sighted): boolean {
   if (viewer === target) return true;
   const sceneId = sceneKey(viewer.sceneIdx);
   const scene = scenes[sceneId];
@@ -37,8 +38,11 @@ export function canSee(room: PartyRoom, viewer: PlayerSim, target: PlayerSim): b
   return !segmentBlocked(sightGrid(room, sceneId), viewer.x, viewer.y, at.x, at.y);
 }
 
-/** The seat ids of two sims (at most ten seats, read once each). */
-function seatsOf(room: PartyRoom, viewer: PlayerSim, target: PlayerSim) {
+/** What the sight rule reads of its target: where it stands. A seat's sim or a figure. */
+export type Sighted = Pick<PlayerSim, 'sceneIdx' | 'x' | 'y'>;
+
+/** The seat ids of two sims (at most ten seats, read once each); a figure target has none. */
+function seatsOf(room: PartyRoom, viewer: PlayerSim, target: Sighted) {
   let v: string | null = null;
   let t: string | null = null;
   for (const [seat, p] of simOf(room).players) {

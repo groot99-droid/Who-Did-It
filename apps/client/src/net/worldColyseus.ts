@@ -58,6 +58,8 @@ interface PlayerState {
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
+    /** Round 7 (GDD 3.20): the own vendetta id, or the Accomplice's Killers' ids joined by commas. */
+    vendetta?: string;
   };
 }
 interface AvatarState {
@@ -92,6 +94,8 @@ interface GameStateLike {
   phase: number;
   phaseEndsTick: number;
   startTick: number;
+  /** The public day count (`GameState.round`), read by On the line for the last cycle (round 10, y13). */
+  round: number;
   players: Collection<PlayerState> & { get(id: string): PlayerState | undefined };
   scenes: { forEach(cb: (s: SceneStateLike, id: string) => void): void };
 }
@@ -205,6 +209,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     return { look: priv?.coverLook ?? '', mates };
   }
 
+  vendetta(): string {
+    return this.state.players.get(this.selfId)?.priv?.vendetta ?? '';
+  }
+
   doors(): DoorSnap[] {
     const out: DoorSnap[] = [];
     // The view holds a single SceneState: the one this client is standing in.
@@ -267,7 +275,13 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   clock() {
     const s = this.state;
-    return { tick: s.tick, phase: s.phase, phaseEndsTick: s.phaseEndsTick, startTick: s.startTick };
+    return {
+      tick: s.tick,
+      phase: s.phase,
+      phaseEndsTick: s.phaseEndsTick,
+      startTick: s.startTick,
+      round: s.round,
+    };
   }
 
   sendMove(cmd: MoveCmd): void {
@@ -444,6 +458,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   inspect(targetId: string): void {
     this.room.send('act.inspect', { targetId });
+  }
+
+  talk(targetId: string, ask: 'town' | 'time'): void {
+    this.room.send('talk.ask', { targetId, ask });
   }
 
   mug(choice: 'pay' | 'fight' | 'flee'): void {

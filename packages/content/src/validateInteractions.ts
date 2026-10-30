@@ -19,7 +19,7 @@ import {
  * interaction names exists; a tool wall has its `NEED_TOOL` line.
  */
 /** Mini-game kinds an interaction plays with no `minigames.json` row, which are rows of a station task (round 10, D5). */
-const STATIONLESS_MINIGAMES: readonly string[] = ['lockpick'];
+const STATIONLESS_MINIGAMES: readonly string[] = ['lockpick', 'jailGym', 'jailYard', 'jailScrub'];
 
 export function checkInteractions(
   c: {
