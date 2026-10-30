@@ -114,6 +114,7 @@ export function openMinigame(
       skin: skinOf(open.taskId, open.kind),
       steps: (open.public as { steps?: number }).steps,
       holdS: (open.public as { holdS?: number }).holdS,
+      pub: open.public,
       onDone: () => finish(),
     });
   const born = now();
