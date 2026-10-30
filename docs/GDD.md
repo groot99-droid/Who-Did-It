@@ -1327,6 +1327,17 @@ Reader is Anyone (footprints, thread); never the opener or a signer. Only the si
 (`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
 evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
 
+**The Constables' own petitions (B3c).** In Paint The Town Red, where no human is on the town side (both humans are
+the Killers), the Constables file their own petition when their posted briefings fit exactly one figure. Within the
+last `law.fileWindowS` (_proposed_ 300 s), the briefings that named a trait (footprints, thread) are read against the
+traits every client sees on the roster's figures; a living seat matching at least `petition.constableMatches` (2) of
+those traits is a candidate. Only a single candidate is named: none or a tie files nothing, and a seat in its grace
+after a lapse is skipped. They read nothing else (no card, no cover, no private view). The petition is the ordinary
+public row, charged with murder, its entries the briefed clues (each backed), with no opener and `needed` 0, so it
+passes at once into a warrant for the manhunt. They file only with a living Constable, while no petition is open, no
+manhunt runs or waits, and `petition.cooldownS` after their last filing. In the main world mode they never file: a
+filing there would tell the table that no human is left on the town side.
+
 **The manhunt (B4).** A passed petition's warrant waits its turn, and one manhunt runs at a time, for
 `manhunt.durationS` (120 s), a world phase rather than a pause. It is public as `GameState.manhunt` (the accused, its
 clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s) with a
