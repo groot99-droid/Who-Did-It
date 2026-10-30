@@ -96,6 +96,7 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10S | `docs/round10/scope.md`, design only |
 | Wave 1 of `scope.md` | S1 to 10F, S2 and S3 to 10H, S4 and then D4b to 10D, S5 to 10Y, each in its own paths above; a file outside them only with 6Z's grant in the pull request |
 | 10V | its verbs' new files (`apps/server/src/sim/verbs/**`) and their tests. Through section 1 or a grant: `sim/Actions.ts` `handleAbility`, `sim/Hold.ts` `handleHold`, `sim/Commands.ts`, `sim/Portals.ts` (doors), `abilities.json`, `clues.json`, `items.json`, `interactions.json`, and new ids in `scenes/*.json` |
+| Wave 2 of `scope.md` | 10S (W1 to W8, M5), 10N, 10K, 10T, 10M, and 10A (K1, T4), 10B (T5), 10C (V1 to V4): the new files each step creates and the paths `scope.md` 4 names for it. A path this table gives a live session is edited only after that session's last step there has merged, or with 6Z's grant in the pull request (A276) |
 | 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
 | 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223, A224 and its rows of 5; `docs/round11/README.md` and the Round 11 section |
 
@@ -105,10 +106,10 @@ the later session builds on the merged earlier one and does not reshape it.
 ## 5. Reserved rows
 
 - **Decisions.** 10A A225, 10F A226, 10H A227, 10G A228, 10B A229, 10C A230, 10D A231, 10E A232, 10X A233, 10Y A234,
-  10Z A235, 6Z A236, 10R A237, 10S A238, 10V A239. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
+  10Z A235, 6Z A236, 10R A237, 10S A238, 10V A239, 10N A240, 10K A241, 10T A242, 10M A243. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
   A226, A246, A266 and so on. Rows stay in number order in the table.
 - **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.50, 10C 14.47, 10D 14.48, 10E 14.49, 10Y 14.51,
-  10X 14.52, 10R 14.53, 10V 14.54, 10F 14.55. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
+  10X 14.52, 10R 14.53, 10V 14.54, 10F 14.55, 10S 14.56, 10N 14.57, 10K 14.58, 10T 14.59, 10M 14.60. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
   cites it, so 10B's copy moved to 14.50 (2026-10-30). A fix to another session's copy edits that line in place.
   A session's copy on a further topic goes in a `####` subsection of its own section, never under a new number.
   Sections stay in number order in section 14.

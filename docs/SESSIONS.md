@@ -3908,6 +3908,46 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   Rope ships with the V1.5 snares. The verbs feed the law: a Forged entry stays off a petition (row 13), and an entry
   weighs only as its presenter's Notebook backs it (row 22). Each new wire item waits for its `seams.md` 3 row. Its
   spawn prompt is its brief, and it copies the brief into its first PR's description.
+- **Wave 2 of `scope.md`** (2026-10-30, A276). 10S's plan (`scope.md` 4.2 to 4.7) is built by four new sessions and
+  five whose lists end. A session runs on one model, so the plan's Opus steps in its Sonnet groups (K1, K6, T1, T4, M2,
+  M5) go to Opus sessions. Every step is one draft PR under 400 lines on `claude/r10-<step>-<slug>`, waits for the
+  steps its "After" names and for its `seams.md` 3 row, and changes `GDD.md` in the same PR. A session owns the new
+  files its steps create and the paths `scope.md` 4 names for them. A path that section 4 of `seams.md` gives a live
+  session is edited only after that session's last step there has merged, or with 6Z's grant.
+  - **10S, then world mode** (Opus, 800k). After #420 merges, 10S builds 4.2 in order: W1, the world-mode deal (after
+    B6c and 10C's last step in `sim/Deck.ts`), to W8. Then M5, spectator mode (after W3).
+  - **10N. The new roles** (Opus, 800k; new). In order:
+    - K6, snares and Rope (row 31; no "After", so it starts first);
+    - N2, the Child (after 10V's hiding spots);
+    - T1, the Trades as cards (after W1; Q-S2);
+    - N1, the Butler;
+    - N3, the Ranger (after B4 and K6; Q-S1);
+    - N4, the Thief (after S1 and T5; row 31's smoke);
+    - N5, the Medium (after B7; row 32);
+    - N6, the lobby toggles and Forged Alibi (after W1, B6a and 10V's Inspect);
+    - M2, the Wisp (after B7; row 34).
+
+    Each new card brings its `roles.json` row, its `abilities.json` routes with `status: live` (10R's test), a
+    `looks.json` placeholder (`scope.md` 2.10), GDD 3.2 and its `rolecards.md` lines. Its tests cover each ability's
+    refusals, plus a secrecy test that another card's client sees nothing of it beyond the drawn figure. A card joins
+    a world-mode roster only after W1 has merged.
+  - **10K. Kit and the wild** (Sonnet, 500k; new). K3, candles for all and Handcuffs, and K7, crows, the bog-wisp and
+    deep mud, first. Then:
+    - K2, armour's resistances, and K4, recipe teaching (row 29), after S3;
+    - K5, skill checks, after K4;
+    - K8, the bog lurker and poison food, after C4c.
+  - **10T. The town** (Sonnet, 500k; new). T6, new places and the mood hooks, first. Then T2, chores and errands
+    (after D9b), and T3, standing, examine lines, leads and Faith's sources (after T2; row 29).
+  - **10M. Ghosts, talk and modes** (Sonnet, 500k; new). M1, barks and the world lines, and M4, the minimap and fog,
+    first. Then M3, shove, fists on townsfolk and two-player carrying (after C6).
+  - **10A** (Opus, 500k), whose list ended with A7b, takes K1, weapons, on its weapon slot (A12; after C6). Then T4:
+    town work, windows, stations and silhouettes (after C4c and C4d; row 30).
+  - **10B** takes T5 as its list ends: theft, trespass Notices, curfew locks, forced labour and the heresy trial (after
+    B6b and B6c).
+  - **10C** takes V1 to V4, the vendettas' world-mode steps (4.7), as its list ends.
+
+  The four new sessions start from the base, 10N from `claude/r10-tier-800k`. Their spawn prompt is their brief, and
+  each copies it into its first PR's description.
 - **10Z. The final sweep** (Fable; plan 4, S6). When every other round-10 PR has merged: DECISIONS rows for every
   owner answer and R1 to R18, the check that every `gdd-map.md` row's GDD edit landed, the cross-references of the
   round-9 and round-10 docs, `pnpm docs:protocol`, and the round-10 integration log below.
@@ -4438,6 +4478,19 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - A cause in the rule itself goes to 10B.
 - 2026-10-30: x8 (#415), y14 (#417) and x11 (#418) go into one check on the base after 10Y's six: the full server
   suite, auto 50 and the whole e2e suite. x11 meets 10Y's A414 in DECISIONS, and both rows stay in number order.
+- 2026-10-30: 6Z reviewed 10S's `scope.md` (#420) and asked for six secrecy fixes before its rows 25 to 34 join
+  `seams.md` 3 (A276). In world mode the Killer is always human, so a field that tells a human seat from an NPC seat
+  narrows him:
+  - the seats enter the roster in one tick, under ids no client can link to the lobby, with no public profile or
+    connection flag per seat;
+  - no player name goes out from the deal to game over;
+  - every cover's worn card is withdrawn, not only the Killer's;
+  - the Drifter and the Thief get offered lists of their own, so none of them learns the Killer's pick (a ruling);
+  - NPC ghosts answer seances and wisp as human ghosts might;
+  - the spectator row says what reaches it live.
+
+  Q-S1 to Q-S6 went to the owner, and their defaults stand until the owner answers. Wave 2 is assigned in the briefs
+  above.
 
 ## Round 11 (planning, started 2026-10-29)
 
