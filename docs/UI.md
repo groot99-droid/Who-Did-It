@@ -1840,6 +1840,8 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
+| a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
+| a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 

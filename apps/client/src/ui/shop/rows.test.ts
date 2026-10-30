@@ -34,6 +34,23 @@ describe('shopRows', () => {
     ]);
     expect(rows.buys[0]).toEqual({ itemId: 'timber', price: 1, have: 3, can: true });
   });
+
+  it('greys a stall item with none left today and passes `left` through (round 10, C3)', () => {
+    const stall = {
+      shopId: 'bakery',
+      stock: [
+        { itemId: 'flour', price: 1, left: 0 },
+        { itemId: 'wakeLoaf', price: 1, left: 3 },
+      ],
+      buys: [],
+    };
+    expect(shopRows(stall, 9, []).stock).toEqual([
+      { itemId: 'flour', price: 1, have: 0, can: false, left: 0 },
+      { itemId: 'wakeLoaf', price: 1, have: 0, can: true, left: 3 },
+    ]);
+    expect(SCRIP_COPY['shop.soldOut']).toBeTruthy();
+    expect(SCRIP_COPY['shop.left']).toContain('{n}');
+  });
 });
 
 describe('shop copy', () => {
