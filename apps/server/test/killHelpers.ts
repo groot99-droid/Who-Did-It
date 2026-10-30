@@ -3,6 +3,7 @@ import { NavGrid, Phase, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { type MeetingRequest, type DeathEvent, simOf } from '../src/sim/RoomSim';
 import { sceneIndex } from '../src/sim/World';
+import { until } from './flowHelpers';
 import { type Bot, type Match, sleep, standAt } from './simHelpers';
 
 export { sleep };
@@ -54,10 +55,30 @@ export const errorCodes = (bot: Bot): number[] =>
 export const eventsOf = (bot: Bot, type: string) =>
   bot.events.filter((e) => e.type === type).map((e) => e.payload);
 
-/** Sends a message and waits two or three steps for the server to consume it and reply. */
+/** Ticks `act` waits for after its send: the one that consumes the message and two more for whatever it starts. */
+export const ACT_TICKS = 3;
+/** Longest `act` polls for those ticks; a paused or left room then falls through to the floor below. */
+export const ACT_TICK_WAIT_MS = 2000;
+
+/**
+ * Sends a message and waits for the server to consume it and reply. Round 10, x16 (6Z's grant of 2026-10-30): the
+ * wait is on the room's tick, not the wall clock. The bot's own `state.tick` is the server's, mirrored by the patch
+ * of each step (one per tick since x7, A373), so it moves only when a step has run and its patch has crossed the
+ * socket. After the send it advances `ACT_TICKS` ticks, then one more patch lands after that observation: a refusal
+ * or an event the server sends in a step goes down the same socket before that step's patch, so by then it has
+ * arrived. A loaded run that steps late (the `act()` flake of x15, `expected [] to include 427`) now waits for the
+ * steps instead of a fixed 200 ms; a quiet one is no faster, since the wait never ends before `ms`.
+ */
 export async function act(bot: Bot, type: string, payload: unknown, ms = 200): Promise<void> {
   bot.room.send(type, payload);
-  await sleep(ms);
+  const sentAt = Date.now();
+  const seen = bot.room.state.tick;
+  if (await until(() => bot.room.state.tick >= seen + ACT_TICKS, ACT_TICK_WAIT_MS)) {
+    const after = bot.room.state.tick;
+    await until(() => bot.room.state.tick > after, ACT_TICK_WAIT_MS);
+  }
+  const left = ms - (Date.now() - sentAt);
+  if (left > 0) await sleep(left);
 }
 
 /** A horizontal run of `len` walkable tiles in a scene: the first tile. */
