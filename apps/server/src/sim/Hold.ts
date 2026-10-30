@@ -16,7 +16,7 @@ import { handleInteract, tickInteract } from './interact/resolve';
 import { handleSleepHold } from './Sleep';
 import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
-import { handleInspectHold, runEvidence, tickInspect } from './verbs/evidence';
+import { PLANT_HOLD, handleInspectHold, runEvidence, tickInspect, tickPlant } from './verbs/evidence';
 import { writeClueEntry } from './verbs/notebook';
 
 const CLUE_TEACHING = 'clue_teaching';
@@ -127,6 +127,10 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'inspect') {
       tickInspect(room, sessionId, p); // round 10, V1a: the Lens Inspect
+      continue;
+    }
+    if (hold.action === PLANT_HOLD) {
+      tickPlant(room, sessionId, p); // round 10, V1a: Plant Clue's cast
       continue;
     }
     if (hold.action === 'interact') {

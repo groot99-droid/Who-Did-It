@@ -4,6 +4,7 @@ import { roles } from '@wdi/content';
 import { ClueKind, NotebookStatus, Phase, besideTile, trailDir } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { nearestPortalTile } from '../src/sim/Clues';
+import { AnimId } from '../src/sim/constants';
 import { addStack, count, take } from '../src/sim/Inventory';
 import { simOf } from '../src/sim/RoomSim';
 import { navGrid } from '../src/sim/World';
@@ -150,7 +151,21 @@ describe('Plant Clue', () => {
     const m = await party();
     const scene = m.room.state.scenes.get('overworld')!;
     const before = new Set(scene.clues.keys());
+    const figure = () => {
+      const a = scene.avatars.get(playerOf(m, m.bots[0]!).priv.avatar)!;
+      return { animId: a.animId, statusBits: a.statusBits, nearBits: a.nearBits };
+    };
+    const look = figure();
+    const noises = () => m.bots.reduce((n, b) => n + eventsOf(b, 'noise').length, 0);
+    const heard = noises();
     await act(m.bots[0]!, 'act.ability', { abilityId: 'plantClue', kind: 'footprints', value: 2 });
+    // The cast is a hold: the figure shows nothing a still figure would not, and nothing rings (6Z, row 23).
+    expect(simOfBot(m, m.bots[0]!).hold).toMatchObject({ action: 'plantClue' });
+    expect(figure()).toEqual({ ...look, animId: AnimId.interact }); // any hold's animation, whatever the hold
+    expect([...scene.clues.keys()].filter((id) => !before.has(id))).toEqual([]);
+    await sleep(2100);
+    expect(figure()).toEqual(look);
+    expect(noises()).toBe(heard);
     const planted = [...scene.clues.values()].filter((c) => !before.has(c.id));
     expect(planted).toHaveLength(1);
     const clue = planted[0]!;
@@ -166,14 +181,13 @@ describe('Plant Clue', () => {
     });
     expect(clue.id).toMatch(/^clue_overworld_\d+$/);
     expect(count(playerOf(m, m.bots[0]!), 'plantKit')).toBe(2);
-    expect(simOfBot(m, m.bots[0]!).busyUntilTick).toBeGreaterThan(m.room.state.tick);
     await act(m.bots[2]!, 'act.hold', hold('collect', clue.id));
     await act(m.bots[1]!, 'act.hold', hold('inspect', clue.id));
     await sleep(3300);
     expect(notebook(m, 2)[0]).toMatchObject({ value: 2, status: NotebookStatus.claimed });
     expect(notebook(m, 1)[0]).toMatchObject({ value: 2, status: NotebookStatus.forged });
     expect(simOf(m.room).clueMeta.get(clue.id)!.collectors.size).toBe(2);
-  });
+  }, 15000);
 
   it("lays a thread only within reach of a portal, beside it, as a kill's thread lies", async () => {
     const m = await party();
@@ -190,6 +204,7 @@ describe('Plant Clue', () => {
     const scene = m.room.state.scenes.get('overworld')!;
     const before = new Set(scene.clues.keys());
     await act(acc, 'act.ability', { abilityId: 'plantClue', kind: 'thread', value: 1 });
+    await sleep(2100);
     const clue = [...scene.clues.values()].find((c) => !before.has(c.id))!;
     const portal = nearestPortalTile('overworld', TEACH.x, TEACH.y)!;
     const grid = navGrid('overworld', simOf(m.room).profile);
@@ -201,7 +216,7 @@ describe('Plant Clue', () => {
       x: tilePx(at.x),
       y: tilePx(at.y),
     });
-  });
+  }, 15000);
 
   it('refuses another card, a bad trait, the cooldown and an empty kit', async () => {
     const m = await party();

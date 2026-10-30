@@ -22,6 +22,8 @@ import { entryFor, isPlanted, markPlanted, writeClueEntry } from './notebook';
 // the inspector's own Notebook.
 
 const LENS = 'lens';
+/** The hold a Plant Clue cast runs as; no client sends it (`handleHold` refuses it as any unknown action). */
+export const PLANT_HOLD = 'plantClue';
 const MAGNIFIER = 'magnifier';
 const KIND_ID = new Map<number, string>(Object.entries(ClueKind).map(([id, kind]) => [kind, id]));
 
@@ -102,7 +104,28 @@ const PLANTS: Readonly<Record<string, { kind: number; values: readonly string[] 
   thread: { kind: ClueKind.thread, values: TRAIT_IDS.scarf },
 };
 
-/** `act.ability {abilityId: 'plantClue', kind, value}`: lays a footprint or a thread with the traits chosen. */
+/** Why a plant of `plant` cannot start or land this tick, or null; the tile and facing it would lie at. */
+function plantSpot(room: PartyRoom, p: PlayerSim, kind: number) {
+  // A plant follows its kind's true rule in every wire field (6Z, row 23): a kill's Footprints lie on its tile and
+  // run toward the nearest portal, and its Thread lies on the walkable tile beside that portal, so a thread is
+  // planted only within reach of a portal, there.
+  const sceneId = sceneKey(p.sceneIdx) as SceneId;
+  const tx = Math.floor(p.x / TILE_PX);
+  const ty = Math.floor(p.y / TILE_PX);
+  const portal = nearestPortalTile(sceneId, tx, ty);
+  if (kind === ClueKind.thread) {
+    if (!portal || Math.hypot(portal.x - tx, portal.y - ty) > balance.doors.reachTiles) return null;
+    const grid = navGrid(sceneId, simOf(room).profile);
+    return { sceneId, dir: 0, ...besideTile(portal, { x: tx, y: ty }, (x, y) => !grid.solidAt(x, y)) };
+  }
+  return { sceneId, x: tx, y: ty, dir: portal ? trailDir(tx, ty, portal.x, portal.y) : 4 };
+}
+
+/**
+ * `act.ability {abilityId: 'plantClue', kind, value}`: starts the cast of a footprint or a thread with the traits
+ * chosen. The cast is a hold (`PlayerSim.hold`, cancelled by moving like a collect), so the figure shows only what
+ * any hold shows; the kit is spent and the clue laid when it completes.
+ */
 export function handlePlantClue(
   room: PartyRoom,
   sessionId: string,
@@ -115,10 +138,11 @@ export function handlePlantClue(
   if (!hasCard(room, sessionId, 'plantClue')) return reject(room, sessionId, 'NOT_YOUR_POWER');
   const p = actorOf(room, sessionId);
   if (!p) return;
-  const tick = room.state.tick;
-  if (tick < (player.priv.cooldownEndTick.get('plantClue') ?? 0)) return reject(room, sessionId, 'COOLDOWN');
-  const plant = typeof payload.kind === 'string' ? PLANTS[payload.kind] : undefined;
+  if (room.state.tick < (player.priv.cooldownEndTick.get('plantClue') ?? 0)) {
+    return reject(room, sessionId, 'COOLDOWN');
+  }
   const value = payload.value;
+  const plant = typeof payload.kind === 'string' ? PLANTS[payload.kind] : undefined;
   if (
     !plant ||
     typeof value !== 'number' ||
@@ -128,28 +152,39 @@ export function handlePlantClue(
   ) {
     return reject(room, sessionId, 'BAD_REQUEST');
   }
-  // A plant follows its kind's true rule in every wire field (6Z): a kill's Footprints lie on its tile and run
-  // toward the nearest portal, and its Thread lies on the walkable tile beside that portal, so a thread is planted
-  // only within reach of a portal, there.
-  const sceneId = sceneKey(p.sceneIdx) as SceneId;
-  const tx = Math.floor(p.x / TILE_PX);
-  const ty = Math.floor(p.y / TILE_PX);
-  const portal = nearestPortalTile(sceneId, tx, ty);
-  const thread = plant.kind === ClueKind.thread;
-  if (thread && (!portal || Math.hypot(portal.x - tx, portal.y - ty) > balance.doors.reachTiles)) {
-    return reject(room, sessionId, 'TOO_FAR', { of: 'door' });
-  }
-  if (!take(player, def.consumes ?? 'plantKit', 1))
+  if (!plantSpot(room, p, plant.kind)) return reject(room, sessionId, 'TOO_FAR', { of: 'door' });
+  if (count(player, def.consumes ?? 'plantKit') < 1)
     return reject(room, sessionId, 'SPENT', { what: 'stock' });
-  const grid = navGrid(sceneId, simOf(room).profile);
-  const at =
-    thread && portal ? besideTile(portal, { x: tx, y: ty }, (x, y) => !grid.solidAt(x, y)) : { x: tx, y: ty };
-  const dir = thread ? 0 : portal ? trailDir(tx, ty, portal.x, portal.y) : 4;
-  const id = spawnClue(room, sceneId, { kind: plant.kind, value, dir, tx: at.x, ty: at.y });
+  p.hold = { action: PLANT_HOLD, targetId: `${String(payload.kind)}:${value}`, startTick: room.state.tick };
+}
+
+/** Call site: `runHolds`. Moving, a closed phase, death or a lost spot cancels; at `castS` the clue is laid. */
+export function tickPlant(room: PartyRoom, sessionId: string, p: PlayerSim): void {
+  const def = abilities.abilities.plantClue;
+  const player = room.state.players.get(sessionId);
+  const hold = p.hold;
+  if (!def || !player || !hold) return;
+  const [kindId = '', raw = ''] = hold.targetId.split(':');
+  const plant = PLANTS[kindId];
+  const spot = plant ? plantSpot(room, p, plant.kind) : null;
+  if (!plant || !spot || p.dead || !p.placed || !isVerbPhase(room.state.phase) || p.vx !== 0 || p.vy !== 0) {
+    p.hold = null;
+    return;
+  }
+  const tick = room.state.tick;
+  if (tick - hold.startTick < Math.round((def.castS ?? 0) * TICK_RATE)) return;
+  p.hold = null;
+  if (!take(player, def.consumes ?? 'plantKit', 1)) return;
+  const id = spawnClue(room, spot.sceneId, {
+    kind: plant.kind,
+    value: Number(raw),
+    dir: spot.dir,
+    tx: spot.x,
+    ty: spot.y,
+  });
   const meta = id === null ? undefined : simOf(room).clueMeta.get(id);
   if (meta) markPlanted(meta);
   player.priv.cooldownEndTick.set('plantClue', tick + Math.round((def.cooldownS ?? 0) * TICK_RATE));
-  p.busyUntilTick = tick + Math.round((def.castS ?? 0) * TICK_RATE);
 }
 
 const lastRound = new WeakMap<RoomSim, number>();
