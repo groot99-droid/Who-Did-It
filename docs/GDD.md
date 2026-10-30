@@ -823,7 +823,7 @@ dead seat's body row empties with the ghost handoff. Bodies tick only in the
 world phases: a meeting, the role card and game over freeze health, stamina and every effect clock. Effect chances
 roll on the body's own stream, never a secret one.
 
-**On the line** (round 10, C1; `docs/round9/world-mode.md` 6, `phases.md` 6). A seat that dies by day to a bite or a shot, on a map with a Train (3.3), leaves the world until the next morning's arrival. Its purse drops where it fell as coins, a find for whoever reaches the body, and its hotbar, pack and belt are lost with the body (3.30's `strip`; until the town chest holds lost property, they lie nowhere); bound kit (`onDeath: kept`), the three equipment slots and the bank stay. Its role card, cover, vendetta, notebook and quests are kept. BlackPine has no Train (3.3), so its daylight deaths stay final; whether it gets a station is an open question for the owner. It gets no ghost view: its `killed` message names no role, its view holds no scene and no figure, the ghost channel neither reaches it nor takes its lines, and it moves and acts on nothing; only its own `Private.onLine` says it waits. A dying Gamekeeper on the line fires no Last Shot, a Killer on the line passes no Knife (3.2), and the win check counts a seat on the line as living, since it comes back. At the arrival the Undertaker's cart takes its body, and the seat stands on the platform with `respawn.hp` (50) health, full stamina and no effects; its cooldowns resume where they stood, and its public `alive` is true again.
+**On the line** (round 10, C1; `docs/round9/world-mode.md` 6, `phases.md` 6). A seat that dies by day to a bite or a shot, on a map with a Train (3.3), leaves the world until the next morning's arrival. Its purse drops where it fell as coins, a find for whoever reaches the body, and its hotbar, pack and belt are lost with the body (3.30's `strip`; until the town chest holds lost property, they lie nowhere); bound kit (`onDeath: kept`), the three equipment slots and the bank stay. Its role card, cover, vendetta, notebook and quests are kept. BlackPine has no Train (3.3), so its daylight deaths stay final; whether it gets a station is an open question for the owner. It gets no ghost view: its `killed` message names no role, its view holds no scene and no figure, the ghost channel neither reaches it nor takes its lines, and it moves and acts on nothing; only its own `Private.onLine` says it waits. A dying Gamekeeper on the line fires no Last Shot, a Killer on the line passes no Knife (3.2), and the win check counts a seat on the line as living, since it comes back. At the arrival the Undertaker's cart takes its body, and the seat stands on the platform with `respawn.hp` (50) health, full stamina and no effects; its cooldowns resume where they stood, and its public `alive` is true again. Once a meeting shows it dead, its look's town work stops until it returns (3.23, "What breaks when I'm gone").
 
 **Fists** (`strike`): every card, in every world phase, a 2 s cooldown and 1.2 tiles of reach (`abilities.json`), at
 the stamina cost above. It hurts seats, ambient townsfolk and creatures; a creature at zero health (`mobs.json` `hp`,
@@ -987,6 +987,24 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   about 1.5 Scrip a task against 6 Scrip of rent a day), so the errand is what keeps the two-day target; the
   balance lab checks both (`packages/content/test/fareCheck.test.ts`). BlackPine has no Train, so it has no fare and
   no errand.
+- **What breaks when I'm gone** (round 10, C3; `docs/round9/round10-plan.md` 5). Each card's `roles.json` `townWork`
+  names the work its look does in town. The work follows the seat's public look, never its card or the drawn figure, so
+  a death never names a cover and an impersonation never moves it. A look is **gone** when a seat wore it at the deal
+  and no wearer is shown alive on the roster: a kill is private until the next meeting (3.8), so the stall and the
+  altar keep working until the meeting shows the death, and a seat on the line (3.22) stays gone from then until the
+  train brings it back. A look no
+  seat wears keeps its work running, so an undealt card's stall stays full. A look is **thin** while a seat wearing it
+  owes the line.
+  - A **stall** (`work: 'stall'`: the shop whose `owner` the look is) sells each item from a day's stock of
+    `townWork.stallStockPerSeat` (1) per seat and at least `townWork.stallStockMin` (4), `respawn.stockMult` (half,
+    rounded down) of that while thin and none while gone, less what it sold since the day began; a new day refills it.
+    `shop.open` shows each item's `left`, the same for every opener, and a purchase past it is refused (`SPENT`
+    stock). A shop with no character never runs out.
+  - **Faith** (`work: 'faith'`: the Vicar's `ch.altar_main`): the chapel altar takes no donation while the Vicar's
+    look is gone (`COUNTER_CLOSED`, the altar); the wayside altars keep working.
+  - A cover or Cabal card (`work: 'worn'`) does the work of the look it wears. Every other card is `work: 'none'`
+    for now, with its `nfy` note of what it will do (the lantern posts, the surgery, the fish, the tin, the doors and
+    the rest), for round 11.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
