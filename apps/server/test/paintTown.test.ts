@@ -5,7 +5,9 @@ import { balance } from '@wdi/content';
 import { C2S, Phase, Winner } from '@wdi/shared';
 import { markDead } from '../src/sim/Death';
 import { flowOf } from '../src/sim/Flow';
-import { isCaught, isPaintTown, paintDeck, paintGameOver } from '../src/sim/paintTown';
+import { deckFor } from '@wdi/content';
+import { mulberry32 } from '@wdi/shared';
+import { isCaught, isPaintTown, paintDeal, paintDeck, paintGameOver } from '../src/sim/paintTown';
 import { addNpcSeat } from '../src/sim/npc/seats';
 import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
@@ -47,6 +49,7 @@ describe('the deal (world-mode.md 1.6)', () => {
     expect(isPaintTown(room)).toBe(true);
     for (const k of killers)
       expect([roleOf(party, k), room.state.players.get(k)!.priv.paintTown]).toEqual(['killer', true]);
+    expect(npcIds.map((n) => roleOf(party, n))).toContain('vicar'); // a pillar is always dealt
     for (const n of npcIds) {
       expect(roleOf(party, n)).not.toBe('killer');
       expect(room.state.players.get(n)!.priv.paintTown).toBe(false);
@@ -75,6 +78,25 @@ describe('the deal (world-mode.md 1.6)', () => {
       'killer',
     ]);
     expect(paintDeck(['killer', 'killer', 'vicar'], rng)).toEqual(['killer', 'killer', 'vicar']);
+  });
+});
+
+describe('the Paint deal over many seeds (6Z: the Vicar is always dealt)', () => {
+  it('deals both humans the Killer card and an NPC seat the Vicar, at every seat count and 200 seeds', () => {
+    for (let n = 3; n <= 10; n++) {
+      const humans = ['h1', 'h2'];
+      const npcs = Array.from({ length: n - 2 }, (_, i) => `n${i}`);
+      const deck = [...deckFor(Math.max(4, n)).cards];
+      for (let seed = 1; seed <= 200; seed++) {
+        const { dealt } = paintDeal(humans, npcs, deck, mulberry32(seed * 7919 + n));
+        expect([dealt.get('h1'), dealt.get('h2')], `${n} seats, seed ${seed}`).toEqual(['killer', 'killer']);
+        expect(
+          npcs.some((id) => dealt.get(id) === 'vicar'),
+          `${n} seats, seed ${seed}`,
+        ).toBe(true);
+        expect(npcs.every((id) => dealt.get(id) !== 'killer')).toBe(true);
+      }
+    }
   });
 });
 

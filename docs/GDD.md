@@ -177,7 +177,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
   exactly two humans and at least one NPC seat deals both humans the Killer card, with no vendetta. The deck's second
   Killer card takes the place of the Accomplice, else the Drifter, else a profession drawn on the deal's stream (never
   the Vicar), so it still holds at most two covers; the 10-seat row already holds two. Every other card goes to an NPC
-  seat. Each Killer's private view is marked (`Private.paintTown`) and picks its worn card as any Killer does.
+  seat. The Vicar card is always dealt (to an NPC seat), so the three pillars stand in every match. Each Killer's private view is marked (`Private.paintTown`) and picks its worn card as any Killer does.
   - Every NPC seat's death returns on the next morning train (3.22), after dark and to the Knife too, so the town never
     runs out. A Killer's own death follows the usual rule.
   - A Knife kill of an NPC seat by a Killer adds one to that Killer's total, and to its unique count the first time it
