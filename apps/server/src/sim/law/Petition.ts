@@ -13,7 +13,7 @@ import { isVerbPhase, reject } from '../World';
  * Petitions (round 10, B3a; GDD 3.31, `world-mode.md` 3.1 and 5, `followup-4.md` 2.1; seams.md 3 row 13). A living,
  * free human opens one at a notice board against a roster seat, with a charge and up to `petition.maxEntries` of its
  * own clue entries. One is open in the whole town at a time. It needs ceil(`petition.othersPct` x the living, free
- * humans, the accused left out) other signatures within `petition.openS`; then it passes (a warrant for B4's
+ * humans, the opener and the accused counted, fixed at open) other signatures within `petition.openS`; then it passes (a warrant for B4's
  * manhunt), else it lapses and the accused and the opener wait `petition.cooldownS`. At `petition.constableAtHumans`
  * humans or fewer a Constable signs once, as one signature, when the public entries hold `petition.constableMatches`
  * backed matches against the accused's public traits. The public row names the accused, the charge, the counts and
@@ -28,6 +28,8 @@ interface Open {
   opener: string;
   signers: Set<string>;
   constable: boolean;
+  /** Fixed at open: a bar that moved at a death would say the dead seat was human (6Z). */
+  needed: number;
   untilTick: number;
 }
 
@@ -77,11 +79,11 @@ function freeHuman(room: PartyRoom, seat: string): boolean {
   return !!p && !p.dead && p.placed && !isOnLine(room, seat) && !jailed(room, seat);
 }
 
-/** The other signatures needed: ceil(othersPct x the living, free humans), the accused left out. */
-function neededOf(room: PartyRoom, accused: string): number {
+/** The living, free humans, every seat counted: the bar never tells whether the accused is a person (R6). */
+function freeHumans(room: PartyRoom): number {
   let humans = 0;
-  for (const id of room.state.players.keys()) if (id !== accused && freeHuman(room, id)) humans++;
-  return Math.ceil(balance.petition.othersPct * humans);
+  for (const id of room.state.players.keys()) if (freeHuman(room, id)) humans++;
+  return humans;
 }
 
 const KIND_KEY = new Map<number, string>(Object.entries(ClueKind).map(([k, v]) => [v, k]));
@@ -147,6 +149,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
     opener: seat,
     signers: new Set(),
     constable: false,
+    needed: Math.ceil(balance.petition.othersPct * freeHumans(room)),
     untilTick: tick + Math.round(balance.petition.openS * TICK_RATE),
   };
   const row = room.state.petition;
@@ -192,9 +195,9 @@ function write(room: PartyRoom, m: PetitionMemory): void {
   const open = m.open;
   if (open) {
     const row = room.state.petition;
-    const needed = neededOf(room, open.accused);
-    const signed = [...open.signers].filter((s) => freeHuman(room, s)).length + (open.constable ? 1 : 0);
-    if (row.needed !== needed) row.needed = needed;
+    // A signature stands once given: a count that fell at a death would name the signer (row 13).
+    const signed = open.signers.size + (open.constable ? 1 : 0);
+    if (row.needed !== open.needed) row.needed = open.needed;
     if (row.signed !== signed) row.signed = signed;
   }
   for (const [id, player] of room.state.players) {
@@ -220,9 +223,7 @@ export function runPetition(room: PartyRoom): void {
   if (!simOf(room).players.get(open.accused) || simOf(room).players.get(open.accused)!.dead)
     return close(room, m);
   if (!open.constable) {
-    let humans = 0;
-    for (const id of room.state.players.keys()) if (freeHuman(room, id)) humans++;
-    if (humans <= balance.petition.constableAtHumans && constableSigns(room, open.accused))
+    if (freeHumans(room) <= balance.petition.constableAtHumans && constableSigns(room, open.accused))
       open.constable = true;
   }
   write(room, m);

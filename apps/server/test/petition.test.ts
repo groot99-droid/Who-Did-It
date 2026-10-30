@@ -1,9 +1,10 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance } from '@wdi/content';
-import { ClueKind, NotebookEntry, NotebookStatus, Phase, TICK_RATE } from '@wdi/shared';
+import { C2S, ClueKind, NotebookEntry, NotebookStatus, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { handlePetitionOpen, handlePetitionSign, warrantsOf } from '../src/sim/law/Petition';
 import { isNpcSeat } from '../src/sim/Npc';
+import { simOf } from '../src/sim/RoomSim';
 import {
   type Human,
   type Party,
@@ -36,9 +37,10 @@ beforeAll(async () => ({ colyseus, release } = await bootNpcServer()));
 afterAll(async () => release());
 beforeEach(async () => colyseus.cleanup());
 
-/** Three humans by day on HollowMere at the square's notice board (ov.board, 35,20); the NPC fill is the accused. */
-async function world(): Promise<Party> {
-  const party = await lobbyOf(colyseus, 3);
+/** `n` humans by day on HollowMere at the square's notice board (ov.board, 35,20), and one NPC seat. */
+async function world(n = 3): Promise<Party> {
+  const party = await lobbyOf(colyseus, n);
+  if (n >= 4) await send(party.humans[0]!, C2S.lobbyAddNpc);
   await start(party);
   await toWorld(party);
   pauseClock(party.room);
@@ -200,5 +202,35 @@ describe('petitions (GDD 3.31)', () => {
     advance(party, 1);
     await sleep(150);
     expect(warrantsOf(party.room)).toHaveLength(1); // consumed in step(): the one signature passed it
+  });
+
+  it('A170: the bar is the same for a human and an NPC accused, and fixed at open', async () => {
+    const bars: number[] = [];
+    for (const npc of [true, false]) {
+      const party = await world(4);
+      const [a, b] = party.humans.map((h) => h.id) as [string, string];
+      handlePetitionOpen(party.room, a, {
+        accused: npc ? accusedOf(party) : b,
+        charge: 'theft',
+        entries: [],
+      });
+      bars.push(row(party).needed);
+      simOf(party.room).players.get(party.humans[3]!.id)!.dead = true; // a human dies: the bar holds
+      advance(party, 1);
+      expect(row(party).needed).toBe(bars.at(-1));
+    }
+    expect(bars).toEqual([2, 2]); // ceil(0.3 x 4), the opener and the accused counted
+  });
+
+  it("A170: a signature stands once given; a signer's death leaves the count", async () => {
+    const party = await world(4);
+    const [a, b] = party.humans.map((h) => h.id) as [string, string];
+    handlePetitionOpen(party.room, a, { accused: accusedOf(party), charge: 'theft', entries: [] });
+    handlePetitionSign(party.room, b, { id: row(party).id });
+    advance(party, 1);
+    expect(row(party).signed).toBe(1);
+    simOf(party.room).players.get(b)!.dead = true;
+    advance(party, 1);
+    expect([row(party).signed, row(party).needed]).toEqual([1, 2]);
   });
 });

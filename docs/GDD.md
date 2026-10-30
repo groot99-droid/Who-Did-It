@@ -1243,9 +1243,11 @@ a sighting of a figure wearing B's look accuses B, never through an impersonatio
 clue entries. A night-power entry, a Forged entry or the teaching entry never attaches. One petition is open in the
 whole town at a time (`PETITION_OPEN`); after a lapse the accused and the opener wait `petition.cooldownS` (120 s)
 before naming or opening again (`PETITION_GRACE`). The petition needs ceil(`petition.othersPct` (0.3) times the
-living, free humans, the accused left out) other signatures within `petition.openS` (60 s): 1 at 3 humans, 2 at 4 to
-6, 3 at 7 to 10, and the bar falls as humans die or are jailed. Any living, free human but the opener and the
-accused may sign, once. At `petition.constableAtHumans` (5) humans or fewer, the Constables sign once, as one
+living, free humans, the opener and the accused counted) other signatures within `petition.openS` (60 s): 1 at 3
+humans, 2 at 4 to 6, 3 at 7 to 10. The bar is fixed when the petition opens and holds for its window, so it never
+moves at a death; a person and an NPC seat give the same bar as the accused. Any living, free human but the opener
+and the accused may sign, once, and a signature stands once given: the count never drops when a signer dies, goes
+on the line or is jailed. At `petition.constableAtHumans` (5) humans or fewer, the Constables sign once, as one
 signature, when the petition's public entries hold `petition.constableMatches` (2) backed matches against the
 accused's public traits; they never read whether a clue was planted, a role's reading or a card. With enough names
 the petition passes and leaves a warrant for the manhunt (B4); at its clock's end it lapses. The public row
