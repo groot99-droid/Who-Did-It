@@ -1,8 +1,21 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { C2S, S2C, TICK_RATE, type LockAttempt, type LockpickPublic, type RefusalFrame } from '@wdi/shared';
+import { economy, scenes } from '@wdi/content';
+import {
+  C2S,
+  ClueKind,
+  S2C,
+  TICK_RATE,
+  TILE_PX,
+  type LockAttempt,
+  type LockpickPublic,
+  type RefusalFrame,
+} from '@wdi/shared';
+import { balanceOf } from '../src/sim/economy/purse';
 import { addStack, count } from '../src/sim/Inventory';
+import { briefingLine } from '../src/sim/law/Briefing';
 import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
+import { fixSeeds } from './seedHelpers';
 import { sleep } from './simHelpers';
 
 // Round 10 (D5; GDD 3.29): the lock-pick on the manor study door. The hold opens a mini-game that sends the picker the
@@ -121,5 +134,55 @@ describe('the lock-pick', () => {
     expect(heard.length).toBeGreaterThan(0);
     for (const m of heard)
       expect(Object.keys(m.payload as object).sort()).toEqual(['kind', 'sceneId', 'x', 'y']);
+  });
+
+  describe('what an opened lock leaves', () => {
+    // First draws of the `locks` stream keyed `fine`: under fineChance (0.1), and over it.
+    const CAUGHT = [2, 6, 14, 22] as const;
+    const UNSEEN = [1, 2, 3, 4] as const;
+
+    async function openIt(words: readonly [number, number, number, number]) {
+      const p = await atDoor(1);
+      fixSeeds(p.room, { locks: words });
+      const id = p.humans[0]!.id;
+      const before = balanceOf(p.room, id);
+      await pick(p);
+      const pub = (starts(p)[0]!.payload as { public: LockpickPublic }).public;
+      await answer(p, honest(pub));
+      expect(doorState(p)).toBe('open');
+      return { p, id, before };
+    }
+
+    it('leaves a scratch on the door tile that shows nothing of the picker', async () => {
+      const { p } = await openIt(UNSEEN);
+      const door = scenes.manor_upper.props.find((q) => q.id === DOOR)!;
+      const marks = [...p.room.state.scenes.get('manor_upper')!.clues.values()].filter(
+        (c) => c.kind === ClueKind.scratch,
+      );
+      expect(marks).toHaveLength(1);
+      expect([marks[0]!.value, marks[0]!.dir]).toEqual([0, 0]);
+      expect([Math.floor(marks[0]!.x / TILE_PX), Math.floor(marks[0]!.y / TILE_PX)]).toEqual([
+        door.x,
+        door.y,
+      ]);
+    });
+
+    it('fines the picker when the roll on the locks stream falls under fineChance, and only then', async () => {
+      const caught = await openIt(CAUGHT);
+      expect(caught.before).toBeGreaterThan(0);
+      expect(balanceOf(caught.p.room, caught.id)).toBe(
+        caught.before - Math.min(economy.trespassFine, caught.before),
+      );
+      await colyseus.cleanup();
+      const unseen = await openIt(UNSEEN);
+      expect(balanceOf(unseen.p.room, unseen.id)).toBe(unseen.before);
+    });
+  });
+
+  it('is briefed by the Constables as a kind and a scene, with no trait', () => {
+    const line = briefingLine({ sceneId: 'manor_upper', kind: ClueKind.scratch, value: 0 }, true);
+    expect(line.toLowerCase()).toContain('scratches');
+    expect(line).toContain(scenes.manor_upper.name);
+    expect(line).toBe(briefingLine({ sceneId: 'manor_upper', kind: ClueKind.scratch, value: 0 }, false));
   });
 });

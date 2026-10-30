@@ -1,5 +1,7 @@
 import {
   balance,
+  clues,
+  economy,
   interactions,
   items,
   minigames,
@@ -9,6 +11,7 @@ import {
   type SceneId,
 } from '@wdi/content';
 import {
+  ClueKind,
   Phase,
   PropState,
   S2C,
@@ -28,7 +31,9 @@ import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
+import { decaySeconds, spawnClue } from './Clues';
 import { addStack, canAdd, count, take } from './Inventory';
+import { movePurse, TOWN } from './economy/purse';
 import { emitNoise } from './Noise';
 import { isVerbPhase, reject, sceneIndex, tileCentre } from './World';
 import { refusal, sendRefusal, type Refusal } from './refusal';
@@ -174,6 +179,27 @@ function lockResult(
   state.state = after.state;
   state.untilTick = after.respawnS === null ? 0 : room.state.tick + Math.round(after.respawnS * TICK_RATE);
   room.state.scenes.get(lock.sceneId)?.propStates.set(lock.propId, state);
+  const mode = interactions.interactions[lock.interactionId]?.modes.find((m) => m.minigame === 'lockpick');
+  // The scratch is the same for every picker (seams.md 3 row 12); the fine rolls on `locks`, a stream no client sees.
+  if (mode?.leaves === 'scratch') leaveScratch(room, lock);
+  if (mode?.fineChance !== undefined && room.seeds.get('locks', 'fine')() < mode.fineChance) {
+    movePurse(room, sessionId, TOWN, economy.trespassFine, 'fine'); // never more than the purse holds
+  }
+}
+
+/** The `scratch` clue on the picked prop's tile: value and dir 0, so it shows nothing of the picker. */
+function leaveScratch(room: PartyRoom, lock: NonNullable<Open['lock']>): void {
+  const prop = scenes[lock.sceneId].props.find((q) => q.id === lock.propId);
+  const def = clues.clues.scratch;
+  if (!prop || !def) return;
+  spawnClue(room, lock.sceneId, {
+    kind: ClueKind.scratch,
+    value: 0,
+    dir: 0,
+    decayS: decaySeconds(def.decay),
+    tx: prop.x,
+    ty: prop.y,
+  });
 }
 
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */

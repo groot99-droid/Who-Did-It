@@ -38,6 +38,7 @@ export function entryText(e: Pick<NotebookSnap, 'clueKind' | 'value'>): string {
     });
   if (e.clueKind === ClueKind.felt)
     return fill(C['notebook.entry.felt'], { hat: hat.values[e.value]?.label ?? '?' });
+  if (e.clueKind === ClueKind.scratch) return C['notebook.entry.scratch'];
   return C['notebook.entry.other'];
 }
 
