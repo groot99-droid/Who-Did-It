@@ -4397,6 +4397,26 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: the owner answered the role cards' questions (`rolecards.md` 12, 10R's A237). Asked what "those" in Q-E1
   covers, the owner chose "Only card and Satchel". 10R's build has started (its brief above). 6Z republished the mock,
   renamed the Satchel, at the link the owner already has.
+- 2026-10-30: `seams.md` 3 rows 23 and 24 (10V's V1a and V1b) come from 10V's draft, with six changes by 6Z.
+  - A role's reading is a Notebook entry with a `note` of its own, so it never attaches to a petition. On a petition,
+    its kind would tell the town that the anonymous opener holds a reading.
+  - A hidden attribute never overwrites a `value` that a petition shows.
+  - A planted thread lies only beside a portal, as a kill's thread does.
+  - Every body gives a lift, and a door records every figure that crosses it. A lift therefore never tells the cause
+    of death, a seat from a figure, or a human from an NPC.
+  - Dust lifts the most recent crosser other than the duster.
+  - The Lens refills once a day, at dawn.
+
+  Grant: `hold.test.ts` lines 82 to 86, because collecting no longer verifies an entry.
+- 2026-10-30: 10S's wave 1 (`scope.md`) is assigned. 10F's copy goes in `UI.md` 14.55.
+
+  | Step | What it builds | Session |
+  |---|---|---|
+  | S1 | containers and loot | 10F (Opus) |
+  | S2 | berries, Game and stew | 10H (Sonnet) |
+  | S3 | the forge chain | 10H (Sonnet) |
+  | S4 | the mugging's flee and fight | 10D, then D4b's dishes once S2 has merged |
+  | S5 | the art style, chosen in the menu only | 10Y |
 
 ## Round 11 (planning, started 2026-10-29)
 
