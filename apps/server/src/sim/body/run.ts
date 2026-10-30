@@ -7,6 +7,7 @@ import { isWorldPhase } from '../World';
 import '../townsfolk/invariants'; // round 8, 8A: the registry runs in import order, figureNotSeat before bodyBounds
 import './invariants'; // the `bodyBounds` check registers with the body stage
 import { showClip, wake } from './damage';
+import { endDishesAtDawn } from './dishes';
 import {
   blocksAct,
   blocksRegen,
@@ -33,6 +34,7 @@ export function runBody(room: PartyRoom): void {
     return;
   }
   const sim = simOf(room);
+  endDishesAtDawn(room); // round 10, x11: a dish's buff ends when the night turns to day
   // A seat placed after the deal (a late join) gets its body here.
   for (const [id, p] of sim.players) {
     if (p.placed && !p.dead && room.state.players.has(id) && !bodyOf(room, id)) ensureBody(room, id);
