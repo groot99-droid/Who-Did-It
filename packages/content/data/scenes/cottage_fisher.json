@@ -1,0 +1,74 @@
+{
+  "id": "cottage_fisher",
+  "prefix": "fc",
+  "name": "The fisher's cottage",
+  "zoneId": "cottage_fisher",
+  "profile": "small",
+  "kind": "interior",
+  "biome": "house",
+  "dark": false,
+  "size": { "w": 12, "h": 9 },
+  "notes": "The Fisher's home (round 10, T6; WORLD 4.4, GDD 3.10): a greybox of nets on the wall, a table, a cot and a hearth, one door onto the quay lane. Round 11 draws the art. Prop kinds are existing ones; no interaction yet.",
+  "worldRef": "4.4",
+  "portals": [
+    {
+      "id": "fc.door",
+      "from": "cottage_fisher",
+      "x": 5,
+      "y": 8,
+      "kind": "door",
+      "to": "overworld",
+      "toSpawn": "cottage",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1"
+    }
+  ],
+  "spawns": [{ "id": "door", "x": 5, "y": 7, "z": 0, "facing": "n" }],
+  "spots": [
+    {
+      "id": "fc.wardrobe",
+      "kind": "hide",
+      "variant": "wardrobe",
+      "x": 2,
+      "y": 1,
+      "childOnly": false
+    },
+    {
+      "id": "fc.crate_pile",
+      "kind": "body",
+      "variant": "cratePile",
+      "x": 8,
+      "y": 4,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "fc.fireplace_e", "kind": "dressing", "x": 0, "y": 3 },
+    { "id": "fc.dining_table", "kind": "dressing", "x": 5, "y": 3 },
+    { "id": "fc.cot", "kind": "dressing", "x": 1, "y": 5 },
+    { "id": "fc.rope", "kind": "dressing", "x": 7, "y": 0 },
+    { "id": "fc.tool_rack", "kind": "dressing", "x": 4, "y": 0 }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "fc.lt_lamp", "kind": "lamp", "x": 5, "y": 3, "radiusTiles": 2.5 },
+    { "id": "fc.lt_hearth", "kind": "fire", "x": 0, "y": 3, "radiusTiles": 2 }
+  ],
+  "grid": [
+    "############",
+    "#.H........#",
+    "#..........#",
+    "#....#.....#",
+    "#.......B..#",
+    "#..........#",
+    "#..........#",
+    "#....S.....#",
+    "#####D######"
+  ]
+}
