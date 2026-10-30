@@ -1,16 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, economy } from '@wdi/content';
-import {
-  C2S,
-  ClueKind,
-  ManhuntState,
-  NotebookEntry,
-  NotebookStatus,
-  Phase,
-  TICK_RATE,
-  TILE_PX,
-  TribunalSentence,
-} from '@wdi/shared';
+import { C2S, ManhuntState, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { hurt } from '../src/sim/body/damage';
@@ -18,7 +8,6 @@ import { emitSim } from '../src/sim/events/bus';
 import { isJailed } from '../src/sim/law/Jail';
 import { cuffedOf, handleCuffHold } from '../src/sim/law/Manhunt';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
-import { tribunalOpen } from '../src/sim/law/Tribunal';
 import { simOf } from '../src/sim/RoomSim';
 import { figuresOf } from '../src/sim/townsfolk/figures';
 import { sceneKey } from '../src/sim/World';
@@ -37,6 +26,7 @@ import {
   stateOf,
   toWorld,
 } from './npcHelpers';
+import { fitting, tried } from './tribunalHelpers';
 
 /**
  * The manhunt (round 10, B4; GDD 3.31; seams.md 3 row 14): a passed petition's warrant hunts its accused for
@@ -82,41 +72,6 @@ function warrant(party: Party, accused: string): void {
   for (const id of rest.filter((x) => x !== accused).slice(0, 2))
     handlePetitionSign(party.room, id, { id: party.room.state.petition.id });
   advance(party, 1);
-}
-
-/** Two Verified entries in `opener`'s Notebook that fit `accused`'s public traits (as `petition.test.ts` builds them). */
-function fitting(party: Party, opener: string, accused: string): string[] {
-  const t = party.room.state.players.get(accused)!.traits;
-  const notebook = party.room.state.players.get(opener)!.priv.notebook;
-  return [
-    [ClueKind.footprints, t.height],
-    [ClueKind.thread, t.scarf],
-  ].map(([kind, value]) => {
-    const e = new NotebookEntry();
-    e.id = `entry_t${notebook.length + 1}`;
-    e.clueKind = kind!;
-    e.value = value!;
-    e.sceneId = notebook.length + 1;
-    e.status = NotebookStatus.verified;
-    notebook.push(e);
-    return e.id;
-  });
-}
-
-/**
- * Runs the Tribunal the cell opened (B6a) to its end: it only steps the clock. The warrant's entries prove the
- * robbery, so the seat must still be held, sentenced to jail.
- */
-function tried(party: Party, seat: string): void {
-  let sentence: number = TribunalSentence.none;
-  for (let i = 0; i < S(300) && tribunalOpen(party.room); i++) {
-    advance(party, 1);
-    if (party.room.state.tribunal.sentence !== TribunalSentence.none)
-      sentence = party.room.state.tribunal.sentence;
-  }
-  expect(tribunalOpen(party.room)).toBe(false);
-  expect(sentence).toBe(TribunalSentence.jail);
-  expect(party.room.state.players.get(seat)!.priv.jailUntilTick).toBeGreaterThan(0);
 }
 
 /** Borrows `as`'s face for `seat` (an applied impersonation, GDD 3.17). */
