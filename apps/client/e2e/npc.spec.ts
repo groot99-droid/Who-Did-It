@@ -9,12 +9,9 @@ import { createParty as startParty } from './fixtures/party';
 // NPC fill (M3c, GDD 3.12) end to end against the real server. The host adds NPC seats in the lobby or
 // lets Start fill the party; nothing on the page marks a seat as an NPC, so the specs read names from the
 // player list and positions from a standing bot's state (never the server-only name pool). It needs the
-// NPC server (S), the lobby (V) and the match flow, so it runs only with WDI_E2E_NPC=1. The server runs with
-// WDI_DEBUG=1 (playwright.config.ts).
-test.skip(
-  process.env.WDI_E2E_NPC !== '1',
-  'needs the M3b/M3c sessions R, S, T, U and V merged (WDI_E2E_NPC=1)',
-);
+// NPC server (S), the lobby (V) and the match flow, behind WDI_E2E_NPC=1 until they merged; they are long in
+// and the suite runs in CI (A514), so it runs with the rest (A554). The server runs with WDI_DEBUG=1
+// (playwright.config.ts).
 
 interface PlayerView {
   id: string;
@@ -173,9 +170,12 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     // Park the NPCs on their spawns so the host can find them, and free the Knife; the Knife works from dusk to the
-    // end of the night (balance.json `kill.phases`, GDD 3.2), so the clock goes to the night.
+    // end of the night (abilities.json `kill.phases`, GDD 3.2), so the clock goes to dusk. Not to the night: since
+    // round 8 (8L, A190; GDD 3.7) a living seat sees another at night only within the night radius, and the
+    // watcher, which the positions are read from, stands on its own spawn, so at night its view never held the
+    // host and the walk had nothing to steer by (A554).
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true });
 
     // First kill: the watcher. The host reports the body; three NPCs and the host are still alive.
     await approach(page, w.view, 'Watch1');
@@ -190,11 +190,13 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     await page.getByTestId('vote-skip').click();
     await expect(page.getByTestId('reveal-role')).toBeVisible({ timeout: voteWindowMs });
 
-    // The Killer finishes it: with the watcher gone, two more kills leave the Village at one (GDD 3.8).
+    // The Killer finishes it. The host and the watcher are the party's only humans, so the deal is Paint The Town
+    // Red (round 10, C5, GDD 3.8): the Killers win once their unique NPC kills reach half the NPC seats, rounded
+    // up, two of the three here; and two kills also leave the Village at one, the Cabal's own line (A554).
     await expect(page.getByTestId('hud-clock')).toBeVisible({
       timeout: (balance.phases.revealS + 30) * 1000,
     });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true });
     const alive = () => {
       const out: string[] = [];
       w.view().players.forEach(
@@ -222,10 +224,11 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
       await page.keyboard.press('KeyQ');
       await expect.poll(bodies, { message: `kill ${i + 2} leaves a body` }).toBe(before + 1);
       downed.add(prey);
-      w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
+      w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true });
     }
     await expect(page.getByTestId('gameover')).toBeVisible({ timeout: (balance.phases.revealS + 30) * 1000 });
-    await expect(page.getByTestId('gameover-winner')).toContainText(/cabal/i);
+    // The Killers' win, by the paint line of `over.paintTown` (UI.md 14.47), not the Cabal's.
+    await expect(page.getByTestId('gameover-winner')).toContainText(/paint the town red/i);
   } finally {
     await w.swarm.stop();
     await page.context().close();
@@ -249,7 +252,7 @@ test('Start alone fills the party: four portraits in the meeting', async ({ brow
     await skipOpening(page);
     await expect(page.getByTestId('hud-clock')).toBeVisible();
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
-    w.swarm.rooms[0]!.send('debug.clock', { phase: 'night', clearCooldowns: true });
+    w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true }); // dusk, as above (A554)
     await approach(page, w.view, 'Watch1');
     await page.keyboard.press('KeyQ');
     await expect.poll(() => w.view().scenes.get('overworld')?.bodies.size ?? 0).toBe(1);

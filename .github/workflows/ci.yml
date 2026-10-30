@@ -43,10 +43,10 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @wdi/server test
 
-  # The whole Playwright suite against the real server (ARCHITECTURE 5.12, DECISIONS A514) on every pull request
-  # that touches the client, the shared or content packages, the lockfile or this workflow. A spec went stale a
-  # round after it was written while nothing ran the suite (A494). The job is required, so on a pull request that
-  # touches none of those paths, and on a push, it reports green without running.
+  # The whole Playwright suite against the real server (ARCHITECTURE 5.12, DECISIONS A514 and A554) on every pull
+  # request that touches the client, the server, the shared or content packages, the lockfile or this workflow. A
+  # spec went stale a round after it was written while nothing ran the suite (A494). The job is required, so on a
+  # pull request that touches none of those paths, and on a push, it reports green without running.
   e2e:
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
@@ -67,7 +67,7 @@ jobs:
           git fetch --depth=1 origin "$BASE_SHA"
           changed=$(git diff --name-only "$BASE_SHA" HEAD)
           if printf '%s\n' "$changed" |
-            grep -qE '^(apps/client/|packages/shared/|packages/content/|pnpm-lock\.yaml$|\.github/workflows/ci\.yml$)'; then
+            grep -qE '^(apps/client/|apps/server/|packages/shared/|packages/content/|pnpm-lock\.yaml$|\.github/workflows/ci\.yml$)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -87,12 +87,9 @@ jobs:
       # The runner has no browser; the pinned Playwright fetches its own Chromium and the libraries it needs.
       - if: steps.paths.outputs.run == 'true'
         run: pnpm --filter @wdi/client exec playwright install --with-deps chromium
+      # Every spec but admin.spec.ts, which needs the admin login and a token (ARCHITECTURE 5.12, A554).
       - name: Playwright
         if: steps.paths.outputs.run == 'true'
-        env:
-          # Of the opt-in suites (ARCHITECTURE 5.12) the looks suite runs too; match.spec and npc.spec join once
-          # their host's walk is fixed (A514), admin.spec stays behind its token.
-          WDI_E2E_LOOKS: '1'
         run: pnpm --filter @wdi/client test:e2e
       - name: Traces of the failed specs
         if: failure() && steps.paths.outputs.run == 'true'

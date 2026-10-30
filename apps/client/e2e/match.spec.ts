@@ -7,11 +7,10 @@ import { skipOpening } from './helpers';
 import { createParty, joinParty } from './fixtures/party';
 
 // The first playable, end to end against the real server (M3): two browsers and bots play kill -> body ->
-// report -> meeting -> vote -> game over -> lobby. It needs the match flow (K), the verbs (L), the screens
-// (M) and the World actions (N), so it runs only with WDI_E2E_MATCH=1; the orchestrator sets it at
-// integration. The server runs with WDI_DEBUG=1 (playwright.config.ts): a bot sends `debug.deal` and
-// `debug.clock`. Screens are located by the frozen data-testid lists of docs/SESSIONS.md Round 3.
-test.skip(process.env.WDI_E2E_MATCH !== '1', 'needs the M3 sessions K, L, M and N merged (WDI_E2E_MATCH=1)');
+// report -> meeting -> vote -> game over -> lobby. It waited behind WDI_E2E_MATCH=1 for the M3 sessions K, L,
+// M and N; they are long merged and the suite runs in CI (A514), so it runs with the rest (A554). The server
+// runs with WDI_DEBUG=1 (playwright.config.ts): a bot sends `debug.deal` and `debug.clock`. Screens are located
+// by the frozen data-testid lists of docs/SESSIONS.md Round 3.
 
 interface PlayerView {
   id: string;
@@ -108,7 +107,10 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
   await expect(host.getByTestId('hud-clock')).toBeVisible();
   await expect(guest.getByTestId('hud-clock')).toBeVisible();
   // Out of grace with the Knife ready: the Kill is allowed from dusk to the last night only (abilities.json).
-  m.debug('debug.clock', { phase: 'night', clearCooldowns: true });
+  // Dusk, not night: since round 8 (8L, A190; GDD 3.7) a living seat sees another at night only within the
+  // night radius, and the observer bot, which this spec reads positions from, stands on its own spawn, so at
+  // night its view never held the host, and the walk below had nothing to steer by (A554).
+  m.debug('debug.clock', { phase: 'dusk', clearCooldowns: true });
   return m;
 }
 
