@@ -1109,7 +1109,9 @@ still where it is; the lobby clears every figure.
 
 On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3.17) with a `villager` look (never
 a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
-tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
+tag, so nothing but the drawn figure tells it apart; its id never leaves the server. A seat's view holds the living
+figures of its own scene as it holds the seats there (3.17), through the same sight rule in the dark and at night
+(3.7, 3.15), with no near tag (its Blood range of 3.4 is a seat's), and a ghost sees them as the living do (round 10, x5, A353). Needs and moods tick for it as
 for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
 The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
 that kills (the wolf's `mobs.json` `dmg` off its reduced body's `body.maxHp`, regained like a seat's, 3.22; any
@@ -1183,7 +1185,32 @@ Round 8 addendum C (A200; `docs/round8/stations.md` 5), 7M. The owner: "walking 
 
 ### 3.27 The county jail
 
-Round 10, B5 (`docs/round9/gdd-map.md` 2.1). Not built yet: the step that builds it writes this section.
+Round 10, B5 (`docs/round9/gdd-map.md` 2.1; `world-mode.md` 5.1; owner answers LW9, LW10, WM11). B5a builds the cell;
+B5b puts the cuffed seat in it and releases it.
+
+**The cell (B5a).** One scene, `cj_cell` ("The county jail", 12x8, a house interior), serves every map. It is a `jail`
+scene: in no map's graph, with no portal in or out (WORLD 4.3), its ids prefixed `cj.`, its ten spawns `cell_1` to
+`cell_10`, so the cell can hold every seat at once. The server alone places a seat in it, and its art takes the default
+map's theme. Its view holds only the seats inside it. D8 adds the props of the jail mini-games.
+
+**Held (B5b).** A seat the manhunt cuffs (3.31) walks for `jail.walkS` (_proposed_ 5 s), held, and is placed in the
+cell. It stays there until the next morning train, the first arrival of a later round, which sets it down at the
+station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
+the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
+jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. A death in jail takes the
+usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
+no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
+
+**The face it was cuffed in** (the owner, 2026-10-30: "jail and try them"; 6Z's ruling). An impersonation applied when
+the seat is cuffed is pinned from the cuff until the seat leaves jail or dies: nothing drops it, neither the cell door,
+being alone in the cell, its run out, a meeting, nor the Tribunal (B6). The cell, the Tribunal's defendant and the
+manifest draw and name that face, exactly as if the accused had been cuffed; the sentence lands on the seat held. A
+disguise still pending at the cuff is cancelled. The seat is set down at the station still in the face, and the usual
+rule applies after that (it drops when the seat is alone or passes a door). What a table can still deduce is only what
+the drawn figures show: the true accused seen in town after a public "cuffed", two of one face in the cell, and a
+hanging's roster flip (B6).
 
 ### 3.28 Accounts and achievements
 
@@ -1328,6 +1355,17 @@ scene, whether it is backed (Verified or Corroborated, one mark for both), and t
 Reader is Anyone (footprints, thread); never the opener or a signer. Only the signer learns it signed
 (`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
 evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
+
+**The Constables' own petitions (B3c).** In Paint The Town Red, where no human is on the town side (both humans are
+the Killers), the Constables file their own petition when their posted briefings fit exactly one figure. Within the
+last `law.fileWindowS` (_proposed_ 300 s), the briefings that named a trait (footprints, thread) are read against the
+traits every client sees on the roster's figures; a living seat matching at least `petition.constableMatches` (2) of
+those traits is a candidate. Only a single candidate is named: none or a tie files nothing, and a seat in its grace
+after a lapse is skipped. They read nothing else (no card, no cover, no private view). The petition is the ordinary
+public row, charged with murder, its entries the briefed clues (each backed), with no opener and `needed` 0, so it
+passes at once into a warrant for the manhunt. They file only with a living Constable, while no petition is open, no
+manhunt runs or waits, and `petition.cooldownS` after their last filing. In the main world mode they never file: a
+filing there would tell the table that no human is left on the town side.
 
 **The manhunt (B4).** A passed petition's warrant waits its turn, and one manhunt runs at a time, for
 `manhunt.durationS` (120 s), a world phase rather than a pause. It is public as `GameState.manhunt` (the accused, its

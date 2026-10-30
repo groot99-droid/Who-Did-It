@@ -401,7 +401,13 @@
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
   "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
-  "law": { "speedMult": 2, "briefingAfterS": 30, "cuffHoldS": 3, "gddRef": "3.31" },
+  "law": {
+    "speedMult": 2,
+    "briefingAfterS": 30,
+    "cuffHoldS": 3,
+    "fileWindowS": 300,
+    "gddRef": "3.31"
+  },
   "sleep": {
     "confirmS": 3,
     "innBedScrip": 2,
@@ -445,5 +451,6 @@
     "constableMatches": 2,
     "gddRef": "3.31"
   },
-  "manhunt": { "durationS": 120, "gddRef": "3.31" }
+  "manhunt": { "durationS": 120, "gddRef": "3.31" },
+  "jail": { "walkS": 5, "gddRef": "3.27" }
 }

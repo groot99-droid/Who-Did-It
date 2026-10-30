@@ -9,8 +9,11 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared';
 export const POSITION_RING_TICKS = (TICK_RATE * 250) / 1000;
 /** Half the collision box side in pixels (metrics.json `collisionBoxTiles`, WORLD 4.2). */
 export const FOOT_HALF_PX = (metrics.collisionBoxTiles * TILE_PX) / 2;
-/** An input not refreshed for this many ticks stops the player (a dead tab must not keep walking). */
-export const INPUT_STALE_TICKS = 5;
+/**
+ * An input not refreshed for this many ticks stops the player (a dead tab must not keep walking). Ten since round 10
+ * (A373): at 20 Hz input and one patch per tick, five let a hiccup of two lost frames stop a walking seat.
+ */
+export const INPUT_STALE_TICKS = 10;
 /** How close a player must stand to a portal tile centre to use it (balance.json `doors.reachTiles`, GDD 3.7). */
 export const PORTAL_REACH_TILES = balance.doors.reachTiles;
 /**

@@ -31,6 +31,7 @@ import crumbCold from '../data/scenes/crumb_cold.nav.json' with { type: 'json' }
 import crumbMixing from '../data/scenes/crumb_mixing.nav.json' with { type: 'json' };
 import crumbOven from '../data/scenes/crumb_oven.nav.json' with { type: 'json' };
 import crumbProofing from '../data/scenes/crumb_proofing.nav.json' with { type: 'json' };
+import cjCell from '../data/scenes/cj_cell.nav.json' with { type: 'json' };
 import { Profile } from './schemas/balance.js';
 import { SCENE_IDS, type SceneId } from './schemas/scene.js';
 
@@ -89,6 +90,7 @@ const navJson: Record<SceneId, unknown> = {
   crumb_mixing: crumbMixing,
   crumb_oven: crumbOven,
   crumb_proofing: crumbProofing,
+  cj_cell: cjCell,
 };
 
 function parseNavs(): Record<SceneId, NavFile> {

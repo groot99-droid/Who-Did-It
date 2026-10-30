@@ -1,12 +1,21 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { ErrorCode, Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { resolveHandle } from '../src/sim/Avatars';
+import { avatarOf, resolveHandle } from '../src/sim/Avatars';
 import { markDead } from '../src/sim/Death';
 import { handleKill } from '../src/sim/Kill';
 import { enterScene } from '../src/sim/Portals';
+import { simOf } from '../src/sim/RoomSim';
+import { figureOfHandle } from '../src/sim/townsfolk/figures';
 import { StatusBit } from '../src/sim/constants';
-import { avatarsHeld, handleOf, handlesHeld, settle } from './avatarHelpers';
+import {
+  avatarsHeld,
+  handleOf,
+  handlesHeld,
+  seatAvatarsHeld,
+  seatHandlesHeld,
+  settle,
+} from './avatarHelpers';
 import {
   bootFlowServer,
   idOf,
@@ -19,7 +28,7 @@ import {
   voteAll,
 } from './flowHelpers';
 import { act, errorCodes, readyKnife, setPhase, teleport } from './killHelpers';
-import { type Match, sleep, stateOf } from './simHelpers';
+import { type Bot, type Match, sleep, stateOf } from './simHelpers';
 
 vi.setConfig({ testTimeout: 40_000 });
 
@@ -43,7 +52,17 @@ function expectedHandles(m: Match, viewer: number, seats: number[]): string[] {
     .sort();
 }
 
-const held = (m: Match, i: number) => handlesHeld(m.bots[i]!);
+// Round 10, x5 (A353): the living figures of the viewer's scene share the view, so `held` reads the seats' handles
+// and `onlyFiguresBeside` checks that every handle it leaves out is a living figure of that scene.
+const held = (m: Match, i: number) => seatHandlesHeld(m, m.bots[i]!);
+function onlyFiguresBeside(m: Match, bot: Bot): void {
+  const sceneIdx = simOf(m.room).players.get(bot.id)!.sceneIdx;
+  for (const h of handlesHeld(bot)) {
+    if (seatHandlesHeld(m, bot).includes(h)) continue;
+    const f = figureOfHandle(m.room, h);
+    expect(f && !f.dead && f.sceneIdx === sceneIdx).toBe(true);
+  }
+}
 
 describe('avatars by scene (P1, P2, P4)', () => {
   it('a view holds exactly the avatars of the living placed seats in its own scene, its own included', async () => {
@@ -53,6 +72,7 @@ describe('avatars by scene (P1, P2, P4)', () => {
     await sleep(500);
     const all = [0, 1, 2, 3, 4, 5];
     for (const i of all) expect(held(m, i)).toEqual(expectedHandles(m, i, all));
+    for (const i of all) onlyFiguresBeside(m, m.bots[i]!);
     expect(held(m, 0)).toHaveLength(3);
     expect(held(m, 4)).toHaveLength(3);
     // The own scene is the only SceneState with avatars in the view.
@@ -186,6 +206,41 @@ describe('handles (P6)', () => {
   });
 });
 
+describe('leaving Blood range (round 10, x4, A333)', () => {
+  /** The copy of avatar `h` a bot's client holds, in any scene. */
+  const copyOf = (bot: Bot, h: string) => avatarsHeld(bot).find((a) => a.handle === h)?.avatar;
+
+  it('an avatar that walks out of the 3-tile ring keeps moving on the viewer, then leaves with its scene', async () => {
+    const m = await startParty(colyseus, 4);
+    await skipPhase(m);
+    setPhase(m, Phase.day);
+    const [viewer, walker, control] = [m.bots[1]!, m.bots[2]!, m.bots[3]!];
+    teleport(m, viewer, 'overworld', 30, 22);
+    teleport(m, walker, 'overworld', 31, 22); // inside Blood range: the near tag goes on
+    teleport(m, control, 'overworld', 38, 18); // never within 3 tiles: the near tag never goes on
+    settle(m, viewer, walker, control);
+    await sleep(400);
+    const h = handleOf(m, walker);
+    const c = handleOf(m, control);
+    expect(copyOf(viewer, h)?.x).toBe(avatarOf(m.room, h)!.x);
+    // Out of the ring: in schema 5.0.36 `view.remove(avatar, near)` hid the whole avatar, so the copy froze here.
+    teleport(m, walker, 'overworld', 38, 18);
+    await sleep(400);
+    teleport(m, walker, 'overworld', 40, 18);
+    teleport(m, control, 'overworld', 40, 20);
+    await sleep(400);
+    expect(handleOf(m, walker)).toBe(h); // the same handle throughout: nothing re-handled it
+    expect(copyOf(viewer, h)?.x).toBe(avatarOf(m.room, h)!.x);
+    expect(copyOf(viewer, h)?.y).toBe(avatarOf(m.room, h)!.y);
+    expect(copyOf(viewer, c)?.x).toBe(avatarOf(m.room, c)!.x);
+    expect(copyOf(viewer, h)?.seat).toBeFalsy(); // the add-back carries no tagged field
+    // Through a door: the frozen copy used to stay until the viewer changed scene; now it leaves with its tail.
+    expect(enterScene(m.room, seat(m, 2), sim(m, 2), 'tavern_bar', 'front', true)).toBe(true);
+    expect(await until(() => copyOf(viewer, h) === undefined, 4000)).toBe(true);
+    expect(copyOf(viewer, c)?.x).toBe(avatarOf(m.room, c)!.x);
+  });
+});
+
 describe('deaths (P5)', () => {
   it('living views lose the victim at once; the ghost sees its scene with the true seats', async () => {
     const m = await startParty(colyseus, 5);
@@ -203,7 +258,8 @@ describe('deaths (P5)', () => {
       for (const a of avatarsHeld(m.bots[i]!)) expect(a.avatar.seat).toBeFalsy();
     }
     // The ghost sees every avatar of its scene, itself included, with the true seat.
-    const ghost = avatarsHeld(m.bots[3]!);
+    const ghost = seatAvatarsHeld(m, m.bots[3]!);
+    onlyFiguresBeside(m, m.bots[3]!);
     expect(ghost.map((a) => a.handle).sort()).toEqual(
       [0, 1, 2, 3, 4].map((i) => seat(m, i).priv.avatar).sort(),
     );

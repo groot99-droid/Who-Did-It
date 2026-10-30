@@ -5,7 +5,7 @@ import { ErrorCode, TICK_RATE } from '@wdi/shared';
 import { createServer } from '../src/server';
 import { avatarMemory } from '../src/sim/Avatars';
 import { simOf } from '../src/sim/RoomSim';
-import { avatarsHeld } from './avatarHelpers';
+import { avatarsHeld, seatAvatarsHeld } from './avatarHelpers';
 import { type Match, lastEvent, move, sleep, spawnOf, standAt, startMatch, stateOf } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -23,7 +23,7 @@ const front = spawnOf('overworld', 'tavern_front');
 const sceneKeys = (m: Match, i: number) => [...stateOf(m.bots[i]!).scenes.keys()];
 /** The seats whose avatar the bot's client holds (other than itself): the handles resolved in room memory. */
 const seenPresence = (m: Match, i: number) =>
-  avatarsHeld(m.bots[i]!)
+  seatAvatarsHeld(m, m.bots[i]!) // round 10, x5 (A353): the figures of the scene are held too
     .map((a) => avatarMemory(m.room).seatOf.get(a.handle) as string)
     .filter((id) => id !== m.bots[i]!.id);
 
