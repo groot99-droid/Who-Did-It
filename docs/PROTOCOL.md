@@ -204,6 +204,8 @@ export type HoldAction =
   | 'altar'
   | 'mailbag'
   | 'rack'
+  // Round 10 (GDD 3.23, C2b; seams.md 3 row 11): the Clerk's labour errand at a `ledger` prop clears a fare.
+  | 'errand'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
