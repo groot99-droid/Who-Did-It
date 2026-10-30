@@ -324,6 +324,7 @@ describe('POST /studio/draft', () => {
     expect(room.got).toEqual([]);
   });
 
+  // Posts DRAFTS_PER_HOUR drafts, and each runs the whole content validator (`checkScene` → `validateContent`).
   it('answers 404 without the room, 429 when its queue is full, and is gated and limited', async () => {
     const body = { roomId: 'r', scene: editedBakery() };
     expect((await harness(true).call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(404);
@@ -348,5 +349,5 @@ describe('POST /studio/draft', () => {
       expect((await call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(202);
     expect((await call('POST', '/studio/draft', { auth: bearer(), body })).status).toBe(429);
     expect(room.got).toHaveLength(DRAFTS_PER_HOUR - 1);
-  });
+  }, 20_000);
 });

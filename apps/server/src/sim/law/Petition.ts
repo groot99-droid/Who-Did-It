@@ -10,6 +10,7 @@ import { isPaintTown } from '../paintTown';
 import { isOnLine } from '../Train';
 import { isVerbPhase, reject, sceneIndex } from '../World';
 import { briefingsOf } from './Briefing';
+import { isJailed, untilDawnS } from './Jail';
 import { warrantsWaiting } from './Manhunt';
 
 /**
@@ -96,14 +97,11 @@ const BOARDS: readonly string[] = Object.values(scenes).flatMap((s) =>
   s.props.filter((p) => p.kind === 'noticeBoard').map((p) => p.id),
 );
 
-/** B5 wires the county jail; until then nobody is jailed. */
-const jailed = (_room: PartyRoom, _seat: string): boolean => false;
-
 /** A living, free human: placed, alive, not on the line (C1), not jailed (B5). */
 function freeHuman(room: PartyRoom, seat: string): boolean {
   if (isNpcSeat(room, seat)) return false;
   const p = simOf(room).players.get(seat);
-  return !!p && !p.dead && p.placed && !isOnLine(room, seat) && !jailed(room, seat);
+  return !!p && !p.dead && p.placed && !isOnLine(room, seat) && !isJailed(room, seat);
 }
 
 /** The living, free humans, every seat counted: the bar never tells whether the accused is a person (R6). */
@@ -141,6 +139,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
   const m = memoryOf(room);
   const tick = room.state.tick;
   if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
+  if (isJailed(room, seat)) return reject(room, seat, 'IN_JAIL', { untilDawn: untilDawnS(room, seat) });
   if (!freeHuman(room, seat)) return reject(room, seat, 'NOT_IN_PLAY');
   const accused = typeof payload.accused === 'string' ? payload.accused : '';
   const charge = typeof payload.charge === 'string' ? payload.charge : '';
@@ -195,6 +194,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
 export function handlePetitionSign(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const open = memoryOf(room).open;
   if (!open || payload.id !== open.id) return reject(room, seat, 'NOTHING_THERE');
+  if (isJailed(room, seat)) return reject(room, seat, 'IN_JAIL', { untilDawn: untilDawnS(room, seat) });
   if (!freeHuman(room, seat)) return reject(room, seat, 'NOT_IN_PLAY');
   if (seat === open.opener || seat === open.accused || open.signers.has(seat))
     return reject(room, seat, 'BUSY');
