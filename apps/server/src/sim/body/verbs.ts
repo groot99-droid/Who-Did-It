@@ -8,6 +8,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { reject } from '../World';
 import { handleCure, handleEat } from './cures';
 import { handleSlingshot, handleStrike } from './fists';
+import { handleSkin } from './skin';
 import { type Body, bodyOf } from './state';
 
 /**
@@ -32,6 +33,8 @@ export function handleBodyAbility(
     case 'eat':
     case 'eatHerbBread':
       return handleEat(room, sessionId, payload.abilityId);
+    case 'skin':
+      return handleSkin(room, sessionId);
     default:
       reject(room, sessionId, 'NFY');
   }
