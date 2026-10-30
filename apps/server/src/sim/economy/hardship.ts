@@ -64,10 +64,13 @@ export function onDeliveryHardship(room: PartyRoom, round: number): void {
   const count = least + Math.min(most - least, Math.floor(rng() * (most - least + 1)));
   const pool = hardshipPool(room);
   const until = room.state.tick + Math.round(balance.hardship.recoverS * TICK_RATE);
-  for (let i = 0; i < count && pool.length > 0; i++) {
-    const seat = pool.splice(Math.floor(rng() * pool.length), 1)[0]!;
-    const kinds = balance.hardship.kinds;
+  // Every delivery makes 1 + 2 x `atOnce[1]` draws, whatever is struck, so the stream never depends on the outcome.
+  const kinds = balance.hardship.kinds;
+  for (let i = 0; i < most; i++) {
+    const at = rng();
     const kind = kinds[Math.min(kinds.length - 1, Math.floor(rng() * kinds.length))]!;
+    if (i >= count || pool.length === 0) continue;
+    const seat = pool.splice(Math.floor(at * pool.length), 1)[0]!;
     s.running.set(seat, { kind, untilTick: until, round });
     if (kind === 'rent') s.rents.push({ look: room.state.players.get(seat)!.look, round });
   }

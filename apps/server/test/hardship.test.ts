@@ -13,6 +13,7 @@ import {
 import { stockLeft, workOf } from '../src/sim/economy/townWork';
 import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
+import { MatchSeeds } from '../src/sim/seeds';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
 import { type Party, bootNpcServer, pauseClock, setRole, standardParty } from './npcHelpers';
 import { sleep } from './simHelpers';
@@ -112,6 +113,24 @@ describe('hardships (GDD 3.33, F4 b2 to b5)', () => {
     forceHardship(room, a, 'rent');
     expect(inHardship(room, a)).toBe(true);
     expect(rentHardships(room)).toEqual([]); // forced strikes do not write the ledger; a delivery does
+  });
+});
+
+describe('the hardship stream (sim/seeds.ts)', () => {
+  it('draws the same number of times at every delivery, whoever is struck', async () => {
+    const party = await day();
+    const room = party.room;
+    const words = [7, 11, 13, 17] as const;
+    const next = (pool: string[]) => {
+      const seeds = new MatchSeeds({ hardship: words });
+      const fake = { seeds, state: room.state } as unknown as typeof room;
+      looks(party, pool);
+      onDeliveryHardship(fake, 1);
+      return seeds.get('hardship')();
+    };
+    const ids = [...room.state.players.keys()];
+    expect(next([])).toBe(next(ids.slice(0, 1)));
+    expect(next(ids.slice(0, 2))).toBe(next([]));
   });
 });
 
