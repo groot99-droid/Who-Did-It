@@ -44,6 +44,8 @@ export const BLACKPINE_RULES: PlacementRules = {
     refuge_table: 'surface',
     map_table: 'surface',
     teachingClue: 'floor',
+    // Round 10 (A7, GDD 3.32): a bed is where a seat lies down, flat on the floor beside the bed dressing.
+    bed: 'floor',
     // The dressing kit (kind `dressing`, art by tail and stem).
     crate: 'free',
     crates: 'free',

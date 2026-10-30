@@ -13,6 +13,7 @@ import { handleGather, tickGather } from './Resources';
 import { handleCivicHold, isCivicHold, tickCivicHold } from './economy/holds';
 import { refusal, type Refusal } from './refusal';
 import { handleInteract, tickInteract } from './interact/resolve';
+import { handleSleepHold } from './Sleep';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -72,6 +73,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     return;
   }
   if (isCivicHold(action)) return handleCivicHold(room, sessionId, action, targetId); // round 8, 8D (GDD 3.23)
+  if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
   // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
   if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     const via = typeof payload.via === 'string' && payload.via.length <= 64 ? payload.via : undefined;

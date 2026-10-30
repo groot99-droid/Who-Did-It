@@ -3923,6 +3923,21 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     is named only for a clue anyone may read (GDD 3.4). The felt's hat and prints are briefed as kind and place. A
     briefing never says Forged or Verified, writes no Notebook entry and changes no clue. Its lines live in
     `laws.json`. 10B's grant: one call line, `runLaw(room)`, in `sim/Step.ts` after `runDecay`.
+- 2026-10-29: #342 (wire row 8 and the logs above) merged at f38dfa0 and D2 (#340) at 0094684. On 10D's request for
+  D5, wire row 9: the lock-pick sends the picker's own client the set points it must feel, and the server replays the
+  trace, as for the tap. D5 locks the manor study door; the curfew doors' locks wait for D7, since a curfew door is
+  locked only at night for an Indebted seat. D4 splits into D4a and D4b:
+  - D4a: the bakery's parts and the Herb Bread. Its poison resistance shortens Poisoned, as armour's does, and never
+    touches Nightshade.
+  - D4b: the Miner's Pasty keeps its Game filling and waits for Game, with the other dishes.
+  - D4a's grants: `eat` in `sim/Actions.ts` (no public clip or status bit), buff rows in `effects.json`, `EffectId`
+    appended after A7b's `exhausted` (D4a merges after A7b), the buff in `sim/body/effects.ts` with its icons, the
+    dish rows and the optional `parts` and `buff` fields, and the stem stations of `sim/Craft.ts`.
+  - D3's grant: the `consumes` check in 10F's resolver (`problemOf` and `interactReady`), so a saw takes a seat's Logs.
+- 2026-10-29: on 10B's plan for B8, wire row 10: Walk with me. Every answer reaches the asker at one delay drawn on
+  `pairing`, whoever the target is, because a person's held answer and an NPC's think time would be two distributions
+  (R6). A pair shields a seat only against a third party, and only while its partner shares its scene (`world-mode.md`
+  3.1). B8a builds while B2 is in review; once B2 merges, B3 to B6 come before B8b, since 10E, C6 and C7 wait on B6.
 
 ## Round 11 (planning, started 2026-10-29)
 
