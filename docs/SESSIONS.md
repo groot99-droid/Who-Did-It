@@ -4173,9 +4173,14 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   `mapOf` returns the default map for a jail scene, so the tilemap and the Studio don't throw; a test pins it, and
   WORLD.md 4.4 says the cell takes the default map's look on both maps. B5b is granted the `isPinned` skips in three
   functions of `sim/Impersonate.ts` and the `enterScene` export.
-- 2026-10-30: merged y3 (#386), C5a (#391) and 6Z's docs (#395). 6Z checked C5a's tree again on y3's base before
-  merging it. C5b (#393) merges the base next: 6Z has read its own diff (the shared `paintTarget`, the card's goal and
-  the end tally) and found nothing blocking. B3c (#394) swaps its mode stub for `isPaintTown`.
+- 2026-10-30: merged y3 (#386), C5a (#391), 6Z's docs (#395) and y5 (#389). 6Z checked each code tree again on the
+  base it merged into. y5 found the Studio's NPC editor dropping B1's `guard` and `count` from any row it saved, which
+  would have ended the Constables' guarding; it keeps them now. 6Z read C5b's own diff (#393: the shared
+  `paintTarget`, the card's goal and the end tally) and found nothing blocking. B3c (#394) swaps its mode stub for
+  `isPaintTown`.
+- 2026-10-30: at 10X's request, a Complete may stand on a base a few merges old, and 6Z runs the full check on the
+  true merge before merging (seams.md 1, "Merging"). With one port, a full check and auto 50 take a session about 35
+  minutes, and every base merge restarted that clock on each of nine open pull requests.
 
 ## Round 11 (planning, started 2026-10-29)
 
