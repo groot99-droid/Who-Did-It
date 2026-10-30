@@ -962,8 +962,19 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   cut part is never paid out, so no coin is made or lost. `act.payRent` at a bank
   counter pays the rent first, then the whole fare when the purse covers it; a seat that owes only the fare pays it
   there too. Owing the line is not Indebted and brings no curfew of its own. The fare is private (`Private.fare`);
-  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days). The owner look's
-  dear stall and the Clerk's labour errand come with C2b.
+  nothing public carries it. A fare is meant to clear within `respawn.clearTargetDays` (2 days).
+- **The dear stall** (C2b). A shop with an `owner` look (`economy.json`: the bakery is the Baker's, the apothecary the
+  Herbalist's, the Gamekeeper's stalls his) asks `respawn.priceMult` (1.5x, rounded up) while any seat whose public look
+  is that look owes the line, and charges what it shows. It reads the roster look, never the drawn figure or the card,
+  so an impersonation never moves it and no cover is named; a shop with no character (the stores, the markets) is never
+  dear.
+- **The Clerk's labour errand** (C2b). Holding the action key at the Company Clerk's books (a `ledger` prop:
+  HollowMere's `bk.ledger`) for `respawn.errandS` (30 s), standing still within reach, clears one fare. It is always
+  open, whether or not the Clerk stands there, so a fare never locks a seat out. An NPC seat that owes the line works
+  it too, as a trip of its day routine, and only while it owes. Tasks alone never clear a fare (an owing seat earns
+  about 1.5 Scrip a task against 6 Scrip of rent a day), so the errand is what keeps the two-day target; the
+  balance lab checks both (`packages/content/test/fareCheck.test.ts`). BlackPine has no Train, so it has no fare and
+  no errand.
 
 - **Faith** (8D). Donating Scrip at an altar (`act.donate`, within verb reach, up to `faith.donateMax` at a time)
   earns `faith.perScrip` Faith per Scrip, up to `faith.max`; Faith is private (`Private.faith`). There is an altar in
