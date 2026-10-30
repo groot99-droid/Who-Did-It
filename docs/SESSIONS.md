@@ -4240,6 +4240,24 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - The game-over field is `hitman {seatId, day, stage}`, with no card (the end screen has `roles`).
   - The weapon's key and disc and the departed seat's screen go to 10Y, as one client pull request stacked on C4b. It
     merges right after C4b, so production never has a Hitman who can't shoot.
+- 2026-10-30: merged y7 (#392), the vendetta on the card. B5a's full check failed one test,
+  `studioRoutes.test.ts`'s draft-limit case. It posts `DRAFTS_PER_HOUR` drafts, and each runs the whole content
+  validator, so every new scene slows it: 4.4 s on the base and 5.2 s with the cell, against vitest's 5 s (CI took
+  3.2 s). 6Z granted that one test an explicit timeout. After y7, y9 and x5 each conflicted with it only in docs: the
+  `UI.md` 14.51 sections and the `DECISIONS.md` rows. 6Z checked each keep-both tree, and the sessions pushed those
+  same trees.
+- 2026-10-30: x5's third test grant: P15 in `nightPowers.test.ts` drops figure avatar rows from its diff, through the
+  same helper as `kill.test.ts`. A figure moves by its routine, its needs, a guard's hunt, a pairing or a mugging.
+  None of them reads a night power, so a figure walking in the test's window is its clock and not a tell.
+- 2026-10-30: 6Z's review of B5b (#405), the jail, set two gaps, both now in row 19. A meeting gathered every placed
+  seat on the square and so emptied the cell. A jailed seat now stays where it is through the meeting and the
+  placement after it. BlackPine has a notice board but no station, so no train ever released its prisoner, and the
+  Final Night left it in a cell no portal leaves. On a map with no station, the first dawn of a later round now
+  releases the seat at the meeting spawns, with no line.
+- 2026-10-30: C4b. A Hitman who boards is unplaced as a seat on the line is, so no meeting sets him down. The vote's
+  early end waits on his vote as on any living seat's, because a meeting that closed without it would show his seat
+  as the one not counted. His client keeps the meeting screen. Row 21 now says "nothing in the world waits on it"
+  (the sleep count, the line, the train).
 
 ## Round 11 (planning, started 2026-10-29)
 
