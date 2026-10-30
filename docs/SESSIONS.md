@@ -4537,6 +4537,22 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     - after R1 and S5, the key bind in `input/` and the mount lines in `view/Hud.ts`, for M4's minimap too.
 - 2026-10-30: CI's `server` job took 13m28s at #420's merge, against its 15-minute limit, and wave 2 adds about
   thirty rules steps. 10Y's y17 raises the limit to 25 minutes.
+- 2026-10-30: rulings, with A296 (6) to (8).
+  - **The Clerk's ledger** (C4d, row 37): every rent hardship by `Player.look`, to the reader only. A rent hardship
+    boards nothing, D7's real boardings stay out, NPC seats read the ledger too, and Blackpine's is NFY.
+  - **Row 30**: `missing` (T5) and `sigil` (the Following) aren't the Hitman's. His mailbag and crow (I39) are drawn
+    only in `arrived`, written in the tick of his line. T4 splits into T4a (windows, stations and his props), T4b
+    (the I37 work rules) and T4c (silhouettes).
+  - **K1** adds no field: the weapon stays private (row 1), and NPC seats equip and swing the weapons they hold.
+  - **The mood hooks** (T6b): the Angry hook follows the drawn face, in the NPC's own scene and sight, never the
+    seat behind it.
+- 2026-10-30: grants. Each is listed in the pull request that uses it.
+  - 10B, B6d: the Final Night block of `flow.test.ts`, the four end-of-hunt cases of `trial.test.ts` and the kinds
+    list of `invariants.test.ts`, each rewritten to the end trial's.
+  - 10C, C4d: the `ledger.read` and `ledger` messages, one command-table case, the `ledger` kind's read verb in
+    `interactions.json`, the NPC read's `routines.json` rows and one line in `sim/npc/routine.ts`, and one case in
+    the A170 leak test.
+  - 10T, T6b: one call line in `sim/npc/routine.ts` `pickStation` and one in `sim/townsfolk/walk.ts`.
 
 ## Round 11 (planning, started 2026-10-29)
 
