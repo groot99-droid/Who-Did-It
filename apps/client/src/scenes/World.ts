@@ -26,6 +26,7 @@ import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
+import { type TalkAsk, TALK_KEYS, TALK_REACH_TILES, askedLine } from '../ui/talk/talk';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
@@ -468,6 +469,8 @@ export class World extends Phaser.Scene {
     for (const [code, slot] of Object.entries(ABILITY_SLOTS))
       input.bind(code, (down) => down && this.abilityKey(slot));
     input.bind('KeyX', (down) => down && this.strikeKey()); // round 8, 8A
+    for (const [code, ask] of Object.entries(TALK_KEYS))
+      input.bind(code, (down) => down && this.talkKey(ask)); // round 10, D9c
   }
 
   /**
@@ -574,6 +577,15 @@ export class World extends Phaser.Scene {
     if (row.id === 'kill') {
       this.feed.kill(near);
     } else this.feed.ability(row.id, near);
+  }
+
+  /** Round 10, D9c: G / H, ask the nearest avatar in reach about the town or the time; the server tells a figure from a seat. */
+  private talkKey(ask: TalkAsk): void {
+    if (this.feed.dead()) return;
+    const handle = this.nearestPlayer(TALK_REACH_TILES);
+    if (handle === null) return this.hud.say(C['refuse.nobody']);
+    this.feed.talk(handle, ask);
+    this.hud.toast(askedLine(ask), 'interact');
   }
 
   /** The handle of the avatar nearest to the own in reach: the Kill and the Bandage name a handle (GDD 3.17). */

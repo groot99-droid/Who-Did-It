@@ -35,5 +35,37 @@
     "Does anyone else smell bread?",
     "My feet are sore. Can we sit?",
     "Someone owes me a shilling."
-  ]
+  ],
+  "figures": {
+    "names": {
+      "clerk": "The Company Clerk",
+      "tallyman": "The Tallyman",
+      "constable": "A Constable",
+      "stallholder": "A stallholder",
+      "villager": "A villager"
+    },
+    "parts": {
+      "grace": "early in the day",
+      "day": "by day",
+      "dusk": "at dusk",
+      "night": "at night",
+      "finalNight": "on the last night"
+    },
+    "time": [
+      "It is {part}, as far as I can tell.",
+      "{part}, and the work does not do itself.",
+      "Ask me {part} and I will say the same: keep your head down.",
+      "The clocks agree on nothing. I say it is {part}."
+    ],
+    "town": [
+      "They say a figure in {look}'s look was seen in {scene}.",
+      "Somebody in {look}'s look was in {scene}. I only repeat it.",
+      "I heard of {look} being seen in {scene}. Make of it what you will."
+    ],
+    "quiet": [
+      "I have heard nothing worth the telling.",
+      "Nothing today. Ask me again later.",
+      "Quiet, for once. Which I do not like."
+    ]
+  }
 }
