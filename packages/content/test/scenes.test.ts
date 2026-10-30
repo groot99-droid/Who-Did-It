@@ -449,7 +449,7 @@ describe("Crumb's Ovens' station rooms (A116, A118)", () => {
       expect(s.lights?.length, id).toBeGreaterThan(0);
     }
   });
-  it('stand their station prop on a solid footprint, as a work station of the routines', () => {
+  it('stand their station prop on a solid footprint, as a bake station of the routines (day and night, round 10 x13)', () => {
     const station = {
       crumb_cold: 'coldShelves',
       crumb_mixing: 'doughMixer',
@@ -462,7 +462,8 @@ describe("Crumb's Ovens' station rooms (A116, A118)", () => {
         s.props.filter((p) => p.kind !== 'dressing').map((p) => p.kind),
         id,
       ).toEqual([station[id]]);
-      expect(routines.activities.work?.kinds, id).toContain(station[id]);
+      expect(routines.activities.bake?.kinds, id).toContain(station[id]);
+      expect(routines.activities.bake?.phases, id).toEqual(['day', 'night']);
       const f = s.props.find((p) => p.kind === station[id])!.footprint!;
       for (let y = f.y; y < f.y + f.h; y++)
         for (let x = f.x; x < f.x + f.w; x++) {

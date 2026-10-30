@@ -87,6 +87,7 @@ describe('routines.json (GDD 3.12)', () => {
       night: ['dusk', 'night', 'finalNight'],
     });
     expect(routines.activities.work?.phases).toEqual(['day']);
+    expect(routines.activities.bake?.phases).toEqual(['day', 'night']); // round 10, x13: the lit bakery rooms
     expect(routines.activities.social?.phases).toEqual(['day', 'night']);
     expect(routines.activities.rest?.phases).toEqual(['night']);
   });
