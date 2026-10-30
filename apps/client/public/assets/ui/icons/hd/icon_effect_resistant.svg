@@ -2,13 +2,13 @@
 <!-- Resistant: a loaf of herb bread with a leaf on it, the sign that a dish is working in you. -->
 <defs>
   <linearGradient id="g0" data-flat="#FFF1DC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF1DC"/><stop offset="1" stop-color="#D9D2C2"/></linearGradient>
-  <radialGradient id="g1" data-flat="#C98B4A" gradientUnits="userSpaceOnUse" cx="22" cy="24" r="19"><stop offset="0" stop-color="#E3A862"/><stop offset="1" stop-color="#C98B4A"/></radialGradient>
+  <radialGradient id="g1" data-flat="#DA9348" gradientUnits="userSpaceOnUse" cx="22" cy="24" r="19"><stop offset="0" stop-color="#DE9767"/><stop offset="1" stop-color="#DA9348"/></radialGradient>
 </defs>
 <rect x="1" y="1" width="46" height="46" rx="6" fill="url(#g0)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <rect class="hd" x="2" y="2" width="44" height="44" rx="5" fill="none" stroke="#B2AA99" stroke-width="2" opacity="0.5"/>
 <path d="M7,32 Q7,18 24,18 Q41,18 41,32 Q41,38 36,38 L12,38 Q7,38 7,32 Z" fill="url(#g1)" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M16,23 L19,31" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <path d="M24,22 L27,31" fill="none" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-<path d="M32,10 Q40,10 40,17 Q33,17 32,10 Z" fill="#4C8A4E" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M32,10 Q40,10 40,17 Q33,17 32,10 Z" fill="#4F8A4A" stroke="#12141C" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
 <ellipse class="hd" cx="15" cy="22" rx="4" ry="1.6" fill="#FFF1DC" opacity="0.6"/>
 </svg>
