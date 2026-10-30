@@ -70,6 +70,14 @@ export function releaseToSquare(room: PartyRoom, seat: string): void {
   if (m.held.has(seat)) release(room, m, seat, true);
 }
 
+/** B6a: the paused world resumed after a Tribunal, so every held seat's release tick moves by the pause. */
+export function rescheduleReleases(room: PartyRoom): void {
+  for (const seat of memoryOf(room).held.keys()) {
+    const priv = room.state.players.get(seat)?.priv;
+    if (priv) priv.jailUntilTick = nextReleaseTick(room);
+  }
+}
+
 /** The seconds until the releasing train, for `IN_JAIL {untilDawn}`. */
 export const untilDawnS = (room: PartyRoom, seat: string): number =>
   Math.max(

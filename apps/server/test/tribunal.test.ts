@@ -148,6 +148,11 @@ describe('the Tribunal (GDD 3.8, B6a)', () => {
     until(party, TribunalStep.none);
     expect(tribunalOpen(party.room)).toBe(false);
     expect(inCell(party, d)).toBe(true); // jailed until the morning train
+    // The pause moved the train: the held seat's own countdown is the resumed day's real release tick.
+    const ph = balance.phases;
+    expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(
+      party.room.state.phaseEndsTick + S(ph.duskS + ph.nightS + balance.train.arriveAtS),
+    );
     expect(party.room.state.phase).toBe(Phase.day);
     // The paused day keeps the seconds it had, less the walk.
     expect(party.room.state.phaseEndsTick - party.room.state.tick).toBeGreaterThan(

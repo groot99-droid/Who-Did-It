@@ -23,7 +23,7 @@ import { simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
 import { countsVote } from '../vendettas/conversion';
 import { isWorldPhase, reject } from '../World';
-import { inCell, isJailed, releaseToSquare, untilDawnS } from './Jail';
+import { inCell, isJailed, releaseToSquare, rescheduleReleases, untilDawnS } from './Jail';
 import { type Cuffed, cuffedOf } from './Manhunt';
 import { type WarrantEntry, attachable, backedEntry, graceAccused, publicAxis } from './Petition';
 
@@ -219,7 +219,10 @@ function close(room: PartyRoom, m: TribunalMemory): void {
   t.exclusions = 0;
   t.finding = TribunalFinding.none;
   t.sentence = TribunalSentence.none;
-  if (open && room.state.phase === Phase.tribunal) setPhase(room, open.resume.phase, open.resume.seconds);
+  if (open && room.state.phase === Phase.tribunal) {
+    setPhase(room, open.resume.phase, open.resume.seconds);
+    rescheduleReleases(room); // the pause moved the dawn and the train: the held seats' countdowns follow
+  }
 }
 
 /** The Tribunal's tick (inside `runLaw`, after the jail): an open on a placed cuff, the steps, the verdict, the end. */
