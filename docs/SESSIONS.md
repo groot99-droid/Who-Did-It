@@ -4165,6 +4165,17 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - 2026-10-30: 10X's x14, an invariant for the bot swarm: each seat's view is decoded through a shadow encoder, and
   every avatar a seat holds must exist on the server at the same place, every avatar the server shows the seat must be
   held, and no secret field may decode. It runs behind `pnpm auto -- --views`, off by default, after x13.
+- 2026-10-30: 10B splits B5 in two. B5a is the cell as content: `cj_cell`, a scene of a new kind, `jail`, that
+  belongs to no map and is listed for every map, with no hub reachability, no portals and its `cj.` ids appended.
+  B5b is the server, `sim/law/Jail.ts`: the walk to the cell (`jail.walkS`), the release on the morning train, and
+  the manifest naming the face that was cuffed. 6Z granted B5a the map checks in `validateWorld.ts`, the scene
+  schema's kind, three edits of `packages/content/test/scenes.test.ts` and the jail exclusion in `world.test.ts`.
+  `mapOf` returns the default map for a jail scene, so the tilemap and the Studio don't throw; a test pins it, and
+  WORLD.md 4.4 says the cell takes the default map's look on both maps. B5b is granted the `isPinned` skips in three
+  functions of `sim/Impersonate.ts` and the `enterScene` export.
+- 2026-10-30: merged y3 (#386), C5a (#391) and 6Z's docs (#395). 6Z checked C5a's tree again on y3's base before
+  merging it. C5b (#393) merges the base next: 6Z has read its own diff (the shared `paintTarget`, the card's goal and
+  the end tally) and found nothing blocking. B3c (#394) swaps its mode stub for `isPaintTown`.
 
 ## Round 11 (planning, started 2026-10-29)
 
