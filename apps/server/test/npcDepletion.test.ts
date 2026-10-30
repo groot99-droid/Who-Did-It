@@ -3,11 +3,12 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, interactions } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
-import { workable } from '../src/sim/npc/chores';
+import { otherAt, workable } from '../src/sim/npc/chores';
 import { npcMemory } from '../src/sim/npc/memory';
 import { type Station, stationsOf } from '../src/sim/npc/routine';
 import { mapScenesOf } from '../src/sim/MapSites';
 import { simOf } from '../src/sim/RoomSim';
+import { isVerbPhase } from '../src/sim/World';
 import {
   advance,
   allTownsfolk,
@@ -34,11 +35,11 @@ const savedDay = { ...weights.day };
 afterEach(() => void Object.assign(weights.day, savedDay));
 
 describe('depletion', () => {
-  it('every pile of the logic table comes back, and only a nailed crate stays open', () => {
+  it('every pile of the logic table comes back, and only a nailed crate and a picked lock stay open', () => {
     for (const [id, it] of Object.entries(interactions.interactions)) {
       if (it.after === undefined) continue;
       const stays = it.after.respawnS === null;
-      expect(stays, id).toBe(it.target === 'crateNailed');
+      expect(stays, id).toBe(['crateNailed', 'lockedDoor'].includes(it.target));
     }
   });
 
@@ -72,7 +73,13 @@ describe('depletion', () => {
     simOf(party.room).players.get(id)!.hold = null;
     holdPhase(party, Phase.day, 3600);
     advance(party, respawnS * TICK_RATE + 1);
-    expect(states.has(PILE)).toBe(false);
-    expect(workable(party.room, seat, st)).toBe(true);
+    // One assertion per condition of `workable`, so a failure names the one that flipped.
+    const body = party.room.state.players.get(id)!.priv.body;
+    const why = `phase ${party.room.state.phase}, hp ${body?.hp}, dead ${simOf(party.room).players.get(id)!.dead}`;
+    expect(isVerbPhase(party.room.state.phase), `verb phase (${why})`).toBe(true);
+    expect(states.has(PILE), `pile back (${why})`).toBe(false);
+    expect(count(seat, 'axe'), `axe held (${why})`).toBe(1);
+    expect(otherAt(party.room, id, PILE), `another seat holds the pile (${why})`).toBe(false);
+    expect(workable(party.room, seat, st), `workable (${why})`).toBe(true);
   });
 });

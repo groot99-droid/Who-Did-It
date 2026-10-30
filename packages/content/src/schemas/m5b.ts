@@ -105,7 +105,7 @@ export const QuestsFile = z.strictObject({
 export type QuestsFile = z.infer<typeof QuestsFile>;
 
 /** Mirrors the protocol's `MinigameKind`: the five station mini-games (GDD 3.16; `tap` is round 7's, 7M). */
-export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap']);
+export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap', 'lockpick']);
 
 export const MinigameDef = z.strictObject({
   id: Id,
