@@ -1,5 +1,5 @@
-import { abilities, balance, roles } from '@wdi/content';
-import { NotebookEntry, NotebookStatus, S2C, TICK_RATE, TILE_PX, type PlayerState } from '@wdi/shared';
+import { abilities, balance } from '@wdi/content';
+import { NotebookStatus, TICK_RATE, TILE_PX, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { bodyBlocksAct } from './body/run';
 import { type PlayerSim, simOf } from './RoomSim';
@@ -16,6 +16,8 @@ import { handleInteract, tickInteract } from './interact/resolve';
 import { handleSleepHold } from './Sleep';
 import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
+import { PLANT_HOLD, handleInspectHold, runEvidence, tickInspect, tickPlant } from './verbs/evidence';
+import { writeClueEntry } from './verbs/notebook';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -78,6 +80,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
   if (action === 'errand') return handleErrandHold(room, sessionId, targetId); // round 10, C2b (GDD 3.23)
   if (action === 'cuff') return handleCuffHold(room, sessionId, targetId); // round 10, B4 (GDD 3.31)
+  if (action === 'inspect') return handleInspectHold(room, sessionId, targetId); // round 10, V1a (GDD 3.2)
   // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
   if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     const via = typeof payload.via === 'string' && payload.via.length <= 64 ? payload.via : undefined;
@@ -99,6 +102,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
 
 /** Re-validates every hold each tick (ARCHITECTURE 5.6) and completes the ones whose cast has run. */
 export function runHolds(room: PartyRoom): void {
+  runEvidence(room); // round 10, V1a: the Lens refill at dawn and `lensCharges` (sim/verbs/evidence.ts)
   const tick = room.state.tick;
   const castTicks = Math.round(
     (abilities.abilities.collect?.castS ?? balance.clues.collectHoldS) * TICK_RATE,
@@ -119,6 +123,14 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'cuff') {
       tickCuff(room, sessionId, p); // round 10, B4
+      continue;
+    }
+    if (hold.action === 'inspect') {
+      tickInspect(room, sessionId, p); // round 10, V1a: the Lens Inspect
+      continue;
+    }
+    if (hold.action === PLANT_HOLD) {
+      tickPlant(room, sessionId, p); // round 10, V1a: Plant Clue's cast
       continue;
     }
     if (hold.action === 'interact') {
@@ -161,18 +173,7 @@ function completeCollect(
   if (!clue || !meta || meta.collectors.has(sessionId)) return;
   meta.collectors.add(sessionId);
   clue.claimed = true;
-  const verified = roles.roles[player.priv.role.roleId]?.abilities.includes('inspect') === true;
-  const entry = new NotebookEntry();
-  entry.id = `entry_${++p.entrySeq}`;
-  entry.clueKind = clue.kind;
-  entry.value = clue.value;
-  entry.sceneId = p.sceneIdx;
-  entry.tick = room.state.tick;
-  entry.status = verified
-    ? NotebookStatus.verified
-    : clueId === CLUE_TEACHING
-      ? NotebookStatus.teaching
-      : NotebookStatus.claimed;
-  player.priv.notebook.push(entry);
-  room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
+  // Round 10, V1a: a collect is Claimed for every card; only a Lens Inspect verifies (or reads a plant Forged).
+  const status = clueId === CLUE_TEACHING ? NotebookStatus.teaching : NotebookStatus.claimed;
+  writeClueEntry(room, sessionId, player, p, clue, meta, status);
 }

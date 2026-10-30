@@ -244,7 +244,8 @@ export interface C2SPayloads {
    * `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat`
    * (Impersonate, the night powers, Last Shot) a seat id.
    */
-  'act.ability': { abilityId: string; targetId?: string };
+  /** `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. */
+  'act.ability': { abilityId: string; targetId?: string; kind?: string; value?: number };
   /** Re-validated every tick. */
   /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
   'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
