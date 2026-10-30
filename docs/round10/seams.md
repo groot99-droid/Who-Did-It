@@ -93,6 +93,7 @@ the later session builds on the merged earlier one and does not reshape it.
 - **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.50, 10C 14.47, 10D 14.48, 10E 14.49, 10Y 14.51,
   10X 14.52. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
   cites it, so 10B's copy moved to 14.50 (2026-10-30). A fix to another session's copy edits that line in place.
+  A session's copy on a further topic goes in a `####` subsection of its own section, never under a new number.
   Sections stay in number order in section 14.
 
 ## 6. Invariants and checks
