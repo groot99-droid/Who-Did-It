@@ -24,7 +24,6 @@ export const WORLD_COPY = {
   'prompt.ability': '{ability} {target}',
   'prompt.ability.cooldown': '{ability} in {s} s',
   'touch.use': 'Use',
-  'touch.act': 'Act',
   'touch.run': 'Run',
   'touch.sneak': 'Sneak',
 

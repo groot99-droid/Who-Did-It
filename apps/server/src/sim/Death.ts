@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { rehandle } from './Avatars';
 import { beginAim } from './NightPowers';
 import { emitSim } from './events/bus';
+import { onPaintDeath } from './paintTown';
 import { simOf } from './RoomSim';
 import { boardLine, returnsOnTrain } from './Train';
 import { sceneKey } from './World';
@@ -28,7 +29,8 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
       : { playerId: victimId, cause, killerId, tick: room.state.tick },
   );
   sim.viewsDirty = true;
-  const onLine = returnsOnTrain(room, cause);
+  onPaintDeath(room, victimId, cause, killerId); // round 10, C5: Paint The Town Red's counts (room memory only)
+  const onLine = returnsOnTrain(room, cause, victimId);
   const data = { cause, by: killerId, ...(onLine && { onLine }) };
   emitSim(room, { tick: room.state.tick, kind: 'death', seat: victimId, data }); // 6B
   rehandle(room, victimId, false);
