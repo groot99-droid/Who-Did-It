@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { BUILD_VERSION } from '@wdi/shared';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { formatDataJson } from '../src/services/studioSave';
 import {
   MAX_LOG_LINES,
@@ -13,6 +13,11 @@ import {
 } from '../src/services/studioRoutes';
 import { FAKE_TOKEN } from './fakeGitHub';
 import { T0, bearer, harness } from './studioHttpHelpers';
+
+// Round 10, 10X (x12): the draft route's rate-limit test sends DRAFTS_PER_HOUR scenes and the route checks each
+// against the whole content set (about 3 s alone), so vitest's 5 s default timed it out on a loaded machine while
+// CI passed. The budget the other route-heavy suites use; the test itself has no clock in it.
+vi.setConfig({ testTimeout: 30_000 });
 
 /** A PNG signature followed by `extra` bytes, as base64. */
 const png = (extra = 16) =>
