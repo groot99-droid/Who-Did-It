@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { applyEffect, cureEffect } from './body/effects';
 import { bodies, bodyOf } from './body/state';
 import { emitSim } from './events/bus';
+import { onManhunt } from './law/Manhunt';
 
 /**
  * What a night's sleep gives and what staying up costs (round 10, A7b, GDD 3.32; docs/round9/world-mode.md 7.3,
@@ -38,8 +39,6 @@ function restOf(room: PartyRoom): Rest {
 
 /** Not built yet (the Defrocked sentence): no seat is barred from the chapel. */
 const chapelBarred = (_room: PartyRoom, _seat: string): boolean => false;
-/** Not built yet (B4): no seat is on a manhunt. */
-const onManhunt = (_room: PartyRoom, _seat: string): boolean => false;
 
 /** A card holding a power usable in the night phase (`abilities.json` `phases`, the gate of `NightPowers.ts`). */
 function hasNightPower(room: PartyRoom, seat: string): boolean {
