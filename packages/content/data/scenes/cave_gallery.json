@@ -85,7 +85,8 @@
     { "id": "cg.pit_prop_2", "kind": "dressing", "x": 2, "y": 15 },
     { "id": "cg.pit_prop_3", "kind": "dressing", "x": 29, "y": 2 },
     { "id": "cg.rubble_0", "kind": "dressing", "x": 31, "y": 18 },
-    { "id": "cg.rubble_1", "kind": "dressing", "x": 33, "y": 17 }
+    { "id": "cg.rubble_1", "kind": "dressing", "x": 33, "y": 17 },
+    { "id": "cg.barrel", "kind": "dressing", "x": 3, "y": 3 }
   ],
   "gates": [],
   "paths": [
@@ -156,7 +157,7 @@
     "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXXXXrrXXXXrXXXXXXXXXXXXXXX",
     "XXXXXXXXXXXXXXXrrrrrrrrrrXXrXPXXrXXXXXXX",
-    "XXXXXXXXrXXXXXXrPrrrrrrPrXXrrrrrrrrrrrrX",
+    "XXXPXXXXrXXXXXXrPrrrrrrPrXXrrrrrrrrrrrrX",
     "XXr~~~~~~~~~~~XrrrrrrrrrrXXrrrrrRrPPrrXX",
     "XXX~OOOOOOOOO~XrrrrrPrrrrrXrrrrrrrPPrrrX",
     "XXX~OOOOOOOOO~Xrrrrr=rrrrXXrrrrrrrPPrrrX",

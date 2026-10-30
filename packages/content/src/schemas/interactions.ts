@@ -36,6 +36,8 @@ export const ClassMatch = z
     resource: Id.optional(),
     /** Every portal with a `lock`. */
     portalLock: z.literal(true).optional(),
+    /** Round 10 (S1): every `dressing` or `decor` prop with this census decision that no other class takes. */
+    census: z.enum(['live', 'interact', 'container', 'keep']).optional(),
   })
   .refine((m) => Object.keys(m).length > 0, 'a class matches something');
 
@@ -111,9 +113,46 @@ export const LootTable = z.strictObject({
   rolls: Qty,
   /** Weights are relative; a null item is the empty draw. */
   entries: z
-    .array(z.strictObject({ item: Id.nullable(), w: z.number().positive(), qty: Qty.optional() }))
+    .array(
+      z.strictObject({
+        item: Id.nullable(),
+        w: z.number().positive(),
+        qty: Qty.optional(),
+        /** Round 10 (S1): the lowest container tier that may draw this entry (logic-table.md 6.2). Default 1. */
+        tier: z.number().int().min(1).max(3).optional(),
+      }),
+    )
     .min(1),
 });
+
+/**
+ * Round 10 (S1; logic-table.md 6.2 to 6.4, GDD 3.14): which containers hold loot in a match, and from which table.
+ * `themes` and `stems` map a table to the scenes or stems that draw from it, split by spaces; a stem's table wins.
+ */
+export const ContainerRules = z.strictObject({
+  /** Classes whose props are furniture unless dealt active. */
+  classes: z.array(ClassId).min(1),
+  /** Classes whose verb works on every prop, and whose active props also give their contents. */
+  stocked: z.array(ClassId),
+  /** The locked classes: capped per scene, spaced apart and never below `chestMinTier`. */
+  chestGrade: z.array(ClassId),
+  activeFrac: z.number().gt(0).max(1),
+  keepClearTiles: z.number().min(0),
+  minSpacingTiles: z.number().min(0),
+  chestCap: z.strictObject({
+    interior: z.number().int().min(0),
+    exterior: z.number().int().min(0),
+    exteriorMinFloor: z.number().int().min(0),
+  }),
+  /** The most portal hops from the hub that are still tier 1, and tier 2; more is tier 3, as is a dark cave. */
+  tierHops: z.tuple([z.number().int().min(0), z.number().int().min(0)]),
+  chestMinTier: z.number().int().min(1).max(3),
+  /** The line an empty search gives its searcher. */
+  empty: z.string().min(1),
+  themes: z.record(Id, z.string().regex(/^[a-z][a-z_ ]*$/)),
+  stems: z.record(Id, z.string().regex(/^[a-z][a-z0-9_ ]*$/)),
+});
+export type ContainerRules = z.infer<typeof ContainerRules>;
 
 /**
  * The census decision of every placed prop (logic-table.md 5): `live` the sim reads it today, `interact` a tool, a
@@ -131,6 +170,7 @@ export const InteractionsFile = z.strictObject({
   classes: z.record(ClassId, InteractionClass),
   interactions: z.record(Id, Interaction),
   lootTables: z.record(Id, LootTable),
+  containers: ContainerRules,
   census: z.strictObject({ kinds: CensusLists, stems: CensusLists }),
 });
 export type InteractionsFile = z.infer<typeof InteractionsFile>;
@@ -160,14 +200,22 @@ export function decideProp(
     : censusMap(file.census.kinds).get(prop.kind);
 }
 
-/** The ids of every class whose match takes this prop; a valid table gives at most one. */
+/**
+ * The ids of every class whose match takes this prop; a valid table gives at most one. A class matching by census
+ * decision takes a stem prop only when no class names it.
+ */
 export function classesOfProp(file: InteractionsFile, prop: { id: string; kind: string }): string[] {
   const stem = STEM_KINDS.has(prop.kind) ? propStem(prop.id) : undefined;
-  return Object.entries(file.classes)
+  const named = Object.entries(file.classes)
     .filter(
       ([, c]) =>
         (c.match.kinds?.includes(prop.kind) ?? false) ||
         (stem !== undefined && (c.match.stems?.includes(stem) ?? false)),
     )
+    .map(([id]) => id);
+  if (named.length > 0 || stem === undefined) return named;
+  const decision = decideProp(file, prop);
+  return Object.entries(file.classes)
+    .filter(([, c]) => c.match.census !== undefined && c.match.census === decision)
     .map(([id]) => id);
 }

@@ -147,7 +147,9 @@
     { "id": "fo.stump_3", "kind": "dressing", "x": 24, "y": 23 },
     { "id": "fo.lantern_pole", "kind": "dressing", "x": 21, "y": 22 },
     { "id": "fo.mushrooms_4", "kind": "dressing", "x": 18, "y": 21 },
-    { "id": "fo.shop_stall", "kind": "counter", "x": 16, "y": 23 }
+    { "id": "fo.shop_stall", "kind": "counter", "x": 16, "y": 23 },
+    { "id": "fo.bottle_crate", "kind": "dressing", "x": 13, "y": 17 },
+    { "id": "fo.barrel", "kind": "dressing", "x": 20, "y": 10 }
   ],
   "gates": [],
   "paths": [
@@ -279,14 +281,14 @@
     "TlllllpllllllllllllllllllllllllllllllllT",
     "TllllPpllllllllllllTTllllllllllllllTTTlT",
     "TllTTTTllllllllllllTTllllllllllllllTTTlT",
-    "TllTTTTllllTTTlllllPTlllllTTTTlllllllllT",
+    "TllTTTTllllTTTlllllPPlllllTTTTlllllllllT",
     "TlllllpllllTTTllllllllllllTTTTllllPllllT",
     "TlllllpPlllTTTllPllllPlllllPlllllllllllT",
     "TlllllpppppppppppppppppppppppppppppppplT",
     "TllllllllPllllllllllplllPllllllPlTTTlllT",
     "TlPllTTlllllllllllllpllllllllllllTTTlllT",
     "TppppTTlllllPTTTlllPpllllllllllllTTTlllT",
-    "TllllTTllllllTTTllllpllllllTTllllllllllT",
+    "TllllTTllllllPTTllllpllllllTTllllllllllT",
     "TllPlTTlllllllllllllpPlllllTTllllllllllT",
     "TlllllllllPlllllllllpllllllTTlllllluuulT",
     "TlllllllllllllllllllplllllllllllllluuulT",

@@ -53,6 +53,11 @@
     "crateNailed": {
       "name": "Nailed crate",
       "match": { "stems": ["crates", "crate", "tin_crate", "bottle_crate"] }
+    },
+    "containerOpen": { "name": "Open container", "match": { "census": "container" } },
+    "containerLocked": {
+      "name": "Locked container",
+      "match": { "stems": ["footlocker", "blanket_chest", "safe", "tin_cabinet", "tin_cabinet_b"] }
     }
   },
   "interactions": {
@@ -355,9 +360,185 @@
         "NOTHING_THERE": "The lock is already open."
       },
       "ships": "V1.5"
+    },
+    "searchContainer": {
+      "verb": "search",
+      "label": "Search",
+      "target": "containerOpen",
+      "handler": "search",
+      "status": "nfy",
+      "feature": "containers",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "holdS": 2 }],
+      "after": { "state": "searched", "respawnS": null },
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "Somebody has been through it already." },
+      "ships": "V1"
+    },
+    "pickContainer": {
+      "verb": "pick",
+      "label": "Pick the lock",
+      "target": "containerLocked",
+      "handler": "lock",
+      "status": "nfy",
+      "feature": "containers",
+      "phases": ["day", "night"],
+      "modes": [
+        { "tool": { "tag": "pick", "tier": 1 }, "minigame": "lockpick", "noise": "lockpick" }
+      ],
+      "after": { "state": "open", "respawnS": null },
+      "ownership": "owned",
+      "crime": "theft",
+      "fail": {
+        "NEED_TOOL": "It is locked. A pick or a bar would open it.",
+        "NOTHING_THERE": "It stands open, and empty."
+      },
+      "ships": "V1"
+    },
+    "pryContainer": {
+      "verb": "pry",
+      "label": "Force the lid",
+      "target": "containerLocked",
+      "handler": "stock",
+      "status": "nfy",
+      "feature": "containers",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": { "tag": "pry", "tier": 1 }, "holdS": 4, "wear": 1, "noise": "crowbar" }],
+      "after": { "state": "broken", "respawnS": null },
+      "ownership": "owned",
+      "crime": "vandalism",
+      "fail": {
+        "NEED_TOOL": "It is locked. A pick or a bar would open it.",
+        "NOTHING_THERE": "It stands open, and empty."
+      },
+      "ships": "V1"
     }
   },
-  "lootTables": {},
+  "lootTables": {
+    "stores": {
+      "name": "Stores",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "candle", "w": 3 },
+        { "item": "rope", "w": 2 },
+        { "item": "flour", "w": 2 },
+        { "item": null, "w": 8 }
+      ]
+    },
+    "pantry": {
+      "name": "Pantry",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "flour", "w": 4, "qty": [1, 2] },
+        { "item": "wakeLoaf", "w": 2 },
+        { "item": null, "w": 6 }
+      ]
+    },
+    "apothecary": {
+      "name": "Apothecary",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "herb", "w": 4, "qty": [1, 2] },
+        { "item": "bandage", "w": 3 },
+        { "item": "salts", "w": 2 },
+        { "item": "medkit", "w": 1, "tier": 2 },
+        { "item": null, "w": 5 }
+      ]
+    },
+    "toolshed": {
+      "name": "Tool shed",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "planks", "w": 3, "qty": [1, 2] },
+        { "item": "rope", "w": 2 },
+        { "item": "spade", "w": 1 },
+        { "item": "axe", "w": 1, "tier": 2 },
+        { "item": null, "w": 6 }
+      ]
+    },
+    "mineStash": {
+      "name": "Miner's stash",
+      "rolls": [1, 2],
+      "entries": [
+        { "item": "tinOre", "w": 4, "qty": [1, 2] },
+        { "item": "stone", "w": 4, "qty": [1, 2] },
+        { "item": "lockpicks", "w": 1, "tier": 2 },
+        { "item": "pickaxe", "w": 1, "tier": 3 },
+        { "item": null, "w": 4 }
+      ]
+    },
+    "domestic": {
+      "name": "Household",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "candle", "w": 3 },
+        { "item": "letter", "w": 2 },
+        { "item": "chalk", "w": 2 },
+        { "item": null, "w": 5 }
+      ]
+    },
+    "valuables": {
+      "name": "Valuables",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "heirloom", "w": 2 },
+        { "item": "pocketWatch", "w": 2 },
+        { "item": "indulgence", "w": 1, "tier": 3 },
+        { "item": null, "w": 4 }
+      ]
+    },
+    "armoury": {
+      "name": "Armoury",
+      "rolls": [1, 1],
+      "entries": [
+        { "item": "quiltedCoat", "w": 2 },
+        { "item": "rope", "w": 1 },
+        { "item": "axe", "w": 1 },
+        { "item": "leatherJerkin", "w": 1, "tier": 3 },
+        { "item": null, "w": 4 }
+      ]
+    },
+    "lore": {
+      "name": "Lore",
+      "rolls": [1, 1],
+      "entries": [{ "item": "letter", "w": 1 }, { "item": null, "w": 4 }]
+    },
+    "forager": {
+      "name": "Forager",
+      "rolls": [1, 2],
+      "entries": [
+        { "item": "herb", "w": 3 },
+        { "item": "mushroom", "w": 3 },
+        { "item": "resin", "w": 2 },
+        { "item": "snare", "w": 1, "tier": 2 },
+        { "item": null, "w": 4 }
+      ]
+    }
+  },
+  "containers": {
+    "classes": ["containerOpen", "containerLocked"],
+    "stocked": ["crateNailed"],
+    "chestGrade": ["containerLocked"],
+    "activeFrac": 0.3,
+    "keepClearTiles": 3,
+    "minSpacingTiles": 6,
+    "chestCap": { "interior": 1, "exterior": 2, "exteriorMinFloor": 600 },
+    "tierHops": [1, 3],
+    "chestMinTier": 2,
+    "empty": "Only dregs and cobwebs.",
+    "themes": {
+      "stores": "overworld cellar chapel",
+      "apothecary": "apoth_shop apoth_loft",
+      "pantry": "bakery tavern_bar tavern_back crumb_cold crumb_mixing crumb_oven crumb_proofing",
+      "toolshed": "barn bp_camp bp_mill bp_woods",
+      "mineStash": "bp_mine bp_deep cave_entry cave_gallery",
+      "domestic": "widow_bedroom widow_parlour manor_upper",
+      "valuables": "manor_hall bp_office",
+      "armoury": "bp_lodge bp_smithy",
+      "forager": "forest forest_deep"
+    },
+    "stems": { "lore": "bookcase bookcase_b ossuary bones" }
+  },
   "census": {
     "kinds": {
       "live": [

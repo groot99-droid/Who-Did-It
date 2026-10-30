@@ -1969,3 +1969,12 @@ lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy 
 is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
 mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
 Tab shows it; a real room has the private view from the join).
+
+### 14.55 Containers (10F, round 10, S1)
+
+The words of containers (GDD 3.14, `docs/round9/logic-table.md` 6), all in `interactions.json`: the prompts are the
+interactions' labels, "Search" (`searchContainer`), "Pick the lock" (`pickContainer`) and "Force the lid"
+(`pryContainer`). A searched container answers `NOTHING_THERE` with "Somebody has been through it already."; a locked
+one answers `NEED_TOOL` with "It is locked. A pick or a bar would open it." and, once open, "It stands open, and empty."
+An empty search is not a refusal: the searcher alone reads the system line "Only dregs and cobwebs."
+(`containers.empty`). What a container held shows only in the opener's inventory; no line names it.

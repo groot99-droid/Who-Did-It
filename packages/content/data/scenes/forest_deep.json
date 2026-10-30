@@ -129,7 +129,9 @@
     { "id": "fd.boulder_2", "kind": "dressing", "x": 5, "y": 33 },
     { "id": "fd.stump_1", "kind": "dressing", "x": 38, "y": 29 },
     { "id": "fd.mushrooms_2", "kind": "dressing", "x": 37, "y": 28 },
-    { "id": "fd.fern_4", "kind": "dressing", "x": 26, "y": 24 }
+    { "id": "fd.fern_4", "kind": "dressing", "x": 26, "y": 24 },
+    { "id": "fd.barrel", "kind": "dressing", "x": 30, "y": 33 },
+    { "id": "fd.blanket_chest", "kind": "dressing", "x": 18, "y": 19 }
   ],
   "gates": [],
   "paths": [
@@ -274,7 +276,7 @@
     "TTTTTTTTTTTTTTTTTTTggggPPgggggTlTTlTlTTullTTTTTT",
     "TTTTTTTTTTTTTTTTTTTggggggggggglllPlllllllluPlllT",
     "TTTTTTTTTTTTTTTTTTTugRgggggggglTlllllllllllllllT",
-    "TTTTTTTTTTTTTTTTTTTgPggggggggglllllllllllllllllT",
+    "TTTTTTTTTTTTTTTTTTPgPggggggggglllllllllllllllllT",
     "TTTTTTTTTTTTTTTTTTggggggggggTgTTlTTTTTTTTTTlTTTT",
     "TTTTTTTTTTuTgTTTTTTgwwgglllllgTTTTTTTTTTTTTTTTTT",
     "TgggggggggggguguggggwwgTlllllTTTTTTTTTTTTTTTTTTT",
@@ -288,7 +290,7 @@
     "TT~OOOOO~~P~~~~~~~~~~~~TTTTTllTTTTTTTTTTTTTTllTT",
     "TT~OOOOO~~~~~~OOOOOOO~~TTTTTlTTTTTTTTTTTuTlTllTT",
     "TT~OOOOO~~~~~~~OOOOOO~~TTTTTlllllllllllllllllTTT",
-    "TuuuuPu~~~~~~~~OOOOOO~~TTTTTTlTTTTllTTTTTTTTTTTT",
+    "TuuuuPu~~~~~~~~OOOOOO~~TTTTTTlPTTTllTTTTTTTTTTTT",
     "TTuuuuu~~~~~~~~~~~~~~~~TTTTTTTTTTTTTTTTTTTTTTTTT",
     "TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT"
   ]
