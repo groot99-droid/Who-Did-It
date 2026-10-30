@@ -3,7 +3,7 @@ import { ErrorCode, Phase } from '@wdi/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server';
 import { ACT_TICKS, act, errorCodes, setPhase } from './killHelpers';
-import { startMatch } from './simHelpers';
+import { startMatch, stateOf } from './simHelpers';
 
 /**
  * Round 10, x16: `act` waits for the room's tick, not the wall clock. The server and the bots share this process's
@@ -42,11 +42,11 @@ describe('act() waits for the room, not the clock (x16)', () => {
     const m = await startMatch(colyseus, 1);
     setPhase(m, Phase.day);
     const a = m.bots[0]!;
-    const seen = a.room.state.tick;
+    const seen = stateOf(a).tick;
     const t0 = Date.now();
     await act(a, 'act.payRent', {});
     expect(Date.now() - t0).toBeGreaterThanOrEqual(200);
-    expect(a.room.state.tick - seen).toBeGreaterThan(ACT_TICKS);
+    expect(stateOf(a).tick - seen).toBeGreaterThan(ACT_TICKS);
     expect(errorCodes(a)).toContain(ErrorCode.outOfRange);
   });
 });

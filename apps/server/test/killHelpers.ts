@@ -4,7 +4,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { type MeetingRequest, type DeathEvent, simOf } from '../src/sim/RoomSim';
 import { sceneIndex } from '../src/sim/World';
 import { until } from './flowHelpers';
-import { type Bot, type Match, sleep, standAt } from './simHelpers';
+import { type Bot, type Match, sleep, standAt, stateOf } from './simHelpers';
 
 export { sleep };
 
@@ -72,10 +72,10 @@ export const ACT_TICK_WAIT_MS = 2000;
 export async function act(bot: Bot, type: string, payload: unknown, ms = 200): Promise<void> {
   bot.room.send(type, payload);
   const sentAt = Date.now();
-  const seen = bot.room.state.tick;
-  if (await until(() => bot.room.state.tick >= seen + ACT_TICKS, ACT_TICK_WAIT_MS)) {
-    const after = bot.room.state.tick;
-    await until(() => bot.room.state.tick > after, ACT_TICK_WAIT_MS);
+  const seen = stateOf(bot).tick;
+  if (await until(() => stateOf(bot).tick >= seen + ACT_TICKS, ACT_TICK_WAIT_MS)) {
+    const after = stateOf(bot).tick;
+    await until(() => stateOf(bot).tick > after, ACT_TICK_WAIT_MS);
   }
   const left = ms - (Date.now() - sentAt);
   if (left > 0) await sleep(left);
