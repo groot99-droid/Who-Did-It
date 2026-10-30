@@ -1,0 +1,190 @@
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ColyseusTestServer } from '@colyseus/testing';
+import { balance } from '@wdi/content';
+import { NoteKind, S2C } from '@wdi/shared';
+import type { PartyRoom } from '../src/rooms/PartyRoom';
+import { isNpcSeat } from '../src/sim/Npc';
+import { MatchSeeds, type SeedWords } from '../src/sim/seeds';
+import {
+  HITMAN_ARRIVE_LINE,
+  arrivalDraw,
+  drawArrival,
+  forceArrival,
+  isTurned,
+  onDeliveryArrival,
+} from '../src/sim/vendettas/arrival';
+import { vendettaOf } from '../src/sim/vendettas/state';
+import { openContract } from '../src/sim/vendettas/contract';
+import { type Party, bootNpcServer, lobbyOf, npcIdsOf, standardParty } from './npcHelpers';
+import { sleep } from './simHelpers';
+
+/** Round 10, C4a (GDD 3.33; world-mode.md 1.5, followup-4 2.6; seams.md 3 row 20): the Hitman's arrival. */
+
+let colyseus: ColyseusTestServer;
+let release: () => Promise<void>;
+beforeAll(async () => ({ colyseus, release } = await bootNpcServer()));
+afterAll(async () => release());
+beforeEach(async () => colyseus.cleanup());
+vi.setConfig({ testTimeout: 60_000 });
+
+/** The parts of a room the draw reads: the streams and the seats (none of them NPC seats). */
+const fakeRoom = (seed: number): PartyRoom =>
+  ({
+    seeds: new MatchSeeds({ hitman: [seed, 0x9e3779b9, seed ^ 0x5bd1e995, 0x2545f491] as SeedWords }),
+  }) as never;
+const humans = (n: number) => Array.from({ length: n }, (_, i) => `h${i}`);
+
+describe('the draw (world-mode.md 1.5, F4 a12, a13)', () => {
+  it('follows hitman.byHumans: never below 3 humans, days 3 to 5, the human column', () => {
+    for (const n of [1, 2]) {
+      const room = fakeRoom(n);
+      drawArrival(room, humans(n));
+      expect(arrivalDraw(room)?.day).toBeNull();
+    }
+    const N = 3000;
+    for (const [count, row] of Object.entries(balance.hitman.byHumans)) {
+      let comes = 0;
+      let human = 0;
+      const days = new Set<number>();
+      for (let s = 1; s <= N; s++) {
+        const room = fakeRoom(s * 7919 + Number(count));
+        drawArrival(room, humans(Number(count)));
+        const d = arrivalDraw(room)!;
+        if (d.day === null) continue;
+        comes++;
+        days.add(d.day);
+        if (d.human) human++;
+      }
+      expect(Math.abs(comes / N - row.comes), `comes at ${count}`).toBeLessThan(0.04);
+      if (comes > 0) expect(Math.abs(human / comes - row.human), `human at ${count}`).toBeLessThan(0.05);
+      expect([...days].sort()).toEqual([3, 4, 5]);
+    }
+  });
+});
+
+/** Three humans and the S1 NPC seats by day: the main mode. */
+const mainParty = () => standardParty(colyseus, 'S1', false, 3);
+
+type Row = { priv?: { hitman?: boolean; notebook: { note: number }[] }; presence?: unknown };
+/** A client's decoded roster, as plain rows (the client room's state is untyped). */
+const rosterOf = (h: Party['humans'][number]) =>
+  (h.room.state as { players: { toJSON(): Record<string, Row> } }).players.toJSON();
+
+/** Every other seat's public row as each client decodes it, `priv` and `presence` aside. */
+const publicRows = (party: Party): string[] =>
+  party.humans.map((h) =>
+    JSON.stringify(
+      Object.entries(rosterOf(h)).flatMap(([id, { priv: _p, presence: _q, ...rest }]) =>
+        id === h.id ? [] : [[id, rest]],
+      ),
+    ),
+  );
+
+const linesOf = (party: Party) =>
+  party.humans.map((h) =>
+    h.log
+      .filter((e) => e.type === S2C.chatMsg)
+      .map((e) => (e.payload as { text: string }).text)
+      .filter((t) => t === HITMAN_ARRIVE_LINE),
+  );
+
+/** Forces the arrival on today's round and runs the delivery; returns the turned seat. */
+async function turn(party: Party, human: boolean): Promise<string | null> {
+  const room = party.room;
+  forceArrival(room, room.state.round, human);
+  onDeliveryArrival(room, room.state.round);
+  await sleep(200);
+  return [...room.state.players.keys()].find((id) => isTurned(room, id)) ?? null;
+}
+
+describe('the turning (seams.md 3 row 20)', () => {
+  it('turns an eligible human: own view only, the mark in its own Notebook, no public field moves', async () => {
+    const party = await mainParty();
+    const room = party.room;
+    await sleep(200);
+    const before = publicRows(party);
+    const seat = await turn(party, true);
+    expect(seat).not.toBeNull();
+    expect(isNpcSeat(room, seat!)).toBe(false);
+    expect(['killer', 'accomplice']).not.toContain(room.state.players.get(seat!)!.priv.role.roleId);
+    expect(vendettaOf(room, seat!)?.id).toBe('hitman');
+    expect(publicRows(party)).toEqual(before);
+    for (const h of party.humans) {
+      const own = rosterOf(h)[h.id]?.priv;
+      expect(own?.hitman === true, h.id).toBe(h.id === seat);
+      expect(own?.notebook.some((n) => n.note === NoteKind.contract)).toBe(h.id === seat);
+    }
+    const mark = openContract(room, seat!)!.target;
+    expect(isNpcSeat(room, mark)).toBe(false); // a human mark while one is free
+    expect(linesOf(party)).toEqual(party.humans.map(() => [HITMAN_ARRIVE_LINE]));
+  });
+
+  it('turns an NPC seat with the same sign, once; sends nothing when he does not come', async () => {
+    const party = await mainParty();
+    const seat = await turn(party, false);
+    expect(seat !== null && isNpcSeat(party.room, seat)).toBe(true);
+    expect(linesOf(party)).toEqual(party.humans.map(() => [HITMAN_ARRIVE_LINE]));
+    onDeliveryArrival(party.room, party.room.state.round); // once only
+    drawArrival(party.room, []); // no humans: he never comes
+    onDeliveryArrival(party.room, party.room.state.round);
+    await sleep(200);
+    expect(linesOf(party).flat()).toHaveLength(party.humans.length);
+  });
+
+  it('turns no cover, Cabal or Thief card, and none holding a vendetta; with none eligible he never comes', async () => {
+    const party = await mainParty();
+    const room = party.room;
+    const others = ['drifter', 'thief', 'killer', 'accomplice'];
+    [...room.state.players.values()].forEach((p, i) => (p.priv.role.roleId = others[i % 4]!));
+    expect(await turn(party, true)).toBeNull();
+    expect(linesOf(party).flat()).toEqual([]);
+  });
+});
+
+describe('the human chance is a ceiling (A350)', () => {
+  it('an NPC draw with no NPC seat eligible turns nobody, even with a human eligible', async () => {
+    const party = await mainParty();
+    for (const [id, p] of party.room.state.players)
+      if (isNpcSeat(party.room, id)) p.priv.role.roleId = 'drifter';
+    expect(await turn(party, false)).toBeNull();
+    expect(linesOf(party).flat()).toEqual([]);
+  });
+});
+
+describe('stream isolation (sim/seeds.ts)', () => {
+  it('leaves the deal, the names and every public stream the same with the arrival forced on and off', async () => {
+    const snap = async (on: boolean) => {
+      const party = await mainParty();
+      const room = party.room;
+      if (on) await turn(party, true);
+      // The NPC names are drawn in the lobby, before the deal, on `npcNames` (not fixed by `standardParty`).
+      const seats = [...room.state.players.values()].map((p) => [
+        p.priv.role.roleId,
+        p.look,
+        p.traits.height,
+      ]);
+      const streams = ['deal', 'traits', 'nodes', 'mobs', 'events', 'minigame', 'vendetta'] as const;
+      const draws = streams.map((n) => room.seeds.get(n)());
+      for (const id of npcIdsOf('S1'))
+        draws.push(room.seeds.get('npcPlay', id)(), room.seeds.get('npcTiming', id)());
+      return JSON.stringify({ seats, draws });
+    };
+    expect(await snap(true)).toBe(await snap(false));
+  });
+});
+
+describe('the debug hook (WDI_DEBUG only)', () => {
+  it('registers debug.hitman only with WDI_DEBUG=1', async () => {
+    const handlers = (room: PartyRoom) =>
+      Object.keys((room as unknown as { onMessageEvents: { events: object } }).onMessageEvents.events);
+    const on = await lobbyOf(colyseus, 1);
+    expect(handlers(on.room)).toContain('debug.hitman');
+    delete process.env.WDI_DEBUG;
+    try {
+      const off = await lobbyOf(colyseus, 1);
+      expect(handlers(off.room)).not.toContain('debug.hitman');
+    } finally {
+      process.env.WDI_DEBUG = '1';
+    }
+  });
+});
