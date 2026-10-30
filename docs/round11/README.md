@@ -123,7 +123,9 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
   `.claude/settings.local.json` step of `docs/round10/README.md`, "Compaction" (800000).
 - **The playtest.** The owner's playtest notes on how the game looks go to 11A and 11B as well as to 10X and 10Y.
 
-## Status (2026-10-29)
+## Status (2026-10-30)
 
 - This contract (#339).
 - The playtest gate opened when round 10's A13b merged (4a8e70f), and 11A and 11B started.
+- 11A's `pipeline.md` (#346) and 11B's `look.md` (#347) are in. Their questions are merged in `questions.md`, sent to
+  the owner on 2026-10-30.

@@ -11,6 +11,7 @@ import { npcMemory } from './npc/memory';
 import { litAtNight, profileOfRoom } from './npc/routine';
 import { sendRefusal } from './refusal';
 import { simOf } from './RoomSim';
+import { onSleepPhase, trackHoldout } from './SleepRest';
 import { profileOpen, sceneKey } from './World';
 import { isOnLine } from './Train';
 
@@ -32,17 +33,19 @@ type BedKind = (typeof BED_KINDS)[number];
 interface Sleepers {
   homes: Map<string, SceneId>;
   drawn: boolean;
-  /** Sleeping seats and the bed each lies in. */
-  asleep: Map<string, string>;
+  /** Sleeping seats and the kind of bed each lies in. */
+  asleep: Map<string, BedKind>;
   /** The tick from which every active player has been asleep, or -1. */
   allSinceTick: number;
+  /** The phase of the last tick, so a change is seen once (A7b, `SleepRest.ts`). */
+  phase: number;
 }
 
 const memory = new WeakMap<object, Sleepers>();
 function sleepersOf(room: PartyRoom): Sleepers {
   let m = memory.get(room.seeds);
   if (!m) {
-    m = { homes: new Map(), drawn: false, asleep: new Map(), allSinceTick: -1 };
+    m = { homes: new Map(), drawn: false, asleep: new Map(), allSinceTick: -1, phase: -1 };
     memory.set(room.seeds, m);
   }
   return m;
@@ -157,7 +160,7 @@ export function handleSleepHold(room: PartyRoom, seat: string, targetId: unknown
   }
   p.hold = null;
   p.input = null;
-  m.asleep.set(seat, bed.id);
+  m.asleep.set(seat, kind);
   player.priv.asleep = true;
   emitSim(room, { tick: room.state.tick, kind: 'sleep.lieDown', seat, data: { seat, bed: bed.id, kind } });
 }
@@ -178,6 +181,10 @@ export function runSleep(room: PartyRoom): void {
   const state = room.state;
   const active = activeSeats(room);
   const open = LIE_DOWN.has(state.phase);
+  if (m.phase !== state.phase) {
+    if (m.phase >= 0) onSleepPhase(room, m.phase, state.phase, m.asleep); // before the dawn wakes them
+    m.phase = state.phase;
+  }
   for (const seat of [...m.asleep.keys()]) {
     if (!open || !active.includes(seat)) wake(room, seat, open ? 'gone' : 'dawn');
   }
@@ -188,6 +195,7 @@ export function runSleep(room: PartyRoom): void {
     priv.inBed = Math.min(255, inBed);
     priv.inBedOf = Math.min(255, active.length);
   }
+  trackHoldout(room, active, new Set(m.asleep.keys()));
   const everyone = state.phase === Phase.night && active.length > 0 && inBed === active.length;
   if (!everyone) {
     m.allSinceTick = -1;

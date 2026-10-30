@@ -19,6 +19,7 @@ export const EFFECT_IDS = [
   'knockedOut',
   'indebted',
   'charm',
+  'exhausted',
 ] as const;
 export const EffectKey = z.enum(EFFECT_IDS);
 export type EffectKey = z.infer<typeof EffectKey>;
@@ -48,6 +49,8 @@ export const Effect = z.strictObject({
   strikeCooldownFactor: z.number().min(1).optional(),
   /** Factor on stamina regeneration. */
   staminaRegenFactor: Factor.optional(),
+  /** Factor on maximum stamina (round 10, A7: Exhausted); the body's stamina never rises above the cap. */
+  maxStaminaFactor: Factor.optional(),
   /** Health does not regenerate while on. */
   blocksRegen: z.boolean().optional(),
   noRun: z.boolean().optional(),
