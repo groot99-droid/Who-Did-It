@@ -49,7 +49,10 @@ export class ShadowViews {
     if (this.first) {
       this.first = false;
       const it = { offset: 1 };
-      this.fullBuffer = encoder.encodeAll(it, this.fullBuffer);
+      const full = encoder.encodeAll(it, this.fullBuffer);
+      // `encodeAll` returns the frame as a subarray of the buffer it filled, a larger one when `fullBuffer` overflowed:
+      // keep the whole backing buffer, never the subarray, or the views below start past its end and overflow it.
+      if (full.buffer !== this.fullBuffer.buffer) this.fullBuffer = new Uint8Array(full.buffer);
       const shared = it.offset;
       for (const shadow of this.shadows) {
         const frame = encoder.encodeAllView(shadow.view, shared, { offset: shared }, this.fullBuffer);

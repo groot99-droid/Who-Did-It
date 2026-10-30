@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { TICK_RATE } from '@wdi/shared';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { applyClock, enableAuto, queueAutoStart } from '../src/sim/auto/Auto';
 import { registeredInvariants } from '../src/sim/auto/invariants';
@@ -36,7 +36,7 @@ async function worldWithShadows() {
       [...decoder.state.scenes.values()].flatMap((scene) => [...scene.avatars.keys()]),
     );
   for (let i = 0; i < 400 * TICK_RATE; i++) {
-    advance(party, 1);
+    advance(party, 1); // every step patches (x7, A373), and the patch feeds the shadows
     if (shadows.encodedTick !== room.state.tick) room.broadcastPatch();
     if (isWorldPhase(room.state.phase) && decodedAvatars().length > 0) break;
   }
@@ -75,13 +75,29 @@ describe('the decoded views of an auto match', () => {
         `seat ${shadow.sessionId} shows avatar ${handle} in ${sceneId}, which it has not decoded`,
       );
 
-      // A stale tick is a failure of its own: the shadows must have decoded the frame of this very tick.
-      advance({ humans: [], room }, 1);
+      // A stale tick is a failure of its own, read before the avatars: the shadows must hold the frame of this very
+      // tick. Since x7 (A373) every step patches, so a step cannot leave a shadow behind; only a dropped frame could.
+      shadow.decoder.state.tick = room.state.tick - 1;
       expect(shadows.check()?.detail).toMatch(/decoded tick/);
     } finally {
       shadows.dispose();
       expect(shadowViewsOf(room)).toBeUndefined();
       await room.disconnect();
+    }
+  });
+
+  it('sends the first frame from a whole buffer: no overflow warning from the encoder', async () => {
+    // `encodeAll` returns the frame as a subarray of the buffer it filled. A harness that kept that subarray as its
+    // buffer overflowed it on every shadow's first frame: the encoder grows and retries, so the frames were right and
+    // the run clean, with a warning per seat.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    try {
+      const { room, shadows } = await worldWithShadows();
+      shadows.dispose();
+      await room.disconnect();
+      expect(warn.mock.calls.filter((call) => String(call[0]).includes('buffer overflow'))).toEqual([]);
+    } finally {
+      warn.mockRestore();
     }
   });
 
