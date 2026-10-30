@@ -121,6 +121,11 @@ the later session builds on the merged earlier one and does not reshape it.
 - `pnpm auto` runs clean at 50 matches before a session marks a rules pull request complete (round 8, 8P), and the
   invariants of round 6 and 8 still hold. A new invariant is registered in the pull request that adds the rule.
 - Nothing waits on an NPC: a phase, a petition or a sleep check never holds open for an NPC seat (A7, B3).
+- Nothing a seat does marks it human (GDD 3.12 "Hidden seats"; `living-world.md` R15). A verb a seat can be seen
+  doing (a hold, a walk to a prop, a chase, a blow, a visible effect) is one NPC seats also do by their routine or
+  their choices stream, in the same pull request or in a step it names; a choice a human makes in sight (pay, flee or
+  fight) is one an NPC seat also draws. In world mode the Killer is always human, so every human marker narrows him
+  (A276).
 
 ## 7. Merge order
 
