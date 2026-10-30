@@ -10,14 +10,18 @@ import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
+import { isOnLine } from './Train';
 import { SCENE_KEYS } from './World';
 
-/** `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. */
+/**
+ * `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. Round 10
+ * (C1): a seat on the line counts as living, since the morning Train brings it back; a wolf by day decides no match.
+ */
 export function evaluateWin(room: PartyRoom): 'village' | 'cabal' | null {
   const sim = simOf(room);
   const living: ReturnType<typeof factionOf>[] = [];
   room.state.players.forEach((p: PlayerState, id: string) => {
-    if (!sim.players.get(id)?.dead) living.push(factionOf(p));
+    if (!sim.players.get(id)?.dead || isOnLine(room, id)) living.push(factionOf(p));
   });
   return checkWin(living, countRow(room.state.players.size).cabalWin);
 }

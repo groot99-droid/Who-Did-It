@@ -1813,3 +1813,13 @@ bed, never who (GDD 3.32).
 - **"You slept through"** shows for five seconds when the sleeper wakes outside dusk and night (a hit or a move wakes it inside
   them). A night skip and a natural dawn read the same, and both are true for the sleeper; phases.md 13.4's "every client"
   is every sleeper.
+
+### 14.47 The train's returns (10C, round 10)
+
+Session 10C, C1 (DECISIONS A230). The server's lines go on the `chat.msg` `system` channel to every seat, like the
+arrival line of 14.30. The On-the-line screen and the dawn manifest come with C1b.
+
+| Line | Text | Where |
+|---|---|---|
+| a seat back on the morning train (server, `Train.ts` `trainReturnLine`) | {name} steps off the train. | `chat.msg` `system`, every seat, at the arrival |
+| the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
