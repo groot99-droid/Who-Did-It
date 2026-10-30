@@ -150,3 +150,14 @@ measuring.
 - The contract: this folder, the Round 10 section of `docs/SESSIONS.md`, A223 and A224, the GDD stubs 3.27 to
   3.33, and the compaction default.
 - 10A, 10F and 10H start now. The rest start at their gates.
+
+## Status (2026-10-30): paused
+
+Part 1 stopped on 2026-10-30 at the owner's request, and every session was archived. `part2.md` is the pickup list:
+- the state at the stop;
+- the open pull requests and the merge queue;
+- each session's remaining steps, handoff and id;
+- the owner's open questions;
+- how to resume.
+
+`wave2-briefs.md` keeps the four wave-2 briefs.

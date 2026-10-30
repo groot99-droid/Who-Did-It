@@ -3940,7 +3940,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     - K5, skill checks, after K4;
     - K8, the bog lurker and poison food, after C4c.
   - **10T. The town** (Sonnet, 500k; new). T6, new places and the mood hooks, first. Then T2, chores and errands
-    (after D9b), and T3, standing, examine lines, leads and Faith's sources (after T2; row 29).
+    (not after D9b: 6Z's ruling in the log below), and T3, standing, examine lines, leads and Faith's sources (after
+    T2; row 29).
   - **10M. Ghosts, talk and modes** (Sonnet, 500k; new). M1, barks and the world lines, and M4, the minimap and fog,
     first. Then M3, shove, fists on townsfolk and two-player carrying (after C6).
   - **10A** (Opus, 500k), whose list ended with A7b, takes K1, weapons, on its weapon slot (A12; after C6). Then T4:
@@ -3948,6 +3949,7 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - **10B** takes T5 as its list ends: theft, trespass Notices, curfew locks, forced labour and the heresy trial (after
     B6b and B6c).
   - **10C** takes V1 to V4, the vendettas' world-mode steps (4.7), as its list ends.
+  - **10F** takes D1b after S1b: NPC seats at night (I41), on Q-S4's proposed default until the owner answers.
 
   The four new sessions start from the base, 10N from `claude/r10-tier-800k`. Their spawn prompt is their brief, and
   each copies it into its first PR's description.
@@ -4496,6 +4498,104 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   above.
 - 6Z merged #420 (`scope.md`) at 822f7e8. Section 4 of `scope.md` now opens with who builds each step, since the
   briefs above moved six Opus steps out of the Sonnet sessions and gave world mode to 10S (A276).
+- 2026-10-30: merged x8 (#415), y14 (#417) and x11 (#418) after their one check, y15 (#424) on its own e2e job, then
+  #400 (this contract: `seams.md` 3 rows 25 to 34, `seams.md` 6, the wave-2 briefs, A276). The check's one failure
+  was `constableFile.test.ts`, the known flake: four clean reruns, and 10X found the cause (an NPC seat collects the
+  clue before the briefing). x17 fixes it in the test.
+- 2026-10-30: wave 2 spawned. 10N (Opus, 800k) came from `claude/r10-tier-800k` and wrote its window first; 10K, 10T
+  and 10M (Sonnet, 500k) came from the base. 10A was told K1 and T4, and 10S its world-mode brief.
+- 2026-10-30: rulings, with A296.
+  - **The end trial** (B6d, row 35) is the only Final Night verdict in every match. The Unseen victory is
+    `Winner.cabal` with `unseen` in the game-over frame, and a jailed seat files nothing. NPC seats present and file
+    by one rule, which closes B6a's tell, where only humans presented. B6a merges naming B6d.
+  - **No seat vanishes in a world match** (row 25): a dropped human seat stays on the NPC brain to game over (W1a2).
+  - **Barks** (row 36): the quick-chat wheel was declared and never built, so 10M's M1 builds the whole path, the
+    server in M1a and the client in M1b after R1 and S5.
+  - **Snares** (row 31): a seat sent a snare may disarm it, and NPC seats disarm by chance (K6c).
+  - **T2 doesn't wait for D9b.** Chores stay in `chores.json`, never move the bar and never join the task deal, so
+    D9b stays parked for the balance lab.
+  - **I41** (Q-S4) goes to 10F as D1b, after S1b.
+- 2026-10-30: grants. Each is listed in the pull request that uses it.
+  - 10V: `hold.test.ts` line 86's reading becomes `teaching`, with the test's title (V1a).
+  - 10F: one list in `npcDepletion.test.ts` (S1a), and one `takeContents` call in `sim/Minigames.ts` `lockResult`
+    (S1b).
+  - 10X: `npcRoutine` (x9).
+  - 10H: the stew's dispatch lines in `sim/Actions.ts` and `sim/body/verbs.ts`, and the berries sound in `sfx.ts` (S2).
+  - 10K, K3:
+    - `economy.json`: the Handcuffs on the general stores' lists, with their price;
+    - a hook line in `sim/Npc.ts` for its new `sim/npc/lights.ts`;
+    - the cuff hold's length in `sim/law/Manhunt.ts`, built on B6a's version.
+  - 10N, K6:
+    - `abilities.json`: the `snare` and `rope` rows take `scope: "item"`, since a role-scoped Rope or Snare would be
+      a tell;
+    - one call line each in `sim/Step.ts` and `sim/body/run.ts`;
+    - one in `sim/npc/world.ts` and a snare stall in `sim/npc/chores.ts`, after 10F's pushes;
+    - `NoteKind` `snared`, appended.
+  - 10M, M1:
+    - the quick-chat pool's `.length(8)` becomes `.min(8)` in `balance.ts`;
+    - the `chat.quick` route in `rooms/handlers/lobby.ts`, which only queues;
+    - after R1 and S5, the key bind in `input/` and the mount lines in `view/Hud.ts`, for M4's minimap too.
+- 2026-10-30: CI's `server` job took 13m28s at #420's merge, against its 15-minute limit, and wave 2 adds about
+  thirty rules steps. 10Y's y17 raises the limit to 25 minutes.
+- 2026-10-30: rulings, with A296 (6) to (8).
+  - **The Clerk's ledger** (C4d, row 37): every rent hardship by `Player.look`, to the reader only. A rent hardship
+    boards nothing, D7's real boardings stay out, NPC seats read the ledger too, and Blackpine's is NFY.
+  - **Row 30**: `missing` (T5) and `sigil` (the Following) aren't the Hitman's. His mailbag and crow (I39) are drawn
+    only in `arrived`, written in the tick of his line. T4 splits into T4a (windows, stations and his props), T4b
+    (the I37 work rules) and T4c (silhouettes).
+  - **K1** adds no field: the weapon stays private (row 1), and NPC seats equip and swing the weapons they hold.
+  - **The mood hooks** (T6b): the Angry hook follows the drawn face, in the NPC's own scene and sight, never the
+    seat behind it.
+- 2026-10-30: grants. Each is listed in the pull request that uses it.
+  - 10B, B6d: the Final Night block of `flow.test.ts`, the four end-of-hunt cases of `trial.test.ts` and the kinds
+    list of `invariants.test.ts`, each rewritten to the end trial's.
+  - 10C, C4d: the `ledger.read` and `ledger` messages, one command-table case, the `ledger` kind's read verb in
+    `interactions.json`, the NPC read's `routines.json` rows and one line in `sim/npc/routine.ts`, and one case in
+    the A170 leak test.
+  - 10T, T6b: one call line in `sim/npc/routine.ts` `pickStation` and one in `sim/townsfolk/run.ts` `pickStation`,
+    where the townsfolk choose their stations.
+- 2026-10-30: grants. Each is listed in the pull request that uses it.
+  - 10B, B6d: `AUTO_EVENT_KINDS` in `test/autoHelpers.ts` and `ADMIN_EVENT_KINDS` in `sim/auto/AdminView.ts` gain
+    `endTrial.open` and `endTrial.verdict`.
+  - 10M, M1a: R17's stream list in `npcRoutine.test.ts` gains `barks`, with a comment.
+  - 10T, T6a:
+    - `mapSites.test.ts` gains `cottage_fisher` and `sea_exit`;
+    - R17 in `npcRoutine.test.ts` gets its own `loot` branch, which asserts a prop key. T6a's scenes shift the
+      persona draw, so two NPCs reach rubble props that A11's `breakRock` drops, a path latent since A11.
+- 2026-10-30: rulings.
+  - **C4b's client half** (10Y):
+    - The Derringer's key and disc come from the own pack on the client, as `useVerbOf` gives an item its verb (the
+      ability is `scope: item`). Nothing new goes on the wire.
+    - The over screen names all four `gameOver.hitman` stages. The match is over, and `gameOver.roles` names every
+      card.
+  - **`herbBreadDawn.test.ts`** (x11): its two tests run close to vitest's 5-second default in the cloud containers.
+    They failed there on the bare base and on stack11, and they pass on CI's runner. 10X gives the file the day
+    timeout `npcRoutine.test.ts` uses, as x18.
+- 2026-10-30: stack11 merged after one check of C4b, B6a, R1 and R2 on the merged tree. The check covered the full
+  suite, 50 clean bot matches and every e2e spec; its only failure was `herbBreadDawn.test.ts`'s timeout. Merged:
+  - C4b #408, with C4a #401, at e9265a2a;
+  - B6a #427 at 5671fae3;
+  - R1 #419 at 6ac53f62;
+  - R2 #423 at 1a1e494a.
+- 2026-10-30: y17 #439 merged at 04d76d35, raising CI's `server` job limit. x18 #446 merged at 8b03b36a, giving
+  `herbBreadDawn.test.ts` the day timeout. Both were checked on the merged tree, and the test passed on x18's merge.
+- 2026-10-30: the stop. The owner wrote "Get to the next stopping point then we will pick up all that is left in
+  round 10 pt2", and then "When the sessions are done and the pause has commenced, archive the sessions, move the
+  information to be done for pt2 to access later".
+  - Every session sent 6Z a handoff and was archived: 10A to 10Y, and 11A and 11B. All their work is pushed except
+    10F's S1b (below).
+  - `docs/round10/part2.md` is the pickup list: the state at the stop, the merge queue, each session's handoff and
+    id, and how to resume.
+  - `docs/round10/wave2-briefs.md` keeps the briefs of 10N, 10K, 10T and 10M.
+  - 6Z's rulings at the stop, each in its session's handoff in `part2.md`:
+    - B6d #448 stays one pull request: its source is about 405 changed lines, and the rest is tests and docs.
+    - x9's refusal reason `ALREADY_DONE` stands.
+    - x13's "Open tells" bullet stays in GDD 3.12.
+    - K3 #440 waits for a fix of the forest walk. In match 30 of its auto 50, a lit NPC strolls into the dark forest
+      and sticks at a wall, a latent fault the base never reaches. Accepting 49 of 50 would leave the bug, and
+      skipping the light rule in the forest would bring back the tell K3 removes.
+  - S1b (10F) was never pushed: the session's permission check refused any branch but its own. Its code diff is kept
+    in a comment on #429, with the docs to write beside it.
 
 ## Round 11 (planning, started 2026-10-29)
 
