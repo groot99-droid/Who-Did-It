@@ -9,7 +9,8 @@ import { CELL, isJailed, isPinned } from '../src/sim/law/Jail';
 import { cuffSeat } from '../src/sim/law/Manhunt';
 import { handleKill } from '../src/sim/Kill';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
-import { stationOf } from '../src/sim/MapSites';
+import { hubOf, stationOf } from '../src/sim/MapSites';
+import { enterImmunity, openMeeting } from '../src/sim/Meeting';
 import { simOf } from '../src/sim/RoomSim';
 import { figuresOf } from '../src/sim/townsfolk/figures';
 import { sceneIndex } from '../src/sim/World';
@@ -33,7 +34,8 @@ import {
 /**
  * The county jail (round 10, B5b; GDD 3.27; seams.md 3 row 19; A349): a cuffed seat walks `jail.walkS` into the cell,
  * which it leaves on the next morning train; an impersonation worn at the cuff is pinned until then, so the cell and
- * the manifest show the face it was cuffed in; `jailUntilTick` reaches its own view only.
+ * the manifest show the face it was cuffed in; `jailUntilTick` reaches its own view only. A meeting leaves the
+ * prisoner in the cell; on a map with no station (BlackPine) the next dawn lets it out at the meeting spawns.
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
@@ -230,5 +232,52 @@ describe('the county jail (GDD 3.27)', () => {
     expect(isJailed(party.room, b)).toBe(false);
     advance(party, 1);
     expect(party.room.state.manhunt.state).toBe(ManhuntState.none);
+  });
+  it('keeps the prisoner in the cell through a meeting and its immunity placement', async () => {
+    const party = await world();
+    const [a, , , d] = ids(party);
+    hunt(party, d);
+    cuffSeat(party.room, d);
+    advance(party, S(balance.jail.walkS) + 1);
+    expect(inCell(party, d)).toBe(true);
+    openMeeting(party.room, { reason: 'bell', callerId: a });
+    advance(party, 1);
+    expect(inCell(party, d)).toBe(true);
+    expect(simOf(party.room).players.get(a)!.sceneIdx).toBe(sceneIndex(hubOf(party.room)));
+    enterImmunity(party.room);
+    advance(party, 1);
+    expect(inCell(party, d)).toBe(true);
+    holdPhase(party, Phase.day, 3600); // the next day, before its train
+    advance(party, 1);
+    expect(inCell(party, d)).toBe(true);
+    expect(isJailed(party.room, d)).toBe(true);
+  });
+
+  it('on a map with no station, lets the prisoner out at the next dawn on the meeting spawns, with no line', async () => {
+    const party = await world();
+    const [, , , d] = ids(party);
+    party.room.state.settings.map = 'blackpine';
+    expect(stationOf(party.room)).toBeUndefined();
+    hunt(party, d);
+    cuffSeat(party.room, d);
+    advance(party, S(balance.jail.walkS) + 1);
+    expect(inCell(party, d)).toBe(true);
+    // The release tick is the next dawn, the day's end plus dusk and night.
+    const p = balance.phases;
+    expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(
+      party.room.state.phaseEndsTick + S(p.duskS + p.nightS),
+    );
+    holdPhase(party, Phase.night, 300);
+    advance(party, 1);
+    expect(inCell(party, d)).toBe(true); // the night of the same round
+    for (const h of party.humans) h.log.length = 0;
+    party.room.state.round += 1; // the dawn of a later round
+    holdPhase(party, Phase.day, 3600);
+    advance(party, 1);
+    expect(isJailed(party.room, d)).toBe(false);
+    expect(simOf(party.room).players.get(d)!.sceneIdx).toBe(sceneIndex('bp_camp'));
+    expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(0);
+    await sleep(150);
+    for (const h of party.humans) expect(manifest(h)).toEqual([]);
   });
 });

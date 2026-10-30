@@ -3,7 +3,7 @@ import { Phase, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory } from '../Avatars';
 import { emitSim, onSim } from '../events/bus';
-import { stationOf } from '../MapSites';
+import { meetingSpawnsOf, stationOf } from '../MapSites';
 import { enterScene } from '../Portals';
 import { simOf } from '../RoomSim';
 import { trainReturnLine } from '../Train';
@@ -12,8 +12,10 @@ import { trainReturnLine } from '../Train';
  * The county jail (round 10, B5b; GDD 3.27, `world-mode.md` 5.1; seams.md 3 row 19; A349). A seat the manhunt cuffs
  * walks for `jail.walkS` and is placed in the cell (`cj_cell`, B5a), which no portal leaves. It stays there until the
  * next morning train (the first arrival of a later round), which sets it down at the station with the manifest line,
- * or until it dies. `Private.jailUntilTick` (own view) is the releasing train's tick, 0 when not jailed. A jailed seat
- * is not active for sleep, cannot open, sign or cuff, and cannot use the Knife (`IN_JAIL`).
+ * or until it dies. On a map with no station (BlackPine) the first dawn of a later round sets it down at the map's
+ * meeting spawns instead, with no line (6Z's default). `Private.jailUntilTick` (own view) is the releasing tick, 0 when
+ * not jailed. A jailed seat is not active for sleep, cannot open, sign or cuff, and cannot use the Knife (`IN_JAIL`); a
+ * meeting does not move it (`Meeting.ts placeAtSquare`).
  *
  * The pin (owner, 2026-10-30, "jail and try them"; 6Z's ruling A): an impersonation applied at the cuff stays on the
  * figure from the cuff until the seat leaves jail or dies. `Impersonate.ts` skips a pinned seat (no expiry, no alone
@@ -65,12 +67,16 @@ export const untilDawnS = (room: PartyRoom, seat: string): number =>
     Math.ceil(((room.state.players.get(seat)?.priv.jailUntilTick ?? 0) - room.state.tick) / TICK_RATE),
   );
 
-/** The tick the next morning train is due, from the phase clock (a meeting may move it; the day start corrects it). */
-function nextTrainTick(room: PartyRoom): number {
+/**
+ * The tick of the release: the next morning train, or the next dawn on a map with no station. From the phase clock (a
+ * meeting may move it; the day start corrects it).
+ */
+function nextReleaseTick(room: PartyRoom): number {
   const p = balance.phases;
   const after =
     room.state.phase === Phase.day ? p.duskS + p.nightS : room.state.phase === Phase.dusk ? p.nightS : 0;
-  return room.state.phaseEndsTick + Math.round((after + balance.train.arriveAtS) * TICK_RATE);
+  const train = stationOf(room) ? balance.train.arriveAtS : 0;
+  return room.state.phaseEndsTick + Math.round((after + train) * TICK_RATE);
 }
 
 /** A cuff lands (`Manhunt.ts`): the seat is held for the walk, its applied disguise pinned, a pending one cancelled. */
@@ -87,10 +93,13 @@ export function jailSeat(room: PartyRoom, seat: string, face: string): void {
   p.hold = null;
   p.input = null;
   p.busyUntilTick = placeAt;
-  player.priv.jailUntilTick = nextTrainTick(room);
+  player.priv.jailUntilTick = nextReleaseTick(room);
 }
 
-/** Sets the seat down at the station with the manifest line, then unpins it. */
+/**
+ * Sets the seat down at the station with the manifest line, or at the map's meeting spawns with no line where no
+ * station is, then unpins it.
+ */
 function release(room: PartyRoom, m: JailMemory, seat: string): void {
   const held = m.held.get(seat);
   const p = simOf(room).players.get(seat);
@@ -100,13 +109,17 @@ function release(room: PartyRoom, m: JailMemory, seat: string): void {
   if (!held || !p || !player) return;
   player.priv.jailUntilTick = 0;
   p.busyUntilTick = room.state.tick;
-  if (p.dead || !station) return;
-  // Set down while still pinned: the figure that steps off the train is the face the manifest names.
+  if (p.dead) return;
+  const spread = meetingSpawnsOf(room);
+  const site = station ?? spread[p.ordinal % spread.length]!;
+  // Set down while still pinned: the figure that steps off the train is the face the manifest names. A refused entry
+  // (none is expected: the site is a spawn of the map) leaves the seat where it is, out of jail.
   m.held.set(seat, held);
-  enterScene(room, player, p, station.sceneId, station.spawn, false);
+  enterScene(room, player, p, site.sceneId, site.spawn, false);
   m.held.delete(seat);
+  emitSim(room, { tick: room.state.tick, kind: 'jail.release', seat, sceneId: site.sceneId });
+  if (!station) return;
   const name = room.state.players.get(held.face)?.name ?? player.name;
-  emitSim(room, { tick: room.state.tick, kind: 'jail.release', seat, sceneId: station.sceneId });
   for (const client of room.clients) {
     client.send(S2C.chatMsg, { from: '', text: trainReturnLine(name), channel: 'system' });
   }
@@ -140,12 +153,17 @@ export function runJail(room: PartyRoom): void {
       release(room, m, seat); // the Final Night's bells empty the cell, as they bring back the line
       continue;
     }
+    const station = stationOf(room);
+    if (!station && room.state.phase === Phase.day && held.round < room.state.round) {
+      release(room, m, seat); // no train on this map: the first dawn of a later round lets it out
+      continue;
+    }
     if (held.placeAt >= 0 && tick >= held.placeAt) {
       const others = [...m.held.values()].filter((h) => h !== held && h.placeAt < 0).length;
       if (enterScene(room, player, p, CELL, `cell_${(others % 10) + 1}`, false)) held.placeAt = -1;
     }
     // The day's train tick is known once the day starts.
-    if (room.state.phase === Phase.day && held.round < room.state.round) {
+    if (station && room.state.phase === Phase.day && held.round < room.state.round) {
       const exact =
         room.state.phaseEndsTick - Math.round((balance.phases.dayS - balance.train.arriveAtS) * TICK_RATE);
       if (player.priv.jailUntilTick !== exact) player.priv.jailUntilTick = exact;

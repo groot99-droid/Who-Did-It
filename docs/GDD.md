@@ -1194,8 +1194,10 @@ cell. It stays there until the next morning train, the first arrival of a later 
 station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
-Knife (`IN_JAIL {untilDawn}`). A death in jail takes the usual death path. The manhunt stays cuffed until the seat
-leaves jail or dies; then the next warrant may run.
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. A death in jail takes the
+usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
+no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
 
 **The face it was cuffed in** (the owner, 2026-10-30: "jail and try them"; 6Z's ruling). An impersonation applied when
 the seat is cuffed is pinned from the cuff until the seat leaves jail or dies: nothing drops it, neither the cell door,
