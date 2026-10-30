@@ -16,7 +16,7 @@ it here. Numbers stay in `GDD.md` and `packages/content/data`.
 | `SCENE_IDS` and `scenes/*.json` | Append-only ids (GDD 3.13, WORLD 4.3). B5 adds the `cj.` prefix. A new prop (a `bed`, a lock, a saw horse) gets a new id; no id is renamed. |
 | `packages/content/data/events.json` | Append events; never rename one. |
 | `docs/DECISIONS.md` | Each session writes under its reserved row (section 5); nobody edits an older row. |
-| `docs/UI.md` 14 | Each session's copy goes in its subsection (section 5). |
+| `docs/UI.md` 14 | Each session's copy goes in its subsection (section 5). `apps/client/src/ui/copy/uiDeck.test.ts` (y10, A414) checks every row of section 14 whose first cell is one backticked key. A module of `apps/client/src/ui/copy/` must hold that key, and another cell of the row must quote its text verbatim, so a row for a client line lands in the pull request that adds the line. A line those modules don't hold (a server system line, a content field) names its source in words, never as a lone backticked key. |
 | `apps/server/test/*.test.ts` | No session edits an existing test file without 6Z's grant. List the files and why in the pull request description; 6Z grants on review. A new test file needs no grant. 10G has a standing grant for the handler and sim tests its codemod changes, as long as the assertion only gains the reason. |
 
 **Merging.** Before a session marks a pull request complete it merges `origin/claude/zen-turing-m1jnw0` in and runs

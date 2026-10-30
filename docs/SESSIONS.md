@@ -4418,6 +4418,27 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   | S4 | the mugging's flee and fight | 10D, then D4b's dishes once S2 has merged |
   | S5 | the art style, chosen in the menu only | 10Y |
 
+  S3 leaves out the grindstone, which is 10X's x9 (A313). The Miner's cap lamp and Warmth wait for wave 2.
+- 2026-10-30: merged 10Y's six client steps in a row: y8 (#398), y9 (#402), y10 (#406), y11 (#407), y12 (#409) and
+  y13 (#412). 10Y's base merges reproduced the trees of the nine-PR check, and each base tree matched the simulated
+  one. With y10's deck guard (A414) in, `seams.md` 1 says what a copy row of `UI.md` 14 needs.
+- 2026-10-30: grants to 10R for R1 (#419), the action table. They cover four scopes:
+  - in `scenes/World.ts`, the `bindKeys` block, `abilityKey` and the imports;
+  - in `ui/M5bLayer.ts`, `onKey`;
+  - one line of `ui/RoleCard.ts`;
+  - in `input/TouchControls.ts`, `abilityDiscs` and the run and sneak discs.
+
+  R1 merges the base after 10Y's six and runs the e2e screens before it is complete. A card slot for one of 10V's
+  verbs is bound when that verb's step merges, and stays off the card until then.
+- 2026-10-30: CI's `server` job failed once on #398's earlier head, in `constableFile.test.ts`'s real Paint The Town
+  Red match ("expected one warrant, got none"). y8 touches no server file, so the failure is the base's.
+  - 10Y's lead: the test deals its match on unfixed seeds, and `fileByConstables` files nothing without a living
+    Constable.
+  - 10X is to find the cause on a failing seed and fix it in the test, which is granted; never a skip or a retry.
+  - A cause in the rule itself goes to 10B.
+- 2026-10-30: x8 (#415), y14 (#417) and x11 (#418) go into one check on the base after 10Y's six: the full server
+  suite, auto 50 and the whole e2e suite. x11 meets 10Y's A414 in DECISIONS, and both rows stay in number order.
+
 ## Round 11 (planning, started 2026-10-29)
 
 Round 11 plans **the full Blender makeover** while round 10 builds. The owner set it on 2026-10-29: the pipeline half
