@@ -1142,6 +1142,8 @@ spends one Lockpicks and refuses `PICK_SNAPPED`; a charge is lost only that way.
 scratch clue and the small fine the interaction names arrive with D5c. NPC seats do not pick yet (their routine reaches
 only props a mode of no mini-game works, 3.12 Chores).
 
+**The screen** (round 10, D5b). The picker's dialog draws one column per pin and a tension gauge with the snap line, and never the set points: a pin that is lifted into its band under light tension clicks (a tone, a buzz, a jolt). Letting go of the pick records an attempt; the trace of attempts is the answer, and the board ends when every pin is set or the pick snaps.
+
 ### 3.30 The inventory and crafting
 
 Round 10, A12 and A13 (`docs/round9/gdd-map.md` 2.4; `docs/round9/logic-table.md` 8.6; DECISIONS A245). A12 builds the
@@ -1213,6 +1215,24 @@ before its time is not briefed, and the same words twice within `law.briefingAft
 alive there is no briefing (proposed; a knocked-out Constable is alive, and until C5 nothing kills a guard). It opens
 no screen, pauses nothing and waits on nobody. The server keeps the posted
 briefings in order for the police board, which shows them with the petition form (B3).
+
+**Walk with me (B8, A269; seams.md 3 row 10).** In the night phases (dusk, night, the Final Night) a living seat
+may ask a figure in inspect reach (`relations.inspect.rangeTiles`; a seat or a townsperson, by its handle) to walk with
+it until dawn. Every ask draws one delay from `pairing.answerS` (5 to 9 s, long enough to read and answer) and one
+yes roll from the `pairing` stream, whoever is asked, and the answer reaches the asker at that delay, so its timing
+never tells a person from an NPC (R6). A human target sees a private prompt until then: an early answer is held, and
+no answer is a no. An NPC seat or a townsperson says yes on the roll, `pairing.yesChance`, times
+`pairing.scaredMult` while its mood is Scared (the needs never read a card). A guard (3.24) keeps its post and always
+says no, and since no seat wears a guard's look, its no says nothing about a person. A target that is already
+asking, asked or paired says no at the delay like any other. A no is an answer, never a refusal (`failures.md` 10):
+the asker sees the same line whoever said it. A pair lasts until dawn, a death, a cancel (`pair.answer` with
+`yes: false`), or `pairing.apartS` with the two in different scenes. A townsperson or an NPC-seat partner follows
+its asker within `pairing.followTiles`, through doors like any walk; a human partner is never moved. While the two
+share a scene, a paired seat is not alone for the NPC Killer's strike roll and its kill-opportunity timer (3.12),
+but only against a third party: a pair is no shield against a partner who is the Killer. The mugging's alone rule
+already counts any figure in the room. Only the two seats learn of a pair, in `Private.pair` (a phase and the other
+figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
+inspect panel's section is B8b.
 
 ### 3.32 Sleeping
 

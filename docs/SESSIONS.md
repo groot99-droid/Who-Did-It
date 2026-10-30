@@ -3965,6 +3965,16 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     attached would tell a true wearer of a look from a cover. A Verified and a Corroborated entry both show as backed.
   - A jailed seat is not free and a seat on the line is not living, so neither counts or signs. Briefings are not
     evidence. NPC seats sign later, under an R6-style timing rule.
+- 2026-10-30: #356 (row 13 and the log above) merged at ed5e79c and D4a (#357) at 01a2c9c, after a clean 50-match
+  bot run of 6Z's on it. D5b's grants: `registry.ts`, the `pub` line of `MinigameModal.ts` and `copy/minigames.ts`.
+  Row 10 gains `declined`, the asker's state after a no: it is the same whoever answered, so it tells nothing about
+  the target. On D4a:
+  - It used fewer of its grants than planned. The buff is a field of the eaten item, not of the recipe; a recipe row
+    already names its station, so there is no `parts` list; and the stem stations wait for D4b's shaping table.
+  - Its other edits outside 10D's paths were granted on review: the m5b tests of `tools/sprites`, the client and the
+    content, which list the recipes; `docs/SPRITES.md`; the `EffectId` pin; and the icons.
+  - The plan's dish buff "until dawn" is a fixed 780 s, so a dish eaten at night can carry into the next day. That is
+    for the owner and 10X to judge.
 
 ## Round 11 (planning, started 2026-10-29)
 

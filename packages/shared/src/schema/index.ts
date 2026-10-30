@@ -16,7 +16,7 @@ import { schema, t } from '@colyseus/schema';
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 adds `Private.onLine`
-// (row 6) and C2 `Private.fare` (row 11) to version 7.
+// (row 6), B8 adds `Private.pair` (row 10) and C2 `Private.fare` (row 11) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -213,6 +213,13 @@ export const BodyState = schema(
   'BodyState',
 );
 
+/**
+ * Round 10, B8 (GDD 3.31, seams.md 3 row 10): this seat's Walk with me. `state` is a `PairPhase`; `handle` the other
+ * figure's avatar handle in this seat's scene, '' while it is elsewhere (handles re-roll on every entry), never a
+ * seat id. Own view only: nothing public shows a pair.
+ */
+export const PairState = schema({ state: u8(), handle: str() }, 'PairState');
+
 export const Private = schema(
   {
     role: Role,
@@ -256,6 +263,8 @@ export const Private = schema(
     inBedOf: u8(),
     /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
     onLine: bool(),
+    /** Round 10, B8 (schema version 7): Walk with me. */
+    pair: PairState,
     /** Round 10 (GDD 3.23, C2): the Scrip this seat owes the line for its returns; only its owner sees it. */
     fare: u16(),
   },

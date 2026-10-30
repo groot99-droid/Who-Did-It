@@ -1,5 +1,6 @@
 import balance from '@wdi/content/data/balance.json';
 import { cratesGame } from './crates';
+import { lockpickGame } from './lockpick';
 import { pourGame } from './pour';
 import { slideGame } from './slide';
 import { stokeGame } from './stoke';
@@ -9,7 +10,7 @@ import type { MiniSkin } from './skin';
 export { skinOf, type MiniSkin } from './skin';
 
 type Bases = typeof balance.minigames;
-export type MiniKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MiniKind = 'crates' | 'lockpick' | 'pour' | 'slide' | 'stoke' | 'tap';
 /** One kind's numbers from `balance.json` `minigames` (GDD 3.16), tagged with the kind. */
 export type MiniGameSpec = { [K in MiniKind]: { kind: K } & Bases[K] }[MiniKind];
 
@@ -26,6 +27,8 @@ export interface MiniGameHost {
   /** The server's board size where it differs from the station's base (`minigames.json` difficulty adds steps). */
   steps?: number | undefined;
   holdS?: number | undefined;
+  /** The server's `public` as sent (the lock-pick draws its own board from it). */
+  pub?: unknown;
 }
 
 export interface MiniGame {
@@ -39,6 +42,7 @@ export type MiniGameFactory = (host: MiniGameHost) => MiniGame;
 /** Every mini-game by kind (GDD 3.16). */
 export const MINIGAMES: Partial<Record<MiniKind, MiniGameFactory>> = {
   crates: cratesGame,
+  lockpick: lockpickGame,
   pour: pourGame,
   slide: slideGame,
   stoke: stokeGame,
