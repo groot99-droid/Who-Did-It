@@ -3,6 +3,8 @@
 // a shorter delay (two patches) so input still feels direct. A first sample, and any jump too big to be
 // walking, teleports instead of sliding.
 
+import { TICK_RATE } from '@wdi/shared/constants';
+
 export const REMOTE_DELAY_MS = 150;
 /** Round 6 (docs/round6/auto-admin.md 2): the admin views divide the delay by the sim scale; a match uses 1. */
 export const remoteDelayMs = (scale = 1): number => REMOTE_DELAY_MS / scale;
@@ -10,6 +12,39 @@ export const SELF_DELAY_MS = 100;
 /** A step larger than this many pixels between samples is a portal or a spawn, never a slide (1.5 tiles). */
 export const TELEPORT_PX = 96;
 const KEEP = 12;
+/** One server tick on the render clock, in ms (`TICK_RATE` 20). */
+export const TICK_MS = 1000 / TICK_RATE;
+/** How much of each new tick's arrival offset moves the smoothed one: about half a second to settle. */
+export const OFFSET_SMOOTHING = 0.1;
+/** An arrival this far off the smoothed offset is a reconnect or a tab that slept, not jitter: the clock restarts. */
+export const OFFSET_RESET_MS = 1000;
+
+/**
+ * Round 10 (10Y, y4; DECISIONS A294): the sample clock. A patch's samples are stamped at `tick * TICK_MS` plus an
+ * offset smoothed from the arrival times, so the buffer holds one sample per tick, evenly spaced, whether the
+ * server sends a patch every tick or two ticks at once, and however the network jitters. Stamping by the frame
+ * time instead stretched the interval before a late patch and squeezed the one before an early one, which the eye
+ * read as stutter. The first stamp is the arrival time itself; the same tick stamps the same time on every frame.
+ */
+export class TickClock {
+  private offset: number | null = null;
+  private lastTick = -1;
+  private lastStamp = 0;
+
+  /** The render-clock time of `tick`, given that a patch carrying it was seen at wall time `now` (ms). */
+  stamp(tick: number, now: number): number {
+    if (tick === this.lastTick && this.offset !== null) return this.lastStamp;
+    const raw = now - tick * TICK_MS;
+    if (this.offset === null || tick < this.lastTick || Math.abs(raw - this.offset) > OFFSET_RESET_MS) {
+      this.offset = raw;
+    } else {
+      this.offset += (raw - this.offset) * OFFSET_SMOOTHING;
+    }
+    this.lastTick = tick;
+    this.lastStamp = tick * TICK_MS + this.offset;
+    return this.lastStamp;
+  }
+}
 
 export interface Sample {
   t: number;

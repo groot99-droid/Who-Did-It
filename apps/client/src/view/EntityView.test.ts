@@ -262,4 +262,41 @@ describe('EntityView (GDD 3.17)', () => {
     v.destroy();
     expect(handler).toBeUndefined();
   });
+
+  // Round 10 (A294): a patch's samples are stamped by the feed's tick, not by the frame that first showed them.
+  describe('the sample clock', () => {
+    const clocked = (tick: { n: number }) => ({
+      avatars: () => [],
+      selfHandle: () => '',
+      clock: () => ({ tick: tick.n, phase: 1, phaseEndsTick: 0, startTick: 0 }),
+    });
+    const walker = (x: number) => [avatar('h-me', SELF), avatar('h-a', 'a', { x })];
+
+    it('stamps by the tick, so a late frame does not stretch the slide before it', () => {
+      const tick = { n: 0 };
+      const v = new EntityView(scene, SELF, () => clocked(tick) as never);
+      v.setDelayMs(100);
+      v.update(roster, 0, walker(0), 'h-me');
+      tick.n = 1;
+      v.update(roster, 50, walker(10), 'h-me');
+      tick.n = 2;
+      v.update(roster, 130, walker(20), 'h-me'); // the frame came 30 ms late
+      v.update(roster, 200, walker(20), 'h-me'); // the same tick again: no new sample
+      // Tick 2 is stamped 103 (50 ms after tick 1, plus a tenth of the 30 ms), not 130: at 100 the walker
+      // is 50/53 of the way from 10 to 20.
+      const a = made.find((m) => m.name === 'Ann')!;
+      expect(a.pos[a.pos.length - 1]![0]).toBeCloseTo(10 + 10 * (50 / 53), 3);
+    });
+
+    it('without a clock (the admin and Studio views) the frame time stamps the sample', () => {
+      const v = view();
+      v.setDelayMs(100);
+      v.update(roster, 0, walker(0), 'h-me');
+      v.update(roster, 50, walker(10), 'h-me');
+      v.update(roster, 130, walker(20), 'h-me');
+      v.update(roster, 200, walker(20), 'h-me');
+      const a = made.find((m) => m.name === 'Ann')!;
+      expect(a.pos[a.pos.length - 1]![0]).toBeCloseTo(10 + 10 * (50 / 80), 3);
+    });
+  });
 });

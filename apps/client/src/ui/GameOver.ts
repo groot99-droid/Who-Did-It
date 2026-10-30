@@ -23,12 +23,52 @@ export interface GameOverScreen extends Screen {
 }
 
 /** Did this seat win? The faction is judged against the winner id. */
-function won(over: GameOver, roleId: string): boolean {
+export function won(over: GameOver, roleId: string): boolean {
   const faction = factionOf(roleId);
   return (
     (over.winner === 1 && faction === 'village') ||
     (over.winner === 2 && faction === 'cabal') ||
-    (over.winner === 3 && roleId === 'drifter')
+    (over.winner === 3 && roleId === 'drifter') ||
+    (over.winner === 4 && roleId === 'killer') // round 10, C5: the two Killers share Paint The Town Red
+  );
+}
+
+/**
+ * Round 10, C5 (GDD 3.8, phases.md 7): Paint The Town Red's tally, the target and each Killer's unique and total
+ * kills ranked by total; nothing outside the mode.
+ */
+export function paintLines(
+  over: GameOver,
+  nameOf: (id: string) => string,
+): { target: string; rows: Array<{ seatId: string; text: string }> } | null {
+  const paint = over.paintTown;
+  if (!paint) return null;
+  return {
+    target: fill(C['over.paint.target'], { n: paint.target }),
+    rows: [...paint.killers]
+      .sort((a, b) => b.total - a.total)
+      .map((k) => ({
+        seatId: k.seatId,
+        text: fill(C['over.paint.row'], { name: nameOf(k.seatId), unique: k.unique, total: k.total }),
+      })),
+  };
+}
+
+function paintTally(over: GameOver, nameOf: (id: string) => string): HTMLElement | null {
+  const lines = paintLines(over, nameOf);
+  if (!lines) return null;
+  return h(
+    'div',
+    { class: 'wdi-stack', 'data-testid': 'gameover-paint' },
+    h('h2', { class: 'wdi-eyebrow' }, C['over.paint.title']),
+    h('p', { class: 'wdi-muted' }, lines.target),
+    h(
+      'ul',
+      { class: 'wdi-roster' },
+      ...lines.rows.map((r) =>
+        h('li', { class: 'wdi-roster__row', 'data-testid': `gameover-paint-${r.seatId}` }, r.text),
+      ),
+    ),
   );
 }
 
@@ -98,6 +138,7 @@ export function mountGameOver(root: HTMLElement, opts: GameOverOptions): GameOve
       winnerLine(over.winner),
     ),
     over.summary !== '' && h('p', { class: 'wdi-muted', 'data-testid': 'gameover-summary' }, over.summary),
+    paintTally(over, (id) => opts.roster.find((p) => p.id === id)?.name ?? 'Someone'),
     h('h2', { class: 'wdi-eyebrow' }, C['over.roles']),
     h('ul', { class: 'wdi-roster' }, ...rows),
     // Empty (the pre-seed stub) the panel stays out, so it adds no gap to the stack.

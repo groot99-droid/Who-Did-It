@@ -84,13 +84,13 @@ export function chatTag(line: ChatLine): string {
   return line.channel === 'ghost' ? 'ghost' : line.channel === 'cabal' ? 'cabal' : '';
 }
 
-/** `Winner` ids of the schema: 0 none, 1 village, 2 cabal, 3 drifter, 4 (unused), 5 nobody. */
+/** `Winner` ids of the schema: 0 none, 1 village, 2 cabal, 3 drifter, 4 paintTown (round 10, C5), 5 nobody. */
 const WINNER_LINE = [
   C['over.none'],
   C['over.village'],
   C['over.cabal'],
   C['over.drifter'],
-  C['over.none'],
+  C['over.paintTown'],
   C['over.nobody'],
 ];
 
