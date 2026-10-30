@@ -75,7 +75,10 @@ export const Interaction = z
     label: z.string().min(1),
     /** A key of `classes`. */
     target: ClassId,
-    /** The server routine that runs the hold: the generic ones, or a legacy action kept as an alias. */
+    /**
+     * The server routine that runs the hold: the generic ones, or a legacy action kept as an alias. `sharpen` (round
+     * 10, x5) restores every worn tool the seat carries instead of dropping anything.
+     */
     handler: z.enum([
       'stock',
       'search',
@@ -87,6 +90,7 @@ export const Interaction = z
       'bank',
       'civic',
       'collect',
+      'sharpen',
     ]),
     /** `nfy` answers NFY with `feature` (failures.md). */
     status: z.enum(['live', 'nfy']),

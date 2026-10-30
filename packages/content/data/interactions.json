@@ -46,6 +46,7 @@
     "orePile": { "name": "Ore pile", "match": { "stems": ["ore_pile"] } },
     "headSaw": { "name": "Head saw", "match": { "stems": ["head_saw"] } },
     "sawHorse": { "name": "Saw horse", "match": { "stems": ["saw_horse"] } },
+    "grindstone": { "name": "Grindstone", "match": { "stems": ["grindstone"] } },
     "lockedDoor": { "name": "Locked door", "match": { "kinds": ["lockedDoor"] } },
     "crateNailed": {
       "name": "Nailed crate",
@@ -287,6 +288,19 @@
       "fail": { "NEED_ITEM": "Nothing to saw. The horse wants a log across it." },
       "ships": "V1",
       "hint": "Slow work by hand: one log, one Timber. The mill's head saw does twice as much."
+    },
+    "sharpenTools": {
+      "verb": "sharpen",
+      "label": "Sharpen your tools",
+      "target": "grindstone",
+      "handler": "sharpen",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "holdS": 6, "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "ALREADY_DONE": "Nothing you carry wants the stone." },
+      "ships": "V1",
+      "hint": "Six seconds at the wheel and every worn tool you carry is whole again. Charges are not wear."
     },
     "pickLock": {
       "verb": "pick",
