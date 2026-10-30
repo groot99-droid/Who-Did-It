@@ -607,9 +607,15 @@ export const BalanceFile = z.strictObject({
   /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
    * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
-   * (B4); a Constable's takes `cuffHoldS / speedMult`.
+   * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
+   * last `fileWindowS` (B3c).
    */
-  law: Section({ speedMult: z.number().positive(), briefingAfterS: Seconds, cuffHoldS: Seconds }),
+  law: Section({
+    speedMult: z.number().positive(),
+    briefingAfterS: Seconds,
+    cuffHoldS: Seconds,
+    fileWindowS: Seconds,
+  }),
   /** Round 10, A7 (GDD 3.32): sleeping through the night. */
   sleep: Section({
     /** Every active player asleep this long ends the night. */

@@ -269,3 +269,6 @@ export function onManhunt(room: PartyRoom, seat: string): boolean {
   const hunt = memoryOf(room).hunt;
   return !!hunt && hunting(room) && (hunt.accused === seat || hunt.watchers.includes(seat));
 }
+
+/** Passed warrants not yet hunted (B3c: the Constables file only when none waits). */
+export const warrantsWaiting = (room: PartyRoom): number => warrantsOf(room).length - memoryOf(room).next;
