@@ -6,6 +6,7 @@ import { VENDETTA_COPY, vendettaGoal } from './copy/vendettas';
 import './match.css';
 import { h, icon, isTyping, type Screen } from './dom';
 import { type PortraitTextures, drawPortrait, isCoverRole, lookName, roleLook } from './portrait';
+import { actionOfCode } from '../input/actions';
 
 /** Fallback hold time (`balance.json` phases.roleRevealS); the server's `phaseChange.endsTick` overrides it. */
 export const ROLE_CARD_SECONDS = balance.phases.roleRevealS;
@@ -305,7 +306,7 @@ export function mountRoleCard(
   const toggle = () => (open ? hide() : show(false));
 
   const onKey = (e: KeyboardEvent) => {
-    if (e.key !== 'Tab' || isTyping(e.target)) return;
+    if (actionOfCode(e.code) !== 'card' || isTyping(e.target)) return; // round 10, R1: the action table
     e.preventDefault();
     toggle();
   };

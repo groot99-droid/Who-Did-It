@@ -380,7 +380,8 @@ Doors into buildings sit on a south or east face, so they are always in sight. M
 **Controls.**
 
 - The keys W, A, S and D (or the arrows) walk straight up, left, down and right on the screen. Two keys together walk along the grid.
-- A touch stick walks where the thumb points.
+- A touch stick walks where the thumb points; pushed to its rim it runs, and a Sneak toggle beside it sneaks (round 10, R1).
+- Every key and touch control of a match is one row of the client's action table (`apps/client/src/input/actions.ts`, `docs/round10/rolecards.md` 3). The card's abilities that are not passive take Q, R and F in card order; a passive takes no key.
 - The speed in tiles is unchanged (3.7).
 
 **Lighting by phase and scene (M5a).** The world is drawn under a darkness layer that follows the phase (`metrics.json` `lighting.ambient`):
