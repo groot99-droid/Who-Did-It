@@ -4217,6 +4217,29 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   approved B5b's two calls, now in row 19: a disguise still channelling at the cuff is cancelled, and at the release
   the seat steps off the train in the face the manifest names before the usual rule applies. C4a (10C) changes the
   expected rows of the Killer's draw in `vendettas.test.ts`, which no longer offers the Hitman.
+- 2026-10-30: merged B3c (#394). Its only conflict was two `DECISIONS.md` rows: 6Z checked the keep-both merge (the
+  whole server suite and auto 50), and 10B pushed the same tree. x5 has two more test grants: the `seen` helper of
+  `nightSight.test.ts` reads seats only, and the outsiders' diff in `kill.test.ts` drops only figure avatar rows. A
+  figure walking at the edge of an outsider's view made both fail by timing. Nothing in a figure's code reacts to a
+  seat's kill; a step that adds such a reaction narrows that filter.
+- 2026-10-30: 6Z's review of C4a (#401) moves the dormant stall to C4c. A seat owes the line only after a death a
+  meeting showed, so on its own a thin, dear stall whose wearer never died names the turned seat. The stall ships
+  in the same pull request as C4c's hardships, which show the same sign (row 20). The rest of C4a stands, with two
+  points set in the docs. A draw that says NPC never turns a human, so the `human` column stays a ceiling. He comes
+  only where the Train runs: BlackPine has no station. Once B5b has merged, the jail bars a seat from the turning.
+- 2026-10-30: 6Z's rulings on C4b, the day weapon and the boarding (row 21).
+  - The derringer's death has a `DeathCause` of its own. `shot` returns on the train in world mode (the Last Shot's
+    path), and the Hitman's kill is permanent (R4).
+  - The target test reads the drawn figure, as the cuff does (row 14): a figure drawn as the mark may be shot, and the
+    shot lands on the seat behind it. Testing the seat would tell the Hitman who walks under an impersonation.
+  - A boarded Hitman's figure leaves every view at the departure, and only its own view learns it boarded
+    (`Private.departed`). It is never sent the ghost view.
+  - At a meeting, the departed seat stays a living seat in every public respect: it may vote and be voted for. A
+    refusal for a vote at him would name the Hitman's seat on the wire, which section 3 forbids. This holds until B6's
+    Tribunal, which carries it.
+  - The game-over field is `hitman {seatId, day, stage}`, with no card (the end screen has `roles`).
+  - The weapon's key and disc and the departed seat's screen go to 10Y, as one client pull request stacked on C4b. It
+    merges right after C4b, so production never has a Hitman who can't shoot.
 
 ## Round 11 (planning, started 2026-10-29)
 
