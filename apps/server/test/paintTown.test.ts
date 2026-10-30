@@ -90,7 +90,10 @@ describe('the Paint deal over many seeds (6Z: the Vicar is always dealt)', () =>
       for (let seed = 1; seed <= 200; seed++) {
         const { dealt } = paintDeal(humans, npcs, deck, mulberry32(seed * 7919 + n));
         expect([dealt.get('h1'), dealt.get('h2')], `${n} seats, seed ${seed}`).toEqual(['killer', 'killer']);
-        expect(npcs.some((id) => dealt.get(id) === 'vicar'), `${n} seats, seed ${seed}`).toBe(true);
+        expect(
+          npcs.some((id) => dealt.get(id) === 'vicar'),
+          `${n} seats, seed ${seed}`,
+        ).toBe(true);
         expect(npcs.every((id) => dealt.get(id) !== 'killer')).toBe(true);
       }
     }
