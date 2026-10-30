@@ -6,6 +6,7 @@ import { emitSim } from '../events/bus';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
 import { figuresOf } from '../townsfolk/figures';
+import { isPaintTown } from '../paintTown';
 import { isOnLine } from '../Train';
 import { isVerbPhase, reject, sceneIndex } from '../World';
 import { briefingsOf } from './Briefing';
@@ -249,7 +250,7 @@ export function runPetition(room: PartyRoom): void {
   }
   const open = m.open;
   if (!open) {
-    if (paintTown(room)) fileByConstables(room);
+    if (isPaintTown(room)) fileByConstables(room); // Paint The Town Red: no human on the town side
     return;
   }
   if (!simOf(room).players.get(open.accused) || simOf(room).players.get(open.accused)!.dead)
@@ -283,8 +284,6 @@ export function runPetition(room: PartyRoom): void {
 
 type Entry = InstanceType<typeof PetitionEntry>;
 
-/** Not built yet (C5a, 10C): whether the match is Paint The Town Red, where no human is on the town side. */
-const paintTown = (_room: PartyRoom): boolean => false;
 
 const livingConstable = (room: PartyRoom): boolean =>
   [...figuresOf(room).values()].some((f) => f.kind === 'constable' && !f.dead);

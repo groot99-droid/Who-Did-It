@@ -1,10 +1,13 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
+import type { Client } from 'colyseus';
 import { balance } from '@wdi/content';
-import { ClueKind, ManhuntState, Phase, TICK_RATE } from '@wdi/shared';
+import { C2S, ClueKind, ManhuntState, Phase, TICK_RATE } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { spawnClue } from '../src/sim/Clues';
 import { constableCandidate, fileByConstables, warrantsOf } from '../src/sim/law/Petition';
 import { isNpcSeat } from '../src/sim/Npc';
+import { addNpcSeat } from '../src/sim/npc/seats';
+import { isPaintTown } from '../src/sim/paintTown';
 import {
   type Party,
   advance,
@@ -49,6 +52,24 @@ async function world(): Promise<{ party: Party; target: string }> {
   return { party, target };
 }
 
+/** A real Paint The Town Red match (as `paintTown.test.ts` sets one up): two humans and four NPC seats, dealt. */
+async function paintParty(): Promise<{ party: Party; target: string }> {
+  const party = await lobbyOf(colyseus, 2);
+  pauseClock(party.room);
+  for (let i = 0; i < 4; i++) addNpcSeat(party.room, party.room.seeds.get('npcNames'));
+  party.room.lobbyCommands.push({ sessionId: party.humans[0]!.id } as Client, C2S.lobbyStart, {});
+  advance(party, 1);
+  party.room.state.phaseEndsTick = party.room.state.tick;
+  for (let i = 0; i < 40; i++) advance(party, 1);
+  holdPhase(party, Phase.day, 3600);
+  const target = [...party.room.state.players.keys()].find((id) => isNpcSeat(party.room, id))!;
+  for (const [id, p] of party.room.state.players) {
+    p.traits.height = id === target ? 2 : 0;
+    p.traits.scarf = id === target ? 0 : 1;
+  }
+  return { party, target };
+}
+
 /** Footprints and a thread in the bakery, briefed after `law.briefingAfterS`. */
 function brief(party: Party, height: number, scarf: number): void {
   spawnClue(party.room, 'bakery', { kind: ClueKind.footprints, value: height, dir: 0, tx: 3, ty: 4 });
@@ -73,6 +94,15 @@ describe("the Constables' own petitions (GDD 3.31, B3c)", () => {
       target,
       ManhuntState.hunting,
     ]);
+  });
+
+  it('file on their own in a real Paint The Town Red match, through the step', async () => {
+    const { party, target } = await paintParty();
+    expect(isPaintTown(party.room)).toBe(true);
+    brief(party, 2, 0);
+    advance(party, 2);
+    expect(warrantsOf(party.room).map((w) => w.accused)).toEqual([target]);
+    expect(party.room.state.manhunt.accused).toBe(target);
   });
 
   it('never file in world mode, nor on a tie, nor on one briefed trait', async () => {
