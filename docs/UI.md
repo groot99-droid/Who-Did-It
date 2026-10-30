@@ -541,7 +541,10 @@ braces is filled at run time, from state (`{name}`, `{scene}`) or from content (
 `balance.phases.duskS`, `{maxChars}` is `balance.chat.maxChars`). `{name}` is a seat's public name,
 `{scene}` a scene's `name` from `scenes/*.json` ("The Drowned Lantern"), `{role}` a role's `name`
 from `roles.json`, `{key}` the bound key shown as a keycap. Lines on the landing, lobby and role
-card already exist in `ui/{Landing,Lobby,RoleCard}.ts` and are listed in 14.11 so the deck is whole.
+card already exist in `ui/{Landing,Lobby,RoleCard}.ts` and are listed in 14.11 so the deck is whole. A table row
+that names one key gives its line as the client holds it: `ui/copy/uiDeck.test.ts` (10Y, round 10, A414) reads these
+tables and fails on a key no copy module holds or a text the client does not say; a line that moves to a later section
+leaves its old table.
 
 House style: sentence case; no exclamation marks; the second person for the player ("You are a
 ghost"); the past tense for what happened ("Hana rang the bell"); the village's own words over game
@@ -598,12 +601,13 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `refuse.busy` | 426 | Your hands are full |
 | `refuse.cooldown` | 424 | Not ready yet |
 | `refuse.reach` | 427 | Too far |
-| `refuse.nothing` | 422 on `kill` | Nothing happens |
-| `refuse.reported` | 422 on `reportBody` | Someone already reported this body |
 | `refuse.bell` | a refused `bell` | The bell is spent for you |
-| `refuse.locked` | 423 | Locked (and `door_locked` plays) |
-| `refuse.closed` | 428 | Boarded up (and `door_locked` plays) |
-| `refuse.generic` | other 4xx | That did not work |
+| `refuse.locked` | 423 | Locked |
+| `refuse.closed` | 428 | Boarded up |
+
+`refuse.locked` and `refuse.closed` also play `door_locked`. The 422 lines (`kill`, `reportBody`) and the generic line
+are gone (10A, 10G): a refusal shows the line of its reason from 14.43 (`ALREADY_DONE` reads "Someone already reported
+this body.", an unknown reason "Nothing happens."), never the server's `msg` (14.45).
 
 ### 14.4 HUD and log (N)
 
@@ -616,11 +620,9 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `phase.day` | Day | |
 | `phase.dusk` | Dusk | |
 | `phase.night` | Night | `--night` clock |
-| `phase.meetingDiscussion` | Discuss | |
-| `phase.meetingVote` | Vote | |
-| `phase.reveal` | Reveal | |
+| `phase.dawn` | Dawn | |
 | `phase.immunity` | Calm | kills are off; the word avoids promising more than that |
-| `phase.gameOver` | Over | |
+| `phase.finalNight` | Final night | the Final Night's clock (GDD 3.2) |
 | `log.scream` | A scream from the {dir} | `{dir}` from `dir.*` below; also `scream` plays |
 | `log.door` | A door to the {dir} | a door noise from another player |
 | `log.steps` | Footsteps to the {dir} | a run noise |
@@ -632,6 +634,9 @@ Bandage refusal reads exactly like a missed strike that the GDD calls "nothing h
 | `log.crowbar` | Wood splintering to the {dir} | the `crowbar` mode's noise |
 | `log.lockpick` | Scratching at a lock to the {dir} | the `lockpick` mode's noise; the pick's own screen says more |
 | `log.noise` | Something to the {dir} | any noise kind this client has no line for; a new server kind never reads as a door (`ui/copy/noise.ts`) |
+
+The meeting and the game over are screens of their own, not clock captions: the meeting's phase reads
+`meeting.phase.*` (14.6) and the end `over.title` (14.10).
 
 Directions (`dirFromVector` ids): `dir.n` north, `dir.ne` north-east, `dir.e` east, `dir.se`
 south-east, `dir.s` south, `dir.sw` south-west, `dir.w` west, `dir.nw` north-west.
@@ -657,15 +662,18 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 
 | Id | Text | Notes |
 |---|---|---|
-| `meeting.title` | Meeting | header |
+| `meeting.title` | Who did it? | header |
 | `meeting.reason.body` | {caller} reported {victim}'s body | `meeting-reason`; `{victim}` is `bodyOf`'s name |
 | `meeting.reason.bell` | {caller} rang the bell | `meeting-reason` |
+| `meeting.reason.bodyUnknown` | {caller} reported a body | a `body` report whose `bodyOf` the roster lacks |
+| `meeting.reason.missing` | Roll call: someone is missing | reason `missing` |
+| `meeting.reason.none` | A meeting has been called | no `meetingStart` yet |
 | `meeting.dead.one` | {names} was found dead | system line, at the start; every death since the last meeting (A30) |
 | `meeting.dead.many` | {names} were found dead | `{names}` joined with commas and "and" |
-| `meeting.vanished` | {name} has vanished | a seat that left during play (cause `vanished`) |
 | `meeting.discuss` | Talk it over | caption beside the discussion timer |
 | `meeting.vote.open` | Votes are secret until the reveal | caption beside the vote timer; voting is open in both phases |
 | `meeting.vote.hint` | Tap a portrait to vote, or Skip | living players only |
+| `meeting.vote.wait` | Votes open in {s} s. Talk it over first | in place of the hint while votes are closed |
 | `meeting.vote.skip` | Skip | `vote-skip` button |
 | `meeting.vote.mine` | Your vote: {name} | after a vote; may change until the vote closes |
 | `meeting.vote.mineSkip` | Your vote: Skip | |
@@ -673,10 +681,21 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 | `meeting.chip.voted` | Voted | the `hasVoted` chip on a portrait |
 | `meeting.chip.dead` | Dead | `--quiet` chip with the ghost glyph |
 | `meeting.chip.you` | You | the self tile |
-| `meeting.allVoted` | Everyone has voted | system line when the reveal starts early |
 | `meeting.tab.report` | Report | tab |
 | `meeting.tab.notebook` | Notebook | tab |
 | `meeting.tab.chat` | Chat | tab |
+| `meeting.phase.discussion` | Discuss | the phase caption (`ui/meetingText.ts`) |
+| `meeting.phase.vote` | Vote | |
+| `meeting.phase.reveal` | Reveal | |
+| `meeting.report.called` | Called | the Report tab's rows (7G): the reason line |
+| `meeting.report.found` | Found | |
+| `meeting.report.found.line` | {name} is dead. | |
+| `meeting.report.here` | Still here | |
+| `meeting.report.here.line` | {living} alive, {voted} voted | |
+
+`meeting.vanished` and `meeting.allVoted` were never built: a seat that leaves during play is a death of cause
+`vanished` on the server (`PartyRoom.ts`), and the reveal starts early once everyone has voted (`sim/Meeting.ts`) with
+no line of its own.
 
 ### 14.7 Chat (M)
 
@@ -687,21 +706,22 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 | `chat.limit` | {n} / {maxChars} | counter, shown once the text nears the limit |
 | `chat.channel.meeting` | Meeting | channel tag on a `meeting` line |
 | `chat.channel.ghost` | Ghosts | channel tag on a `ghost` line |
-| `chat.closed` | Chat opens at the next meeting | a living player's form outside a meeting |
+| `chat.channel.cabal` | Cabal | channel tag on a `cabal` line |
 | `chat.empty` | Nothing said yet | empty log |
+
+`chat.closed` was never built: the chat form exists only in the meeting (`ui/Meeting.ts`).
 
 ### 14.8 Ghost (N in the world, M in the meeting)
 
 | Id | Text | Notes |
 |---|---|---|
-| `ghost.killed` | You were killed in {scene} | on `killed` with cause `knife` |
-| `ghost.ejected` | The village voted you out | on `killed` with cause `ejected` |
-| `ghost.vanished` | You left the match | cause `vanished`, if the client is still up |
-| `ghost.secret` | Nobody knows yet. Your body is the only sign. | after `ghost.killed`, until the next meeting |
-| `ghost.roles` | You can see every role now | the roles from `killed` |
+| `ghost.label` | You are a ghost | the goal chip once dead, in place of `hud.goal` (`view/Hud.ts`) |
 | `ghost.walk` | Walk anywhere. Only ghosts can see you. | the first World after death |
 | `ghost.noVote` | Ghosts cannot vote | in the meeting, in place of `meeting.vote.hint` |
 | `ghost.chat` | Only the dead read this | caption on a ghost's chat form |
+
+`ghost.killed`, `ghost.ejected`, `ghost.vanished`, `ghost.secret` and `ghost.roles` were never built: a death plays
+its cutscene (14.20), shows `toast.ghost` (14.1) and, since C1b, the On-the-line screen with its cause line (14.47).
 
 ### 14.9 Reveal (M)
 
@@ -719,16 +739,25 @@ clue reads "Footprints, long stride: Tall", as in GDD 2 step 5.
 
 | Id | Text | Notes |
 |---|---|---|
+| `over.title` | Game over | eyebrow over the winner |
 | `over.village` | The village wins | `gameover-winner` |
 | `over.cabal` | The Cabal wins | `gameover-winner` |
-| `over.why.cabalOut` | Every Cabal member is dead or ejected | Village win (GDD 3.8) |
-| `over.why.parity` | The Cabal matches the living village | Cabal win by `parity` (GDD 3.8) |
-| `over.why.lastVillager` | One villager is left standing | Cabal win by `villageAtMostOne` (GDD 3.8) |
+| `over.drifter` | The Drifter wins | `Winner.drifter` |
+| `over.nobody` | Nobody wins | winner 5 |
+| `over.none` | The match ended | winner 0 and any other value |
 | `over.roles` | Who was who | header of the role list |
 | `over.row` | {name}: {role} | `gameover-role-<playerId>`, with the faction chip and the ghost glyph for the dead |
+| `over.you` | (you) | after the own name in its row |
+| `over.faction.village` | Village | the faction chip of a row |
+| `over.faction.cabal` | Cabal | |
+| `over.faction.neutral` | Neutral | |
 | `over.you.won` | You won | own row's tag |
 | `over.you.lost` | You lost | own row's tag |
-| `over.lobby` | Back to the lobby in {s} | countdown from `phases.gameOverS` |
+| `over.lobby` | Back to the lobby in {s} s | countdown from `phases.gameOverS` |
+| `over.leave` | Leave party | button beside the countdown |
+
+The reason the match ended is the server's `summary` of the `gameOver` payload (`gameover-summary`), not a client
+line: `over.why.*` were never built.
 
 ### 14.11 Lines that exist today (for reference)
 
@@ -1779,12 +1808,13 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
 | `inv.hotbar`, `inv.pack`, `inv.belt` | Hotbar, Pack, Belt |
 | `inv.head`, `inv.body`, `inv.weapon` | Head, Body, Weapon |
 | `inv.pick` | Pick a stack, then a slot that takes it. |
-| `inv.slots` | {n} of {max} slots (the count of used slots over the whole layout) |
+| `inv.slots` | {n} of {max} slots |
 | `grid.title`, `grid.size2`, `grid.size3` | Craft; 2 by 2; 3 by 3 (workbench) |
 | `grid.hint` | Pick a stack, then a square. Take what comes out. |
 | `grid.bound` | That stays with you. It cannot be worked. |
 | `hotbar.label` | Hotbar |
 
+- **The count.** `inv.slots` counts the used slots over the whole layout.
 - **Moves.** Click a stack to pick it; the slots that would refuse the move (`inv.move`: the belt takes tools, a gear
   slot its own gear, a full stack of the same item) are dimmed and cannot be clicked, so a move offered lands. Click the
   picked stack again to put it down.
