@@ -579,11 +579,11 @@ export class MockWorldFeed implements WorldFeed {
     return this.m5b.taskBar();
   }
 
-  // Round 8, 8C (locked): the mock town has no shops and an empty purse.
   paintTarget(): number {
     return 0; // the mock deals no Paint The Town Red
   }
 
+  // Round 8, 8C (locked): the mock town has no shops and an empty purse.
   fare(): number {
     return 0; // the mock has no train
   }

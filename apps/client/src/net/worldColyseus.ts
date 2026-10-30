@@ -368,7 +368,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     return this.state.taskBar ?? 0;
   }
 
-  // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.
+  // Round 10, C5 (GDD 3.8): Paint The Town Red's target, while this seat's `Private.paintTown` is set.
   paintTarget(): number {
     if (this.state.players.get(this.selfId)?.priv?.paintTown !== true) return 0;
     let seats = 0;
@@ -376,6 +376,7 @@ export class ColyseusWorldFeed implements WorldFeed {
     return paintTarget(balance.paintTown.winUnique, seats - 2);
   }
 
+  // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.
   fare(): number {
     return this.state.players.get(this.selfId)?.priv?.fare ?? 0;
   }
