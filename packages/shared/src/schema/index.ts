@@ -19,6 +19,8 @@ import { schema, t } from '@colyseus/schema';
 // `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
 // (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), C5 `Private.paintTown` (row 18), B5
 // `Private.jailUntilTick` (row 19), and C4 `Private.hitman` (row 20) and `Private.departed` (row 21) to version 7.
+// B6a adds `GameState.tribunal` (row 22) to version 7.
+
 export const SCHEMA_VERSION = 7;
 
 /**
@@ -53,6 +55,8 @@ export const Phase = {
   immunity: 10,
   finalNight: 11,
   gameOver: 12,
+  /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): the Tribunal; the world is paused under it. */
+  tribunal: 13,
 } as const;
 export type PhaseId = (typeof Phase)[keyof typeof Phase];
 
@@ -376,6 +380,35 @@ export const Petition = schema(
  */
 export const Manhunt = schema({ accused: str(), untilTick: u32(), state: u8() }, 'Manhunt');
 
+/**
+ * Round 10, B6a (GDD 3.8, seams.md 3 row 22): one entry on the Tribunal's scales. `value` is filled as row 13 fills
+ * it; `backed` as the presenter's Notebook shows it; `presenter` '' for the warrant's entries (the Constables'
+ * badge), else the presenting seat; `weight` a `EntryWeight`, from the accused's public traits only.
+ */
+export const TribunalEntry = schema(
+  { clueKind: u8(), value: u8(), sceneId: u8(), backed: bool(), presenter: str(), weight: u8() },
+  'TribunalEntry',
+);
+/**
+ * Round 10, B6a (row 22): the Tribunal, public. `accused` and `charge` the warrant's, never the seat held; `step` a
+ * `TribunalStep`, `finding` a `TribunalFinding`, `sentence` a `TribunalSentence`; `matches` and `exclusions` count
+ * the weights on the scales.
+ */
+export const Tribunal = schema(
+  {
+    accused: str(),
+    charge: str(),
+    step: u8(),
+    untilTick: u32(),
+    entries: t.array(TribunalEntry),
+    matches: u8(),
+    exclusions: u8(),
+    finding: u8(),
+    sentence: u8(),
+  },
+  'Tribunal',
+);
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -403,6 +436,8 @@ export const GameState = schema(
     petition: Petition,
     /** Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, public. */
     manhunt: Manhunt,
+    /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): the Tribunal, public. */
+    tribunal: Tribunal,
   },
   'GameState',
 );

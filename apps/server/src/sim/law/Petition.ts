@@ -40,6 +40,17 @@ interface Open {
   /** Fixed at open, like the bar: a gate that opened mid-petition would say the seat that fell was human (6Z). */
   constableMay: boolean;
   untilTick: number;
+  /** The attached entries with the opener's own values, for the Tribunal's scales (B6a). Room memory only. */
+  raw: WarrantEntry[];
+}
+
+/** One warrant entry: the public row's fields, and the opener's own value (a reading the row leaves out). */
+export interface WarrantEntry {
+  clueKind: number;
+  value: number;
+  raw: number;
+  sceneId: number;
+  backed: boolean;
 }
 
 /** A passed petition: B4's manhunt reads it. */
@@ -49,6 +60,8 @@ export interface Warrant {
   tick: number;
   /** The opener and the signers: room memory only, the manhunt's `huntScene` goes to them (B4, row 14). */
   watchers: readonly string[];
+  /** The petition's entries as row 13 shows them, plus the opener's own values: the Tribunal's (B6a, row 22). */
+  entries: readonly WarrantEntry[];
 }
 
 interface PetitionMemory {
@@ -87,6 +100,13 @@ function memoryOf(room: PartyRoom): PetitionMemory {
 /** The passed petitions of the match, oldest first (B4's manhunt). */
 export const warrantsOf = (room: PartyRoom): readonly Warrant[] => memoryOf(room).warrants;
 
+/** A dismissal (B6a): no petition opens against `accused` for `trial.acquittalGraceS`. */
+export function graceAccused(room: PartyRoom, accused: string): void {
+  const m = memoryOf(room);
+  const until = room.state.tick + Math.round(balance.trial.acquittalGraceS * TICK_RATE);
+  m.accusedGrace.set(accused, Math.max(m.accusedGrace.get(accused) ?? 0, until));
+}
+
 /** A manhunt ran out (B4): no new petition opens for `petition.cooldownS`. */
 export function holdPetitions(room: PartyRoom): void {
   memoryOf(room).heldUntil = room.state.tick + Math.round(balance.petition.cooldownS * TICK_RATE);
@@ -111,9 +131,16 @@ function freeHumans(room: PartyRoom): number {
   return humans;
 }
 
+/** A Notebook entry a petition or the Tribunal takes: a clue entry, never a night-power, Forged or teaching one. */
+export const attachable = (e: { note: number; status: number }): boolean =>
+  e.note === 0 && e.status !== NotebookStatus.forged && e.status !== NotebookStatus.teaching;
+/** Backed: Verified or Corroborated, as the seat's own Notebook shows it (GDD 3.4). */
+export const backedEntry = (e: { status: number }): boolean =>
+  e.status === NotebookStatus.verified || e.status === NotebookStatus.corroborated;
+
 const KIND_KEY = new Map<number, string>(Object.entries(ClueKind).map(([k, v]) => [v, k]));
 /** The trait axis a clue kind shows to anyone (GDD 3.4 Reader "anyone"), or undefined. */
-function publicAxis(kind: number): keyof typeof traits.axes | undefined {
+export function publicAxis(kind: number): keyof typeof traits.axes | undefined {
   const key = KIND_KEY.get(kind) ?? '';
   if (clueDefs.clues[key]?.reader !== 'anyone') return undefined;
   return (Object.keys(traits.axes) as (keyof typeof traits.axes)[]).find((a) => traits.axes[a].clue === key);
@@ -156,16 +183,23 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
   // Only the opener's own clue entries attach: never a night-power entry, a Forged or a teaching one (6Z, row 13).
   const notebook = room.state.players.get(seat)!.priv.notebook;
   const entries: InstanceType<typeof PetitionEntry>[] = [];
+  const raw: WarrantEntry[] = [];
   for (const id of new Set(ids)) {
     const e = notebook.find((x) => x.id === id);
-    if (!e || e.note !== 0 || e.status === NotebookStatus.forged || e.status === NotebookStatus.teaching)
-      return reject(room, seat, 'BAD_REQUEST');
+    if (!e || !attachable(e)) return reject(room, seat, 'BAD_REQUEST');
     const row = new PetitionEntry();
     row.clueKind = e.clueKind;
     row.value = publicAxis(e.clueKind) === undefined ? 0 : e.value;
     row.sceneId = e.sceneId;
-    row.backed = e.status === NotebookStatus.verified || e.status === NotebookStatus.corroborated;
+    row.backed = backedEntry(e);
     entries.push(row);
+    raw.push({
+      clueKind: row.clueKind,
+      value: row.value,
+      raw: e.value,
+      sceneId: row.sceneId,
+      backed: row.backed,
+    });
   }
   const id = `petition_${++m.seq}`;
   m.open = {
@@ -178,6 +212,7 @@ export function handlePetitionOpen(room: PartyRoom, seat: string, payload: Recor
     needed: Math.ceil(balance.petition.othersPct * freeHumans(room)),
     constableMay: freeHumans(room) <= balance.petition.constableAtHumans,
     untilTick: tick + Math.round(balance.petition.openS * TICK_RATE),
+    raw,
   };
   const row = room.state.petition;
   row.id = id;
@@ -266,6 +301,7 @@ export function runPetition(room: PartyRoom): void {
       charge: open.charge,
       tick,
       watchers: [open.opener, ...open.signers].filter((s) => s !== ''),
+      entries: open.raw,
     });
     emitSim(room, {
       tick,
@@ -338,6 +374,13 @@ export function fileByConstables(room: PartyRoom): void {
     needed: 0,
     constableMay: false,
     untilTick: tick + Math.round(balance.petition.openS * TICK_RATE),
+    raw: fit.entries.slice(0, balance.petition.maxEntries).map((e) => ({
+      clueKind: e.clueKind,
+      value: e.value,
+      raw: e.value,
+      sceneId: e.sceneId,
+      backed: e.backed,
+    })),
   };
   const row = room.state.petition;
   row.id = id;

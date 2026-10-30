@@ -476,5 +476,17 @@
     "yard": { "difficulty": 3, "boardS": 20, "maxHpLoss": 10, "maxHpFloor": 80, "purse": 2 },
     "scrub": { "difficulty": 2, "wage": 1 },
     "gddRef": "3.27"
+  },
+  "trial": {
+    "chargeS": 5,
+    "caseS": 30,
+    "defenceS": 30,
+    "convictAt": 2,
+    "murderAt": 2,
+    "acquittalGraceS": 30,
+    "theftFine": 6,
+    "trespassFine": 4,
+    "rumourFine": 3,
+    "gddRef": "3.8"
   }
 }

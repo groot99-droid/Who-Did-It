@@ -83,6 +83,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number; left?: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop with an `owner` gives each stock row how many it has `left` today, the same for every opener. |
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
+| `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
