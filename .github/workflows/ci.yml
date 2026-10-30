@@ -42,3 +42,63 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @wdi/server test
+
+  # The whole Playwright suite against the real server (ARCHITECTURE 5.12, DECISIONS A514) on every pull request
+  # that touches the client, the shared or content packages, the lockfile or this workflow. A spec went stale a
+  # round after it was written while nothing ran the suite (A494). The job is required, so on a pull request that
+  # touches none of those paths, and on a push, it reports green without running.
+  e2e:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    # About 15 minutes of specs after the install, the browser and the client build.
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - name: Paths
+        id: paths
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # The checkout is the merge of the pull request into its base, so the diff against the base's tip is
+          # the pull request's own change. Only the two trees are needed, not the history between them.
+          git fetch --depth=1 origin "$BASE_SHA"
+          changed=$(git diff --name-only "$BASE_SHA" HEAD)
+          if printf '%s\n' "$changed" |
+            grep -qE '^(apps/client/|packages/shared/|packages/content/|pnpm-lock\.yaml$|\.github/workflows/ci\.yml$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing the suite covers changed; the job reports green without running it." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/setup-node@v7
+        if: steps.paths.outputs.run == 'true'
+        with:
+          node-version: 22
+      - if: steps.paths.outputs.run == 'true'
+        run: corepack enable
+      - if: steps.paths.outputs.run == 'true'
+        run: pnpm install --frozen-lockfile
+      # The client's build resolves @wdi/content to its dist (pages.yml does the same).
+      - if: steps.paths.outputs.run == 'true'
+        run: pnpm --filter @wdi/content build
+      # The runner has no browser; the pinned Playwright fetches its own Chromium and the libraries it needs.
+      - if: steps.paths.outputs.run == 'true'
+        run: pnpm --filter @wdi/client exec playwright install --with-deps chromium
+      - name: Playwright
+        if: steps.paths.outputs.run == 'true'
+        env:
+          # Of the opt-in suites (ARCHITECTURE 5.12) the looks suite runs too; match.spec and npc.spec join once
+          # their host's walk is fixed (A514), admin.spec stays behind its token.
+          WDI_E2E_LOOKS: '1'
+        run: pnpm --filter @wdi/client test:e2e
+      - name: Traces of the failed specs
+        if: failure() && steps.paths.outputs.run == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-traces
+          path: apps/client/test-results
+          if-no-files-found: ignore
+          retention-days: 7
