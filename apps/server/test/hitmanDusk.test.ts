@@ -4,7 +4,7 @@ import { Phase } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory, avatarOf } from '../src/sim/Avatars';
 import { gameOverExtras } from '../src/sim/Deck';
-import { count, strip } from '../src/sim/Inventory';
+import { addStack, canAdd, count, strip } from '../src/sim/Inventory';
 import { stationOf } from '../src/sim/MapSites';
 import { simOf } from '../src/sim/RoomSim';
 import { isOnLine } from '../src/sim/Train';
@@ -105,6 +105,25 @@ describe('the Derringer (GDD 3.33)', () => {
     expect(dead(m, bystander)).toBe(true);
     expect(dead(m, mark)).toBe(false);
     expect(openContract(m.room, hitman.id)?.target).toBe(mark.id); // the contract stays open
+  });
+});
+
+describe('the turning and a full pack (6Z, C4b review)', () => {
+  it('never turns a seat with no room for the Derringer; one with room gets it', async () => {
+    const m = await startMatch(colyseus, 5, ROLES);
+    setPhase(m, Phase.day);
+    const fill = (id: string) => {
+      const p = m.room.state.players.get(id)!;
+      for (const item of ['oil', 'crowbar', 'stone'])
+        for (let i = 0; i < 64 && canAdd(p, DERRINGER_ITEM, 1); i++) addStack(p, item, 1);
+      return !canAdd(p, DERRINGER_ITEM, 1);
+    };
+    const roomy = m.bots[1]!.id; // the Detective keeps its room
+    for (const b of m.bots) if (b.id !== roomy) expect(fill(b.id)).toBe(true);
+    forceArrival(m.room, m.room.state.round, true);
+    onDeliveryArrival(m.room, m.room.state.round);
+    expect(isTurned(m.room, roomy)).toBe(true);
+    expect(count(m.room.state.players.get(roomy)!, DERRINGER_ITEM)).toBe(1);
   });
 });
 

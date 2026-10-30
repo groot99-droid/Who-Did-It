@@ -2,7 +2,7 @@ import { balance, roles } from '@wdi/content';
 import { TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { systemLine } from '../economy/rumours';
-import { addStack } from '../Inventory';
+import { addStack, canAdd } from '../Inventory';
 import { stationOf } from '../MapSites';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
@@ -80,7 +80,8 @@ export const isTurned = (room: PartyRoom, seat: string): boolean => arrivals.get
 
 /**
  * The seats the letter may turn: living, free, wearing their own card's look (no cover, Cabal or Thief card: its
- * `townWork` is not `worn`), holding no vendetta and no vendetta's partner card.
+ * `townWork` is not `worn`), holding no vendetta and no vendetta's partner card, and with room in the pack for the
+ * Derringer (C4b; never dropped or evicting a stack, both public, and the pool is never public).
  */
 function eligible(room: PartyRoom): string[] {
   const sim = simOf(room);
@@ -98,7 +99,8 @@ function eligible(room: PartyRoom): string[] {
       !isOnLine(room, seat) &&
       roles.roles[card]?.townWork.work !== 'worn' && // no cover, no Cabal card, no Thief: its own card's look
       !vendettaHolders(room).has(seat) &&
-      !partners.has(card)
+      !partners.has(card) &&
+      canAdd(room.state.players.get(seat)!, DERRINGER_ITEM, 1)
     );
   });
 }
