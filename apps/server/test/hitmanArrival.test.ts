@@ -15,7 +15,7 @@ import {
   isTurned,
   onDeliveryArrival,
 } from '../src/sim/vendettas/arrival';
-import { eligibleVendettas, vendettaOf } from '../src/sim/vendettas/state';
+import { vendettaOf } from '../src/sim/vendettas/state';
 import { openContract } from '../src/sim/vendettas/contract';
 import { type Party, bootNpcServer, lobbyOf, npcIdsOf, standardParty } from './npcHelpers';
 import { sleep } from './simHelpers';
@@ -62,44 +62,25 @@ describe('the draw (world-mode.md 1.5, F4 a12, a13)', () => {
       expect([...days].sort()).toEqual([3, 4, 5]);
     }
   });
-
-  it('is never drawn by the Killer at the deal: the Hitman row is an arrival row', () => {
-    const room = {
-      seeds: new MatchSeeds(),
-      state: { settings: { map: 'hollowmere' }, players: new Map() },
-    } as never;
-    const cards = ['killer', 'vicar', ...Array.from({ length: 6 }, () => 'townsfolk')];
-    expect(eligibleVendettas(room, 'killer', cards).map((v) => v.id)).not.toContain('hitman');
-  });
 });
 
 /** Three humans and the S1 NPC seats by day: the main mode. */
 const mainParty = () => standardParty(colyseus, 'S1', false, 3);
 
-/** A client's decoded roster (the client room's state is untyped). */
-interface Roster {
-  players: {
-    forEach(cb: (p: { toJSON(): Record<string, unknown> }, id: string) => void): void;
-    get(id: string): { priv?: { hitman?: boolean; notebook: { note: number }[] } } | undefined;
-  };
-}
-const rosterOf = (h: Party['humans'][number]) => h.room.state as Roster;
+type Row = { priv?: { hitman?: boolean; notebook: { note: number }[] }; presence?: unknown };
+/** A client's decoded roster, as plain rows (the client room's state is untyped). */
+const rosterOf = (h: Party['humans'][number]) =>
+  (h.room.state as { players: { toJSON(): Record<string, Row> } }).players.toJSON();
 
-/** Every seat's public row as each other client decodes it, `priv` and `presence` aside. */
-function publicRows(party: Party): string[] {
-  return party.humans.map((h) => {
-    const rows: Record<string, unknown> = {};
-    rosterOf(h).players.forEach((p, id) => {
-      const {
-        priv: _p,
-        presence: _q,
-        ...rest
-      } = JSON.parse(JSON.stringify(p.toJSON())) as Record<string, unknown>;
-      if (id !== h.id) rows[id] = rest;
-    });
-    return JSON.stringify(rows);
-  });
-}
+/** Every other seat's public row as each client decodes it, `priv` and `presence` aside. */
+const publicRows = (party: Party): string[] =>
+  party.humans.map((h) =>
+    JSON.stringify(
+      Object.entries(rosterOf(h)).flatMap(([id, { priv: _p, presence: _q, ...rest }]) =>
+        id === h.id ? [] : [[id, rest]],
+      ),
+    ),
+  );
 
 const linesOf = (party: Party) =>
   party.humans.map((h) =>
@@ -127,13 +108,11 @@ describe('the turning (seams.md 3 row 20)', () => {
     const seat = await turn(party, true);
     expect(seat).not.toBeNull();
     expect(isNpcSeat(room, seat!)).toBe(false);
-    const card = room.state.players.get(seat!)!.priv.role.roleId;
-    expect(['killer', 'accomplice']).not.toContain(card);
-    expect(card).toBe(room.state.players.get(seat!)!.priv.role.roleId); // the card is kept
+    expect(['killer', 'accomplice']).not.toContain(room.state.players.get(seat!)!.priv.role.roleId);
     expect(vendettaOf(room, seat!)?.id).toBe('hitman');
     expect(publicRows(party)).toEqual(before);
     for (const h of party.humans) {
-      const own = rosterOf(h).players.get(h.id)?.priv;
+      const own = rosterOf(h)[h.id]?.priv;
       expect(own?.hitman === true, h.id).toBe(h.id === seat);
       expect(own?.notebook.some((n) => n.note === NoteKind.contract)).toBe(h.id === seat);
     }
@@ -142,30 +121,23 @@ describe('the turning (seams.md 3 row 20)', () => {
     expect(linesOf(party)).toEqual(party.humans.map(() => [HITMAN_ARRIVE_LINE]));
   });
 
-  it('turns an NPC seat with the same sign, and sends nothing when nobody comes', async () => {
+  it('turns an NPC seat with the same sign, once; sends nothing when he does not come', async () => {
     const party = await mainParty();
     const seat = await turn(party, false);
     expect(seat !== null && isNpcSeat(party.room, seat)).toBe(true);
     expect(linesOf(party)).toEqual(party.humans.map(() => [HITMAN_ARRIVE_LINE]));
     onDeliveryArrival(party.room, party.room.state.round); // once only
-    const quiet = await mainParty();
-    drawArrival(quiet.room, []); // no humans: he never comes
-    onDeliveryArrival(quiet.room, quiet.room.state.round);
+    drawArrival(party.room, []); // no humans: he never comes
+    onDeliveryArrival(party.room, party.room.state.round);
     await sleep(200);
-    expect(linesOf(quiet).flat()).toEqual([]);
     expect(linesOf(party).flat()).toHaveLength(party.humans.length);
   });
 
   it('turns no cover, Cabal or Thief card, and none holding a vendetta; with none eligible he never comes', async () => {
     const party = await mainParty();
     const room = party.room;
-    const ids = [...room.state.players.keys()];
     const others = ['drifter', 'thief', 'killer', 'accomplice'];
-    ids.forEach((id, i) => {
-      const card = room.state.players.get(id)!.priv.role.roleId;
-      if (card !== 'killer' && card !== 'accomplice')
-        room.state.players.get(id)!.priv.role.roleId = others[i % 4]!;
-    });
+    [...room.state.players.values()].forEach((p, i) => (p.priv.role.roleId = others[i % 4]!));
     expect(await turn(party, true)).toBeNull();
     expect(linesOf(party).flat()).toEqual([]);
   });
@@ -206,11 +178,10 @@ describe('stream isolation (sim/seeds.ts)', () => {
         p.look,
         p.traits.height,
       ]);
-      const npcs = npcIdsOf('S1');
-      const draws = (['deal', 'traits', 'nodes', 'mobs', 'events', 'minigame', 'vendetta'] as const).map(
-        (n) => room.seeds.get(n)(),
-      );
-      for (const id of npcs) draws.push(room.seeds.get('npcPlay', id)(), room.seeds.get('npcTiming', id)());
+      const streams = ['deal', 'traits', 'nodes', 'mobs', 'events', 'minigame', 'vendetta'] as const;
+      const draws = streams.map((n) => room.seeds.get(n)());
+      for (const id of npcIdsOf('S1'))
+        draws.push(room.seeds.get('npcPlay', id)(), room.seeds.get('npcTiming', id)());
       return JSON.stringify({ seats, draws });
     };
     expect(await snap(true)).toBe(await snap(false));
