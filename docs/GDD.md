@@ -1432,8 +1432,8 @@ the Hitman: the mail turns a townsman into one.
 - **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
   like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
   (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2). It may be fired
-  only at a figure drawn as the mark's look: the test reads the drawn figure, never the seat behind it, so the
-  real mark drawn as someone else is refused like any figure, and an impersonator drawn as the mark dies in its place
+  only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads the drawn figure, never the seat
+  behind it, so the real mark drawn as someone else is refused like any figure, and an impersonator drawn as the mark dies in its place
   while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
   makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
 - **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day

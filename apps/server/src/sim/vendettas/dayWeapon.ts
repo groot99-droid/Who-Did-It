@@ -18,11 +18,12 @@ import { acceptOpenContract, openContract } from './contract';
  * turned seat's own pack at the turning (`arrival.ts`), role-bound and `onDeath: kept` like the Knife, so no robbery,
  * search, loot or death drop moves or shows it (`Inventory.ts` `strip` keeps it; no shop, recipe or chest names it).
  * `act.ability {abilityId: 'derringer', targetId}`: one shot, by day (`abilities.json` `phases`), with every refusal
- * of the Knife's `validateKill` path. The test of the target reads the drawn figure, never the seat behind it (row 14's
- * rule): a figure drawn as the mark's look (`Avatar.lookOf` is the mark's `Player.look`) may be shot, any other is
- * refused as a non-target; the shot lands on the seat behind the figure, so an impersonator drawn as the mark dies in
- * its place and the contract stays open. The death's cause is `derringer`, which the Train never returns; it makes
- * the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
+ * of the Knife's `validateKill` path. The test of the target reads the drawn figure, never the seat behind it (row
+ * 14's rule, as the manhunt reads the accused): a figure drawn with the mark's face (`Avatar.lookOf`, the seat whose
+ * face it draws, is the mark) may be shot, any other is refused as a non-target; the shot lands on the seat behind
+ * the figure, so an impersonator drawn as the mark dies in its place and the contract stays open. The death's cause
+ * is `derringer`, which the Train never returns; it makes the Last Shot's noise and lays no clue of a look. A shot
+ * at the mark accepts an open contract first.
  */
 
 const DERRINGER = DERRINGER_ITEM; // the ability and the item share the id
@@ -40,10 +41,9 @@ export function handleDerringer(room: PartyRoom, sessionId: string, payload: Rec
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED');
   const handle = payload.targetId;
   const figure = typeof handle === 'string' ? avatarOf(room, handle) : undefined;
-  const markLook = room.state.players.get(contract.target)?.look;
   const targetId = resolveHandle(room, sessionId, handle);
   const target = targetId === null ? undefined : sim.players.get(targetId);
-  if (!figure || figure.lookOf !== markLook || !target || targetId === sessionId)
+  if (!figure || figure.lookOf !== contract.target || !target || targetId === sessionId)
     return reject(room, sessionId, 'NO_TARGET');
   const grid = navGrid(sceneKey(actor.sceneIdx), sim.profile);
   const verdict = validateKill({

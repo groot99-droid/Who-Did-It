@@ -86,7 +86,9 @@ describe('the Derringer (GDD 3.33)', () => {
     expect(dead(m, mark)).toBe(true);
     expect(isOnLine(m.room, mark.id)).toBe(false); // permanent (R4)
     expect(count(m.room.state.players.get(hitman.id)!, DERRINGER_ITEM)).toBe(0);
-    expect(vendettaSteps(m.room).map((s) => s.kind)).toContain('vendetta.contract.done');
+    expect(await until(() => vendettaSteps(m.room).some((s) => s.kind === 'vendetta.contract.done'))).toBe(
+      true,
+    );
     await sleep(150);
     expect(eventsOf(mark, 'killed').at(-1)).toMatchObject({ cause: 'derringer' });
     expect(hitmanGameOver(m.room)?.stage).toBe('killed');
@@ -94,12 +96,11 @@ describe('the Derringer (GDD 3.33)', () => {
 
   it('reads the drawn figure: the mark drawn as another is refused; one drawn as the mark dies in its place', async () => {
     const { m, hitman, mark, bystander } = await hitmanDay();
-    const markLook = m.room.state.players.get(mark.id)!.look;
-    avatarOf(m.room, handle(m, mark))!.lookOf = 'x';
+    avatarOf(m.room, handle(m, mark))!.lookOf = bystander.id; // the mark drawn as another
     shoot(m, hitman, mark);
     await sleep(150);
     expect(reasons(hitman)).toEqual(['NO_TARGET']);
-    avatarOf(m.room, handle(m, bystander))!.lookOf = markLook;
+    avatarOf(m.room, handle(m, bystander))!.lookOf = mark.id; // drawn with the mark's face
     shoot(m, hitman, bystander);
     expect(dead(m, bystander)).toBe(true);
     expect(dead(m, mark)).toBe(false);
@@ -141,7 +142,9 @@ describe('the Dusk Train (GDD 3.33, F4 b6)', () => {
     expect(progressOf(m.room, hitman.id).over).toBe(false);
     onDuskArrival(m.room, day + balance.hitman.contractDays - 1);
     expect(progressOf(m.room, hitman.id).over).toBe(true);
-    expect(vendettaSteps(m.room).map((s) => s.kind)).toContain('vendetta.contract.lapsed');
+    expect(await until(() => vendettaSteps(m.room).some((s) => s.kind === 'vendetta.contract.lapsed'))).toBe(
+      true,
+    );
     expect(hitmanGameOver(m.room)?.stage).toBe('arrived');
   });
 
