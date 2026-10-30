@@ -275,7 +275,7 @@ describe('EntityView (GDD 3.17)', () => {
     const clocked = (tick: { n: number }) => ({
       avatars: () => [],
       selfHandle: () => '',
-      clock: () => ({ tick: tick.n, phase: 1, phaseEndsTick: 0, startTick: 0 }),
+      clock: () => ({ tick: tick.n, phase: 1, phaseEndsTick: 0, startTick: 0, round: 0 }),
     });
     const walker = (x: number) => [avatar('h-me', SELF), avatar('h-a', 'a', { x })];
 

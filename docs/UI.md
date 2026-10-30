@@ -1880,7 +1880,8 @@ bed, never who (GDD 3.32).
 Session 10C, C1 (DECISIONS A230). The server's lines go on the `chat.msg` `system` channel to every seat, like the
 arrival line of 14.30. C1b adds the On-the-line screen (`ui/OnTheLine.ts`): a full-screen dark carriage over the
 world while `Private.onLine` is true, through a meeting too (a seat on the line does not attend, phases.md 4), with
-the time to the morning train, how the seat died and what it keeps; when
+the time to the morning train (or to the Final Night's bells on the last cycle, 14.51.5), how and where the seat
+died, what it keeps, and its own Notebook and quests read only (14.51.5); when
 the train brings the seat back the screen lifts and a 3 s toast says so. The manifest is the log line below.
 
 | Line | Text | Where |
@@ -1889,8 +1890,8 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
 | the fare owed (`purse.fare`, C2b) | You owe the line {n} Scrip | under the own purse counter, while a fare is owed |
 | the screen's title (`line.title`) | On the line | On the line, top band |
-| the time to the train (`line.train`) | The train in {time} | On the line, top band, as m:ss |
-| how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
+| the time to the train (`line.train`) | The train in {time} | On the line, top band, as m:ss, until the last cycle; then `line.bells` (14.51.5) |
+| how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you in {place}. / Something in the dark took you in {place}. / A shot took you in {place}. / You fell by day. | On the line, centre; {place} is the name of the scene of the own `killed.sceneId` (14.51.5), and `.other` the line of a client no `killed` reached |
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
@@ -2043,3 +2044,24 @@ slot lies beside the cells.
 - **The out slot** of the crafting square (14.44) sits beside the cells behind an arrow, dashed and a size larger
   (3.5rem), so it no longer reads as a tenth cell under the first column (`crafting-390w.png`,
   `crafting-1280x720.png`).
+
+#### 14.51.5 On the line: the place, the book and the bells (y13)
+
+C1b's three optional items (`docs/round9/phases.md` 6; DECISIONS A474), client only. The centre line names where the
+seat fell: `killed.sceneId`, which the server already sends, is kept by the World beside the cause and named by
+`view/sceneNames.ts` ("A wolf took you in HollowMere."; the id with underscores spelled out until the names load); a
+client that no `killed` reached keeps `line.cause.other`. Under the carriage lines sits the seat's book: its Notebook
+(`view/NotebookPanel.ts` with `readOnly`: a contract note draws no Accept) and its quests (`ui/QuestLog.ts`
+`questRowEl` with no actions: the held and finished quests with their progress, no Take, no Hand-in, and no offer,
+since no giver is in reach), both from the private view, which still syncs on the line, on the Notebook sheet's night
+page (`match.css`); the screen scrolls on a phone.
+On the last cycle, when the day that follows would be the Final Night (`finalNight.afterCycle`, GDD 3.3), no morning
+train comes: the top band reads `line.bells` and counts to the end of the night (or of the meeting's immunity) without
+`train.arriveAtS`, since the bells bring the line back as the hunt begins. The feed's `clock()` carries the public
+`round` for it; nothing changes on the wire. `OnTheLine.test.ts` covers the three rules; `e2e/screens.spec.ts` the
+line, the book and the bells at 390 x 844 and 1280 x 720 (`docs/ui/line-*.png`), with not one button on the screen.
+
+| Line | Text | Where |
+|---|---|---|
+| the time to the bells (`line.bells`) | The bells in {time} | On the line, top band, as m:ss, in place of `line.train` when the next day is the Final Night |
+| no work held (`line.quests.none`) | You hold no work. | On the line, the quest list, when the seat holds no quest |
