@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { Faction, GddRef, Id, LookId, PaletteToken, Ships, byPlayerCount } from './common.js';
+import { Faction, GddRef, Id, LookId, PaletteToken, PrefixedId, Ships, byPlayerCount } from './common.js';
 
 export const KitEntry = z.strictObject({ item: Id, qty: z.number().int().positive() });
 
@@ -10,6 +10,18 @@ export const FactionInfo = z.strictObject({
   /** Members are told each other's names on the role card (Cabal only). */
   membersKnowEachOther: z.boolean(),
 });
+
+/**
+ * Round 10, C3 (GDD 3.23; round10-plan.md 5): the work a card's look does in town, which stops while the look is gone.
+ * `stall`: its shop (`economy.json` `owner`) sells from a day's stock; `faith`: its `props` earn Faith; `worn`: a cover
+ * or Killer card does the work of the look it wears; `none`: nothing built yet. `nfy` says what is not built yet.
+ */
+export const TownWork = z.strictObject({
+  work: z.enum(['stall', 'faith', 'worn', 'none']),
+  props: z.array(PrefixedId).min(1).optional(),
+  nfy: z.string().min(1).optional(),
+});
+export type TownWork = z.infer<typeof TownWork>;
 
 export const Role = z.strictObject({
   id: Id,
@@ -26,6 +38,7 @@ export const Role = z.strictObject({
   look: LookId.nullable(),
   /** A profession names the class row it plays as; every rules field equals that row's (validate.ts). */
   plays: Id.optional(),
+  townWork: TownWork,
   ships: Ships,
   /** Part of the M3 first playable (GDD 3.10). */
   firstPlayable: z.boolean(),

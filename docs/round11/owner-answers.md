@@ -43,6 +43,21 @@ the client draws under every y-sorted sprite and fades at dusk. The default had 
 light hides most of them (`pipeline.md` 3.2), and CL2 keeps that key. `round11-plan.md` says which light casts the long
 shadows and what the layer costs.
 
+## The plan approved (2026-10-30)
+
+The owner approved `round11-plan.md` (A236). In 11A's session, after 11A said the plan had gone to the owner for
+approval, the owner wrote, verbatim:
+
+> yes merge
+
+In 6Z's session, answering 6Z's numbered list, where item 3 was the plan's approval with CL3a's default (item 6 was
+round 10's Herb Bread question), the owner wrote, verbatim:
+
+> 3. confirm, 6. dawn. im off for tonight
+
+So CL3a takes its default: the long shadows fall from a sun at 25°, turned 45° from today's key (`round11-plan.md` 9).
+The look gate shows them again in every style. Round 11 builds after round 10's final sweep (10Z) has merged.
+
 ## What three defaults still need from the owner
 
 - **SC2.** The default allows Meshy models "once you confirm that Meshy's output on your plan is yours to ship". Until
