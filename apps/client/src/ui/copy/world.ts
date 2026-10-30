@@ -88,4 +88,14 @@ export const WORLD_COPY = {
   // 14.8 Ghost (the world side)
   'ghost.label': 'You are a ghost',
   'ghost.walk': 'Walk anywhere. Only ghosts can see you.',
+
+  // 14.47 On the line (round 10, C1b)
+  'line.title': 'On the line',
+  'line.train': 'The train in {time}',
+  'line.cause.wolf': 'A wolf took you.',
+  'line.cause.creature': 'Something in the dark took you.',
+  'line.cause.shot': 'A shot took you.',
+  'line.cause.other': 'You fell by day.',
+  'line.kept': 'Your card and your Notebook come back with you. Your pack and your purse lie where you fell.',
+  'line.back': 'You are back. You stepped off the morning train.',
 } as const satisfies Record<string, string>;

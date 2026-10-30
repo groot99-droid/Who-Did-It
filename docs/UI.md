@@ -1793,9 +1793,16 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
 ### 14.47 The train's returns (10C, round 10)
 
 Session 10C, C1 (DECISIONS A230). The server's lines go on the `chat.msg` `system` channel to every seat, like the
-arrival line of 14.30. The On-the-line screen and the dawn manifest come with C1b.
+arrival line of 14.30. C1b adds the On-the-line screen (`ui/OnTheLine.ts`): a full-screen dark carriage over the
+world while `Private.onLine` is true, with the time to the morning train, how the seat died and what it keeps; when
+the train brings the seat back the screen lifts and a 3 s toast says so. The manifest is the log line below.
 
 | Line | Text | Where |
 |---|---|---|
 | a seat back on the morning train (server, `Train.ts` `trainReturnLine`) | {name} steps off the train. | `chat.msg` `system`, every seat, at the arrival |
 | the Dusk Train (server, `Train.ts` `TRAIN_DUSK_LINE`) | The dusk train pulls out of the station. | `chat.msg` `system`, every seat, once per dusk |
+| the screen's title (`line.title`) | On the line | On the line, top band |
+| the time to the train (`line.train`) | The train in {time} | On the line, top band, as m:ss |
+| how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
+| what it keeps (`line.kept`) | Your card and your Notebook come back with you. Your pack and your purse lie where you fell. | On the line, below |
+| back on the platform (`line.back`) | You are back. You stepped off the morning train. | toast, 3 s, to the returning seat |

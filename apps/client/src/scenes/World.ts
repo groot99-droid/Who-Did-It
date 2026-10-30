@@ -3,7 +3,7 @@ import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
-import type { ErrorPayload } from '@wdi/shared/protocol';
+import type { DeathCause, ErrorPayload } from '@wdi/shared/protocol';
 import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
@@ -43,6 +43,7 @@ import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 
 import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
+import { type LineScreen, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -115,6 +116,13 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
+/** Round 10, C1b: per feed, whether its seat was on the line and how it died; a World restart keeps it. */
+const lines = new WeakMap<WorldFeed, { on: boolean; cause: DeathCause | undefined }>();
+const lineOf = (feed: WorldFeed): { on: boolean; cause: DeathCause | undefined } => {
+  let memory = lines.get(feed);
+  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined }));
+  return memory;
+};
 
 interface PortalSpot {
   id: string;
@@ -176,6 +184,8 @@ export class World extends Phaser.Scene {
   private hold: { clueId: string; since: number; x: number; y: number } | null = null;
   private focusEntry: { had: number; until: number } | null = null;
   private wasDead = false;
+  /** Round 10, C1b: the On-the-line screen while this seat waits for the morning train. */
+  private line: LineScreen | null = null;
   /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
   private lastPhase = -1;
   private stepAt = 0;
@@ -193,6 +203,7 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.focusEntry = null;
     this.wasDead = false;
+    this.line = null;
   }
 
   preload(): void {
@@ -287,8 +298,10 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
-    const onKilled = (m: { cutsceneId?: string }) =>
+    const onKilled = (m: { cutsceneId?: string; cause?: string }) => {
+      lineOf(this.feed).cause = m.cause as DeathCause | undefined; // round 10, C1b: the screen's centre line
       void this.cutscenes.playDeath(m.cutsceneId).then(() => this.refreshGhost());
+    };
     const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
     feed.bus.on('noise', onNoise);
     feed.bus.on('error', onError);
@@ -359,6 +372,7 @@ export class World extends Phaser.Scene {
       this.civic?.destroy(); // round 8, 8D
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
+      this.line?.destroy(); // round 10, C1b
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -395,6 +409,7 @@ export class World extends Phaser.Scene {
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     if (!this.cutscenes.playing) this.refreshGhost();
+    if (!this.cutscenes.playing) this.refreshLine(clock); // round 10, C1b
 
     const clues = feed.clues();
     const bodies = feed.bodies();
@@ -709,6 +724,25 @@ export class World extends Phaser.Scene {
       v.destroy();
       this.bodyViews.delete(id);
     }
+  }
+
+  /**
+   * Round 10, C1b (GDD 3.22, UI.md 14.47): on the line the seat sees the dark carriage and the time to the train, never
+   * the world (the server sends it none); when the train brings it back, the screen lifts and says so.
+   */
+  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number }): void {
+    const memory = lineOf(this.feed);
+    const on = this.feed.onLine();
+    if (on) {
+      memory.on = true;
+      this.line ??= mountOnTheLine(overlayRoot(), memory.cause);
+      return this.line.update(lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE));
+    }
+    this.line?.destroy();
+    this.line = null;
+    if (!memory.on) return;
+    memory.on = false; // the scene restarts on the platform, so the memory outlives this run
+    this.hud.toast(C['line.back'], 'warm', undefined, 3000);
   }
 
   /** Ghost mode: your sprite translucent, "You are a ghost", the verbs off. The flag lives in the feed. */

@@ -282,6 +282,11 @@ export interface WorldFeed {
    * scene, so it survives World restarts; resets when the phase returns to the lobby.
    */
   dead(): boolean;
+  /**
+   * Round 10 (C1b, GDD 3.22): this seat died by day and waits for the morning train (`Private.onLine`). It is not a
+   * ghost then: `dead()` is false, and the On-the-line screen stands in for the world until the train.
+   */
+  onLine(): boolean;
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
   /** `targetId` is an avatar handle (GDD 3.17); the server resolves it to a seat. */
