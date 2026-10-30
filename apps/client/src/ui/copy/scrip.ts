@@ -20,6 +20,8 @@ export const SCRIP_COPY = {
   'purse.amount': '{n} Scrip',
   'purse.gain': '+{n}',
   'purse.loss': '−{n}',
+  // 14.47 Owing the line (round 10, C2b): only the seat sees it
+  'purse.fare': 'You owe the line {n} Scrip',
 
   // 14.34.1 Shop names
   'shop.bakery': 'Bakery',
