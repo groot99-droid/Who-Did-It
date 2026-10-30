@@ -21,6 +21,7 @@ import {
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
 import { NOTHING_HAPPENS, interactionFails, isNfy, refusalText } from '../ui/copy/refusals';
+import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
@@ -873,13 +874,8 @@ export class World extends Phaser.Scene {
     const at = toScreen(n.x, n.y);
     // HUD words are screen frame: "from the north" is up on the screen (SPRITES 10.4).
     const dir = meObj ? dirFromVector(at.x - meObj.x, at.y - meObj.y) : null;
-    const line = /bell/i.test(n.kind)
-      ? C['log.bell']
-      : scream
-        ? C['log.scream']
-        : /run|step/i.test(n.kind)
-          ? C['log.steps']
-          : C['log.door'];
+    // One line per kind, and never the door's for a kind this client does not know (10Y, A254).
+    const line = C[noiseLine(n.kind)];
     const label = fill(line, { dir: dir === null ? '' : C[`dir.${dir}` as keyof typeof C] });
     this.hud.say(label);
     if (scream) this.audio.play('scream');
