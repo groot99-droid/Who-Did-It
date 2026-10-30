@@ -1851,6 +1851,7 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
 | a stall's stock (`shop.left`, C3) | {n} left today | the shop panel, beside an item's price, at a stall with a character (`shop.open` `left`) |
 | a stall sold out (`shop.soldOut`, C3) | Sold out | the shop panel, in place of the count; the Buy button greys |
+| the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 
