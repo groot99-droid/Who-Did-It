@@ -12,6 +12,7 @@ import { emitSim } from './events/bus';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
+import { handlePlantClue } from './verbs/evidence';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
@@ -76,6 +77,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'eatHerbBread':
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
+    case 'plantClue':
+      return handlePlantClue(room, sessionId, payload, livingActor); // round 10, V1a (GDD 3.2)
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });
   }

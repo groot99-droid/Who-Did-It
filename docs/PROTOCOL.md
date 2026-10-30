@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string }` | 5/s | `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. |
+| `act.ability` | `{ abilityId: string; targetId?: string; kind?: string; value?: number }` | 5/s | `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean; via?: string }` | 5/s | Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |

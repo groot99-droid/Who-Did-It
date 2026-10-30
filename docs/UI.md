@@ -1969,3 +1969,24 @@ lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy 
 is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
 mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
 Tab shows it; a real room has the private view from the join).
+
+### 14.54 The evidence verbs (10V, round 10)
+
+The copy for V1a's Inspect and Plant Clue (GDD 3.4). The client lines are 10Y's to place; the server sends only the
+refusal reasons of 14.43 and `clueFound`.
+
+| Id | Copy |
+|---|---|
+| `verb.inspect` | Inspect |
+| `verb.inspect.prompt` | Inspect with a Lens ({n} left) |
+| `verb.inspect.done.verified` | Verified: this clue is true. |
+| `verb.inspect.done.forged` | Forged: someone planted this. An Accomplice is in play. |
+| `verb.plant` | Plant Clue |
+| `verb.plant.pick` | Plant what? |
+| `verb.plant.footprints` | Footprints: {height} stride |
+| `verb.plant.thread` | Thread: {scarf} wool |
+| `verb.plant.done` | Planted. It looks like any other clue. |
+| `card.lens` | Lenses: {n} of {max}. One comes back each dawn. |
+
+A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`.
