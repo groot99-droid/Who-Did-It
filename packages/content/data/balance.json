@@ -441,6 +441,13 @@
     },
     "days": [3, 5],
     "contractDays": 2,
+    "dormantOutput": 0.5,
+    "gddRef": "3.33"
+  },
+  "hardship": {
+    "atOnce": [1, 2],
+    "recoverS": 480,
+    "kinds": ["robbed", "harvest", "fined", "rent", "illness", "shipment"],
     "gddRef": "3.33"
   },
   "armor": {

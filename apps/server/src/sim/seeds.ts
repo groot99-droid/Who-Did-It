@@ -47,7 +47,8 @@ export type StreamName =
   | 'homes'
   | 'locks' // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
   | 'pairing' // round 10, B8: Walk with me's answer delays and rolls (public-safe, seams.md 1)
-  | 'hitman'; // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
+  | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
+  | 'hardship'; // round 10, C4c: how many seats a delivery strikes, which, and the kind (secret)
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];
