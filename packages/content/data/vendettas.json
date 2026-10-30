@@ -37,6 +37,7 @@
       "role": "killer",
       "kind": "contract",
       "maps": ["hollowmere"],
+      "arrival": true,
       "triggers": [{ "on": "train.arrive" }, { "on": "kill" }, { "on": "death" }],
       "emits": [
         "vendetta.contract.offered",
