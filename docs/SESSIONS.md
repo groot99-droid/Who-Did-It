@@ -4067,3 +4067,6 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
   props, furniture and machinery once the owner confirms the licence, never figures or creatures. 6Z merged their
   questions into `docs/round11/questions.md` (22, from 25: three were asked by both) and sent the owner a form
   that saves the answers.
+- 2026-10-30: the owner answered all 22 (`docs/round11/owner-answers.md`): 21 defaults, and CL3 changed to yes, so the
+  buildings' long shadows come in round 11. Three defaults still wait on the owner: the Meshy licence (SC2), the test
+  phone (BU4) and the environment's setup script (RN3). 6Z asked 11A to write `round11-plan.md`, with 11B.
