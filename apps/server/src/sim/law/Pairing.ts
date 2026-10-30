@@ -3,10 +3,13 @@ import { PairPhase, Phase, type Rng, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory } from '../Avatars';
 import { emitSim } from '../events/bus';
+import { mapScenesOf } from '../MapSites';
 import { isNpcSeat } from '../Npc';
+import type { Brain } from '../npc/memory';
 import { moodOf } from '../npc/needs';
 import { spanTicks } from '../npc/routine';
-import { simOf } from '../RoomSim';
+import { firstPortalToward, stand, walkThrough, walkTo } from '../npc/walk';
+import { type PlayerSim, simOf } from '../RoomSim';
 import { type Figure, type FigureAct, figureOfHandle, figuresOf } from '../townsfolk/figures';
 import { reject, sceneKey } from '../World';
 import { isGuard } from './Guards';
@@ -24,7 +27,7 @@ import { isGuard } from './Guards';
  * a third party only while the partner shares its scene (`pairedWith`). Nothing public shows a pair.
  */
 
-interface Ask {
+export interface Ask {
   asker: string;
   /** The asked seat or figure id. */
   target: string;
@@ -36,7 +39,7 @@ interface Ask {
   blocked: boolean;
 }
 
-interface PairMemory {
+export interface PairMemory {
   /** Open asks by asker. */
   asks: Map<string, Ask>;
   /** Both ends of every pair: id -> partner id (seats and figures). */
@@ -56,6 +59,9 @@ function memoryOf(room: PartyRoom): PairMemory {
   }
   return memory;
 }
+
+/** The room's asks and pairs (the tests read and steer them). */
+export const pairingMemory = (room: PartyRoom): PairMemory => memoryOf(room);
 
 const NIGHT_PHASES = new Set<number>([Phase.dusk, Phase.night, Phase.finalNight]);
 const rngOf = (room: PartyRoom): Rng => room.seeds.get('pairing');
@@ -234,9 +240,22 @@ export function followAct(room: PartyRoom, f: Figure): FigureAct | null {
   if (!lead) return null;
   const tick = room.state.tick;
   const scene = sceneKey(lead.sceneIdx);
-  if (lead.sceneIdx === f.sceneIdx && Math.hypot(lead.x - f.x, lead.y - f.y) <= balance.pairing.followTiles * TILE_PX)
-    return { kind: 'idle', untilTick: tick + 1, station: null, goal: { scene: sceneKey(f.sceneIdx), x: f.x, y: f.y } };
-  return { kind: 'travel', untilTick: Number.POSITIVE_INFINITY, station: null, goal: { scene, x: lead.x, y: lead.y } };
+  if (
+    lead.sceneIdx === f.sceneIdx &&
+    Math.hypot(lead.x - f.x, lead.y - f.y) <= balance.pairing.followTiles * TILE_PX
+  )
+    return {
+      kind: 'idle',
+      untilTick: tick + 1,
+      station: null,
+      goal: { scene: sceneKey(f.sceneIdx), x: f.x, y: f.y },
+    };
+  return {
+    kind: 'travel',
+    untilTick: Number.POSITIVE_INFINITY,
+    station: null,
+    goal: { scene, x: lead.x, y: lead.y },
+  };
 }
 
 /** An NPC seat's partner, when the NPC was the one asked (it follows); null otherwise. */
@@ -246,4 +265,36 @@ export function npcLeader(room: PartyRoom, id: string): { sceneIdx: number; x: n
   if (partner === undefined || !isNpcSeat(room, id)) return null;
   // Two NPC seats never pair (NPCs do not ask); a human partner leads.
   return isNpcSeat(room, partner) ? null : placeOf(room, partner);
+}
+
+/** Whether `id` is shielded from `by` (the alone rules): its partner shares its scene and is not `by` itself. */
+export function shielded(room: PartyRoom, id: string, by: string): boolean {
+  const partner = pairedWith(room, id);
+  return partner !== null && partner !== by;
+}
+
+/**
+ * An NPC seat walking with a human partner (`npc/world.ts`, before its routine): within `followTiles` it stands,
+ * else it walks to the partner, through the first portal on the way when the partner is elsewhere. Returns whether
+ * it drove the seat this tick.
+ */
+export function followPartner(room: PartyRoom, brain: Brain, p: PlayerSim, id: string): boolean {
+  const lead = npcLeader(room, id);
+  if (!lead) return false;
+  if (lead.sceneIdx === p.sceneIdx) {
+    const reach = balance.pairing.followTiles * TILE_PX;
+    if (Math.hypot(lead.x - p.x, lead.y - p.y) <= reach) stand(p);
+    else if (walkTo(room, brain, p, lead.x, lead.y, reach) === 'stuck') return false;
+    return true;
+  }
+  const to = sceneKey(lead.sceneIdx);
+  const portal = firstPortalToward(
+    sceneKey(p.sceneIdx),
+    simOf(room).profile,
+    (s) => s === to,
+    mapScenesOf(room),
+  );
+  if (!portal) return false;
+  walkThrough(room, brain, p, id, portal);
+  return true;
 }

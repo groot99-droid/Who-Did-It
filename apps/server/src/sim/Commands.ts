@@ -17,6 +17,7 @@ import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
 import { handleCraftGrid } from './Craft';
 import { handleInvMove, handleInvSelect } from './InventoryMoves';
+import { handlePairAnswer, handlePairAsk } from './law/Pairing';
 import { wakeOnInput } from './Sleep';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -130,6 +131,13 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.craftGrid: // round 10, A13 (GDD 3.30)
         handleCraftGrid(room, cmd.sessionId, payload);
+        break;
+      // Round 10, B8 (GDD 3.31): Walk with me.
+      case C2S.pairAsk:
+        handlePairAsk(room, cmd.sessionId, payload);
+        break;
+      case C2S.pairAnswer:
+        handlePairAnswer(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.
