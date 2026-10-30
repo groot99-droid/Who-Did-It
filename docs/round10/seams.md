@@ -22,6 +22,14 @@ it here. Numbers stay in `GDD.md` and `packages/content/data`.
 **Merging.** Before a session marks a pull request complete it merges `origin/claude/zen-turing-m1jnw0` in and runs
 the full check. A JSON conflict keeps both sides' keys. A conflict in another session's logic goes to 6Z.
 
+A Complete may stand on a base a few merges old (6Z, 2026-10-30, at 10X's request), when three things hold. The full
+check, with `pnpm auto -- --matches 50` for a rules pull request, ran clean on a head that merged the base. No merge
+since touches a file the pull request's code touches; rows in `DECISIONS.md`, `UI.md` 14 and `GDD.md` don't count if
+they merge clean, and the description lists those merges. Lint and typecheck pass on a local merge with the current
+base. Before merging, 6Z runs the full check on the true merge (every package's tests and the whole server suite), and
+auto 50 for a rules pull request. A merge since that touches one of the pull request's code files, or a failure in
+6Z's check, sends it back for a base merge and a full rerun.
+
 ## 2. Ids the plan already fixes
 
 - **Refusal reasons.** The reasons of `failures.md` 4.1 to 4.9 and the `NFY` tag all land in A1, so no later session

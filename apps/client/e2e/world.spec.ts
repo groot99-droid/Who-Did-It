@@ -43,7 +43,7 @@ test('the touch controls appear with ?touch=1', async ({ page }) => {
   await toWorld(page, '&touch=1');
   await expect(page.locator('.wdi-stick')).toBeVisible();
   await expect(page.getByTestId('touch-use')).toBeVisible();
-  await expect(page.getByTestId('touch-act')).toBeVisible();
+  await expect(page.getByTestId('touch-ability-Q')).toHaveText(/Kill/); // round 10, 10Y (A334): the card's discs
 });
 
 /**
