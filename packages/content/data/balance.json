@@ -462,5 +462,9 @@
     "scrub": { "difficulty": 2, "wage": 1 },
     "gddRef": "3.27"
   },
-  "snare": { "seeTiles": 1, "gddRef": "3.5" }
+  "snare": {
+    "seeTiles": 1,
+    "npc": { "setChancePer10s": 0.2, "buyChance": 0.3, "ropeChance": 0.7 },
+    "gddRef": "3.5"
+  }
 }

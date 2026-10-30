@@ -665,6 +665,13 @@ export const BalanceFile = z.strictObject({
    * Round 10, K6 (GDD 3.5, seams.md 3 row 31): a set snare is sent to its layer and to seats within `seeTiles` of it.
    * The hold is `abilities.json` `snare.params.holdS`, then Slowed.
    */
-  snare: Section({ seeTiles: Tiles }),
+  snare: Section({
+    seeTiles: Tiles,
+    /**
+     * K6b (GDD 3.12): an NPC seat outdoors sets the Snare it holds by `setChancePer10s`; at a stall that sells one it
+     * buys a Snare by `buyChance`; it frees a held seat it sees with its Rope by `ropeChance`, one roll per held seat.
+     */
+    npc: z.strictObject({ setChancePer10s: z.number().min(0), buyChance: Frac, ropeChance: Frac }),
+  }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

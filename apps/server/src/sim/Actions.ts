@@ -78,7 +78,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
     case 'snare': // round 10, K6 (GDD 3.5): `sim/snares.ts`
-      return handleSnareAbility(room, sessionId);
+    case 'rope':
+      return handleSnareAbility(room, sessionId, payload);
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });
   }
