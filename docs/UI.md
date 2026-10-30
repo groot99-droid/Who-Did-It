@@ -1790,7 +1790,31 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
   from "you are missing something". `NFY_SHOWN` (14.43) is the release switch.
 - The refused prompt keeps its shake (`refusedIn`, UI.md 9), and the door sound still follows the legacy code.
 
-### 14.46 The law (10B, round 10)
+### 14.46 Sleeping (10H, round 10)
+
+Lines are in `apps/client/src/ui/copy/sleep.ts` (`SLEEP_COPY`). No line names a seat: a sleeper learns how many are in
+bed, never who (GDD 3.32).
+
+| Key | Line |
+| --- | --- |
+| `prompt.bed` | Press E: lie down |
+| `prompt.cot` | Press E: lie down on the cot |
+| `prompt.innBed` | Press E: rent the bed ({n} Scrip) |
+| `asleep.title` | Asleep |
+| `asleep.count` | {n} of {m} in bed |
+| `asleep.hint` | Move to wake. |
+| `asleep.through` | You slept through. |
+
+- **The prompt** shows at a bed, cot or inn bed in reach at dusk or at night, and E sends `act.hold {action: 'sleep'}`. The
+  server's refusals (`NO_BED`, `BOARDED_HOME`, `NEED_SCRIP`, `PHASE_CLOSED`, `TOO_FAR`) read their lines from 14.43.
+- **The overlay** follows `Private.asleep`: the view dims to the bedroom, the count line reads `Private.inBed` of
+  `Private.inBedOf` (hidden while the server writes none), and the hint says how to wake. It takes no pointer, so the stick and
+  the keys still reach the server, where the first input wakes the sleeper and is refused `ASLEEP` without a line.
+- **"You slept through"** shows for five seconds when the sleeper wakes outside dusk and night (a hit or a move wakes it inside
+  them). A night skip and a natural dawn read the same, and both are true for the sleeper; phases.md 13.4's "every client"
+  is every sleeper.
+
+### 14.50 The law (10B, round 10)
 
 The server fills these templates (`packages/content/data/laws.json` `briefing`, read by
 `apps/server/src/sim/law/Briefing.ts` and, with D9, by a Constable's tips) and sends them on the `system` chat

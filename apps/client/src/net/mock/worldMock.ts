@@ -583,6 +583,11 @@ export class MockWorldFeed implements WorldFeed {
 
   sell(_shopId: string, _itemId: string, _qty: number): void {}
 
+  // Round 10 (A7): the mock town has no bed to lie in.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    return { asleep: false, inBed: 0, inBedOf: 0 };
+  }
+
   // Round 8, 8D: the mock town has no altar, station or bank, so no Faith and nothing built.
   faith(): number {
     return 0;
