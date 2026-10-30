@@ -413,11 +413,12 @@ export interface S2CPayloads {
   'inspect.hunch': { copyId: string };
   /**
    * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
-   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop
+   * with an `owner` gives each stock row how many it has `left` today, the same for every opener.
    */
   'shop.open': {
     shopId: string;
-    stock: Array<{ itemId: string; price: number }>;
+    stock: Array<{ itemId: string; price: number; left?: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
   /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */

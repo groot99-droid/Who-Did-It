@@ -418,6 +418,7 @@
     "clearTargetDays": 2,
     "priceMult": 1.5,
     "errandS": 30,
+    "stockMult": 0.5,
     "gddRef": "3.22"
   },
   "armor": {
@@ -425,6 +426,7 @@
     "cap": 0.5,
     "gddRef": "3.22"
   },
+  "townWork": { "stallStockPerSeat": 1, "stallStockMin": 4, "gddRef": "3.23" },
   "pairing": {
     "answerS": { "min": 5, "max": 9 },
     "yesChance": 0.5,

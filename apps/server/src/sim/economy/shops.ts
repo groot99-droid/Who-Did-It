@@ -7,6 +7,7 @@ import { isVerbPhase, reject, sceneKey, tileCentre } from '../World';
 import { TOWN, balanceOf, movePurse } from './purse';
 import { refusal, type Refusal } from '../refusal';
 import { askOf } from './fare';
+import { stockLeft, takeStock } from './townWork';
 
 /**
  * Shops (round 8, GDD 3.23; docs/round8/economy.md 2), Session 8C. A shop is one `counter` static named by
@@ -48,12 +49,29 @@ export function counterProblem(room: PartyRoom, sessionId: string, propId: strin
   return null;
 }
 
-/** A shop's list with its prices: `ask` from `askOf` (round 10, C2b: a dear stall shows what it asks), `pay` as set. */
+/**
+ * A shop's list with its prices: `ask` from `askOf` (round 10, C2b: a dear stall shows what it asks), `pay` as set.
+ * C3: a stall with an `owner` also shows how many of each it has `left` today (seams.md row 15).
+ */
 const priced = (room: PartyRoom, shopId: string, items: readonly string[], side: 'ask' | 'pay') =>
-  items.map((itemId) => ({
-    itemId,
-    price: (side === 'ask' ? askOf(room, shopId, itemId) : economy.prices[itemId]?.pay) ?? 0,
-  }));
+  items.map((itemId) => {
+    const left = side === 'ask' ? stockLeft(room, shopId, itemId) : undefined;
+    return {
+      itemId,
+      price: (side === 'ask' ? askOf(room, shopId, itemId) : economy.prices[itemId]?.pay) ?? 0,
+      ...(left !== undefined && { left }),
+    };
+  });
+
+/** `shop.open` to the seat: what the shop sells and buys now. */
+function sendShop(room: PartyRoom, sessionId: string, shopId: string): void {
+  const shop = economy.shops[shopId]!;
+  room.clients.getById(sessionId)?.send(S2C.shopOpen, {
+    shopId,
+    stock: priced(room, shopId, shop.sells, 'ask'),
+    buys: priced(room, shopId, shop.buys, 'pay'),
+  });
+}
 
 /** `act.hold {action: 'shop', targetId: propId}` (the one line in `sim/Hold.ts`): opens the counter's shop. */
 export function handleShopHold(room: PartyRoom, sessionId: string, propId: string): void {
@@ -63,13 +81,8 @@ export function handleShopHold(room: PartyRoom, sessionId: string, propId: strin
     reject(room, sessionId, problem ?? refusal('NO_COUNTER', { kind: 'shop' }));
     return;
   }
-  const shop = economy.shops[shopId]!;
   openOf(room).set(sessionId, shopId);
-  room.clients.getById(sessionId)?.send(S2C.shopOpen, {
-    shopId,
-    stock: priced(room, shopId, shop.sells, 'ask'),
-    buys: priced(room, shopId, shop.buys, 'pay'),
-  });
+  sendShop(room, sessionId, shopId);
 }
 
 /** The checks `act.buy` and `act.sell` share: the shop is the one held open, still in reach, and `qty` is a count. */
@@ -101,6 +114,11 @@ export function handleBuy(room: PartyRoom, sessionId: string, payload: Record<st
     reject(room, sessionId, 'NOT_FOR_SALE', { item: itemId });
     return;
   }
+  const left = stockLeft(room, shopId, itemId); // round 10, C3: a stall sells from its day's stock
+  if (left !== undefined && left < qty) {
+    reject(room, sessionId, 'SPENT', { what: 'stock' });
+    return;
+  }
   const cost = ask * qty;
   if (balanceOf(room, sessionId) < cost) {
     reject(room, sessionId, 'NEED_SCRIP');
@@ -112,6 +130,9 @@ export function handleBuy(room: PartyRoom, sessionId: string, payload: Record<st
   }
   movePurse(room, sessionId, TOWN, cost, 'buy');
   addStack(player, itemId, qty);
+  if (left === undefined) return;
+  takeStock(room, shopId, itemId, qty);
+  sendShop(room, sessionId, shopId); // the panel shows what is left
 }
 
 /** `act.sell {shopId, itemId, qty}`: the items leave the inventory, and the town pays `pay` each into the purse. */
