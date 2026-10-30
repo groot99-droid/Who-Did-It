@@ -1418,9 +1418,27 @@ the Hitman: the mail turns a townsman into one.
   shares neither the Village's win nor the Cabal's, and its only victory is the Contract (C4b).
 - **The sign.** At the turning every seat's chat log gets one system line that names nobody, "A stranger's coat was
   seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
+- **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
+  like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
+  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2). It may be fired
+  only at a figure drawn as the mark's look: the test reads the drawn figure, never the seat behind it, so the
+  real mark drawn as someone else is refused like any figure, and an impersonator drawn as the mark dies in its place
+  while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
+  makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
+- **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day
+  and stands, living, in the station's scene within `train.hearTiles` of the platform boards it: the Contract
+  victory, the same day. He leaves play: unplaced, so his figure leaves every view as any leaving figure does, with
+  no scene, no avatars and no ghost view of his own; his own view's `Private.departed` is set, and the roster keeps
+  him alive. The match goes on and the win check counts him for nobody. Until B6's Tribunal he stays a living seat
+  in every public respect: he may be voted for and ejected as any seat (his boarded win stands), and a departed
+  human may vote and speak at a meeting, whose all-voted early end waits on his vote as on any living seat's. A Hitman who killed but missed that day's Dusk Train does not win. With no
+  kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
+  frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
+  his death), and a boarded Hitman joins `alsoWon`.
 - Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
-  him: its look runs thin and dear as a seat Owing the line, 3.23); the day weapon, the Dusk Train boarding and the
-  Contract victory (C4b); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
+  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
+  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
+  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
   window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
   black-wax mailbag and the crow on the station roof; the jail as a bar to the turning (B5); a turned NPC seat
   stopping its routine.

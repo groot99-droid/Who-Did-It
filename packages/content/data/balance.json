@@ -434,6 +434,7 @@
       "10": { "comes": 1, "human": 1 }
     },
     "days": [3, 5],
+    "contractDays": 2,
     "gddRef": "3.33"
   },
   "armor": {

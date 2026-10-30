@@ -148,7 +148,8 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
  */
 /** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
+/** Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by the Train. */
+export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
@@ -362,7 +363,9 @@ export interface S2CPayloads {
   /**
    * `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody
    * held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the
-   * unique count the win needed and each Killer seat's unique and total kills.
+   * unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21):
+   * `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in
+   * `alsoWon`; `stopped` died before boarding).
    */
   gameOver: {
     winner: number;
@@ -371,6 +374,7 @@ export interface S2CPayloads {
     alsoWon?: string[];
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
+    hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */

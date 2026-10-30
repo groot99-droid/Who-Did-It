@@ -30,7 +30,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { STRONGBOX_ITEM, strongboxOf } from '../src/sim/vendettas/heist';
 import { act, errorCodes, setPhase, teleport } from './killHelpers';
 import { markDead } from '../src/sim/Death';
-import { CONTRACT_QUEST, openContract } from '../src/sim/vendettas/contract';
+import { CONTRACT_QUEST, offerContract, openContract } from '../src/sim/vendettas/contract';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
@@ -332,13 +332,6 @@ describe('the contract in a match', () => {
     Bot3: 'townsfolk',
     Bot4: 'townsfolk',
   };
-  const arrive = (m: Match) =>
-    emitSim(m.room, {
-      tick: m.room.state.tick,
-      kind: 'train.arrive',
-      sceneId: 'overworld',
-      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
-    });
   /** A landed Knife strike as `sim/Kill.ts` sends it: the `kill` event, then the death. */
   const knife = (m: Match, by: string, victim: string) => {
     emitSim(m.room, { tick: m.room.state.tick, kind: 'kill', seat: victim, data: { by } });
@@ -349,7 +342,7 @@ describe('the contract in a match', () => {
     const m = await startMatch(colyseus, 5, ROLES);
     const hitman = idOf(m, 0);
     holdVendetta(m.room, hitman, 'hitman');
-    arrive(m);
+    offerContract(m.room, hitman); // round 10, C4b: the arrival's mailing (the first train's is retired)
     await until(() => openContract(m.room, hitman) !== null);
     return { m, hitman, target: openContract(m.room, hitman)!.target };
   };
@@ -438,12 +431,7 @@ describe('the vendetta invariants', () => {
     const m = await startMatch(colyseus, 5, ROLES);
     const hitman = idOf(m, 0);
     holdVendetta(m.room, hitman, 'hitman');
-    emitSim(m.room, {
-      tick: m.room.state.tick,
-      kind: 'train.arrive',
-      sceneId: 'overworld',
-      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
-    });
+    offerContract(m.room, hitman); // round 10, C4b: the arrival's mailing (the first train's is retired)
     await until(() => openContract(m.room, hitman) !== null);
     await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
     emitStep(m.room, hitman, 'vendetta.contract.done');

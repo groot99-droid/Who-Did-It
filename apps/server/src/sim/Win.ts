@@ -12,6 +12,7 @@ import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
 import { isOnLine } from './Train';
+import { hitmanGameOver, isDeparted } from './vendettas/arrival';
 import { SCENE_KEYS } from './World';
 
 /**
@@ -23,6 +24,7 @@ export function evaluateWin(room: PartyRoom): Outcome | null {
   const sim = simOf(room);
   const living: ReturnType<typeof factionOf>[] = [];
   room.state.players.forEach((p: PlayerState, id: string) => {
+    if (isDeparted(room, id)) return; // round 10, C4b: a Hitman who boarded the Dusk Train counts for nobody
     if (!sim.players.get(id)?.dead || isOnLine(room, id)) living.push(factionOf(p));
   });
   return checkWin(living, countRow(room.state.players.size).cabalWin);
@@ -55,6 +57,7 @@ export function endMatch(room: PartyRoom, outcome: Outcome): void {
     summary: summaryOf(winner, maps[mapIdOfRoom(room)].name),
     ...gameOverExtras(room),
     ...(isPaintTown(room) && { paintTown: paintGameOver(room) }),
+    ...(hitmanGameOver(room) && { hitman: hitmanGameOver(room) }), // round 10, C4b (seams.md 3 row 21)
   });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];
@@ -146,6 +149,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.myVote = '';
     priv.paintTown = false; // round 10, C5
     priv.hitman = false; // round 10, C4
+    priv.departed = false;
   });
   for (const id of gone) state.players.delete(id);
   if (!state.players.has(state.leaderId)) state.leaderId = state.players.keys().next().value ?? '';

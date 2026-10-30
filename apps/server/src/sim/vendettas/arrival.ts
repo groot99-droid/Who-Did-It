@@ -1,10 +1,14 @@
 import { balance, roles } from '@wdi/content';
+import { TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { systemLine } from '../economy/rumours';
+import { addStack } from '../Inventory';
+import { stationOf } from '../MapSites';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
-import { offerContract } from './contract';
+import { sceneKey } from '../World';
+import { lapseContract, offerContract } from './contract';
 import { holdVendetta, vendettaHolders, vendettaOf } from './state';
 
 /**
@@ -26,11 +30,18 @@ export const HITMAN_VENDETTA = 'hitman';
 export const HITMAN_ARRIVE_LINE = "A stranger's coat was seen on the 6:10.";
 
 interface Arrival {
-  /** The day (the round) he comes on, or null when he does not come. */
+  /** The day (the round) he comes on, or null when he does not come (or has come). */
   day: number | null;
   human: boolean;
   turned: string | null;
+  /** C4b: the round of the turning, the round he shot his mark (null before), and whether he boarded. */
+  turnedDay: number;
+  killDay: number | null;
+  boarded: boolean;
 }
+
+/** How far the Hitman got (`gameOver.hitman.stage`, seams.md 3 row 21). */
+export type HitmanStage = 'arrived' | 'killed' | 'boarded' | 'stopped';
 
 const arrivals = new WeakMap<object, Arrival>();
 
@@ -43,12 +54,13 @@ export function drawArrival(room: PartyRoom, ids: readonly string[]): void {
   const comes = rng() < (row?.comes ?? 0);
   const day = first + Math.min(last - first, Math.floor(rng() * (last - first + 1)));
   const human = rng() < (row?.human ?? 0);
-  arrivals.set(room.seeds, { day: comes && row !== undefined ? day : null, human, turned: null });
+  const at = comes && row !== undefined ? day : null;
+  arrivals.set(room.seeds, { day: at, human, turned: null, turnedDay: 0, killDay: null, boarded: false });
 }
 
 /** Forces the draw (tests, and the `debug.hitman` hook through the step): he comes on `day`, as a human or not. */
 export function forceArrival(room: PartyRoom, day: number, human: boolean): void {
-  arrivals.set(room.seeds, { day, human, turned: null });
+  arrivals.set(room.seeds, { day, human, turned: null, turnedDay: 0, killDay: null, boarded: false });
 }
 
 const debugQueue = new WeakMap<PartyRoom, { day: number; human: boolean }>();
@@ -108,8 +120,73 @@ export function onDeliveryArrival(room: PartyRoom, round: number): void {
   if (from.length === 0) return; // nobody to turn: he never comes, and nothing is sent
   const seat = from[Math.floor(room.seeds.get('hitman', 'turn')() * from.length)]!;
   a.turned = seat;
+  a.turnedDay = round;
   holdVendetta(room, seat, HITMAN_VENDETTA);
-  room.state.players.get(seat)!.priv.hitman = true;
+  const player = room.state.players.get(seat)!;
+  player.priv.hitman = true;
+  addStack(player, DERRINGER_ITEM, 1); // C4b: the day weapon, concealed in its own pack
   offerContract(room, seat);
   systemLine(room, HITMAN_ARRIVE_LINE);
+}
+
+/** The Derringer's item id (`items.json`, role-bound, kept at death; `dayWeapon.ts`). */
+export const DERRINGER_ITEM = 'derringer';
+
+/** Whether `seat` boarded the Dusk Train and left play (C4b). Server memory; its own `Private.departed` mirrors it. */
+export const isDeparted = (room: PartyRoom, seat: string): boolean => {
+  const a = arrivals.get(room.seeds);
+  return a?.boarded === true && a.turned === seat;
+};
+
+/** The Derringer's shot (`dayWeapon.ts`): a shot that killed the mark, on this round. */
+export function onShotArrival(room: PartyRoom, seat: string, onMark: boolean): void {
+  const a = arrivals.get(room.seeds);
+  if (a?.turned === seat && onMark) a.killDay = room.state.round;
+}
+
+/**
+ * The Dusk Train's departure of `round` (`Train.ts`). A Hitman who shot his mark today, living and placed in the
+ * station's scene within `train.hearTiles` of the platform, boards it: he leaves play (unplaced, so his avatar leaves
+ * every view as any leaving avatar does; the roster keeps him alive), his own `Private.departed` is set, and the win
+ * check counts him for nobody. A Hitman with no kill by the dusk of the `hitman.contractDays`th day from the turning
+ * sees his contract lapse.
+ */
+export function onDuskArrival(room: PartyRoom, round: number): void {
+  const a = arrivals.get(room.seeds);
+  const seat = a?.turned;
+  if (!a || seat === null || seat === undefined || a.boarded) return;
+  const p = simOf(room).players.get(seat);
+  const player = room.state.players.get(seat);
+  if (!p || !player || p.dead) return;
+  const station = stationOf(room);
+  if (a.killDay === round && station && p.placed && sceneKey(p.sceneIdx) === station.sceneId) {
+    const near = Math.hypot(p.x - (station.x + 0.5) * TILE_PX, p.y - (station.y + 0.5) * TILE_PX);
+    if (near <= balance.train.hearTiles * TILE_PX) {
+      a.boarded = true;
+      p.placed = false;
+      p.input = null;
+      p.hold = null;
+      player.priv.departed = true;
+      simOf(room).viewsDirty = true;
+      return;
+    }
+  }
+  if (a.killDay === null && round >= a.turnedDay + balance.hitman.contractDays - 1) lapseContract(room, seat);
+}
+
+/** The game-over frame's `hitman` (seams.md 3 row 21), when he came: the seat, the day and how far he got. */
+export function hitmanGameOver(
+  room: PartyRoom,
+): { seatId: string; day: number; stage: HitmanStage } | undefined {
+  const a = arrivals.get(room.seeds);
+  if (!a || a.turned === null) return undefined;
+  const dead = simOf(room).players.get(a.turned)?.dead === true;
+  const stage: HitmanStage = a.boarded
+    ? 'boarded'
+    : dead
+      ? 'stopped'
+      : a.killDay !== null
+        ? 'killed'
+        : 'arrived';
+  return { seatId: a.turned, day: a.turnedDay, stage };
 }
