@@ -80,7 +80,7 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10X, 10Y | anything, one fix per pull request, after checking no live session owns the path (10X server, rules and content; 10Y client, copy and art) |
 | 10R | `docs/round10/rolecards.md` and `docs/round10/samples/rolecards/`, design only; the build's paths are named in the plan the owner approves |
 | 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
-| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223 and A224; `docs/round11/README.md` and the Round 11 section |
+| 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223, A224 and its rows of 5; `docs/round11/README.md` and the Round 11 section |
 
 Where two sessions' files meet (A6 and C1 in `sim/Death.ts`, A12 and C6 in a robbery, D1 and B1 in the NPC routines),
 the later session builds on the merged earlier one and does not reshape it.
@@ -88,7 +88,7 @@ the later session builds on the merged earlier one and does not reshape it.
 ## 5. Reserved rows
 
 - **Decisions.** 10A A225, 10F A226, 10H A227, 10G A228, 10B A229, 10C A230, 10D A231, 10E A232, 10X A233, 10Y A234,
-  10Z A235. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
+  10Z A235, 6Z A236, 10R A237. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
   A226, A246, A266 and so on. Rows stay in number order in the table.
 - **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.50, 10C 14.47, 10D 14.48, 10E 14.49, 10Y 14.51,
   10X 14.52. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
