@@ -290,6 +290,8 @@ export interface WorldFeed {
   minigameResult(taskId: string, answer: unknown): void;
   /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
   inspect(targetId: string): void;
+  /** Round 10 (D9c): `talk.ask { targetId, ask }`, an avatar handle in reach; the answer is a system chat line. */
+  talk(targetId: string, ask: 'town' | 'time'): void;
   /** Round 8 (8E, GDD 3.24): the answer to a `mugPrompt` (`act.mug`). */
   mug(choice: 'pay' | 'fight' | 'flee'): void;
   /**

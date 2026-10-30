@@ -521,16 +521,81 @@
   gap: 1rem;
 }
 
+/* The crafting square (round 10, 10Y, y9; UI.md 14.51.4): the cells, then the out slot beside them behind an arrow,
+   dashed and a size larger, so it never reads as one more cell of the square (under the first column it did). */
+.wdi-m5b .wdi-craftgrid {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  grid-template-areas:
+    'title title'
+    'cells out'
+    'size size'
+    'hint hint';
+  gap: var(--wdi-space-2) var(--wdi-space-5);
+  align-items: center;
+  justify-content: start;
+}
+
+.wdi-m5b .wdi-craftgrid > h3 {
+  grid-area: title;
+}
+
+.wdi-m5b .wdi-craftgrid > .wdi-btn {
+  grid-area: size;
+  justify-self: start;
+}
+
+.wdi-m5b .wdi-craftgrid > .wdi-hint {
+  grid-area: hint;
+}
+
 .wdi-m5b .wdi-craftgrid__cells {
+  grid-area: cells;
   display: grid;
   grid-template-columns: repeat(var(--wdi-grid-n, 2), 3rem);
   gap: 0.25rem;
 }
 
+.wdi-m5b .wdi-craftgrid .wdi-slot--out {
+  grid-area: out;
+  justify-self: start;
+  min-width: 3.5rem;
+  min-height: 3.5rem;
+  border-style: dashed;
+  border-color: var(--wdi-night-label);
+}
+
+.wdi-m5b .wdi-craftgrid .wdi-slot--out::before {
+  content: '\2192';
+  position: absolute;
+  right: 100%;
+  width: var(--wdi-space-5);
+  font-size: var(--wdi-text-lg);
+  line-height: 1;
+  text-align: center;
+  color: var(--wdi-night-label);
+}
+
 /* Round 10 (10Y, y3): the bottom band (UI.md 14.44). The key row, the hotbar and the body panel stack bottom-left so
    none covers another or the toasts: keys (36px) at the bottom, the hotbar (3rem) over it, the body panel over that.
    On touch the stick (128px) holds the corner and the cluster (80 + 64 + 64 and two gaps, 232px) the right, so the
-   keys go two by two beside the cluster, the hotbar and the body panel start above it, and the toasts above them. */
+   keys go two by two beside the cluster, the hotbar and the body panel start above it, and the toasts above them.
+   y9 (UI.md 14.51.4): the band's floor is one number, `--wdi-band-floor`, the bottom of the hotbar: over the key
+   row on a desktop, over the cluster on touch; the layers above add their own heights (the hotbar 3rem, the body
+   panel 73px, the prompt 50px). The panel and the prompt were counted as 60 and 48, so the prompt brushed the panel. */
+:root {
+  --wdi-band-floor: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2));
+}
+
+:root:has(.wdi-m5b ~ .wdi-hud-touch) {
+  --wdi-band-floor: calc(var(--wdi-space-3) + 232px + var(--wdi-space-2) + env(safe-area-inset-bottom));
+}
+
+/* With ability discs (14.51.1) the row over the cluster (64px and its 12px margin) raises the floor. */
+:root:has(.wdi-m5b ~ .wdi-hud-touch .wdi-touch-abilities:not(:empty)) {
+  --wdi-band-floor: calc(var(--wdi-space-3) + 308px + var(--wdi-space-2) + env(safe-area-inset-bottom));
+}
+
 .wdi-m5b .wdi-m5b__keys {
   flex-wrap: wrap;
   max-width: calc(100% - 2 * var(--wdi-space-3));
@@ -538,21 +603,21 @@
 
 .wdi-m5b .wdi-hotbar {
   position: absolute;
-  left: var(--wdi-space-3);
-  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2));
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  bottom: var(--wdi-band-floor);
   display: flex;
   gap: 0.25rem;
   pointer-events: auto;
 }
 
 .wdi-m5b ~ .wdi-hud .wdi-body {
-  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2) + 3rem + var(--wdi-space-2));
+  bottom: calc(var(--wdi-band-floor) + 3rem + var(--wdi-space-2));
 }
 
-/* The prompt (centred) clears the key row; the toasts (centred) start above the band, so a stack of them never
+/* The prompt (centred) clears the key row; the toasts (centred) start above the body panel, so a stack of them never
    reaches the hotbar or the body panel at any width. */
 .wdi-m5b .wdi-m5b__prompt {
-  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2));
+  bottom: var(--wdi-band-floor);
 }
 
 /* The shops' layer (8C) is a second `.wdi-m5b` after this one, so its counter prompt would paint over an open board. */
@@ -561,9 +626,7 @@
 }
 
 .wdi-m5b ~ .wdi-hud > .wdi-toasts {
-  bottom: calc(
-    var(--wdi-space-3) + 36px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2)
-  );
+  bottom: calc(var(--wdi-band-floor) + 3rem + var(--wdi-space-2) + 73px + var(--wdi-space-2));
 }
 
 .wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__keys {
@@ -582,29 +645,19 @@
   display: none;
 }
 
-.wdi-m5b:has(~ .wdi-hud-touch) .wdi-hotbar {
-  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
-  bottom: calc(var(--wdi-space-3) + 232px + var(--wdi-space-2) + env(safe-area-inset-bottom));
-}
-
+/* On touch the body panel keeps the band's floor (body.css lifts it over the stick alone), the prompt sits above
+   the panel and the toasts above the prompt: the band spans the width there. */
 .wdi-m5b ~ .wdi-hud:has(~ .wdi-hud-touch) .wdi-body {
-  bottom: calc(
-    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + env(safe-area-inset-bottom)
-  );
+  bottom: calc(var(--wdi-band-floor) + 3rem + var(--wdi-space-2));
 }
 
-/* The body panel is two bars (about 60px); the prompt (about 48px) sits above it and the toasts above the prompt. */
 .wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__prompt {
-  bottom: calc(
-    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2) +
-      env(safe-area-inset-bottom)
-  );
+  bottom: calc(var(--wdi-band-floor) + 3rem + var(--wdi-space-2) + 73px + var(--wdi-space-2));
 }
 
 .wdi-m5b ~ .wdi-hud:has(~ .wdi-hud-touch) > .wdi-toasts {
   bottom: calc(
-    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2) +
-      48px + var(--wdi-space-2) + env(safe-area-inset-bottom)
+    var(--wdi-band-floor) + 3rem + var(--wdi-space-2) + 73px + var(--wdi-space-2) + 50px + var(--wdi-space-2)
   );
 }
 
@@ -782,15 +835,48 @@
   }
 }
 
-/* On a phone the clock is at the right (components.css), so the bar sits under it there and the log starts below
-   the bar (round 10, 10Y, UI.md 14.51): centred, it hid the log's first line. */
+/* On a phone the clock is in the second row at the right (components.css, `--wdi-hud-row2`), so the bar sits under
+   it there and the log starts below the bar (round 10, 10Y, UI.md 14.51 and 14.51.4): centred, it hid the log's
+   first line. The band on a narrow screen without touch (a small window): the four keys wrap to two rows (80px),
+   and the prompt and the toasts stack above the body panel as on touch, since the prompt is as wide as the hotbar. */
 @media (max-width: 480px) {
   .wdi-m5b .wdi-m5b__work {
-    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 56px);
+    top: calc(var(--wdi-hud-row2) + 44px + var(--wdi-space-2));
     right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
     left: auto;
     width: min(240px, 70vw);
     transform: none;
+  }
+
+  :root {
+    --wdi-band-floor: calc(var(--wdi-space-3) + 80px + var(--wdi-space-2) + env(safe-area-inset-bottom));
+  }
+
+  .wdi-m5b .wdi-m5b__prompt {
+    bottom: calc(var(--wdi-band-floor) + 3rem + var(--wdi-space-2) + 73px + var(--wdi-space-2));
+  }
+
+  /* The stack shows what fits between the controls' row (the art switch and the gear, 44px under the work bar) and
+     the prompt, in whole toasts (48px and a gap): three at most (components.css, the fallback where `round()` is
+     unknown), two over the ability discs (14.51.1). */
+  .wdi-m5b ~ .wdi-hud > .wdi-toasts {
+    bottom: calc(
+      var(--wdi-band-floor) + 3rem + var(--wdi-space-2) + 73px + var(--wdi-space-2) + 50px +
+        var(--wdi-space-2)
+    );
+    max-height: min(
+      calc(3 * 48px + 2 * var(--wdi-space-2)),
+      calc(
+        round(
+            down,
+            100dvh - var(--wdi-hud-row2) - 44px - var(--wdi-space-2) - 30px - var(--wdi-space-2) - 44px -
+              var(--wdi-space-2) - var(--wdi-band-floor) - 3rem - var(--wdi-space-2) - 73px -
+              var(--wdi-space-2) - 50px - var(--wdi-space-2) + var(--wdi-space-2),
+            48px + var(--wdi-space-2)
+          ) -
+          var(--wdi-space-2)
+      )
+    );
   }
 }
 
