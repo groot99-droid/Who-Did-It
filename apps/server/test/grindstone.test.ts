@@ -5,7 +5,7 @@ import { C2S, TICK_RATE, type RefusalFrame } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
 import { wornOf } from '../src/sim/interact/resolve';
 import { simOf } from '../src/sim/RoomSim';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
+import { advance, bootNpcServer, pauseClock, placeSeat, standardParty, type Party } from './npcHelpers';
 import { sleep } from './simHelpers';
 
 // Round 10, x9 (A313; GDD 3.14): the grindstone restores a worn tool. A bare-handed hold of `holdS` at the lumber
@@ -40,10 +40,19 @@ function beside(p: Party, sceneId: 'forest' | 'bp_camp', tx: number, ty: number)
   p.humans[0]!.log.length = 0;
 }
 
+/**
+ * Sends the hold and steps the paused room a tick at a time until the sim has answered it: the hold is on, or a
+ * refusal came back. (A fixed wait before the one step let the message land late under load, and every tick count
+ * after it drifted by one.)
+ */
 async function hold(p: Party, targetId: string): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true }, 60);
-  advance(p, 1);
-  await sleep(80);
+  const before = refusals(p).length;
+  p.humans[0]!.room.send(C2S.hold, { action: 'interact', targetId, on: true });
+  for (let i = 0; i < 40; i++) {
+    await sleep(25);
+    advance(p, 1);
+    if (holdOf(p) !== null || refusals(p).length > before) return;
+  }
 }
 
 const refusals = (p: Party): RefusalFrame[] =>
@@ -69,7 +78,7 @@ describe('the grindstone (x9)', () => {
     await hold(p, STONE);
     expect(refusals(p)).toHaveLength(0);
     expect(holdOf(p)).toMatchObject({ action: 'interact', targetId: STONE });
-    advance(p, ticks(sharpenS) - 2);
+    advance(p, ticks(sharpenS) - 1);
     expect(wornOf(p.room, id, 'axe')).toBe(1);
     advance(p, 1);
     expect(wornOf(p.room, id, 'axe')).toBe(0);
