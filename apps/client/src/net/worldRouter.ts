@@ -170,8 +170,9 @@ export function installWorldRouter(
             sleep: (asleep: boolean, inBed = 0, inBedOf = 0) => {
               feedMock.sleeping = () => ({ asleep, inBed, inBedOf });
             },
-            line: (on: boolean, cause?: string) => {
+            line: (on: boolean, cause?: string, round?: number) => {
               feedMock.onLine = () => on;
+              if (round !== undefined) feedMock.setRound(round); // y13: the last cycle counts to the bells
               if (on && cause) feedMock.bus.emit('killed', { sceneId: 'overworld', cause, roles: {} });
             },
             requestMeeting: (reason: MockMeetingRequest['reason'] = 'body') =>
