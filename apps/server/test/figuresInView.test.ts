@@ -1,5 +1,5 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { Phase, TILE_PX } from '@wdi/shared';
+import { Phase, TILE_PX, VIEW_TAG } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { canSee } from '../src/sim/Sight';
 import { simOf } from '../src/sim/RoomSim';
@@ -52,10 +52,18 @@ describe("figures in a seat's view (round 10, x5, A353)", () => {
     const here = figuresIn(m, constable.sceneIdx);
     expect(here).toContain(constable.handle);
     expect(figuresHeld(m, viewer)).toEqual(here);
+    const view = m.room.clients.getById(viewer.id)?.view;
+    expect(view).toBeDefined();
     for (const a of avatarsHeld(viewer)) {
       if (figureOfHandle(m.room, a.handle) === undefined) continue;
       expect(a.avatar.seat ?? '').toBe(''); // never a seat's field (tagged, so never sent), never the ghost tag
+      expect(a.avatar.nearBits ?? 0).toBe(0);
       expect(a.avatar.lookOf === 'constable' || a.avatar.lookOf.startsWith('villager')).toBe(true);
+      // The figure's row sits in the view plain: no near tag (it is not a seat's ring) and no ghost tag.
+      const row = m.room.state.scenes.get(sceneId)!.avatars.get(a.handle)!;
+      expect(view!.has(row)).toBe(true);
+      expect(view!.hasTag(row, VIEW_TAG.near)).toBe(false);
+      expect(view!.hasTag(row, VIEW_TAG.ghost)).toBe(false);
     }
     // Through to another scene: the old scene's figures leave, the new scene's arrive.
     const elsewhere = [...figuresOf(m.room).values()].find(
