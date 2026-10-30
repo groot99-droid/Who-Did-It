@@ -59,8 +59,6 @@ async function world(): Promise<Party> {
 }
 
 const ids = (party: Party) => party.humans.map((h) => h.id) as [string, string, string, string];
-const reasons = (h: Human): string[] =>
-  h.log.filter((m) => m.type === 'error').map((m) => (m.payload as { reason?: string }).reason ?? '');
 const lookOf = (party: Party, seat: string) =>
   avatarOf(party.room, avatarMemory(party.room).handleOf.get(seat)!)?.lookOf;
 const manifest = (h: Human): string[] =>
