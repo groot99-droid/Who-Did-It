@@ -24,6 +24,7 @@ import { runTrain } from './Train';
 import { runCommands } from './Commands';
 import { runHunger } from './Hunger';
 import { runImpersonation } from './Impersonate';
+import { runBarks } from './Barks';
 import { runNpcs } from './Npc';
 import { applyInputs, moveAndCollide } from './Movement';
 import { runNightPowers } from './NightPowers';
@@ -57,6 +58,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runAuto(room); // round 6, 6A: the auto commands, Start inside the step (locked call site)
   runNpcs(room); // M3c: NPC brains write their inputs and verbs (round 4, S)
   runTownsfolk(room); // round 8, 8E: ambient figures' brains write their inputs (locked call site)
+  runBarks(room); // round 10, M1: NPC seats and figures bark a pool line (seams.md 3 row 36)
   applyInputs(room);
   moveAndCollide(room);
   publishAvatars(room); // round 5, 5F: presence onto avatars (locked call site)

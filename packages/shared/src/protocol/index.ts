@@ -107,6 +107,8 @@ export const S2C = {
   shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
+  /** Round 10, M1 (seams.md 3 row 36): a quick-chat line over one figure's head, the same from a seat or a figure. */
+  bark: 'bark',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -382,6 +384,8 @@ export interface S2CPayloads {
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
+  /** A quick-chat bubble over the avatar `handle`; names no seat, card, side or channel. */
+  bark: { handle: string; phraseId: string };
   /** Where the shout rang; names no seat, no card and no body. */
   shout: { sceneId: string; x: number; y: number };
   /**

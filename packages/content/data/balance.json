@@ -379,8 +379,29 @@
       { "id": "clear", "text": "Clear" },
       { "id": "suspicious", "text": "Suspicious" },
       { "id": "wait", "text": "Wait" },
-      { "id": "go", "text": "Go" }
+      { "id": "go", "text": "Go" },
+      { "id": "anyoneSeenBaker", "text": "Anyone seen the baker?" },
+      { "id": "foodToSpare", "text": "Got any food to spare?" },
+      { "id": "mindWolves", "text": "Mind the wolves" },
+      { "id": "oweClerk", "text": "I owe the clerk" },
+      { "id": "heardBell", "text": "Was that the bell?" },
+      { "id": "wolfNear", "text": "Wolf!" },
+      { "id": "lanternLit", "text": "Keep to the light" },
+      { "id": "gettingDark", "text": "Getting dark" }
     ],
+    "quickGapS": 3,
+    "gddRef": "3.5"
+  },
+  "bark": {
+    "idleGapS": { "min": 3, "max": 45 },
+    "reactChance": 0.5,
+    "reactDelayS": { "min": 0.5, "max": 3 },
+    "wolfTiles": 8,
+    "moments": {
+      "bell": ["heardBell", "wait", "clear"],
+      "wolf": ["wolfNear", "mindWolves", "help"],
+      "lantern": ["lanternLit", "gettingDark", "followMe"]
+    },
     "gddRef": "3.5"
   },
   "talk": {

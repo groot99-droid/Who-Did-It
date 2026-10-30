@@ -536,7 +536,26 @@ export const BalanceFile = z.strictObject({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),
     quickChatRadiusTiles: Tiles,
-    quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
+    quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).min(8),
+    /** A seat or figure barks at most once in this many seconds (round 10, M1; GDD 3.5), human or NPC alike. */
+    quickGapS: Seconds,
+  }),
+  /** Round 10, M1 (GDD 3.5 "Barks"): when NPC seats and figures bark a pool line, and at what. */
+  bark: Section({
+    /** The gap to an idle bark, drawn per actor; its minimum is `chat.quickGapS`, so it reaches the human's rate. */
+    idleGapS: z.strictObject({ min: Seconds, max: Seconds }),
+    /** The chance an actor that sees a shared moment barks at it. */
+    reactChance: z.number().min(0).max(1),
+    /** The delay from the moment to the bark, drawn per actor. */
+    reactDelayS: z.strictObject({ min: Seconds, max: Seconds }),
+    /** A wolf within this many tiles of an actor is a moment. */
+    wolfTiles: Tiles,
+    /** Per moment, the pool ids its barks draw from. */
+    moments: z.strictObject({
+      bell: z.array(Id).min(1),
+      wolf: z.array(Id).min(1),
+      lantern: z.array(Id).min(1),
+    }),
   }),
   /** Round 8 (GDD 3.8 "Meeting notes", 3.25), 8T's keys. */
   talk: Section({

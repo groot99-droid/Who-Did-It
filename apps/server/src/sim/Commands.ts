@@ -5,6 +5,7 @@ import { runAction } from './Actions';
 import { handleBank } from './economy/bank';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
+import { handleQuick } from './Barks';
 import { handleLight } from './mobs/light';
 import { handleTalk } from './townsfolk/talk';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
@@ -89,6 +90,9 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.minigameResult:
         handleMinigameResult(room, cmd.sessionId, payload);
+        break;
+      case C2S.quick: // round 10, M1 (seams.md 3 row 36)
+        handleQuick(room, cmd.sessionId, payload);
         break;
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);

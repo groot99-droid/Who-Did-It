@@ -36,6 +36,8 @@ export const REFUSAL_REASONS = [
   // 4.9 Reasons the owner answers add
   'IN_JAIL', 'ASLEEP', 'NO_BED', 'BOARDED_HOME', 'PETITION_GRACE', 'PETITION_OPEN', 'NOT_HUNTED', 'PICK_SNAPPED',
   'GRID_NO_RECIPE', 'GRID_BOUND', 'NEEDS_PART',
+  // Round 10, M1 (seams.md 3 row 36)
+  'UNKNOWN_PHRASE',
 ] as const;
 export type RefusalReason = (typeof REFUSAL_REASONS)[number];
 
