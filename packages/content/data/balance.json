@@ -424,5 +424,14 @@
     "followTiles": 2,
     "apartS": 20,
     "gddRef": "3.31"
+  },
+  "petition": {
+    "othersPct": 0.3,
+    "openS": 60,
+    "cooldownS": 120,
+    "maxEntries": 4,
+    "constableAtHumans": 5,
+    "constableMatches": 2,
+    "gddRef": "3.31"
   }
 }

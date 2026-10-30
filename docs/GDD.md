@@ -1250,6 +1250,27 @@ already counts any figure in the room. Only the two seats learn of a pair, in `P
 figure's handle in the viewer's scene, '' while it is elsewhere, never a seat id); nothing public shows one. The
 inspect panel's section is B8b.
 
+**The petition (B3a, A289; seams.md 3 row 13; F4 2.1).** A living, free human (placed, not on the line, 3.22, and
+not jailed, 3.27) opens a **petition** at a notice board in reach, naming a seat of the public roster (by character:
+a sighting of a figure wearing B's look accuses B, never through an impersonation), a charge from `laws.json`
+`crimes` (the crimes of `world-mode.md` 5; their sentences are B6's), and up to `petition.maxEntries` (4) of its own
+clue entries. A night-power entry, a Forged entry or the teaching entry never attaches. One petition is open in the
+whole town at a time (`PETITION_OPEN`); after a lapse the accused and the opener wait `petition.cooldownS` (120 s)
+before naming or opening again (`PETITION_GRACE`). The petition needs ceil(`petition.othersPct` (0.3) times the
+living, free humans, the opener and the accused counted) other signatures within `petition.openS` (60 s): 1 at 3
+humans, 2 at 4 to 6, 3 at 7 to 10. The bar is fixed when the petition opens and holds for its window, and so is whether the Constables may sign, so it never
+moves at a death; a person and an NPC seat give the same bar as the accused. Any living, free human but the opener
+and the accused may sign, once, and a signature stands once given: the count never drops when a signer dies, goes
+on the line or is jailed. At `petition.constableAtHumans` (5) humans or fewer, the Constables sign once, as one
+signature, when the petition's public entries hold `petition.constableMatches` (2) backed matches against the
+accused's public traits; they never read whether a clue was planted, a role's reading or a card. With enough names
+the petition passes and leaves a warrant for the manhunt (B4); at its clock's end it lapses. The public row
+(`GameState.petition`) shows the accused, the charge, the counts and each entry as anyone may read it: the kind, the
+scene, whether it is backed (Verified or Corroborated, one mark for both), and the trait only for a kind whose
+Reader is Anyone (footprints, thread); never the opener or a signer. Only the signer learns it signed
+(`Private.petitionSigned`). A petition is not a vote: nobody is removed by it, and the verdict comes from the
+evidence at the Tribunal (B6). NPC seats do not sign yet, and a petition never waits on an NPC. The screen is B3b.
+
 ### 3.32 Sleeping
 
 Round 10, A7 (`docs/round9/gdd-map.md` 2.6; `docs/round9/world-mode.md` 7.3; `docs/round9/followup-4.md` 2.4 and
