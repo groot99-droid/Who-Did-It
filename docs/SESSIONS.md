@@ -3790,7 +3790,9 @@ once. A session's decisions go under its reserved row and its copy under its UI.
 | **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Z. The final sweep** | Fable | 800k | `claude/r10-tier-800k` | S6 | last |
-| **10R. Role cards and the dashboard** | Opus | 800k | `claude/r10-tier-800k` | R1, the design; the build after the owner approves it | 2026-10-30, by the owner |
+| **10R. Role cards and the dashboard** | Opus | 800k | `claude/r10-tier-800k` | the design, then the build R1 to R6 (`rolecards.md` 9 and 12) | 2026-10-30, by the owner |
+| **10S. The scope census** | Opus | 800k | `claude/r10-tier-800k` | `docs/round10/scope.md` | 2026-10-30, by the owner |
+| **10V. The missing verbs** | Opus | 500k | base | V1 to V3 (`rolecards.md` 11.3) | 2026-10-30, by the owner |
 
 A session is spawned with the prompt "You are session 10X of docs/SESSIONS.md Round 10 (model, compaction size).
 Read your brief there, then docs/round10/README.md, docs/round10/seams.md, docs/round9/round10-plan.md and
@@ -3869,6 +3871,43 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   A clickable mock in `docs/round10/samples/rolecards/` goes to the owner as a page. One draft PR on
   `claude/r10-r1-rolecards`. The build waits for the owner's approval; the proposed default is round 10's tail, before
   10Z.
+
+  The owner answered on 2026-10-30 (`rolecards.md` 12, A237). The build is round 10's, and the dashboard is the
+  Satchel. The paper covers the card and the Satchel only, and the HUD and the world's panels stay glass. R1 (the action
+  table) and R2 (the paper) start at once, each on its own branch from the base. R3 follows them and B6c, then R4 and
+  R5. R6, the tidy-up of Q-B4, follows R1 and waits for its `seams.md` 3 row.
+- **10S. The scope census** (Opus, 800k). Added on 2026-10-30, when the owner moved every gameplay feature but the
+  bosses into round 10 (A256). Its spawn prompt is its brief, and it copies the brief into the opening of
+  `docs/round10/scope.md`. The document holds five things:
+  - **The inventory.** It lists every gameplay feature that is neither built nor assigned. The sources:
+    - the V1, V1.5 and V2 lists of GDD 3.10 and the sections they point to;
+    - every NFY, "round 11", "a later round" or "waits" line;
+    - round 9's `world-mode.md`, `living-world.md`, `round10-plan.md` and `followup-4.md`;
+    - the world-mode routes of `rolecards.md` 4 (Q-A2);
+    - the NFY rulings in the log below.
+
+    For each item it gives the source, what the code holds today, whether the design is complete, and every conflict
+    with world mode.
+  - **The design** of each gap, marked _proposed_.
+  - **A draft `seams.md` 3 row** for each new wire item.
+  - **The build plan.** Pull requests under 400 lines, each with its paths, tests, dependencies and model, grouped into
+    sessions in the order of `seams.md` 7.
+  - **The owner's questions**, each with a proposed default.
+
+  It sends 6Z a first wave as soon as one is fully designed and touches no open question. Design only: it writes
+  `docs/round10/scope.md` and nothing else, in one draft PR on `claude/r10-s1-scope`.
+- **10V. The missing verbs** (Opus, 500k). Added on 2026-10-30 by the owner's Q-A3 and Q-A4 (`rolecards.md` 12). It
+  builds what a shipped card shows with no server behind it (`rolecards.md` 11), as three rules steps:
+  - **V1, the evidence verbs**, on `claude/r10-v1-evidence`: the Lens's Inspect, Dust and Compare, Autopsy and Plant
+    Clue.
+  - **V2, the cover-up verbs**, on `claude/r10-v2-coverup`: Drag body, the Bloody Rag's Clean, the Bucket's Wash, the
+    Skeleton Key on keyed doors and the Crowbar.
+  - **V3, the hiding spots**, on `claude/r10-v3-hiding`: Hide, Check and Burst Out, with Chalk, Act Shifty and Fake
+    Blood.
+
+  Rope ships with the V1.5 snares. The verbs feed the law: a Forged entry stays off a petition (row 13), and an entry
+  weighs only as its presenter's Notebook backs it (row 22). Each new wire item waits for its `seams.md` 3 row. Its
+  spawn prompt is its brief, and it copies the brief into its first PR's description.
 - **10Z. The final sweep** (Fable; plan 4, S6). When every other round-10 PR has merged: DECISIONS rows for every
   owner answer and R1 to R18, the check that every `gdd-map.md` row's GDD edit landed, the cross-references of the
   round-9 and round-10 docs, `pnpm docs:protocol`, and the round-10 integration log below.
@@ -4316,6 +4355,48 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
     fights would show "bruised" to every inspector for the rest of the match.
   - A yard fight left unanswered past its time is lost, so a seat can't open the board, look and walk away.
   - Two copy fixes: the reach refusal names no pile, and the yard's hint names no jail pot.
+- 2026-10-30: merged B5c (#411) on 6Z's check of the true merge: the full server suite and auto 50 ran clean, and the
+  base tree matched the simulated one.
+- 2026-10-30: two test grants. C4c adds the `hardship` stream to R17's allowlist in `npcRoutine.test.ts`, one line.
+  x15 (#414, 10X) makes the two rent suites wait on the room's own rent records (`shiftRound`, `rentRound` and
+  `settledRound`) and one tick more, never a fixed sleep; every assertion stays. The 200 ms wait inside the test
+  helper `act()` is x16's.
+- 2026-10-30: merged x10 (#413), D8 (#410) and x15 (#414) on one check of the tree that nine pull requests make
+  together: those three, after B5c, then 10Y's six client steps (#398, #402, #406, #407, #409 and #412).
+  - The check ran every package's tests, the build, the grid check, the e2e screens, the full server suite and auto
+    50, all clean. Each base tree matched the simulated one.
+  - 10Y's y9, y11 and y12 conflict with x10 and D8 only in DECISIONS rows. 6Z resolved them by keeping both sides'
+    rows in number order. Once 10Y's base merges reproduce the checked trees, the six merge in a row with no new check.
+- 2026-10-30: three grants to 10B for B6a, where a Tribunal now opens when a cuffed seat reaches the cell.
+  - `jail.test.ts` and `manhunt.test.ts` may add a helper, `tried(party)`, at the three sites that now meet a
+    Tribunal. It steps the clock until the Tribunal closes, writes no state and forces no verdict, and it asserts that
+    the seat is still held.
+  - `hunt()` and `warrant()` may attach two Verified entries that fit the accused's public traits, through the opener's
+    Notebook, as `petition.test.ts` does. The entries fit the accused, never the seat held.
+  - `manhunt.test.ts` places the opener back on the square before its second warrant, because the Tribunal's
+    gathering moved it out of reach.
+
+  6Z also asked for one change, which 10B made: at the Tribunal's resume every held seat's release is scheduled again
+  (`rescheduleReleases`), because the pause delays the dawn and the train. `tribunal.test.ts` asserts it.
+- 2026-10-30: 10D is done: D2 to D9 have merged, and D9b was skipped by ruling. It waits for its part of `scope.md`.
+- 2026-10-30: the owner's scope (A256), verbatim:
+
+  > Real quick how many rounds are you trying to stretch everything, for me round 11 is blender only really, every
+  > gameplay feature (except bosses) should be added
+
+  Asked which lists that covers, the owner chose "Also V1.5 and V2 gameplay". Round 10 builds every gameplay feature
+  that is not built yet:
+  - what V1 and world mode planned;
+  - everything tagged round 11, NFY or "not yet";
+  - the V1.5 list;
+  - V2's gameplay: the Medium, bats, the bog lurker, crows and poison.
+
+  The Beast boss with the Cave Gate, the first-person renderer and voice chat stay out. Cosmetics are not gameplay, so
+  they stay out too unless the owner adds them. 10S (Opus, 800k) writes the census and the plan in `scope.md`, and 10V
+  (Opus, 500k) builds the role cards' missing verbs. Both were spawned on 2026-10-30.
+- 2026-10-30: the owner answered the role cards' questions (`rolecards.md` 12, 10R's A237). Asked what "those" in Q-E1
+  covers, the owner chose "Only card and Satchel". 10R's build has started (its brief above). 6Z republished the mock,
+  renamed the Satchel, at the link the owner already has.
 
 ## Round 11 (planning, started 2026-10-29)
 
@@ -4351,3 +4432,6 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
   default is a sun at 25°, turned 45° from today's key.
 - 2026-10-30: the owner approved `round11-plan.md` with CL3a's default (A236, `docs/round11/owner-answers.md`). Round 11
   builds after 10Z merges. SC2, BU4 and RN3 still wait on the owner.
+- 2026-10-30: the owner said "for me round 11 is blender only really, every gameplay feature (except bosses) should
+  be added" (A256). Round 11 stays the Blender makeover and nothing else, and its plan is unchanged. Any gameplay item
+  a document had left for round 11 is built in round 10, from `docs/round10/scope.md`.

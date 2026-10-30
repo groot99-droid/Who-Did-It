@@ -90,7 +90,9 @@ A session edits outside its paths only through a shared file of section 1, or wi
 | 10D | `minigames.json`, `sim/Minigames.ts` (lock-pick, jail), `sim/economy/rent.ts`, `economy.json`, `quests.json`, `lore.json` tips, `sim/townsfolk/*`, the bakery and mill scenes' props |
 | 10E | `achievements.json`, `story.json`, the achievement step evaluation, the client's device record, the chapter cards |
 | 10X, 10Y | anything, one fix per pull request, after checking no live session owns the path (10X server, rules and content; 10Y client, copy and art) |
-| 10R | `docs/round10/rolecards.md` and `docs/round10/samples/rolecards/`, design only; the build's paths are named in the plan the owner approves |
+| 10R | `docs/round10/rolecards.md` and `docs/round10/samples/rolecards/`; the build's paths are those of `rolecards.md` 9, R1 to R6 (approved by the owner on 2026-10-30, `rolecards.md` 12) |
+| 10S | `docs/round10/scope.md`, design only |
+| 10V | its verbs' new files (`apps/server/src/sim/verbs/**`) and their tests. Through section 1 or a grant: `sim/Actions.ts` `handleAbility`, `sim/Hold.ts` `handleHold`, `sim/Commands.ts`, `sim/Portals.ts` (doors), `abilities.json`, `clues.json`, `items.json`, `interactions.json`, and new ids in `scenes/*.json` |
 | 10Z | `docs/**`, except `docs/round11/**` (round 11's planning, `docs/round11/README.md`) |
 | 6Z | `docs/round10/**`, the Round 10 section of `docs/SESSIONS.md`, A223, A224 and its rows of 5; `docs/round11/README.md` and the Round 11 section |
 
@@ -100,10 +102,10 @@ the later session builds on the merged earlier one and does not reshape it.
 ## 5. Reserved rows
 
 - **Decisions.** 10A A225, 10F A226, 10H A227, 10G A228, 10B A229, 10C A230, 10D A231, 10E A232, 10X A233, 10Y A234,
-  10Z A235, 6Z A236, 10R A237. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
+  10Z A235, 6Z A236, 10R A237, 10S A238, 10V A239. A session's nth row takes its first number plus 20 × (n − 1): 10A's are A225, A245, A265 and A285, 10F's
   A226, A246, A266 and so on. Rows stay in number order in the table.
 - **Copy** (`UI.md` 14). 10A 14.43, 10H 14.44, 10G 14.45, 10B 14.50, 10C 14.47, 10D 14.48, 10E 14.49, 10Y 14.51,
-  10X 14.52. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
+  10X 14.52, 10R 14.53, 10V 14.54. 14.46 is A8's Sleeping (10H). It took 10B's first slot and merged before anyone noticed, and the client
   cites it, so 10B's copy moved to 14.50 (2026-10-30). A fix to another session's copy edits that line in place.
   A session's copy on a further topic goes in a `####` subsection of its own section, never under a new number.
   Sections stay in number order in section 14.
@@ -126,7 +128,7 @@ the later session builds on the merged earlier one and does not reshape it.
 3. A11, A13, A8; D1 (after A10 and A12). **The playtest gate** follows A13.
 4. 10B in order B1 to B8; 10C C1, then C2, C3, C5, then C4; C6 and C7 after B6.
 5. 10D after A11 and D1; D7 after A7 and D5; D8 after B5. 10E after B6.
-6. 10X and 10Y throughout the end; 10Z last.
+6. 10X, 10Y, 10R's build and 10V throughout the end, with the waves of `scope.md` in the order it gives; 10Z last.
 
 When two complete pull requests touch the same lines, the one earlier in this list merges first and the other merges
 the base again.
