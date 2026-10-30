@@ -67,7 +67,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; hitman?: { seatId: string; day: number; stage: 'arrived' \| 'killed' \| 'boarded' \| 'stopped' }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21): `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in `alsoWon`; `stopped` died before boarding). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
@@ -83,6 +83,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number; left?: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop with an `owner` gives each stock row how many it has `left` today, the same for every opener. |
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
+| `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -222,7 +223,8 @@ export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lock
 ```
 
 ```ts
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
+export type DeathCause =
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer';
 ```
 
 ## Admin (WDI_ADMIN only)

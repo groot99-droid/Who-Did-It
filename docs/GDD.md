@@ -193,6 +193,36 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
   - Not built yet: the Knife on the guards and their return on the morning train (C5's guard step), and, until the
     Constables' petitions land (10B), the Constables filing their own petitions with no human on the town side (12,
     R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
+- **The Tribunal** (round 10, B6a; `docs/round9/phases.md` 4, `world-mode.md` 5; seams.md 3 row 22). The trial of
+  the seat a manhunt cuffed (3.31). It opens when that seat is placed in the county jail's cell (3.27), never during
+  the Final Night, as a phase of its own (`Phase.tribunal`) under which the world is paused; when it ends, the world
+  phase it paused resumes with the seconds it had left. Like a meeting it reveals the deaths so far, ends every
+  attendee's impersonation and wakes the knocked out, and every living seat is placed at the meeting spawns, except
+  the held seat, which stays in the cell (the dock) still in the face it was cuffed in, the other jailed seats and the
+  seats on the line.
+  - **The steps:** the charge (`trial.chargeS`, _proposed_ 5 s), the case (`trial.caseS`, 30 s), the defence
+    (`trial.defenceS`, 30 s), the verdict (`phases.revealS`) and the Return (`phases.immunityS`).
+  - **The accused** is the warrant's seat throughout (3.31), never the seat held: a seat cuffed in the accused's face
+    is tried as the accused, and the accused, free on the square, defends.
+  - **The scales** start with the warrant's entries (shown under the Constables' badge, with no opener) and take what
+    the attendees present (`act.present`), up to `meeting.presentPerPlayer` each: in the case, any attendee; in the
+    defence, the accused, and others only an exclusion. A jailed seat other than the accused presents nothing, and a
+    clue already on the scales is refused. Each entry weighs from the accused's public traits only: a backed
+    (Verified or Corroborated, as the presenter's Notebook shows it) trait entry is a match when it fits and an
+    exclusion when it does not. Claimed, Forged-as-shown and Doubted testimony (3.20) weigh nothing; a role's reading
+    (the felt's hat) weighs only when its reader presents it, and a reading in the warrant weighs nothing.
+  - **The verdict.** Any exclusion dismisses. `trial.murderAt` (_proposed_ 2) matches prove murder, and
+    `trial.convictAt` (_proposed_ 2) any other charge; a murder charge short of `murderAt` is dismissed (the petition
+    names no lesser charge).
+  - **The sentence follows the charge**, on the seat held. Murder: death, by the usual death path and for good, the
+    true role shown to everyone (`tribunalVerdict`), so a seat hanged in another's face is shown as itself. Robbery,
+    assault, sabotage and conspiring: jail until the next morning train (3.27). Theft, trespass and a rumour turned to
+    a case: a fine from the charge alone (`trial.theftFine` 6, `trial.trespassFine` 4, `trial.rumourFine` 3 Scrip),
+    taken from the purse and never the bank; a purse short of it gives what it holds and serves the shortfall in jail
+    until the morning train (the verdict says so). A dismissal or a paid fine releases the held seat onto the square
+    at the Return, and a dismissed accused may not be petitioned again for `trial.acquittalGraceS` (30 s). The
+    role-specific sentences (demotion, defrocking, goods returned, the Drifter and the Gamekeeper) are B6b's; the
+    Final Night's end trial is B6d's, and voting retires in B6c.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (Round 8, 8L, A190) **The vote delay.** A vote cast in the first 15 s of a meeting (`meeting.minVoteS`, Final Night's included) is refused with the reason, so a vote agreed before the meeting cannot land before anyone has spoken; the portraits and Skip wait out the delay with a countdown, and a vote is changeable as before once it opens. `minVoteS` stays under the shortest discussion (the content check). It replaces `meeting.voteOpensImmediately`.
@@ -350,7 +380,8 @@ Doors into buildings sit on a south or east face, so they are always in sight. M
 **Controls.**
 
 - The keys W, A, S and D (or the arrows) walk straight up, left, down and right on the screen. Two keys together walk along the grid.
-- A touch stick walks where the thumb points.
+- A touch stick walks where the thumb points; pushed to its rim it runs, and a Sneak toggle beside it sneaks (round 10, R1).
+- Every key and touch control of a match is one row of the client's action table (`apps/client/src/input/actions.ts`, `docs/round10/rolecards.md` 3). The card's abilities that are not passive take Q, R and F in card order; a passive takes no key.
 - The speed in tiles is unchanged (3.7).
 
 **Lighting by phase and scene (M5a).** The world is drawn under a darkness layer that follows the phase (`metrics.json` `lighting.ambient`):
@@ -693,8 +724,8 @@ contract) and `train.delivery` the strongbox (the Bandit's heist).
 
 **The draw (7H).** At the deal, every seat dealt a card that carries vendettas (the Killer; `vendettas.json`
 `role`) draws one, uniformly among the rows the match allows: the Zealot only when a seat is dealt the Vicar, the
-Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit and the Hitman
-only on HollowMere, where the Train runs. A seat with no row allowed draws none. Each seat draws from a stream of
+Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit only on HollowMere,
+where the Train runs. The Hitman's row is never drawn at the deal (round 10, C4a: an `arrival` row, 3.33). A seat with no row allowed draws none. Each seat draws from a stream of
 its own (`vendetta`, keyed by seat), so the draw moves no other draw. The two Killers of a 10-seat deck draw
 apart and may draw the same row. The vendetta stays with its seat: it ends
 when the seat dies or is ejected, and an Accomplice who inherits the Knife (3.2) inherits none.
@@ -733,9 +764,9 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
-- **Contract: the Hitman (7H).** At the first Train arrival of the match the mail brings the Hitman a sealed
-  letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
-  other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
+- **Contract: the Hitman (7H; round 10, C4a, 3.33).** The Hitman's own mail turns him (3.33) and brings him a
+  sealed letter at once (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living
+  seats other than the Hitman and its Cabal mates, a human when one is free, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
   row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
   offer is open; an NPC Hitman accepts at once. The button reads the public roster, so after a private death of
@@ -1211,8 +1242,10 @@ station with the manifest line "{name} steps off the train."; the Final Night's 
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
 Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. Only its cellmates see
-it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. A death in
-jail takes the usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. The Tribunal
+(3.8) opens when the seat is placed in the cell; a dismissal or a paid fine releases it onto the square at the Return,
+and `jailUntilTick` keeps the cuff's value until then. A death in jail takes the usual death path. The manhunt stays
+cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
 with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
 no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
 
@@ -1464,4 +1497,46 @@ out.
 
 ### 3.33 The Hitman's arrival
 
-Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.
+Round 10, C4 (`docs/round9/world-mode.md` 1.5, followup-4 2.6; seams.md 3 row 20; DECISIONS A350). Nobody is dealt
+the Hitman: the mail turns a townsman into one.
+
+- **The draw.** At the deal of the main mode, on the secret stream `hitman`, the server draws three things and tells
+  nobody: whether he comes, by the human seats at the deal (`hitman.byHumans`: from 0.5 at 3 humans to 1 at 10, never
+  below 3 humans), the day (`hitman.days`: 3 to 5, uniform), and whether a human is turned (`hitman.byHumans`
+  `human`: 0 at 3 humans, 0.15 at 4, 0.25 at 5, 0.4 at 6, rising to 1 at 10). He comes only where the Train runs
+  (3.3; BlackPine has no station, so no delivery), and there is no Hitman in Paint The Town Red (3.8). The Killer
+  never draws the Hitman's row (3.20).
+- **The turning.** On that day's `train.delivery`, the black-wax letter reaches one seat that is living, free (not on
+  the line, 3.22, and not in jail, 3.24), wears its own card's look (never a cover, a Cabal card or the Thief), holds
+  no vendetta, is not a vendetta's partner card (the Zealot's Vicar) and has room for the Derringer, drawn on `hitman`. A human draw turns an eligible human, else an
+  eligible NPC seat; an NPC draw turns an eligible NPC seat only, so `human` is a ceiling (0 at 3 humans turns no
+  human ever). With no seat in that pool he never comes. The turned seat keeps its card (its `roleId`, its abilities,
+  its town work), its look and every public field; it holds the `hitman` vendetta, its own view's `Private.hitman` is
+  set until the lobby, and its mark is mailed to it at once (3.20, a human when one is free). Its side is its own: it
+  shares neither the Village's win nor the Cabal's, and its only victory is the Contract (C4b).
+- **The sign.** At the turning every seat's chat log gets one system line that names nobody, "A stranger's coat was
+  seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
+- **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
+  like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
+  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2), the jail's
+  `IN_JAIL` among them. It may be fired only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads
+  the drawn figure, never the seat behind it, so the real mark drawn as someone else is refused like any figure, and
+  an impersonator drawn as the mark dies in its place while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
+  makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
+- **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day
+  and stands, living, in the station's scene within `train.hearTiles` of the platform boards it: the Contract
+  victory, the same day. He leaves play: unplaced, so his figure leaves every view as any leaving figure does, with
+  no scene, no avatars and no ghost view of his own; his own view's `Private.departed` is set, and the roster keeps
+  him alive. The match goes on and the win check counts him for nobody. Until B6's Tribunal he stays a living seat
+  in every public respect: he may be voted for and ejected as any seat (his boarded win stands), and a departed
+  human may vote and speak at a meeting, whose all-voted early end waits on his vote as on any living seat's. A Hitman who killed but missed that day's Dusk Train does not win. With no
+  kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
+  frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
+  his death), and a boarded Hitman joins `alsoWon`.
+- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
+  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
+  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
+  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
+  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
+  black-wax mailbag and the crow on the station roof; a turned NPC seat
+  stopping its routine.

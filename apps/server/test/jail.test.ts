@@ -30,6 +30,7 @@ import {
   stateOf,
   toWorld,
 } from './npcHelpers';
+import { fitting, tried } from './tribunalHelpers';
 
 /**
  * The county jail (round 10, B5b; GDD 3.27; seams.md 3 row 19; A349): a cuffed seat walks `jail.walkS` into the cell,
@@ -75,7 +76,7 @@ const manifest = (h: Human): string[] =>
 /** Seat 0 opens against `accused` and two others sign: the manhunt hunts it from the next tick. */
 function hunt(party: Party, accused: string): void {
   const [a, ...rest] = ids(party);
-  handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: [] });
+  handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: fitting(party, a, accused) });
   for (const id of rest.filter((x) => x !== accused).slice(0, 2))
     handlePetitionSign(party.room, id, { id: party.room.state.petition.id });
   advance(party, 1);
@@ -127,6 +128,7 @@ describe('the county jail (GDD 3.27)', () => {
     expect(isJailed(party.room, d)).toBe(true);
     expect(inCell(party, d)).toBe(false); // the walk
     advance(party, S(balance.jail.walkS) + 1);
+    tried(party, d); // B6a: the cell opened the Tribunal
     expect(inCell(party, d)).toBe(true);
     expect(party.room.state.manhunt.state).toBe(ManhuntState.cuffed);
     const until = party.room.state.players.get(d)!.priv.jailUntilTick;
@@ -259,14 +261,14 @@ describe('the county jail (GDD 3.27)', () => {
     party.room.state.settings.map = 'blackpine';
     expect(stationOf(party.room)).toBeUndefined();
     hunt(party, d);
+    const dayEnd = party.room.state.phaseEndsTick; // B6a: the Tribunal pauses this day
     cuffSeat(party.room, d);
     advance(party, S(balance.jail.walkS) + 1);
     expect(inCell(party, d)).toBe(true);
     // The release tick is the next dawn, the day's end plus dusk and night.
     const p = balance.phases;
-    expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(
-      party.room.state.phaseEndsTick + S(p.duskS + p.nightS),
-    );
+    expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(dayEnd + S(p.duskS + p.nightS));
+    tried(party, d);
     holdPhase(party, Phase.night, 300);
     advance(party, 1);
     expect(inCell(party, d)).toBe(true); // the night of the same round
