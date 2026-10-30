@@ -1893,6 +1893,8 @@ says the ask went out ("You ask what the town is saying." / "You ask the time.")
 line in the chat log (`from` the figure's name). The words live in `ui/talk/talk.ts`. A seat answers nothing: the
 server refuses it like no target.
 
+**The mugging's answers (S4).** The private prompt of 14.36.1 already offers Pay, Flee and Fight; Flee and Fight now do what they say instead of answering "NFY: fighting back.". There is no new copy and no new screen: a Flee is the player running, a Fight is the two figures' hurt clips, and the health bar and the purse show the cost.
+
 **The jail's games (D8).** The cell's three props answer the Use key like any prop, with the label of their interaction and
 the board of 14.19.6 (a tap, crates, a pour); no new key and no new screen. Their lines are the data's (`interactions.json`):
 

@@ -384,6 +384,9 @@ export const BalanceFile = z.strictObject({
       answerS: Seconds,
       share: Chance,
       chaseS: Seconds,
+      /** Round 10, S4: a Fight lasts `fightS`; the two sides trade a blow every `fightHitS`. */
+      fightS: Seconds,
+      fightHitS: Seconds,
       cooldownS: Seconds,
     }),
     weights: z.strictObject({

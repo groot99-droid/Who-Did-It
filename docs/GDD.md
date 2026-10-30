@@ -1166,8 +1166,15 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
   figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
 - **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
-- **Flee** (a chase of `chaseS`, the share taken if the mugger reaches the target) and **Fight** (strikes on both
-  sides, 3.22) are part two of A180, after 8A's fists; until then both answers are refused.
+- **Flee** (round 10, S4): a chase of `chaseS` (_proposed_ 5 s). The mugger runs after the target at its own walking
+  pace (a figure `townsfolk.walkTilesPerS`, an NPC seat its usual walk) and takes the share only if it comes within
+  `reachTiles`; a target that outpaces it, or leaves the scene, keeps its purse. A scuffle is left either way.
+- **Fight** (round 10, S4): for `fightS` (_proposed_ 9 s) the two stand in reach and trade a blow every `fightHitS`
+  (_proposed_ 1.5 s) on 8A's fists (3.22): the target's `strike` row on the mugger, the mugger's `mugging` row on the
+  target, each cut by the striker's Weakened and the other's armour, with no stamina cost. A target the blows knock
+  out is taken for the share; a mugger whose next blow would knock it out is beaten off and goes (a figure is never
+  knocked out); one still standing at `fightS` gives up. A target that steps out of reach turns the fight into a
+  chase. The target's blows are the exchange itself, not a strike it aims.
 
 A mugged NPC seat pays. Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
 stood showing the mugger's height, and a robbed seat angry at its mugger

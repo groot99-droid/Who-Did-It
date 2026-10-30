@@ -298,6 +298,8 @@
       "answerS": 6,
       "share": 0.3,
       "chaseS": 5,
+      "fightS": 9,
+      "fightHitS": 1.5,
       "cooldownS": 420
     },
     "weights": {
