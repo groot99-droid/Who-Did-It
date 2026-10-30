@@ -7,7 +7,8 @@ import { TOWN, balanceOf, movePurse } from '../src/sim/economy/purse';
 import { duesOf, isBoarded, isIndebted, pryBoards } from '../src/sim/economy/rent';
 import { matchEvents } from '../src/sim/auto/log';
 import { addStack, count } from '../src/sim/Inventory';
-import { act, errorCodes, playerOf, setPhase, sleep, teleport } from './killHelpers';
+import { act, errorCodes, playerOf, setPhase, teleport } from './killHelpers';
+import { until } from './flowHelpers';
 import { type Match, startMatch } from './simHelpers';
 
 /** Round 10 (D7, GDD 3.23): rent in kind, goods taken at dusk, the boarded house and its boards. */
@@ -48,16 +49,33 @@ async function inDay(n: number, map: string, scrip: number): Promise<Match> {
     movePurse(m.room, b.id, TOWN, playerOf(m, b).priv.purse, 'buy');
     movePurse(m.room, TOWN, b.id, scrip, 'stake');
   }
-  m.room.state.round = 1;
-  setPhase(m, Phase.day);
-  await sleep(100);
+  await toDay(m, 1);
   return m;
+}
+
+/**
+ * Round 10, x15 (6Z's grant of 2026-10-30): each wait here is on the room's own bookkeeping (`duesOf`), never on the
+ * wall clock, so a loaded run that steps late cannot land an assertion before `runRent` has run.
+ */
+const settled = async (cond: () => boolean): Promise<void> => expect(await until(cond)).toBe(true);
+
+/** Opens the day shift of `round`: the quota falls due on its first tick. */
+async function toDay(m: Match, round: number): Promise<void> {
+  m.room.state.round = round;
+  setPhase(m, Phase.day);
+  await settled(() => duesOf(m.room).shiftRound === round);
 }
 
 /** The rent falls due at once (the shift opened long ago). */
 async function rentDue(m: Match): Promise<void> {
   duesOf(m.room).shiftStartTick = -1e6;
-  await sleep(100);
+  await settled(() => duesOf(m.room).rentRound === m.room.state.round);
+}
+
+/** Dusk settles the shift: the fines, the seizures, Indebted. */
+async function toDusk(m: Match): Promise<void> {
+  setPhase(m, Phase.dusk);
+  await settled(() => duesOf(m.room).settledRound === m.room.state.round);
 }
 
 const kinds = (m: Match, seat: string) =>
@@ -109,8 +127,7 @@ describe('goods taken and the boarded house (D7, GDD 3.23)', () => {
     await rentDue(m);
     addStack(playerOf(m, a), 'herb', Math.ceil(economy.rent.amount / pay('herb')));
     addStack(playerOf(m, b), 'herb', 1);
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     expect(count(playerOf(m, a), 'herb')).toBe(0); // taken whole: the debt is met
     expect(isIndebted(m.room, a.id)).toBe(false);
     expect(isBoarded(m.room, a.id)).toBe(false);
@@ -126,17 +143,14 @@ describe('goods taken and the boarded house (D7, GDD 3.23)', () => {
     const m = await inDay(2, 'hollowmere', 0);
     const [a, b] = m.bots as [Match['bots'][0], Match['bots'][0]];
     await rentDue(m);
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     expect(isBoarded(m.room, a.id)).toBe(true);
     expect(pryBoards(m.room, a.id)).toBe(false); // bare hands
     addStack(playerOf(m, b), 'hammer', 1);
     expect(pryBoards(m.room, b.id)).toBe(true);
     expect(isBoarded(m.room, b.id)).toBe(false);
     expect(isIndebted(m.room, b.id)).toBe(true); // the debt stands
-    m.room.state.round = 2;
-    setPhase(m, Phase.day);
-    await sleep(100);
+    await toDay(m, 2);
     expect(isBoarded(m.room, b.id)).toBe(true);
   });
 
@@ -144,8 +158,7 @@ describe('goods taken and the boarded house (D7, GDD 3.23)', () => {
     const m = await inDay(1, 'hollowmere', 0);
     const a = m.bots[0]!;
     await rentDue(m);
-    setPhase(m, Phase.dusk);
-    await sleep(100);
+    await toDusk(m);
     movePurse(m.room, TOWN, a.id, economy.rent.amount, 'stake');
     teleport(m, a, 'manor_hall', bank.x + 1, bank.y);
     await act(a, 'act.payRent', {});
