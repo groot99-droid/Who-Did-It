@@ -38,6 +38,7 @@ import type {
   CivicAct,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
+import { MOCK_VENDETTA } from '../fixtures';
 import { TASKS } from '../../ui/tasks';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -367,6 +368,10 @@ export class MockWorldFeed implements WorldFeed {
 
   coverState(): CoverState {
     return { look: '', mates: {} };
+  }
+
+  vendetta(): string {
+    return MOCK_VENDETTA;
   }
 
   doors(): DoorSnap[] {

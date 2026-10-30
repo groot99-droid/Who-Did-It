@@ -226,6 +226,11 @@ export interface WorldFeed {
   selfHandle(): string;
   /** A cover role's pick and its mates' picks; `{look: '', mates: {}}` for any other seat. */
   coverState(): CoverState;
+  /**
+   * This seat's own vendetta from the private view (GDD 3.20 "On the card"; round 10, 10Y, A354): a Killer's vendetta
+   * id, for the Accomplice the ids of its Killers' vendettas joined by commas, '' for everyone else.
+   */
+  vendetta(): string;
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
   clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };

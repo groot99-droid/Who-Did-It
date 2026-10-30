@@ -33,6 +33,7 @@ export class RoleReveal extends Phaser.Scene {
       onReady: () => net.send('lobby.ready', { ready: true }),
       onPickCover: (lookId) => net.send('role.cover', { lookId }),
       cover: () => feed()?.coverState() ?? { look: '', mates: {} },
+      vendetta: () => feed()?.vendetta() ?? '',
       textures: this.textures,
     });
 
