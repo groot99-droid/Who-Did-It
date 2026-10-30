@@ -48,6 +48,9 @@
     "sawHorse": { "name": "Saw horse", "match": { "stems": ["saw_horse"] } },
     "grindstone": { "name": "Grindstone", "match": { "stems": ["grindstone"] } },
     "lockedDoor": { "name": "Locked door", "match": { "kinds": ["lockedDoor"] } },
+    "jailGym": { "name": "Jail weights", "match": { "stems": ["barbell"] } },
+    "jailYard": { "name": "Sparring post", "match": { "stems": ["sparring_post"] } },
+    "jailScrub": { "name": "Scrub pail", "match": { "stems": ["scrub_pail"] } },
     "crateNailed": {
       "name": "Nailed crate",
       "match": { "stems": ["crates", "crate", "tin_crate", "bottle_crate"] }
@@ -302,6 +305,45 @@
       "ships": "V1",
       "hint": "Six seconds at the wheel and every worn tool you carry is whole again. Charges are not wear."
     },
+    "jailLift": {
+      "verb": "lift",
+      "label": "Work out",
+      "target": "jailGym",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailGym", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "You have lifted enough for one day." },
+      "ships": "V1.5",
+      "hint": "Fists hit two harder for the rest of the match. Once a day."
+    },
+    "jailSpar": {
+      "verb": "spar",
+      "label": "Fight in the yard",
+      "target": "jailYard",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailYard", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "Nobody in the yard wants another round today." },
+      "ships": "V1.5",
+      "hint": "Win and take 2 Scrip. Lose, or walk away from the fight, and your health bar stays smaller. Once a day."
+    },
+    "jailScrub": {
+      "verb": "scrub",
+      "label": "Scrub the cells",
+      "target": "jailScrub",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailScrub", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "The floor is clean enough for today." },
+      "ships": "V1.5",
+      "hint": "A Scrip of wage. Once a day."
+    },
     "pickLock": {
       "verb": "pick",
       "label": "Pick the lock",
@@ -345,7 +387,7 @@
         "stump log fallen_log firewood woodpile timber_set log_basket planks tree boulder",
         "rock_pile ore_pile rubble mushrooms berry_bush water_bucket bucket snare wheelbarrow",
         "drying_frame saw_horse grindstone workbench anvil forge kiln mortar_table still",
-        "shaping_table dough_trough peel_rack couche_rack head_saw"
+        "shaping_table dough_trough peel_rack couche_rack head_saw barbell sparring_post scrub_pail"
       ],
       "container": [
         "barrel crates crate tin_crate bottle_crate footlocker blanket_chest wine_cask",
