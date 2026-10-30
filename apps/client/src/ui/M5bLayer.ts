@@ -249,6 +249,11 @@ class Layer implements M5bLayer {
       crafting: () => (this.hold?.action === 'craft' ? this.hold.targetId : null),
       toggle: (id) => this.toggleCraft(id),
       progress: () => this.progress(),
+      openSquare: () => {
+        // Round 10, A374: a hand recipe is made in the crafting square at the foot of Pockets (UI.md 14.44).
+        this.craft.close();
+        this.inv.open();
+      },
     });
     this.questLog = mountQuestLog(this.root, {
       quests: () => feed.quests(),
