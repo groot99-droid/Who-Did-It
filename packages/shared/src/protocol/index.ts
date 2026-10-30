@@ -17,6 +17,8 @@ export const C2S = {
   light: 'act.light',
   /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
   mug: 'act.mug',
+  /** Round 10, D9c (GDD 3.24, seams.md 3 row 16): ask a figure about the town or the time; `sim/townsfolk/talk.ts`. */
+  talkAsk: 'talk.ask',
   /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
@@ -314,6 +316,13 @@ export interface C2SPayloads {
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
   /**
+   * Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town`
+   * (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed
+   * delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure),
+   * `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`.
+   */
+  'talk.ask': { targetId: string; ask: 'town' | 'time' };
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -467,6 +476,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.hq': 5,
   'act.payRent': 5,
   'act.mug': 5,
+  'talk.ask': 5,
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,

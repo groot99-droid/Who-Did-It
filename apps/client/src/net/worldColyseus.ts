@@ -430,6 +430,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.room.send('act.inspect', { targetId });
   }
 
+  talk(targetId: string, ask: 'town' | 'time'): void {
+    this.room.send('talk.ask', { targetId, ask });
+  }
+
   mug(choice: 'pay' | 'fight' | 'flee'): void {
     this.room.send('act.mug', { choice });
   }
