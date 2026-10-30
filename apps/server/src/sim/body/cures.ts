@@ -1,11 +1,11 @@
-import { balance } from '@wdi/content';
+import { type EffectKey, balance, items } from '@wdi/content';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
 import { take } from '../Inventory';
 import { reject } from '../World';
 import { showClip } from './damage';
-import { cureWith, deriveEffects, effectDef, effectsOn } from './effects';
+import { applyEffect, cureEffect, cureWith, deriveEffects, effectDef, effectsOn } from './effects';
 import { bodyOf } from './state';
 import { openVerb, seatInReach, startCooldown } from './verbs';
 
@@ -54,8 +54,8 @@ export function handleCure(
  * Weakened) and resets the Famished clock; a food that cures Fatigued (the Wake Loaf) also fills the stamina, or
  * Fatigued would be back the next tick. The `eat` clip is public.
  */
-export function handleEat(room: PartyRoom, sessionId: string): void {
-  const v = openVerb(room, sessionId, 'eat');
+export function handleEat(room: PartyRoom, sessionId: string, abilityId = 'eat'): void {
+  const v = openVerb(room, sessionId, abilityId);
   if (!v) return;
   const item = v.def.consumes;
   if (item === undefined || !take(v.player, item, 1)) {
@@ -65,6 +65,12 @@ export function handleEat(room: PartyRoom, sessionId: string): void {
   v.body.lastAteTick = v.tick;
   cureWith(room, sessionId, v.body, item, true);
   if ((effectDef('fatigued').cures as readonly string[]).includes(item)) v.body.stamina = v.body.maxStamina;
+  // A dish gives its buff for the rest of the day; a second dish replaces the first (round 10, D4a, GDD 3.14).
+  const buff = items.items[item]?.buff as EffectKey | undefined;
+  if (buff !== undefined) {
+    for (const id of effectsOn(v.body)) if (effectDef(id).dish) cureEffect(room, sessionId, v.body, id);
+    applyEffect(room, sessionId, v.body, buff);
+  }
   deriveEffects(room, sessionId, v.body);
   showClip(v.body, AnimId.eat, v.tick);
   startCooldown(v);

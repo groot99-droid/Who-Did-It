@@ -17,8 +17,9 @@ sessions share (`seams.md`).
 
 ## The sessions
 
-Eleven build sessions and 6Z. The plan's sessions 10A to 10E keep their pull requests (A1 to E2); 10A and 10D are
-split by model, because a session runs on one model and the plan gives them both.
+Eleven build sessions, one design session (10R, added by the owner on 2026-10-30) and 6Z. The plan's sessions 10A
+to 10E keep their pull requests (A1 to E2); 10A and 10D are split by model, because a session runs on one model and
+the plan gives them both.
 
 | Session | Model | Compaction | Pull requests | Starts |
 |---|---|---|---|---|
@@ -30,9 +31,10 @@ split by model, because a session runs on one model and the plan gives them both
 | **10C. Death's cost and arrivals** | Opus | 800k | C1 to C5 and C7; C6 after B6 | when A6 merges |
 | **10D. The living world** | Sonnet | 500k | D2 to D9 | when A11 and D1 merge |
 | **10E. Achievements and story** | Sonnet | 500k | E1, E2 | when B6 merges |
-| **10X. Fixes: server and rules** | Fable | 300k | every open issue left on the server, rules and content side | toward the end (below) |
-| **10Y. Fixes: client and screens** | Fable | 300k | every open issue left on the client, copy and art side | toward the end (below) |
+| **10X. Fixes: server and rules** | Fable | 300k | every open issue left on the server, rules and content side | early, on 2026-10-30 (below) |
+| **10Y. Fixes: client and screens** | Fable | 300k | every open issue left on the client, copy and art side | early, on 2026-10-30 (below) |
 | **10Z. The final sweep** | Fable | 800k | S6: `DECISIONS.md`, the `gdd-map.md` check, cross-references, `PROTOCOL.md`, the integration log | last |
+| **10R. Role cards and the dashboard** | Opus | 800k | the design: `rolecards.md` and a clickable mock; the build once the owner approves it | 2026-10-30, at the owner's request (below) |
 | **6Z. Orchestrator** | Opus | 300k | this contract, merges, spawning, the owner's questions | throughout |
 
 **Toward the end.** 10X and 10Y start when 10B, 10C and 10D have each opened their last pull request, and they keep
@@ -40,6 +42,17 @@ going while those merge. Their work is everything the build leaves open: a revie
 flaky or skipped test, an `NFY` tag whose system has since shipped, a "still waits" line in `GDD.md`, a failing
 `pnpm auto` invariant, the owner's playtest notes, the round-9 leftovers (the Studio NPC editor's save, verified
 end to end), and the stale draft #245. 10Z starts when every other round-10 pull request has merged.
+
+**Started early.** The owner started 10X and 10Y on 2026-10-30, while 10B, 10C and 10D were still building. Until
+those three finish, a fix in a path a live session owns, or in a file an open pull request touches, goes to 6Z first,
+and 6Z hands it to the owning session or grants it.
+
+**Role cards and the dashboard.** After playing on production on 2026-10-30, the owner asked for new role cards. On
+a desktop the card is a trifold that fills the screen; on a phone it flips panel by panel. It maps every button and
+every action, with each role's win conditions and lore. The owner also asked for a private dashboard for the chores,
+the inventory and everything a player doesn't need at a glance, in the style of round 11's questionnaire. 10R
+designs both, in `docs/round10/rolecards.md` (the owner's words open it) and a clickable mock. Nothing is built until
+the owner approves the design and says when it is built. The proposed default is round 10's tail, before 10Z.
 
 **Models.** The plan's rule holds: Opus for a pull request that sets a contract, touches role secrecy or needs
 judgement across systems; Sonnet for one that follows a merged contract; Fable, by the owner's call, for the
@@ -53,7 +66,7 @@ The owner's three sizes (A223), by the kind of work:
 | Size | Work | Sessions |
 |---|---|---|
 | 500k | precise work: contracts and rules | 10A, 10F, 10H, 10D, 10E |
-| 800k | work that needs more context across systems or documents | 10B, 10C, 10Z |
+| 800k | work that needs more context across systems or documents | 10B, 10C, 10Z, 10R |
 | 300k | testing, fixing and organizing | 10G, 10X, 10Y, 6Z |
 
 `autoCompactWindow` is read when a session's worker starts; editing a settings file mid-session changes nothing

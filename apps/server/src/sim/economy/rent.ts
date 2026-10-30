@@ -1,12 +1,14 @@
-import { balance, economy, scenes } from '@wdi/content';
+import { balance, economy, scenes, type SceneId } from '@wdi/content';
 import { EffectId, EffectState, Phase, type PlayerState, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { emitSim } from '../events/bus';
 import { take, count } from '../Inventory';
+import { emitNoise } from '../Noise';
 import { mapIdOfRoom, mapScenesOf } from '../MapSites';
 import { simOf } from '../RoomSim';
 import { isVerbPhase, reject, sceneKey } from '../World';
 import { balanceOf, movePurse, TOWN } from './purse';
+import { payFare } from './fare';
 import { perkMul } from './perks';
 import { nearProp } from './reach';
 
@@ -32,6 +34,8 @@ interface Dues {
   rentRound: number;
   settledRound: number;
   shiftStartTick: number;
+  /** Round 10, D7 (GDD 3.23): the seats that have pried their boarded house open for this night. */
+  pried: Set<string>;
 }
 
 const dues = new WeakMap<object, Dues>();
@@ -45,6 +49,7 @@ export function duesOf(room: PartyRoom): Dues {
       rentRound: -1,
       settledRound: -1,
       shiftStartTick: 0,
+      pried: new Set(),
     };
     dues.set(room.seeds, d);
   }
@@ -100,6 +105,7 @@ export function runRent(room: PartyRoom): void {
     d.shiftRound = round;
     d.shiftStartTick = tick;
     d.hauled.clear();
+    d.pried.clear(); // the boards go back at dawn and the debt stands
     if (onMap(room, economy.quota.maps))
       for (const pl of living(room))
         emitSim(room, { tick, kind: 'quota.due', seat: pl.id, data: { qty: quotaOf(room, pl.id) } });
@@ -129,8 +135,59 @@ function settle(room: PartyRoom, d: Dues): void {
       const short = fine - movePurse(room, pl.id, TOWN, fine, 'fine');
       if (short > 0) d.debt.set(pl.id, (d.debt.get(pl.id) ?? 0) + short);
     }
-    if ((d.debt.get(pl.id) ?? 0) > 0) setIndebted(room, pl.id, true);
+    if ((d.debt.get(pl.id) ?? 0) > 0) {
+      // Round 10, D7: goods are taken to the debt's value; a seat still owing then has its house boarded (Indebted).
+      const value = seizeGoods(room, pl.id, d.debt.get(pl.id)!);
+      const left = d.debt.get(pl.id)! - value;
+      if (left > 0) d.debt.set(pl.id, left);
+      else d.debt.delete(pl.id);
+      if (left > 0) setIndebted(room, pl.id, true);
+    }
   }
+}
+
+/** The goods a shop pays for, cheapest first: what the Clerk takes toward a debt (`economy.prices` `pay`). */
+const GOODS = Object.entries(economy.prices)
+  .flatMap(([item, p]) => (p.pay === undefined ? [] : [{ item, pay: p.pay }]))
+  .sort((a, b) => a.pay - b.pay || a.item.localeCompare(b.item));
+
+const goodsValue = (player: PlayerState): number =>
+  GOODS.reduce((n, g) => n + g.pay * count(player, g.item), 0);
+
+/** Takes goods worth at least `value` (or all there are) from a seat's pack, cheapest first; returns their value. */
+function takeGoods(player: PlayerState, value: number): number {
+  let got = 0;
+  for (const g of GOODS) {
+    const n = Math.min(count(player, g.item), Math.ceil(Math.max(0, value - got) / g.pay));
+    if (n > 0 && take(player, g.item, n)) got += n * g.pay;
+  }
+  return got;
+}
+
+/** Dusk: goods taken to the debt's value, up to what the seat holds; returns the value taken. */
+function seizeGoods(room: PartyRoom, seat: string, owed: number): number {
+  const player = room.state.players.get(seat);
+  if (!player?.priv) return 0;
+  const value = Math.min(owed, takeGoods(player, owed));
+  if (value > 0) emitSim(room, { tick: room.state.tick, kind: 'rent.seized', seat, data: { value } });
+  return value;
+}
+
+/** Whether the seat's house is boarded up now: it is Indebted, and has not pried the boards for this night (D7). */
+export const isBoarded = (room: PartyRoom, seat: string): boolean =>
+  isIndebted(room, seat) && !duesOf(room).pried.has(seat);
+
+/**
+ * A Crowbar or a Hammer in the pack pries the boards for the night, with the noise of a crowbar; the boards go back at
+ * dawn and the debt stands. Returns whether the house is open.
+ */
+export function pryBoards(room: PartyRoom, seat: string): boolean {
+  const player = room.state.players.get(seat);
+  const p = simOf(room).players.get(seat);
+  if (!player || !p || !['crowbar', 'hammer'].some((tool) => count(player, tool) > 0)) return false;
+  duesOf(room).pried.add(seat);
+  emitNoise(room, sceneKey(p.sceneIdx) as SceneId, p.x, p.y, balance.noise.crowbar, 'crowbar', seat);
+  return true;
 }
 
 /** The bank counters of the room's map. */
@@ -144,12 +201,20 @@ export function handlePayRent(room: PartyRoom, seat: string): void {
   if (!isVerbPhase(room.state.phase)) return reject(room, seat, 'PHASE_CLOSED');
   if (!nearProp(room, seat, banksOf(room))) return reject(room, seat, 'NO_COUNTER', { kind: 'bank' });
   const owed = d.debt.get(seat) ?? 0;
-  if (owed === 0) return reject(room, seat, 'NOTHING_OWED');
-  if (balanceOf(room, seat) < owed) return reject(room, seat, 'NEED_SCRIP');
-  if (movePurse(room, seat, TOWN, owed, 'rent') !== owed) return;
+  if (owed === 0) {
+    const why = payFare(room, seat); // round 10, C2: a seat that owes only the fare pays it here
+    return why === null ? undefined : reject(room, seat, why);
+  }
+  // Round 10, D7: the purse first, then goods at the market's price toward what is left.
+  const purse = Math.min(balanceOf(room, seat), owed);
+  const player = room.state.players.get(seat)!;
+  if (purse + goodsValue(player) < owed) return reject(room, seat, 'NEED_SCRIP');
+  if (purse > 0 && movePurse(room, seat, TOWN, purse, 'rent') !== purse) return;
+  if (purse < owed) takeGoods(player, owed - purse);
   d.debt.delete(seat);
   setIndebted(room, seat, false);
   emitSim(room, { tick: room.state.tick, kind: 'rent.paid', seat, data: { amount: owed } });
+  payFare(room, seat); // round 10, C2: then the whole fare, when the purse covers it too
 }
 
 /** Quota items this seat could hand in at a rack now: 0 outside an open shift, off a quota map, or once it is met. */

@@ -19,7 +19,7 @@ import {
   teleport,
 } from './killHelpers';
 import { act } from './killHelpers';
-import { handleOf, settle } from './avatarHelpers';
+import { handleOf, settle, withoutFigureRows } from './avatarHelpers';
 import { errorCodes, giveKit, nightfall, notes, power, refusals, toPhase } from './nightHelpers';
 import { type Match, startMatch, stateOf } from './simHelpers';
 
@@ -150,7 +150,10 @@ describe('night powers: entries, spent marks and silence', () => {
     await power(m.bots[3]!, 'poison', id(m, 6));
     await sleep(200);
     expect(
-      diffPaths(before, flatten(JSON.parse(JSON.stringify(stateOf(watcher).scenes.get('overworld'))))),
+      withoutFigureRows(
+        m,
+        diffPaths(before, flatten(JSON.parse(JSON.stringify(stateOf(watcher).scenes.get('overworld'))))),
+      ),
     ).toEqual([]);
     m.bots.forEach((b, i) => {
       const fresh = b.events.slice(counts[i]!).filter((e) => !['phaseChange', 'noise'].includes(e.type));
@@ -216,12 +219,21 @@ describe('protections and Nightshade (GDD 3.2)', () => {
     await power(watchman, 'keepWatch', id(m, 5));
     await power(herb, 'remedy', id(m, 5));
     expect(doctor).toBeDefined();
-    for (let i = 0; i < 3; i++) await strike(m);
+    // Each voided strike knocks the pair a tile apart (round 10, x10, A393), so they step back into reach first.
+    const back = () => {
+      teleport(m, killer, 'overworld', 30, ROW);
+      teleport(m, m.bots[5]!, 'overworld', 31, ROW);
+    };
+    for (let i = 0; i < 3; i++) {
+      back();
+      await strike(m);
+    }
     expect(refusals(killer).map((r) => r.reason)).toEqual(['VOIDED', 'VOIDED', 'VOIDED']);
     expect(target.dead).toBe(false);
     expect(target.bandagedUntilTick).toBe(0);
     expect(notes(m, watchman).map((e) => e.note)).toEqual([NoteKind.watching, NoteKind.watchHeld]);
     expect(notes(m, herb).map((e) => e.note)).toEqual([NoteKind.remedyGiven, NoteKind.remedyHeld]);
+    back();
     await strike(m);
     expect(target.dead).toBe(true);
   });

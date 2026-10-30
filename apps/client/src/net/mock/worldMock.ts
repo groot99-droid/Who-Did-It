@@ -38,6 +38,7 @@ import type {
   CivicAct,
 } from '../world';
 import { MockM5b, type MockSceneM5b } from './m5bMock';
+import { MOCK_VENDETTA } from '../fixtures';
 import { TASKS } from '../../ui/tasks';
 
 // A local stand-in for the server's movement stage, used behind ?mock=1 until a server is attached. It runs
@@ -231,18 +232,19 @@ export class MockWorldFeed implements WorldFeed {
       this.startAt = { sceneId: shotScene, spawn: shotSpawn.id, facing: shotSpawn.facing };
     }
     // Round 6 (6I): `?m5b=1` stands the own seat beside the overworld's quest giver with a spade and a kit of nodes.
-    let kit: { scene: string; x: number; y: number } | null = null;
+    let kit: { scene: string; x: number; y: number; bare?: boolean } | null = null;
     const giver = this.content.scenes.overworld?.givers?.[0];
     const me0 = this.actors.get(this.selfId);
     const navGrid = this.grid('overworld');
-    if (q.get('m5b') === '1' && giver && me0 && navGrid) {
+    const m5bQuery = q.get('m5b'); // `bare` (round 10, 10Y): the kit without the spade, so the tin node's prompt greys
+    if ((m5bQuery === '1' || m5bQuery === 'bare') && giver && me0 && navGrid) {
       const free = [-1, 1, 0, 2, -2]
         .flatMap((dy) => [-1, 1, 0, 2].map((dx) => ({ dx, dy })))
         .find(({ dx, dy }) => (dx !== 0 || dy !== 0) && !navGrid.solidAt(giver.x + dx, giver.y + dy));
       if (free) {
         me0.x = (giver.x + free.dx + 0.5) * TILE_PX;
         me0.y = (giver.y + free.dy + 0.5) * TILE_PX;
-        kit = { scene: 'overworld', x: me0.x, y: me0.y };
+        kit = { scene: 'overworld', x: me0.x, y: me0.y, bare: m5bQuery === 'bare' };
       }
     }
     this.m5b = new MockM5b(this.content.scenes, kit);
@@ -368,6 +370,10 @@ export class MockWorldFeed implements WorldFeed {
     return { look: '', mates: {} };
   }
 
+  vendetta(): string {
+    return MOCK_VENDETTA;
+  }
+
   doors(): DoorSnap[] {
     const me = this.actors.get(this.selfId);
     const scene = me ? this.content.scenes[me.scene] : undefined;
@@ -403,6 +409,10 @@ export class MockWorldFeed implements WorldFeed {
 
   dead(): boolean {
     return this.ghost;
+  }
+
+  onLine(): boolean {
+    return false; // the mock has no train
   }
 
   kill(targetId: string): void {
@@ -574,7 +584,15 @@ export class MockWorldFeed implements WorldFeed {
     return this.m5b.taskBar();
   }
 
+  paintTarget(): number {
+    return 0; // the mock deals no Paint The Town Red
+  }
+
   // Round 8, 8C (locked): the mock town has no shops and an empty purse.
+  fare(): number {
+    return 0; // the mock has no train
+  }
+
   purse(): number {
     return 0;
   }
@@ -582,6 +600,11 @@ export class MockWorldFeed implements WorldFeed {
   buy(_shopId: string, _itemId: string, _qty: number): void {}
 
   sell(_shopId: string, _itemId: string, _qty: number): void {}
+
+  // Round 10 (A7): the mock town has no bed to lie in.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    return { asleep: false, inBed: 0, inBedOf: 0 };
+  }
 
   // Round 8, 8D: the mock town has no altar, station or bank, so no Faith and nothing built.
   faith(): number {
@@ -628,6 +651,9 @@ export class MockWorldFeed implements WorldFeed {
   minigameResult(_taskId: string, _answer: unknown): void {
     // The mock has no task layer: `?minigame=<kind>` opens a modal whose result is dropped here.
   }
+
+  /** Round 10 (D9c): the mock has no figures to answer. */
+  talk(_targetId: string, _ask: 'town' | 'time'): void {}
 
   /** Round 8 (8B): the mock reads every bot as unhurt and sign-free; no reach or cooldown check. */
   inspect(targetId: string): void {

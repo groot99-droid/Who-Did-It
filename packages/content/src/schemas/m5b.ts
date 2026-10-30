@@ -46,6 +46,8 @@ export const Recipe = z.strictObject({
    * is matched wherever it sits in the grid, and mirrored. Absent = shapeless: the grid matches the set of inputs.
    */
   shape: z.array(z.array(Id.nullable()).min(1)).min(1).optional(),
+  /** Round 10, D4a: the maps this recipe is made on (its stations stand only there); absent = every map. */
+  maps: z.array(Id).min(1).optional(),
 });
 export type Recipe = z.infer<typeof Recipe>;
 
@@ -71,6 +73,10 @@ export const MobDef = z.strictObject({
   /** Round 8 (GDD 3.22, Session 8A): the health its attack takes and the effects it may apply (`hp` above is 8G's). */
   dmg: z.number().int().positive(),
   effects: z.record(z.string().regex(/^[a-z][A-Za-z0-9]*$/), z.number().min(0).max(1)),
+  /** Round 10 (D6b, GDD 3.22): what a Skinning knife takes off its corpse; none for a creature that has no hide. */
+  skin: z
+    .strictObject({ hide: z.number().int().nonnegative(), game: z.number().int().nonnegative() })
+    .optional(),
 });
 export type MobDef = z.infer<typeof MobDef>;
 
@@ -92,6 +98,8 @@ export const Quest = z.strictObject({
   reward: z.array(z.strictObject({ item: Id, qty: Qty })),
   /** Round 8 (GDD 3.23, 8C): the Scrip the giver pays on the turn-in, beside the items (0 when absent). */
   scrip: z.number().int().nonnegative().optional(),
+  /** Round 10 (D9, GDD 3.16): another quest of the same giver this seat must have turned in first (a chain step). */
+  after: Id.optional(),
   /** A copy id of the client's `ui/copy/m5b.ts` for the giver's lines. */
   copyId: z.string().regex(/^[a-z][A-Za-z0-9.]*$/),
 });
@@ -105,7 +113,7 @@ export const QuestsFile = z.strictObject({
 export type QuestsFile = z.infer<typeof QuestsFile>;
 
 /** Mirrors the protocol's `MinigameKind`: the five station mini-games (GDD 3.16; `tap` is round 7's, 7M). */
-export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap']);
+export const MinigameKind = z.enum(['crates', 'pour', 'slide', 'stoke', 'tap', 'lockpick']);
 
 export const MinigameDef = z.strictObject({
   id: Id,

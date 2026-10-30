@@ -37,6 +37,8 @@ export function drawsOf(kind: MinigameKind, pub: unknown): number[] {
       const p = pub as TapPublic;
       return p.bands.map((b) => clamp01(b / (1 - p.bandFrac)));
     }
+    case 'lockpick':
+      return [0]; // drawn by its own board (round 10, D5b); no widget takes bands from the rng
     case 'slide': {
       const order = (pub as SlidePublic).order;
       const work = order.map((_, i) => i);

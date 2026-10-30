@@ -3,12 +3,12 @@ import abilitiesJson from '@wdi/content/data/abilities.json';
 import balance from '@wdi/content/data/balance.json';
 import palette from '@wdi/content/data/palette.json';
 import { Phase } from '@wdi/shared';
-import type { ErrorPayload } from '@wdi/shared/protocol';
+import type { DeathCause, ErrorPayload } from '@wdi/shared/protocol';
 import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
-import { TouchControls } from '../input/TouchControls';
+import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
   REG_ROLE_CHIP,
@@ -20,10 +20,13 @@ import {
   type WorldFeed,
 } from '../net/world';
 import { LOOKS_COPY, WORLD_COPY as C, fill } from '../ui/copy';
+import { RefusalHints } from '../ui/copy/refusalHint';
 import { NOTHING_HAPPENS, interactionFails, isNfy, refusalText } from '../ui/copy/refusals';
+import { noiseLine } from '../ui/copy/noise';
 import { overlayRoot } from '../ui/dom';
 import { bodyMotion, refusedIn } from '../ui/theme/motion';
 import { mountSeatPicker } from '../ui/SeatPicker';
+import { type TalkAsk, TALK_KEYS, TALK_REACH_TILES, askedLine } from '../ui/talk/talk';
 import { INSPECT_PROMPT, INSPECT_REACH_TILES, type InspectBinding, bindInspect } from '../ui/inspect/bind';
 import { bindShout } from '../ui/hive/shout';
 import { AUDIO_KEYS, type AudioKey, AudioBus } from '../view/AudioBus';
@@ -41,8 +44,10 @@ import { TransportView } from '../view/transport/TransportView';
 import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
 import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
+import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
+import { type LineScreen, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
 import { Lighting } from '../view/Lighting';
@@ -115,6 +120,13 @@ type Target =
 
 /** Clue ids this client has already collected, per feed: the prompt does not offer them again. */
 const collectedBy = new WeakMap<WorldFeed, Set<string>>();
+/** Round 10, C1b: per feed, whether its seat was on the line and how it died; a World restart keeps it. */
+const lines = new WeakMap<WorldFeed, { on: boolean; cause: DeathCause | undefined }>();
+const lineOf = (feed: WorldFeed): { on: boolean; cause: DeathCause | undefined } => {
+  let memory = lines.get(feed);
+  if (!memory) lines.set(feed, (memory = { on: false, cause: undefined }));
+  return memory;
+};
 
 interface PortalSpot {
   id: string;
@@ -150,6 +162,7 @@ export class World extends Phaser.Scene {
   private m5b: M5bLayer | null = null;
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
   private civic: CivicLayer | null = null; // round 8, 8D
+  private sleepLayer: SleepLayer | null = null; // round 10, A8
   private purse: PurseHud | null = null; // round 8, 8C (locked)
   private mug: MugPrompt | null = null;
   private cutscenes!: CutscenePlayer;
@@ -158,6 +171,8 @@ export class World extends Phaser.Scene {
   private statics!: StaticView;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
+  /** Round 10, 10Y (UI.md 14.51): when each NEED_* refusal last showed, for the second one's hint. */
+  private readonly hints = new RefusalHints();
   private bodyHud!: BodyHud; // round 8, 8A
   private lighting!: Lighting;
   private sheet!: NotebookSheet;
@@ -176,6 +191,8 @@ export class World extends Phaser.Scene {
   private hold: { clueId: string; since: number; x: number; y: number } | null = null;
   private focusEntry: { had: number; until: number } | null = null;
   private wasDead = false;
+  /** Round 10, C1b: the On-the-line screen while this seat waits for the morning train. */
+  private line: LineScreen | null = null;
   /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
   private lastPhase = -1;
   private stepAt = 0;
@@ -193,6 +210,7 @@ export class World extends Phaser.Scene {
     this.hold = null;
     this.focusEntry = null;
     this.wasDead = false;
+    this.line = null;
   }
 
   preload(): void {
@@ -236,6 +254,7 @@ export class World extends Phaser.Scene {
     this.m5b = mountM5bLayer(this);
     this.shop = mountShopLayer(this); // round 8, 8C (locked)
     this.civic = mountCivicLayer(this); // round 8, 8D
+    this.sleepLayer = mountSleepLayer(this); // round 10, A8
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -271,9 +290,10 @@ export class World extends Phaser.Scene {
     if (flags.touch || isTouchDevice()) {
       this.touch = new TouchControls(overlayRoot(), {
         onUse: (on) => this.useKey(on),
-        onAct: () => this.abilityKey('Q'),
+        onAbility: (id) => this.useAbility(id), // round 10, 10Y (A334): one disc per active Q, R or F
         onStrike: () => this.strikeKey(), // round 8, 8A
       });
+      this.touch.setAbilities(abilityDiscs(getNet(this).roleCard));
       input.attachTouch(this.touch);
     }
 
@@ -281,14 +301,23 @@ export class World extends Phaser.Scene {
     const onNoise = (n: NoisePulse) => this.ring(n);
     const onError = (e: ErrorPayload) => {
       const line = this.refusal(e);
-      if (line !== null) this.hud.say(line, undefined, isNfy(e.reason) ? 'nfy' : undefined);
+      // Round 10, 10Y (UI.md 14.51): the second identical NEED_* in 30 s adds where the thing is found.
+      const hint = line === null ? null : this.hints.take(e, performance.now());
+      if (line !== null)
+        this.hud.say(
+          hint ? `${line} ${hint}` : line,
+          hint ? 4000 : undefined,
+          isNfy(e.reason) ? 'nfy' : undefined,
+        );
       refusedIn(overlayRoot()); // round 8, 8H (locked): the refused prompt shakes (UI.md 9)
       if (e.code === 423 || e.code === 428) this.audio.play('door_locked');
     };
     const onFound = () => this.clueFound();
     // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
-    const onKilled = (m: { cutsceneId?: string }) =>
+    const onKilled = (m: { cutsceneId?: string; cause?: string }) => {
+      lineOf(this.feed).cause = m.cause as DeathCause | undefined; // round 10, C1b: the screen's centre line
       void this.cutscenes.playDeath(m.cutsceneId).then(() => this.refreshGhost());
+    };
     const onAim = (m: { endsTick: number }) => this.openAim(m.endsTick);
     feed.bus.on('noise', onNoise);
     feed.bus.on('error', onError);
@@ -357,8 +386,10 @@ export class World extends Phaser.Scene {
       this.m5b?.destroy();
       this.shop?.destroy(); // round 8, 8C (locked)
       this.civic?.destroy(); // round 8, 8D
+      this.sleepLayer?.destroy(); // round 10, A8
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
+      this.line?.destroy(); // round 10, C1b
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -395,6 +426,7 @@ export class World extends Phaser.Scene {
     this.hud.setPhase(PHASE_LABEL[clock.phase] ?? '', darkness >= 1);
     this.watchPhase(clock.phase);
     if (!this.cutscenes.playing) this.refreshGhost();
+    if (!this.cutscenes.playing) this.refreshLine(clock); // round 10, C1b
 
     const clues = feed.clues();
     const bodies = feed.bodies();
@@ -437,6 +469,8 @@ export class World extends Phaser.Scene {
     for (const [code, slot] of Object.entries(ABILITY_SLOTS))
       input.bind(code, (down) => down && this.abilityKey(slot));
     input.bind('KeyX', (down) => down && this.strikeKey()); // round 8, 8A
+    for (const [code, ask] of Object.entries(TALK_KEYS))
+      input.bind(code, (down) => down && this.talkKey(ask)); // round 10, D9c
   }
 
   /**
@@ -475,6 +509,7 @@ export class World extends Phaser.Scene {
   private useKey(down: boolean): void {
     if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
     if (this.civic?.use(down)) return; // round 8, 8D: an altar, the mailbag, a rack, the back room, a station, a bank
+    if (this.sleepLayer?.use(down)) return; // round 10, A8: a bed in reach at dusk or night
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();
@@ -517,10 +552,19 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
-  /** Q, R or F: the card's ability on that key, aimed at the nearest living player in reach. */
+  /** Q, R or F: the card's ability on that key. */
   private abilityKey(slot: string): void {
-    if (this.feed.dead()) return;
     const row = getNet(this).roleCard?.abilities.find((a) => a.key === slot);
+    if (row) this.useAbility(row.id);
+  }
+
+  /**
+   * The card's ability by id, aimed at the nearest living player in reach: the one path of a key, a touch disc
+   * (round 10, 10Y, A334) and, later, a card button (rolecards.md R1). Only an active ability goes out (1.2 A2).
+   */
+  private useAbility(id: string): void {
+    if (this.feed.dead()) return;
+    const row = getNet(this).roleCard?.abilities.find((a) => a.id === id);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
     if (def.target === 'seat') return this.pickSeat(row.id, row.name);
@@ -533,6 +577,15 @@ export class World extends Phaser.Scene {
     if (row.id === 'kill') {
       this.feed.kill(near);
     } else this.feed.ability(row.id, near);
+  }
+
+  /** Round 10, D9c: G / H, ask the nearest avatar in reach about the town or the time; the server tells a figure from a seat. */
+  private talkKey(ask: TalkAsk): void {
+    if (this.feed.dead()) return;
+    const handle = this.nearestPlayer(TALK_REACH_TILES);
+    if (handle === null) return this.hud.say(C['refuse.nobody']);
+    this.feed.talk(handle, ask);
+    this.hud.toast(askedLine(ask), 'interact');
   }
 
   /** The handle of the avatar nearest to the own in reach: the Kill and the Bandage name a handle (GDD 3.17). */
@@ -711,6 +764,25 @@ export class World extends Phaser.Scene {
     }
   }
 
+  /**
+   * Round 10, C1b (GDD 3.22, UI.md 14.47): on the line the seat sees the dark carriage and the time to the train, never
+   * the world (the server sends it none); when the train brings it back, the screen lifts and says so.
+   */
+  private refreshLine(clock: { tick: number; phase: number; phaseEndsTick: number }): void {
+    const memory = lineOf(this.feed);
+    const on = this.feed.onLine();
+    if (on) {
+      memory.on = true;
+      this.line ??= mountOnTheLine(overlayRoot(), memory.cause);
+      return this.line.update(lineSecondsLeft(clock.phase, (clock.phaseEndsTick - clock.tick) / TICK_RATE));
+    }
+    this.line?.destroy();
+    this.line = null;
+    if (!memory.on) return;
+    memory.on = false; // the scene restarts on the platform, so the memory outlives this run
+    this.hud.toast(C['line.back'], 'warm', undefined, 3000);
+  }
+
   /** Ghost mode: your sprite translucent, "You are a ghost", the verbs off. The flag lives in the feed. */
   private refreshGhost(): void {
     const dead = this.feed.dead();
@@ -718,7 +790,7 @@ export class World extends Phaser.Scene {
     this.wasDead = dead;
     this.entities.setGhost(dead);
     this.hud.setGhost(dead);
-    this.touch?.setActEnabled(!dead);
+    this.touch?.setAbilitiesEnabled(!dead);
     if (dead) {
       this.endUse();
       this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);
@@ -834,13 +906,8 @@ export class World extends Phaser.Scene {
     const at = toScreen(n.x, n.y);
     // HUD words are screen frame: "from the north" is up on the screen (SPRITES 10.4).
     const dir = meObj ? dirFromVector(at.x - meObj.x, at.y - meObj.y) : null;
-    const line = /bell/i.test(n.kind)
-      ? C['log.bell']
-      : scream
-        ? C['log.scream']
-        : /run|step/i.test(n.kind)
-          ? C['log.steps']
-          : C['log.door'];
+    // One line per kind, and never the door's for a kind this client does not know (10Y, A254).
+    const line = C[noiseLine(n.kind)];
     const label = fill(line, { dir: dir === null ? '' : C[`dir.${dir}` as keyof typeof C] });
     this.hud.say(label);
     if (scream) this.audio.play('scream');

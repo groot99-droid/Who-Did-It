@@ -3787,9 +3787,10 @@ once. A session's decisions go under its reserved row and its copy under its UI.
 | **10C. Death's cost and arrivals** | Opus | 800k | `claude/r10-tier-800k` | C1 to C7 | when A6 merges |
 | **10D. The living world** | Sonnet | 500k | base | D2 to D9 | when A11 and D1 merge |
 | **10E. Achievements and story** | Sonnet | 500k | base | E1, E2 | when B6 merges |
-| **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
-| **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | toward the end |
+| **10X. Fixes: server and rules** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
+| **10Y. Fixes: client and screens** | Fable | 300k | `claude/r10-tier-300k` | the open issues (brief) | early, on 2026-10-30 |
 | **10Z. The final sweep** | Fable | 800k | `claude/r10-tier-800k` | S6 | last |
+| **10R. Role cards and the dashboard** | Opus | 800k | `claude/r10-tier-800k` | R1, the design; the build after the owner approves it | 2026-10-30, by the owner |
 
 A session is spawned with the prompt "You are session 10X of docs/SESSIONS.md Round 10 (model, compaction size).
 Read your brief there, then docs/round10/README.md, docs/round10/seams.md, docs/round9/round10-plan.md and
@@ -3843,8 +3844,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - **10D. The living world** (plan 4). D2 to D9 in the plan's order, D7 after A7 and D5, D8 after B5; the chores and
   quests the 12-cycle match needs (F4 2.8) join D9.
 - **10E. Achievements and story** (plan 4). E1, then E2.
-- **10X. Fixes: server and rules** (Fable). Starts when 10B, 10C and 10D have opened their last PR. One fix per PR,
-  each with a test that failed before it:
+- **10X. Fixes: server and rules** (Fable). Started early, by the owner, on 2026-10-30 (the log below); the plan had it
+  start when 10B, 10C and 10D had opened their last PR. One fix per PR, each with a test that failed before it:
   1. the lists the round's PRs left for later (10G's refusal list first), and every parked review finding;
   2. flaky and skipped tests, and the `pnpm auto` invariants at 50 matches;
   3. `NFY` tags whose system has shipped, and the "still waits" lines of `GDD.md` (the Bandage knockback);
@@ -3853,6 +3854,21 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 - **10Y. Fixes: client and screens** (Fable). Same start and rules as 10X, on the client: the screens the round
   added, every refusal's line on a phone, the e2e and screenshot sets, the Studio NPC editor's save verified end to
   end (round 9), missing atlas keys (`constable`), copy drift against UI.md 14.
+- **10R. Role cards and the dashboard** (Opus, 800k). Added by the owner on 2026-10-30, design only for now. Its spawn
+  prompt is its brief, and it copies the brief into the opening of `docs/round10/rolecards.md`. The brief covers:
+  - an audit of every role's card;
+  - the trifold, which fills a desktop screen and flips panel by panel on a phone;
+  - one table of every action and button, read by both the input code and the card;
+  - each role's win conditions and lore, as copy that never restates a number;
+  - the private dashboard: the chores, the inventory, the quest log, the notebook, rent and debts;
+  - the style, from round 11's questionnaire, mapped onto the game's tokens;
+  - role secrecy;
+  - the build, split into PRs;
+  - questions for the owner, each with a proposed default.
+
+  A clickable mock in `docs/round10/samples/rolecards/` goes to the owner as a page. One draft PR on
+  `claude/r10-r1-rolecards`. The build waits for the owner's approval; the proposed default is round 10's tail, before
+  10Z.
 - **10Z. The final sweep** (Fable; plan 4, S6). When every other round-10 PR has merged: DECISIONS rows for every
   owner answer and R1 to R18, the check that every `gdd-map.md` row's GDD edit landed, the cross-references of the
   round-9 and round-10 docs, `pnpm docs:protocol`, and the round-10 integration log below.
@@ -3912,6 +3928,259 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   with no public status bit, and draws `icon_effect_exhausted.svg` in the house style. A holdout whose card holds a
   night power, or who is on a manhunt, is never Exhausted (followup-4 2.11). Round 11's planning starts at the
   playtest gate (`docs/round11/README.md`).
+- 2026-10-29: A13a (#332) merged at 203206d, B1 (#336) at cccd160, the round-11 contract (#339) at 65c2851 and A13b
+  (#335) at 4a8e70f. A13 is done, so **the playtest gate is open** and the owner has been told. Sleeping lands after the
+  gate: A7a, then A8's bed prompt. 10H plans A8 until A7a merges. Rulings:
+  - **D2 deals NPC seats no tools.** A free tool would be a tell (a seat working a pile before anyone could own the
+    tool), so `carries` goes. D2b later lets an NPC buy a tool at the store with the human verb. Its grant covers
+    npcRoutine P3, P4, R5/R6, R10, R13 and R17 (`loot` joins R17's allowlist for gathers), npcChores "stands still"
+    and, with a reason, npcTells.
+  - **B2, the briefing, is wire row 8**, a system line. A Constable reads a clue as a collector would, so the trait
+    is named only for a clue anyone may read (GDD 3.4). The felt's hat and prints are briefed as kind and place. A
+    briefing never says Forged or Verified, writes no Notebook entry and changes no clue. Its lines live in
+    `laws.json`. 10B's grant: one call line, `runLaw(room)`, in `sim/Step.ts` after `runDecay`.
+- 2026-10-29: #342 (wire row 8 and the logs above) merged at f38dfa0 and D2 (#340) at 0094684. On 10D's request for
+  D5, wire row 9: the lock-pick sends the picker's own client the set points it must feel, and the server replays the
+  trace, as for the tap. D5 locks the manor study door; the curfew doors' locks wait for D7, since a curfew door is
+  locked only at night for an Indebted seat. D4 splits into D4a and D4b:
+  - D4a: the bakery's parts and the Herb Bread. Its poison resistance shortens Poisoned, as armour's does, and never
+    touches Nightshade.
+  - D4b: the Miner's Pasty keeps its Game filling and waits for Game, with the other dishes.
+  - D4a's grants: `eat` in `sim/Actions.ts` (no public clip or status bit), buff rows in `effects.json`, `EffectId`
+    appended after A7b's `exhausted` (D4a merges after A7b), the buff in `sim/body/effects.ts` with its icons, the
+    dish rows and the optional `parts` and `buff` fields, and the stem stations of `sim/Craft.ts`.
+  - D3's grant: the `consumes` check in 10F's resolver (`problemOf` and `interactReady`), so a saw takes a seat's Logs.
+- 2026-10-29: on 10B's plan for B8, wire row 10: Walk with me. Every answer reaches the asker at one delay drawn on
+  `pairing`, whoever the target is, because a person's held answer and an NPC's think time would be two distributions
+  (R6). A pair shields a seat only against a third party, and only while its partner shares its scene (`world-mode.md`
+  3.1). B8a builds while B2 is in review; once B2 merges, B3 to B6 come before B8b, since 10E, C6 and C7 wait on B6.
+- 2026-10-30: A7a (#337) merged at f56f3d4, #345 (wire row 10 and the log above) at 807ca30, A8 (#348) at 805ebeb
+  and D3 (#343) at 233709b. A8 went before A7b because it was green first and the owner is waiting on sleeping. A8
+  took `UI.md` 14.46, 10B's slot in seams.md 5, for Sleeping. It is merged and cited in the client, so 10B's copy moves
+  to 14.50, for B2 and every later B step. C1a (#341) waits for C1b, cut from C1a's head, and the two merge seconds
+  apart: C1a alone would bring a seat back on the Train with its verbs still off. 10H is done.
+- 2026-10-30: #350 (round 11's questions) merged at 66b5d88, #352 (the copy move and the log above) at 42b8e19, A7b
+  (#349) at d61e765, C1a (#341) at 9426f9e and C1b (#351) at 5d362b8. 10A is done. D5a's grant: an optional `humans`
+  count on `standardParty` in `test/npcHelpers.ts`, so its leak test seats a second human. Two wire rows for the next
+  steps:
+  - **Row 11, C2, Owing the line.** The fare is private. It is paid at the bank with the rent, or cleared by the Clerk's
+    errand at the ledger. The dear stall follows the roster look, never an impersonation or the card. The stock and
+    output cuts move to C3, whose town work restocks the stalls. An NPC seat owes the line and clears it like a human,
+    so a stall that stays dear never marks an NPC. 10C's grants: one line in `purse.ts` (the cut stays with the
+    payer), the dear stall (`economy.json` `owner`, its schema and `shops.ts`), two lines in `rent.ts`, the `errand`
+    branch in `Hold.ts`, and the NPC errand in `routines.json` and `sim/npc/routine.ts`.
+  - **Row 12, D5c, the scratch.** The clue is the same whoever picks, and B2's briefing reads it like any clue.
+- 2026-10-30: D5a (#353) merged at 791cc77, #354 (rows 11 and 12) at 36881d3 and B2 (#344) at 40f664f. C2's rulings:
+  an owing seat's pay halves exactly, by a per-seat remainder in `fare.ts`, so two 3-Scrip tasks pay 1 and then 2, and
+  the two-day check moves to C2b, since only the errand clears a fare in two days. For the playtest: at 4 or 5 humans
+  an owing seat cannot make rent from tasks, so it is Indebted until the errand clears the fare. On 10B's plan for B3,
+  wire row 13, petitions:
+  - One petition is open in the town at a time, as the plan says. The opener of one that lapses waits
+    `petition.cooldownS` too, so an anonymous seat cannot keep the slot full. The owner may prefer one per accused.
+  - A petition shows only what the opener's Notebook shows, and only clue entries: a confession or a role's reading
+    attached would tell a true wearer of a look from a cover. A Verified and a Corroborated entry both show as backed.
+  - A jailed seat is not free and a seat on the line is not living, so neither counts or signs. Briefings are not
+    evidence. NPC seats sign later, under an R6-style timing rule.
+- 2026-10-30: #356 (row 13 and the log above) merged at ed5e79c and D4a (#357) at 01a2c9c, after a clean 50-match
+  bot run of 6Z's on it. D5b's grants: `registry.ts`, the `pub` line of `MinigameModal.ts` and `copy/minigames.ts`.
+  Row 10 gains `declined`, the asker's state after a no: it is the same whoever answered, so it tells nothing about
+  the target. On D4a:
+  - It used fewer of its grants than planned. The buff is a field of the eaten item, not of the recipe; a recipe row
+    already names its station, so there is no `parts` list; and the stem stations wait for D4b's shaping table.
+  - Its other edits outside 10D's paths were granted on review: the m5b tests of `tools/sprites`, the client and the
+    content, which list the recipes; `docs/SPRITES.md`; the `EffectId` pin; and the icons.
+  - The plan's dish buff "until dawn" is a fixed 780 s, so a dish eaten at night can carry into the next day. That is
+    for the owner and 10X to judge.
+- 2026-10-30: D5b (#358) merged at f930ae4, #360 (row 10's `declined` and the log above) at 9fee056, B8a (#355) at
+  10083ca and D5c (#361) at 2e07440, after a clean 50-match bot run of 6Z's on it. B8a's `pair.*` events carry seat
+  ids on the server bus only, as every event does (A84). D5c's grants: `ClueKind`, the clue and economy schemas, one
+  line each in `NotebookPanel.ts` and `ui/copy/world.ts`, and its own `lockpick.test.ts`. Row 12 now says what D5c
+  built: the scratch's Notebook entry is like any clue's (the scene and the time it was collected), and the fine comes
+  from the picker's purse like any other. B3a's grants: two cases in `sim/Commands.ts`; row 13's messages and fields in
+  `packages/shared`, with `PROTOCOL.md` regenerated; the `petition` section of `balance.ts`; and the optional `crimes`
+  in `schemas/bible.ts`. On 10D's plan for D6, which splits into D6a (armour) and D6b (the skinning knife):
+  - D6a's grants: the armour factor in `hurt` (`sim/body/damage.ts`), the armour reads in `sim/body/effects.ts`, the
+    `armor` block of `balance.json` with its schema, and an optional `armor` field on an item (`logic-table.md` 8.2
+    and 8.3). Damage taken is never below `armor.cap` of the blow, the Lodge's creature perk included, and the Knife,
+    Nightshade and the Last Shot never pass through it.
+  - Tin mail and the tin helm come only from the forge, which no round-10 step builds, so they wait for it.
+  - Armour shows only in its wearer's own view in round 10 (LT6). It is not drawn, so an inspect line naming it would
+    tell an impersonator from the seat whose look it wears. Drawing it on the figure is round 11's art question.
+  - A beating's robbery (C6) never takes armour (LW9).
+- 2026-10-30: C2a (#359) merged at a51e0d1, ahead of D6a by `seams.md` 7's order, since both touch `balance.json`
+  at the same lines. On D6a (#363):
+  - Only a creature's bite takes the Lodge's perk: `hurt` reads the hit's `cause`, so a guard's blow takes the armour
+    alone (10D's fix on review). 6Z's 50-match bot run on it is clean.
+  - Granted on review: `sim/body/run.ts` (stamina regeneration and speed under armour) and the armour checks in
+    `content/src/validate.ts`.
+- 2026-10-30: wire row 14, the manhunt, on 10B's plan for B4:
+  - A cuff tests the figure, never the seat: `NOT_HUNTED` unless the target is drawn as the accused. A refusal that
+    read the seat behind the handle would tell an impersonator from the accused, and only the Killer impersonates.
+  - The cuff lands on the seat behind the figure, as the Kill does, so an impersonator drawn as the accused is cuffed
+    in its place. By 6Z's default for B5 the cell holds, and the Tribunal tries, the seat that was cuffed; the owner
+    may rule otherwise.
+  - The signers' map mark follows the face by the rumour ledger's rule, never the seat.
+  - The Constables keep their leash (`followup-4.md` 2.2 wins over `world-mode.md` 3.1). "With no human free, they
+    finish it" is a cuff where the accused stands at the timeout, when no living human but the accused is out of jail
+    and off the line. Asleep and knocked-out humans count as free, so no living client receives that scene.
+  - B4's grants: the `cuff` case in `sim/Hold.ts` with its interrupts; row 14 in `packages/shared`, with
+    `PROTOCOL.md` regenerated; the `manhunt` block of `balance.json` and `law.cuffHoldS`.
+- 2026-10-30: the owner ruled on B5: "keep the default for B5, jail and try them". The seat a manhunt cuffs is held in
+  the county jail cell and tried by the Tribunal on the passed petition's charge and entries. That includes an
+  impersonator cuffed while drawn as the accused, and nothing unmasks at the cuff. Before its code, B5 proposes the
+  wire for what the cell and the trial draw for a cuffed impersonator.
+- 2026-10-30: the owner started 10X and 10Y early, while 10B, 10C and 10D were still building. 6Z merged the base into
+  `claude/r10-tier-300k` (473f233) and spawned both on Fable at 300k: 10X on `claude/r10-x1-refusals` and 10Y on
+  `claude/r10-y1-refusal-lines`. Each carries the fix list the round's reviews parked, on its side. Until the build
+  sessions finish, a fix in a path a live session owns, or in a file an open PR touches, goes to 6Z first. Their copy
+  goes under UI.md 14.51 (10Y) and 14.52 (10X), added to seams.md 5.
+- 2026-10-30, during the owner's game on production (no merges until it ends):
+  - B3a (#364) took the last review fix: whether the Constables may sign is fixed when the petition opens, like the
+    bar.
+  - D6b (#367, stacked on D6a) and C2b (#368) were reviewed OK. C2b merges after the D6 pair and resolves two data
+    files.
+  - 10X's grants: the SPENT copy for `what: 'match'` and the stacked DeathCause comment, after B3a. NPC seats sign
+    petitions (world-mode.md 5, "NPCs may sign, but a petition never waits for one"), built by 10X after B3a: they read
+    only the public entries, sign on a chance, draw once per petition on `npcTiming`, and go through the human path.
+  - 10X's new audit: a seat seen working a pile, a counter or the ledger at night is a human, because those NPC
+    activities are day-only.
+  - C3's ruling and row 15:
+    - a look's work is gone only when a seat wore it at the deal and no living, placed wearer is left;
+    - the stalls keep a daily stock;
+    - the chapel earns no Faith while the Vicar's look is gone;
+    - the rows with no system yet carry an NFY note.
+  - D7 (#369, rent in kind and the boarded house) was reviewed OK. NPC rent goes to 10X after D7 merges.
+  - D9 is split three ways:
+    - D9a: the two chains (Moll, Ada Kerrow) through a quest `after` field. Step 2 pays items or Scrip, since nothing
+      teaches recipes yet; recipe teaching, the one-per-match branch and tin mail wait for round 11.
+    - D9b: widening the task deal's pool waits for the balance lab, because it changes how many tasks a seat is dealt
+      and the playtest measures pacing.
+    - D9c: Talk, on row 16.
+- 2026-10-30, after the owner's game ("clear to merge"): merged D6a (#363), D6b (#367), 6Z's docs (#366), D7 (#369),
+  B3a (#364), x3 (#377, the `talk.test.ts` flake), C2b (#368), D9a (#373) and y1 (#372). C2b and y1 were checked
+  first on the base they would land on: typecheck, lint and the tests of the files both sides touched.
+- 2026-10-30, the owner's report from the game: figures froze on other players' screens, mostly when people changed
+  scene or walked out of view, and the game lagged.
+  - **The frozen figures.** `Visibility.ts` removes the near tag when two figures part by more than Blood's range.
+    In `@colyseus/schema` 5.0.36, `StateView.remove(obj, tag)` also hides the object itself, so the viewer's copy
+    stops where it left the ring. The DELETE at a later scene change or re-handle is filtered by the same flag, so the
+    copy stays until the viewer changes scene. The ghost tag's removal does the same. 10X fixes it as x4: the avatar
+    is shown again with a default-tag add, which sends only fields the viewer already holds. The test reproduces the
+    freeze on the base. The DECISIONS row corrects A170's reading of a removed tag.
+  - **Figures never sent.** No townsperson or Constable was ever in a seat's view (A160's open item). 10X adds them as
+    x5, on row 17. D9c's Talk (#380) waits on it for its client half.
+  - **Lag.** Production ran far under its limits during the game: CPU at most 0.084 vCPU, memory 175 MB, and a tick's
+    p95 of 2.6 ms of 50 in a bot run. What players feel is the client pipeline and the distance to the server's
+    region:
+    - the patch timer runs beside the fixed step, so a patch carries no tick or two;
+    - samples are stamped with the client's frame time;
+    - the own sprite is drawn 100 ms behind and others 150 ms;
+    - a 250 ms input gap stops a walker.
+
+    10X's x7 sends one patch per tick and widens `INPUT_STALE_TICKS` to 10. 10Y's half stamps samples by tick, then
+    lowers the self delay. 6Z lands the new ARCHITECTURE 5.6 sentence after both. Moving the Railway region waits on
+    the owner, who was asked where the players are.
+- 2026-10-30: B4 (#381, about 650 lines) stays one PR: splitting off the Constables' cuff would leave about 560 lines
+  and part `Manhunt.ts` from its tests. B3a (612) is the precedent. Grant: the `onManhunt` line in `sim/SleepRest.ts`.
+- 2026-10-30: in C3a's review (#378), `townWork.ts` decided a look was gone from the sim's death. A Baker's stall would
+  have shown `left: 0`, and the Vicar's altar would have refused donations, the moment the seat died: that reveals a
+  kill before the meeting (GDD 3.7). Row 15 now reads the roster's `Player.alive`, which flips only at a meeting or an
+  ejection (A30), and the list of what never goes on the wire names "a kill before the meeting reveals it". 10C
+  fixes C3a with a test that a kill before a meeting leaves the stall full.
+- 2026-10-30: y1's DECISIONS row A234 had landed after A331; 6Z moved it into number order.
+- 2026-10-30: the owner asked for new role cards and a player dashboard (`docs/round10/README.md`). 6Z started 10R
+  (Opus, 800k, from `claude/r10-tier-800k` at 08ddb21) on `claude/r10-r1-rolecards` to design them.
+- 2026-10-30: 6Z's rulings on 10C's C5 plan (Paint The Town Red):
+  - the wire is seams row 18: `Winner.paintTown`, the game-over counts and `Private.paintTown`;
+  - `paintTown.winUnique` keeps its name and holds a fraction, 0.5 of the NPC seats at the deal, rounded up;
+  - in this mode a dead guard returns on the morning train (`world-mode.md` 12, R4), and a guard's death counts only
+    toward the pillars, which are the Vicar's seat, the Clerk guard and both Constables;
+  - a Killer is caught when its seat is dead for good, and B6's hanging is such a death;
+  - the deal turns the row's Accomplice, or else a profession, into the second Killer;
+  - 10C is granted edits in `sim/Kill.ts` (the Knife on a guard, every mode), `sim/law/Guards.ts` and
+    `sim/townsfolk/figures.ts` (a guard's death and return);
+  - the Constables' own petitions when no human is on the town side (`world-mode.md` 1.6, 12 R3) go to 10B.
+- 2026-10-30: 10X's next steps:
+  - x6 is skipped, because the order at `Portals.ts:137` is deliberate;
+  - x7 (one patch per tick) rewrites the patch half of ARCHITECTURE 5.6, and 10Y's client pull request rewrites its
+    lerp half, so 6Z no longer rewrites 5.6;
+  - 6Z granted 10X `apps/server/test/npcHelpers.ts`, one `items.json` row and `npcTells.test.ts`;
+  - the station mini-games get a server-side bound on the reported times once 10D clears `sim/Minigames.ts`, and
+    server-timed taps wait for a later round;
+  - the hand-craft hold retires in two pull requests, 10Y's client change first.
+- 2026-10-30: 6Z published 10R's mock for the owner (https://claude.ai/artifact/UAZMrGX14mD1szMSWDx5Sj). World mode
+  replaces the main mode at B6, with no flag, so the card covers two modes: world mode and Paint The Town Red.
+- 2026-10-30: the owner answered the Herb Bread question: "6. dawn". The Herb Bread's buff lasts until the next dawn,
+  not D4a's fixed 780 s. 10X fixes it after x7.
+- 2026-10-30: 6Z merged y2 (#376), 10R's design (#383), C3a (#378), C3b (#379), B4 (#381), 10R's census (#387) and
+  y4 (#388). Each was checked first on the tree it would land as: lint, typecheck, the content, shared and client
+  suites, and the server test files the change touches. Production (Railway, region `ams`) runs 6625eb8, which
+  carries B4.
+- 2026-10-30: x10, the Bandage's knockback (10X; its row is _proposed_). A Knife strike that a protection voids (the
+  Watch, the Remedy or the Bandage) knocks the striker back whichever one held, through one helper, so the striker
+  cannot tell which. The blackout and Claimed stay the Bandage's own, and the Charm gives no knockback. GDD 3.2 still
+  gives the Bandage its cooldown from before A227; x10 corrects it from the data, and any other stale cooldown in 3.2
+  goes to 10Z's list. 6Z granted the two re-placed strikes in `nightPowers.test.ts`, their assertions unchanged.
+- 2026-10-30: the hand-craft hold retires for hand recipes only (`station: null`), the scope 6Z set when 10X planned
+  it. Station recipes keep the panel's Make (D4a's timed holds). 10Y's y8 points the hand recipes to the crafting
+  square; then 10X narrows the server's craft hold to station recipes, refusing a hand recipe with an existing
+  reason and testing that a station recipe still crafts. Station recipes in the grid would be a design change (D4a,
+  A13), so it goes to the owner with the dashboard's R5.
+- 2026-10-30: 10X's audit of the R6 tells (`living-world.md`: a watcher cannot tell an NPC seat from a player by what
+  it does). Item 3 goes ahead after x11: an NPC's `work` gains the night class at the lit bakery stations, _proposed_,
+  with an `npcTells` case. Items 1 (gathering), 2 (trading), 4 (saws, crates and locks) and 7 (beds) are open tells,
+  not accepted ones. One GDD line names them, and the owner will be asked whether NPCs gain night activity or the
+  tells stay.
+- 2026-10-30: B3c, the Constables' own petitions (10B), in Paint The Town Red only (`world-mode.md` 1.6, 12 R3). A
+  living Constable files when no petition is open and no manhunt runs, at most once per `petition.cooldownS`. Its
+  evidence is its own posted briefings within `law.fileWindowS`, read only on the axes anyone may read, and it files
+  only when exactly one seat's drawn traits match at least `petition.constableMatches` of them. The petition is row
+  13's public row, so there is no new seams row. A test swaps two seats' cards and expects the same filing.
+- 2026-10-30: C5a's review (#391):
+  - the second Killer card replaces the Accomplice, else the Drifter, else a profession (never the Vicar). This is a
+    review change to 6Z's ruling: in the 5- and 6-seat rows a profession swap would leave three covers for two
+    undealt cards;
+  - CI found that the Vicar could be one of the two undealt cards, which made the pillar win impossible in that match.
+    In this mode the Vicar card is always dealt, to an NPC seat (GDD 3.8);
+  - a vote ejection never comes back on the train: the ejection path never reaches `returnsOnTrain`.
+- 2026-10-30: 10C's C5b (the Paint screens) is granted `ui/GameOver.ts`, `ui/meetingText.ts`, the goal line of
+  `ui/RoleCard.ts`, `ui/copy/meeting.ts`, `ui/copy/looks.ts` and the game-over types under `net/`. The target is one
+  pure rule in `@wdi/shared`, `paintTarget`, which the server's deal and the card both call. The card counts the NPC
+  seats as the roster less the two humans, since a seat that leaves during play stays in the roster. 10R's census
+  carries the Paint goal into the new card.
+- 2026-10-30: 10R's census (#387) found abilities on the cards with no server code yet (drag, autopsy, the dust
+  compare). 6Z published the owner's role-card questionnaire (https://claude.ai/artifact/WVZyziyQsptsUs4f3JBTxM): the
+  questions of `rolecards.md` 10 and 11.2. 10R builds nothing until the owner answers Q-A1.
+- 2026-10-30: 10Y's items after y5 are y6 (an ability disc per active ability on a phone), y7 (the vendetta goal on
+  the day's card), y8 (the hand-craft panel) and y9 (the bottom band's CSS on a phone and the crafting square's out
+  slot). 10Y's copy goes in `####` subsections of its 14.51, since 14.52 is 10X's (seams.md 5).
+- 2026-10-30: x11, the Herb Bread until dawn (10X), as the owner answered. 6Z granted its `effects.json` row and the
+  comment in `sim/body/cures.ts`; the client's effect chip and tooltip must never read "0 s".
+- 2026-10-30: B5's wire note (10B) is seams row 19, the county jail. 6Z ruled on the face: an impersonation worn at
+  the cuff stays pinned until the seat leaves jail or dies, so the cell, the Tribunal and the release show the face
+  that was cuffed. Dropping it at the jail door would unmask the Killer there, against the owner's "nothing unmasks
+  on the spot". Two figures in one face can then be seen at once, as with any impersonation: only the drawn figures
+  tell. B5 is granted the `inJail` stub in `sim/Sleep.ts` and the `jailed` stubs in `sim/law/Petition.ts` and
+  `sim/law/Manhunt.ts`.
+- 2026-10-30: 10X's x14, an invariant for the bot swarm: each seat's view is decoded through a shadow encoder, and
+  every avatar a seat holds must exist on the server at the same place, every avatar the server shows the seat must be
+  held, and no secret field may decode. It runs behind `pnpm auto -- --views`, off by default, after x13.
+- 2026-10-30: 10B splits B5 in two. B5a is the cell as content: `cj_cell`, a scene of a new kind, `jail`, that
+  belongs to no map and is listed for every map, with no hub reachability, no portals and its `cj.` ids appended.
+  B5b is the server, `sim/law/Jail.ts`: the walk to the cell (`jail.walkS`), the release on the morning train, and
+  the manifest naming the face that was cuffed. 6Z granted B5a the map checks in `validateWorld.ts`, the scene
+  schema's kind, three edits of `packages/content/test/scenes.test.ts` and the jail exclusion in `world.test.ts`.
+  `mapOf` returns the default map for a jail scene, so the tilemap and the Studio don't throw; a test pins it, and
+  WORLD.md 4.4 says the cell takes the default map's look on both maps. B5b is granted the `isPinned` skips in three
+  functions of `sim/Impersonate.ts` and the `enterScene` export.
+- 2026-10-30: merged y3 (#386), C5a (#391), 6Z's docs (#395) and y5 (#389). 6Z checked each code tree again on the
+  base it merged into. y5 found the Studio's NPC editor dropping B1's `guard` and `count` from any row it saved, which
+  would have ended the Constables' guarding; it keeps them now. 6Z read C5b's own diff (#393: the shared
+  `paintTarget`, the card's goal and the end tally) and found nothing blocking. B3c (#394) swaps its mode stub for
+  `isPaintTown`.
+- 2026-10-30: at 10X's request, a Complete may stand on a base a few merges old, and 6Z runs the full check on the
+  true merge before merging (seams.md 1, "Merging"). With one port, a full check and auto 50 take a session about 35
+  minutes, and every base merge restarted that clock on each of nine open pull requests.
 
 ## Round 11 (planning, started 2026-10-29)
 
@@ -3928,3 +4197,22 @@ after round 10's final sweep.
 
 A session is spawned with the prompt "You are session 11X of docs/SESSIONS.md Round 11 (Opus, 800k). Read
 docs/round11/README.md, then the documents and tools your part names." 6Z adds the spawn branch and the first branch.
+
+### Round 11 log: 6Z
+
+- 2026-10-29: the playtest gate opened when A13b merged (4a8e70f). 6Z merged the base into `claude/r10-tier-800k`
+  (08ddb21) and started 11A on `claude/r11-a-pipeline` and 11B on `claude/r11-b-look`. Each has the other's session
+  id.
+- 2026-10-30: 11A's `pipeline.md` merged (#346), and 11B's `look.md` followed (#347). Two rulings: the code-drawn
+  creatures, nodes and givers move into the rig last (11A's P9 over 11B's draft of Q10), and Meshy models may serve
+  props, furniture and machinery once the owner confirms the licence, never figures or creatures. 6Z merged their
+  questions into `docs/round11/questions.md` (22, from 25: three were asked by both) and sent the owner a form
+  that saves the answers.
+- 2026-10-30: the owner answered all 22 (`docs/round11/owner-answers.md`): 21 defaults, and CL3 changed to yes, so the
+  buildings' long shadows come in round 11. Three defaults still wait on the owner: the Meshy licence (SC2), the test
+  phone (BU4) and the environment's setup script (RN3). 6Z asked 11A to write `round11-plan.md`, with 11B.
+- 2026-10-30: 11B's shadow-layer budget (`look.md` 5.3.1, #371) and 11A's `round11-plan.md` (#374) merged. 6Z sent
+  the owner the plan for approval with its one question, CL3a (which way the long shadows fall), with 11A's sheet. The
+  default is a sun at 25°, turned 45° from today's key.
+- 2026-10-30: the owner approved `round11-plan.md` with CL3a's default (A236, `docs/round11/owner-answers.md`). Round 11
+  builds after 10Z merges. SC2, BU4 and RN3 still wait on the owner.

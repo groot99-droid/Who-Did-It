@@ -58,7 +58,8 @@
     { "id": "bf.grindstone", "kind": "dressing", "x": 2, "y": 7 },
     { "id": "bf.crates", "kind": "dressing", "x": 14, "y": 8 },
     { "id": "bf.crate", "kind": "dressing", "x": 14, "y": 9 },
-    { "id": "bf.stool", "kind": "dressing", "x": 9, "y": 6 }
+    { "id": "bf.stool", "kind": "dressing", "x": 9, "y": 6 },
+    { "id": "bf.bed", "kind": "bed", "x": 1, "y": 1 }
   ],
   "gates": [],
   "paths": [],

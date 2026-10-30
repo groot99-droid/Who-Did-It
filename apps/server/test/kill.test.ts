@@ -1,5 +1,5 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
-import { avatarsHeld, handleOf as h } from './avatarHelpers';
+import { avatarsHeld, handleOf as h, withoutFigureRows } from './avatarHelpers';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { abilities, balance, clues } from '@wdi/content';
 import { ClueKind, ErrorCode, ItemStack, NotebookStatus, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
@@ -344,8 +344,9 @@ describe('what a kill leaks (ARCHITECTURE 5.4, scoped to M3)', () => {
     expect(simOfBot(m, v).dead).toBe(true);
     const [dWitness = [], dOut1, dOut2] = [witness, out1, out2].map((b, i) => diffPaths(before[i]!, snap(b)));
 
-    expect(dOut1).toEqual([]);
-    expect(dOut2).toEqual([]);
+    // Round 10, x5 (6Z's grant): a figure walking in or out of an outsider's view that second is not a kill's leak.
+    expect(withoutFigureRows(m, dOut1 ?? [])).toEqual([]);
+    expect(withoutFigureRows(m, dOut2 ?? [])).toEqual([]);
     for (const b of [out1, out2]) expect([...stateOf(b).scenes.keys()]).toEqual(['overworld']);
     expect(dWitness.length).toBeGreaterThan(0);
     const allowed = [

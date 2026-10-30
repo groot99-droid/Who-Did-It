@@ -79,7 +79,8 @@
     { "id": "bo.window", "kind": "dressing", "x": 15, "y": 1 },
     { "id": "bo.coat_rack", "kind": "dressing", "x": 16, "y": 5 },
     { "id": "bo.bank_counter", "kind": "bank", "x": 9, "y": 5 },
-    { "id": "bo.hq_office", "kind": "hq", "x": 9, "y": 6 }
+    { "id": "bo.hq_office", "kind": "hq", "x": 9, "y": 6 },
+    { "id": "bo.bed", "kind": "bed", "x": 1, "y": 1 }
   ],
   "gates": [],
   "paths": [],

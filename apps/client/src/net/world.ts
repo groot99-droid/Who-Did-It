@@ -142,7 +142,8 @@ export type WorldFeedEvents = {
   /** Private, round 8, 8C (locked; GDD 3.23): a `shop` hold opened this shop (`S2C.shopOpen`). */
   shopOpen: {
     shopId: string;
-    stock: Array<{ itemId: string; price: number }>;
+    /** Round 10, C3: `left`, a stall's stock today (seams.md row 15). */
+    stock: Array<{ itemId: string; price: number; left?: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
   /** Private, round 7 (7M, GDD 3.5): the hands on the co-op hold this seat is in and its shared progress (0 to 1). */
@@ -225,6 +226,11 @@ export interface WorldFeed {
   selfHandle(): string;
   /** A cover role's pick and its mates' picks; `{look: '', mates: {}}` for any other seat. */
   coverState(): CoverState;
+  /**
+   * This seat's own vendetta from the private view (GDD 3.20 "On the card"; round 10, 10Y, A354): a Killer's vendetta
+   * id, for the Accomplice the ids of its Killers' vendettas joined by commas, '' for everyone else.
+   */
+  vendetta(): string;
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
   clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
@@ -250,11 +256,20 @@ export interface WorldFeed {
   body(): OwnBodySnap | null;
   /** Round 8, 8C (locked; GDD 3.23): this player's own purse, `Private.purse`. */
   purse(): number;
+  /** Round 10 (C2b, GDD 3.23): the Scrip this seat owes the line (`Private.fare`), 0 when it owes none. */
+  fare(): number;
+  /**
+   * Round 10 (C5, GDD 3.8): in Paint The Town Red, the unique count the two Killers need (`paintTarget` over the
+   * public roster), read only while this seat's `Private.paintTown` is set; 0 otherwise.
+   */
+  paintTarget(): number;
   /** Round 8, 8C (locked): `act.buy` and `act.sell` at the shop a `shop` hold opened. */
   buy(shopId: string, itemId: string, qty: number): void;
   sell(shopId: string, itemId: string, qty: number): void;
   /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
   faith(): number;
+  /** Round 10 (A7, GDD 3.32): whether this seat sleeps and, while it does, how many active players are in bed of how many. */
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number };
   /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */
   hqTiers(): Record<string, number>;
   /** Round 8, 8D: one of the civic acts at the altar, the black market, a station or a bank counter. */
@@ -275,6 +290,8 @@ export interface WorldFeed {
   minigameResult(taskId: string, answer: unknown): void;
   /** Round 8 (8B): `act.inspect { targetId }`, an avatar handle in reach. */
   inspect(targetId: string): void;
+  /** Round 10 (D9c): `talk.ask { targetId, ask }`, an avatar handle in reach; the answer is a system chat line. */
+  talk(targetId: string, ask: 'town' | 'time'): void;
   /** Round 8 (8E, GDD 3.24): the answer to a `mugPrompt` (`act.mug`). */
   mug(choice: 'pay' | 'fight' | 'flee'): void;
   /**
@@ -282,6 +299,11 @@ export interface WorldFeed {
    * scene, so it survives World restarts; resets when the phase returns to the lobby.
    */
   dead(): boolean;
+  /**
+   * Round 10 (C1b, GDD 3.22): this seat died by day and waits for the morning train (`Private.onLine`). It is not a
+   * ghost then: `dead()` is false, and the On-the-line screen stands in for the world until the train.
+   */
+  onLine(): boolean;
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
   /** `targetId` is an avatar handle (GDD 3.17); the server resolves it to a seat. */

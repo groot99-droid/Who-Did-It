@@ -21,6 +21,13 @@ export const MINIGAME_COPY = {
   'minigame.tap.tap': 'Tap',
   'minigame.tap.progress': '{hits} of {steps}',
   'minigame.tap.miss': 'Missed. From the top.',
+  // Round 10 (D5b, GDD 3.29): the lock-pick.
+  'minigame.lockpick.hint':
+    'Choose a pin, lift it, then press the pick lightly and let go when you feel a click. Press too hard and the pick snaps.',
+  'minigame.lockpick.press': 'Hold the pick',
+  'minigame.lockpick.progress': '{set} of {pins} pins set',
+  'minigame.lockpick.miss': 'It slips back.',
+  'minigame.lockpick.snap': 'The pick snaps.',
 } as const;
 
 export type MinigameCopyId = keyof typeof MINIGAME_COPY;

@@ -94,7 +94,8 @@
     { "id": "mu.bookcase", "kind": "dressing", "x": 17, "y": 1 },
     { "id": "mu.bookcase_b", "kind": "dressing", "x": 18, "y": 1 },
     { "id": "mu.armchair", "kind": "dressing", "x": 18, "y": 3 },
-    { "id": "mu.lamp_table_1", "kind": "dressing", "x": 17, "y": 3 }
+    { "id": "mu.lamp_table_1", "kind": "dressing", "x": 17, "y": 3 },
+    { "id": "mu.bed", "kind": "bed", "x": 3, "y": 1 }
   ],
   "gates": [],
   "paths": [],

@@ -15,6 +15,10 @@ import { schema, t } from '@colyseus/schema';
 // `Avatar.nearBits`) join version 6 without another bump. Version 7 (round 10, docs/round10/seams.md 3): A10's
 // `SceneState.propStates` and A12's `ItemStack.slot` and `Inventory.selected` (A245); the other round-10 rows
 // join version 7.
+// A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
+// `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
+// (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), C5 `Private.paintTown` (row 18), and B5
+// `Private.jailUntilTick` (row 19) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -54,8 +58,8 @@ export const Phase = {
 export type PhaseId = (typeof Phase)[keyof typeof Phase];
 
 export const DoorState = { open: 0, closed: 1, locked: 2, broken: 3 } as const;
-/** 0 = nobody has won yet. */
-export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3 } as const;
+/** 0 = nobody has won yet. Round 10 (C5, seams.md row 18): `paintTown`, the two Killers' shared win. Append-only. */
+export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3, paintTown: 4 } as const;
 export const Team = { village: 0, cabal: 1, neutral: 2 } as const;
 
 // --- Public roster ---------------------------------------------------------------------------
@@ -211,6 +215,13 @@ export const BodyState = schema(
   'BodyState',
 );
 
+/**
+ * Round 10, B8 (GDD 3.31, seams.md 3 row 10): this seat's Walk with me. `state` is a `PairPhase`; `handle` the other
+ * figure's avatar handle in this seat's scene, '' while it is elsewhere (handles re-roll on every entry), never a
+ * seat id. Own view only: nothing public shows a pair.
+ */
+export const PairState = schema({ state: u8(), handle: str() }, 'PairState');
+
 export const Private = schema(
   {
     role: Role,
@@ -242,6 +253,33 @@ export const Private = schema(
     bank: u32(),
     /** Round 8 (GDD 3.23, 8D): the Faith this seat has earned by donating at an altar. */
     faith: u16(),
+    /** Round 10 (GDD 3.32, A7): this seat's home, a scene id whose `bed` is its own; '' before the match. */
+    home: str(),
+    /** Round 10 (GDD 3.32, A7): whether this seat lies asleep in a bed; only its owner learns it. */
+    asleep: bool(),
+    /**
+     * Round 10 (GDD 3.32, A7): while this seat sleeps, how many active players are in bed (`inBed`) of how many
+     * there are (`inBedOf`), never a name; both 0 while it is awake, so an awake seat learns nothing (PH 13.4).
+     */
+    inBed: u8(),
+    inBedOf: u8(),
+    /** Round 10 (GDD 3.22, C1): this seat died by day and waits for the morning train; it gets no ghost view. */
+    onLine: bool(),
+    /** Round 10, B8 (schema version 7): Walk with me. */
+    pair: PairState,
+    /** Round 10 (GDD 3.23, C2): the Scrip this seat owes the line for its returns; only its owner sees it. */
+    fare: u16(),
+    /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
+    petitionSigned: bool(),
+    /**
+     * Round 10, B4 (seams.md 3 row 14): for the hunt's opener and signers only, the scene where a figure drawn as the
+     * accused was last seen by the rumour ledger's rule; '' until the first sighting and when no manhunt runs.
+     */
+    huntScene: str(),
+    /** Round 10, C5 (seams.md 3 row 18): this seat is a Killer of Paint The Town Red. Set at the deal; own view only. */
+    paintTown: bool(),
+    /** Round 10, B5 (seams.md 3 row 19): the tick of the train that releases this seat from jail, 0 when not jailed. */
+    jailUntilTick: u32(),
   },
   'Private',
 );
@@ -303,6 +341,38 @@ export const MeetingState = schema(
   'MeetingState',
 );
 
+/**
+ * Round 10, B3 (GDD 3.31, seams.md 3 row 13): one supporting entry of the open petition, as the public sees it. `value`
+ * is filled only for a kind anyone may read (footprints, thread), else 0; `backed` is a Verified or Corroborated entry.
+ * No entry id, tick, note or `of`.
+ */
+export const PetitionEntry = schema(
+  { clueKind: u8(), value: u8(), sceneId: u8(), backed: bool() },
+  'PetitionEntry',
+);
+/**
+ * Round 10, B3: the open petition, one at a time; `id` '' when none is open. `accused` a roster seat id; `needed` the
+ * other signatures it needs and `signed` how many it has, a count only: no opener and no signer is on the wire.
+ */
+export const Petition = schema(
+  {
+    id: str(),
+    accused: str(),
+    charge: str(),
+    needed: u8(),
+    signed: u8(),
+    untilTick: u32(),
+    entries: t.array(PetitionEntry),
+  },
+  'Petition',
+);
+
+/**
+ * Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, one at a time. `accused` the passed petition's seat, ''
+ * when `state` is none; `state` a `ManhuntState`. Nothing names the seat a cuff held.
+ */
+export const Manhunt = schema({ accused: str(), untilTick: u32(), state: u8() }, 'Manhunt');
+
 export const GameState = schema(
   {
     schemaVersion: u8(SCHEMA_VERSION),
@@ -326,6 +396,10 @@ export const GameState = schema(
      * `economy.json` station id. Public: a building visibly upgrades. No row names who bought it.
      */
     hq: t.map('uint8'),
+    /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): the open petition, public. */
+    petition: Petition,
+    /** Round 10, B4 (GDD 3.31, seams.md 3 row 14): the manhunt, public. */
+    manhunt: Manhunt,
   },
   'GameState',
 );

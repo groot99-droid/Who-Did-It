@@ -3,11 +3,13 @@ import { DIRECTIONS, Phase, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { PORTAL_REACH_TILES } from '../constants';
 import { guardNightAct, stepGuard } from '../law/Guards';
+import { followAct } from '../law/Pairing';
 import { mapScenesOf } from '../MapSites';
 import { tickNeeds } from '../npc/needs';
 import { type Station, phaseClassOf, spanTicks } from '../npc/routine';
 import { firstPortalToward } from '../npc/walk';
 import { simOf } from '../RoomSim';
+import { runTalk } from './talk';
 import { isWorldPhase, navGrid, sceneIndex, sceneKey, tileCentre } from '../World';
 import {
   type Figure,
@@ -37,6 +39,7 @@ const GOAL_PX = TILE_PX / 4;
 export function runTownsfolk(room: PartyRoom): void {
   const phase = room.state.phase;
   const memory = townsfolkMemory(room);
+  runTalk(room); // round 10, D9c: the answers that fall due, and the lobby's reset (GDD 3.24)
   if (phase === Phase.lobby) {
     if (memory.spawned) clearTownsfolk(room);
     clearMuggings(room);
@@ -85,7 +88,9 @@ function stepFigure(room: PartyRoom, f: Figure): void {
   if (stepGuard(room, f)) return; // a guard down, or fighting back (round 10, B1)
 
   const cls = phaseClassOf(room.state.phase);
-  if (cls === 'night') {
+  const follow = followAct(room, f); // round 10, B8: walking with its partner
+  if (follow) f.act = follow;
+  else if (cls === 'night') {
     if (f.act?.kind !== 'home') f.act = homeAct(room, f);
   } else if (cls === 'day' && (f.act === null || f.act.kind === 'home' || tick >= f.act.untilTick)) {
     f.act = nextAct(room, f);

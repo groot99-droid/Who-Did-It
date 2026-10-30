@@ -160,7 +160,8 @@
     { "id": "bk.barrel", "kind": "dressing", "x": 2, "y": 9 },
     { "id": "bk.bread_basket_2", "kind": "dressing", "x": 16, "y": 9 },
     { "id": "bk.rug", "kind": "dressing", "x": 8, "y": 8 },
-    { "id": "bk.hq_ovens", "kind": "hq", "x": 13, "y": 3 }
+    { "id": "bk.hq_ovens", "kind": "hq", "x": 13, "y": 3 },
+    { "id": "bk.bed", "kind": "bed", "x": 16, "y": 2 }
   ],
   "gates": [],
   "paths": [],

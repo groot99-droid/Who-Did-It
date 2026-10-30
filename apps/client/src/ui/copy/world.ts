@@ -24,7 +24,6 @@ export const WORLD_COPY = {
   'prompt.ability': '{ability} {target}',
   'prompt.ability.cooldown': '{ability} in {s} s',
   'touch.use': 'Use',
-  'touch.act': 'Act',
   'touch.run': 'Run',
   'touch.sneak': 'Sneak',
 
@@ -55,6 +54,14 @@ export const WORLD_COPY = {
   'log.door': 'A door to the {dir}',
   'log.steps': 'Footsteps to the {dir}',
   'log.bell': 'The bell rings',
+  // Round 10, 10Y (A254): one line per noise kind, and a generic one for a kind the client does not know.
+  'log.chop': 'Chopping to the {dir}',
+  'log.smash': 'Stone breaking to the {dir}',
+  'log.shot': 'A shot from the {dir}',
+  'log.shout': 'A shout from the {dir}',
+  'log.crowbar': 'Wood splintering to the {dir}',
+  'log.lockpick': 'Scratching at a lock to the {dir}',
+  'log.noise': 'Something to the {dir}',
   'log.train': 'The train pulls in at the platform',
   'dir.n': 'north',
   'dir.ne': 'north-east',
@@ -71,6 +78,7 @@ export const WORLD_COPY = {
   'notebook.entry.footprints': 'Footprints, {stride}: {height}',
   'notebook.entry.thread': 'Thread, {wool} wool: {scarf}',
   'notebook.entry.felt': 'Felt: {hat}',
+  'notebook.entry.scratch': 'Scratches round a lock',
   'notebook.entry.other': 'Clue',
   'notebook.meta': '{scene}, {time}',
   'notebook.status.claimed': 'Claimed',
@@ -88,4 +96,15 @@ export const WORLD_COPY = {
   // 14.8 Ghost (the world side)
   'ghost.label': 'You are a ghost',
   'ghost.walk': 'Walk anywhere. Only ghosts can see you.',
+
+  // 14.47 On the line (round 10, C1b)
+  'line.title': 'On the line',
+  'line.train': 'The train in {time}',
+  'line.cause.wolf': 'A wolf took you.',
+  'line.cause.creature': 'Something in the dark took you.',
+  'line.cause.shot': 'A shot took you.',
+  'line.cause.other': 'You fell by day.',
+  'line.kept':
+    'Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost.',
+  'line.back': 'You are back.',
 } as const satisfies Record<string, string>;

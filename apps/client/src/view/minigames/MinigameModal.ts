@@ -2,7 +2,14 @@ import balance from '@wdi/content/data/balance.json';
 import tasks from '@wdi/content/data/tasks.json';
 import { M5B_COPY as C } from '../../ui/copy/m5b';
 import { h } from '../../ui/dom';
-import { MINIGAMES, skinOf, type MiniGame, type MiniGameFactory, type MiniGameSpec } from './registry';
+import {
+  MINIGAMES,
+  skinOf,
+  type MiniGame,
+  type MiniGameFactory,
+  type MiniGameSpec,
+  type MiniKind,
+} from './registry';
 import { bandRng } from './board';
 import type { MinigameKind } from '@wdi/shared/protocol';
 
@@ -39,7 +46,7 @@ export function openMinigame(
   send: (taskId: string, answer: unknown) => void,
   onClose: () => void,
   now: () => number = () => performance.now(),
-  factory: MiniGameFactory | undefined = MINIGAMES[open.kind],
+  factory: MiniGameFactory | undefined = MINIGAMES[open.kind as MiniKind],
 ): MinigameModal {
   const stage = h('div', { class: 'wdi-m5b__stage', 'data-testid': 'minigame-stage' });
   const assist = h(
@@ -107,6 +114,7 @@ export function openMinigame(
       skin: skinOf(open.taskId, open.kind),
       steps: (open.public as { steps?: number }).steps,
       holdS: (open.public as { holdS?: number }).holdS,
+      pub: open.public,
       onDone: () => finish(),
     });
   const born = now();

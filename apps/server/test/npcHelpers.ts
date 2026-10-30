@@ -158,11 +158,12 @@ export function placeSeat(party: Party, id: string, sceneId: SceneId, tx: number
   sim.viewsDirty = true;
 }
 
-/** The room's own fixed step (`PartyRoom.setFixedTimestep`), without the clock. */
+/** The room's own fixed step (`PartyRoom.setFixedTimestep`), without the clock: the steps, then the tick's patch. */
 function fixedStep(room: PartyRoom, ctx: StepContext): void {
   step(room, ctx);
   runLobbyCommands(room);
   runLobbyPhase(room);
+  room.broadcastPatch(); // round 10, x7 (A373): a paused room patches only here
 }
 
 /**
@@ -225,8 +226,9 @@ export async function standardParty(
   colyseus: ColyseusTestServer,
   set: SeedSet,
   onCard = false,
+  humans = 1,
 ): Promise<Party> {
-  const party = await lobbyOf(colyseus, 1);
+  const party = await lobbyOf(colyseus, humans);
   pauseClock(party.room);
   const lobbyTicks = party.room.state.tick;
   if (lobbyTicks > STANDARD_START_TICK) throw new Error(`standardParty: the lobby took ${lobbyTicks} ticks`);

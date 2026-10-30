@@ -44,8 +44,13 @@
 | `act.sell` | `{ shopId: string; itemId: string; qty: number }` | 5/s | Round 8 (GDD 3.23, 8C): `qty` of `itemId` from the inventory to `shopId`, at its `pay` each, into the purse. |
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
+| `talk.ask` | `{ targetId: string; ask: 'town' \| 'time' }` | 5/s | Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town` (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure), `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`. |
 | `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
 | `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
+| `pair.ask` | `{ targetId: string }` | 2/s | Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. |
+| `pair.answer` | `{ yes: boolean }` | 2/s | - |
+| `petition.open` | `{ accused: string; charge: string; entries: string[] }` | 2/s | `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. |
+| `petition.sign` | `{ id: string }` | 2/s | - |
 | `craft.grid` | `{ size: 2 \| 3; cells: Array<string \| null> }` | 5/s | Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches, `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
@@ -62,7 +67,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
@@ -75,7 +80,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `inspect.result` | `{ targetId: string; lookId: string; signs: string[]; health: InspectHealth; purse: InspectPurse; light: boolean; tool?: string; }` | Private, round 8 (GDD 3.22): the inspected avatar's drawn look and what the eye reads of it. `signs` are copy ids of `ui/copy/inspect.ts` taken only from the avatar's public status bits; `light` is a burning light in hand. Never a card, a cover, a vendetta or an inventory. |
 | `inspect.noticed` | `{ lookId: string }` | Private, round 8: the look the inspector is drawn as. |
 | `inspect.hunch` | `{ copyId: string }` | Private, round 8: an `inspect.hunch.*` copy id. |
-| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. |
+| `shop.open` | `{ shopId: string; stock: Array<{ itemId: string; price: number; left?: number }>; buys: Array<{ itemId: string; price: number }>; }` | Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop with an `owner` gives each stock row how many it has `left` today, the same for every opener. |
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 
@@ -202,12 +207,18 @@ export type HoldAction =
   | 'altar'
   | 'mailbag'
   | 'rack'
+  // Round 10 (GDD 3.23, C2b; seams.md 3 row 11): the Clerk's labour errand at a `ledger` prop clears a fare.
+  | 'errand'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
-  | 'interact';
+  | 'interact'
+  // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
+  | 'sleep'
+  // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
+  | 'cuff';
 ```
 
 ```ts
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 ```
 
 ```ts

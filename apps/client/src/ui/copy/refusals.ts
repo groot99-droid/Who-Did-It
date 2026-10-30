@@ -95,7 +95,12 @@ export const REFUSAL_COPY: { readonly [R in RefusalReason]: Line<R> } = {
   DOWN_OR_STUNNED: 'You are too dazed to do that.',
   BUSY: 'Your hands are full right now.',
   COOLDOWN: (a) => (whole(a.readyInS) ? `Not ready yet: ${whole(a.readyInS)} s.` : 'Not ready yet.'),
-  SPENT: (a) => (a.what === 'power' ? 'You have used it up for tonight.' : 'Nothing is left.'),
+  SPENT: (a) =>
+    a.what === 'power'
+      ? 'You have used it up for tonight.'
+      : a.what === 'match'
+        ? 'You have used it up for this match.'
+        : 'Nothing is left.',
   LOBBY_ONLY: 'The party has started. That is settled now.',
   NOT_LEADER: 'Only the party leader can change that.',
   LOBBY_RULE: (a) => (a.rule && LOBBY[a.rule]) || 'The party cannot do that.',
@@ -172,7 +177,7 @@ export const REFUSAL_COPY: { readonly [R in RefusalReason]: Line<R> } = {
     whole(a.readyInS)
       ? `The case was just dismissed. Wait ${whole(a.readyInS)} s.`
       : 'The case was just dismissed.',
-  PETITION_OPEN: 'A petition is already open against them. Sign that one.',
+  PETITION_OPEN: 'A petition is already open. Sign that one.',
   NOT_HUNTED: 'There is no warrant for them. Petition first.',
   PICK_SNAPPED: 'The pick snaps. Ease the tension next time.',
   GRID_NO_RECIPE: 'Nothing comes of that.',

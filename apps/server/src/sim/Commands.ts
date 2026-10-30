@@ -6,6 +6,7 @@ import { handleBank } from './economy/bank';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
 import { handleLight } from './mobs/light';
+import { handleTalk } from './townsfolk/talk';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
 import { runHolds } from './Hold';
 import { handleInspect } from './inspect';
@@ -17,6 +18,9 @@ import { handleNotice } from './economy/notices';
 import { handleMug } from './townsfolk/mug';
 import { handleCraftGrid } from './Craft';
 import { handleInvMove, handleInvSelect } from './InventoryMoves';
+import { handlePairAnswer, handlePairAsk } from './law/Pairing';
+import { handlePetitionOpen, handlePetitionSign } from './law/Petition';
+import { wakeOnInput } from './Sleep';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -61,6 +65,8 @@ export function runCommands(room: PartyRoom): void {
     const player = room.state.players.get(cmd.sessionId);
     if (!player) continue;
     const payload = (cmd.payload ?? {}) as Record<string, unknown>;
+    // Round 10, A7 (GDD 3.32): a sleeper's first input wakes it and is refused, silently; chat is not an act.
+    if (cmd.type !== C2S.say && wakeOnInput(room, cmd.sessionId, true)) continue;
     switch (cmd.type) {
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);
@@ -72,6 +78,9 @@ export function runCommands(room: PartyRoom): void {
         runAction(room, cmd.sessionId, cmd.type, payload);
         break;
       // Round 6 (locked call sites): the M5b commands go to their owners' files (6H); each refuses until it lands.
+      case C2S.talkAsk: // round 10, D9c (GDD 3.24, seams.md 3 row 16)
+        handleTalk(room, cmd.sessionId, payload);
+        break;
       case C2S.questAccept:
         handleQuestAccept(room, cmd.sessionId, payload);
         break;
@@ -127,6 +136,20 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.craftGrid: // round 10, A13 (GDD 3.30)
         handleCraftGrid(room, cmd.sessionId, payload);
+        break;
+      // Round 10, B8 (GDD 3.31): Walk with me.
+      case C2S.pairAsk:
+        handlePairAsk(room, cmd.sessionId, payload);
+        break;
+      case C2S.pairAnswer:
+        handlePairAnswer(room, cmd.sessionId, payload);
+        break;
+      // Round 10, B3 (GDD 3.31): petitions.
+      case C2S.petitionOpen:
+        handlePetitionOpen(room, cmd.sessionId, payload);
+        break;
+      case C2S.petitionSign:
+        handlePetitionSign(room, cmd.sessionId, payload);
         break;
       default:
         // act.interact, hide, check, burst, present arrive with M4+; queued and ignored until then.

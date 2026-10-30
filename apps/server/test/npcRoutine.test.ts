@@ -39,6 +39,7 @@ import {
   standardParty,
 } from './npcHelpers';
 import { openRun } from './killHelpers';
+import { addFare } from '../src/sim/economy/fare';
 
 // NPC routines (GDD 3.12 "Routines"; npc.md part 2, sections 2 and 4). The party is the standard one: 1 human AFK
 // plus nine NPC seats under fixed ids and seeds (S1), all Townsfolk, driven with `advance` (no sleeps).
@@ -156,6 +157,7 @@ describe('the privacy rule (npc.md part 2, section 2)', () => {
       rockPile: 'interact',
       orePile: 'interact',
       counter: 'shop',
+      ledger: 'errand', // round 10, C2b (6Z's grant)
     });
   });
 
@@ -440,6 +442,7 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
               tool && Object.values(items.items).find((i) => (i.tool?.[tool.tag] ?? 0) >= tool.tier);
             if (item && count(seat, item.id) === 0) addStack(seat, item.id, 1);
           }
+        if (action === 'errand') addFare(party.room, human); // C2b: the errand is open to a seat that owes (6Z's grant)
         const at = st.stands[0]!;
         placeSeat(party, human, st.scene, at.x, at.y);
         holdPhase(party, Phase.day, 600);
@@ -953,7 +956,8 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
       // Round 6: the creatures draw from their own stream, keyed by spawner; the node pool (6F) from `nodes`.
       else if (name === 'mobs') expect(spawners.has(key!), k).toBe(true);
       // Round 8 (8A): a body's chance rolls (a wound's spread, a strike's knockout) draw from `body` (A49, no secret draw shares it).
-      else expect(['npcNames', 'nodes', 'body'], k).toContain(name);
+      // Round 10 (A7): the human seats' homes, drawn once on the first world tick from their own stream.
+      else expect(['npcNames', 'nodes', 'body', 'homes'], k).toContain(name);
     }
   });
 

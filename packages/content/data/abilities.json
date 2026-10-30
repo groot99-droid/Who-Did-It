@@ -610,6 +610,32 @@
       "effect": "Eats a food item: cures Famished and Weakened; a Wake Loaf also restores stamina to full.",
       "ships": "V1",
       "gddRef": "3.22"
+    },
+    "eatHerbBread": {
+      "id": "eatHerbBread",
+      "name": "Eat Herb Bread",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "herbBread",
+      "effect": "Eats the Herb Bread: cures Famished and Weakened, and Poisoned lasts half as long for the rest of the day.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "skin": {
+      "id": "skin",
+      "name": "Skin",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "cooldownS": 3,
+      "castS": 0,
+      "rangeTiles": 1.5,
+      "requires": "skinningKnife",
+      "effect": "Skins the nearest fallen creature in reach that has not been skinned, for the hide and game its row names (mobs.json skin). Wears the knife one use. Public to nobody: no noise, no clue, no animation beyond the swing of any use.",
+      "ships": "V1",
+      "gddRef": "3.22"
     }
   }
 }

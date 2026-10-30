@@ -186,10 +186,13 @@
     "wispRattle": 2,
     "shot": 10,
     "shout": 8,
+    "chop": 8,
+    "smash": 10,
     "portalFactor": 0.5,
     "gddRef": "3.7"
   },
   "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7", "reachTiles": 1.5 },
+  "figureTalk": { "reachTiles": 2, "delayS": 1.5, "cooldownS": 30, "gddRef": "3.24" },
   "tasks": {
     "cabalFakeList": true,
     "ghostShareCap": 0.25,
@@ -327,10 +330,24 @@
     "slide": { "steps": 4 },
     "stoke": { "stokePerTap": 0.15, "ratePerS": 0.08, "bandFrac": 0.18, "holdS": 3 },
     "tap": { "steps": 3, "periodS": 1.4, "bandFrac": 0.18 },
+    "lockpick": {
+      "pinsByTier": [3, 4, 5],
+      "bandFrac": 0.12,
+      "lowerTierBandMult": 0.6,
+      "snapAt": 0.85,
+      "minAttemptS": 0.3,
+      "maxAttempts": 40
+    },
     "gddRef": "3.16"
   },
   "reader": { "spinesMin": 3, "spinesMax": 5, "pageMaxChars": 600, "gddRef": "3.26" },
-  "train": { "arriveAtS": 20, "deliveryAfterS": 32, "hearTiles": 20, "gddRef": "3.3" },
+  "train": {
+    "arriveAtS": 20,
+    "deliveryAfterS": 32,
+    "hearTiles": 20,
+    "dusk": { "leaveAtS": 15 },
+    "gddRef": "3.3"
+  },
   "ui": {
     "transitionS": { "fade": 0.4, "iris": 0.6, "wipe": 0.7 },
     "loading": { "showAfterS": 0.3, "tipEveryS": 4 },
@@ -386,5 +403,63 @@
     "gddRef": "3.8"
   },
   "inventory": { "hotbar": 6, "belt": 2, "gddRef": "3.30" },
-  "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" }
+  "guard": { "leashTiles": 6, "angerS": 20, "gddRef": "3.24" },
+  "law": {
+    "speedMult": 2,
+    "briefingAfterS": 30,
+    "cuffHoldS": 3,
+    "fileWindowS": 300,
+    "gddRef": "3.31"
+  },
+  "sleep": {
+    "confirmS": 3,
+    "innBedScrip": 2,
+    "restore": { "bed": 1, "cot": 0.5, "innBed": 1 },
+    "innBedCures": ["slowed", "stunned", "poisoned", "famished"],
+    "cotFaith": 5,
+    "holdoutGraceS": 60,
+    "gddRef": "3.32"
+  },
+  "respawn": {
+    "hp": 50,
+    "fareDebt": 6,
+    "wageMult": 0.5,
+    "clearTargetDays": 2,
+    "priceMult": 1.5,
+    "errandS": 30,
+    "stockMult": 0.5,
+    "gddRef": "3.22"
+  },
+  "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
+  "armor": {
+    "tierMult": { "body": [0.8, 0.65, 0.5], "head": [0.9, 0.8] },
+    "cap": 0.5,
+    "gddRef": "3.22"
+  },
+  "townWork": { "stallStockPerSeat": 1, "stallStockMin": 4, "gddRef": "3.23" },
+  "pairing": {
+    "answerS": { "min": 5, "max": 9 },
+    "yesChance": 0.5,
+    "scaredMult": 1.6,
+    "followTiles": 2,
+    "apartS": 20,
+    "gddRef": "3.31"
+  },
+  "petition": {
+    "othersPct": 0.3,
+    "openS": 60,
+    "cooldownS": 120,
+    "maxEntries": 4,
+    "constableAtHumans": 5,
+    "constableMatches": 2,
+    "gddRef": "3.31"
+  },
+  "manhunt": { "durationS": 120, "gddRef": "3.31" },
+  "jail": {
+    "walkS": 5,
+    "gym": { "difficulty": 2, "damage": 2 },
+    "yard": { "difficulty": 3, "boardS": 20, "maxHpLoss": 10, "maxHpFloor": 80, "purse": 2 },
+    "scrub": { "difficulty": 2, "wage": 1 },
+    "gddRef": "3.27"
+  }
 }

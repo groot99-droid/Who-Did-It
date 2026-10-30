@@ -17,12 +17,22 @@ export const C2S = {
   light: 'act.light',
   /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
   mug: 'act.mug',
+  /** Round 10, D9c (GDD 3.24, seams.md 3 row 16): ask a figure about the town or the time; `sim/townsfolk/talk.ts`. */
+  talkAsk: 'talk.ask',
   /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
   invSelect: 'inv.select',
   /** Round 10, A13 (GDD 3.30): the crafting grid's cells; `sim/Craft.ts`. */
   craftGrid: 'craft.grid',
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): ask a figure in reach to walk with you; `sim/law/Pairing.ts`. */
+  pairAsk: 'pair.ask',
+  /** Round 10, B8: answer an ask (`yes`), or end a pair (`yes: false` while paired). */
+  pairAnswer: 'pair.answer',
+  /** Round 10, B3 (GDD 3.31, seams.md 3 row 13): open a petition at a notice board; `sim/law/Petition.ts`. */
+  petitionOpen: 'petition.open',
+  /** Round 10, B3: sign the open petition. */
+  petitionSign: 'petition.sign',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -118,10 +128,16 @@ export type HoldAction =
   | 'altar'
   | 'mailbag'
   | 'rack'
+  // Round 10 (GDD 3.23, C2b; seams.md 3 row 11): the Clerk's labour errand at a `ledger` prop clears a fare.
+  | 'errand'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
-  | 'interact';
+  | 'interact'
+  // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
+  | 'sleep'
+  // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
+  | 'cuff';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
-export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap';
+export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
  * Why a meeting opened (GDD 3.3); `missing` is the roll-call of M4; `final` is the forced meeting after the Final
  * Night hunt.
@@ -131,9 +147,9 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
- * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
+ * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life; the two ids
+ * are never reused.
  */
-/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
 export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
 /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
@@ -308,6 +324,13 @@ export interface C2SPayloads {
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
   /**
+   * Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town`
+   * (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed
+   * delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure),
+   * `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`.
+   */
+  'talk.ask': { targetId: string; ask: 'town' | 'time' };
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -315,6 +338,12 @@ export interface C2SPayloads {
   'inv.move': { from: number; to: number };
   /** Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. */
   'inv.select': { slot: number };
+  /** Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. */
+  'pair.ask': { targetId: string };
+  'pair.answer': { yes: boolean };
+  /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
+  'petition.open': { accused: string; charge: string; entries: string[] };
+  'petition.sign': { id: string };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
@@ -341,7 +370,8 @@ export interface S2CPayloads {
   voteResult: { tally: Record<string, number>; ejectedId?: string; role?: string };
   /**
    * `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody
-   * held (GDD 3.1, 3.8).
+   * held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the
+   * unique count the win needed and each Killer seat's unique and total kills.
    */
   gameOver: {
     winner: number;
@@ -349,6 +379,7 @@ export interface S2CPayloads {
     summary: string;
     alsoWon?: string[];
     undealt?: string[];
+    paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -402,11 +433,12 @@ export interface S2CPayloads {
   'inspect.hunch': { copyId: string };
   /**
    * Private, round 8 (GDD 3.23, 8C): a `shop` hold on a counter opened `shopId`; `stock` is what it sells at each
-   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`.
+   * price, `buys` what it pays for. Answered with `act.buy` and `act.sell`. Round 10 (C3, seams.md row 15): a shop
+   * with an `owner` gives each stock row how many it has `left` today, the same for every opener.
    */
   'shop.open': {
     shopId: string;
-    stock: Array<{ itemId: string; price: number }>;
+    stock: Array<{ itemId: string; price: number; left?: number }>;
     buys: Array<{ itemId: string; price: number }>;
   };
   /** Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. */
@@ -458,9 +490,14 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.hq': 5,
   'act.payRent': 5,
   'act.mug': 5,
+  'talk.ask': 5,
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,
+  'pair.ask': 2,
+  'pair.answer': 2,
+  'petition.open': 2,
+  'petition.sign': 2,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

@@ -23,6 +23,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { addStack, canAdd, count, take } from '../Inventory';
+import { runJailBoards, startJailGame, startLockpick } from '../Minigames';
 import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
@@ -115,6 +116,10 @@ function stateOf(room: PartyRoom, t: Target) {
   return room.state.scenes.get(t.sceneId)?.propStates.get(t.id);
 }
 
+/** The first item a mode consumes that the seat holds too few of, or undefined when it holds them all. */
+const missingInput = (player: PlayerState, mode: Mode): string | undefined =>
+  mode.consumes?.find((c) => count(player, c.item) < c.qty)?.item;
+
 const spent = (room: PartyRoom, t: Target): boolean => {
   const state = stateOf(room, t);
   return state !== undefined && (state.untilTick === 0 || room.state.tick < state.untilTick);
@@ -139,7 +144,9 @@ export function interactReady(
       it.target === t.classId &&
       it.status === 'live' &&
       it.phases.includes(cls) &&
-      it.modes.some((m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined),
+      it.modes.some(
+        (m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined && !missingInput(player, m),
+      ),
   );
 }
 
@@ -173,8 +180,8 @@ function problemOf(
     const need = wall ? toolsFor(wall.tag, wall.tier)[0] : undefined;
     return { problem: { reason: 'NEED_TOOL', args: need && wall ? { need, tier: wall.tier } : {} }, t };
   }
-  if (mode.minigame !== undefined)
-    return { problem: { reason: 'NFY', args: { feature: 'lock-pick mini-game' } }, t };
+  const lacking = missingInput(player, mode);
+  if (lacking !== undefined) return { problem: { reason: 'NEED_ITEM', args: { need: lacking } }, t };
   if ((mode.drops ?? []).some((d) => !canAdd(player, d.item, d.qty[1])))
     return { problem: { reason: 'PACK_FULL' }, t };
   return { problem: null, t, modeIdx };
@@ -202,6 +209,18 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
   const interactionId = t ? chooseInteraction(player, t, via) : undefined;
   const { problem, modeIdx } = problemOf(room, player, p, targetId, interactionId);
   if (problem) return refuse(room, sessionId, problem, interactionId);
+  const mode = interactions.interactions[interactionId as string]?.modes[modeIdx as number];
+  // A mode with a mini-game (the lock-pick, round 10 D5) opens it in place of a hold.
+  if (t && mode?.minigame !== undefined && startJailGame(room, sessionId, mode.minigame, t)) return;
+  if (mode?.minigame !== undefined && mode.minigame !== 'lockpick')
+    return refuse(room, sessionId, { reason: 'NFY', args: { feature: 'this action' } }, interactionId);
+  if (t && mode?.minigame === 'lockpick')
+    return startLockpick(
+      room,
+      sessionId,
+      { sceneId: t.sceneId, propId: t.id, interactionId: interactionId as string },
+      mode.noise,
+    );
   // Pressing again on the same target keeps the original start; another target restarts.
   if (p.hold?.action === 'interact' && p.hold.targetId === targetId) return;
   p.hold = { action: 'interact', targetId, startTick: room.state.tick };
@@ -245,7 +264,7 @@ export function tickInteract(room: PartyRoom, sessionId: string, p: PlayerSim): 
 }
 
 /** Wears `n` uses off the seat's `tool`; the tool breaks (one is taken) when its `uses` run out. */
-function wear(room: PartyRoom, sessionId: string, player: PlayerState, tool: string, n: number): void {
+export function wear(room: PartyRoom, sessionId: string, player: PlayerState, tool: string, n: number): void {
   const uses = items.items[tool]?.uses;
   if (uses === undefined || n === 0) return;
   const bySeat = WORN.get(room) ?? new Map<string, Map<string, number>>();
@@ -271,6 +290,7 @@ export function runInteract(room: PartyRoom): void {
     for (const [id, s] of scene.propStates)
       if (s.untilTick !== 0 && tick >= s.untilTick) scene.propStates.delete(id);
   });
+  runJailBoards(room);
 }
 
 /** The tool uses worn off a seat's `item` (tests). */

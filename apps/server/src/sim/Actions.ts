@@ -73,6 +73,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'salts':
     case 'antidote':
     case 'eat':
+    case 'eatHerbBread':
+    case 'skin':
       return handleBodyAbility(room, sessionId, payload);
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });
@@ -176,7 +178,7 @@ function handleBell(room: PartyRoom, sessionId: string): void {
     return;
   }
   if (actor.bellPulls >= (roles.roles[player.priv.role.roleId]?.bellPulls ?? 0)) {
-    reject(room, sessionId, 'SPENT', { what: 'power' });
+    reject(room, sessionId, 'SPENT', { what: 'match' }); // the pulls are per match, not per night (A233)
     return;
   }
   actor.bellPulls++;

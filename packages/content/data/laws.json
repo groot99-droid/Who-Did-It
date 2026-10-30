@@ -1,1 +1,18 @@
-{ "gddRef": "3", "laws": {} }
+{
+  "gddRef": "3",
+  "laws": {},
+  "briefing": {
+    "line": "Constables' briefing: {clue} in {scene}.",
+    "withTrait": "Constables' briefing: {clue} in {scene}, {trait}."
+  },
+  "crimes": {
+    "murder": { "name": "Murder" },
+    "conspiring": { "name": "Conspiring with the Killer" },
+    "robbery": { "name": "Robbery" },
+    "assault": { "name": "Assault" },
+    "sabotage": { "name": "Sabotage" },
+    "theft": { "name": "Theft" },
+    "trespass": { "name": "Trespass" },
+    "rumour": { "name": "A rumour turned to a case" }
+  }
+}

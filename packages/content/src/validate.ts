@@ -314,7 +314,9 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (r.tool !== undefined && !isItem(r.tool)) err(`resources.json: ${r.id} needs unknown tool ${r.tool}`);
   }
   for (const item of Object.values(items.items)) {
-    if (item.kind === 'material' && !Object.hasOwn(resources.resources, item.id)) {
+    // A material comes from a node, or off a creature's corpse (round 10, D6b).
+    const skinned = Object.values(c.mobs.mobs).some((m) => m.skin && item.id in m.skin);
+    if (item.kind === 'material' && !Object.hasOwn(resources.resources, item.id) && !skinned) {
       err(`items.json: material ${item.id} is no resource`);
     }
   }
@@ -332,6 +334,7 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     if (!isItem(r.out)) err(`${where}: unknown out ${r.out}`);
     else if (items.items[r.out]!.kind === 'material') err(`${where}: makes material ${r.out}`);
     for (const input of r.in) if (!isItem(input.item)) err(`${where}: unknown input ${input.item}`);
+    for (const m of r.maps ?? []) if (!Object.hasOwn(c.maps, m)) err(`${where}: unknown map ${m}`);
     if (r.station !== null && !stationKinds.has(r.station))
       err(`${where}: station ${r.station} is no station kind`);
   }
@@ -368,6 +371,18 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
         err(`effects.json: ${effect.id} applies unknown effect ${applied}`);
     }
   }
+  for (const item of Object.values(items.items)) {
+    if (item.buff !== undefined && !effectRows[item.buff as keyof typeof effectRows]?.dish)
+      err(`items.json ${item.id}: buff ${item.buff} is no dish buff`);
+  }
+  for (const item of Object.values(items.items)) {
+    if ((item.kind === 'armour') !== (item.armor !== undefined))
+      err(`items.json ${item.id}: kind armour and an armor block go together`);
+    if (item.armor && item.equip !== 'body' && item.equip !== 'head')
+      err(`items.json ${item.id}: armour is worn on the body or the head`);
+    else if (item.armor && item.armor.tier > c.balance.armor.tierMult[item.equip as 'body' | 'head'].length)
+      err(`items.json ${item.id}: no armor.tierMult for its tier`);
+  }
   const checkDamageEffects = (where: string, row: { effects: Record<string, number> }) => {
     for (const id of Object.keys(row.effects)) {
       if (!Object.hasOwn(effectRows, id)) err(`${where}: applies unknown effect ${id}`);
@@ -393,7 +408,8 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
         .filter((s) => PROFILE_RANK[s.profile] <= rank);
       const reach = reachable(c, open);
       inHand.set(`${map.id}/${profile}`, reach.have);
-      for (const id of Object.keys(recipes.recipes)) {
+      for (const [id, recipe] of Object.entries(recipes.recipes)) {
+        if (recipe.maps && !recipe.maps.includes(map.id)) continue;
         if (!reach.made.has(id))
           err(`map ${map.id} (${profile}): recipe ${id} cannot be crafted from its nodes`);
       }
@@ -425,6 +441,13 @@ function checkM5b(c: Content, err: (msg: string) => void): void {
     const where = `quests.json ${q.id}`;
     if (q.kind === 'contract') err(`${where}: contract quests wait for round 7`);
     if (!Object.hasOwn(quests.npcs, q.giver)) err(`${where}: unknown giver ${q.giver}`);
+    // A chain step follows another quest of the same giver, one step at a time (round 10, D9).
+    if (q.after !== undefined) {
+      const before = quests.quests[q.after];
+      if (!before || before.giver !== q.giver) err(`${where}: after ${q.after} is no quest of ${q.giver}`);
+      else if (before.after !== undefined)
+        err(`${where}: a chain has two steps, ${q.after} has one before it`);
+    }
     const have = inHand.get(standsOn.get(q.giver) ?? '');
     for (const w of q.wants) {
       if (!isItem(w.item)) err(`${where}: wants unknown item ${w.item}`);
@@ -517,10 +540,24 @@ function mainTrackS(cs: Content['cutscenes']['cutscenes'][string]): number {
 function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; have: Set<string> } {
   const nodeResources = new Set(scenes.flatMap((s) => (s.nodes ?? []).map((n) => n.resource)));
   const propKinds = new Set(scenes.flatMap((s) => s.props.map((p) => p.kind)));
+  // A shop in an open scene sells its stock: Flour comes from the bakery's counter (round 10, D4a).
+  const propIds = new Set(scenes.flatMap((s) => s.props.map((p) => p.id)));
+  const stock = new Set<string>(
+    Object.values(c.economy.shops).flatMap((s) => (propIds.has(s.prop) ? s.sells : [])),
+  );
   const have = new Set<string>();
   const made = new Set<string>();
+  // A skinned corpse gives its hide and game to whoever can hold a Skinning knife (round 10, D6b).
+  const skinDrops = Object.values(c.mobs.mobs).flatMap((m) => Object.keys(m.skin ?? {}));
   for (let grew = true; grew;) {
     grew = false;
+    if (stock.has('skinningKnife') || have.has('skinningKnife')) {
+      for (const id of skinDrops) {
+        if (have.has(id)) continue;
+        have.add(id);
+        grew = true;
+      }
+    }
     for (const id of nodeResources) {
       const tool = c.resources.resources[id]?.tool;
       if (!have.has(id) && (tool === undefined || have.has(tool))) {
@@ -530,7 +567,7 @@ function reachable(c: Content, scenes: readonly Scene[]): { made: Set<string>; h
     }
     for (const r of Object.values(c.recipes.recipes)) {
       if (made.has(r.id) || (r.station !== null && !propKinds.has(r.station))) continue;
-      if (r.in.every((input) => have.has(input.item))) {
+      if (r.in.every((input) => have.has(input.item) || stock.has(input.item))) {
         made.add(r.id);
         have.add(r.out);
         grew = true;

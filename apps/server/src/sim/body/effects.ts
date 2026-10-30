@@ -3,6 +3,7 @@ import { TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { StatusBit } from '../constants';
 import { emitSim } from '../events/bus';
+import { armourOf } from './armour';
 import { type Body, bodyOf, bodyRng } from './state';
 
 /**
@@ -28,7 +29,10 @@ export function applyEffect(
   durationTicks = Math.round(effectDef(id).durationS * TICK_RATE),
 ): void {
   const tick = room.state.tick;
-  const untilTick = durationTicks > 0 ? tick + durationTicks : 0;
+  // A dish's resistance shortens a Poisoned that starts; Nightshade (`flow.poisoned`) never reads it (round 10, D4a).
+  const scaled =
+    id === 'poisoned' ? Math.round(durationTicks * factorOf(body, (d) => d.poisonFactor)) : durationTicks;
+  const untilTick = scaled > 0 ? tick + scaled : 0;
   const on = body.effects.get(id);
   if (on) {
     on.untilTick = untilTick;
@@ -141,7 +145,9 @@ export function tickEffects(room: PartyRoom, target: string, body: Body): void {
     }
     const def = effectDef(id);
     if (def.hpPerS !== undefined && body.hp > 0) {
-      body.hp = Math.max(Math.min(1, body.hp), body.hp - def.hpPerS * dt);
+      // Armour eases the drains (round 10, D6a): the jerkin halves how fast a Bleeding takes health.
+      const drain = def.hpPerS * (armourOf(room, target).resist[id] ?? 1);
+      body.hp = Math.max(Math.min(1, body.hp), body.hp - drain * dt);
     }
     if (def.applies) {
       for (const [spread, chance] of Object.entries(def.applies) as [EffectKey, number][]) {

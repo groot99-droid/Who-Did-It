@@ -1,10 +1,27 @@
-import { balance, minigames, tasks } from '@wdi/content';
 import {
+  balance,
+  clues,
+  economy,
+  interactions,
+  items,
+  minigames,
+  scenes,
+  tasks,
+  type Mode,
+  type SceneId,
+} from '@wdi/content';
+import {
+  ClueKind,
   Phase,
+  PropState,
   S2C,
   TICK_RATE,
+  TILE_PX,
   checkMinigame,
+  generateLockpick,
   generateMinigame,
+  lockpickOutcome,
+  type LockpickPublic,
   type MinigamePuzzle,
   type PlayerState,
 } from '@wdi/shared';
@@ -14,9 +31,13 @@ import { martyrOf } from './Memorial';
 import { type PlayerSim, simOf } from './RoomSim';
 import { atNode, completeTask } from './tasks/complete';
 import { endMatch } from './Win';
-import { addStack, canAdd, count } from './Inventory';
-import { isVerbPhase, reject } from './World';
-import { refusal, type Refusal } from './refusal';
+import { decaySeconds, spawnClue } from './Clues';
+import { JAIL_GAMES, type JailGame, addStrength, loseMaxHp, markPlayed, playedToday } from './JailGames';
+import { addStack, canAdd, count, take } from './Inventory';
+import { movePurse, TOWN } from './economy/purse';
+import { emitNoise } from './Noise';
+import { isVerbPhase, reject, sceneIndex, tileCentre } from './World';
+import { refusal, sendRefusal, type Refusal } from './refusal';
 
 /**
  * Main-mode mini-games (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): a station task's `task` hold sends
@@ -29,6 +50,10 @@ interface Open {
   taskId: string;
   puzzle: MinigamePuzzle;
   startTick: number;
+  /** Round 10, D5: a lock-pick on a prop (`taskId` is the prop's id), not a station task. */
+  lock?: { sceneId: SceneId; propId: string; interactionId: string };
+  /** Round 10, D8: a jail game on a prop of the cell (`taskId` is the prop's id). */
+  jail?: { game: JailGame; sceneId: SceneId };
 }
 
 /** The open puzzles of the match, keyed by the match's `MatchSeeds` (a new object at every Start), then by seat. */
@@ -41,6 +66,223 @@ function openOf(room: PartyRoom): Map<string, Open> {
 }
 
 type Problem = Refusal;
+
+// The lock-pick (round 10, D5; GDD 3.29): the resolver hands a `minigame` mode of the logic table here. The lock keeps
+// the pin set points it was dealt on the first pick of the match; the picker's client gets them, as the tap bands go,
+// and the answer is a trace that `lockpickOutcome` replays.
+
+/** The set points of each lock, drawn once per match on the `locks` stream keyed by the prop id. */
+const LOCKS = new WeakMap<object, Map<string, LockpickPublic>>();
+
+/** The best tier of pick the seat holds, 0 for none. */
+function pickTierOf(player: PlayerState): number {
+  let best = 0;
+  for (const it of Object.values(items.items))
+    if (it.tool?.pick !== undefined && count(player, it.id) > 0) best = Math.max(best, it.tool.pick);
+  return best;
+}
+
+/** The plainest pick item the seat holds: the one a snap spends. */
+function pickItemOf(player: PlayerState): string | undefined {
+  return Object.values(items.items)
+    .filter((it) => it.tool?.pick !== undefined && count(player, it.id) > 0)
+    .sort((a, b) => (a.tool?.pick ?? 0) - (b.tool?.pick ?? 0) || a.id.localeCompare(b.id))[0]?.id;
+}
+
+const lockCenter = (sceneId: SceneId, propId: string): { x: number; y: number } | null => {
+  const prop = scenes[sceneId].props.find((q) => q.id === propId);
+  return prop ? { x: tileCentre(prop.x, TILE_PX), y: tileCentre(prop.y, TILE_PX) } : null;
+};
+
+/** Why this seat cannot work the open lock now, or null. */
+function lockProblem(room: PartyRoom, p: PlayerSim, player: PlayerState, lock: NonNullable<Open['lock']>) {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  const at = lockCenter(lock.sceneId, lock.propId);
+  if (!at || p.sceneIdx !== sceneIndex(lock.sceneId)) return refusal('NO_TARGET');
+  if (Math.hypot(p.x - at.x, p.y - at.y) > balance.doors.reachTiles * TILE_PX)
+    return refusal('TOO_FAR', { of: 'door' });
+  if (room.state.scenes.get(lock.sceneId)?.propStates.has(lock.propId)) return refusal('NOTHING_THERE');
+  if (pickTierOf(player) < 1) return refusal('NEED_TOOL');
+  return null;
+}
+
+/**
+ * Opens the lock-pick on prop `propId` (called by the resolver's `handleInteract` after its checks): sends the picker
+ * `minigameStart` with the pins, their set points and the band its pick's tier leaves, and keeps the same board. The
+ * attempt sounds from the start, at the interaction's noise.
+ */
+export function startLockpick(
+  room: PartyRoom,
+  sessionId: string,
+  lock: NonNullable<Open['lock']>,
+  noise: Mode['noise'],
+): void {
+  const player = room.state.players.get(sessionId);
+  const p = simOf(room).players.get(sessionId);
+  const b = balance.minigames.lockpick;
+  if (!player || !p) return;
+  const dealt = LOCKS.get(room.seeds) ?? new Map<string, LockpickPublic>();
+  LOCKS.set(room.seeds, dealt);
+  const lockTier = 1; // every placed lock is tier 1 until the scenes carry tiers
+  let base = dealt.get(lock.propId);
+  if (!base)
+    dealt.set(
+      lock.propId,
+      (base = generateLockpick(lockTier, lockTier, room.seeds.get('locks', lock.propId), b)),
+    );
+  const band = pickTierOf(player) < lockTier ? b.bandFrac * b.lowerTierBandMult : b.bandFrac;
+  const pub: LockpickPublic = { ...base, setPoints: [...base.setPoints], band };
+  openOf(room).set(sessionId, {
+    taskId: lock.propId,
+    puzzle: { kind: 'lockpick', public: pub, solution: pub },
+    startTick: room.state.tick,
+    lock,
+  });
+  const at = lockCenter(lock.sceneId, lock.propId);
+  if (at && noise) emitNoise(room, lock.sceneId, at.x, at.y, balance.noise[noise], noise, sessionId);
+  room.clients
+    .getById(sessionId)
+    ?.send(S2C.minigameStart, { taskId: lock.propId, kind: 'lockpick', public: pub });
+}
+
+/** The answer to an open lock: opens it, snaps the pick, or asks again. */
+function lockResult(
+  room: PartyRoom,
+  sessionId: string,
+  player: PlayerState,
+  p: PlayerSim,
+  open: Open,
+  answer: unknown,
+): void {
+  const lock = open.lock!;
+  const problem = lockProblem(room, p, player, lock);
+  if (problem) {
+    openOf(room).delete(sessionId);
+    return reject(room, sessionId, problem);
+  }
+  const trace =
+    typeof answer === 'object' && answer !== null ? (answer as { trace?: unknown }).trace : undefined;
+  // No hand is faster than the clock: a trace cannot end later than the seconds the board has been open.
+  const last = Array.isArray(trace) ? (trace.at(-1) as { t?: unknown } | undefined)?.t : undefined;
+  if (typeof last === 'number' && last > (room.state.tick - open.startTick) / TICK_RATE)
+    return reject(room, sessionId, 'BAD_REQUEST');
+  const outcome = lockpickOutcome(open.puzzle.public as LockpickPublic, trace);
+  if (outcome === 'invalid' || outcome === 'incomplete') return reject(room, sessionId, 'BAD_REQUEST');
+  openOf(room).delete(sessionId);
+  if (outcome === 'snap') {
+    const pick = pickItemOf(player);
+    if (pick) take(player, pick, 1);
+    return sendRefusal(room, sessionId, 'PICK_SNAPPED');
+  }
+  const after = interactions.interactions[lock.interactionId]?.after;
+  if (!after) return;
+  const state = new PropState();
+  state.id = lock.propId;
+  state.state = after.state;
+  state.untilTick = after.respawnS === null ? 0 : room.state.tick + Math.round(after.respawnS * TICK_RATE);
+  room.state.scenes.get(lock.sceneId)?.propStates.set(lock.propId, state);
+  const mode = interactions.interactions[lock.interactionId]?.modes.find((m) => m.minigame === 'lockpick');
+  // The scratch is the same for every picker (seams.md 3 row 12); the fine rolls on `locks`, a stream no client sees.
+  if (mode?.leaves === 'scratch') leaveScratch(room, lock);
+  if (mode?.fineChance !== undefined && room.seeds.get('locks', 'fine')() < mode.fineChance) {
+    movePurse(room, sessionId, TOWN, economy.trespassFine, 'fine'); // never more than the purse holds
+  }
+}
+
+// The county jail's games (round 10, D8; GDD 3.27): the same boards as the stations', opened from a prop of the cell.
+// Once a day each; the gym adds Strength, the yard fight costs maximum health or pays a little, scrubbing pays a wage. The seat's own stream `minigame` draws the board, as for a station task.
+
+/** Why this seat cannot work the open jail game now, or null. */
+function jailProblem(room: PartyRoom, p: PlayerSim, propId: string, jail: NonNullable<Open['jail']>) {
+  if (!isVerbPhase(room.state.phase)) return refusal('PHASE_CLOSED');
+  if (p.dead || !p.placed) return refusal('NOT_IN_PLAY');
+  const at = lockCenter(jail.sceneId, propId);
+  if (!at || p.sceneIdx !== sceneIndex(jail.sceneId)) return refusal('NO_TARGET');
+  if (Math.hypot(p.x - at.x, p.y - at.y) > balance.doors.reachTiles * TILE_PX) return refusal('TOO_FAR');
+  return null;
+}
+
+/**
+ * Opens the jail game `minigame` on prop `propId` (called by the resolver's `handleInteract` after its checks): once a
+ * day, then the board is spent whether or not it is finished. Returns false when it is not a jail game.
+ */
+export function startJailGame(
+  room: PartyRoom,
+  sessionId: string,
+  minigame: string,
+  t: { sceneId: SceneId; id: string },
+): boolean {
+  const game = JAIL_GAMES[minigame];
+  if (!game) return false;
+  const p = simOf(room).players.get(sessionId);
+  if (!p) return true;
+  const jail = { game, sceneId: t.sceneId };
+  const problem = jailProblem(room, p, t.id, jail);
+  const refused = problem ?? (playedToday(room, sessionId, game) ? refusal('NOTHING_THERE') : null);
+  if (refused) {
+    reject(room, sessionId, refused);
+    return true;
+  }
+  markPlayed(room, sessionId, game);
+  const rng = room.seeds.get('minigame', sessionId);
+  const b = balance.jail[game];
+  const kind = game === 'gym' ? 'tap' : game === 'yard' ? 'crates' : 'pour';
+  const puzzle = generateMinigame(kind, b.difficulty, rng, balance.minigames);
+  openOf(room).set(sessionId, { taskId: t.id, puzzle, startTick: room.state.tick, jail });
+  room.clients.getById(sessionId)?.send(S2C.minigameStart, { taskId: t.id, kind, public: puzzle.public });
+  return true;
+}
+
+/**
+ * Step stage (`runInteract`): a yard board still open `boardS` after it opened is lost, as a slow answer is, so a fight
+ * cannot be looked at and dropped for free. The board closes for the seat; nothing is sent.
+ */
+export function runJailBoards(room: PartyRoom): void {
+  const limit = Math.round(balance.jail.yard.boardS * TICK_RATE);
+  for (const [seat, open] of [...openOf(room)])
+    if (open.jail?.game === 'yard' && room.state.tick - open.startTick > limit) {
+      openOf(room).delete(seat);
+      loseMaxHp(room, seat);
+    }
+}
+
+/** The answer to an open jail game. The yard fight is one round: a wrong or a slow answer loses it. */
+function jailResult(room: PartyRoom, sessionId: string, p: PlayerSim, open: Open, answer: unknown): void {
+  const jail = open.jail!;
+  const problem = jailProblem(room, p, open.taskId, jail);
+  if (problem) {
+    openOf(room).delete(sessionId);
+    return reject(room, sessionId, problem);
+  }
+  const right = checkMinigame(open.puzzle, answer);
+  if (jail.game === 'yard') {
+    openOf(room).delete(sessionId);
+    const inTime = room.state.tick - open.startTick <= Math.round(balance.jail.yard.boardS * TICK_RATE);
+    if (right && inTime) movePurse(room, TOWN, sessionId, balance.jail.yard.purse, 'wage');
+    else loseMaxHp(room, sessionId);
+    return;
+  }
+  if (!right) return reject(room, sessionId, 'BAD_REQUEST');
+  openOf(room).delete(sessionId);
+  if (jail.game === 'gym') return addStrength(room, sessionId);
+  movePurse(room, TOWN, sessionId, balance.jail.scrub.wage, 'wage'); // the hour off the sentence is NFY (GDD 3.27)
+}
+
+/** The `scratch` clue on the picked prop's tile: value and dir 0, so it shows nothing of the picker. */
+function leaveScratch(room: PartyRoom, lock: NonNullable<Open['lock']>): void {
+  const prop = scenes[lock.sceneId].props.find((q) => q.id === lock.propId);
+  const def = clues.clues.scratch;
+  if (!prop || !def) return;
+  spawnClue(room, lock.sceneId, {
+    kind: ClueKind.scratch,
+    value: 0,
+    dir: 0,
+    decayS: decaySeconds(def.decay),
+    tx: prop.x,
+    ty: prop.y,
+  });
+}
 
 /** Why this seat cannot work `taskId` now, or null: the checks that start a mini-game and that finish it. */
 function taskProblem(
@@ -188,6 +430,8 @@ export function handleMinigameResult(
     reject(room, sessionId, 'NOTHING_THERE');
     return;
   }
+  if (open.lock) return lockResult(room, sessionId, player, p, open, answer);
+  if (open.jail) return jailResult(room, sessionId, p, open, answer);
   const problem = taskProblem(room, p, player, taskId);
   if (problem) {
     openOf(room).delete(sessionId);

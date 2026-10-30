@@ -10,26 +10,40 @@ import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
+import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
+import { isOnLine } from './Train';
 import { SCENE_KEYS } from './World';
 
-/** `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. */
-export function evaluateWin(room: PartyRoom): 'village' | 'cabal' | null {
+/**
+ * `checkWin` over the living seats (GDD 3.8). Called after a death or an ejection, never on a bare tick. Round 10
+ * (C1): a seat on the line counts as living, since the morning Train brings it back; a wolf by day decides no match.
+ */
+export function evaluateWin(room: PartyRoom): Outcome | null {
+  if (isPaintTown(room)) return paintWinner(room); // round 10, C5: no parity in Paint The Town Red (GDD 3.8)
   const sim = simOf(room);
   const living: ReturnType<typeof factionOf>[] = [];
   room.state.players.forEach((p: PlayerState, id: string) => {
-    if (!sim.players.get(id)?.dead) living.push(factionOf(p));
+    if (!sim.players.get(id)?.dead || isOnLine(room, id)) living.push(factionOf(p));
   });
   return checkWin(living, countRow(room.state.players.size).cabalWin);
 }
 
+/** How a match ends: a faction wins, or, in Paint The Town Red, the two Killers share theirs (round 10, C5). */
+export type Outcome = 'village' | 'cabal' | 'paintTown';
+
 /** The end-of-match line, naming the map the room played by its display name (`maps/<id>.json` `name`). */
-const summaryOf = (winner: 'village' | 'cabal', town: string): string =>
+const summaryOf = (winner: Outcome, town: string): string =>
   winner === 'village'
     ? `The Cabal is gone from ${town}. The Village wins.`
-    : `The Cabal holds ${town}. The Village is lost.`;
+    : winner === 'paintTown'
+      ? `${town} is painted red. The Killers win.`
+      : `The Cabal holds ${town}. The Village is lost.`;
 
 /** Game over: the phase, the winner, the gameOver message and the match-log line (A30). */
-export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
+export function endMatch(room: PartyRoom, outcome: Outcome): void {
+  // Round 10, C5: in Paint The Town Red the Killers win only by painting the town; the end trial closing without
+  // it (the Final Night's Cabal verdict) is the Village's (GDD 3.8).
+  const winner = isPaintTown(room) && outcome === 'cabal' ? 'village' : outcome;
   const state = room.state;
   const sim = simOf(room);
   const flow = flowOf(room);
@@ -40,6 +54,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
     roles: rolesOf(room),
     summary: summaryOf(winner, maps[mapIdOfRoom(room)].name),
     ...gameOverExtras(room),
+    ...(isPaintTown(room) && { paintTown: paintGameOver(room) }),
   });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];
@@ -58,7 +73,7 @@ export function endMatch(room: PartyRoom, winner: 'village' | 'cabal'): void {
     code: room.roomId,
     seats: state.players.size,
     durationS: (state.tick - state.startTick) / TICK_RATE,
-    winner,
+    winner: winner === 'paintTown' ? 'cabal' : winner, // the log's two factions: the Killers are the Cabal
     rounds: state.round,
     kills: flow.kills,
     vanished: flow.vanished,
@@ -117,6 +132,10 @@ export function resetToLobby(room: PartyRoom): void {
     priv.role.team = 0;
     priv.inventory.slots.clear();
     priv.inventory.selected = 0; // round 10, A12
+    priv.home = ''; // round 10, A7
+    priv.asleep = false;
+    priv.inBed = 0;
+    priv.inBedOf = 0;
     priv.notebook.clear();
     priv.tasks.clear();
     priv.quests.clear(); // round 6 (6H): a new match starts with no quest
@@ -125,6 +144,7 @@ export function resetToLobby(room: PartyRoom): void {
     priv.ledger.clear();
     priv.lensCharges = 0;
     priv.myVote = '';
+    priv.paintTown = false; // round 10, C5
   });
   for (const id of gone) state.players.delete(id);
   if (!state.players.has(state.leaderId)) state.leaderId = state.players.keys().next().value ?? '';

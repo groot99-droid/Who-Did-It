@@ -1,6 +1,8 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import balance from '@wdi/content/data/balance.json';
 import type { HoldAction } from '@wdi/shared/protocol';
+import { paintTarget } from '@wdi/shared/rules';
 import type {
   AvatarSnap,
   BodySnap,
@@ -47,9 +49,17 @@ interface PlayerState {
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
     faith?: number; // round 8, 8D
+    asleep?: boolean; // round 10, A7
+    inBed?: number;
+    inBedOf?: number;
+    onLine?: boolean; // round 10, C1
+    fare?: number; // round 10, C2
+    paintTown?: boolean; // round 10, C5
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
+    /** Round 7 (GDD 3.20): the own vendetta id, or the Accomplice's Killers' ids joined by commas. */
+    vendetta?: string;
   };
 }
 interface AvatarState {
@@ -95,7 +105,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('sceneEnter', (m: SceneEnter) => this.bus.emit('sceneEnter', m));
     room.onMessage('noise', (m: NoisePulse) => this.bus.emit('noise', m));
     room.onMessage('killed', (m: WorldFeedEvents['killed']) => {
-      this.ghost = true;
+      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost.
+      const onLine = Object.keys(m.roles ?? {}).length === 0;
+      this.ghost = !onLine;
+      this.line = onLine;
       this.bus.emit('killed', m);
     });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
@@ -119,6 +132,8 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   /** Set by the private `killed` message or a false roster `alive`; cleared when the lobby returns. */
   private ghost = false;
+  /** Round 10, C1b: the seat has been on the line since its death, so its `killed` made no ghost. */
+  private line = false;
 
   /** The room this feed reads; the router compares it to spot a reconnect to a new room. */
   get sessionRoom(): Room {
@@ -192,6 +207,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     return { look: priv?.coverLook ?? '', mates };
   }
 
+  vendetta(): string {
+    return this.state.players.get(this.selfId)?.priv?.vendetta ?? '';
+  }
+
   doors(): DoorSnap[] {
     const out: DoorSnap[] = [];
     // The view holds a single SceneState: the one this client is standing in.
@@ -238,9 +257,18 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   dead(): boolean {
     const s = this.state;
-    if (s.phase === 0) this.ghost = false;
-    else if (s.players.get(this.selfId)?.alive === false) this.ghost = true;
+    const self = s.players.get(this.selfId);
+    const next = ghostAfter(
+      { ghost: this.ghost, line: this.line },
+      { phase: s.phase, alive: self?.alive, onLine: self?.priv?.onLine === true },
+    );
+    this.ghost = next.ghost;
+    this.line = next.line;
     return this.ghost;
+  }
+
+  onLine(): boolean {
+    return this.state.players.get(this.selfId)?.priv?.onLine === true;
   }
 
   clock() {
@@ -346,7 +374,19 @@ export class ColyseusWorldFeed implements WorldFeed {
     return this.state.taskBar ?? 0;
   }
 
+  // Round 10, C5 (GDD 3.8): Paint The Town Red's target, while this seat's `Private.paintTown` is set.
+  paintTarget(): number {
+    if (this.state.players.get(this.selfId)?.priv?.paintTown !== true) return 0;
+    let seats = 0;
+    this.state.players.forEach(() => seats++);
+    return paintTarget(balance.paintTown.winUnique, seats - 2);
+  }
+
   // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.
+  fare(): number {
+    return this.state.players.get(this.selfId)?.priv?.fare ?? 0;
+  }
+
   purse(): number {
     return this.state.players.get(this.selfId)?.priv?.purse ?? 0;
   }
@@ -357,6 +397,12 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   sell(shopId: string, itemId: string, qty: number): void {
     this.room.send('act.sell', { shopId, itemId, qty });
+  }
+
+  // Round 10 (A7, GDD 3.32): the own sleep state; the counts are written only while asleep.
+  sleeping(): { asleep: boolean; inBed: number; inBedOf: number } {
+    const priv = this.state.players.get(this.selfId)?.priv;
+    return { asleep: priv?.asleep ?? false, inBed: priv?.inBed ?? 0, inBedOf: priv?.inBedOf ?? 0 };
   }
 
   // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
@@ -406,6 +452,10 @@ export class ColyseusWorldFeed implements WorldFeed {
     this.room.send('act.inspect', { targetId });
   }
 
+  talk(targetId: string, ask: 'town' | 'time'): void {
+    this.room.send('talk.ask', { targetId, ask });
+  }
+
   mug(choice: 'pay' | 'fight' | 'flee'): void {
     this.room.send('act.mug', { choice });
   }
@@ -413,4 +463,19 @@ export class ColyseusWorldFeed implements WorldFeed {
   dispose(): void {
     this.bus.all.clear();
   }
+}
+
+/**
+ * The ghost flag after a read of the own seat (round 10, C1b; GDD 3.22). A `killed` or a false roster `alive` makes a
+ * ghost, the lobby clears it, and a seat on the line is no ghost: its `alive` may read false after a meeting, and when
+ * the morning train brings it back the flag its `killed` set is cleared.
+ */
+export function ghostAfter(
+  was: { ghost: boolean; line: boolean },
+  now: { phase: number; alive: boolean | undefined; onLine: boolean },
+): { ghost: boolean; line: boolean } {
+  if (now.phase === 0) return { ghost: false, line: false };
+  if (now.onLine) return { ghost: false, line: true };
+  if (was.line) return { ghost: now.alive === false, line: false };
+  return { ghost: was.ghost || now.alive === false, line: false };
 }

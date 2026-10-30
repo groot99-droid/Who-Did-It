@@ -23,7 +23,7 @@
       "phases": ["day"],
       "kinds": ["lumber", "stump", "timberSet", "boulder", "rockPile", "orePile"]
     },
-    "trade": { "phases": ["day"], "kinds": ["counter"] },
+    "trade": { "phases": ["day"], "kinds": ["counter", "ledger"] },
     "social": {
       "phases": ["day", "night"],
       "kinds": ["noticeBoard", "dartboard", "bell", "lamp", "decor"]
@@ -37,7 +37,8 @@
     "boulder": "interact",
     "rockPile": "interact",
     "orePile": "interact",
-    "counter": "shop"
+    "counter": "shop",
+    "ledger": "errand"
   },
   "ignore": [
     "dressing",
@@ -49,13 +50,15 @@
     "wakeTable",
     "plate",
     "deadLoaf",
-    "ledger",
     "bank",
     "altar",
     "mailbag",
     "rack",
     "hq",
-    "blackMarket"
+    "blackMarket",
+    "bed",
+    "cot",
+    "innBed"
   ],
   "lightKinds": ["lanternPost"],
   "townsfolk": {

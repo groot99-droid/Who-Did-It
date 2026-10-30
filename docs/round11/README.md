@@ -46,7 +46,8 @@ card portraits, the screens), in the questionnaire below.
 | **11A. The render pipeline** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/pipeline.md`, `docs/round11/samples/pipeline/` | when the playtest gate opens |
 | **11B. Materials, styles and budgets** | Opus | 800k | `claude/r10-tier-800k` | `docs/round11/look.md`, `docs/round11/samples/look/` | when the playtest gate opens |
 | **The asset list** | 11B, or a session 6Z spawns | 800k | — | `docs/round11/assets.md` | at the content freeze |
-| **6Z** | — | — | — | this file, `docs/round11/questions.md` when it is sent to the owner | throughout |
+| **The plan** | 11A, with 11B | 800k | — | `docs/round11/round11-plan.md` | when the owner has answered |
+| **6Z** | — | — | — | this file, `docs/round11/questions.md` when it is sent to the owner, `docs/round11/owner-answers.md` | throughout |
 
 Both are Opus, because each sets a contract the build will follow (the round-10 model rule). Both compact at 800k,
 because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/round5/art-plan.md`, `docs/round8/art.md`,
@@ -123,6 +124,15 @@ because each reads most of the art record: ASSETS 6, SPRITES 1 to 12, `docs/roun
   `.claude/settings.local.json` step of `docs/round10/README.md`, "Compaction" (800000).
 - **The playtest.** The owner's playtest notes on how the game looks go to 11A and 11B as well as to 10X and 10Y.
 
-## Status (2026-10-29)
+## Status (2026-10-30)
 
-- This contract. 11A and 11B start when A13 merges.
+- This contract (#339).
+- The playtest gate opened when round 10's A13b merged (4a8e70f), and 11A and 11B started.
+- 11A's `pipeline.md` (#346) and 11B's `look.md` (#347) are in. Their questions are merged in `questions.md`, sent to
+  the owner on 2026-10-30.
+- The owner answered on 2026-10-30 (`owner-answers.md`). Every default holds except CL3, which brings the buildings'
+  long shadows into round 11. 11A writes `round11-plan.md` from the answers, with 11B.
+- 11B's budget for the shadow layer (`look.md` 5.3.1, #371) and 11A's `round11-plan.md` (#374) merged on 2026-10-30.
+  The plan waits on the owner's approval and on CL3a, which way the shadows fall (default: a sun at 25°, turned 45°).
+- The owner approved the plan on 2026-10-30, with CL3a's default (A236, `owner-answers.md`). It builds after round
+  10's final sweep (10Z) has merged. SC2, BU4 and RN3 keep their fallbacks until the owner answers them.

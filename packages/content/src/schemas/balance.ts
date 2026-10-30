@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { GddRef, Id, Seconds, Tiles, byPlayerCount } from './common.js';
+import { EffectKey } from './effects.js';
 
 export const NOISE_KEYS = [
   'walk',
@@ -18,6 +19,9 @@ export const NOISE_KEYS = [
   'wispRattle',
   'shot',
   'shout',
+  // Round 10, x2 (A253): an axe's chop and a pickaxe's smash at the tool walls (GDD 3.7, 3.14).
+  'chop',
+  'smash',
 ] as const;
 export const NoiseKey = z.enum(NOISE_KEYS);
 export type NoiseKey = z.infer<typeof NoiseKey>;
@@ -230,6 +234,15 @@ export const BalanceFile = z.strictObject({
     /** A door is usable from this many tiles of its tile centre (GDD 3.7). */
     reachTiles: z.number().positive(),
   }),
+  /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  figureTalk: Section({
+    /** A figure answers from this many tiles. */
+    reachTiles: z.number().positive(),
+    /** Every answer comes this long after the ask. */
+    delayS: Seconds,
+    /** Each asker may ask the same figure again after this long. */
+    cooldownS: Seconds,
+  }),
   tasks: Section({
     cabalFakeList: z.boolean(),
     ghostShareCap: z.number().min(0).max(1),
@@ -420,6 +433,19 @@ export const BalanceFile = z.strictObject({
     slide: z.strictObject({ steps: Count }),
     stoke: z.strictObject({ stokePerTap: Frac, ratePerS: Frac, bandFrac: Frac, holdS: Seconds }),
     tap: z.strictObject({ steps: Count, periodS: Seconds, bandFrac: Frac }),
+    /**
+     * Round 10 (D5, GDD 3.29): the lock-pick. `pinsByTier` is the pins of a tier 1, 2 and 3 lock; a pin sets when the
+     * lift is within `bandFrac` of its set point (`lowerTierBandMult` of that for a pick of a lower tier); a tension
+     * of `snapAt` snaps the pick; attempts come `minAttemptS` apart at the least, at most `maxAttempts` of them.
+     */
+    lockpick: z.strictObject({
+      pinsByTier: z.array(Count).length(3),
+      bandFrac: Frac,
+      lowerTierBandMult: Frac,
+      snapAt: Frac,
+      minAttemptS: Seconds,
+      maxAttempts: Count,
+    }),
   }),
   /**
    * Round 8 (GDD 3.26, 7M): the shelf reader. A shelf of books shows `spinesMin` to `spinesMax` spines (owner, A200
@@ -431,7 +457,48 @@ export const BalanceFile = z.strictObject({
    * Round 7 (GDD 3.3): the Daily Train of a map with a `station`. It stops `arriveAtS` into each day and delivers
    * `deliveryAfterS` later; the seats of the hub within `hearTiles` of the platform hear it.
    */
-  train: Section({ arriveAtS: z.number().nonnegative(), deliveryAfterS: Seconds, hearTiles: Tiles }),
+  /** Round 10 (C1, GDD 3.3): `dusk.leaveAtS`, the Dusk Train's leaving, into dusk. */
+  train: Section({
+    arriveAtS: z.number().nonnegative(),
+    deliveryAfterS: Seconds,
+    hearTiles: Tiles,
+    dusk: z.strictObject({ leaveAtS: z.number().nonnegative() }),
+  }),
+  /** Round 10 (C1, GDD 3.22): a seat the morning train brings back arrives with `hp` health. */
+  /** C2 (GDD 3.23): the fare a return owes the line, the pay cut while it is owed, and the target to clear it. */
+  respawn: Section({
+    hp: z.number().int().positive(),
+    fareDebt: z.number().int().positive(),
+    wageMult: Frac,
+    clearTargetDays: z.number().positive(),
+    /** C2b: an owing seat's look makes its shop ask this much more; the Clerk's errand is held this long. */
+    priceMult: z.number().min(1),
+    errandS: z.number().positive(),
+    /** C3: an owing look's stall stocks this much of its day's stock. */
+    stockMult: Frac,
+  }),
+  /** Round 10 (C3, GDD 3.23): a stall's day's stock of each item, one per seat and at least `stallStockMin`. */
+  townWork: Section({
+    stallStockPerSeat: z.number().positive(),
+    stallStockMin: z.number().int().nonnegative(),
+  }),
+  /**
+   * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
+   * slot; the factors of the worn items and the Lodge's `creatureDmg` perk multiply, and the damage never falls below
+   * `cap` of what the row would have dealt.
+   */
+  armor: Section({
+    tierMult: z.strictObject({
+      body: z.array(Frac).min(1),
+      head: z.array(Frac).min(1),
+    }),
+    cap: Frac,
+  }),
+  /**
+   * Round 10 (C5, GDD 3.8): Paint The Town Red. `winUnique` is a fraction: the Killers' combined unique kills must reach
+   * ceil(`winUnique` x the NPC seats at the deal), at least 1.
+   */
+  paintTown: Section({ winUnique: Frac }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
@@ -514,10 +581,85 @@ export const BalanceFile = z.strictObject({
    */
   inventory: Section({ hotbar: z.number().int().positive(), belt: z.number().int().nonnegative() }),
   /**
+   * Round 10, B8 (GDD 3.31, seams.md 3 row 10): Walk with me. Every answer reaches the asker `answerS` after the ask,
+   * whoever answers; an NPC seat or a townsperson says yes with `yesChance` (times `scaredMult` while Scared); a
+   * figure partner follows within `followTiles`; a pair apart for `apartS` ends.
+   */
+  pairing: Section({
+    answerS: Span,
+    yesChance: Chance,
+    scaredMult: z.number().positive(),
+    followTiles: Tiles,
+    apartS: Seconds,
+  }),
+  /**
+   * Round 10, B3 (GDD 3.31, F4 2.1): petitions. A petition needs ceil(`othersPct` x the living, free humans, every
+   * seat counted) other signatures within `openS`, the bar fixed at open; a lapse gives the accused and the opener
+   * `cooldownS`; at most `maxEntries` entries attach; at `constableAtHumans` humans or fewer when it opens, a
+   * Constable signs once on `constableMatches` backed matches.
+   */
+  petition: Section({
+    othersPct: Chance,
+    openS: Seconds,
+    cooldownS: Seconds,
+    maxEntries: z.number().int().positive(),
+    constableAtHumans: z.number().int().positive(),
+    constableMatches: z.number().int().positive(),
+  }),
+  /** Round 10, B4 (GDD 3.31): a manhunt runs `durationS` from the warrant's turn. */
+  manhunt: Section({ durationS: Seconds }),
+  /** Round 10, B5 and D8 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell, where it may work out. */
+  jail: Section({
+    walkS: Seconds,
+    /** D8: the gym's tap board, and the Strength it gives (damage added to a strike, for the match). */
+    gym: z.strictObject({ difficulty: z.number().int().min(1).max(5), damage: z.number().int().positive() }),
+    /** D8: the yard fight's crates board (right and inside `boardS` wins), what a loss costs, what a win pays. */
+    yard: z.strictObject({
+      difficulty: z.number().int().min(1).max(5),
+      boardS: Seconds,
+      maxHpLoss: z.number().int().positive(),
+      maxHpFloor: z.number().int().positive(),
+      purse: z.number().int().positive(),
+    }),
+    /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
+    scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
+  }),
+  /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat
    * stays within the leash.
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
+  /**
+   * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
+   * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
+   * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
+   * last `fileWindowS` (B3c).
+   */
+  law: Section({
+    speedMult: z.number().positive(),
+    briefingAfterS: Seconds,
+    cuffHoldS: Seconds,
+    fileWindowS: Seconds,
+  }),
+  /** Round 10, A7 (GDD 3.32): sleeping through the night. */
+  sleep: Section({
+    /** Every active player asleep this long ends the night. */
+    confirmS: Seconds,
+    /** The tavern bed's price, paid from the purse when the sleeper lies down. */
+    innBedScrip: z.number().int().nonnegative(),
+    /** Round 10, A7b: the share of maximum stamina each kind of bed restores at the dawn its sleeper sleeps to. */
+    restore: z.strictObject({
+      bed: z.number().min(0).max(1),
+      cot: z.number().min(0).max(1),
+      innBed: z.number().min(0).max(1),
+    }),
+    /** The effects the tavern bed cures at that dawn (`effects.json` ids). */
+    innBedCures: z.array(EffectKey),
+    /** The Faith a night on the chapel cot gives, unless the chapel bars the sleeper. */
+    cotFaith: z.number().int().nonnegative(),
+    /** The last active player awake, alone this long while the rest sleep, is Exhausted the next day. */
+    holdoutGraceS: Seconds,
+  }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

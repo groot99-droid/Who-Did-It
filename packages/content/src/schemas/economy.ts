@@ -66,7 +66,13 @@ const FaithPrice = z.strictObject({ faith: Count, scrip: Scrip });
 /** A stake tier: the purse a seat starts with is drawn uniformly in [min, max]. */
 const StakeTier = z.strictObject({ min: Scrip, max: Scrip }).refine((t) => t.min <= t.max, 'min > max');
 
-const Shop = z.strictObject({ prop: PrefixedId, sells: z.array(Id), buys: z.array(Id) });
+/** `owner` (round 10, C2b): the `looks.json` look whose character keeps the shop; a shop with no character has none. */
+const Shop = z.strictObject({
+  prop: PrefixedId,
+  sells: z.array(Id),
+  buys: z.array(Id),
+  owner: Id.optional(),
+});
 
 const Price = z
   .strictObject({ ask: Scrip.positive().optional(), pay: Scrip.positive().optional() })
@@ -106,6 +112,8 @@ export const EconomyFile = z.strictObject({
     fine: Count,
     racks: z.array(PrefixedId).min(1),
   }),
+  /** Scrip taken from a seat whose pick opens a lock and is caught at it (round 10, D5c, GDD 3.29). */
+  trespassFine: Count,
   /** The scenes whose doors refuse an Indebted seat from dusk until it pays (GDD 3.23), per map. */
   curfew: z.partialRecord(MapId, z.array(WorldId)),
   faith: z.strictObject({
