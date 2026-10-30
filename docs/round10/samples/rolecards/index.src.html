@@ -677,7 +677,7 @@ function dbChores() {
   if (s.fake) out.push(h('p', { class: 'secs', style: 'margin:-4px 0 8px' }, 'Your list writes alibis but never fills the bar. Only you can see this line.'));
   for (const [id, st] of s.tasks) {
     const t = CONTENT.tasks.tasks[id];
-    const where = t.targets.map((x) => SCENE[x.scene] ?? x.scene).join(' or ');
+    const where = [...new Set(t.targets.map((x) => SCENE[x.scene] ?? x.scene))].join(' or ');
     const steps = t.kind === 'coop' ? `Takes ${t.coopPlayers} hands, at ${where}.` : st === 'carry' ? `Carrying the ${itemName(t.tool)}. Bring it to ${where}.` : `Fetch the ${itemName(t.tool)} from ${SCENE[t.source.scene] ?? t.source.scene}, bring it to ${where}.`;
     out.push(h('div', { class: 'chore' }, h('span', { class: `tick ${st === 'done' ? 'done' : ''}`, 'aria-hidden': 'true' }), h('div', {}, h('b', {}, t.name), h('div', { class: 'steps' }, st === 'done' ? 'Done. Your alibi is in the Notebook.' : steps)), h('span', {}, t.nightOnly ? h('span', { class: 'pill soft' }, 'After dark') : st === 'carry' ? h('span', { class: 'pill mustard' }, 'Next') : '')));
   }
