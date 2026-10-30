@@ -286,11 +286,11 @@ describe('a mugging', () => {
     // An NPC seat as the target, alone with the figure: it pays, and is angry at the figure.
     const w = balance.moods.mug.npcAnswer;
     const kept = { ...w };
-    Object.assign(w, { pay: 1, flee: 0, fight: 0 });
+    Object.assign(w, { pay: 1, flee: 0, fight: 0, silent: 0 });
     const { party: p2, target: npc, mugger, heard } = await world({ apart: 1, npcTarget: true });
     const room = p2.room;
     expect(untilMugged(p2, npc)).toBe(true);
-    for (let i = 0; i < ticksOf(m.threatS + 1) && muggingOf(room, npc); i++) advance(p2, 1);
+    for (let i = 0; i < ticksOf(m.threatS + m.answerS + 1) && muggingOf(room, npc); i++) advance(p2, 1);
     expect(heard.at(-1)?.data).toEqual({ mugger: mugger.id, target: npc, outcome: 'paid' });
     expect(balanceOf(room, npc)).toBe(21);
     expect(needsOf(npcMemory(room).brain(npc)).angryAt).toBe(mugger.id);

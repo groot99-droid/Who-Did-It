@@ -49,6 +49,8 @@ export interface Mugging {
   untilTick: number;
   /** A fight: the tick of the next exchange of blows. */
   nextHitTick: number;
+  /** An NPC seat's drawn answer and the tick it lands inside the window (null for a human, or when it stays silent). */
+  npcAnswer: { choice: MugChoice; atTick: number } | null;
 }
 
 interface MugMemory {
@@ -241,6 +243,7 @@ function start(room: PartyRoom, m: Mugger, target: string, inReach: boolean): vo
     state: inReach ? 'threat' : 'approach',
     untilTick: tick + ticksOf(inReach ? c.threatS : c.approachS),
     nextHitTick: 0,
+    npcAnswer: null,
   };
   const mem = memoryOf(room);
   mem.byTarget.set(target, mg);
@@ -286,7 +289,8 @@ function advance(room: PartyRoom, mg: Mugging): void {
       return;
     case 'prompt':
       hold(room, mg);
-      // A silent target is taken for the share (the strike, once the fists land).
+      // An NPC seat's drawn answer lands at its drawn tick; a silent target is taken for the share when the window ends.
+      if (mg.npcAnswer && tick >= mg.npcAnswer.atTick) return answer(room, mg, mg.npcAnswer.choice);
       if (tick >= mg.untilTick) take(room, mg, 'taken');
       return;
     case 'chase':
@@ -314,8 +318,11 @@ function hold(room: PartyRoom, mg: Mugging): void {
 function prompt(room: PartyRoom, mg: Mugging): void {
   mg.state = 'prompt';
   mg.untilTick = room.state.tick + ticksOf(balance.moods.mug.answerS);
-  // An NPC seat answers as a human might: one card-blind draw on its own choices stream (round 10, S4, GDD 3.24).
-  if (isNpcSeat(room, mg.target)) return answer(room, mg, npcChoice(room, mg.target));
+  // An NPC seat answers as a human might: its choice (or silence) and the tick it lands, drawn now on its own stream.
+  if (isNpcSeat(room, mg.target)) {
+    mg.npcAnswer = npcDraw(room, mg.target);
+    return;
+  }
   const muggerId = mg.figure
     ? (mg.figure.handle ?? '')
     : (room.state.players.get(mg.mugger)?.priv.avatar ?? '');
@@ -392,11 +399,19 @@ function fight(room: PartyRoom, mg: Mugging, t: PlayerSim, reach: number): void 
   hurt(room, mg.target, row.mugging, { source: 'mugging', by: mg.mugger, factor: muggerFactor });
 }
 
-/** The NPC seat's answer: one uniform from its `npcPlay` stream against the `moods.mug.npcAnswer` weights. */
-function npcChoice(room: PartyRoom, seat: string): MugChoice {
-  const w = balance.moods.mug.npcAnswer;
-  const pick = playRng(room, seat)() * (w.pay + w.flee + w.fight);
-  return pick < w.pay ? 'pay' : pick < w.pay + w.flee ? 'flee' : 'fight';
+/**
+ * The NPC seat's answer, drawn when the prompt opens on its `npcPlay` stream (card-blind, mood-free, GDD 3.24): a
+ * choice by the `moods.mug.npcAnswer` weights (silence is one) and, for an answer, the tick it lands, uniform between
+ * `npcAnswerMinS` and `answerS`, so a seat never answers on the prompt's first tick nor always waits the window out.
+ */
+export function npcDraw(room: PartyRoom, seat: string): Mugging['npcAnswer'] {
+  const c = balance.moods.mug;
+  const w = c.npcAnswer;
+  const rng = playRng(room, seat);
+  const pick = rng() * (w.pay + w.flee + w.fight + w.silent);
+  const at = room.state.tick + ticksOf(c.npcAnswerMinS + rng() * (c.answerS - c.npcAnswerMinS));
+  if (pick >= w.pay + w.flee + w.fight) return null;
+  return { choice: pick < w.pay ? 'pay' : pick < w.pay + w.flee ? 'flee' : 'fight', atTick: at };
 }
 
 /** An answer lands (a human's `act.mug`, or an NPC seat's draw): Pay is taken at once, Flee and Fight start theirs. */

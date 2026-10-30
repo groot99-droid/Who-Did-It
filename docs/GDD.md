@@ -1176,8 +1176,11 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
   knocked out); one still standing at `fightS` gives up. A target that steps out of reach turns the fight into a
   chase. The target's blows are the exchange itself, not a strike it aims.
 
-A mugged NPC seat draws its answer when the threat ends, once, from its own choices stream and blind to its card and
-mood: Pay _proposed_ 50 %, Flee 25 %, Fight 25 % (`moods.mug.npcAnswer`). Its Flee runs to the nearest open portal of the
+A mugged NPC seat draws, when the threat ends, once, from its own choices stream and blind to its card and mood, both
+what it answers and when: Pay _proposed_ 40 %, Flee 20 %, Fight 20 %, or silence 20 % (`moods.mug.npcAnswer`), the
+answer landing at a tick uniform between `npcAnswerMinS` (_proposed_ 1.5 s) and `answerS`, never on the prompt's first
+tick; a silent seat lets the window run out and is taken for the share, as a human who does not answer. If the target
+leaves the scene or the mugging ends first, nothing lands. Its Flee runs to the nearest open portal of the
 scene, else straight away from the mugger, and its Fight stands and trades blows, both on the human's paths above.
 Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
 stood showing the mugger's height, and a robbed seat angry at its mugger

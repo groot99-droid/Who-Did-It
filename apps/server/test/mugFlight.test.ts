@@ -9,7 +9,7 @@ import { npcMemory } from '../src/sim/npc/memory';
 import { needsOf } from '../src/sim/npc/needs';
 import { simOf } from '../src/sim/RoomSim';
 import { type Figure, figuresOf, rehandleFigure } from '../src/sim/townsfolk/figures';
-import { handleMug, muggingOf } from '../src/sim/townsfolk/mug';
+import { handleMug, muggingOf, npcDraw } from '../src/sim/townsfolk/mug';
 import { sceneIndex } from '../src/sim/World';
 import { openRun } from './killHelpers';
 import {
@@ -115,8 +115,8 @@ function atPrompt(party: Party, human: string): void {
 const outcomeOf = (heard: SimEvent[]) => heard.find((e) => e.kind === 'mug.end')?.data?.outcome;
 
 /** Forces an NPC seat's drawn answer by the weights (the draw itself is one uniform on the seat's own stream). */
-function npcAnswers(w: { pay: number; flee: number; fight: number }): void {
-  Object.assign(m.npcAnswer, w);
+function npcAnswers(w: { pay: number; flee: number; fight: number; silent?: number }): void {
+  Object.assign(m.npcAnswer, { silent: 0 }, w);
 }
 const npcDefault = { ...m.npcAnswer };
 afterEach(() => npcAnswers(npcDefault));
@@ -131,6 +131,34 @@ function untilState(party: Party, target: string, state: string): boolean {
 }
 
 describe('the mugging, Flee and Fight (S4)', () => {
+  it("an NPC seat never answers on the prompt's first tick, its answers spread over the window, and some stay silent", async () => {
+    const { party, target } = await world({ apart: 1, npcTarget: true });
+    const room = party.room;
+    const now = room.state.tick;
+    const offsets: number[] = [];
+    let silent = 0;
+    for (let i = 0; i < 400; i++) {
+      const d = npcDraw(room, target);
+      if (d === null) silent++;
+      else offsets.push(d.atTick - now);
+    }
+    expect(silent).toBeGreaterThan(0);
+    expect(silent).toBeLessThan(400);
+    expect(Math.min(...offsets)).toBeGreaterThanOrEqual(ticksOf(m.npcAnswerMinS));
+    expect(Math.max(...offsets)).toBeLessThanOrEqual(ticksOf(m.answerS));
+    const spread = new Set(offsets.map((o) => Math.floor((o - ticksOf(m.npcAnswerMinS)) / 10)));
+    expect(spread.size).toBeGreaterThan(5);
+  });
+
+  it('an NPC seat that draws silence is taken for the share when the window runs out', async () => {
+    npcAnswers({ pay: 0, flee: 0, fight: 0, silent: 1 });
+    const { party, target, heard } = await world({ apart: 1, npcTarget: true });
+    expect(untilState(party, target, 'prompt')).toBe(true);
+    advance(party, ticksOf(m.answerS) + 2);
+    expect(muggingOf(party.room, target)).toBeUndefined();
+    expect(outcomeOf(heard)).toBe('taken');
+  });
+
   it('an NPC seat target that draws Flee runs from its mugger on the chase path', async () => {
     npcAnswers({ pay: 0, flee: 1, fight: 0 });
     const { party, target, mugger } = await world({ apart: 1, npcTarget: true });
