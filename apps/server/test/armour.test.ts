@@ -6,6 +6,7 @@ import { armourOf, capped, damageFactor } from '../src/sim/body/armour';
 import { hurt } from '../src/sim/body/damage';
 import { applyEffect, tickEffects } from '../src/sim/body/effects';
 import { bodyOf } from '../src/sim/body/state';
+import { tiersOf } from '../src/sim/economy/perks';
 import { LAYOUT } from '../src/sim/Inventory';
 import { bootNpcServer, pauseClock, standardParty, type Party } from './npcHelpers';
 
@@ -104,6 +105,24 @@ describe('armour', () => {
     await colyseus.cleanup();
     const bare = await party();
     expect(damageFactor(bare.p.room, bare.id, true)).toBe(1);
+  });
+
+  it("cuts a creature's bite by the Lodge perk and a guard's blow by the armour only", async () => {
+    const { p, id } = await party('quiltedCoat');
+    const seat = p.room.state.players.get(id)!;
+    seat.look = 'gamekeeper';
+    tiersOf(p.room).set('lodge', 3);
+    const body = bodyOf(p.room, id)!;
+    const row = balance.body.damage.strike!;
+    const taken = (hit: { source: string; cause?: 'creature' }): number => {
+      body.hp = body.maxHp;
+      hurt(p.room, id, row, hit);
+      return body.maxHp - body.hp;
+    };
+    expect(taken({ source: 'guard' })).toBe(Math.round(row.dmg * tier('body', 'quiltedCoat')));
+    expect(taken({ source: 'wolf', cause: 'creature' })).toBe(
+      Math.round(row.dmg * Math.max(balance.armor.cap, tier('body', 'quiltedCoat') * 0.8)),
+    );
   });
 
   it('keeps no Knife in the damage table that armour reads (the Knife kills outright, A89)', () => {
