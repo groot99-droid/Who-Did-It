@@ -3960,3 +3960,8 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
 - 2026-10-29: the playtest gate opened when A13b merged (4a8e70f). 6Z merged the base into `claude/r10-tier-800k`
   (08ddb21) and started 11A on `claude/r11-a-pipeline` and 11B on `claude/r11-b-look`. Each has the other's session
   id.
+- 2026-10-30: 11A's `pipeline.md` merged (#346), and 11B's `look.md` followed (#347). Two rulings: the code-drawn
+  creatures, nodes and givers move into the rig last (11A's P9 over 11B's draft of Q10), and Meshy models may serve
+  props, furniture and machinery once the owner confirms the licence, never figures or creatures. 6Z merged their
+  questions into `docs/round11/questions.md` (22, from 25: three were asked by both) and sent the owner a form
+  that saves the answers.
