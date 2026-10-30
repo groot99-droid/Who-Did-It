@@ -1213,7 +1213,7 @@ Session 7G, round 7 (DECISIONS A111). The owner's admin page (14.23) wears the t
 
 ### 14.29 Vendettas (7H)
 
-Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`, 7F renders it) reads `Private.vendetta` (GDD 3.20): a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
+Lines are in `apps/client/src/ui/copy/vendettas.ts` (`VENDETTA_COPY`, `vendettaGoal(id)`). The role card (`ui/RoleCard.ts`; drawn since round 10, 10Y, A354, 14.51.2) reads `Private.vendetta` (GDD 3.20) through the world feed's `vendetta()`: a Killer's own vendetta id, or for the Accomplice the ids of the Killers it knows, joined by commas. An empty value shows no line. No other seat's card, no world label and no toast names a vendetta; the doubted Vicar's note is its own.
 
 | Key                        | Text                                                         |
 | -------------------------- | ------------------------------------------------------------ |
@@ -1937,3 +1937,19 @@ find their row, then call it by ability id), a disc and, later, a card button; a
 (`setAbilitiesEnabled`). Run and Sneak stay as they are until the owner answers Q-C3. `e2e/touch.spec.ts` checks
 the discs and their fit at 390 x 844 (`docs/ui/touch-390w.png`); `TouchControls.test.ts` the discs of the mock
 net's card (Q and R, no F for the hold) and of a card with three active abilities.
+
+#### 14.51.2 The vendetta on the card (y7)
+
+Round 10's role-card audit found that the vendetta lines of 14.29 reached no screen: the role card never read
+`Private.vendetta`, so a Killer never saw its vendetta and the Accomplice never saw its Killer's
+(`docs/round10/rolecards.md` 1.2 A4; DECISIONS A354). The world feed (`net/world.ts`) now has `vendetta()`, the own
+private view's value and nothing else (Colyseus and the mock, whose Killer holds `bandit`); `scenes/RoleReveal.ts`
+hands it to the card, which reads it at mount and twice a second after, as it does the cover picks, since the
+private view can land after the `roleReveal` message. `vendettaLines(value, holder)` in `ui/RoleCard.ts` turns the
+value into lines: a card that holds the Knife reads its own goal under the `vendetta.label` ("Vendetta: Bandit:
+crack the manor's strongbox after dark, alone."); any other card (the Accomplice) reads `vendetta.mate` per Killer
+("Your Killer's vendetta: …"); an empty value or an id with no goal line (an inherited name) draws nothing. The
+lines sit under the goal line (`card-vendetta`, `.wdi-card__vendetta`). No copy key is new, no other seat's view
+is read, and nothing changes on the wire. `RoleCard.test.ts` covers the three cases; `e2e/world.spec.ts` checks the
+mock Killer's line (the mock builds its world feed on Ready, so there the line fills once the village is up and
+Tab shows it; a real room has the private view from the join).
