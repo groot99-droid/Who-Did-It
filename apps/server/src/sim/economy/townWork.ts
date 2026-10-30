@@ -1,14 +1,14 @@
 import { balance, economy, roles } from '@wdi/content';
 import type { PartyRoom } from '../../rooms/PartyRoom';
-import { simOf } from '../RoomSim';
 import { owesFare } from './fare';
 
 /**
  * What breaks when I'm gone (round 10, C3; GDD 3.23, docs/round9/round10-plan.md 5). Each card's `roles.json`
  * `townWork` names the town work its look does. The work follows the seat's public look (`Player.look`), never its
  * card or the drawn avatar, so a death never reveals a cover and an impersonation never moves it (seams.md row 15):
- * - a look is **gone** when a seat wore it at the deal and no living, placed seat wears it now (a seat on the line is
- *   dead). A look no seat wears keeps its work running, so an undealt card's stall stays full;
+ * - a look is **gone** when a seat wore it at the deal and no wearer is shown alive on the roster (`Player.alive`,
+ *   which a death flips only at the next meeting, A30), so a stall or an altar never reveals a kill before the
+ *   meeting. A look no seat wears keeps its work running, so an undealt card's stall stays full;
  * - a look is **thin** while a seat wearing it owes the line (`fare.ts`);
  * - else it is **at work**.
  * A `stall` look's shop (`economy.json` `owner`) sells each item from a day's stock: `townWork.stallStock` at work,
@@ -20,7 +20,6 @@ export type WorkState = 'work' | 'thin' | 'gone';
 
 /** How `look`'s town work runs now. */
 export function workOf(room: PartyRoom, look: string): WorkState {
-  const sim = simOf(room);
   let worn = false;
   let living = false;
   let owes = false;
@@ -28,8 +27,7 @@ export function workOf(room: PartyRoom, look: string): WorkState {
     if (player.look !== look) continue;
     worn = true;
     owes ||= owesFare(room, seat);
-    const p = sim.players.get(seat);
-    if (p && !p.dead && p.placed) living = true;
+    if (player.alive) living = true;
   }
   if (!worn) return 'work';
   if (!living) return 'gone';
