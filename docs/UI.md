@@ -2068,21 +2068,19 @@ line, the book and the bells at 390 x 844 and 1280 x 720 (`docs/ui/line-*.png`),
 
 ### 14.54 The evidence verbs (10V, round 10)
 
-The copy for V1a's Inspect and Plant Clue (GDD 3.4). The client lines are 10Y's to place; the server sends only the
-refusal reasons of 14.43 and `clueFound`.
+The copy proposed for V1a's Inspect and Plant Clue (GDD 3.4). The server sends only the refusal reasons of 14.43 and
+`clueFound`. 10Y adds the keys and writes these lines into a table here as it places them, since a table row names a
+key the client holds (A414's deck test):
 
-| Id | Copy |
-|---|---|
-| `verb.inspect` | Inspect |
-| `verb.inspect.prompt` | Inspect with a Lens ({n} left) |
-| `verb.inspect.done.verified` | Verified: this clue is true. |
-| `verb.inspect.done.forged` | Forged: someone planted this. An Accomplice is in play. |
-| `verb.plant` | Plant Clue |
-| `verb.plant.pick` | Plant what? |
-| `verb.plant.footprints` | Footprints: {height} stride |
-| `verb.plant.thread` | Thread: {scarf} wool |
-| `verb.plant.done` | Planted. It looks like any other clue. |
-| `card.lens` | Lenses: {n} of {max}. One comes back each dawn. |
+- `verb.inspect`: "Inspect"; `verb.inspect.prompt`: "Inspect with a Lens ({n} left)".
+- `verb.inspect.done.verified`: "Verified: this clue is true."
+- `verb.inspect.done.forged`: "Forged: someone planted this. An Accomplice is in play."
+- `verb.plant`: "Plant Clue"; `verb.plant.pick`: "Plant what?"
+- `verb.plant.footprints`: "Footprints: {height} stride"; `verb.plant.thread`: "Thread: {scarf} wool" (a thread is
+  laid only beside a door).
+- `verb.plant.done`: "Planted. It looks like any other clue."
+- `card.lens`: "Lenses: {n} of {max}. One comes back each day."
 
 A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
-a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`.
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
+away from a door `TOO_FAR {of: 'door'}`.
