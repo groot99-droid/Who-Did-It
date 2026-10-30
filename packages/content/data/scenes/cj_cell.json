@@ -28,7 +28,10 @@
     { "id": "cj.window", "kind": "dressing", "x": 5, "y": 0 },
     { "id": "cj.bench", "kind": "dressing", "x": 11, "y": 3 },
     { "id": "cj.stool", "kind": "dressing", "x": 0, "y": 4 },
-    { "id": "cj.lamp", "kind": "lamp", "x": 11, "y": 1 }
+    { "id": "cj.lamp", "kind": "lamp", "x": 11, "y": 1 },
+    { "id": "cj.barbell", "kind": "dressing", "x": 10, "y": 4 },
+    { "id": "cj.sparring_post", "kind": "dressing", "x": 10, "y": 6 },
+    { "id": "cj.scrub_pail", "kind": "dressing", "x": 1, "y": 6 }
   ],
   "gates": [],
   "paths": [],
