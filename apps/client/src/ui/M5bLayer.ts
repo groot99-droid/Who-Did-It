@@ -316,7 +316,7 @@ class Layer implements M5bLayer {
   /** `?minigame=<kind>`: opens that kind's board at once and judges the answer in place (a demo and test hook). */
   private devMinigame(): void {
     const kind = new URLSearchParams(location.search).get('minigame') as MinigameKind | null;
-    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap'].includes(kind)) return;
+    if (!kind || !['crates', 'pour', 'slide', 'stoke', 'tap', 'lockpick'].includes(kind)) return;
     const board = devBoard(kind);
     const verdict = (taskId: string, answer: unknown) => {
       const ok = checkMinigame(board.puzzle, answer);

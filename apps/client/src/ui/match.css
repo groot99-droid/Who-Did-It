@@ -527,14 +527,85 @@
   gap: 0.25rem;
 }
 
+/* Round 10 (10Y, y3): the bottom band (UI.md 14.44). The key row, the hotbar and the body panel stack bottom-left so
+   none covers another or the toasts: keys (36px) at the bottom, the hotbar (3rem) over it, the body panel over that.
+   On touch the stick (128px) holds the corner and the cluster (80 + 64 + 64 and two gaps, 232px) the right, so the
+   keys go two by two beside the cluster, the hotbar and the body panel start above it, and the toasts above them. */
+.wdi-m5b .wdi-m5b__keys {
+  flex-wrap: wrap;
+  max-width: calc(100% - 2 * var(--wdi-space-3));
+}
+
 .wdi-m5b .wdi-hotbar {
-  position: fixed;
-  left: 50%;
-  bottom: 0.5rem;
+  position: absolute;
+  left: var(--wdi-space-3);
+  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2));
   display: flex;
   gap: 0.25rem;
-  transform: translateX(-50%);
   pointer-events: auto;
+}
+
+.wdi-m5b ~ .wdi-hud .wdi-body {
+  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2) + 3rem + var(--wdi-space-2));
+}
+
+/* The prompt (centred) clears the key row; the toasts (centred) start above the band, so a stack of them never
+   reaches the hotbar or the body panel at any width. */
+.wdi-m5b .wdi-m5b__prompt {
+  bottom: calc(var(--wdi-space-3) + 36px + var(--wdi-space-2));
+}
+
+/* The shops' layer (8C) is a second `.wdi-m5b` after this one, so its counter prompt would paint over an open board. */
+.wdi-m5b:has(> .wdi-m5b__modal) ~ .wdi-m5b .wdi-m5b__prompt {
+  visibility: hidden;
+}
+
+.wdi-m5b ~ .wdi-hud > .wdi-toasts {
+  bottom: calc(
+    var(--wdi-space-3) + 36px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2)
+  );
+}
+
+.wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__keys {
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  bottom: calc(var(--wdi-space-3) + 128px + var(--wdi-space-2) + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: var(--wdi-space-1);
+}
+
+.wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__key {
+  padding-inline: var(--wdi-space-2);
+}
+
+.wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__key kbd {
+  display: none;
+}
+
+.wdi-m5b:has(~ .wdi-hud-touch) .wdi-hotbar {
+  left: calc(var(--wdi-space-3) + env(safe-area-inset-left));
+  bottom: calc(var(--wdi-space-3) + 232px + var(--wdi-space-2) + env(safe-area-inset-bottom));
+}
+
+.wdi-m5b ~ .wdi-hud:has(~ .wdi-hud-touch) .wdi-body {
+  bottom: calc(
+    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + env(safe-area-inset-bottom)
+  );
+}
+
+/* The body panel is two bars (about 60px); the prompt (about 48px) sits above it and the toasts above the prompt. */
+.wdi-m5b:has(~ .wdi-hud-touch) .wdi-m5b__prompt {
+  bottom: calc(
+    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2) +
+      env(safe-area-inset-bottom)
+  );
+}
+
+.wdi-m5b ~ .wdi-hud:has(~ .wdi-hud-touch) > .wdi-toasts {
+  bottom: calc(
+    var(--wdi-space-3) + 232px + var(--wdi-space-2) + 3rem + var(--wdi-space-2) + 60px + var(--wdi-space-2) +
+      48px + var(--wdi-space-2) + env(safe-area-inset-bottom)
+  );
 }
 
 .wdi-m5b .wdi-hotbar kbd {
