@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { handleHold } from '../Hold';
 import { count } from '../Inventory';
 import { simOf } from '../RoomSim';
+import { owesFare } from '../economy/fare';
 import { handleSell } from '../economy/shops';
 import { interactReady } from '../interact/resolve';
 import { sceneIndex } from '../World';
@@ -41,6 +42,7 @@ export function workable(room: PartyRoom, player: PlayerState, st: Station): boo
   const hold = holdOf(st);
   if (hold === 'interact') return interactReady(room, player, st.scene, st.propId);
   if (hold === 'shop') return sellables(player, st.propId).length > 0;
+  if (hold === 'errand') return owesFare(room, player.id); // round 10, C2b: the Clerk's books, only while owing
   return true;
 }
 
