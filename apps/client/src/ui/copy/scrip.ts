@@ -11,6 +11,8 @@ export const SCRIP_COPY = {
   'shop.sell': 'Sell',
   'shop.have': 'You have {n}',
   'shop.short': 'Not enough Scrip',
+  'shop.left': '{n} left today',
+  'shop.soldOut': 'Sold out',
   'shop.purse': 'Your purse: {n} Scrip',
   'shop.close': 'Close',
   'prompt.coins': 'Hold E: pick up the coins',
