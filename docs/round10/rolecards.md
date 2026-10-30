@@ -1,12 +1,12 @@
-# Round 10 (10R): the role cards and the Daybook
+# Round 10 (10R): the role cards and the Satchel
 
 **Status.** Design only (2026-10-30). This document and the mock in [`samples/rolecards/`](samples/rolecards/index.html)
 change no code, no rule and no number. `GDD.md`, `UI.md` and `DECISIONS.md` are not edited here; the build edits them
 once the owner approves. Every number the card shows is a token read from `packages/content/data` at run time ("data
 wins, card generated", A168), so no number is written in this document's copy either.
 
-**Owner review.** Section 10 lists the questions. Each one has a proposed default, and a question left unanswered takes
-its default, marked _proposed_.
+**Owner review.** The owner answered on 2026-10-30. Section 12 records the answers and what each one changes; it wins
+over any earlier section that disagrees. The build (section 9) is 10R's, in round 10.
 
 ## 0. The brief
 
@@ -75,9 +75,9 @@ answers shape this design:
 
 - "Paper = what you hold". The owner chose it on 2026-10-23 (A168). A110 then moved the card to glass, and the owner's
   final word was to leave A110 alone for now, "I didn't like the paper style from before so I'll probably create a new
-  one if want to go back". The questionnaire style is that new paper. The card and the Daybook are what a player holds,
+  one if want to go back". The questionnaire style is that new paper. The card and the Satchel are what a player holds,
   so they take it, and the world's HUD stays glass.
-- "Pixel on menus, not in matches". The card and the Daybook use no pixel face. Today's card sets the role name and
+- "Pixel on menus, not in matches". The card and the Satchel use no pixel face. Today's card sets the role name and
   the faction word in Press Start 2P (`ui/match.css:39`, `:51`); both go.
 
 ## 1. The audit
@@ -149,7 +149,7 @@ The trifold is one sheet folded in three, like a pamphlet. Each panel answers on
 | --- | --- | --- | --- |
 | **1. Who** | Who am I here? | the faction stripe and frame; the role name; the portrait slot (`portrait_<look>`, UI.md 13 until the art lands); the look the town sees, with your traits and the line "traits come with your seat, every clue you leave shows them"; the lore (two sentences); for a cover role, the cover picker; your Cabal mates; the deck, public, with one line on what each card does | `roleReveal`, `Private.coverLook`, `mateLooks`, `roles.json` (public content) |
 | **2. Win** | How do I win and lose? | the goal in one line; the win routes, numbered; for a Killer, the vendetta and its steps; for the Accomplice, its Killer's vendetta; "You lose when"; Beware, at most four short lines; "How to play it", at most three tips | `roles.json` (the new fields of 4), `Private.vendetta` |
-| **3. Do** | What can I press? | "Your card": each ability with its key and touch control, one plain line, and pills for when (after dark), how long it rests, the hold it takes, its uses a match, what it costs and what it needs; a passive shows "Always on", never a key. "Your kit": each item, Bound or not, and how it is used. "Everyone can": every universal verb. "Screens": card, Daybook and its tabs, Esc. Reopened in play, a row shows its live cooldown and charges (`Private.cooldownEndTick`, `lensCharges`) | the action table (3), `abilities.json`, `items.json`, `Private` |
+| **3. Do** | What can I press? | "Your card": each ability with its key and touch control, one plain line, and pills for when (after dark), how long it rests, the hold it takes, its uses a match, what it costs and what it needs; a passive shows "Always on", never a key. "Your kit": each item, Bound or not, and how it is used. "Everyone can": every universal verb. "Screens": card, Satchel and its tabs, Esc. Reopened in play, a row shows its live cooldown and charges (`Private.cooldownEndTick`, `lensCharges`) | the action table (3), `abilities.json`, `items.json`, `Private` |
 
 Panel 1 holds no rule, panel 2 no control, panel 3 no lore. A player in a hurry reads panel 3 alone. The copy of every
 line is in section 4.
@@ -231,7 +231,7 @@ The build moves every one of them into the table.
 
 **One source, three readers.**
 
-1. **The input code** binds by action id: `input.bindAction('daybook.chores', handler)`. `InputController.bind(code)`
+1. **The input code** binds by action id: `input.bindAction('satchel.chores', handler)`. `InputController.bind(code)`
    becomes private, so a key can only be bound through a row.
 2. **The touch HUD** builds its discs and buttons from the rows that have a `touch` control.
 3. **The card's panel 3** draws its rows, keycaps and touch labels from the same rows.
@@ -255,12 +255,12 @@ sends anything. The server still refuses with A1's reasons.
 | `strike` | Strike | X | the Strike disc | in the world | Fists: knocks out, never kills (GDD 3.22). |
 | `hotbar.1` to `hotbar.6` | Hold an item | 1 to 6 | tap a hotbar slot | in the world | Picks the held item (`inv.select`). Use acts with it. |
 | `card` | Role card | Tab | tap the card chip | always | Opens and closes the trifold. |
-| `daybook` | Daybook | I | the Daybook button | always | Opens and closes the Daybook on its last tab. |
-| `daybook.pockets` | Pockets | I | the Pockets tab | always | Opens the Daybook at Pockets. |
-| `daybook.craft` | Craft | C | the Pockets tab | always | Opens it at Pockets, focused on the crafting square. |
-| `daybook.chores` | Chores | K | the Chores tab | always | Opens it at Chores. |
-| `daybook.quests` | Quests | J | the Quests tab | always | Opens it at Quests. |
-| `daybook.notebook` | Notebook | N | the Notebook tab | always | Opens it at the Notebook. |
+| `satchel` | Satchel | I | the Satchel button | always | Opens and closes the Satchel on its last tab. |
+| `satchel.pockets` | Pockets | I | the Pockets tab | always | Opens the Satchel at Pockets. |
+| `satchel.craft` | Craft | C | the Pockets tab | always | Opens it at Pockets, focused on the crafting square. |
+| `satchel.chores` | Chores | K | the Chores tab | always | Opens it at Chores. |
+| `satchel.quests` | Quests | J | the Quests tab | always | Opens it at Quests. |
+| `satchel.notebook` | Notebook | N | the Notebook tab | always | Opens it at the Notebook. |
 | `talk` | Ask for work | T | Use, at a giver | at a giver | Opens the giver's quests. |
 | `close` | Close | Esc | the screen's Close button | a screen is open | Closes the topmost screen. During an opening cutscene it skips (today's behaviour). |
 | `minigame.*` | the mini-game's own keys | arrows, Space, Enter | the board's own controls | a mini-game is open | Owned by each board (`view/minigames/*`). Listed so the card can name them. The table checks that none of them collides with a world key while a board is open. |
@@ -570,10 +570,10 @@ count, and the guards count only toward the pillars. R3 registers the token besi
 as a token filled at run time, and its check refuses the row until C5 adds the key, so it cannot ship early. The mock has a Mode select: world mode (the default), Paint The Town Red (the Killer only) and
 today's main mode. It shows a key that is not in the data yet as its name in brackets.
 
-## 5. The Daybook
+## 5. The Satchel
 
-The name is _proposed_ (Q-D1). A daybook is the period's ledger of the day's business, and it does not collide with
-the Butler's Ledger, the Clerk's ledger or the Notebook it contains.
+The owner named it the Satchel (Q-D1, 2026-10-30): the bag a player carries, holding what they own and the papers of
+their day.
 
 ### 5.1 What moves in
 
@@ -586,7 +586,7 @@ the Butler's Ledger, the Clerk's ledger or the Notebook it contains.
 | The Notebook sheet (`view/NotebookPanel.ts`, N) and its HUD button | the Notebook tab, with the contract note and its Accept button (`vendettas.ts`) |
 | The purse detail, the bank balance, rent due, the line's fare, Faith, Indebted | the Purse tab (new; the numbers are already private: `purse`, `bank`, `fare`, `faith`) |
 | The body's detail (health and stamina in numbers, each effect with its cure), your home (`Private.home`), your seat's public face | the You tab (new) |
-| The four HUD key buttons (Pockets, Craft, Quests, Chores) | one Daybook button |
+| The four HUD key buttons (Pockets, Craft, Quests, Chores) | one Satchel button |
 | The HUD deck chip (`main/deckChip.ts`) | panel 1 of the card |
 
 ### 5.2 What stays on the HUD
@@ -602,7 +602,7 @@ These are the things a player needs at a glance or with a thumb:
 - the toasts and the log;
 - the edge cues;
 - the settings gear;
-- the Daybook button.
+- the Satchel button.
 
 The work bar leaves the HUD. A toast says when it passes each quarter (_proposed_, Q-D3).
 
@@ -614,25 +614,25 @@ The work bar leaves the HUD. A toast says when it passes each quarter (_proposed
 | Chores | K | the village's work bar (public); your list with what to fetch, where from and where to, the next step marked, night-only chores marked. A Cabal or neutral seat sees "A show of work", as today. |
 | Quests | J | the quests you hold, the count of the most you can hold (`quests.maxActive`), each one's wants, progress and pay; the nearby givers' offers when one is in reach. |
 | Notebook | N | entries with their status pills (claimed, verified, corroborated, forged), the contract note. Filters: clues, alibis, night powers. |
-| Purse | — | on you, in the bank, Faith; what you owe (rent and when it is due, the line's fare) and what owing does (the halved pay, the dear stall); a dot on the tab and the Daybook button while something is owed. |
+| Purse | — | on you, in the bank, Faith; what you owe (rent and when it is due, the line's fare) and what owing does (the halved pay, the dear stall); a dot on the tab and the Satchel button while something is owed. |
 | You | — | health and stamina in numbers, each effect and its cure, your home, what everyone sees of you. |
 
-- **Desktop.** I opens the Daybook on its last tab. K, J, N and C open it at their tab, and the same key on an open tab
+- **Desktop.** I opens the Satchel on its last tab. K, J, N and C open it at their tab, and the same key on an open tab
   closes it. The arrow keys move between tabs. Esc closes.
-- **Phone.** The Daybook button at the top right opens it. The tabs sit along the bottom, under the thumb.
+- **Phone.** The Satchel button at the top right opens it. The tabs sit along the bottom, under the thumb.
 
 ### 5.4 How it behaves in play
 
 - **The world runs on.** A match is shared, so no screen of one seat pauses it. That includes story mode, which the
   server runs too (Q-D2).
 - **You can be attacked.**
-  - Desktop: the Daybook is a side sheet on the right, about 620 px wide, and the world stays visible on the left. It
+  - Desktop: the Satchel is a side sheet on the right, about 620 px wide, and the world stays visible on the left. It
     is non-modal: the movement keys still move you, and only its own keys are taken.
   - Phone: it fills the screen and covers the stick, so you stand still.
   - Both: the edge cues (a scream, a door) still draw over it, and a hit closes it (_proposed_, Q-D4). The client sees
     its own health drop in `Private.body`, so no new field is needed.
 - **The card** follows the same rule: a hit closes it in play, but never at the reveal, when nobody can be hit.
-- **Asleep, knocked out or on the line.** The Daybook closes and its button greys, as today's panels do when the World
+- **Asleep, knocked out or on the line.** The Satchel closes and its button greys, as today's panels do when the World
   sleeps (`M5bLayer.setAsleep`).
 - **A ghost** keeps the Notebook and Chores tabs (it finishes its own chores, GDD 3.7) and loses Pockets and Purse.
 
@@ -640,7 +640,7 @@ The work bar leaves the HUD. A toast says when it passes each quarter (_proposed
 
 ### 6.1 Mapping the questionnaire onto the game
 
-The card and the Daybook are paper: what you hold (2). The HUD and the world stay on the night glass of A110 and 7B.
+The card and the Satchel are paper: what you hold (2). The HUD and the world stay on the night glass of A110 and 7B.
 
 | Questionnaire | In the game | Why |
 | --- | --- | --- |
@@ -653,7 +653,7 @@ The card and the Daybook are paper: what you hold (2). The HUD and the world sta
 | mustard text #8C600A | `dossier.mustardText` | Eyebrows and numbers on light paper |
 | moss, blood | `dossier.moss` and `dossier.brick` (renamed) | Status only: done and forged. "Blood" is a faction word in this game, so the questionnaire's blood is renamed brick, and it never colours a faction |
 | focus #2D5FA8 (dark #8DB4F0) | `dossier.focus` light; `--wdi-moon` on dark paper | The game's double ring (ink and mustard) fails on light paper (mustard on card is 1.80). Moon passes on dark paper (4.78). |
-| Alegreya SC, Alegreya Sans, IBM Plex Mono | the card and the Daybook only | 6.2 |
+| Alegreya SC, Alegreya Sans, IBM Plex Mono | the card and the Satchel only | 6.2 |
 | section heads under a 2 px ink rule, 1 px rule cards, 8 px corners, mono chips, outlined pills, Proposed wells, the sticky bar and meter, 6 px buttons | `.wdi-dossier` components in a new `ui/theme/dossier.css` | The game's `components.css` stays as it is |
 
 **What does not change.**
@@ -663,7 +663,7 @@ The card and the Daybook are paper: what you hold (2). The HUD and the world sta
 - **UI.md 7's frames.** The trifold is framed by them: a 2 px ink outer rule, the faction rule inside it and the corner
   motif. On light paper the motif is drawn in ink, because moon (2.27) and mustard (1.80) fall under 3:1 on the card
   colour. The frames still differ by shape, which is what UI.md 7 asks.
-- **The faction stays on the card.** It never reaches the HUD chip, the Daybook or a roster (UI.md 1.6). The mock's
+- **The faction stays on the card.** It never reaches the HUD chip, the Satchel or a roster (UI.md 1.6). The mock's
   chip says "Your card", never the faction or the role.
 - **The three art styles** (8-bit, Low poly, HD) change the world behind the card, never the card. The card is the
   same DOM in all three, and the portrait slot shows the look's portrait, which is one per look, not per style. On
@@ -691,7 +691,7 @@ The card and the Daybook are paper: what you hold (2). The HUD and the world sta
 - **The mock** reads them from Google Fonts, as the brief allows. The game never does.
 
 **What the mock simplifies.** It draws the phone card without the 4 px faction edge of 2.3, has no 1600 px cap, uses
-sample private state for the Daybook (marked in its source), and stands a gradient in for the world.
+sample private state for the Satchel (marked in its source), and stands a gradient in for the world.
 
 ### 6.3 Contrast (measured, WCAG 2 relative luminance)
 
@@ -712,11 +712,11 @@ sample private state for the Daybook (marked in its source), and stands a gradie
 
 ## 7. Role secrecy
 
-- **Private only.** The card and the Daybook draw from the seat's own `roleReveal` and `Private` view and from public
+- **Private only.** The card and the Satchel draw from the seat's own `roleReveal` and `Private` view and from public
   content. They are mounted in the overlay only for the seat they belong to, and they are never written to storage, the
   console or the network, as `RoleCard.ts` promises today.
 - **A cover-wearer's card is theirs alone.** Panel 1 shows its true card and the look it walks in (`Private.coverLook`).
-  Cabal mates' picks come from `mateLooks`, as today. Nothing on the HUD, the Daybook or any shared screen names a card,
+  Cabal mates' picks come from `mateLooks`, as today. Nothing on the HUD, the Satchel or any shared screen names a card,
   a faction or a cover. The HUD chip shows the goal, as today, and is the seat's own screen.
 - **Listing other roles.** Panel 1 lists the deck and what each card does. GDD 3.1 makes the deck public by design:
   "the deck list itself is public, in the lobby, on the role card and in the HUD". In world mode the whole roster is
@@ -743,7 +743,7 @@ sample private state for the Daybook (marked in its source), and stands a gradie
 - **Reduced motion.** No unfold, no rise, no slide, no smooth scroll. The panels swap and the sheets appear in place.
   The reveal meter still drains, because it is status (UI.md 9).
 - **Keyboard.**
-  - Inside the card and the Daybook, Tab moves focus, Esc closes, and the arrow keys turn panels and tabs.
+  - Inside the card and the Satchel, Tab moves focus, Esc closes, and the arrow keys turn panels and tabs.
   - On the world, Tab opens the card (2.4).
   - Focus goes to Ready at the reveal and to the panel heading when the card is reopened. It returns to the chip when
     the card closes.
@@ -753,13 +753,13 @@ sample private state for the Daybook (marked in its source), and stands a gradie
   - A keycap reads "Key Q", and a touch label reads as its words.
   - The reveal's time left is announced once at the start and once five seconds before the end, never every second
     (`aria-live="polite"`).
-  - The Daybook's tabs are a `tablist` with a `tabpanel`, and each status pill says its word (verified, forged), never
+  - The Satchel's tabs are a `tablist` with a `tabpanel`, and each status pill says its word (verified, forged), never
     colour alone.
 - **Frame rate on the test Android** (the 2022 mid-range phone of ROADMAP M5a, at its target there).
   - The paper is opaque. It has no backdrop blur, which is the costliest thing glass does, so the card is cheaper to
     draw than today's.
   - Scroll snap runs on the compositor, and the unfold is two transforms.
-  - While the card or the Daybook covers the whole screen on a phone, the World scene can stop drawing the canvas.
+  - While the card or the Satchel covers the whole screen on a phone, the World scene can stop drawing the canvas.
     The camera turns invisible, and the simulation and the network keep running. The build measures that with the FPS
     overlay before and after, and keeps it only if it helps.
   - The mock weighs about 130 KiB, including the content it embeds.
@@ -775,9 +775,12 @@ what each one touches that a live session owns or uses (`seams.md` 4); 6Z sequen
 | **R2. The paper** | the `dossier` palette set, `ui/theme/dossier.css`, the three faces, `style.json` `ui.fonts`, `CREDITS.md`, `LICENSES/fonts/`, UI.md 2, 3 and 10, ASSETS' font line, one `DECISIONS.md` row | `packages/content/data/palette.json`, `style.json`, `apps/client/src/ui/theme/**`, `apps/client/src/assets/fonts/**` | `theme.test.ts` (the new pairs and families) | 10Y; the content's canonical layout (`pnpm --filter @wdi/content format`) |
 | **R3. The card copy** | `roles.json` `lore`, `wins`, `loses`, `tips`, `beware` as lines, `abilities.json` `line`; the schema; the token check over the new fields; UI.md 14 (a reserved subsection from 6Z); GDD 3.2 says the card shows them | `packages/content/data/roles.json`, `abilities.json`, `packages/content/src/schemas/*`, `cardText.ts` | the content tests; a drift test: every `wins` row's `ships` names a merged step | 10C (`roles.json` `townWork`, C3; C4 `roles.json`); 10H (`abilities.json` clocks): JSON merges keep both sides' keys (`seams.md` 1) |
 | **R4. The trifold** | `ui/RoleCard.ts` rewritten as `ui/card/*` (three panels, the phone strip, the reveal meter, Ready, open and close, the hit close), `match.css` card rules removed, UI.md 7 rewritten, GDD 2 step 4 | `apps/client/src/ui/card/**`, `ui/RoleCard.ts`, `ui/match.css`, `ui/main/deckChip.ts` | `RoleCard.test.ts` rewritten; e2e at 1280 and 390 for one card of each faction; the cover picker's tests kept | 10Y; 10E's chapter cards (E2) share the reveal slot |
-| **R5. The Daybook** | `ui/daybook/*`: the shell, the six tabs, the Purse and You tabs; Inventory, Crafting, Chores, QuestLog and NotebookPanel mounted inside it; the HUD button and the four key buttons removed; UI.md 6 and 14 | `apps/client/src/ui/daybook/**`, `ui/M5bLayer.ts`, `view/Hud.ts`, `view/NotebookPanel.ts` | DOM tests per tab against the mock net; e2e opening every tab by key and by tap | 10H's Inventory and Crafting (A13 merged); 10C's fare (C2) and 10D's rent (D7) for the Purse tab's lines; 10Y |
+| **R5. The Satchel** | `ui/satchel/*`: the shell, the six tabs, the Purse and You tabs; Inventory, Crafting, Chores, QuestLog and NotebookPanel mounted inside it; the HUD button and the four key buttons removed; UI.md 6 and 14 | `apps/client/src/ui/satchel/**`, `ui/M5bLayer.ts`, `view/Hud.ts`, `view/NotebookPanel.ts` | DOM tests per tab against the mock net; e2e opening every tab by key and by tap | 10H's Inventory and Crafting (A13 merged); 10C's fare (C2) and 10D's rent (D7) for the Purse tab's lines; 10Y |
 
-R1 and R2 have no dependency between them. R3 goes after both and after B6, then R4, then R5. R3 writes only the
+| **R6. The protocol tidy-up** (Q-B4) | `RoleRevealAbility.key` leaves the wire. The server stops writing it, and the client already gives slots from the action table (R1) | `packages/shared/src/protocol/index.ts`, `rooms/handlers/lobby.ts` `buildRoleReveal`, `PROTOCOL.md` (`pnpm docs:protocol`) | the lobby handler's reveal test; the client's card tests with no `key` in the fixture | a `seams.md` 3 row from 6Z before it is built; any open PR on `lobby.ts` |
+
+R1 and R2 have no dependency between them, and both start at once. R3 goes after both and after B6c, then R4, then R5,
+and R6 after R1. R3 writes only the
 world-mode and Paint The Town Red rows, so no main-mode row is ever built and then dropped. R4 and R5 each fit under 400 lines
 only by moving the existing panels as they are: their restyle is CSS in R2's file.
 
@@ -794,15 +797,15 @@ No desktop key changes letter. What moves is what a key opens, and the phone's c
 
 | Key or control | Today | After | PR |
 | --- | --- | --- | --- |
-| I | the Pockets panel | the Daybook, at Pockets | R5 |
-| C | the Crafting panel | the Daybook, at Pockets, with the crafting square focused | R5 |
-| J | the Quests panel | the Daybook, at Quests | R5 |
-| K | the Chores panel | the Daybook, at Chores | R5 |
-| N | the Notebook sheet | the Daybook, at the Notebook | R5 |
-| T | the Quests panel, at a giver | the Daybook, at Quests (with the giver's offers) | R5 |
+| I | the Pockets panel | the Satchel, at Pockets | R5 |
+| C | the Crafting panel | the Satchel, at Pockets, with the crafting square focused | R5 |
+| J | the Quests panel | the Satchel, at Quests | R5 |
+| K | the Chores panel | the Satchel, at Chores | R5 |
+| N | the Notebook sheet | the Satchel, at the Notebook | R5 |
+| T | the Quests panel, at a giver | the Satchel, at Quests (with the giver's offers) | R5 |
 | Tab | toggles the card everywhere, even inside it (A10) | toggles the card only when the world has focus; inside the card it moves focus | R4 |
 | Q, R, F | fire an active ability only; positional keys, so a passive shows a dead key (A1, A2) | active, hold or seat-list abilities by slot; passives get none | R1 |
-| HUD Notebook button, and the Pockets, Craft, Quests and Chores buttons | five buttons | one Daybook button | R5 |
+| HUD Notebook button, and the Pockets, Craft, Quests and Chores buttons | five buttons | one Satchel button | R5 |
 | Phone: the Act (Q) disc | Q only | one disc per slot ability, named (A3) | R1 |
 | Phone: the Run and Sneak discs | two discs | run at the stick's rim; a Sneak toggle under the stick (Q-C3) | R1 |
 | Phone: the card | the "Role card" chip button | the card chip ("Your card") | R4 |
@@ -874,12 +877,13 @@ Inspect, Autopsy, Drag body and the Crowbar become "hold Q, R or F at the target
   for the slots.
 - **Other choice:** keep both discs and add the slots, seven discs in all.
 
-### The Daybook
+### The Satchel
 
 #### Q-D1. Its name
 
 - **Proposed default:** "Daybook".
 - **Other choices:** "Satchel", "Your papers".
+- **Answer:** "Satchel".
 
 #### Q-D2. Pausing in story mode
 
@@ -891,11 +895,11 @@ Inspect, Autopsy, Drag body and the Crowbar become "hold Q, R or F at the target
 
 #### Q-D4. A hit closes it
 
-- **Proposed default:** a hit closes the Daybook and a reopened card, with a setting to turn that off.
+- **Proposed default:** a hit closes the Satchel and a reopened card, with a setting to turn that off.
 
 ### Style
 
-#### Q-E1. The new paper replaces A110's glass for the card and the Daybook
+#### Q-E1. The new paper replaces A110's glass for the card and the Satchel
 
 You said "paper = what you hold", and later that you might design a new paper style. This is that style.
 
@@ -909,7 +913,7 @@ You said "paper = what you hold", and later that you might design a new paper st
 
 Alegreya SC, Alegreya Sans and IBM Plex Mono, all OFL, self-hosted.
 
-- **Proposed default:** yes, on the card and the Daybook only. Oswald and Inter stay everywhere else.
+- **Proposed default:** yes, on the card and the Satchel only. Oswald and Inter stay everywhere else.
 
 ## 11. Ability census (follow-up, 10R, 2026-10-30)
 
@@ -968,6 +972,7 @@ The census covers every ability a shipped card shows, the kit items with a `use`
 | Sneak | movement | everyone | built: `input.move` `sneak` | Shift; phone: Sneak | universal |
 | Hide, Check, Burst Out | active / hold | everyone | **not built**: `act.hide`, `act.check` and `act.burst` are queued and ignored (`Commands.ts` default) | none | universal, shown as coming later |
 | Present a Notebook entry | active | everyone (meetings) | **not built**: `act.present` ignored. B6 retires the meeting | none | dropped with the vote |
+| The Paint The Town Red goal line | (the card's Win panel) | the two Killers, in Paint The Town Red | built: 10C's C5b (stacked on #391). Today's `ui/RoleCard.ts` shows `card.paint.goal` (`ui/copy/looks.ts`) and the target when `Private.paintTown` is true. The target comes from the shared pure rule `paintTarget(winUnique, npcSeats)`, where npcSeats is the roster less two (public, `seams.md` 3 row 18) | today's card | R1 carries it to the new card, and the Killer's Win panel shows the Paint goal and target. 4.5's `{paintTown.target}` calls `paintTarget` and never computes the target itself |
 
 **What the census adds to 1.2.**
 
@@ -998,6 +1003,12 @@ Salts stays on a key while Autopsy waits greyed.
   what is coming.
 - **Other choice:** hide planned rows, and show a card only what works.
 
+**Answer (owner, 2026-10-30): "Build the ones we were going to grey out."** There are no "Coming later" rows. A new
+session, 10V, builds the census's missing verbs in round 10, as 11.3's three pull requests. Rope comes with the V1.5
+snares, which the owner also moved into round 10. The `status` field and its test stay as the mechanism: an ability
+whose row is not `live` when the card ships stays off the card until its pull request lands and flips it. By 10Z,
+every row a card lists is live.
+
 ### 11.3 Owner question
 
 #### Q-A3. When to build the missing V1 abilities
@@ -1026,3 +1037,33 @@ evidence (prints, autopsies, forged clues) has fewer sources than its law needs.
 - **Other choices:**
   - round 10's tail, beside the card's build (10X with 6Z's grant, or a new 10-series session), which delays 10Z;
   - drop the ones that world mode no longer needs, and rewrite the cards around what exists.
+
+## 12. The owner's answers (2026-10-30)
+
+The owner's words, verbatim, through 6Z:
+
+> Q-A1: default; Q-A2: different - Round 10 will get this done; Q-A3: Round 10's tail; Q-A4: different - Build the ones
+> we were going to grey out; Q-B1: default; Q-B2: default; Q-B3: default; Q-B4: different - Tidy up; Q-C1: default;
+> Q-C2: default; Q-C3: default; Q-D1: Satchel; Q-D2: default; Q-D3: default; Q-D4: default; Q-E1: different - Design
+> those to be paper like; Q-E2: default; Q-E3: default
+
+On Q-E1, 6Z asked what "those" covers. The owner chose "Only card and Satchel": the paper covers the card and the
+Satchel, and the HUD and the world's panels stay glass. The owner also moved every gameplay feature except the Beast
+boss into round 10 (V1, V1.5 and V2's gameplay), so round 11 is Blender only.
+
+| Question | Answer | What it changes |
+| --- | --- | --- |
+| Q-A1 When to build | default | Round 10. R1 and R2 start now. R3 waits for R1, R2 and B6c (voting retires), then R4, R5, R6 (9). |
+| Q-A2 World-mode routes | "Round 10 will get this done" | The card shows each world-mode route as round 10 builds it. R3's drift test keeps that honest: a `wins` row is drawn only when its `ships` step has merged. |
+| Q-A3 The missing V1 abilities | round 10's tail | Session 10V builds them (11.3's three pull requests), with Rope after the V1.5 snares. |
+| Q-A4 Unbuilt abilities | "Build the ones we were going to grey out" | No greyed rows. An ability that is not yet live stays off the card until its pull request lands (11.2). |
+| Q-B1 to Q-B3 | default | Who · Win · Do; Ready keeps the card open; the lore of 4.3 as drafted. |
+| Q-B4 The server's ability keys | "Tidy up" | R6: `RoleRevealAbility.key` leaves the wire after R1. Its `seams.md` 3 row goes to 6Z first. |
+| Q-C1 to Q-C3 | default | Hold abilities on their slot key; named slot discs; run at the stick's rim and a Sneak toggle. |
+| Q-D1 The dashboard's name | "Satchel" | The Satchel, everywhere: this document, the mock, `ui/satchel/**`, the copy keys (`satchel.*`) and the action ids (`satchel`, `satchel.chores` and so on). |
+| Q-D2 to Q-D4 | default | No pause in any mode; the work bar moves into Chores with a toast at each quarter; a hit closes the Satchel and a reopened card, with a setting. |
+| Q-E1 The paper | paper on the card and the Satchel only | As 6.1 proposed. The HUD and the world's panels stay glass. |
+| Q-E2, Q-E3 | default | Light or dark from the device with an override; Alegreya SC, Alegreya Sans and IBM Plex Mono on the card and the Satchel. |
+
+**Rows.** 10R's copy goes in UI.md 14.53, and its DECISIONS rows start at A237 and go up by 20 (A257, A277 and so on).
+A237 records these answers.

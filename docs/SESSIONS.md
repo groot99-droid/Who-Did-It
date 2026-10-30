@@ -4494,6 +4494,8 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
 
   Q-S1 to Q-S6 went to the owner, and their defaults stand until the owner answers. Wave 2 is assigned in the briefs
   above.
+- 6Z merged #420 (`scope.md`) at 822f7e8. Section 4 of `scope.md` now opens with who builds each step, since the
+  briefs above moved six Opus steps out of the Sonnet sessions and gave world mode to 10S (A276).
 
 ## Round 11 (planning, started 2026-10-29)
 
