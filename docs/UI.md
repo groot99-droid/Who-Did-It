@@ -855,13 +855,14 @@ timber and coal camp.
 Session 5N, round 5 (DECISIONS A79, A80). The segmented control of `ui/artStyle/ArtStyleSwitch.ts` (module
 `ui/copy/artStyle.ts`). One option per shipped style of `style.json` `artStyles`, then one disabled option per reserved
 id. It is a radio group: the checked option has `aria-checked="true"` and is the only tab stop, the arrow keys move and
-select, and the buttons are at least `--wdi-touch` high. It sits in the lobby settings, in the World HUD's top right. The pick is per player and never sent. The loading veil
+select, and the buttons are at least `--wdi-touch` high. It sits in the lobby settings only (round 10, S5, A534): in a
+match the sound settings panel (14.22) names the pick read only with the line of 14.51.6. The pick is per player and never sent. The loading veil
 (`art-veil`, `role="status"`) covers the screen while textures swap; a failed swap shows `art-notice`
 (`role="alert"`) for four seconds. A style name comes from `artStyle.name.<id>`.
 
 | Id | Text | Notes |
 |---|---|---|
-| `artStyle.label` | Art style | group label; hidden visually in the compact placements |
+| `artStyle.label` | Art style | group label |
 | `artStyle.name.8bit` | 8-bit | option |
 | `artStyle.name.lowpoly` | Low poly | option |
 | `artStyle.name.hd` | HD | disabled option; `aria-describedby` the hint below |
@@ -903,7 +904,8 @@ Session 6L, round 6. The gear of `ui/SettingsPanel.ts` (module `ui/copy/settings
 `settings-slot`, in the lobby's settings block and in the World HUD's top right. A button of at least `--wdi-touch`
 opens a small paper panel with two sliders, music and sound effects (0 to 100, one tab stop each), and a mute
 checkbox; Esc closes it and returns focus to the gear. A change applies at once to the sound that is playing and is
-kept in `localStorage['wdi:audio']`; it is per player and never sent. The panel reads the same on every screen.
+kept in `localStorage['wdi:audio']`; it is per player and never sent. The panel reads the same on every screen, except
+that in a match one read-only row above the sliders names the art style and sends to the lobby (14.51.6).
 
 | Id | Text | Notes |
 |---|---|---|
@@ -2029,8 +2031,8 @@ slot lies beside the cells.
 
 - **The top rows on a phone.** The goal chip and the Notebook button own the top row (the chip takes what leaves the
   button its 44px); the clock sits in the second row at the right (`--wdi-hud-row2` is that row's top), the
-  village's work bar (14.38.3) under the clock, the art switch and the gear in one row under the bar with the gear
-  in the corner, and the log under them, since its lines come and go and it is the one row that grows. Side by side
+  village's work bar (14.38.3) under the clock, the gear in the corner under the bar (the art switch that shared its
+  row left in S5, 14.51.6), and the log under them, since its lines come and go and it is the one row that grows. Side by side
   at 56vw, the clock painted over the end of the goal line and over the Notebook button; stacked under the log, the
   switch and the gear reached a stack of three toasts, and four log lines pushed them further.
 - **The band's floor.** `--wdi-band-floor` is the bottom of the hotbar: over the key row (36px) on a desktop, over
@@ -2065,3 +2067,22 @@ line, the book and the bells at 390 x 844 and 1280 x 720 (`docs/ui/line-*.png`),
 |---|---|---|
 | the time to the bells (`line.bells`) | The bells in {time} | On the line, top band, as m:ss, in place of `line.train` when the next day is the Final Night |
 | no work held (`line.quests.none`) | You hold no work. | On the line, the quest list, when the seat holds no quest |
+
+#### 14.51.6 The art style in the menu only (S5)
+
+`docs/round9/world-mode.md` 10 and `phases.md` 10 (the owner, verbatim: "menu only"; DECISIONS A534; GDD 3.13). The
+switch of 14.18 lives in the lobby alone: the World HUD's top right keeps the settings gear and no switch, the meeting
+mounts none, and `scenes/World.ts` no longer restarts on `art-style-changed`, since nothing changes the style in a
+match. The world router locks the style on `roleReveal` (`view/artStyle.ts` `lockArtStyle`) and `requestArtStyle`
+refuses a change while the lock holds; game over, the return to the lobby and a lost connection lift it. In a match the
+sound settings panel (14.22) opens with one read-only row above the sliders: `settings.artStyle` with the pick's name
+(`artStyle.name.<id>`) beside it, and `settings.artStyle.lobby` under them. The pick stays per player, in the browser,
+never sent (A79). `e2e/artStyle.spec.ts` picks in the lobby, starts the match and finds the row and no switch;
+`view/artStyle.test.ts` and `net/worldRouter.test.ts` cover the lock.
+
+| Id | Text | Notes |
+|---|---|---|
+| `settings.artStyle` | Art style | the read-only row of the sound settings panel in a match; the pick's name beside it |
+| `settings.artStyle.lobby` | Change it in the lobby. | the line under the row |
+
+Frozen test id: `settings-art-style` (the row).
