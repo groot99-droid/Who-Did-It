@@ -205,6 +205,7 @@ export const STUDIO_COPY = {
   'studio.overview.enter': 'Open {scene}',
   'studio.overview.kind.exterior': 'World',
   'studio.overview.kind.interior': 'Room',
+  'studio.overview.kind.jail': 'Cell',
   'studio.overview.links': 'Doors as a list',
   'studio.overview.to': 'Scene that {portal} leads to',
   'studio.overview.spawn': 'Spawn that {portal} lands on',

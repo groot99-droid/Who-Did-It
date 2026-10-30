@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { systemLine } from '../economy/rumours';
 import { emitSim, onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
+import { runJail } from './Jail';
 import { runManhunt } from './Manhunt';
 import { runPetition } from './Petition';
 import { figuresOf } from '../townsfolk/figures';
@@ -111,6 +112,7 @@ export function briefingLine(p: Pick<Pending, 'sceneId' | 'kind' | 'value'>, rea
 export function runLaw(room: PartyRoom): void {
   runPetition(room); // round 10, B3: petitions
   runManhunt(room); // round 10, B4: the manhunt
+  runJail(room); // round 10, B5: the county jail
   const memory = memoryOf(room);
   if (room.state.phase === Phase.lobby) {
     memory.pending = [];

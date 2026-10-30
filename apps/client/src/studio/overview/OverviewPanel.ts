@@ -17,7 +17,7 @@ export interface OverviewDeps {
   sceneId: string;
   api: SaveApi;
   /** A card was clicked: open that scene in the World editor (exterior) or the Room editor (interior). */
-  onEnter: (sceneId: string, kind: 'exterior' | 'interior') => void;
+  onEnter: (sceneId: string, kind: 'exterior' | 'interior' | 'jail') => void;
   onClose: () => void;
 }
 
