@@ -4100,6 +4100,18 @@ Each step's files, tests and dependencies are `round10-plan.md`'s; a brief adds 
   - 10C is granted edits in `sim/Kill.ts` (the Knife on a guard, every mode), `sim/law/Guards.ts` and
     `sim/townsfolk/figures.ts` (a guard's death and return);
   - the Constables' own petitions when no human is on the town side (`world-mode.md` 1.6, 12 R3) go to 10B.
+- 2026-10-30: 10X's next steps:
+  - x6 is skipped, because the order at `Portals.ts:137` is deliberate;
+  - x7 (one patch per tick) rewrites the patch half of ARCHITECTURE 5.6, and 10Y's client pull request rewrites its
+    lerp half, so 6Z no longer rewrites 5.6;
+  - 6Z granted 10X `apps/server/test/npcHelpers.ts`, one `items.json` row and `npcTells.test.ts`;
+  - the station mini-games get a server-side bound on the reported times once 10D clears `sim/Minigames.ts`, and
+    server-timed taps wait for a later round;
+  - the hand-craft hold retires in two pull requests, 10Y's client change first.
+- 2026-10-30: 6Z published 10R's mock for the owner (https://claude.ai/artifact/UAZMrGX14mD1szMSWDx5Sj). World mode
+  replaces the main mode at B6, with no flag, so the card covers two modes: world mode and Paint The Town Red.
+- 2026-10-30: the owner answered the Herb Bread question: "6. dawn". The Herb Bread's buff lasts until the next dawn,
+  not D4a's fixed 780 s. 10X fixes it after x7.
 
 ## Round 11 (planning, started 2026-10-29)
 
@@ -4133,3 +4145,5 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
 - 2026-10-30: 11B's shadow-layer budget (`look.md` 5.3.1, #371) and 11A's `round11-plan.md` (#374) merged. 6Z sent
   the owner the plan for approval with its one question, CL3a (which way the long shadows fall), with 11A's sheet. The
   default is a sun at 25°, turned 45° from today's key.
+- 2026-10-30: the owner approved `round11-plan.md` with CL3a's default (A236, `docs/round11/owner-answers.md`). Round 11
+  builds after 10Z merges. SC2, BU4 and RN3 still wait on the owner.

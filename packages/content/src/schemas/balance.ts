@@ -462,6 +462,13 @@ export const BalanceFile = z.strictObject({
     /** C2b: an owing seat's look makes its shop ask this much more; the Clerk's errand is held this long. */
     priceMult: z.number().min(1),
     errandS: z.number().positive(),
+    /** C3: an owing look's stall stocks this much of its day's stock. */
+    stockMult: Frac,
+  }),
+  /** Round 10 (C3, GDD 3.23): a stall's day's stock of each item, one per seat and at least `stallStockMin`. */
+  townWork: Section({
+    stallStockPerSeat: z.number().positive(),
+    stallStockMin: z.number().int().nonnegative(),
   }),
   /**
    * Round 10, D6a (GDD 3.22, logic-table 8.2): armour. `tierMult` is the damage factor of an item's `armor.tier` by
