@@ -177,6 +177,7 @@ describe('the guards in Paint The Town Red (GDD 3.8)', () => {
     room.state.players.get(killers[1]!)!.priv.cooldownEndTick.set('kill', 0);
     beside(party, killers[1]!, guards[0]!);
     knife(party, killers[1]!, guards[0]!);
+    advance(party, 1); // the step's win check, in the tick of the kill
     expect(room.state.winner).toBe(Winner.paintTown);
   });
 });

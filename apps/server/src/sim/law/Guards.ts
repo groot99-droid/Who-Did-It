@@ -240,7 +240,7 @@ export function strikeGuard(
   } else g.foe = null;
 }
 
-/** A guard back from the morning train (round 10, C5): no foe, no cuff, its post's route afresh. */
+/** A guard killed by the Knife (round 10, C5c, `Kill.ts`): no foe, no cuff, so the train returns it afresh. */
 export function returnGuard(f: Figure): void {
   const g = guards.get(f);
   if (!g) return;

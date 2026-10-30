@@ -1,7 +1,6 @@
 import { balance, roles } from '@wdi/content';
 import { dealDeck, paintTarget } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
-import { returnGuard } from './law/Guards';
 import { type Figure, returnFigure, townsfolkMemory } from './townsfolk/figures';
 import { isNpcSeat } from './Npc';
 import { simOf } from './RoomSim';
@@ -26,6 +25,8 @@ interface PaintState {
   totals: Map<string, number>;
   /** Each dead guard figure's id and the round it died: it rides the next morning's train back (round 10, C5c). */
   guardDeaths: Map<string, number>;
+  /** A guard died since the last win check: the step's `drainDeaths` (`Phases.ts`) runs one, as for a seat's death. */
+  guardFell: boolean;
 }
 
 const states = new WeakMap<object, PaintState>();
@@ -89,6 +90,7 @@ export function beginPaintTown(room: PartyRoom, killers: readonly string[], npcS
     victims: new Map(),
     totals: new Map(),
     guardDeaths: new Map(),
+    guardFell: false,
   });
   for (const seat of killers) {
     const priv = room.state.players.get(seat)?.priv;
@@ -109,7 +111,18 @@ export function onPaintDeath(room: PartyRoom, victim: string, cause: string, kil
 
 /** A guard's death (the Knife, `Kill.ts`): it counts toward the pillars only, never unique or total. */
 export function onGuardDeath(room: PartyRoom, f: Figure): void {
-  stateOf(room)?.guardDeaths.set(f.id, room.state.round);
+  const s = stateOf(room);
+  if (!s) return;
+  s.guardDeaths.set(f.id, room.state.round);
+  s.guardFell = true;
+}
+
+/** Whether a guard died since the last call (`Phases.ts` `drainDeaths`): the pillars may all be down this tick. */
+export function takeGuardFell(room: PartyRoom): boolean {
+  const s = stateOf(room);
+  if (!s?.guardFell) return false;
+  s.guardFell = false;
+  return true;
 }
 
 /** The morning train's arrival of `round` (`Train.ts`): every guard dead since an earlier round is back at its post. */
@@ -121,8 +134,7 @@ export function returnGuards(room: PartyRoom, round: number): void {
     s.guardDeaths.delete(id);
     const f = townsfolkMemory(room).figures.get(id);
     if (!f?.dead) continue;
-    returnFigure(room, f);
-    returnGuard(f);
+    returnFigure(room, f); // its foe and cuff were cleared at its death (`Kill.ts`, `Guards.ts` `returnGuard`)
   }
 }
 

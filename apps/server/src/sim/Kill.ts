@@ -16,10 +16,9 @@ import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
 import { onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
-import { guardTarget } from './law/Guards';
+import { guardTarget, returnGuard } from './law/Guards';
 import { isPaintTown, onGuardDeath } from './paintTown';
 import { figureOfHandle, killFigure } from './townsfolk/figures';
-import { endMatch, evaluateWin } from './Win';
 import { refusal, type Refusal } from './refusal';
 
 /** Kill cooldown in ticks for this party size (GDD 3.9; the row is cut to 4-10 like the deal). */
@@ -186,11 +185,9 @@ function knifeGuard(
   cooldowns.set('kill', tick + killCooldownTicks(room));
   const { x, y } = f;
   killFigure(room, f, 'knife');
+  returnGuard(f); // no foe and no cuff while dead, so the morning train returns it to its post's route afresh
   emitNoise(room, sceneKey(actor.sceneIdx), x, y, balance.noise.killScream, 'scream', sessionId);
-  if (!isPaintTown(room)) return true;
-  onGuardDeath(room, f);
-  const winner = evaluateWin(room); // all four pillars dead at this tick
-  if (winner) endMatch(room, winner);
+  if (isPaintTown(room)) onGuardDeath(room, f); // the step's win check reads the pillars at this tick
   return true;
 }
 
