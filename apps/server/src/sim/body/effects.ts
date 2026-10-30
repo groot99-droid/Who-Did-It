@@ -28,7 +28,10 @@ export function applyEffect(
   durationTicks = Math.round(effectDef(id).durationS * TICK_RATE),
 ): void {
   const tick = room.state.tick;
-  const untilTick = durationTicks > 0 ? tick + durationTicks : 0;
+  // A dish's resistance shortens a Poisoned that starts; Nightshade (`flow.poisoned`) never reads it (round 10, D4a).
+  const scaled =
+    id === 'poisoned' ? Math.round(durationTicks * factorOf(body, (d) => d.poisonFactor)) : durationTicks;
+  const untilTick = scaled > 0 ? tick + scaled : 0;
   const on = body.effects.get(id);
   if (on) {
     on.untilTick = untilTick;

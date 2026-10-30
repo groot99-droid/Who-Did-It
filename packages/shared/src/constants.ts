@@ -102,6 +102,8 @@ export const EffectId = {
   charm: 12,
   /** Round 10, A7 (GDD 3.32): the last holdout of a night, the next day; private, no status bit. */
   exhausted: 13,
+  /** Round 10, D4a (GDD 3.14): a dish's poison resistance until it wears off; private, no status bit. */
+  resistant: 14,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];
