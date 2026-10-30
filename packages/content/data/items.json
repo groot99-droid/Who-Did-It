@@ -564,7 +564,7 @@
       "onDeath": "drops",
       "use": "eatHerbBread",
       "buff": "resistant",
-      "tooltip": "Eat it to take poison more lightly until the buff wears off.",
+      "tooltip": "Eat it to take poison more lightly until the next dawn.",
       "ships": "V1",
       "gddRef": "3.14"
     },
@@ -629,7 +629,7 @@
       "kind": "material",
       "roleBound": false,
       "onDeath": "drops",
-      "tooltip": "Raw wood from a pile or a tree. Crafting waits for the mill.",
+      "tooltip": "Raw wood from a pile, a stump or a tree. A saw turns it into Timber: two a log at the mill's head saw, one at a saw horse.",
       "ships": "V1",
       "gddRef": "3.14"
     },

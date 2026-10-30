@@ -1876,7 +1876,8 @@ Lines are in `apps/client/src/ui/copy/m5b.ts` (`M5B_COPY`, keys `inv.*`, `hotbar
 | `grid.bound` | That stays with you. It cannot be worked. |
 | `hotbar.label` | Hotbar |
 
-- **The count.** `inv.slots` counts the used slots over the whole layout.
+- **The count.** `inv.slots` counts the used slots over the whole layout. A cell names its stack and shows its
+  count above one only (`x3`); one of a thing is the name alone.
 - **Moves.** Click a stack to pick it; the slots that would refuse the move (`inv.move`: the belt takes tools, a gear
   slot its own gear, a full stack of the same item) are dimmed and cannot be clicked, so a move offered lands. Click the
   picked stack again to put it down.
