@@ -118,6 +118,14 @@
       "station": "brickOven",
       "craftS": 6,
       "maps": ["hollowmere"]
+    },
+    "leatherJerkin": {
+      "id": "leatherJerkin",
+      "out": "leatherJerkin",
+      "qty": 1,
+      "in": [{ "item": "hide", "qty": 3 }],
+      "station": null,
+      "craftS": 6
     }
   }
 }

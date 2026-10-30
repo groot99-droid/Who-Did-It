@@ -12,7 +12,8 @@
       "kills": true,
       "sprite": "mob_wolf",
       "dmg": 12,
-      "effects": { "bleeding": 0.35 }
+      "effects": { "bleeding": 0.35 },
+      "skin": { "hide": 2, "game": 1 }
     },
     "boar": {
       "id": "boar",
@@ -25,7 +26,8 @@
       "kills": true,
       "sprite": "mob_boar",
       "dmg": 9,
-      "effects": { "bleeding": 0.2 }
+      "effects": { "bleeding": 0.2 },
+      "skin": { "hide": 2, "game": 2 }
     },
     "bat": {
       "id": "bat",
