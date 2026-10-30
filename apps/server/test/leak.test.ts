@@ -29,7 +29,19 @@ beforeEach(async () => colyseus.cleanup());
 const NEAR_PX = clues.clues.blood!.params!.visibleTiles! * TILE_PX;
 const NIGHT = balance.vision.nightTiles;
 /** Payload keys that would carry a seat's secret. */
-const SECRET_KEYS = new Set(['roleId', 'role', 'team', 'cover', 'coverId', 'cooldowns', 'priv', 'notebook']);
+const SECRET_KEYS = new Set([
+  'roleId',
+  'role',
+  'team',
+  'cover',
+  'coverId',
+  'cooldowns',
+  'priv',
+  'notebook',
+  'paintTown',
+  'unique',
+  'total',
+]);
 /** Payload keys that name a seat. */
 const SEAT_KEYS = new Set(['id', 'seat', 'seatId', 'playerId', 'targetId']);
 

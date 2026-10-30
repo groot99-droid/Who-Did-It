@@ -1833,6 +1833,7 @@ the train brings the seat back the screen lifts and a 3 s toast says so. The man
 | how the seat died (`line.cause.wolf`, `.creature`, `.shot`, `.other`) | A wolf took you. / Something in the dark took you. / A shot took you. / You fell by day. | On the line, centre |
 | what it keeps (`line.kept`) | Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost. | On the line, below |
 | back (`line.back`) | You are back. | toast, 3 s, to the returning seat, after the morning train or the Final Night's bells |
+| the Paint The Town Red win (server, `Win.ts` `summaryOf`, C5a) | {town} is painted red. The Killers win. | `gameOver.summary`, every seat |
 
 ### 14.48 The lock-pick and the Resistant effect (10D, round 10)
 

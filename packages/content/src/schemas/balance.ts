@@ -475,6 +475,11 @@ export const BalanceFile = z.strictObject({
     }),
     cap: Frac,
   }),
+  /**
+   * Round 10 (C5, GDD 3.8): Paint The Town Red. `winUnique` is a fraction: the Killers' combined unique kills must reach
+   * ceil(`winUnique` x the NPC seats at the deal), at least 1.
+   */
+  paintTown: Section({ winUnique: Frac }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),

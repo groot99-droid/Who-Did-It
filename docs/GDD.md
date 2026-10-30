@@ -173,6 +173,26 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 - Tie or Skip majority: nobody ejected. After two consecutive no-ejection meetings (Drifter ejections count as none) the next vote has Skip disabled and ejects only a player holding at least ceil(living/3) votes; otherwise nobody is ejected and the next cycle has no grace.
 - **Hunger**: a Killer with no Knife strike in 2 full rounds leaves glowing footprints until they strike (3.3).
 - **Last Shot** (M5a): an ejected Gamekeeper shoots during the reveal (3.2); the win check runs after the shot, with both seats out.
+- **Paint The Town Red** (round 10, C5; `docs/round9/world-mode.md` 1.6, followup-4 2.2; owner answer WM3). A party of
+  exactly two humans and at least one NPC seat deals both humans the Killer card, with no vendetta. The deck's second
+  Killer card takes the place of the Accomplice, else the Drifter, else a profession drawn on the deal's stream (never
+  the Vicar), so it still holds at most two covers; the 10-seat row already holds two. Every other card goes to an NPC
+  seat. Each Killer's private view is marked (`Private.paintTown`) and picks its worn card as any Killer does.
+  - Every NPC seat's death returns on the next morning train (3.22), after dark and to the Knife too, so the town never
+    runs out. A Killer's own death follows the usual rule.
+  - A Knife kill of an NPC seat by a Killer adds one to that Killer's total, and to its unique count the first time it
+    kills that seat. The counts stay in room memory until game over: no field, line or refusal changes at a kill.
+  - The two share the **Paint The Town Red** victory (`Winner.paintTown`) when their combined unique count (every NPC
+    seat either has killed) reaches ceil(`paintTown.winUnique` (half) x the NPC seats at the deal), at least 1, or
+    when the three pillars are dead at the same moment: the Vicar's seat, the Company Clerk and both Constables (the
+    guard figures of 3.24; the Constables fall as one pillar only when both are dead). A guard's death counts toward
+    the pillars only. The game-over frame carries the target and each Killer's unique and total
+    (`gameOver.paintTown`); the end screen ranks them by total.
+  - There is no parity check. A Killer dead for good (or ejected by the vote) is caught and its run ends; the other
+    plays on. The Village wins when both are caught, or when the end trial closes with the town unpainted.
+  - Not built yet: the Knife on the guards and their return on the morning train (C5's guard step), and, until the
+    Constables' petitions land (10B), the Constables filing their own petitions with no human on the town side (12,
+    R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (Round 8, 8L, A190) **The vote delay.** A vote cast in the first 15 s of a meeting (`meeting.minVoteS`, Final Night's included) is refused with the reason, so a vote agreed before the meeting cannot land before anyone has spoken; the portraits and Skip wait out the delay with a countdown, and a vote is changeable as before once it opens. `minVoteS` stays under the shortest discussion (the content check). It replaces `meeting.voteOpensImmediately`.

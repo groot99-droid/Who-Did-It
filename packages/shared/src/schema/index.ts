@@ -17,7 +17,7 @@ import { schema, t } from '@colyseus/schema';
 // join version 7.
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
 // `Private.pair` (row 10), C2 `Private.fare` (row 11), and B3 `GameState.petition` and `Private.petitionSigned`
-// (row 13) to version 7.
+// (row 13) and C5 `Private.paintTown` (row 18) to version 7.
 
 export const SCHEMA_VERSION = 7;
 
@@ -57,8 +57,8 @@ export const Phase = {
 export type PhaseId = (typeof Phase)[keyof typeof Phase];
 
 export const DoorState = { open: 0, closed: 1, locked: 2, broken: 3 } as const;
-/** 0 = nobody has won yet. */
-export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3 } as const;
+/** 0 = nobody has won yet. Round 10 (C5, seams.md row 18): `paintTown`, the two Killers' shared win. Append-only. */
+export const Winner = { none: 0, village: 1, cabal: 2, drifter: 3, paintTown: 4 } as const;
 export const Team = { village: 0, cabal: 1, neutral: 2 } as const;
 
 // --- Public roster ---------------------------------------------------------------------------
@@ -270,6 +270,8 @@ export const Private = schema(
     fare: u16(),
     /** Round 10, B3 (seams.md 3 row 13): whether this seat has signed the open petition. Own view only. */
     petitionSigned: bool(),
+    /** Round 10, C5 (seams.md 3 row 18): this seat is a Killer of Paint The Town Red. Set at the deal; own view only. */
+    paintTown: bool(),
   },
   'Private',
 );
