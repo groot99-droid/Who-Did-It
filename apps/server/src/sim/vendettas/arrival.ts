@@ -6,6 +6,7 @@ import { addStack, canAdd } from '../Inventory';
 import { stationOf } from '../MapSites';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
+import { isJailed } from '../law/Jail';
 import { isOnLine } from '../Train';
 import { sceneKey } from '../World';
 import { lapseContract, offerContract } from './contract';
@@ -16,7 +17,7 @@ import { holdVendetta, vendettaHolders, vendettaOf } from './state';
  * Nobody is dealt the Hitman. At the deal, on the secret `hitman` stream, the server draws whether he comes (by the
  * human seats, `hitman.byHumans`; never below 3 humans, never in Paint The Town Red), the day (`hitman.days`,
  * uniform) and whether a human or an NPC seat is turned. On that day's `train.delivery` the black-wax letter turns
- * one living, free seat (not on the line) that wears its own card's look (no cover, Cabal or Thief card), holds no
+ * one living, free seat (not on the line, not in jail) that wears its own card's look (no cover, Cabal or Thief card), holds no
  * vendetta and is no vendetta's partner card:
  * a human if the draw says so and one is eligible, else an eligible NPC seat; with none in that pool he never comes
  * (so an NPC draw never turns a human, and `human` stays a ceiling). He comes only where the Train runs. The turned
@@ -97,6 +98,7 @@ function eligible(room: PartyRoom): string[] {
       p !== undefined &&
       !p.dead &&
       !isOnLine(room, seat) &&
+      !isJailed(room, seat) && // free: off the line and out of jail (row 20)
       roles.roles[card]?.townWork.work !== 'worn' && // no cover, no Cabal card, no Thief: its own card's look
       !vendettaHolders(room).has(seat) &&
       !partners.has(card) &&

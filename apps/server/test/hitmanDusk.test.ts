@@ -7,6 +7,7 @@ import { gameOverExtras } from '../src/sim/Deck';
 import { addStack, canAdd, count, strip } from '../src/sim/Inventory';
 import { stationOf } from '../src/sim/MapSites';
 import { simOf } from '../src/sim/RoomSim';
+import { jailSeat } from '../src/sim/law/Jail';
 import { isOnLine } from '../src/sim/Train';
 import { evaluateWin } from '../src/sim/Win';
 import {
@@ -136,6 +137,25 @@ describe('the turning and a full pack (6Z, C4b review)', () => {
     onDeliveryArrival(m.room, m.room.state.round);
     expect(isTurned(m.room, roomy)).toBe(true);
     expect(count(m.room.state.players.get(roomy)!, DERRINGER_ITEM)).toBe(1);
+  });
+});
+
+describe('the jail (B5, rows 14, 19 to 21)', () => {
+  it('never turns a jailed seat; a jailed Hitman’s Derringer refuses IN_JAIL as the Knife does', async () => {
+    const m = await startMatch(colyseus, 5, ROLES);
+    setPhase(m, Phase.day);
+    const free = m.bots[1]!.id; // the Detective stays out of jail
+    for (const b of m.bots) if (b.id !== free) jailSeat(m.room, b.id, b.id);
+    forceArrival(m.room, m.room.state.round, true);
+    onDeliveryArrival(m.room, m.room.state.round);
+    expect(isTurned(m.room, free)).toBe(true);
+
+    const day = await hitmanDay();
+    jailSeat(day.m.room, day.hitman.id, day.hitman.id);
+    shoot(day.m, day.hitman, day.mark);
+    await sleep(150);
+    expect(reasons(day.hitman)).toEqual(['IN_JAIL']);
+    expect(dead(day.m, day.mark)).toBe(false);
   });
 });
 

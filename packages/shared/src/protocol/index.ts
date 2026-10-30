@@ -17,6 +17,8 @@ export const C2S = {
   light: 'act.light',
   /** Round 8 (GDD 3.24): the answer to a `mugPrompt`; `sim/townsfolk/mug.ts` (8E) handles it. */
   mug: 'act.mug',
+  /** Round 10, D9c (GDD 3.24, seams.md 3 row 16): ask a figure about the town or the time; `sim/townsfolk/talk.ts`. */
+  talkAsk: 'talk.ask',
   /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
@@ -145,13 +147,12 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * How a player died; `vanished` is the disconnect death of GDD 3.8 (M7); `poison` is Nightshade, `shot` the
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
- * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life.
+ * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life; the two ids
+ * are never reused. Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by
+ * the Train.
  */
-/** The causes a death carries. `bled` and `sickened` retired in round 10 (A6): Bleeding and Poisoned stop at 1 health, and the two ids are never reused. */
-/** Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by the Train. */
 export type DeathCause =
-  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer';
-/**
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer'; /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
  */
@@ -324,6 +325,13 @@ export interface C2SPayloads {
    */
   'act.mug': { choice: 'pay' | 'fight' | 'flee' };
   /**
+   * Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town`
+   * (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed
+   * delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure),
+   * `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`.
+   */
+  'talk.ask': { targetId: string; ask: 'town' | 'time' };
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -486,6 +494,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.hq': 5,
   'act.payRent': 5,
   'act.mug': 5,
+  'talk.ask': 5,
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,

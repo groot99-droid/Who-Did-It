@@ -43,10 +43,10 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 
 | Role | Cover | Win | Start kit | Abilities (max 3) | Card text | Beware |
 |---|---|---|---|---|---|---|
-| **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife; the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 45 s CD from the drop): for 15 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
-| **Accomplice** (Cabal) | Yes | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (60 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). (M5a) **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s; your Hunger clock starts in the round you inherit). The seat then plays as the **heir** card (`roles.json` `heir`: the Accomplice's kit and Plant Clue and Crowbar, plus the Knife); its public look is unchanged and only a private message tells it. | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test. |
+| **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife, and the two of you are knocked back a tile each along the strike, whichever protection held (A393); the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 135 s CD from the drop): for 45 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
+| **Accomplice** (Cabal) | Yes | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (180 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). (M5a) **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s; your Hunger clock starts in the round you inherit). The seat then plays as the **heir** card (`roles.json` `heir`: the Accomplice's kit and Plant Clue and Crowbar, plus the Knife); its public look is unchanged and only a private message tells it. | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test. |
 | **Detective** (Village) | No | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare**: lift a print (2 charges) and compare any two: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
-| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (60 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the blackout and the Claimed entries are built, `abilities.json` `bandage.params` holds their numbers; the knockback still waits.) the target survives the next kill attempt within 60 s; both are knocked back, the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Slowed or Poisoned (3.22). | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
+| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (180 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the blackout, the Claimed entries and the knockback are built, `abilities.json` `bandage.params` holds their numbers.) the target survives the next kill attempt within 60 s; both are knocked back (as on any voided strike, A393), the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Slowed or Poisoned (3.22). | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
 | **Vicar** (Village) | No | Village | Candle x2, Pocket Watch | (M5a) **Hear Confession** (night power, once per night, not self): pick a seat from the list; your Notebook gets its faction (Village, Cabal or Neutral) as Verified. | Everyone in HollowMere confesses to you sooner or later. Each night, learn where one soul stands, then choose how much to say. | Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name. |
 | **Watchman** (Village) | No | Village | Lantern, Pocket Watch | (M5a) **Keep Watch** (night power, once per night; not self, and never the seat you watched the night before): the seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target, and your Notebook gets "Your watch held" as Verified. | You walk the lanes after dark. Each night, choose one door to stand by; if a blade comes for that soul tonight, it fails. | You cannot watch yourself or the same soul two nights running; poison and the Gamekeeper's shot go past you. |
 | **Herbalist** (Village) | No | Village | Remedy x1, Nightshade x1, Candle | (M5a) **Remedy** (night power, once per match, self allowed): the seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. **Nightshade** (night power, once per match, not self): the seat dies when the night ends, wherever it stands, and leaves no trait clues. | One bottle saves, one bottle ends. Pour the first where the knife will fall and the second only where you are certain. | Nightshade kills a villager as readily as a killer, and a Remedy cannot stop it. |
@@ -55,7 +55,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | **Child** (Village; not dealt until M4) | No | Village | Slingshot, Chalk, Candle | **Silent hide** (instant, no noise; adults cannot Check a crawlspace). **Witness** (passive): with line of sight within 6 tiles of a kill, "The Child saw it" posts height + scarf as Verified at the next meeting. **Slingshot**: a small hit from 5 tiles that Stuns (3.22; 30 s CD). | You are small and quiet. Hide, watch, remember. | Top kill target; vision -1 tile; cannot pick up items. |
 | **Townsfolk** (Village), dealt as the professions below | No | Village | Lantern, Pocket Watch, Chalk, Rope | **Tasks**. **Chalk**: floor marks visible to all. **Rope**: free a snared player. Two Emergency Bell pulls per match (others have one). | Do your chores with others to build alibis, mark what you see, vote with evidence. | Weak alone; strong in pairs. |
 | **Lamplighter**, **Baker**, **Fisher**, **Tinner** (Village, professions) | No | Village | As Townsfolk | As Townsfolk | Lamplighter: You light the lanterns that keep the wolves off the square. Work beside others, mark what you see, vote with evidence. Baker: Up before anyone, flour to the elbows. Do your chores in company, mark what you see, vote with evidence. Fisher: The fog keeps the boats in. Mend the nets beside a neighbour, mark what you see, vote with evidence. Tinner: The mine is shut; your hands are not. Work in pairs, mark what you see, vote with evidence. | As Townsfolk |
-| **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (20 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
+| **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (60 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
 | **Ranger** (Village, V1.5) | No | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
 | **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the sea door at the back of the cave holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
 | **Medium** (Village, V2) | No | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
@@ -156,7 +156,7 @@ Round 8 (3.22, DECISIONS A134, A136) replaced the two-hit-point model: a seat ha
 
 ### 3.7 Stealth, hiding and doors
 
-Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2, an NPC's shout for a body 8 (round 8, 3.12); noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
+Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 4.5 tiles/s, and sneaking (Shift) is silent at 60% of walking speed. A door is usable from 1.5 tiles of its tile centre, the same reach as the other verbs; the body's collision box is a 0.5-tile square under the feet (WORLD 4.2). Noise radii in tiles: walk 2, run 6, door 4, kill scream 8, rag 4, skeleton key 5, crowbar 10, bolt 10, lockpick 5, hide 2, burst out 6, one-way drop 9, the barn goat 4, a Wisp rattle 2, an NPC's shout for a body 8 (round 8, 3.12), an axe's chop 8 and a pickaxe's smash 10 at the tool walls (round 10, x2, 3.14; proposals for the balance lab); noise renders as a screen-edge pulse with a direction arrow and a log line, crossing a portal at 50% radius and re-emitting at the paired portal. In V1 the server encodes a player's position only to clients in the same scene, as an avatar under a random handle (3.17); the darkness radius is a client-side mask, drawn as the lighting layer of 3.13; a dark scene uses the night radius in every phase. Since M5b a dark scene's radius and occluders hold on the server (3.15): a living seat there receives another avatar only within its night radius and line of sight, and a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both seeing and being seen; lights start out and are lit by their holder. Since round 8 (8L, A190) the same holds in every scene at night and in the Final Night: by day, at dusk and at dawn an ordinary scene is still sent whole.
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
@@ -420,7 +420,8 @@ noise and leaves no clue, and nobody's role changes what a node gives.
 slots (`stackMax`); a tool takes a slot of its own (3.5). Materials drop on death like every non-bound item.
 
 **Crafting** is a hold at a **station**, a prop of the recipe's kind within the verb reach; a recipe with no station
-crafts anywhere. The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
+(a **hand recipe**: the Torch, the Snare, the Leather jerkin) is made in the crafting grid (A13a, below) and the
+client offers it no hold (round 10, A374; the server's `craft` still takes one until 10X narrows it). The inputs are taken when the hold ends, and the tool goes into the inventory; an interrupted craft
 takes nothing, and a craft whose inputs are gone by the end of the hold gives nothing. The tool takes the slot the
 inputs free, so a full inventory can still craft. (6F) Every tool is role-neutral: anyone may craft one, and a crafted tool says nothing about who made
 it.
@@ -486,7 +487,9 @@ still give Timber directly (they are the camp's cut stacks). A worn tool breaks 
 
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
 Stone node the same with a Pickaxe; Tin Ore still needs the Spade. A tool speeds supply up, it does not gate it.
-Chopping and breaking make no noise yet (the noise table has no chop or smash row); the Crowbar's pry sounds at 10.
+Chopping sounds (round 10, x2): an Axe on a woodpile, a stump or a mine timber set rings `chop` (8 tiles) when the hold ends,
+a Pickaxe on a boulder, a rock pile or an ore pile `smash` (10); the Crowbar's pry sounds at 10 (`crowbar`) and bare hands on
+rubble and the saws stay silent (3.7).
 The general stores sell the Axe, the Pickaxe and the Hammer (3.23 Shops; prices in `economy.json`, proposals for the balance lab), and a seat can also craft one (the table above). **Depletion (round 10, D2; owner answer LT7).** Every pile above comes back after its own time, and an NPC seat's gather empties a pile like a human's, through the same resolver: it breaks rubble by hand, the cleared pile stays no station until its time has run, and a seat that finds one spent walks on. No seat is dealt a free tool, since a seat working a tool-walled pile before any human could own the tool would tell an NPC; an NPC comes by a tool as any seat does (a card's start kit, or buying it at the general store; a later step, D2b).
 
 ### 3.15 Mobs
@@ -1034,7 +1037,7 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
 
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
-  names a look, never a seat or a card. Each Train delivery fills the mailbag beside the platform (HollowMere) with
+  names a look, never a seat or a card. The county jail's cell is never sampled (3.27). Each Train delivery fills the mailbag beside the platform (HollowMere) with
   `notices.slipsPerBag` ledger slips from the sightings since the last bag, night first, one per look; an uncollected
   bag is replaced. Collecting it (`act.hold`, `clues.collectHoldS` within verb reach) turns the slips into Blackmail
   Notices, private Notebook entries, up to `notices.maxHeld` held at once. A notice can be:
@@ -1109,7 +1112,9 @@ still where it is; the lobby clears every figure.
 
 On the wire a figure is a scene `Avatar` under an opaque handle like a seat's (3.17) with a `villager` look (never
 a card's: 8F's variants all begin `villager`), the `townsfolk.height` height, no status bit and never the ghost
-tag, so nothing but the drawn figure tells it apart; its id never leaves the server. Needs and moods tick for it as
+tag, so nothing but the drawn figure tells it apart; its id never leaves the server. A seat's view holds the living
+figures of its own scene as it holds the seats there (3.17), through the same sight rule in the dark and at night
+(3.7, 3.15), with no near tag (its Blood range of 3.4 is a seat's), and a ghost sees them as the living do (round 10, x5, A353). Needs and moods tick for it as
 for a seat (the mood idle shows while it stands), it hears the same bus events, and it counts the bodies it sees.
 The Knife never finds it (its handle resolves to no seat), a vote for it is refused, and it dies only to a creature
 that kills (the wolf's `mobs.json` `dmg` off its reduced body's `body.maxHp`, regained like a seat's, 3.22; any
@@ -1119,6 +1124,17 @@ such body and the meeting text says how many the creatures took (`ui/copy/townsf
 knockout (3.22, the reduced body) reaches a figure only once the strike hook of A160 lands. The invariant
 `figureNotSeat` (auto 50) checks that no figure is in any seat list, vote, death or meeting, and that no figure
 avatar carries a seat's handle, the ghost tag or a card's look.
+
+**Talk to a figure** (round 10, D9c; `living-world.md` 1.5, seams.md 3 row 16). A seat in reach (`figureTalk.reachTiles`)
+of a figure (a townsperson, a named figure or a Constable) asks it about the town or the time (`talk.ask {targetId,
+ask}`, G and H on the client). A seat's handle, human or NPC, an unknown handle and a figure in another scene refuse as
+no target; a ghost refuses as not in play; too far refuses as too far; each asker may ask the same figure again after
+`figureTalk.cooldownS`. The answer is one system chat line to the asker alone, `figureTalk.delayS` after the ask.
+`town` is a tip off the rumour ledger (3.23) naming a drawn look and a scene, never a seat, a handle or a card; `time`
+is a template remark; a Constable reads the latest briefing line (3.31) instead; with nothing to tell, a figure says so.
+The line is drawn from the figure and the tick it is due, with no random number, so two askers of one figure in one
+tick hear the same words. Nothing public marks a talk: no bubble, no turn of the figure, no event to another client.
+The lines are `talk.json` `figures`.
 
 **Guard figures (round 10, B1, A229; F4 2.2).** The Company Clerk and the two Constables of every map (3.31) are
 guards: figures that "don't move very far and fight when hit" (the owner). A guard row of `routines.json`
@@ -1181,7 +1197,45 @@ Round 8 addendum C (A200; `docs/round8/stations.md` 5), 7M. The owner: "walking 
 
 ### 3.27 The county jail
 
-Round 10, B5 (`docs/round9/gdd-map.md` 2.1). Not built yet: the step that builds it writes this section.
+Round 10, B5 (`docs/round9/gdd-map.md` 2.1; `world-mode.md` 5.1; owner answers LW9, LW10, WM11). B5a builds the cell;
+B5b puts the cuffed seat in it and releases it.
+
+**The cell (B5a).** One scene, `cj_cell` ("The county jail", 12x8, a house interior), serves every map. It is a `jail`
+scene: in no map's graph, with no portal in or out (WORLD 4.3), its ids prefixed `cj.`, its ten spawns `cell_1` to
+`cell_10`, so the cell can hold every seat at once. The server alone places a seat in it, and its art takes the default
+map's theme. Its view holds only the seats inside it. D8 adds the props of the jail mini-games.
+
+**Held (B5b).** A seat the manhunt cuffs (3.31) walks for `jail.walkS` (_proposed_ 5 s), held, and is placed in the
+cell. It stays there until the next morning train, the first arrival of a later round, which sets it down at the
+station with the manifest line "{name} steps off the train."; the Final Night's bells empty the cell as they bring back
+the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
+jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
+Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. Only its cellmates see
+it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. A death in
+jail takes the usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
+no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
+
+**The face it was cuffed in** (the owner, 2026-10-30: "jail and try them"; 6Z's ruling). An impersonation applied when
+the seat is cuffed is pinned from the cuff until the seat leaves jail or dies: nothing drops it, neither the cell door,
+being alone in the cell, its run out, a meeting, nor the Tribunal (B6). The cell, the Tribunal's defendant and the
+manifest draw and name that face, exactly as if the accused had been cuffed; the sentence lands on the seat held. A
+disguise still pending at the cuff is cancelled. The seat is set down at the station still in the face, and the usual
+rule applies after that (it drops when the seat is alone or passes a door). What a table can still deduce is only what
+the drawn figures show: the true accused seen in town after a public "cuffed", two of one face in the cell, and a
+hanging's roster flip (B6).
+
+**The jail's games (D8).** The cell holds three props, and each opens a board for the seat standing at it, once a day
+(a round) and per game; the board is spent when it opens. Working out at the weights is a tap board and adds
+`jail.gym.damage` (_proposed_ 2) to the seat's fist and slingshot damage for the rest of the match (one Strength: a second
+workout adds nothing). The yard fight, at the sparring
+post, is a crates board of one round: a right answer inside `jail.yard.boardS` (_proposed_ 20 s) wins `jail.yard.purse`
+(_proposed_ 2 Scrip) from the town; a wrong or a slow one loses (a board left unanswered past `boardS` is lost too), and a loss takes `jail.yard.maxHpLoss` (_proposed_ 10)
+off the seat's maximum health for the rest of the match, never under `jail.yard.maxHpFloor` (_proposed_ 80). Scrubbing,
+at the pail, is a pour board that pays `jail.scrub.wage` (_proposed_ 1 Scrip). The hour off the sentence the owner's
+design names is not yet built: every sentence ends at the next morning train (3.27 above), so an early release waits on
+the owner. Nothing here is public: the tally is the server's, and the only signs are a harder
+fist, a smaller health bar and the purse.
 
 ### 3.28 Accounts and achievements
 
@@ -1420,8 +1474,8 @@ the Hitman: the mail turns a townsman into one.
   (3.3; BlackPine has no station, so no delivery), and there is no Hitman in Paint The Town Red (3.8). The Killer
   never draws the Hitman's row (3.20).
 - **The turning.** On that day's `train.delivery`, the black-wax letter reaches one seat that is living, free (not on
-  the line, 3.22), wears its own card's look (never a cover, a Cabal card or the Thief), holds no vendetta and is not
-  a vendetta's partner card (the Zealot's Vicar), drawn on `hitman`. A human draw turns an eligible human, else an
+  the line, 3.22, and not in jail, 3.24), wears its own card's look (never a cover, a Cabal card or the Thief), holds
+  no vendetta, is not a vendetta's partner card (the Zealot's Vicar) and has room for the Derringer, drawn on `hitman`. A human draw turns an eligible human, else an
   eligible NPC seat; an NPC draw turns an eligible NPC seat only, so `human` is a ceiling (0 at 3 humans turns no
   human ever). With no seat in that pool he never comes. The turned seat keeps its card (its `roleId`, its abilities,
   its town work), its look and every public field; it holds the `hitman` vendetta, its own view's `Private.hitman` is
@@ -1431,10 +1485,10 @@ the Hitman: the mail turns a townsman into one.
   seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
 - **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
   like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
-  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2). It may be fired
-  only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads the drawn figure, never the seat
-  behind it, so the real mark drawn as someone else is refused like any figure, and an impersonator drawn as the mark dies in its place
-  while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
+  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2), the jail's
+  `IN_JAIL` among them. It may be fired only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads
+  the drawn figure, never the seat behind it, so the real mark drawn as someone else is refused like any figure, and
+  an impersonator drawn as the mark dies in its place while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
   makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
 - **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day
   and stands, living, in the station's scene within `train.hearTiles` of the platform boards it: the Contract
@@ -1461,5 +1515,4 @@ the Hitman: the mail turns a townsman into one.
   contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
   station (10B); the Clerk's ledger of rent hardships (C4d); the cold station and the dark window (a home's window
   state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
-  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; the jail as a bar to the
-  turning (B5); a turned NPC seat stopping its routine.
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.

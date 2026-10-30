@@ -40,6 +40,32 @@ export type TalkNote = z.infer<typeof TalkNote>;
 export const TalkHerring = z.strictObject({ text: lineText('herrings'), when: TalkWhen.optional() });
 export type TalkHerring = z.infer<typeof TalkHerring>;
 
+/** The answers of a figure to `talk.ask` (round 10, D9c; GDD 3.24 "Talk"). A line names no seat, role or card. */
+const figureLine = (fills: readonly string[]) =>
+  z
+    .string()
+    .trim()
+    .min(1)
+    .max(140)
+    .refine((t) => !/[{}]/.test(t.replace(/\{\w+\}/g, '')), 'a brace outside a placeholder')
+    .refine((t) => placeholders(t).every((k) => fills.includes(k)), {
+      message: `a placeholder this list cannot fill (${fills.join(', ') || 'none'})`,
+    });
+
+export const TalkFigures = z.strictObject({
+  /** A figure kind (`routines.json` `townsfolk`) -> the name its answer carries as the speaker. */
+  names: z.record(z.string(), z.string().trim().min(1).max(30)),
+  /** A world phase key (`grace`, `day`, `dusk`, `night`, `finalNight`) -> how a figure says it. */
+  parts: z.record(z.string(), z.string().trim().min(1).max(30)),
+  /** `time`: a remark, `{part}` the part of the day. */
+  time: z.array(figureLine(['part'])).min(1),
+  /** `town`: a tip off the rumour ledger, `{look}` a drawn look's name and `{scene}` a scene's name. */
+  town: z.array(figureLine(['look', 'scene'])).min(1),
+  /** `town` and `time` when the ledger holds nothing, and a Constable's reply when it has no briefing to read. */
+  quiet: z.array(figureLine([])).min(1),
+});
+export type TalkFigures = z.infer<typeof TalkFigures>;
+
 export const TalkFile = z.strictObject({
   gddRef: GddRef,
   /** The template lines of an NPC seat's notes; one whose placeholder has nothing to fill is not drawn. */
@@ -48,5 +74,7 @@ export const TalkFile = z.strictObject({
   herrings: z.array(TalkHerring).min(1),
   /** Small talk: satire of a village meeting, about nothing at all. */
   smallTalk: z.array(lineText('smallTalk')).min(1),
+  /** Round 10, D9c: what a figure answers when a seat asks it (`talk.ask`). */
+  figures: TalkFigures,
 });
 export type TalkFile = z.infer<typeof TalkFile>;

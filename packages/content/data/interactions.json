@@ -47,6 +47,9 @@
     "headSaw": { "name": "Head saw", "match": { "stems": ["head_saw"] } },
     "sawHorse": { "name": "Saw horse", "match": { "stems": ["saw_horse"] } },
     "lockedDoor": { "name": "Locked door", "match": { "kinds": ["lockedDoor"] } },
+    "jailGym": { "name": "Jail weights", "match": { "stems": ["barbell"] } },
+    "jailYard": { "name": "Sparring post", "match": { "stems": ["sparring_post"] } },
+    "jailScrub": { "name": "Scrub pail", "match": { "stems": ["scrub_pail"] } },
     "crateNailed": {
       "name": "Nailed crate",
       "match": { "stems": ["crates", "crate", "tin_crate", "bottle_crate"] }
@@ -66,7 +69,7 @@
           "holdS": 4,
           "drops": [{ "item": "logs", "qty": [2, 3] }],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         }
       ],
       "after": { "state": "cut", "respawnS": 300 },
@@ -94,7 +97,7 @@
             { "item": "resin", "qty": [1, 1], "chance": 0.5 }
           ],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         }
       ],
       "after": { "state": "cut", "respawnS": 900 },
@@ -118,7 +121,7 @@
           "holdS": 5,
           "drops": [{ "item": "logs", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "chop"
         },
         {
           "tool": { "tag": "pry", "tier": 1 },
@@ -152,7 +155,7 @@
             { "item": "tinOre", "qty": [1, 1], "chance": 0.25 }
           ],
           "wear": 2,
-          "noise": null
+          "noise": "smash"
         }
       ],
       "after": { "state": "rubble", "respawnS": 1200 },
@@ -177,7 +180,7 @@
           "holdS": 4,
           "drops": [{ "item": "stone", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "smash"
         },
         {
           "tool": null,
@@ -209,7 +212,7 @@
           "holdS": 4,
           "drops": [{ "item": "tinOre", "qty": [2, 2] }],
           "wear": 1,
-          "noise": null
+          "noise": "smash"
         }
       ],
       "after": { "state": "cleared", "respawnS": 600 },
@@ -288,6 +291,45 @@
       "ships": "V1",
       "hint": "Slow work by hand: one log, one Timber. The mill's head saw does twice as much."
     },
+    "jailLift": {
+      "verb": "lift",
+      "label": "Work out",
+      "target": "jailGym",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailGym", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "You have lifted enough for one day." },
+      "ships": "V1.5",
+      "hint": "Fists hit two harder for the rest of the match. Once a day."
+    },
+    "jailSpar": {
+      "verb": "spar",
+      "label": "Fight in the yard",
+      "target": "jailYard",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailYard", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "Nobody in the yard wants another round today." },
+      "ships": "V1.5",
+      "hint": "Win and take 2 Scrip. Lose, or walk away from the fight, and your health bar stays smaller. Once a day."
+    },
+    "jailScrub": {
+      "verb": "scrub",
+      "label": "Scrub the cells",
+      "target": "jailScrub",
+      "handler": "task",
+      "status": "live",
+      "phases": ["day", "night"],
+      "modes": [{ "tool": null, "minigame": "jailScrub", "wear": 0, "noise": null }],
+      "ownership": "public",
+      "fail": { "NOTHING_THERE": "The floor is clean enough for today." },
+      "ships": "V1.5",
+      "hint": "A Scrip of wage. Once a day."
+    },
     "pickLock": {
       "verb": "pick",
       "label": "Pick the lock",
@@ -331,7 +373,7 @@
         "stump log fallen_log firewood woodpile timber_set log_basket planks tree boulder",
         "rock_pile ore_pile rubble mushrooms berry_bush water_bucket bucket snare wheelbarrow",
         "drying_frame saw_horse grindstone workbench anvil forge kiln mortar_table still",
-        "shaping_table dough_trough peel_rack couche_rack head_saw"
+        "shaping_table dough_trough peel_rack couche_rack head_saw barbell sparring_post scrub_pail"
       ],
       "container": [
         "barrel crates crate tin_crate bottle_crate footlocker blanket_chest wine_cask",

@@ -64,6 +64,7 @@ import crumbColdJson from '../data/scenes/crumb_cold.json' with { type: 'json' }
 import crumbMixingJson from '../data/scenes/crumb_mixing.json' with { type: 'json' };
 import crumbOvenJson from '../data/scenes/crumb_oven.json' with { type: 'json' };
 import crumbProofingJson from '../data/scenes/crumb_proofing.json' with { type: 'json' };
+import cjCellJson from '../data/scenes/cj_cell.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
@@ -154,6 +155,7 @@ const sceneJson: Record<SceneId, unknown> = {
   crumb_mixing: crumbMixingJson,
   crumb_oven: crumbOvenJson,
   crumb_proofing: crumbProofingJson,
+  cj_cell: cjCellJson,
 };
 
 const mapJson: Record<MapId, unknown> = {
@@ -343,8 +345,12 @@ const sceneMap = new Map<SceneId, MapId>(
   MAP_IDS.flatMap((id) => maps[id].scenes.map((s) => [s, id] as const)),
 );
 
-/** The map a scene belongs to (every scene belongs to exactly one, GDD 3.13). */
+/**
+ * The map a scene belongs to (every scene belongs to exactly one, GDD 3.13). A `jail` scene (round 10, B5) belongs to
+ * none: its art takes the default map's theme.
+ */
 export function mapOf(sceneId: SceneId): MapId {
+  if (scenes[sceneId]?.kind === 'jail') return DEFAULT_MAP;
   const id = sceneMap.get(sceneId);
   if (id === undefined) throw new Error(`scene ${sceneId} belongs to no map`);
   return id;

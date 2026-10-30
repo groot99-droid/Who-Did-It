@@ -181,7 +181,7 @@ function handleBell(room: PartyRoom, sessionId: string): void {
     return;
   }
   if (actor.bellPulls >= (roles.roles[player.priv.role.roleId]?.bellPulls ?? 0)) {
-    reject(room, sessionId, 'SPENT', { what: 'power' });
+    reject(room, sessionId, 'SPENT', { what: 'match' }); // the pulls are per match, not per night (A233)
     return;
   }
   actor.bellPulls++;
