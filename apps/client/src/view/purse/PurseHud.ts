@@ -21,6 +21,8 @@ export interface PurseHud {
 export function mountPurseHud(scene: Phaser.Scene, feed: WorldFeed, parent: HTMLElement): PurseHud {
   const amount = h('span', { class: 'wdi-purse__amount', 'data-testid': 'purse-amount' });
   const change = h('span', { class: 'wdi-purse__change', hidden: true, 'data-testid': 'purse-change' });
+  // Round 10, C2b (GDD 3.23): the fare this seat owes the line, beside its own purse only.
+  const owe = h('span', { class: 'wdi-purse__fare', hidden: true, 'data-testid': 'purse-fare' });
   const root = h(
     'div',
     {
@@ -31,10 +33,12 @@ export function mountPurseHud(scene: Phaser.Scene, feed: WorldFeed, parent: HTML
     },
     amount,
     change,
+    owe,
   );
   parent.append(root);
   let last: number | null = null;
   let changeUntil = 0;
+  let lastFare = 0;
 
   const onUpdate = () => {
     const now = performance.now();
@@ -49,6 +53,12 @@ export function mountPurseHud(scene: Phaser.Scene, feed: WorldFeed, parent: HTML
         change.hidden = false;
         changeUntil = now + CHANGE_MS;
       }
+    }
+    const fare = feed.fare();
+    if (fare !== lastFare) {
+      lastFare = fare;
+      owe.hidden = fare === 0;
+      owe.textContent = fare === 0 ? '' : fill(C['purse.fare'], { n: fare });
     }
     if (!change.hidden && now >= changeUntil) {
       change.hidden = true;

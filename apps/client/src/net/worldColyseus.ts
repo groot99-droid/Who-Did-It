@@ -51,6 +51,7 @@ interface PlayerState {
     inBed?: number;
     inBedOf?: number;
     onLine?: boolean; // round 10, C1
+    fare?: number; // round 10, C2
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -365,6 +366,10 @@ export class ColyseusWorldFeed implements WorldFeed {
   }
 
   // Round 8, 8C (locked; GDD 3.23): the purse and the shop's trades.
+  fare(): number {
+    return this.state.players.get(this.selfId)?.priv?.fare ?? 0;
+  }
+
   purse(): number {
     return this.state.players.get(this.selfId)?.priv?.purse ?? 0;
   }

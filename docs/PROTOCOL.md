@@ -49,6 +49,8 @@
 | `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
 | `pair.ask` | `{ targetId: string }` | 2/s | Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. |
 | `pair.answer` | `{ yes: boolean }` | 2/s | - |
+| `petition.open` | `{ accused: string; charge: string; entries: string[] }` | 2/s | `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. |
+| `petition.sign` | `{ id: string }` | 2/s | - |
 | `craft.grid` | `{ size: 2 \| 3; cells: Array<string \| null> }` | 5/s | Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches, `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
@@ -205,6 +207,8 @@ export type HoldAction =
   | 'altar'
   | 'mailbag'
   | 'rack'
+  // Round 10 (GDD 3.23, C2b; seams.md 3 row 11): the Clerk's labour errand at a `ledger` prop clears a fare.
+  | 'errand'
   // Round 10 (A10): any prop the logic table answers for (`interactions.json`).
   | 'interact'
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.

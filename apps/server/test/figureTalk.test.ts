@@ -95,13 +95,16 @@ describe('talk.ask', () => {
     const party = await world(2);
     const [a, b] = party.humans as [Human, Human];
     const p = simOf(party.room).players.get(a.id)!;
-    ledgerOf(party.room).sightings.push({
+    const vicar = {
       look: 'vicar',
       sceneIdx: p.sceneIdx,
       phase: Phase.day,
       round: 1,
       tick: party.room.state.tick,
-    });
+    };
+    // The ledger samples as the world runs; pinning it each tick keeps the vicar the only sighting the tip can name.
+    const pin = () => ledgerOf(party.room).sightings.splice(0, Infinity, vicar);
+    pin();
     const f = figureBeside(party, a.id, 'villager');
     const q = simOf(party.room).players.get(b.id)!;
     q.sceneIdx = p.sceneIdx;
@@ -109,8 +112,8 @@ describe('talk.ask', () => {
     q.y = p.y;
     await send(a, 'talk.ask', { targetId: f.handle, ask: 'town' }, 40);
     await send(b, 'talk.ask', { targetId: f.handle, ask: 'town' }, 40);
-    advance(party, 1); // both asks are read in one tick, so they fall due together
-    advance(party, DELAY + 2);
+    advance(party, 1, pin); // both asks are read in one tick, so they fall due together
+    advance(party, DELAY + 2, pin);
     await send(a, 'net.ping', {}, 80);
     const [la] = lines(a);
     const [lb] = lines(b);
