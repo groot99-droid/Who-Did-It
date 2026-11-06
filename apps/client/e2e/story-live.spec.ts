@@ -21,7 +21,7 @@ for (const [name, width, height, query] of [
     test('Story starts the first chapter: a title card from the sim, then the world', async ({ page }) => {
       await page.goto(`/Who-Did-It/${query}`);
       await page.getByTestId('menu-story').click();
-      await expect(page.getByTestId('story-chapter')).toHaveCount(3);
+      await expect(page.getByTestId('story-chapter')).toHaveCount(4);
       await page.getByLabel('Your name').fill('Hana');
       await page.getByTestId('story-begin').click();
 
