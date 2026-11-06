@@ -88,6 +88,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
 | `story.card` | `{ kind: 'title' \| 'beat' \| 'end'; chapterId: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. |
 | `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
+| `achv` | `{ id: string; step: number; steps: number; done: boolean }` | Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 

@@ -1,0 +1,76 @@
+/* Achievements (GDD 3.28): the toasts over the world and the trophies dialog. */
+.wdi-achv-toasts {
+  position: fixed;
+  top: var(--wdi-space-3, 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--wdi-z-hud);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-2, 8px);
+  width: min(calc(100% - 32px), 24rem);
+  pointer-events: none;
+}
+
+.wdi-achv-toast {
+  margin: 0;
+  padding: var(--wdi-space-2, 8px) var(--wdi-space-3, 12px);
+  color: var(--wdi-text);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.wdi-achv-toast--done {
+  font-family: var(--wdi-font-display);
+}
+
+.wdi-achv-tree h3 {
+  margin: 0 0 var(--wdi-space-1, 4px);
+}
+
+.wdi-achv-tree__text {
+  margin: 0 0 var(--wdi-space-2, 8px);
+  color: var(--wdi-text-muted);
+}
+
+.wdi-achv-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wdi-space-2, 8px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-achv-row {
+  padding: var(--wdi-space-2, 8px) var(--wdi-space-3, 12px);
+  border-radius: 8px;
+  background: var(--wdi-scrim);
+  overflow-wrap: anywhere;
+}
+
+.wdi-achv-row--locked {
+  opacity: 0.6;
+}
+
+.wdi-achv-row__head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--wdi-space-2, 8px);
+}
+
+.wdi-achv-row__state,
+.wdi-achv-row__day,
+.wdi-achv-row__from {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-achv-row__text,
+.wdi-achv-row__from {
+  margin: var(--wdi-space-1, 4px) 0 0;
+}
+
+.wdi-achv-row__steps {
+  margin: var(--wdi-space-1, 4px) 0 0;
+  padding-left: 1.25rem;
+}

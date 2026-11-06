@@ -1,3 +1,5 @@
+import { ACHV_COPY } from './achievements/copy';
+import { openAchievements } from './achievements/AchievementsPanel';
 import type { PartyVisibility } from '../net/protocol';
 import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
 import { MENU_COPY as C, fill } from './copy';
@@ -81,6 +83,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const join = menuButton(C['menu.join'], '⇥');
   const story = menuButton(STORY_COPY['story.menu.entry'], '★');
   story.setAttribute('data-testid', 'menu-story');
+  const trophies = menuButton(ACHV_COPY['achv.menu.entry'], '★');
+  trophies.setAttribute('data-testid', 'menu-trophies');
   const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+');
   const friends = menuButton(C['menu.friends'], '☰');
   const settingsBtn = menuButton(C['menu.settings'], '⚙');
@@ -127,6 +131,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       }),
     ),
   );
+  trophies.addEventListener('click', () => show((onClose) => openAchievements({ root, onClose })));
   quit.addEventListener('click', () =>
     show((onClose) =>
       openQuitDialog({ root, onClose, leave: opts.onQuit ?? (async () => undefined), music: opts.music }),
@@ -192,6 +197,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         start,
         ...((opts.stories?.length ?? 0) > 0 && opts.onStory ? [story] : []),
         join,
+        trophies,
         profile,
         friends,
         settingsBtn,
