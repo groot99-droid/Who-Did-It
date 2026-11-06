@@ -9,6 +9,8 @@ Each session appends to its own section only. Newest line last.
 
 ## S2. Story engine
 
+- 2026-11-06 S2 started. `enableStory`, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` as a queued command and the `storyOneHuman` invariant are written on `claude/story-s2-enable-story` (draft PR to follow once the suite is green). Seat handover and the beat runner come next; the runner waits for S1's schema, so it is coded against the README section 1 shapes (`sim/story/types.ts`).
+
 ## S3. Wire and client
 
 ## S4. Tests and the bot
