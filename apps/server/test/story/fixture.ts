@@ -116,6 +116,8 @@ export interface StartOptions {
   storyId?: string;
   /** Run `runInvariants` every n ticks while stepping (0 = never). */
   invariantsEvery?: number;
+  /** Runs between `enableStory` and the first step: a test that changes the seed words does it here. */
+  afterEnable?: (room: PartyRoom) => void;
 }
 
 /**
@@ -151,6 +153,7 @@ export async function startStoryRoom(
   captureSent(sr);
   onSim(room, ANY_SIM, (ev) => sr.events.push({ ...ev }));
   enableStory(room, storyId);
+  opts.afterEnable?.(room);
   // Clock paused by the harness stays paused: the fixture steps the room itself.
   applyClock(room, { paused: true });
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);
@@ -277,8 +280,11 @@ export class StoryDigest {
 
   tick(sr: StoryRoom): void {
     const parts = [String(sr.room.state.tick), String(sr.room.state.phase)];
-    sr.room.state.players.forEach((p, id) => {
+    // Seats by order, not id: a session id and the drawn NPC ids differ between two runs of the same story.
+    let i = 0;
+    sr.room.state.players.forEach((p) => {
       const pr = p.presence;
+      const id = i++;
       parts.push(`${id}:${p.alive ? 1 : 0}:${p.priv?.sceneId ?? -1}:${pr.x},${pr.y}`);
     });
     this.hash.update(`${parts.join('|')}\n`);
