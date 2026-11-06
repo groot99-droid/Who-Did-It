@@ -263,7 +263,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterStart',
-    data: { chapterId: chapter.id, index: idx },
+    data: { chapterId: chapter.id, chapter: chapter.id, index: idx },
   });
   raise(room, state, {
     kind: 'title',
@@ -284,7 +284,7 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterEnd',
-    data: { chapterId: chapter.id, failed, summary },
+    data: { chapterId: chapter.id, chapter: chapter.id, failed, summary },
   });
   const next = state.story.chapters[state.chapterIdx + 1];
   const card: StoryCard = {
