@@ -9,7 +9,8 @@ import { simOf } from '../src/sim/RoomSim';
 import { canSee } from '../src/sim/Sight';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
 import { avatarsHeld } from './avatarHelpers';
-import { bootFlowServer, murder, sim, skipPhase, startParty, until } from './flowHelpers';
+import { emitSim } from '../src/sim/events/bus';
+import { bootFlowServer, events, murder, sim, skipPhase, startParty, until } from './flowHelpers';
 import { setPhase, teleport } from './killHelpers';
 import { fixSeeds } from './seedHelpers';
 import { type Bot, type Match, sleep, stateOf } from './simHelpers';
@@ -182,6 +183,25 @@ describe('the leak audit (8L)', () => {
     onDeliveryArrival(m.room, m.room.state.round);
     expect(await until(() => a.checked > checked + 5, 10_000)).toBe(true);
     expect([...m.room.state.players.keys()].some((id) => isTurned(m.room, id))).toBe(true);
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('achievements (E1, GDD 3.28): `achv` goes to its earner alone and names nothing of another seat', async () => {
+    const m = await startParty(colyseus, 6);
+    setPhase(m, Phase.day);
+    const a = audit(m);
+    moved(m, a);
+    const tick = m.room.state.tick;
+    // A robbery names a victim and a thief; a kill names a victim and a killer; a task names its own seat only.
+    emitSim(m.room, { tick, kind: 'rob', data: { by: m.bots[0]!.id, target: m.bots[1]!.id, amount: 1 } });
+    emitSim(m.room, { tick, kind: 'kill', seat: m.bots[1]!.id, data: { by: m.bots[0]!.id } });
+    emitSim(m.room, { tick, kind: 'taskDone', seat: m.bots[2]!.id, data: { taskId: 't', fake: false } });
+    expect(
+      await until(() => events(m.bots[0]!, 'achv').length >= 2 && events(m.bots[2]!, 'achv').length >= 1),
+    ).toBe(true);
+    await sleep(200);
+    expect(events(m.bots[1]!, 'achv')).toEqual([]);
+    expect(events(m.bots[0]!, 'achv').map((p) => p['id'])).toEqual(['lightFingers', 'bloodOnHands']);
     expect(a.leaks).toEqual([]);
   });
 

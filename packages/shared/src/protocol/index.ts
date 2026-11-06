@@ -117,6 +117,8 @@ export const S2C = {
   storyCard: 'story.card',
   /** Story mode, private to the player's own client: the chapter's goals and which are done. */
   storyGoals: 'story.goals',
+  /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
+  achv: 'achv',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -492,6 +494,11 @@ export interface S2CPayloads {
   };
   /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
   'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
+  /**
+   * Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step
+   * (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only.
+   */
+  achv: { id: string; step: number; steps: number; done: boolean };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
