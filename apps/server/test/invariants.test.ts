@@ -198,6 +198,7 @@ describe('the round-6 invariants', () => {
       'contractQuest',
       'strongboxOnce',
       'vendettaPublic',
+      'storyOneHuman', // story mode (docs/story/README.md 2)
     ]);
   });
 

@@ -10,6 +10,7 @@ import { runAuto } from './auto/Auto';
 // Round 8, 8E: before the vendettas, so `figureNotSeat` registers ahead of 7H's checks (their test pins them last).
 import { runTownsfolk } from './townsfolk/run';
 import { runEvents } from './events/bus';
+import { runStory } from './story/Story';
 import { runEconomy } from './economy/run';
 import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
 import './npc/hive/invariant'; // round 8, 8R: hiveNoSecrets's host, as 7M's above (one line, pending 6Z's grant)
@@ -31,6 +32,7 @@ import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
 import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
+import './story/invariants'; // story mode (docs/story/README.md 2): its invariants register with the registry
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
 // Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
@@ -80,6 +82,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   }
   runPhases(room);
   runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
+  runStory(room); // story mode: the beat runner and the player's queued commands, after the bus delivers (locked call site)
   runTrain(room); // round 7, 7I: the Daily Train (locked call site)
   runVendettas(room); // round 7, 7H: the vendettas' watched goals (GDD 3.20)
   runMemorial(room); // round 7, 7I: the Vicar's memorial, bus listeners registered once (locked call site)
