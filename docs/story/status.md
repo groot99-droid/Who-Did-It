@@ -6,8 +6,11 @@ Each session appends to its own section only. Newest line last.
 
 - 2026-11-06 S1: schema `story.ts`, `validateStory.ts`, wired into `validate.ts`, tests and a one-chapter `story.json` (Baker) ready; seams addendum 1a in README. Chapters 2 and 3 and `script.md` next.
 - 2026-11-06 S1: PR #450 now holds the schema, all three chapters and docs/story/script.md (the S4 fixture test needs three chapters); local checks green; merging on green CI.
+- 2026-11-06 S1: PR #450 MERGED into the integration branch (schema, validator, all three chapters, script.md). Merged on the green run of the previous head plus a clean merge of S4's suites; local content and story tests green on the final head. Open for the owner: Q-S1 (Killer chapter, default no) and the Thief-as-Bandit mapping (DECISIONS A401). S2 owes `story.enter` / `story.pickup` events (README 1a).
 
 ## S2. Story engine
+
+- 2026-11-06 S2 started. `enableStory`, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` as a queued command and the `storyOneHuman` invariant are written on `claude/story-s2-enable-story` (draft PR to follow once the suite is green). Seat handover and the beat runner come next; the runner waits for S1's schema, so it is coded against the README section 1 shapes (`sim/story/types.ts`).
 
 ## S3. Wire and client
 
