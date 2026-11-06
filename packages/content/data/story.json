@@ -1,0 +1,212 @@
+{
+  "gddRef": "3.34",
+  "stories": {
+    "hollowmere_winter": {
+      "id": "hollowmere_winter",
+      "title": "A Winter in HollowMere",
+      "blurb": "One town, three nights and days, three trades: the Baker whose coin has a story, the Watchman who follows the boots, and the Bandit who made them.",
+      "mapId": "hollowmere",
+      "roster": { "humanSeat": 0, "npcCount": 7 },
+      "seedWords": {
+        "deal": [1359758873, 3761132862, 2075758394, 25405621],
+        "traits": [2719517746, 3226217053, 3857888030, 3249827862],
+        "npcNames": [4150514666, 784628165, 2657988187, 1602071176],
+        "piles": [1143052388, 2458475954, 2664916109, 983124078],
+        "npcTiming": [3688185566, 4258716665, 4086627597, 3935832567],
+        "npcPlay": [4006062069, 1561876425, 2882198297, 3852069613],
+        "mobs": [4190030125, 871650656, 2455318604, 1045276388],
+        "nodes": [2287186153, 932386318, 4279068743, 313625061],
+        "minigame": [123835392, 2312130800, 4195103735, 4063187982],
+        "contract": [3082485180, 3920379642, 2686087587, 736276532],
+        "events": [3972002509, 1311583358, 2683415631, 3850057491],
+        "vendetta": [3717156842, 3123752883, 1461031504, 1319370527],
+        "tasks": [2393802123, 2649135620, 2590087095, 3128122492],
+        "body": [4084011643, 1969817514, 3859923428, 461959346],
+        "purse": [1848036394, 1138305179, 3213165630, 4284202079],
+        "talk": [280486354, 2100765972, 2871579166, 2617384907],
+        "townsfolk": [63348106, 3732997009, 546882024, 740190970],
+        "loot": [248752161, 18943114, 918275730, 2203948390],
+        "homes": [2653139167, 4013735075, 1840578071, 3166339756],
+        "locks": [1870003033, 3553155478, 3619012747, 2604039289],
+        "pairing": [3290741641, 971241027, 2724007702, 1950750697],
+        "hitman": [3647956378, 2388382196, 2025870086, 649453718]
+      },
+      "chapters": [
+        {
+          "id": "ch1_baker",
+          "title": "The Wake Loaf",
+          "setup": "Day one in HollowMere. Crumb's ovens are cold, the train is due, and the whole town wants bread by nine. You are the Baker.",
+          "roleId": "baker",
+          "startPhase": { "cycle": 1, "part": "day" },
+          "goals": [
+            {
+              "id": "gFlour",
+              "text": "Haul the morning flour from the train",
+              "trigger": {
+                "event": "taskDone",
+                "seat": "player",
+                "data": { "taskId": "fetchFlour" }
+              }
+            },
+            {
+              "id": "gDough",
+              "text": "Mix the dough at the bakery",
+              "trigger": { "event": "taskDone", "seat": "player", "data": { "taskId": "mixDough" } }
+            },
+            {
+              "id": "gBake",
+              "text": "Prove the loaves and stoke the oven",
+              "trigger": {
+                "event": "taskDone",
+                "seat": "player",
+                "data": { "taskId": "proofLoaves" }
+              }
+            },
+            { "id": "gTip", "text": "Find out who has been in your back room" }
+          ],
+          "beats": [
+            {
+              "id": "open",
+              "trigger": { "tick": 0 },
+              "action": {
+                "seq": [
+                  { "cutscene": "openingHollowmere" },
+                  {
+                    "card": "beat",
+                    "line": "Before light, the cold room hums and the oven ticks as it cools. Out on the line the morning train is already a smudge of smoke. Flour first, then the fire.",
+                    "speaker": "Dawn in HollowMere",
+                    "portrait": "baker"
+                  }
+                ]
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "train",
+              "trigger": { "event": "train.arrive" },
+              "action": {
+                "card": "beat",
+                "line": "The iron beast rolls in on time and drops its sacks on the platform. Nobody carries flour for you; nobody ever has. Haul it to the bakery before the damp gets in.",
+                "speaker": "The morning train"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "flour",
+              "trigger": {
+                "event": "taskDone",
+                "seat": "player",
+                "data": { "taskId": "fetchFlour" }
+              },
+              "action": {
+                "card": "beat",
+                "line": "Twelve sacks, and your shoulders know every one. The lane is waking up: shutters, a pump handle, a cough. Mix the dough while the ovens still hold last night's heat.",
+                "speaker": "Crumb's Bakery"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "dough",
+              "trigger": {
+                "event": "taskDone",
+                "seat": "player",
+                "data": { "taskId": "mixDough" }
+              },
+              "action": {
+                "card": "beat",
+                "line": "Dough that rises slow is dough that tastes of patience, as your mother said. A stranger's boots stand in the square by the bell. He does not buy bread. He buys a look at your door.",
+                "speaker": "The back room",
+                "portrait": "baker"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "watcher",
+              "trigger": { "tick": 3600 },
+              "action": {
+                "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "overworld" } }
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "visit",
+              "trigger": { "tick": 4200 },
+              "action": {
+                "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "bakery" } }
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "pick",
+              "trigger": { "tick": 4800 },
+              "action": {
+                "seq": [
+                  { "spawn": { "kind": "scratch", "at": "bakery:door" } },
+                  {
+                    "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "forest" } }
+                  }
+                ]
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "tip",
+              "trigger": {
+                "any": [{ "event": "clue", "data": { "kind": "scratch" } }, { "tick": 5400 }]
+              },
+              "action": {
+                "seq": [
+                  { "spawn": { "kind": "letter", "at": "bakery:door" } },
+                  {
+                    "card": "beat",
+                    "line": "Fresh scratches round the back-door lock, and on the cooling rack a single gold coin set square on a folded scrap: 'For the loaf. Keep the change.'",
+                    "speaker": "The back room",
+                    "goal": "gTip"
+                  }
+                ]
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "fence",
+              "trigger": { "tick": 7200 },
+              "action": {
+                "card": "beat",
+                "line": "A coin is a coin. You drop it in the till and the drawer sticks a moment, as if it knew. Somebody out in the lanes now thinks you are a friend of a certain sort, and a friend of that sort is never only a friend.",
+                "speaker": "The Fence road",
+                "portrait": "baker"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "bell",
+              "trigger": { "event": "bell" },
+              "action": {
+                "card": "beat",
+                "line": "The town bell is ringing. Whatever it means, it will not wait for the oven.",
+                "speaker": "The bell"
+              },
+              "oncePerChapter": true
+            }
+          ],
+          "end": {
+            "trigger": { "tick": 9000 },
+            "summaryKeys": ["loavesBaked", "coinsKept", "tasksDone"],
+            "lines": [
+              "The last loaf is cooling, the door is bolted and the coin is still in the till drawer.",
+              "HollowMere has eaten, and not one neighbour has asked where the Baker's luck comes from yet."
+            ],
+            "failedLine": "Your hands go still on the dough. The oven ticks on without you, and another pair of hands will light it in the morning."
+          },
+          "handOn": [
+            {
+              "kind": "lead",
+              "ref": "scratch",
+              "text": "You carry one thing out of the bakery: the scratch-marks round the back-door lock, and the face of the man who made them."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
