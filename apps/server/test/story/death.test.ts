@@ -11,12 +11,12 @@ import {
   startStoryRoom,
   storyDef,
 } from './fixture';
-import { STORY_MAX_TICKS, describeStory, storyServer } from './suite';
+import { STORY_MAX_TICKS, describeChapters, storyServer } from './suite';
 
 // README 2: a player death inside a chapter ends the chapter as failed, shows the end card, and the next chapter
 // still starts, so a story is always finishable. A story with no chapter left to switch to ends.
 
-describeStory('a player who dies still gets the story (README DoD 4)', () => {
+describeChapters('a player who dies still gets the story (README DoD 4)', () => {
   const server = storyServer();
 
   it('dies in chapter 1 and reaches chapter 2 with a living seat and its card', async () => {
