@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { expect, test } from '@playwright/test';
 import { skipIntro } from './helpers';
 
@@ -7,14 +5,6 @@ import { skipIntro } from './helpers';
 // `hollowmere_winter` on the authoritative server, the first chapter's title card comes up from the sim, "continue"
 // closes it by a queued command, and the world runs behind it. The mock path is `screens-story.spec.ts`.
 //
-// It runs once the server handles `story.start` (S2's room wiring); until then it is skipped, visibly, by reading the
-// room's source, so it switches on by itself when that PR merges.
-
-const roomSource = readFileSync(
-  fileURLToPath(new URL('../../server/src/rooms/PartyRoom.ts', import.meta.url)),
-  'utf8',
-);
-const serverStartsStories = roomSource.includes("'story.start'");
 
 const FIRST_CHAPTER = 'ch1_baker';
 
@@ -23,7 +13,6 @@ for (const [name, width, height, query] of [
   ['1280x720', 1280, 720, ''],
 ] as const) {
   test.describe(`a story on the live server at ${name}`, () => {
-    test.skip(!serverStartsStories, 'the server does not handle story.start yet (S2)');
     test.beforeEach(async ({ page }) => {
       await skipIntro(page);
       await page.setViewportSize({ width, height });
