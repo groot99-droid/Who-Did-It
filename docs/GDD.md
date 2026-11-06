@@ -1540,3 +1540,42 @@ the Hitman: the mail turns a townsman into one.
   window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
   black-wax mailbag and the crow on the station roof; a turned NPC seat
   stopping its routine.
+
+### 3.34 Story mode
+
+Story round (`docs/story/README.md`; `docs/round9/world-mode.md` 9, owner answers WM1 and WM1B). One human plays one
+fixed story: a match of the auto harness (3.19) with exactly one human seat, every other seat an NPC (3.12), the
+story's map, and the seed words of every random stream fixed by the story, so the same story replays tick for tick.
+No number is stated here: the roster, the seed words and the chapters are in `story.json`, the rest in
+`balance.json` under `story`.
+
+- **The room.** A story room is a `party` room the story engine (`sim/story`) turns into an auto room with one human.
+  The human is the leader; the NPC seats keep fixed ids; the clock runs at 1x and is never sped up. Nothing a client
+  sends changes the speed.
+- **Chapters.** A story is a list of chapters played in order. Each names the card the player holds for it. Chapter
+  one's card is dealt to the player at the deal (the deck's own fixed-deal request); a later chapter moves the
+  player's seat to its card at the break (the handover below). A chapter ends when its end trigger fires, or at once
+  when the player's seat dies, and either way the next chapter starts, so a story is always finishable.
+- **Cards and the pause.** A chapter's title card, a beat's card and a chapter's end card are shown to the player
+  alone and pause the clock until the player's continue. This is the only pause in any mode other than the admin
+  room (3.19): the world waits only because no second human is wronged by it. A role card is dismissed by the
+  chapter's title card.
+- **Secrecy.** Role secrecy (3.17) holds exactly as in a match. The story's cards and goals reach the player's own
+  client alone; no public field, no other seat's view and no bus event names a chapter, a goal or the player's card
+  with its holder.
+- **Beats.** A chapter's beats are each a trigger on the sim event bus (or on the chapter's own clock) and an action:
+  a card, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. Each fires once, and a goal is
+  done when its beat fires. The player's own scene changes and pickups reach the bus as `story.enter` and
+  `story.pickup`. The chapter's tick count stops while a card holds the clock.
+- **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
+  player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
+  except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
+  vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the
+  chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
+  on the card the player already holds changes no card; it starts the view over and sets its vendetta. The vendetta
+  then runs as in 3.20 (the Bandit's heist, the Activist's sabotage).
+- **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
+- **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
+  seat, and it is the story's own.
+

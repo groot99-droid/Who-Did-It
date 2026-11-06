@@ -88,6 +88,9 @@ export function autoOptionsProblem(opts: AutoOptions): string | null {
   return null;
 }
 
+/** Story mode's hook beside `enableAuto` (docs/story/README.md 2); the engine lives in `sim/story`. */
+export { enableStory } from '../story/Story';
+
 export function autoOf(room: PartyRoom): AutoState | null {
   return simOf(room).auto;
 }
