@@ -72,6 +72,10 @@ export const C2S = {
   hq: 'act.hq',
   /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
   payRent: 'act.payRent',
+  /** Story mode (docs/story/README.md 3): start the story `storyId` from the title screen; `sim/story/` (S2) handles it. */
+  storyStart: 'story.start',
+  /** Story mode: close the story card that is up; queued and consumed inside `step()`. */
+  storyContinue: 'story.continue',
 } as const;
 
 export const S2C = {
@@ -109,6 +113,10 @@ export const S2C = {
   mugPrompt: 'mugPrompt',
   /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): a death sentence's true role, to every client. */
   tribunalVerdict: 'tribunalVerdict',
+  /** Story mode (docs/story/README.md 3), private to the player's own client: a chapter card. */
+  storyCard: 'story.card',
+  /** Story mode, private to the player's own client: the chapter's goals and which are done. */
+  storyGoals: 'story.goals',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -334,6 +342,13 @@ export interface C2SPayloads {
    */
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
+   * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
+   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   */
+  'story.start': { storyId: string; chapterId?: string };
+  /** Story mode: closes the card that is up. Refused 422 with no card up. */
+  'story.continue': Record<string, never>;
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -459,6 +474,24 @@ export interface S2CPayloads {
    * of the seat held (the one card that goes out before game over, as an ejection's does).
    */
   tribunalVerdict: { roleId: string };
+  /**
+   * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
+   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
+   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
+   * is the next chapter's title.
+   */
+  'story.card': {
+    kind: 'title' | 'beat' | 'end';
+    chapterId: string;
+    title?: string;
+    lines: string[];
+    portrait?: string;
+    goal?: string;
+    summary?: Record<string, number>;
+    next?: string;
+  };
+  /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
+  'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -509,6 +542,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
+  'story.start': 2,
+  'story.continue': 5,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).
