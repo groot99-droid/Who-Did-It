@@ -11,10 +11,14 @@ Each session appends to its own section only. Newest line last.
 ## S2. Story engine
 
 - 2026-11-06 S2 started. `enableStory`, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` as a queued command and the `storyOneHuman` invariant are written on `claude/story-s2-enable-story` (draft PR to follow once the suite is green). Seat handover and the beat runner come next; the runner waits for S1's schema, so it is coded against the README section 1 shapes (`sim/story/types.ts`).
+- 2026-11-06 S2 PR #452 merged: `enableStory` (one human seat, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` queued and consumed in `step()`), invariant `storyOneHuman`, GDD 3.34.
+- 2026-11-06 S2 PR #456 open (draft): beat runner, seat handover, chapter flow, `storyBeatsOnce`; S4's handover, death, full-story, replay and leak suites pass against it. `story.enter` / `story.pickup` and `story.start` from the lobby are in. Open gaps: item `spawn`, NPC `goTo` across scenes unverified, `cutscene`/`questStep` only emit bus events, end-card counters approximated.
+
 
 ## S3. Wire and client
 
 - 2026-11-06: read the contract; branch `claude/story-s3-protocol-cards`. Protocol messages `story.start`, `story.continue`, `story.card`, `story.goals` added with `PROTOCOL.md` regenerated; story layer, chapter list, goals strip, mock server path (`?mock=1`), UI.md 14.54, DECISIONS A420, unit tests and `e2e/screens-story.spec.ts` at 390x844 and 1280x720 (screens written to the spec output). Contract additions: optional `chapterId` on `story.start` (replay); the end card's summary rows are the counter keys spelled out. Needs from others: S2 handles `story.start`/`story.continue` in `PartyRoom` and sends `story.card`/`story.goals` to the player's own client only; S1's `story.json` is read by `ui/story/catalog.ts` once it merges (the real title screen has no Story entry until then).
+- 2026-11-06: PR #453 merged (wire, cards, goals strip, Story entry, mock path). Next PR `claude/story-s3-catalog`: the title screen's Story reads `story.json` through `@wdi/content` (the real entry now shows); summary labels split camelCase counters. S2's `story.card` payload matches the wire type.
 
 ## S4. Tests and the bot
 
