@@ -38,7 +38,7 @@ import { isNpcSeat } from '../sim/Npc';
 import { registerMovement } from './handlers/movement';
 import { type FixedSeeds, MatchSeeds } from '../sim/seeds';
 import { autoOf } from '../sim/auto/Auto';
-import { queueStoryContinue, storyQueued } from '../sim/story/Story';
+import { queueStoryContinue, storyOf, storyQueued } from '../sim/story/Story';
 import { clockOf, stepsThisTick } from '../sim/auto/clock';
 
 const codeRegistries = new WeakMap<object, CodeRegistry>();
@@ -151,7 +151,10 @@ export class PartyRoom extends Room<{ state: GameStateType }> {
     this.setFixedTimestep((ctx) => {
       // Round 6 (docs/round6/auto-admin.md 2, locked): the clock says how many steps this tick runs; a `party` room
       // always runs one. The sample recorded is per step, so `tickP95` stays comparable at every scale.
-      const queued = (autoOf(this)?.commands.length ?? 0) + storyQueued(this); // story: a waiting `story.continue`
+      const queued =
+        (autoOf(this)?.commands.length ?? 0) +
+        storyQueued(this) +
+        (storyOf(this)?.cardUp ? this.commands.size : 0); // story: a waiting `story.continue`
       const n = stepsThisTick(clockOf(this), this.lastStepMs, queued);
       if (n > 0) {
         const t0 = performance.now();

@@ -19,6 +19,20 @@ import { profileOfRoom } from '../npc/routine';
  * body and position stay with the seat.
  */
 
+/**
+ * The NPC seat that takes the old card when the new one is undealt (the deck holds more cards than the table has
+ * seats): the first NPC seat in seat order that holds a Village card and no chapter's card, so a Killer never loses
+ * its seat to the break; its own card leaves play. Null when there is none.
+ */
+function spareSeat(room: PartyRoom, humanId: string, keep: ReadonlySet<string>): string | null {
+  for (const [id, player] of room.state.players) {
+    const card = player.priv?.role.roleId ?? '';
+    if (id === humanId || keep.has(card)) continue;
+    if (roles.roles[card]?.faction === 'village') return id;
+  }
+  return null;
+}
+
 /** The seat other than `humanId` that holds `roleId`, or null when the card is undealt. */
 export function holderOf(room: PartyRoom, humanId: string, roleId: string): string | null {
   for (const [id, player] of room.state.players)
@@ -127,17 +141,25 @@ function refreshMates(room: PartyRoom): void {
  * seat that held the new one, whose brain is reset; with no holder the old card leaves play. A dead human is made
  * whole in place. Returns the seat that now holds the old card, or null.
  */
-export function switchRole(room: PartyRoom, humanId: string, roleId: string, look?: string): string | null {
+export function switchRole(
+  room: PartyRoom,
+  humanId: string,
+  roleId: string,
+  look?: string,
+  keep: ReadonlySet<string> = new Set(),
+): string | null {
   const human = room.state.players.get(humanId);
   if (!human) throw new Error(`switchRole: no seat ${humanId}`);
-  const holderId = holderOf(room, humanId, roleId);
+  const holderId = holderOf(room, humanId, roleId) ?? spareSeat(room, humanId, new Set([...keep, roleId]));
   const holder = holderId === null ? undefined : room.state.players.get(holderId);
 
   const mine = takeCard(human);
-  const theirs = holder
-    ? takeCard(holder)
-    : { ...mine, roleId, team: Team[roles.roles[roleId]?.faction as TeamId] };
-  if (!holder) {
+  const dealt = holderOf(room, humanId, roleId) !== null;
+  const theirs =
+    dealt && holder
+      ? takeCard(holder)
+      : { ...mine, roleId, team: Team[roles.roles[roleId]?.faction as TeamId] };
+  if (!dealt) {
     theirs.slots = (roles.roles[roleId]?.startKit ?? []).map((k, i) => ({
       defId: k.item,
       qty: k.qty,

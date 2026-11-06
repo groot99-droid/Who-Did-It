@@ -22,6 +22,7 @@ import { handlePairAnswer, handlePairAsk } from './law/Pairing';
 import { handlePetitionOpen, handlePetitionSign } from './law/Petition';
 import { handlePresent } from './law/Tribunal';
 import { wakeOnInput } from './Sleep';
+import { queueStoryContinue } from './story/Story';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
@@ -52,6 +53,11 @@ export class CommandQueue {
     this.moves.delete(sessionId);
   }
 
+  /** Commands waiting for the next step (a paused story clock steps for them). */
+  get size(): number {
+    return this.items.length;
+  }
+
   /** Hands over everything queued so far in arrival order. */
   drain(): QueuedCommand[] {
     const out = this.items;
@@ -69,6 +75,9 @@ export function runCommands(room: PartyRoom): void {
     // Round 10, A7 (GDD 3.32): a sleeper's first input wakes it and is refused, silently; chat is not an act.
     if (cmd.type !== C2S.say && wakeOnInput(room, cmd.sessionId, true)) continue;
     switch (cmd.type) {
+      case 'story.continue': // story mode (docs/story/README.md 2): a card is closed in the story stage
+        queueStoryContinue(room, cmd.sessionId);
+        break;
       case C2S.enterPortal:
         queuePortal(room, cmd.sessionId, payload);
         break;
