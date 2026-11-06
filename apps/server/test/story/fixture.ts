@@ -1,17 +1,25 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import type { Client } from '@colyseus/core';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { type InvariantFailure, Phase, type SimEventWire } from '@wdi/shared';
 import type { PartyRoom } from '../../src/rooms/PartyRoom';
-import * as AutoModule from '../../src/sim/auto/Auto';
-import { applyClock } from '../../src/sim/auto/Auto';
+import { autoOf } from '../../src/sim/auto/Auto';
+import { clockOf, stepsThisTick } from '../../src/sim/auto/clock';
 import { runInvariants } from '../../src/sim/auto/invariants';
 import { markDead } from '../../src/sim/Death';
 import { isNpcSeat } from '../../src/sim/Npc';
 import { ANY_SIM, onSim } from '../../src/sim/events/bus';
 import { simOf } from '../../src/sim/RoomSim';
+import {
+  enableStory,
+  queueStoryContinue,
+  queueStoryStart,
+  registerStory,
+  storyQueued,
+} from '../../src/sim/story/Story';
+import type { Story } from '../../src/sim/story/types';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -54,7 +62,7 @@ export interface StoryDef {
   id: string;
   mapId: string;
   roster: { humanSeat: 0; npcCount: number };
-  seedWords: Record<string, [number, number]>;
+  seedWords: Record<string, [number, number, number, number]>;
   chapters: {
     id: string;
     roleId: string;
@@ -65,12 +73,6 @@ export interface StoryDef {
 }
 
 // --- what exists yet -------------------------------------------------------------------------------------------
-
-type EnableStory = (room: PartyRoom, storyId: string) => void;
-
-/** S2's `enableStory`, or null while it has not merged (README 2: "beside `enableAuto`"). */
-export const enableStory: EnableStory | null =
-  ((AutoModule as Record<string, unknown>).enableStory as EnableStory | undefined) ?? null;
 
 /** `story.json` read straight off disk (README 1 fixes its shape), or null while S1's file has not merged. */
 export function loadStoryFile(): Record<string, StoryDef> | null {
@@ -89,8 +91,26 @@ export function storyDef(id = STORY_ID): StoryDef | null {
   return loadStoryFile()?.[id] ?? null;
 }
 
-/** True when the engine and the content are both in: the suites that play a story run only then. */
-export const storyReady = (): boolean => enableStory !== null && storyDef() !== null;
+/** True when `story.json` has the story the tests play. The engine is imported directly (S2 merged it). */
+export const storyReady = (): boolean => storyDef() !== null;
+
+/**
+ * True once the engine runs whole chapters: the beat runner emits `story.chapterEnd` and the seat handover
+ * (`switchRole`) is in `sim/story/`. Feature-detected from S2's sources so the suites that need chapter breaks skip
+ * (visibly) until then and switch on by themselves; `WDI_STORY_REQUIRED=1` makes them fail instead of skip.
+ */
+export function chaptersReady(): boolean {
+  const dir = fileURLToPath(new URL('../../src/sim/story/', import.meta.url));
+  try {
+    const src = readdirSync(dir)
+      .filter((f) => f.endsWith('.ts'))
+      .map((f) => readFileSync(`${dir}${f}`, 'utf8'))
+      .join('\n');
+    return src.includes("'story.chapterEnd'") && src.includes('switchRole');
+  } catch {
+    return false;
+  }
+}
 
 // --- the story room --------------------------------------------------------------------------------------------
 
@@ -129,7 +149,6 @@ export async function startStoryRoom(
   colyseus: ColyseusTestServer,
   opts: StartOptions = {},
 ): Promise<StoryRoom> {
-  if (enableStory === null) throw new Error('startStoryRoom: S2 has not merged enableStory');
   const storyId = opts.storyId ?? STORY_ID;
   const def = storyDef(storyId);
   if (def === null) throw new Error(`startStoryRoom: no story ${storyId} in story.json`);
@@ -152,10 +171,11 @@ export async function startStoryRoom(
   };
   captureSent(sr);
   onSim(room, ANY_SIM, (ev) => sr.events.push({ ...ev }));
-  enableStory(room, storyId);
+  // The engine resolves a story by id from its registry; the content file's story is registered as it stands.
+  registerStory(def as unknown as Story);
+  enableStory(room, storyId, { humanId });
   opts.afterEnable?.(room);
-  // Clock paused by the harness stays paused: the fixture steps the room itself.
-  applyClock(room, { paused: true });
+  queueStoryStart(room);
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);
   if (room.state.phase === Phase.lobby) throw new Error('startStoryRoom: the story did not start');
   return sr;
@@ -176,9 +196,14 @@ function captureSent(sr: StoryRoom): void {
   };
 }
 
-/** Steps `n` ticks; invariants every `every` ticks when asked. */
+/**
+ * Steps `n` ticks the way the room's own clock would (`PartyRoom`): a paused clock (a card is up) runs a step only
+ * for a queued command, so the world waits on a card as it does live. Invariants every `every` ticks when asked.
+ */
 export function stepRoom(sr: StoryRoom, n: number, every = 0): void {
   for (let i = 0; i < n; i++) {
+    const queued = (autoOf(sr.room)?.commands.length ?? 0) + storyQueued(sr.room);
+    if (stepsThisTick(clockOf(sr.room), 0, queued) === 0) continue;
     advance(sr.party, 1);
     if (every > 0 && sr.room.state.tick % every === 0) sr.failures.push(...runInvariants(sr.room));
   }
@@ -188,8 +213,7 @@ export function stepRoom(sr: StoryRoom, n: number, every = 0): void {
 
 /** Queues the player's `story.continue`, consumed in the next `step()`. */
 export function continueCard(sr: StoryRoom): void {
-  const client = { sessionId: sr.humanId } as Client;
-  sr.room.commands.push(client, STORY_MSG.continue, {});
+  queueStoryContinue(sr.room, sr.humanId);
 }
 
 /** The newest `story.card` the player has not answered, or null. */
@@ -199,10 +223,10 @@ export function pendingCard(sr: StoryRoom): StoryCard | null {
 
 /** The chapter ids the bus has started, in order. */
 export const chaptersStarted = (sr: StoryRoom): string[] =>
-  sr.events.filter((e) => e.kind === 'story.chapterStart').map((e) => String(e.data?.chapterId ?? ''));
+  sr.events.filter((e) => e.kind === 'story.chapterStart').map((e) => String(e.data?.chapter ?? ''));
 
 export const chaptersEnded = (sr: StoryRoom): string[] =>
-  sr.events.filter((e) => e.kind === 'story.chapterEnd').map((e) => String(e.data?.chapterId ?? ''));
+  sr.events.filter((e) => e.kind === 'story.chapterEnd').map((e) => String(e.data?.chapter ?? ''));
 
 /**
  * The seat the human controls now. A chapter break can move the human to another seat id (README 2: "an NPC seat

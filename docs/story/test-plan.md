@@ -10,9 +10,9 @@ else:
 
 | Need | From | How the fixture uses it |
 |---|---|---|
-| `enableStory(room, storyId)` exported from `sim/auto/Auto.ts` | S2 | Read off the module by name; null until it lands, so the suites skip (they do not fail) before S2 merges |
+| `enableStory`, `queueStoryStart`, `queueStoryContinue`, `registerStory` from `sim/story/Story.ts` | S2 | Called directly; the fixture registers `story.json`'s story and steps the room as its clock does (a card pauses the world) |
 | `packages/content/data/story.json` in the README 1 shape | S1 | Read from disk, no content API needed; `hollowmere_winter` |
-| Bus events `story.beat`, `story.chapterStart`, `story.chapterEnd`, `story.goal` with `data.chapterId` | S2 | `chaptersStarted`, `chaptersEnded` |
+| Bus events `story.beat`, `story.chapterStart`, `story.chapterEnd`, `story.goal` with `data.chapter` | S2 | `chaptersStarted`, `chaptersEnded` |
 | Private messages `story.card`, `story.goals` and the command `story.continue` | S3 (wire), S2 (consumes) | Cards are captured server-side on the player's client; `story.continue` is pushed on the room's command queue and consumed in `step()` |
 | One non-NPC seat at all times | S2 | `humanSeat`, `humanSeatCount` |
 
