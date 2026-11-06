@@ -6,143 +6,30 @@
       "title": "A Winter in HollowMere",
       "blurb": "One town, three nights and days, three trades: the Baker whose coin has a story, the Watchman who follows the boots, and the Bandit who made them.",
       "mapId": "hollowmere",
-      "roster": {
-        "humanSeat": 0,
-        "npcCount": 7
-      },
+      "roster": { "humanSeat": 0, "npcCount": 7 },
       "seedWords": {
-        "deal": [
-          1359758873,
-          3761132862,
-          2075758394,
-          25405621
-        ],
-        "traits": [
-          2719517746,
-          3226217053,
-          3857888030,
-          3249827862
-        ],
-        "npcNames": [
-          4150514666,
-          784628165,
-          2657988187,
-          1602071176
-        ],
-        "piles": [
-          1143052388,
-          2458475954,
-          2664916109,
-          983124078
-        ],
-        "npcTiming": [
-          3688185566,
-          4258716665,
-          4086627597,
-          3935832567
-        ],
-        "npcPlay": [
-          4006062069,
-          1561876425,
-          2882198297,
-          3852069613
-        ],
-        "mobs": [
-          4190030125,
-          871650656,
-          2455318604,
-          1045276388
-        ],
-        "nodes": [
-          2287186153,
-          932386318,
-          4279068743,
-          313625061
-        ],
-        "minigame": [
-          123835392,
-          2312130800,
-          4195103735,
-          4063187982
-        ],
-        "contract": [
-          3082485180,
-          3920379642,
-          2686087587,
-          736276532
-        ],
-        "events": [
-          3972002509,
-          1311583358,
-          2683415631,
-          3850057491
-        ],
-        "vendetta": [
-          3717156842,
-          3123752883,
-          1461031504,
-          1319370527
-        ],
-        "tasks": [
-          2393802123,
-          2649135620,
-          2590087095,
-          3128122492
-        ],
-        "body": [
-          4084011643,
-          1969817514,
-          3859923428,
-          461959346
-        ],
-        "purse": [
-          1848036394,
-          1138305179,
-          3213165630,
-          4284202079
-        ],
-        "talk": [
-          280486354,
-          2100765972,
-          2871579166,
-          2617384907
-        ],
-        "townsfolk": [
-          63348106,
-          3732997009,
-          546882024,
-          740190970
-        ],
-        "loot": [
-          248752161,
-          18943114,
-          918275730,
-          2203948390
-        ],
-        "homes": [
-          2653139167,
-          4013735075,
-          1840578071,
-          3166339756
-        ],
-        "locks": [
-          1870003033,
-          3553155478,
-          3619012747,
-          2604039289
-        ],
-        "pairing": [
-          3290741641,
-          971241027,
-          2724007702,
-          1950750697
-        ],
-        "hitman": [
-          3647956378,
-          2388382196,
-          2025870086,
-          649453718
-        ]
+        "deal": [1359758873, 3761132862, 2075758394, 25405621],
+        "traits": [2719517746, 3226217053, 3857888030, 3249827862],
+        "npcNames": [4150514666, 784628165, 2657988187, 1602071176],
+        "piles": [1143052388, 2458475954, 2664916109, 983124078],
+        "npcTiming": [3688185566, 4258716665, 4086627597, 3935832567],
+        "npcPlay": [4006062069, 1561876425, 2882198297, 3852069613],
+        "mobs": [4190030125, 871650656, 2455318604, 1045276388],
+        "nodes": [2287186153, 932386318, 4279068743, 313625061],
+        "minigame": [123835392, 2312130800, 4195103735, 4063187982],
+        "contract": [3082485180, 3920379642, 2686087587, 736276532],
+        "events": [3972002509, 1311583358, 2683415631, 3850057491],
+        "vendetta": [3717156842, 3123752883, 1461031504, 1319370527],
+        "tasks": [2393802123, 2649135620, 2590087095, 3128122492],
+        "body": [4084011643, 1969817514, 3859923428, 461959346],
+        "purse": [1848036394, 1138305179, 3213165630, 4284202079],
+        "talk": [280486354, 2100765972, 2871579166, 2617384907],
+        "townsfolk": [63348106, 3732997009, 546882024, 740190970],
+        "loot": [248752161, 18943114, 918275730, 2203948390],
+        "homes": [2653139167, 4013735075, 1840578071, 3166339756],
+        "locks": [1870003033, 3553155478, 3619012747, 2604039289],
+        "pairing": [3290741641, 971241027, 2724007702, 1950750697],
+        "hitman": [3647956378, 2388382196, 2025870086, 649453718]
       },
       "chapters": [
         {
@@ -150,10 +37,7 @@
           "title": "The Wake Loaf",
           "setup": "Day one in HollowMere. Crumb's ovens are cold, the train is due, and the whole town wants bread by nine. You are the Baker.",
           "roleId": "baker",
-          "startPhase": {
-            "cycle": 1,
-            "part": "day"
-          },
+          "startPhase": { "cycle": 1, "part": "day" },
           "goals": [
             {
               "id": "gFlour",
@@ -161,21 +45,13 @@
               "trigger": {
                 "event": "taskDone",
                 "seat": "player",
-                "data": {
-                  "taskId": "fetchFlour"
-                }
+                "data": { "taskId": "fetchFlour" }
               }
             },
             {
               "id": "gDough",
               "text": "Mix the dough at the bakery",
-              "trigger": {
-                "event": "taskDone",
-                "seat": "player",
-                "data": {
-                  "taskId": "mixDough"
-                }
-              }
+              "trigger": { "event": "taskDone", "seat": "player", "data": { "taskId": "mixDough" } }
             },
             {
               "id": "gBake",
@@ -183,27 +59,18 @@
               "trigger": {
                 "event": "taskDone",
                 "seat": "player",
-                "data": {
-                  "taskId": "proofLoaves"
-                }
+                "data": { "taskId": "proofLoaves" }
               }
             },
-            {
-              "id": "gTip",
-              "text": "Find out who has been in your back room"
-            }
+            { "id": "gTip", "text": "Find out who has been in your back room" }
           ],
           "beats": [
             {
               "id": "open",
-              "trigger": {
-                "tick": 0
-              },
+              "trigger": { "tick": 0 },
               "action": {
                 "seq": [
-                  {
-                    "cutscene": "openingHollowmere"
-                  },
+                  { "cutscene": "openingHollowmere" },
                   {
                     "card": "beat",
                     "line": "Before light, the cold room hums and the oven ticks as it cools. Out on the line the morning train is already a smudge of smoke. Flour first, then the fire.",
@@ -216,9 +83,7 @@
             },
             {
               "id": "train",
-              "trigger": {
-                "event": "train.arrive"
-              },
+              "trigger": { "event": "train.arrive" },
               "action": {
                 "card": "beat",
                 "line": "The iron beast rolls in on time and drops its sacks on the platform. Nobody carries flour for you; nobody ever has. Haul it to the bakery before the damp gets in.",
@@ -231,9 +96,7 @@
               "trigger": {
                 "event": "taskDone",
                 "seat": "player",
-                "data": {
-                  "taskId": "fetchFlour"
-                }
+                "data": { "taskId": "fetchFlour" }
               },
               "action": {
                 "card": "beat",
@@ -247,9 +110,7 @@
               "trigger": {
                 "event": "taskDone",
                 "seat": "player",
-                "data": {
-                  "taskId": "mixDough"
-                }
+                "data": { "taskId": "mixDough" }
               },
               "action": {
                 "card": "beat",
@@ -261,57 +122,28 @@
             },
             {
               "id": "watcher",
-              "trigger": {
-                "tick": 3600
-              },
+              "trigger": { "tick": 3600 },
               "action": {
-                "npcOrder": {
-                  "npcId": "thief",
-                  "order": "goTo",
-                  "args": {
-                    "scene": "overworld"
-                  }
-                }
+                "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "overworld" } }
               },
               "oncePerChapter": true
             },
             {
               "id": "visit",
-              "trigger": {
-                "tick": 4200
-              },
+              "trigger": { "tick": 4200 },
               "action": {
-                "npcOrder": {
-                  "npcId": "thief",
-                  "order": "goTo",
-                  "args": {
-                    "scene": "bakery"
-                  }
-                }
+                "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "bakery" } }
               },
               "oncePerChapter": true
             },
             {
               "id": "pick",
-              "trigger": {
-                "tick": 4800
-              },
+              "trigger": { "tick": 4800 },
               "action": {
                 "seq": [
+                  { "spawn": { "kind": "scratch", "at": "bakery:door" } },
                   {
-                    "spawn": {
-                      "kind": "scratch",
-                      "at": "bakery:door"
-                    }
-                  },
-                  {
-                    "npcOrder": {
-                      "npcId": "thief",
-                      "order": "goTo",
-                      "args": {
-                        "scene": "forest"
-                      }
-                    }
+                    "npcOrder": { "npcId": "thief", "order": "goTo", "args": { "scene": "forest" } }
                   }
                 ]
               },
@@ -320,26 +152,11 @@
             {
               "id": "tip",
               "trigger": {
-                "any": [
-                  {
-                    "event": "clue",
-                    "data": {
-                      "kind": "scratch"
-                    }
-                  },
-                  {
-                    "tick": 5400
-                  }
-                ]
+                "any": [{ "event": "clue", "data": { "kind": "scratch" } }, { "tick": 5400 }]
               },
               "action": {
                 "seq": [
-                  {
-                    "spawn": {
-                      "kind": "letter",
-                      "at": "bakery:door"
-                    }
-                  },
+                  { "spawn": { "kind": "letter", "at": "bakery:door" } },
                   {
                     "card": "beat",
                     "line": "Fresh scratches round the back-door lock, and on the cooling rack a single gold coin set square on a folded scrap: 'For the loaf. Keep the change.'",
@@ -352,9 +169,7 @@
             },
             {
               "id": "fence",
-              "trigger": {
-                "tick": 7200
-              },
+              "trigger": { "tick": 7200 },
               "action": {
                 "card": "beat",
                 "line": "A coin is a coin. You drop it in the till and the drawer sticks a moment, as if it knew. Somebody out in the lanes now thinks you are a friend of a certain sort, and a friend of that sort is never only a friend.",
@@ -365,9 +180,7 @@
             },
             {
               "id": "bell",
-              "trigger": {
-                "event": "bell"
-              },
+              "trigger": { "event": "bell" },
               "action": {
                 "card": "beat",
                 "line": "The town bell is ringing. Whatever it means, it will not wait for the oven.",
@@ -377,14 +190,8 @@
             }
           ],
           "end": {
-            "trigger": {
-              "tick": 9000
-            },
-            "summaryKeys": [
-              "loavesBaked",
-              "coinsKept",
-              "tasksDone"
-            ],
+            "trigger": { "tick": 9000 },
+            "summaryKeys": ["loavesBaked", "coinsKept", "tasksDone"],
             "lines": [
               "The last loaf is cooling, the door is bolted and the coin is still in the till drawer.",
               "HollowMere has eaten, and not one neighbour has asked where the Baker's luck comes from yet."
@@ -404,40 +211,21 @@
           "title": "The Watchman's Night",
           "setup": "The same night, the other end of town. The lamps are lit and the lanes empty. You are the Watchman, and you have a neighbour to stand over.",
           "roleId": "watchman",
-          "startPhase": {
-            "cycle": 1,
-            "part": "night"
-          },
+          "startPhase": { "cycle": 1, "part": "night" },
           "goals": [
-            {
-              "id": "gRound",
-              "text": "Walk the square with your lantern"
-            },
+            { "id": "gRound", "text": "Walk the square with your lantern" },
             {
               "id": "gPrints",
               "text": "Follow the stranger's prints",
-              "trigger": {
-                "event": "clue",
-                "data": {
-                  "kind": "footprints"
-                }
-              }
+              "trigger": { "event": "clue", "data": { "kind": "footprints" } }
             },
-            {
-              "id": "gWatch",
-              "text": "Stand watch until the small hours"
-            },
-            {
-              "id": "gDawn",
-              "text": "See the night out"
-            }
+            { "id": "gWatch", "text": "Stand watch until the small hours" },
+            { "id": "gDawn", "text": "See the night out" }
           ],
           "beats": [
             {
               "id": "open",
-              "trigger": {
-                "tick": 0
-              },
+              "trigger": { "tick": 0 },
               "action": {
                 "card": "beat",
                 "line": "Dusk comes down on the mere like a lid. The Lamplighter has been round before you; the lanterns burn in a row to the chapel. Your round starts at the bell and ends when the sun does.",
@@ -449,9 +237,7 @@
             },
             {
               "id": "dusk",
-              "trigger": {
-                "event": "train.dusk"
-              },
+              "trigger": { "event": "train.dusk" },
               "action": {
                 "card": "beat",
                 "line": "The dusk train whistles on the cutting and is gone. Whoever came in on it did not come to town by the front way.",
@@ -461,25 +247,19 @@
             },
             {
               "id": "lamps",
-              "trigger": {
-                "tick": 300
-              },
+              "trigger": { "tick": 300 },
               "action": {
                 "npcOrder": {
                   "npcId": "lamplighter",
                   "order": "goTo",
-                  "args": {
-                    "scene": "overworld"
-                  }
+                  "args": { "scene": "overworld" }
                 }
               },
               "oncePerChapter": true
             },
             {
               "id": "round",
-              "trigger": {
-                "tick": 1200
-              },
+              "trigger": { "tick": 1200 },
               "action": {
                 "card": "beat",
                 "line": "Every door on the square is bolted. That is not comfort; it is information. Somebody told these people to be afraid, and they listened.",
@@ -490,38 +270,24 @@
             },
             {
               "id": "stranger",
-              "trigger": {
-                "tick": 2400
-              },
+              "trigger": { "tick": 2400 },
               "action": {
                 "seq": [
                   {
                     "npcOrder": {
                       "npcId": "thief",
                       "order": "goTo",
-                      "args": {
-                        "scene": "manor_hall"
-                      }
+                      "args": { "scene": "manor_hall" }
                     }
                   },
-                  {
-                    "spawn": {
-                      "kind": "footprints",
-                      "at": "manor_hall:front"
-                    }
-                  }
+                  { "spawn": { "kind": "footprints", "at": "manor_hall:front" } }
                 ]
               },
               "oncePerChapter": true
             },
             {
               "id": "prints",
-              "trigger": {
-                "event": "clue",
-                "data": {
-                  "kind": "footprints"
-                }
-              },
+              "trigger": { "event": "clue", "data": { "kind": "footprints" } },
               "action": {
                 "card": "beat",
                 "line": "Wet prints, size nine, crossing the manor's front step in a hurry, with a scrape where a heel dragged. The bakery's scratch-marks and these prints came out of the same boot.",
@@ -533,16 +299,7 @@
             },
             {
               "id": "quiet",
-              "trigger": {
-                "any": [
-                  {
-                    "event": "death"
-                  },
-                  {
-                    "tick": 4200
-                  }
-                ]
-              },
+              "trigger": { "any": [{ "event": "death" }, { "tick": 4200 }] },
               "action": {
                 "card": "beat",
                 "line": "Past the second hour the town feels thinner: a shutter standing open, a lamp burnt dry, a gate that should be latched. Whatever the night is taking, it takes quietly.",
@@ -554,9 +311,7 @@
             },
             {
               "id": "bell",
-              "trigger": {
-                "event": "bell"
-              },
+              "trigger": { "event": "bell" },
               "action": {
                 "card": "beat",
                 "line": "The bell, and then nothing. The Watchman's rule is simple: if the bell rings, you go; if you are late, someone is dead.",
@@ -566,9 +321,7 @@
             },
             {
               "id": "kill",
-              "trigger": {
-                "event": "kill"
-              },
+              "trigger": { "event": "kill" },
               "action": {
                 "card": "beat",
                 "line": "There is a body in the lane, and the cold on it says it has been there some time. You were forty yards off, looking at a closed door.",
@@ -579,9 +332,7 @@
             },
             {
               "id": "grey",
-              "trigger": {
-                "tick": 5400
-              },
+              "trigger": { "tick": 5400 },
               "action": {
                 "card": "beat",
                 "line": "Grey on the eastern roofs. You have lost count of the doors. The man with the wet boots is not on any road you walked tonight, which means he is not on any road he meant you to walk.",
@@ -593,14 +344,8 @@
             }
           ],
           "end": {
-            "trigger": {
-              "tick": 6000
-            },
-            "summaryKeys": [
-              "roundsWalked",
-              "cluesFound",
-              "neighboursWatched"
-            ],
+            "trigger": { "tick": 6000 },
+            "summaryKeys": ["roundsWalked", "cluesFound", "neighboursWatched"],
             "lines": [
               "Dawn finds you on the chapel step with a cold lantern and wet knees.",
               "HollowMere counts its heads in the half light; whoever is missing, you know the boots that walked past them."
@@ -621,10 +366,7 @@
           "setup": "Second night. The coin was a down payment, the watch a map. You are the Bandit, the town's outlaw, and Vane Manor has a strongbox worth the whole town's rent.",
           "roleId": "killer",
           "look": "drifter",
-          "startPhase": {
-            "cycle": 2,
-            "part": "night"
-          },
+          "startPhase": { "cycle": 2, "part": "night" },
           "goals": [
             {
               "id": "gCase",
@@ -632,33 +374,24 @@
               "trigger": {
                 "event": "story.enter",
                 "seat": "player",
-                "data": {
-                  "sceneId": "manor_hall"
-                }
+                "data": { "sceneId": "manor_hall" }
               }
             },
-            {
-              "id": "gCrack",
-              "text": "Crack the strongbox, alone and still"
-            },
+            { "id": "gCrack", "text": "Crack the strongbox, alone and still" },
             {
               "id": "gSea",
               "text": "Reach the sea door at the back of the cave",
               "trigger": {
                 "event": "story.enter",
                 "seat": "player",
-                "data": {
-                  "sceneId": "cave_entry"
-                }
+                "data": { "sceneId": "cave_entry" }
               }
             }
           ],
           "beats": [
             {
               "id": "open",
-              "trigger": {
-                "tick": 0
-              },
+              "trigger": { "tick": 0 },
               "action": {
                 "card": "beat",
                 "line": "Nobody locks a bakery door against a man who tips in gold. You stand in the cold, the outlaw of HollowMere, with the Knife in your boot and a Watchman's round to beat.",
@@ -669,25 +402,15 @@
             },
             {
               "id": "baker",
-              "trigger": {
-                "tick": 400
-              },
+              "trigger": { "tick": 400 },
               "action": {
-                "npcOrder": {
-                  "npcId": "baker",
-                  "order": "goTo",
-                  "args": {
-                    "scene": "bakery"
-                  }
-                }
+                "npcOrder": { "npcId": "baker", "order": "goTo", "args": { "scene": "bakery" } }
               },
               "oncePerChapter": true
             },
             {
               "id": "square",
-              "trigger": {
-                "tick": 900
-              },
+              "trigger": { "tick": 900 },
               "action": {
                 "card": "beat",
                 "line": "The square is yours between the bell and the lamp, and the Baker has left the back door on the latch like a promise. The Hall is across the lane. Go while the round is the other way.",
@@ -701,9 +424,7 @@
               "trigger": {
                 "event": "story.enter",
                 "seat": "player",
-                "data": {
-                  "sceneId": "manor_hall"
-                }
+                "data": { "sceneId": "manor_hall" }
               },
               "action": {
                 "card": "beat",
@@ -716,9 +437,7 @@
             },
             {
               "id": "pick",
-              "trigger": {
-                "event": "vendetta.heist.cracked"
-              },
+              "trigger": { "event": "vendetta.heist.cracked" },
               "action": {
                 "card": "beat",
                 "line": "The box gives with a sigh and comes away in your arms. A footprint at the foot of the safe now says everything about your height, and the Knife is warm in your boot again.",
@@ -730,23 +449,12 @@
             },
             {
               "id": "alarm",
-              "trigger": {
-                "any": [
-                  {
-                    "event": "bell"
-                  },
-                  {
-                    "tick": 5400
-                  }
-                ]
-              },
+              "trigger": { "any": [{ "event": "bell" }, { "tick": 5400 }] },
               "action": {
                 "npcOrder": {
                   "npcId": "watchman",
                   "order": "goTo",
-                  "args": {
-                    "scene": "manor_hall"
-                  }
+                  "args": { "scene": "manor_hall" }
                 }
               },
               "oncePerChapter": true
@@ -756,9 +464,7 @@
               "trigger": {
                 "event": "story.enter",
                 "seat": "player",
-                "data": {
-                  "sceneId": "cave_entry"
-                }
+                "data": { "sceneId": "cave_entry" }
               },
               "action": {
                 "card": "beat",
@@ -771,9 +477,7 @@
             },
             {
               "id": "smoke",
-              "trigger": {
-                "tick": 6300
-              },
+              "trigger": { "tick": 6300 },
               "action": {
                 "card": "beat",
                 "line": "Behind you the town finds out. Ahead is a dark boat and a longer road than the one you came by. The Baker's coin is spent; the Fence will make it back.",
@@ -786,23 +490,11 @@
           "end": {
             "trigger": {
               "any": [
-                {
-                  "event": "story.enter",
-                  "seat": "player",
-                  "data": {
-                    "sceneId": "cave_entry"
-                  }
-                },
-                {
-                  "tick": 6800
-                }
+                { "event": "story.enter", "seat": "player", "data": { "sceneId": "cave_entry" } },
+                { "tick": 6800 }
               ]
             },
-            "summaryKeys": [
-              "strongboxTaken",
-              "cluesFound",
-              "nightsUsed"
-            ],
+            "summaryKeys": ["strongboxTaken", "cluesFound", "nightsUsed"],
             "lines": [
               "The sea door shuts behind you, and for the first time in two nights nobody is watching.",
               "HollowMere wakes poorer by a strongbox and richer by a story, and the Baker keeps a coin that will not spend."
@@ -818,29 +510,19 @@
           "roleId": "killer",
           "vendetta": "activist",
           "look": "tinner",
-          "startPhase": {
-            "cycle": 3,
-            "part": "day"
-          },
+          "startPhase": { "cycle": 3, "part": "day" },
           "goals": [
             {
               "id": "gTamper",
               "text": "Tamper with a work, still and unseen",
-              "trigger": {
-                "event": "vendetta.sabotage.tampered"
-              }
+              "trigger": { "event": "vendetta.sabotage.tampered" }
             },
-            {
-              "id": "gWreck",
-              "text": "Wreck the works"
-            }
+            { "id": "gWreck", "text": "Wreck the works" }
           ],
           "beats": [
             {
               "id": "open",
-              "trigger": {
-                "tick": 0
-              },
+              "trigger": { "tick": 0 },
               "action": {
                 "card": "beat",
                 "line": "Bright morning, and a town at its chores. The pump, the fence, the lanterns: everything HollowMere needs to feel safe is a thing a patient pair of hands can undo. You have patient hands.",
@@ -851,9 +533,7 @@
             },
             {
               "id": "tamper",
-              "trigger": {
-                "event": "vendetta.sabotage.tampered"
-              },
+              "trigger": { "event": "vendetta.sabotage.tampered" },
               "action": {
                 "card": "beat",
                 "line": "One work is loosened and nobody saw you stand there. Hold still, hold long enough, and the town's mending starts to undo itself.",
@@ -864,9 +544,7 @@
             },
             {
               "id": "wreck",
-              "trigger": {
-                "event": "vendetta.sabotage.wrecked"
-              },
+              "trigger": { "event": "vendetta.sabotage.wrecked" },
               "action": {
                 "card": "beat",
                 "line": "The works are wrecked, and the finished chores of the day fall back to undone. The Constable will ask who was near them. You were near all of them.",
@@ -878,9 +556,7 @@
             },
             {
               "id": "late",
-              "trigger": {
-                "tick": 7200
-              },
+              "trigger": { "tick": 7200 },
               "action": {
                 "card": "beat",
                 "line": "The light is going. A town can forgive a broken pump; it never forgives a pattern. Finish, or step back into the crowd.",
@@ -891,21 +567,8 @@
             }
           ],
           "end": {
-            "trigger": {
-              "any": [
-                {
-                  "event": "vendetta.sabotage.wrecked"
-                },
-                {
-                  "tick": 8400
-                }
-              ]
-            },
-            "summaryKeys": [
-              "targetsTampered",
-              "worksWrecked",
-              "tasksDone"
-            ],
+            "trigger": { "any": [{ "event": "vendetta.sabotage.wrecked" }, { "tick": 8400 }] },
+            "summaryKeys": ["targetsTampered", "worksWrecked", "tasksDone"],
             "lines": [
               "The lamps are lit by people who no longer trust the pump, and nobody can say whose hands it was.",
               "HollowMere sleeps behind a mended fence it will not believe in."
