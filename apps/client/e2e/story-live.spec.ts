@@ -36,7 +36,9 @@ for (const [name, width, height, query] of [
       expect(box!.y + box!.height).toBeLessThanOrEqual(height + 0.5);
 
       await page.getByTestId('story-continue').click();
-      await expect(card).toHaveCount(0);
+      // The title card is gone. A beat's card may be queued behind it (cards queue), so another card can follow;
+      // the contract is that "continue" closes the card that was up, not that none comes next.
+      await expect(page.locator('[data-testid="story-card"][data-kind="title"]')).toHaveCount(0);
       // The world is up behind the card: the canvas draws, and the page does not scroll sideways.
       await expect(page.locator('canvas').first()).toBeVisible();
       const sideways = await page.evaluate(
