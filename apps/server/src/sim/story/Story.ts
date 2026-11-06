@@ -168,6 +168,22 @@ export function queueStoryContinue(room: PartyRoom, seat: string): void {
   if (state !== null && seat === state.humanId) state.queue.push({ kind: 'continue', seat });
 }
 
+/**
+ * `story.start { storyId, chapterId? }` (the title screen): the sender's room becomes the story room straight from the
+ * lobby, with the sender as the one human, and the story starts. An unknown story, a room that is not a lone
+ * human's lobby, or a second start is ignored; a chapter replay starts at chapter one for now (Q-S4).
+ */
+export function handleStoryStart(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
+  const { storyId } = payload;
+  if (typeof storyId !== 'string' || storyOf(room) !== null || room.state.phase !== Phase.lobby) return;
+  if (room.state.leaderId !== seat) return;
+  try {
+    enableStory(room, storyId, { humanId: seat });
+  } catch {
+    // an unknown story id, or a lobby with more than one human: nothing starts
+  }
+}
+
 /** Commands waiting for a step; a paused clock runs one step for them (`PartyRoom`'s tick, `stepsThisTick`). */
 export const storyQueued = (room: PartyRoom): number => storyOf(room)?.queue.length ?? 0;
 

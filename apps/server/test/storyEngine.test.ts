@@ -1,5 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { ItemStack, Phase } from '@wdi/shared';
+import type { Client } from '@colyseus/core';
+import { C2S, ItemStack, Phase } from '@wdi/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { isNpcSeat } from '../src/sim/Npc';
@@ -10,7 +11,7 @@ import { runInvariants } from '../src/sim/auto/invariants';
 import { holderOf, switchRole } from '../src/sim/story/handover';
 import { enableStory, queueStoryContinue, storyNpcIds, storyOf, resolveStory } from '../src/sim/story/Story';
 import { bootAutoServer } from './autoHelpers';
-import { advance } from './npcHelpers';
+import { advance, lobbyOf, pauseClock } from './npcHelpers';
 
 const ID = 'hollowmere_winter';
 let colyseus: ColyseusTestServer;
@@ -125,6 +126,28 @@ describe('story.enter and story.pickup (README 1a)', () => {
     expect(heard.map((e) => e.kind).sort()).toEqual(['story.enter', 'story.pickup']);
     expect(heard.every((e) => e.seat === 'human1')).toBe(true);
     expect(heard.find((e) => e.kind === 'story.pickup')?.data).toEqual({ item: 'bread' });
+    await room.disconnect();
+  });
+});
+
+describe('story.start (the title screen)', () => {
+  it("turns the sender's lobby into the story room and starts it, and ignores an unknown story", async () => {
+    const party = await lobbyOf(colyseus, 1);
+    const { room } = party;
+    pauseClock(room);
+    const id = party.humans[0]!.id;
+    const client = { sessionId: id } as Client;
+    room.commands.push(client, C2S.storyStart, { storyId: 'nope' });
+    advance(party, 2);
+    expect(storyOf(room)).toBeNull();
+    room.commands.push(client, C2S.storyStart, { storyId: ID });
+    advance(party, 4);
+    expect(storyOf(room)).toMatchObject({ humanId: id, chapterIdx: 0, cardUp: true });
+    expect(roleOf(room, id)).toBe('baker');
+    expect([...room.state.players.keys()].filter((s) => !isNpcSeat(room, s))).toEqual([id]);
+    room.commands.push(client, C2S.storyContinue, {}); // a paused clock still steps for it
+    advance(party, 1);
+    expect(clockOf(room).paused).toBe(storyOf(room)?.cardUp === true);
     await room.disconnect();
   });
 });
