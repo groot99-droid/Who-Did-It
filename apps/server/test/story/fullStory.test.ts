@@ -9,13 +9,13 @@ import {
   startStoryRoom,
   storyDef,
 } from './fixture';
-import { STORY_MAX_TICKS, describeStory, storyServer } from './suite';
+import { STORY_MAX_TICKS, describeChapters, storyServer } from './suite';
 
 // DoD 1 and 4 (README): a scripted player finishes the story. The player stands still and answers every card; the
 // chapters end on their own triggers (an end the player must act to reach is a bug in `story.json`'s pacing, which
 // this test then reports to S1).
 
-describeStory('a scripted player finishes the story (README DoD 1 and 4)', () => {
+describeChapters('a scripted player finishes the story (README DoD 1 and 4)', () => {
   const server = storyServer();
 
   it('plays every chapter in order, each with a title card, its beats once and an end card', async () => {
@@ -51,8 +51,7 @@ describeStory('a scripted player finishes the story (README DoD 1 and 4)', () =>
         expect(kinds.at(-1), `${ch.id} closes with an end card`).toBe('end');
         // Every beat card is for a beat of this chapter's file, and a beat fires once.
         const beats = sr.events.filter(
-          (e) =>
-            e.kind === 'story.beat' && (e.data as { chapterId?: string } | undefined)?.chapterId === ch.id,
+          (e) => e.kind === 'story.beat' && (e.data as { chapter?: string } | undefined)?.chapter === ch.id,
         );
         const fired = beats.map((e) => JSON.stringify(e.data));
         expect(new Set(fired).size, `${ch.id}: a beat fired twice`).toBe(fired.length);

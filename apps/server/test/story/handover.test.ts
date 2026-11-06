@@ -10,13 +10,13 @@ import {
   startStoryRoom,
   storyDef,
 } from './fixture';
-import { STORY_MAX_TICKS, describeStory, storyServer } from './suite';
+import { STORY_MAX_TICKS, describeChapters, storyServer } from './suite';
 
 // README 1 and 2: at a chapter break the player's seat moves to a new role, the old seat goes back to the NPC
 // brain, the private view resets and only `handOn` crosses. The two invariants S2 adds (exactly one human seat;
 // beats in trigger order, once each) run with the registry at every break.
 
-describeStory('the seat handover (README 2)', () => {
+describeChapters('the seat handover (README 2)', () => {
   const server = storyServer();
 
   it('at every break: the chapter’s card, one human seat, the old card on an NPC, a fresh private view', async () => {

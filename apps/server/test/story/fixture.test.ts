@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { STORY_ID, StoryDigest, enableStory, loadStoryFile, storyDef, storyReady } from './fixture';
+import { STORY_ID, StoryDigest, chaptersReady, loadStoryFile, storyDef, storyReady } from './fixture';
 
 // The fixture's own checks: they run before the engine and the content exist, and keep running after.
 // `WDI_STORY_REQUIRED=1` (CI turns it on once S1 and S2 have merged) turns "not there yet" into a failure, so the
@@ -9,8 +9,8 @@ describe('the story test fixture', () => {
   it('knows whether the story content and engine are in', () => {
     expect(typeof storyReady()).toBe('boolean');
     if (process.env.WDI_STORY_REQUIRED === '1') {
-      expect(enableStory, 'S2 has not merged enableStory').not.toBeNull();
       expect(storyDef(), `S1 has not merged story.json with ${STORY_ID}`).not.toBeNull();
+      expect(chaptersReady(), 'S2 has not merged the beat runner and the seat handover').toBe(true);
     }
   });
 
