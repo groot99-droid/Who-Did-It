@@ -36,6 +36,8 @@ describeChapters('a player who dies still gets the story (README DoD 4)', () => 
       });
       expect(finished, 'chapter 2 never started after the player died').toBe(true);
       expect(chaptersEnded(sr)[0]).toBe(def.chapters[0]!.id);
+      const ended = sr.events.find((e) => e.kind === 'story.chapterEnd');
+      expect(ended?.data?.failed, 'the chapter ended as failed').toBe(true);
       const ch1 = sr.cards.filter((c) => c.card.chapterId === def.chapters[0]!.id).map((c) => c.card.kind);
       expect(ch1.at(-1)).toBe('end');
       expect(humanRole(sr)).toBe(def.chapters[1]!.roleId);
