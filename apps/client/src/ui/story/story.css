@@ -101,9 +101,9 @@
 }
 
 /* The goals strip: top-left under the HUD band on a desktop, full width but short on a phone. */
-.wdi-story-goals {
+.wdi-story-goals.wdi-glass {
   position: fixed;
-  top: 56px;
+  top: 76px;
   left: var(--wdi-space-3, 12px);
   z-index: var(--wdi-z-hud);
   max-width: min(18rem, calc(100vw - 2 * var(--wdi-space-3, 12px)));
@@ -162,4 +162,23 @@
   margin: 0;
   color: var(--wdi-text-muted);
   font-size: 0.9rem;
+}
+
+/* On a phone the HUD fills the top: the strip shrinks to one line, the next open goal, beside the clock. */
+@media (max-width: 600px) {
+  .wdi-story-goals.wdi-glass {
+    width: 10.5rem;
+    padding: var(--wdi-space-1, 4px) var(--wdi-space-2, 8px);
+  }
+
+  .wdi-story-goals .wdi-eyebrow,
+  .wdi-story-goals li:not(.is-next) {
+    display: none;
+  }
+
+  .wdi-story-goals li.is-next span:not(.wdi-story-goals__mark) {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
 }
