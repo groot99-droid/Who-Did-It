@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "trees": {
+    "story": { "title": "The Story", "text": "The chapters of story mode, one after another." },
+    "work": { "title": "Honest Work", "text": "Tasks, rent, hauling and the train." },
+    "rest": { "title": "Bed and Board", "text": "Meals and sleep." },
+    "trouble": {
+      "title": "Trouble",
+      "text": "The things that happen when the town turns on itself."
+    }
+  },
+  "achievements": {
+    "bakerDone": {
+      "id": "bakerDone",
+      "tree": "story",
+      "title": "Flour on the Hands",
+      "text": "Finish the Baker's chapter.",
+      "after": [],
+      "steps": [
+        {
+          "id": "end",
+          "text": "The chapter ends well.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch1_baker", "failed": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "watchmanDone": {
+      "id": "watchmanDone",
+      "tree": "story",
+      "title": "The Long Round",
+      "text": "Finish the Watchman's chapter.",
+      "after": ["bakerDone"],
+      "steps": [
+        {
+          "id": "end",
+          "text": "The chapter ends well.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch2_watchman", "failed": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "banditDone": {
+      "id": "banditDone",
+      "tree": "story",
+      "title": "Out of Reach",
+      "text": "Finish the Bandit's chapter.",
+      "after": ["watchmanDone"],
+      "steps": [
+        {
+          "id": "end",
+          "text": "The chapter ends well.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch3_bandit", "failed": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "activistDone": {
+      "id": "activistDone",
+      "tree": "story",
+      "title": "Lit Fuse",
+      "text": "Finish the Activist's chapter.",
+      "after": ["banditDone"],
+      "steps": [
+        {
+          "id": "end",
+          "text": "The chapter ends well.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch4_activist", "failed": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "storyTold": {
+      "id": "storyTold",
+      "tree": "story",
+      "title": "The Whole Story",
+      "text": "See the story through to its last card.",
+      "after": ["activistDone"],
+      "steps": [{ "id": "end", "text": "The story ends.", "on": "story.end", "who": "humans" }],
+      "gddRef": "3.28"
+    },
+    "firstGoal": {
+      "id": "firstGoal",
+      "tree": "story",
+      "title": "A First Goal",
+      "text": "Meet a goal in a chapter.",
+      "after": [],
+      "steps": [{ "id": "goal", "text": "A goal is met.", "on": "story.goal", "who": "humans" }],
+      "gddRef": "3.28"
+    },
+    "goalsMet": {
+      "id": "goalsMet",
+      "tree": "story",
+      "title": "Getting Things Done",
+      "text": "Meet goals across the chapters.",
+      "after": ["firstGoal"],
+      "steps": [
+        { "id": "goals", "text": "Goals are met.", "on": "story.goal", "who": "humans", "count": 6 }
+      ],
+      "gddRef": "3.28"
+    },
+    "bothSides": {
+      "id": "bothSides",
+      "tree": "story",
+      "title": "Both Sides of the Door",
+      "text": "Finish the Watchman's chapter, then the Bandit's.",
+      "after": ["watchmanDone"],
+      "steps": [
+        {
+          "id": "watch",
+          "text": "Finish the Watchman's chapter.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch2_watchman", "failed": false }
+        },
+        {
+          "id": "bandit",
+          "text": "Then finish the Bandit's.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "chapterId": "ch3_bandit", "failed": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "hardLesson": {
+      "id": "hardLesson",
+      "tree": "story",
+      "title": "A Hard Lesson",
+      "text": "Come to the end of a chapter without winning it.",
+      "after": [],
+      "steps": [
+        {
+          "id": "fail",
+          "text": "A chapter ends in failure.",
+          "on": "story.chapterEnd",
+          "who": "humans",
+          "where": { "failed": true }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "oddJobs": {
+      "id": "oddJobs",
+      "tree": "work",
+      "title": "Odd Jobs",
+      "text": "Finish a task in town.",
+      "after": [],
+      "steps": [
+        {
+          "id": "task",
+          "text": "Finish a task.",
+          "on": "taskDone",
+          "who": "seat",
+          "where": { "fake": false }
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "steadyHands": {
+      "id": "steadyHands",
+      "tree": "work",
+      "title": "Steady Hands",
+      "text": "Keep at the town's tasks.",
+      "after": ["oddJobs"],
+      "steps": [
+        {
+          "id": "tasks",
+          "text": "Finish tasks.",
+          "on": "taskDone",
+          "who": "seat",
+          "where": { "fake": false },
+          "count": 5
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "townFixture": {
+      "id": "townFixture",
+      "tree": "work",
+      "title": "Town Fixture",
+      "text": "Become the one the town counts on for work.",
+      "after": ["steadyHands"],
+      "steps": [
+        {
+          "id": "tasks",
+          "text": "Finish many tasks.",
+          "on": "taskDone",
+          "who": "seat",
+          "where": { "fake": false },
+          "count": 12
+        }
+      ],
+      "gddRef": "3.28"
+    },
+    "paidUp": {
+      "id": "paidUp",
+      "tree": "work",
+      "title": "Paid Up",
+      "text": "Pay your rent.",
+      "after": ["oddJobs"],
+      "steps": [{ "id": "rent", "text": "Pay the rent.", "on": "rent.paid", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "hauler": {
+      "id": "hauler",
+      "tree": "work",
+      "title": "Honest Haul",
+      "text": "Meet your quota for the town.",
+      "after": ["paidUp"],
+      "steps": [{ "id": "quota", "text": "Meet the quota.", "on": "quota.met", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "fairFare": {
+      "id": "fairFare",
+      "tree": "work",
+      "title": "Fair Fare",
+      "text": "Pay what you owe the train.",
+      "after": ["oddJobs"],
+      "steps": [{ "id": "fare", "text": "Pay the fare.", "on": "fare.paid", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "errandRunner": {
+      "id": "errandRunner",
+      "tree": "work",
+      "title": "Errand Runner",
+      "text": "Work off a fare by running errands.",
+      "after": ["fairFare"],
+      "steps": [
+        { "id": "errand", "text": "Clear a fare in errands.", "on": "fare.errand", "who": "seat" }
+      ],
+      "gddRef": "3.28"
+    },
+    "sureEnough": {
+      "id": "sureEnough",
+      "tree": "work",
+      "title": "Sure Enough",
+      "text": "Be both paid up and honest in your hauling.",
+      "after": ["paidUp", "hauler"],
+      "steps": [
+        { "id": "rent", "text": "Pay the rent.", "on": "rent.paid", "who": "seat" },
+        { "id": "quota", "text": "Then meet the quota.", "on": "quota.met", "who": "seat" }
+      ],
+      "gddRef": "3.28"
+    },
+    "goodMeal": {
+      "id": "goodMeal",
+      "tree": "rest",
+      "title": "A Good Meal",
+      "text": "Eat something.",
+      "after": [],
+      "steps": [{ "id": "eat", "text": "Eat.", "on": "eat", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "fullDay": {
+      "id": "fullDay",
+      "tree": "rest",
+      "title": "A Full Day",
+      "text": "Eat, rest, and eat again.",
+      "after": ["goodMeal"],
+      "steps": [
+        { "id": "eat", "text": "Eat.", "on": "eat", "who": "seat" },
+        { "id": "rest", "text": "Rest.", "on": "sleep.rest", "who": "seat" },
+        { "id": "again", "text": "Eat again.", "on": "eat", "who": "seat" }
+      ],
+      "gddRef": "3.28"
+    },
+    "shutEye": {
+      "id": "shutEye",
+      "tree": "rest",
+      "title": "Shut Eye",
+      "text": "Lie down and sleep.",
+      "after": [],
+      "steps": [{ "id": "rest", "text": "Rest.", "on": "sleep.rest", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "eyesOpen": {
+      "id": "eyesOpen",
+      "tree": "trouble",
+      "title": "Eyes Open",
+      "text": "Inspect someone.",
+      "after": [],
+      "steps": [{ "id": "inspect", "text": "Inspect someone.", "on": "inspect", "who": "data.by" }],
+      "gddRef": "3.28"
+    },
+    "twoByTwo": {
+      "id": "twoByTwo",
+      "tree": "trouble",
+      "title": "Two by Two",
+      "text": "Pair up with another.",
+      "after": [],
+      "steps": [{ "id": "pair", "text": "Pair up.", "on": "pair.start", "who": "data.a" }],
+      "gddRef": "3.28"
+    },
+    "lightFingers": {
+      "id": "lightFingers",
+      "tree": "trouble",
+      "title": "Light Fingers",
+      "text": "Rob someone.",
+      "after": [],
+      "steps": [{ "id": "rob", "text": "Take a purse.", "on": "rob", "who": "data.by" }],
+      "gddRef": "3.28"
+    },
+    "lightsOut": {
+      "id": "lightsOut",
+      "tree": "trouble",
+      "title": "Lights Out",
+      "text": "Knock someone out.",
+      "after": [],
+      "steps": [{ "id": "ko", "text": "Knock someone out.", "on": "body.ko", "who": "data.by" }],
+      "gddRef": "3.28"
+    },
+    "townCrier": {
+      "id": "townCrier",
+      "tree": "trouble",
+      "title": "Town Crier",
+      "text": "Put a notice before the town.",
+      "after": [],
+      "steps": [{ "id": "notice", "text": "Make a notice.", "on": "notice.made", "who": "seat" }],
+      "gddRef": "3.28"
+    },
+    "bloodOnHands": {
+      "id": "bloodOnHands",
+      "tree": "trouble",
+      "title": "Blood on the Floor",
+      "text": "Take a life.",
+      "after": ["lightsOut"],
+      "steps": [{ "id": "kill", "text": "Kill.", "on": "kill", "who": "data.by" }],
+      "gddRef": "3.28"
+    },
+    "goneQuiet": {
+      "id": "goneQuiet",
+      "tree": "trouble",
+      "title": "Gone Quiet",
+      "text": "Be taken from the town.",
+      "after": [],
+      "steps": [{ "id": "death", "text": "Die.", "on": "death", "who": "seat" }],
+      "gddRef": "3.28"
+    }
+  }
+}

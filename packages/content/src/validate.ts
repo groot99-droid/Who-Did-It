@@ -32,6 +32,8 @@ import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
 import type { StoryFile } from './schemas/story.js';
 import { checkStory } from './validateStory.js';
+import type { AchievementsFile } from './schemas/achievements.js';
+import { checkAchievements } from './validateAchievements.js';
 import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
@@ -74,6 +76,8 @@ export interface Content {
   talk: TalkFile;
   /** Story mode (docs/story/README.md): the fixed stories. */
   story: StoryFile;
+  /** Round 10, E1 (GDD 3.28): the achievements' trees and steps. */
+  achievements: AchievementsFile;
   /** Round 10 (A9; GDD 3.14): the logic table. */
   interactions: InteractionsFile;
 }
@@ -280,6 +284,7 @@ export function validateContent(c: Content): string[] {
   checkLore(c, err);
   checkTalk(c, err);
   checkStory(c, err);
+  checkAchievements(c, err);
   // Round 10 (A9; GDD 3.14): the logic table's classes and the census of every prop.
   checkInteractions(c, err);
 

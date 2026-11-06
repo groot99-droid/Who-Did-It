@@ -1272,7 +1272,40 @@ fist, a smaller health bar and the purse.
 
 ### 3.28 Accounts and achievements
 
-Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds it writes this section.
+Round 10, E1 (`docs/round9/gdd-map.md` 2.2; the owner: "step by step achievements that branch out in different
+directions", "skill trees plus trophies", stored on the device until accounts exist). The accounts are not built; this
+section is the achievements on the device. The tree and its steps are `achievements.json` (zod schema and validator in
+`@wdi/content`).
+
+**Trees and steps.** An achievement belongs to a tree and has a title, a line and an ordered list of steps. A step is a
+pattern on one sim bus kind (`sim/events/bus.ts`): the kind, whose step it is (the event's own seat, the seat a data
+key names, or every human at the table, which is how the story runner's events, naming no seat, reach the one human of
+a story room), exact matches on the event's data, and how many matching events complete it. Steps are done in order;
+an event counts for a step only once the step before it is done. `after` links an achievement to the ones it grows
+from: a node with two children is a branch and a node with two parents a join. The tree is how the device lays the
+achievements out and what a locked one shows; it gates nothing on the server, which knows no device. Story mode has its
+own tree (a chapter ended well, a goal met, the story finished), and the main game's trees read only events that exist:
+tasks, rent, quota, the fare, meals, rest, inspecting, pairing, a purse taken, a knock-out, a notice, a kill, a death.
+Steps on the trial wait on the Tribunal (B6b to B6d) and are not in the file.
+
+**Evaluation.** The server evaluates every event of a tick in `step()`, as a bus subscriber after the tick's events are
+delivered; a message callback never touches it. Progress is the room's memory for the match, per seat and per
+achievement, and starts again with the next match. It draws no random number, so no stream is shared with anything
+public. A step needs a connected client to hear of it; an NPC seat earns nothing.
+
+**What is told, and to whom.** The `achv` message goes to the earning seat's own client only, when a step is done and
+when the achievement is done, with the achievement id, the steps done and the steps in all. It is never a public field,
+never in the state root, and never sent to another seat, a spectator or the admin room. It names only the achievement,
+so a title that mentions a deed (a kill, a robbery) is shown to the one who did it and to no one else. Two seats
+earning at once get two messages, each to its own client.
+
+**On the device.** The client keeps the earned set under one `localStorage` key beside its other settings, with the
+day each was earned, and reads and writes it inside a guard: a blocked or empty store shows nothing earned and loses
+nothing else. The client shows a toast for each `achv` and a view of the trees; an achievement earned twice on the
+device is kept once. Story mode's end screen reads the same record.
+
+**No reward.** An achievement changes no rule, number, item, card, look or power. It is a title.
+
 
 ### 3.29 The lock-pick mini-game
 
