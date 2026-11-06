@@ -4,6 +4,9 @@ Each session appends to its own section only. Newest line last.
 
 ## S1. Story content
 
+- 2026-11-06 S1: schema `story.ts`, `validateStory.ts`, wired into `validate.ts`, tests and a one-chapter `story.json` (Baker) ready; seams addendum 1a in README. Chapters 2 and 3 and `script.md` next.
+- 2026-11-06 S1: PR #450 now holds the schema, all three chapters and docs/story/script.md (the S4 fixture test needs three chapters); local checks green; merging on green CI.
+
 ## S2. Story engine
 
 ## S3. Wire and client

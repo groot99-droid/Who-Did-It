@@ -88,6 +88,27 @@ Ids of scenes, portals, spawns and clues are frozen (`CLAUDE.md`); `story.json` 
 It checks: every `roleId`, `cutscene`, quest, clue and scene id exists; chapters are in order; no beat id repeats; every
 `all`/`any` is non-empty; the seed words cover every stream in `AUTO_STREAMS`.
 
+
+**1a. Fixed by S1's schema (2026-11-06; the code wins over the sketch above).**
+
+- `story.json` is `{ gddRef: "3.34", stories }`. Story and chapter ids are snake_case; beat and goal ids camelCase.
+- `Trigger.tick` means "chapter tick is at least n" (20 ticks per second, `TICK_RATE`); inside `all` it is a sustained
+  condition, an `event` is latched until the `all` holds. `event.data` is a partial match on `SimEvent.data`; `seat`
+  is `'player'` or a role id (the seat holding that card). Beats that matter use `{ any: [event, { tick }] }` so a story
+  always moves on.
+- `Chapter.goals[].trigger` is optional; a goal with none is completed by a `card.goal` beat. `Chapter.end` also holds
+  `lines` (the end card, 1 to 4 lines) and `failedLine` (shown when the player dies in the chapter).
+- `handOn[]` is `{ kind: 'letter' | 'lead' | 'item', ref, text }`: an item id, a clue kind, or a lore volume id.
+- `npcOrder.npcId` is a **role id**: the NPC seat that holds that card. Orders used so far: `goTo` with `args.scene`.
+- `spawn.at` is a scene id, or `<sceneId>:<spawnId>`; `spawn.kind` is a clue kind or an item id.
+- `look` on a chapter is required when the card has no world look (the Thief).
+- **Events the story reads.** Today on the bus: `train.arrive`, `train.dusk`, `taskDone` (`data.taskId`), `clue`
+  (`data.kind`), `bell`, `death`, `kill`. **New, S2 emits them** (contract request): `story.enter` `{ sceneId }` when
+  the player's avatar enters a scene, and `story.pickup` `{ item }` when the player's inventory gains an item, each
+  with `seat` the player's seat id. Until they exist, a beat that waits on one has a tick fallback or is optional.
+- `startPhase` is a hint to the engine: chapter 2 starts at night of cycle 1, chapter 3 at night of cycle 2, so the
+  engine fast-forwards the clock across the break (a day passes between chapters 2 and 3).
+
 ### 2. The engine (S2 owns `apps/server/src/sim/story/*`)
 
 - `enableStory(room, storyId)` beside `enableAuto`: one human seat (`Auto.ts:152` says an auto room has none today, so
