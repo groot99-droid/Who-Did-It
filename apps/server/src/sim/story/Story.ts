@@ -3,7 +3,7 @@ import { balance, type Chapter, type Story, story as storyFile } from '@wdi/cont
 import { ItemStack, Phase } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { newSeat } from '../../rooms/handlers/lobby';
-import { applyClock, enableAuto, queueAutoStart } from '../auto/Auto';
+import { applyClock, autoOf, enableAuto, queueAutoStart } from '../auto/Auto';
 import { markCardReady } from '../Covers';
 import { ANY_SIM, type SimEvent, emitSim, onSim } from '../events/bus';
 import { flowOf, setPhase } from '../Flow';
@@ -163,6 +163,13 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
 }
 
 /** The player's `story.continue`: queued by the message callback, consumed by the next `runStory`. */
+/** Queues the start of the story's match once; a start already queued by `enableStory` is not doubled. */
+export function queueStoryStart(room: PartyRoom): void {
+  const auto = autoOf(room);
+  if (auto !== null && auto.commands.some((c) => c.kind === 'start')) return;
+  queueAutoStart(room);
+}
+
 export function queueStoryContinue(room: PartyRoom, seat: string): void {
   const state = storyOf(room);
   if (state !== null && seat === state.humanId) state.queue.push({ kind: 'continue', seat });
