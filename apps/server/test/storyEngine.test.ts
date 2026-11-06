@@ -1,8 +1,10 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { Phase } from '@wdi/shared';
+import { ItemStack, Phase } from '@wdi/shared';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { isNpcSeat } from '../src/sim/Npc';
+import { ANY_SIM, onSim } from '../src/sim/events/bus';
+import { simOf } from '../src/sim/RoomSim';
 import { clockOf } from '../src/sim/auto/clock';
 import { runInvariants } from '../src/sim/auto/invariants';
 import { holderOf, switchRole } from '../src/sim/story/handover';
@@ -95,6 +97,34 @@ describe('the seat handover (GDD 3.34)', () => {
     expect(human.look).toBe('drifter');
     expect(roleOf(room, 'human1')).toBe('thief');
     expect(runInvariants(room).filter((f) => f.name.startsWith('story'))).toEqual([]);
+    await room.disconnect();
+  });
+});
+
+describe('story.enter and story.pickup (README 1a)', () => {
+  it("emit on the player's seat when its scene changes or its pack gains an item", async () => {
+    const room = await create();
+    enableStory(room, ID, { humanId: 'human1' });
+    const party = { humans: [], room };
+    const heard: { kind: string; seat?: string; data?: Record<string, unknown> }[] = [];
+    onSim(room, ANY_SIM, (ev) => {
+      if (ev.kind === 'story.enter' || ev.kind === 'story.pickup') heard.push(ev);
+    });
+    for (let i = 0; i < 400 && room.state.phase !== Phase.grace; i++) {
+      if (storyOf(room)?.cardUp) queueStoryContinue(room, 'human1');
+      advance(party, 1);
+    }
+    const p = simOf(room).players.get('human1')!;
+    advance(party, 2);
+    p.sceneIdx = (p.sceneIdx + 1) % 5; // a scene change the next step sees
+    const stack = new ItemStack();
+    stack.defId = 'bread';
+    stack.qty = 1;
+    room.state.players.get('human1')!.priv.inventory.slots.push(stack);
+    advance(party, 3);
+    expect(heard.map((e) => e.kind).sort()).toEqual(['story.enter', 'story.pickup']);
+    expect(heard.every((e) => e.seat === 'human1')).toBe(true);
+    expect(heard.find((e) => e.kind === 'story.pickup')?.data).toEqual({ item: 'bread' });
     await room.disconnect();
   });
 });

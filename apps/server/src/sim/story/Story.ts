@@ -6,12 +6,12 @@ import { newSeat } from '../../rooms/handlers/lobby';
 import { applyClock, enableAuto, queueAutoStart } from '../auto/Auto';
 import { markCardReady } from '../Covers';
 import { ANY_SIM, type SimEvent, emitSim, onSim } from '../events/bus';
-import { setPhase } from '../Flow';
-import { flowOf } from '../Flow';
+import { flowOf, setPhase } from '../Flow';
 import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
+import { SCENE_KEYS } from '../World';
 import { endMatch } from '../Win';
 import type { FixedSeeds } from '../seeds';
 import { runAction } from './actions';
@@ -64,6 +64,8 @@ export interface StoryState {
   goalsDone: Set<string>;
   counters: Record<string, number>;
   queue: StoryCommand[];
+  /** The human's scene and item counts last tick, to emit `story.enter` and `story.pickup` on a change. */
+  seen: { scene: string; items: Map<string, number> | null };
   /** Bus events heard since the last `runStory`, in emission order. */
   inbox: SimEvent[];
 }
@@ -145,11 +147,14 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     goalsDone: new Set(),
     counters: {},
     queue: [],
+    seen: { scene: '', items: null },
     inbox: [],
   };
   states.set(room, state);
+  // The runner's own outputs stay out of its inbox; `story.enter` and `story.pickup` are the triggers' to hear.
   onSim(room, ANY_SIM, (ev) => {
-    if (!ev.kind.startsWith('story.')) state.inbox.push(ev);
+    if (!ev.kind.startsWith('story.') || ev.kind === 'story.enter' || ev.kind === 'story.pickup')
+      state.inbox.push(ev);
   });
   const first = story.chapters[0];
   if (first !== undefined) flowOf(room).fixedDeal = { [humanId]: first.roleId };
@@ -244,6 +249,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
     const player = room.state.players.get(state.humanId);
     if (player) player.look = chapter.look;
   }
+  state.seen.items = null; // a new card's kit is not a pickup
   state.chapterIdx = idx;
   state.chapterStartTick = room.state.tick;
   state.ended = false;
@@ -323,6 +329,35 @@ function count(state: StoryState, ev: SimEvent, seatOf: (who: string) => string 
   if (ev.kind === 'phase' && ev.data?.to === Phase.night) bump('nightsUsed');
 }
 
+/**
+ * `story.enter` { sceneId } when the player's avatar is in a new scene, `story.pickup` { item } when its pack gains
+ * an item (README 1a, S1's contract request). Both name the player's seat and reach the bus one tick later.
+ */
+function watchPlayer(room: PartyRoom, state: StoryState): void {
+  const player = room.state.players.get(state.humanId);
+  const p = simOf(room).players.get(state.humanId);
+  if (!player || !p?.placed) return;
+  const scene = SCENE_KEYS[p.sceneIdx] ?? '';
+  if (scene !== state.seen.scene) {
+    if (state.seen.scene !== '' && scene !== '')
+      emitSim(room, {
+        tick: room.state.tick,
+        kind: 'story.enter',
+        seat: state.humanId,
+        sceneId: scene,
+        data: { sceneId: scene },
+      });
+    state.seen.scene = scene;
+  }
+  const now = new Map<string, number>();
+  for (const stack of player.priv.inventory.slots)
+    now.set(stack.defId, (now.get(stack.defId) ?? 0) + stack.qty);
+  for (const [item, qty] of now)
+    if (state.seen.items !== null && qty > (state.seen.items.get(item) ?? 0))
+      emitSim(room, { tick: room.state.tick, kind: 'story.pickup', seat: state.humanId, data: { item } });
+  state.seen.items = now;
+}
+
 // --- the stage -----------------------------------------------------------------------------------------------------
 
 /**
@@ -349,6 +384,7 @@ export function runStory(room: PartyRoom): void {
 
   const seatOf = (who: string): string | null =>
     who === 'player' ? state.humanId : holderOf(room, state.humanId, who);
+  watchPlayer(room, state);
   const events = state.inbox.splice(0);
   if (state.chapterIdx < 0) {
     if (events.some((e) => e.kind === 'start')) startChapter(room, state, 0);
