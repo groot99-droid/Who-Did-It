@@ -10,6 +10,7 @@ import { runAuto } from './auto/Auto';
 // Round 8, 8E: before the vendettas, so `figureNotSeat` registers ahead of 7H's checks (their test pins them last).
 import { runTownsfolk } from './townsfolk/run';
 import { runEvents } from './events/bus';
+import './story/invariants'; // story mode (docs/story/README.md 2): its invariants register with the registry
 import { runStory } from './story/Story';
 import { runEconomy } from './economy/run';
 import './tasks/invariants'; // round 7, 7M: the taskBar invariant's host (locked line, granted by 6Z; above 7H's so its four stay last)
@@ -32,7 +33,6 @@ import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
 import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
-import './story/invariants'; // story mode (docs/story/README.md 2): its invariants register with the registry
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
 // Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
