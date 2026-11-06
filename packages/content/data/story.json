@@ -205,6 +205,319 @@
               "text": "You carry one thing out of the bakery: the scratch-marks round the back-door lock, and the face of the man who made them."
             }
           ]
+        },
+        {
+          "id": "ch2_watchman",
+          "title": "The Watchman's Night",
+          "setup": "The same night, the other end of town. The lamps are lit and the lanes empty. You are the Watchman, and you have a neighbour to stand over.",
+          "roleId": "watchman",
+          "startPhase": { "cycle": 1, "part": "night" },
+          "goals": [
+            { "id": "gRound", "text": "Walk the square with your lantern" },
+            {
+              "id": "gPrints",
+              "text": "Follow the stranger's prints",
+              "trigger": { "event": "clue", "data": { "kind": "footprints" } }
+            },
+            { "id": "gWatch", "text": "Stand watch until the small hours" },
+            { "id": "gDawn", "text": "See the night out" }
+          ],
+          "beats": [
+            {
+              "id": "open",
+              "trigger": { "tick": 0 },
+              "action": {
+                "card": "beat",
+                "line": "Dusk comes down on the mere like a lid. The Lamplighter has been round before you; the lanterns burn in a row to the chapel. Your round starts at the bell and ends when the sun does.",
+                "speaker": "Dusk in HollowMere",
+                "portrait": "watchman",
+                "goal": "gRound"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "dusk",
+              "trigger": { "event": "train.dusk" },
+              "action": {
+                "card": "beat",
+                "line": "The dusk train whistles on the cutting and is gone. Whoever came in on it did not come to town by the front way.",
+                "speaker": "The dusk train"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "lamps",
+              "trigger": { "tick": 300 },
+              "action": {
+                "npcOrder": {
+                  "npcId": "lamplighter",
+                  "order": "goTo",
+                  "args": { "scene": "overworld" }
+                }
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "round",
+              "trigger": { "tick": 1200 },
+              "action": {
+                "card": "beat",
+                "line": "Every door on the square is bolted. That is not comfort; it is information. Somebody told these people to be afraid, and they listened.",
+                "speaker": "The square",
+                "portrait": "watchman"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "stranger",
+              "trigger": { "tick": 2400 },
+              "action": {
+                "seq": [
+                  {
+                    "npcOrder": {
+                      "npcId": "thief",
+                      "order": "goTo",
+                      "args": { "scene": "manor_hall" }
+                    }
+                  },
+                  { "spawn": { "kind": "footprints", "at": "manor_hall:front" } }
+                ]
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "prints",
+              "trigger": { "event": "clue", "data": { "kind": "footprints" } },
+              "action": {
+                "card": "beat",
+                "line": "Wet prints, size nine, crossing the manor's front step in a hurry, with a scrape where a heel dragged. The bakery's scratch-marks and these prints came out of the same boot.",
+                "speaker": "The manor step",
+                "portrait": "watchman",
+                "goal": "gPrints"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "quiet",
+              "trigger": { "any": [{ "event": "death" }, { "tick": 4200 }] },
+              "action": {
+                "card": "beat",
+                "line": "Past the second hour the town feels thinner: a shutter standing open, a lamp burnt dry, a gate that should be latched. Whatever the night is taking, it takes quietly.",
+                "speaker": "The small hours",
+                "portrait": "watchman",
+                "goal": "gWatch"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "bell",
+              "trigger": { "event": "bell" },
+              "action": {
+                "card": "beat",
+                "line": "The bell, and then nothing. The Watchman's rule is simple: if the bell rings, you go; if you are late, someone is dead.",
+                "speaker": "The bell"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "kill",
+              "trigger": { "event": "kill" },
+              "action": {
+                "card": "beat",
+                "line": "There is a body in the lane, and the cold on it says it has been there some time. You were forty yards off, looking at a closed door.",
+                "speaker": "The lane",
+                "portrait": "watchman"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "grey",
+              "trigger": { "tick": 5400 },
+              "action": {
+                "card": "beat",
+                "line": "Grey on the eastern roofs. You have lost count of the doors. The man with the wet boots is not on any road you walked tonight, which means he is not on any road he meant you to walk.",
+                "speaker": "Before dawn",
+                "portrait": "watchman",
+                "goal": "gDawn"
+              },
+              "oncePerChapter": true
+            }
+          ],
+          "end": {
+            "trigger": { "tick": 6000 },
+            "summaryKeys": ["roundsWalked", "cluesFound", "neighboursWatched"],
+            "lines": [
+              "Dawn finds you on the chapel step with a cold lantern and wet knees.",
+              "HollowMere counts its heads in the half light; whoever is missing, you know the boots that walked past them."
+            ],
+            "failedLine": "The lantern goes over on its side and the flame gutters out. Somebody else will have to finish the round."
+          },
+          "handOn": [
+            {
+              "kind": "item",
+              "ref": "pocketWatch",
+              "text": "You keep the Watchman's pocket watch. It says the Hall is empty between two and three in the morning, every night of the week."
+            }
+          ]
+        },
+        {
+          "id": "ch3_bandit",
+          "title": "The Bandit's Heist",
+          "setup": "Second night. The coin was a down payment, the watch a map. You are the Bandit, and Vane Manor has a safe worth the whole town's rent.",
+          "roleId": "thief",
+          "look": "drifter",
+          "startPhase": { "cycle": 2, "part": "night" },
+          "goals": [
+            {
+              "id": "gCase",
+              "text": "Case Vane Manor from the front step",
+              "trigger": {
+                "event": "story.enter",
+                "seat": "player",
+                "data": { "sceneId": "manor_hall" }
+              }
+            },
+            { "id": "gCrack", "text": "Open the safe in the hall" },
+            { "id": "gHaul", "text": "Leave the Hall holding three heirlooms" },
+            {
+              "id": "gSea",
+              "text": "Reach the sea door at the back of the cave",
+              "trigger": {
+                "event": "story.enter",
+                "seat": "player",
+                "data": { "sceneId": "cave_entry" }
+              }
+            }
+          ],
+          "beats": [
+            {
+              "id": "open",
+              "trigger": { "tick": 0 },
+              "action": {
+                "card": "beat",
+                "line": "Nobody locks a bakery door against a man who tips in gold. You stand in the cold with a pick in your glove, a smoke bomb in your pocket and a Watchman's round to beat.",
+                "speaker": "Night two",
+                "portrait": "drifter"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "baker",
+              "trigger": { "tick": 400 },
+              "action": {
+                "npcOrder": { "npcId": "baker", "order": "goTo", "args": { "scene": "bakery" } }
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "square",
+              "trigger": { "tick": 900 },
+              "action": {
+                "card": "beat",
+                "line": "The square is yours between the bell and the lamp, and the Baker has left the back door on the latch like a promise. The Hall is across the lane. Go while the round is the other way.",
+                "speaker": "The square",
+                "portrait": "drifter"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "hall",
+              "trigger": {
+                "event": "story.enter",
+                "seat": "player",
+                "data": { "sceneId": "manor_hall" }
+              },
+              "action": {
+                "card": "beat",
+                "line": "Vane Manor, hall: a clock that keeps worse time than your pulse, a portrait that watches the safe, and the safe in the corner, solid as a pew. Pick, listen, and do not hurry.",
+                "speaker": "Vane Manor",
+                "portrait": "drifter",
+                "goal": "gCase"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "pick",
+              "trigger": { "event": "clue", "data": { "kind": "scratch" } },
+              "action": {
+                "card": "beat",
+                "line": "The lock gives with a sigh. You leave a scratch on the plate and a story for the Watchman to follow, and you do not care for either.",
+                "speaker": "The safe",
+                "portrait": "drifter",
+                "goal": "gCrack"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "haul",
+              "trigger": {
+                "event": "story.pickup",
+                "seat": "player",
+                "data": { "item": "heirloom" }
+              },
+              "action": {
+                "card": "beat",
+                "line": "Heirlooms: a locket, a pair of spurs, a ring. Three of them, and the town will call you a Bandit for the rest of its life. Out the back way, and do not look at the portrait.",
+                "speaker": "The haul",
+                "portrait": "drifter",
+                "goal": "gHaul"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "alarm",
+              "trigger": { "any": [{ "event": "bell" }, { "tick": 5400 }] },
+              "action": {
+                "npcOrder": {
+                  "npcId": "watchman",
+                  "order": "goTo",
+                  "args": { "scene": "manor_hall" }
+                }
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "cave",
+              "trigger": {
+                "event": "story.enter",
+                "seat": "player",
+                "data": { "sceneId": "cave_entry" }
+              },
+              "action": {
+                "card": "beat",
+                "line": "The Tin Gallery's mouth, black and wet, and at the back of it the sea door the miners never bricked. You have the haul, the night, and a smoke bomb you will not need. The sea air takes the sound of your name.",
+                "speaker": "The sea door",
+                "portrait": "drifter",
+                "goal": "gSea"
+              },
+              "oncePerChapter": true
+            },
+            {
+              "id": "smoke",
+              "trigger": { "tick": 6300 },
+              "action": {
+                "card": "beat",
+                "line": "Behind you the town finds out. Ahead is a dark boat and a longer road than the one you came by. The Baker's coin is spent; the Fence will make it back.",
+                "speaker": "The Fence road",
+                "portrait": "drifter"
+              },
+              "oncePerChapter": true
+            }
+          ],
+          "end": {
+            "trigger": {
+              "any": [
+                { "event": "story.enter", "seat": "player", "data": { "sceneId": "cave_entry" } },
+                { "tick": 6800 }
+              ]
+            },
+            "summaryKeys": ["heirloomsHeld", "scratchesLeft", "nightsUsed"],
+            "lines": [
+              "The sea door shuts behind you, and for the first time in two nights nobody is watching.",
+              "HollowMere wakes poorer by a safe and richer by a story, and the Baker keeps a coin that will not spend."
+            ],
+            "failedLine": "A hand on your collar, a lantern in your face, and the Hall's clock chiming a quarter-past of nothing at all."
+          }
         }
       ]
     }
