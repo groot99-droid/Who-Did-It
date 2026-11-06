@@ -11,6 +11,9 @@ Each session appends to its own section only. Newest line last.
 ## S2. Story engine
 
 - 2026-11-06 S2 started. `enableStory`, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` as a queued command and the `storyOneHuman` invariant are written on `claude/story-s2-enable-story` (draft PR to follow once the suite is green). Seat handover and the beat runner come next; the runner waits for S1's schema, so it is coded against the README section 1 shapes (`sim/story/types.ts`).
+- 2026-11-06 S2 PR #452 merged: `enableStory` (one human seat, fixed seeds and NPC ids, chapter-one fixed deal, title-card pause, `story.continue` queued and consumed in `step()`), invariant `storyOneHuman`, GDD 3.34.
+- 2026-11-06 S2 PR #456 open (draft): beat runner, seat handover, chapter flow, `storyBeatsOnce`; S4's handover, death, full-story, replay and leak suites pass against it. `story.enter` / `story.pickup` and `story.start` from the lobby are in. Open gaps: item `spawn`, NPC `goTo` across scenes unverified, `cutscene`/`questStep` only emit bus events, end-card counters approximated.
+
 
 ## S3. Wire and client
 

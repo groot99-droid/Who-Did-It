@@ -14,3 +14,17 @@ registerInvariant('storyOneHuman', (room) => {
     detail: `story seats: humans [${humans.join(',')}], expected ${story.humanId}`,
   };
 });
+
+// Story mode: a chapter's beats fire once each, and only the running chapter's own beats.
+registerInvariant('storyBeatsOnce', (room) => {
+  const state = storyOf(room);
+  if (state === null || state.chapterIdx < 0) return null;
+  const own = new Set(state.story.chapters[state.chapterIdx]?.beats.map((b) => b.id));
+  const seen = new Set<string>();
+  for (const id of state.fired) {
+    if (seen.has(id) || !own.has(id))
+      return { name: '', tick: room.state.tick, detail: `beat ${id} fired twice or outside its chapter` };
+    seen.add(id);
+  }
+  return null;
+});
