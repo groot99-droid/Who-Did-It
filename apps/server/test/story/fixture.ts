@@ -12,14 +12,8 @@ import { markDead } from '../../src/sim/Death';
 import { isNpcSeat } from '../../src/sim/Npc';
 import { ANY_SIM, onSim } from '../../src/sim/events/bus';
 import { simOf } from '../../src/sim/RoomSim';
-import {
-  enableStory,
-  queueStoryContinue,
-  queueStoryStart,
-  registerStory,
-  storyQueued,
-} from '../../src/sim/story/Story';
-import type { Story } from '../../src/sim/story/types';
+import { enableStory, queueStoryContinue, registerStory, storyQueued } from '../../src/sim/story/Story';
+import type { Story } from '@wdi/content';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -175,7 +169,6 @@ export async function startStoryRoom(
   registerStory(def as unknown as Story);
   enableStory(room, storyId, { humanId });
   opts.afterEnable?.(room);
-  queueStoryStart(room);
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);
   if (room.state.phase === Phase.lobby) throw new Error('startStoryRoom: the story did not start');
   return sr;

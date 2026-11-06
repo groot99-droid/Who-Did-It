@@ -87,6 +87,7 @@ export async function runStoryBot(opts: StoryBotOptions): Promise<StoryBotResult
       if (tracker.done) finish('finished');
     });
     room.onMessage('story.goals', () => undefined);
+    room.onMessage('*', () => undefined); // the world's other messages are not the bot's business
     room.onLeave(() => finish('left'));
     room.send('story.start', { storyId: opts.storyId ?? 'hollowmere_winter' });
   });
