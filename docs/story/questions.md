@@ -90,3 +90,25 @@ client suites did not run locally (CI ran them green on the merge).
 **D4. Production.** The base deploys to Railway on every push, so story mode is live.
 
 - Default: leave it live. Alternative: hide the title screen's Story entry behind a flag until the playtest.
+
+## Answers (owner, 2026-11-06)
+
+| Q | Answer |
+| --- | --- |
+| A1, A2 | Default |
+| A3 | Default, with the note: "we need a full story mode, every role. the lore fully plays out" |
+| A4 | Change: the Killer's own look in both chapters |
+| B1 | Change: a failed chapter replays once before the story moves on |
+| B2 | Default |
+| B3 | Change: save at each chapter break, resume from the menu |
+| B4 | Default |
+| B5 | Change: a dedicated end screen with the chapter summaries |
+| C1 | Change: yes, the Zealot. "for chapters with roles like the vicar and the zealot the player must play both sides of the holy war in sections" |
+| C2 | Change: also bring the stranger back into chapters 1 and 2. "a single chapter shouldnt just be one role it should be based around the lore and how the story unfolds" |
+| C3 | Change: scripted NPC lines inside beats |
+| C4 | Change: plan them now. "HollowMere-Port Au Levin-Black pine-etc" |
+| D1 | Change: no playtest first, keep building |
+| D2 | Change: build achievements now |
+| D3, D4 | Default |
+
+The build plan these answers set is `docs/story/part2.md`.
