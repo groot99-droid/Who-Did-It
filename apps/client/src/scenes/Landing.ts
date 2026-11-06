@@ -31,7 +31,9 @@ export class Landing extends Phaser.Scene {
       this.scene.start('Lobby');
     };
 
-    const show = () => {
+    const show = async () => {
+      const stories = await storyCatalog(flags.mock);
+      if (!this.scene.isActive()) return;
       this.screen = mountLanding(overlayRoot(), {
         joinCode: flags.joinCode,
         build: getHealth(this).build,
@@ -40,7 +42,7 @@ export class Landing extends Phaser.Scene {
         onCreate: async (name, visibility, invited) =>
           enterLobby(await net.create(name, { visibility, ...(invited.length > 0 ? { invited } : {}) })),
         ...(flags.mock ? {} : { listParties: fetchParties }),
-        stories: storyCatalog(flags.mock),
+        stories,
         // A story room is a private party with one human: no lobby; the server deals the first card and scene.
         onStory: async (name, storyId, chapterId) => {
           await net.create(name, { visibility: 'private' });
@@ -58,10 +60,10 @@ export class Landing extends Phaser.Scene {
         if (!this.scene.isActive()) return;
         if (ok) return enterLobby(code);
         setRoute('');
-        show();
+        void show();
       });
     } else {
-      show();
+      void show();
     }
   }
 }
