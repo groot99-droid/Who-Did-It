@@ -64,6 +64,7 @@ describe('story cards', () => {
 
   it('turns summary counters into labelled rows without adding words', () => {
     expect(summaryLabel('loaves_baked')).toBe('Loaves baked');
+    expect(summaryLabel('doorsOpened')).toBe('Doors opened');
     expect(summaryRows(end)).toEqual([{ key: 'loaves_baked', label: 'Loaves baked', value: 3 }]);
     expect(summaryRows(title)).toEqual([]);
   });
