@@ -1,3 +1,4 @@
+import { mountAchievements } from '../ui/achievements/AchievementsLayer';
 import Phaser from 'phaser';
 import { installWorldRouter } from '../net/worldRouter';
 import { installArtSwitch } from '../view/artSwap';
@@ -27,6 +28,7 @@ export class Preload extends Phaser.Scene {
     installArtSwitch(this.game, flags.art, base);
     installWorldRouter(this.game, getNet(this), { mock: flags.mock });
     mountStoryLayer(overlayRoot(), getNet(this)); // story mode's cards and goals strip (private story.card, story.goals)
+    mountAchievements(overlayRoot(), getNet(this)); // round 10, E1: the private `achv` toasts and the device record
     // Round 6 (locked call sites): the music bus and its director (6L), the loading screen (6K), the admin route (6D).
     this.registry.set(REG_MUSIC, new MusicBus());
     installMusicDirector(this.game, getNet(this));
