@@ -9,7 +9,7 @@ import { STORY_STREAMS, type StoryAction, type Trigger } from './schemas/story.j
 export function checkStory(
   c: Pick<
     Content,
-    'story' | 'roles' | 'cutscenes' | 'quests' | 'clues' | 'items' | 'scenes' | 'maps' | 'looks'
+    'story' | 'roles' | 'cutscenes' | 'quests' | 'clues' | 'items' | 'scenes' | 'maps' | 'looks' | 'vendettas'
   >,
   err: (msg: string) => void,
 ): void {
@@ -34,6 +34,12 @@ export function checkStory(
       if (!(ch.roleId in c.roles.roles)) err(`${cat}: unknown role ${ch.roleId}`);
       if (ch.look !== undefined && !(ch.look in c.looks.looks)) err(`${cat}: unknown look ${ch.look}`);
       const card = c.roles.roles[ch.roleId];
+      if (ch.vendetta !== undefined) {
+        const v = c.vendettas.vendettas[ch.vendetta];
+        if (!v) err(`${cat}: unknown vendetta ${ch.vendetta}`);
+        else if (v.role !== ch.roleId)
+          err(`${cat}: vendetta ${ch.vendetta} belongs to card ${v.role}, not ${ch.roleId}`);
+      }
       if (card && ch.look === undefined && card.look == null)
         err(`${cat}: card ${ch.roleId} has no world look, so the chapter needs a \`look\``);
       const prev = story.chapters[n - 1];

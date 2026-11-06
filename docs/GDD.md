@@ -1570,6 +1570,11 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
   player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
   except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
+  vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the
+  chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
+  on the card the player already holds changes no card; it starts the view over and sets its vendetta. The vendetta
+  then runs as in 3.20 (the Bandit's heist, the Activist's sabotage).
 - **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
 - **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
   seat, and it is the story's own.

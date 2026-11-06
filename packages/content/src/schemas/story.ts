@@ -150,6 +150,8 @@ export const Chapter = z.strictObject({
   setup: Line,
   roleId: Id,
   look: LookId.optional(),
+  /** A vendetta id of vendettas.json for a Killer chapter: the player's seat holds it for the chapter (the Bandit's heist). */
+  vendetta: Id.optional(),
   startPhase: z.strictObject({ cycle: z.number().int().positive(), part: z.enum(['day', 'night']) }),
   goals: z.array(ChapterGoal).min(1),
   beats: z.array(Beat).min(1),

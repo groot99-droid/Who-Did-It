@@ -266,6 +266,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
       chapter.roleId,
       chapter.look,
       new Set(state.story.chapters.map((c) => c.roleId)),
+      chapter.vendetta,
     );
     seekPhase(room, chapter);
   } else if (chapter.look !== undefined) {
@@ -350,6 +351,9 @@ function count(state: StoryState, ev: SimEvent, seatOf: (who: string) => string 
     if (ev.data?.kind === 11) bump('scratchesLeft');
   }
   if (ev.kind === 'phase' && ev.data?.to === Phase.night) bump('nightsUsed');
+  if (ev.kind === 'vendetta.heist.cracked') bump('strongboxTaken');
+  if (ev.kind === 'vendetta.sabotage.tampered') bump('targetsTampered');
+  if (ev.kind === 'vendetta.sabotage.wrecked') bump('worksWrecked');
 }
 
 /**

@@ -63,6 +63,11 @@ export function progressOf(room: PartyRoom, seat: string): Progress {
   return p;
 }
 
+/** Forgets `seat`'s progress, as a new vendetta starts (story mode's handover). */
+export function resetProgress(room: PartyRoom, seat: string): void {
+  matchOf(room).progress.delete(seat);
+}
+
 /** Every vendetta step of the match, oldest first, with the holder it was for. */
 export function vendettaSteps(room: PartyRoom): readonly Step[] {
   return matchOf(room).steps;

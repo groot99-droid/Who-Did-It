@@ -191,8 +191,8 @@ description and in a `send_message` to that session.
 
 ## Definition of done
 
-1. The title screen's "Story" starts `hollowmere_winter`; the three chapters play through with a title card, beats, and
-   an end card each; the seat moves from Baker to Watchman to Bandit and the private view resets at each break.
+1. The title screen's "Story" starts `hollowmere_winter`; the four chapters play through with a title card, beats, and
+   an end card each; the seat moves from Baker to Watchman to the Bandit (the outlaw: the Killer card with the `bandit` vendetta) to the Activist (the Killer card with the `activist` vendetta), and the private view resets at each break.
 2. The same seed words give the same story tick for tick (a replay test).
 3. `pnpm lint && pnpm typecheck && pnpm test` clean, `pnpm auto` at 50 clean, the story e2e green at 1280x720 and
    390x844.

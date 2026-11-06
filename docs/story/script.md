@@ -2,11 +2,11 @@
 
 _Generated from `packages/content/data/story.json` (S1, story mode). The copy lives in that file only; this page is what the owner reads. To change a line, change the data and regenerate this page: `python3` over the JSON is enough, there is no second source._
 
-**A Winter in HollowMere.** One town, three nights and days, three trades: the Baker whose coin has a story, the Watchman who follows the boots, and the Bandit who made them.
+**A Winter in HollowMere.** One town, four chapters, four hands: the Baker whose coin has a story, the Watchman who follows the boots, the Bandit who made them, and the Activist who comes for the works.
 
 One human, 7 NPC seats, map `hollowmere`, fixed seed words for every stream, so the story plays the same way each time. Three chapters; the seat moves from card to card at each break, and only a letter, a lead or an item crosses over.
 
-**The through-line.** Chapter 1 is the Baker's day: loaves, flour, a stranger who tips in gold (the Fence road is the turn). Chapter 2 is the Watchman's night: the same stranger's boots, seen from the other end of town. Chapter 3 is the Bandit's heist: the man who made the boots, the safe at Vane Manor, and the sea door. The Killer is the NPC whose crimes the chapters cut across; the Bandit chapter is played on the Thief card (DECISIONS A401).
+**The through-line.** Chapter 1 is the Baker's day: loaves, flour, a stranger who tips in gold (the Fence road is the turn). Chapter 2 is the Watchman's night: the same stranger's boots, seen from the other end of town. Chapter 3 is the Bandit's heist: the outlaw who made the boots, the strongbox at Vane Manor, and the sea door. Chapter 4 is the Activist's day: the same Knife, a new cause, and the town's own chores to undo. Chapters 3 and 4 are played on the Killer card, each with its own vendetta (`bandit`, `activist`); the Thief card stays the stranger NPC and is free for a later heist-man chapter (DECISIONS A430).
 
 ## Chapter 1: The Wake Loaf
 
@@ -190,25 +190,24 @@ If you die in the chapter: > The lantern goes over on its side and the flame gut
 
 ## Chapter 3: The Bandit's Heist
 
-- **Role:** `thief`, look `drifter`
+- **Role:** `killer` with the `bandit` vendetta (the outlaw), look `drifter`
 - **Starts:** cycle 2, night
 
 ### Title card
 
-> Second night. The coin was a down payment, the watch a map. You are the Bandit, and Vane Manor has a safe worth the whole town's rent.
+> Second night. The coin was a down payment, the watch a map. You are the Bandit, the town's outlaw, and Vane Manor has a strongbox worth the whole town's rent.
 
 ### Goals
 
 - Case Vane Manor from the front step _(`gCase`; done on story.enter (sceneId=manor_hall) by you)_
-- Open the safe in the hall _(`gCrack`; done by a beat)_
-- Leave the Hall holding three heirlooms _(`gHaul`; done by a beat)_
+- Crack the strongbox, alone and still _(`gCrack`; done by a beat)_
 - Reach the sea door at the back of the cave _(`gSea`; done on story.enter (sceneId=cave_entry) by you)_
 
 ### Beats
 
 **open** — fires on: 0 s into the chapter
 
-> Nobody locks a bakery door against a man who tips in gold. You stand in the cold with a pick in your glove, a smoke bomb in your pocket and a Watchman's round to beat.
+> Nobody locks a bakery door against a man who tips in gold. You stand in the cold, the outlaw of HollowMere, with the Knife in your boot and a Watchman's round to beat.
 >
 > **Night two**
 
@@ -224,21 +223,15 @@ _Stage direction: the baker NPC → goTo {'scene': 'bakery'}._
 
 **hall** — fires on: story.enter (sceneId=manor_hall) by you
 
-> Vane Manor, hall: a clock that keeps worse time than your pulse, a portrait that watches the safe, and the safe in the corner, solid as a pew. Pick, listen, and do not hurry.
+> Vane Manor, hall: a clock that keeps worse time than your pulse, a portrait that watches the strongbox, and the strongbox in the corner, solid as a pew. Stand still beside it until it gives, and be alone when it does.
 >
 > **Vane Manor** _(completes goal gCase)_
 
-**pick** — fires on: clue (kind=scratch)
+**pick** — fires on: vendetta.heist.cracked
 
-> The lock gives with a sigh. You leave a scratch on the plate and a story for the Watchman to follow, and you do not care for either.
+> The box gives with a sigh and comes away in your arms. A footprint at the foot of the safe now says everything about your height, and the Knife is warm in your boot again.
 >
-> **The safe** _(completes goal gCrack)_
-
-**haul** — fires on: story.pickup (item=heirloom) by you
-
-> Heirlooms: a locket, a pair of spurs, a ring. Three of them, and the town will call you a Bandit for the rest of its life. Out the back way, and do not look at the portrait.
->
-> **The haul** _(completes goal gHaul)_
+> **The strongbox** _(completes goal gCrack)_
 
 **alarm** — fires on: bell or 270 s into the chapter
 
@@ -246,7 +239,7 @@ _Stage direction: the watchman NPC → goTo {'scene': 'manor_hall'}._
 
 **cave** — fires on: story.enter (sceneId=cave_entry) by you
 
-> The Tin Gallery's mouth, black and wet, and at the back of it the sea door the miners never bricked. You have the haul, the night, and a smoke bomb you will not need. The sea air takes the sound of your name.
+> The Tin Gallery's mouth, black and wet, and at the back of it the sea door the miners never bricked. You have the box, the night, and the town's name for you. The sea air takes the sound of it.
 >
 > **The sea door** _(completes goal gSea)_
 
@@ -258,16 +251,65 @@ _Stage direction: the watchman NPC → goTo {'scene': 'manor_hall'}._
 
 ### End card
 
-_Ends on: story.enter (sceneId=cave_entry) by you or 340 s into the chapter. The card counts: heirloomsHeld, scratchesLeft, nightsUsed._
+_Ends on: story.enter (sceneId=cave_entry) by you or 340 s into the chapter. The card counts: strongboxTaken, cluesFound, nightsUsed._
 
 > The sea door shuts behind you, and for the first time in two nights nobody is watching.
-> HollowMere wakes poorer by a safe and richer by a story, and the Baker keeps a coin that will not spend.
+> HollowMere wakes poorer by a strongbox and richer by a story, and the Baker keeps a coin that will not spend.
 
 If you die in the chapter: > A hand on your collar, a lantern in your face, and the Hall's clock chiming a quarter-past of nothing at all.
 
+## Chapter 4: The Works
+
+- **Role:** `killer` with the `activist` vendetta, look `tinner`
+- **Starts:** cycle 3, day
+
+### Title card
+
+> Third day. The outlaw has gone to sea; the Knife has not. You are the Activist now, and a town that cannot fix its pump, its fence and its lamps is a town that listens.
+
+### Goals
+
+- Tamper with a work, still and unseen _(`gTamper`; done on vendetta.sabotage.tampered)_
+- Wreck the works _(`gWreck`; done by a beat)_
+
+### Beats
+
+**open** — fires on: 0 s into the chapter
+
+> Bright morning, and a town at its chores. The pump, the fence, the lanterns: everything HollowMere needs to feel safe is a thing a patient pair of hands can undo. You have patient hands.
+>
+> **The Works**
+
+**tamper** — fires on: vendetta.sabotage.tampered
+
+> One work is loosened and nobody saw you stand there. Hold still, hold long enough, and the town's mending starts to undo itself.
+>
+> **The Works**
+
+**wreck** — fires on: vendetta.sabotage.wrecked
+
+> The works are wrecked, and the finished chores of the day fall back to undone. The Constable will ask who was near them. You were near all of them.
+>
+> **The Works** _(completes goal gWreck)_
+
+**late** — fires on: 360 s into the chapter
+
+> The light is going. A town can forgive a broken pump; it never forgives a pattern. Finish, or step back into the crowd.
+>
+> **Dusk**
+
+### End card
+
+_Ends on: vendetta.sabotage.wrecked or 420 s into the chapter. The card counts: targetsTampered, worksWrecked, tasksDone._
+
+> The lamps are lit by people who no longer trust the pump, and nobody can say whose hands it was.
+> HollowMere sleeps behind a mended fence it will not believe in.
+
+If you die in the chapter: > Somebody counted the loosened bolts and then counted you. The Constable's lantern finds your face before the works can hide it.
+
 ## Open questions for the owner
 
-- **Q-S1.** Add a Killer chapter? Default: no (three chapters). The format takes a fourth chapter with no code change.
-- **The Bandit's card.** There is no Bandit card; the Bandit is the Killer's heist vendetta. Chapter 3 is played on the Thief (`look: drifter`). Say if you want the Killer card with the `bandit` vendetta instead.
+- **Q-S1 (answered 2026-11-06, owner).** Add Killer chapters: chapters 3 and 4 are played on the Killer card.
+- **The Bandit's card (answered 2026-11-06, owner).** The Bandit is the outlaw, the Killer card with the `bandit` heist vendetta. The Thief is free for a later heist-man chapter.
+- **Chapter 4's cause.** The Activist (sabotage) was chosen because it needs no second card and no train timing. The Zealot (needs a Vicar) and the Hitman (arrives on days 3 to 5) are the other two Killer vendettas if a fifth chapter is wanted.
 - **Lines the NPCs speak.** Beats show narration only; NPC dialogue stays in the existing talk and lore files.
-

@@ -17,8 +17,13 @@ describe('story.json', () => {
   it('ships valid, three chapters in play order, each a different card', () => {
     expect(broken(() => undefined)).toEqual([]);
     const story = content.story.stories[storyId]!;
-    expect(story.chapters.map((c) => c.id)).toEqual(['ch1_baker', 'ch2_watchman', 'ch3_bandit']);
-    expect(story.chapters.map((c) => c.roleId)).toEqual(['baker', 'watchman', 'thief']);
+    expect(story.chapters.map((c) => c.id)).toEqual([
+      'ch1_baker',
+      'ch2_watchman',
+      'ch3_bandit',
+      'ch4_activist',
+    ]);
+    expect(story.chapters.map((c) => c.roleId)).toEqual(['baker', 'watchman', 'killer', 'killer']);
     expect(story.mapId).toBe('hollowmere');
   });
 

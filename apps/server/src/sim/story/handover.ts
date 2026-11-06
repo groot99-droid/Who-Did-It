@@ -7,6 +7,8 @@ import { npcMemory } from '../npc/memory';
 import { releaseClaims } from '../npc/routine';
 import { publishLooks } from '../Covers';
 import { simOf } from '../RoomSim';
+import { resetProgress } from '../vendettas/progress';
+import { setVendetta, vendettaOf } from '../vendettas/state';
 import { taskPool } from '../Tasks';
 import { countRow } from '../Flow';
 import { profileOfRoom } from '../npc/routine';
@@ -139,7 +141,10 @@ function refreshMates(room: PartyRoom): void {
 /**
  * Moves `roleId` to the human seat. `look` overrides the card's look (a chapter's `look`). The old card goes to the
  * seat that held the new one, whose brain is reset; with no holder the old card leaves play. A dead human is made
- * whole in place. Returns the seat that now holds the old card, or null.
+ * whole in place. A vendetta travels with its card: the seat that takes the Killer card takes the holder's vendetta,
+ * or `vendetta` when a Killer chapter names one (the Bandit's heist), with its progress started over. A chapter on
+ * the card the human already holds (a second Killer chapter) swaps no card. Returns the seat that now holds the old
+ * card, or null.
  */
 export function switchRole(
   room: PartyRoom,
@@ -147,9 +152,23 @@ export function switchRole(
   roleId: string,
   look?: string,
   keep: ReadonlySet<string> = new Set(),
+  vendetta?: string,
 ): string | null {
   const human = room.state.players.get(humanId);
   if (!human) throw new Error(`switchRole: no seat ${humanId}`);
+  if (human.priv.role.roleId === roleId) {
+    // The same card again: nothing changes hands, the view starts over, the chapter's vendetta is set.
+    clearPrivateView(human);
+    dealOwnTasks(room, human);
+    if (look !== undefined) human.look = look;
+    if (vendetta !== undefined) {
+      setVendetta(room, humanId, vendetta);
+      resetProgress(room, humanId);
+    }
+    reviveHuman(room, humanId);
+    simOf(room).viewsDirty = true;
+    return null;
+  }
   const holderId = holderOf(room, humanId, roleId) ?? spareSeat(room, humanId, new Set([...keep, roleId]));
   const holder = holderId === null ? undefined : room.state.players.get(holderId);
 
@@ -172,6 +191,19 @@ export function switchRole(
     putCard(holder, mine);
     clearPrivateView(holder);
   }
+  // A vendetta stays with its card: the Killer card's holder hands its vendetta over with the card.
+  const humanHeld = vendettaOf(room, humanId)?.id ?? null;
+  const holderHeld = holderId === null ? null : (vendettaOf(room, holderId)?.id ?? null);
+  if (dealt && holderId !== null) {
+    setVendetta(room, humanId, holderHeld);
+    setVendetta(room, holderId, humanHeld);
+    resetProgress(room, humanId);
+    resetProgress(room, holderId);
+  } else {
+    setVendetta(room, humanId, null);
+    resetProgress(room, humanId);
+  }
+  if (vendetta !== undefined) setVendetta(room, humanId, vendetta);
   clearPrivateView(human);
   refreshMates(room);
   dealOwnTasks(room, human);
@@ -183,12 +215,18 @@ export function switchRole(
     mem.brains.delete(holderId);
     releaseClaims(mem, holderId);
   }
+  reviveHuman(room, humanId);
+  simOf(room).viewsDirty = true;
+  return holderId;
+}
+
+/** A dead human is made whole in place. */
+function reviveHuman(room: PartyRoom, humanId: string): void {
+  const human = room.state.players.get(humanId);
   const p = simOf(room).players.get(humanId);
-  if (p?.dead) {
+  if (human && p?.dead) {
     p.dead = false;
     human.alive = true;
     ensureBody(room, humanId);
   }
-  simOf(room).viewsDirty = true;
-  return holderId;
 }
