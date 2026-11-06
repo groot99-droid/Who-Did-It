@@ -180,6 +180,15 @@ Vitest (shared): property tests for roles, traits, votes, suspects, win checks, 
 
 Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`.
 
+### 5.13a Story mode (the engine)
+
+`apps/server/src/sim/story/`: `Story.ts` (`enableStory`, the room's `StoryState`, `runStory`, the one Step stage after
+`runEvents`), `triggers.ts` and `actions.ts` (the beats), `handover.ts` (`switchRole`), `invariants.ts`. A story room
+is an auto room (`sim/auto/Auto.ts`, which re-exports `enableStory`) with one human seat. The player's `story.start`
+and `story.continue` are ordinary queued commands consumed in `step()`; the stage reads the tick's bus events, emits
+`story.*` events, and sends `story.card` and `story.goals` to the player's own client only. See GDD 3.34 and
+DECISIONS A415 to A417.
+
 ### 5.14 Quick mode (removed)
 
 Removed in round 7 (DECISIONS A115, GDD 3.11): schema version 5 dropped its wire, and its rules, server modules, bots and client screens are gone. `docs/round5/onub-contract.md` keeps its round-5 contract as history. The section keeps its number.

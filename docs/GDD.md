@@ -1563,6 +1563,14 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **Secrecy.** Role secrecy (3.17) holds exactly as in a match. The story's cards and goals reach the player's own
   client alone; no public field, no other seat's view and no bus event names a chapter, a goal or the player's card
   with its holder.
+- **Beats.** A chapter's beats are each a trigger on the sim event bus (or on the chapter's own clock) and an action:
+  a card, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. Each fires once, and a goal is
+  done when its beat fires. The player's own scene changes and pickups reach the bus as `story.enter` and
+  `story.pickup`. The chapter's tick count stops while a card holds the clock.
+- **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
+  player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
+  except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
 - **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
   seat, and it is the story's own.
 
