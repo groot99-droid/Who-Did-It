@@ -14,11 +14,11 @@ function broken(edit: (c: Content) => void): string[] {
 const chapter = (c: Content, n = 0) => c.story.stories[storyId]!.chapters[n]!;
 
 describe('story.json', () => {
-  it('ships valid, chapters in play order', () => {
+  it('ships valid, three chapters in play order, each a different card', () => {
     expect(broken(() => undefined)).toEqual([]);
     const story = content.story.stories[storyId]!;
-    expect(story.chapters.map((c) => c.id)[0]).toBe('ch1_baker');
-    expect(story.chapters.map((c) => c.roleId)[0]).toBe('baker');
+    expect(story.chapters.map((c) => c.id)).toEqual(['ch1_baker', 'ch2_watchman', 'ch3_bandit']);
+    expect(story.chapters.map((c) => c.roleId)).toEqual(['baker', 'watchman', 'thief']);
     expect(story.mapId).toBe('hollowmere');
   });
 
@@ -66,13 +66,9 @@ describe('story.json', () => {
     copy.stories[storyId]!.chapters[0]!.beats[0]!.trigger = { all: [] };
     expect(StoryFile.safeParse(copy).success).toBe(false);
     const errs = broken((c) => {
-      const second = structuredClone(chapter(c, 0));
-      second.id = 'ch2_copy';
-      second.startPhase.cycle = 1;
       chapter(c, 0).startPhase.cycle = 3;
-      c.story.stories[storyId]!.chapters.push(second);
     });
-    expect(errs).toEqual([expect.stringContaining('ch2_copy: starts at cycle 1, before ch1_baker')]);
+    expect(errs).toEqual([expect.stringContaining('ch2_watchman: starts at cycle 1, before ch1_baker')]);
   });
 
   it('keeps a card to a screen of words', () => {
