@@ -4,6 +4,7 @@ import { buildIsStale, REFRESH_MESSAGE } from '../health';
 import { hideBackdrop, showBackdrop } from '../ui/backdrop';
 import { fetchParties } from '../ui/menu/partyListModel';
 import { mountLanding } from '../ui/Landing';
+import { storyCatalog } from '../ui/story/catalog';
 import { overlayRoot, type Screen } from '../ui/dom';
 import type { MusicBus } from '../view/MusicBus';
 import { REG_MUSIC, getFlags, getHealth, getNet } from './registry';
@@ -39,6 +40,12 @@ export class Landing extends Phaser.Scene {
         onCreate: async (name, visibility, invited) =>
           enterLobby(await net.create(name, { visibility, ...(invited.length > 0 ? { invited } : {}) })),
         ...(flags.mock ? {} : { listParties: fetchParties }),
+        stories: storyCatalog(flags.mock),
+        // A story room is a private party with one human: no lobby; the server deals the first card and scene.
+        onStory: async (name, storyId, chapterId) => {
+          await net.create(name, { visibility: 'private' });
+          net.send('story.start', { storyId, ...(chapterId ? { chapterId } : {}) });
+        },
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
         explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),
       });
