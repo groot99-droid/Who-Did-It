@@ -13,7 +13,7 @@ import { isNpcSeat } from '../../src/sim/Npc';
 import { ANY_SIM, onSim } from '../../src/sim/events/bus';
 import { simOf } from '../../src/sim/RoomSim';
 import { enableStory, queueStoryContinue, registerStory, storyQueued } from '../../src/sim/story/Story';
-import type { Story } from '@wdi/content';
+import { type Story, story as storyFile } from '@wdi/content';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -68,14 +68,9 @@ export interface StoryDef {
 
 // --- what exists yet -------------------------------------------------------------------------------------------
 
-/** `story.json` read straight off disk (README 1 fixes its shape), or null while S1's file has not merged. */
+/** The stories of `story.json` as plays (one part-1 chapter per section; docs/story/arc.md 5, until P2 retires the view). */
 export function loadStoryFile(): Record<string, StoryDef> | null {
-  const path = fileURLToPath(new URL('../../../../packages/content/data/story.json', import.meta.url));
-  try {
-    return (JSON.parse(readFileSync(path, 'utf8')) as { stories: Record<string, StoryDef> }).stories;
-  } catch {
-    return null;
-  }
+  return storyFile.stories as unknown as Record<string, StoryDef>;
 }
 
 /** The story id the tests play; README 1 names it. */

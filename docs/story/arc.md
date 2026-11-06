@@ -397,15 +397,16 @@ interface Section {
   end: Trigger; // with a tick fallback inside an `any`
 }
 // StoryAction gains a spoken line (E7); `card` stays for narration.
-type Line = { line: { text: string; by?: string; speaker?: string; portrait?: string; goal?: string } };
+type Say = { say: { text: string; by?: string; speaker?: string; portrait?: string; goal?: string } };
 //          by: a role id (the seat holding it speaks); speaker and portrait: a figure with no seat
+//          (P1 named it `say`: `line` is already the narration card's text field)
 ```
 
 Validator checks (P1): every `roleId`, `vendetta`, `npcVendetta`, `cast` entry and `by` exists; a section's
 `vendetta` is that card's (`vendettas.json` `role`), except `hitman` on a card the mail may turn (GDD 3.33); `zealot`
 needs `vicar` in the chapter's `cast` (`needsCard`); `bandit` needs the map and `manor_hall` (`needsScene`); `cast` fits
 `roster`; section ids are unique across the story; and, for the owner's Q-P2, every card of `roles.json` is a section's
-`roleId` or a `by` of some line.
+`roleId` or a `by` of some `say`. As built (P1), this coverage check runs only on a story marked `full: true`.
 
 ## 6. Questions for the owner
 
