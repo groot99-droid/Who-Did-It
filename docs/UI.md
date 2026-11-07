@@ -2170,3 +2170,22 @@ server deals the first card and scene.
 Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
 fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
+
+### 14.54 The evidence verbs (10V, round 10)
+
+The copy proposed for V1a's Inspect and Plant Clue (GDD 3.4). The server sends only the refusal reasons of 14.43 and
+`clueFound`. 10Y adds the keys and writes these lines into a table here as it places them, since a table row names a
+key the client holds (A414's deck test):
+
+- `verb.inspect`: "Inspect"; `verb.inspect.prompt`: "Inspect with a Lens ({n} left)".
+- `verb.inspect.done.verified`: "Verified: this clue is true."
+- `verb.inspect.done.forged`: "Forged: someone planted this. An Accomplice is in play."
+- `verb.plant`: "Plant Clue"; `verb.plant.pick`: "Plant what?"
+- `verb.plant.footprints`: "Footprints: {height} stride"; `verb.plant.thread`: "Thread: {scarf} wool" (a thread is
+  laid only beside a door).
+- `verb.plant.done`: "Planted. It looks like any other clue."
+- `card.lens`: "Lenses: {n} of {max}. One comes back each day."
+
+A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
+away from a door `TOO_FAR {of: 'door'}`.
