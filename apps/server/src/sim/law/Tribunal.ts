@@ -308,5 +308,10 @@ export function handlePresent(room: PartyRoom, seat: string, payload: Record<str
   });
 }
 
+/** B6d2: the clues already on the scales, and how many a seat has put there (the NPC rule reads, never writes). */
+export const scaleKeys = (room: PartyRoom): ReadonlySet<string> => memoryOf(room).open?.keys ?? new Set();
+export const presentedBy = (room: PartyRoom, seat: string): number =>
+  memoryOf(room).open?.presented.get(seat) ?? 0;
+
 /** White-box (tests): whether a Tribunal is open. */
 export const tribunalOpen = (room: PartyRoom): boolean => memoryOf(room).open !== null;

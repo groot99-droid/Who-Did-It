@@ -306,6 +306,11 @@ export const BalanceFile = z.strictObject({
     night: z.strictObject({ leaveDelayS: Span }),
     /** The vote tick: this fraction of the discussion plus the vote time, from the discussion's start. */
     vote: z.strictObject({ windowFrac: FracSpan }),
+    /**
+     * Round 10, B6d2 (GDD 3.12): an NPC seat's tick in a Tribunal's case (or defence) or the end trial's filing is this
+     * fraction of the step, and the chance it presents or files when the tick comes.
+     */
+    trial: z.strictObject({ windowFrac: FracSpan, presentChance: Chance, fileChance: Chance }),
     /** The ready delay on the role card and in the lobby. */
     ready: z.strictObject({ delayS: Span }),
     /**

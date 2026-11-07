@@ -65,6 +65,8 @@ const STREAMS = {
   locks: 1, // round 10, D5
   pairing: 1, // round 10, B8
   hitman: 1, // round 10, C4
+  trialTick: 1, // round 10, B6d2
+  trialChance: 1, // round 10, B6d2
 } satisfies Record<StreamName, 1>;
 export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
 
