@@ -24,6 +24,7 @@ afterAll(async () => {
 beforeEach(async () => colyseus.cleanup());
 
 const ROW = 22;
+const DOOR = { id: 'ov.bakery', x: 42, y: 19 };
 const hold = (action: string, targetId: string, on = true) => ({ action, targetId, on });
 const reasons = (m: Match, i: number) =>
   eventsOf(m.bots[i]!, 'error').map((e) => (e as { reason?: string }).reason);
@@ -64,6 +65,82 @@ const skip = (m: Match, i: number) => {
   const h = simOfBot(m, m.bots[i]!).hold;
   if (h) h.startTick -= 20 * TICK_RATE; // the cast has run
 };
+async function lift(m: Match, i: number, targetId: string) {
+  await act(m.bots[i]!, 'act.hold', hold('dust', targetId));
+  skip(m, i);
+  await sleep(150);
+}
+
+describe('Dust and Compare', () => {
+  it("lifts the knife killer's print from the body and from a door it crossed; Compare says match only for the same hand", async () => {
+    const m = await party();
+    const bodyId = await kill(m);
+    await lift(m, 1, bodyId);
+    expect(book(m, 1)).toHaveLength(1);
+    expect(book(m, 1)[0]).toMatchObject({
+      note: NoteKind.lift,
+      clueKind: ClueKind.fingerprint,
+      status: NotebookStatus.verified,
+      of: m.bots[3]!.id,
+    });
+    // The killer, then a townsperson, cross the bakery door.
+    const crossAt = async (i: number) => {
+      teleport(m, m.bots[i]!, 'overworld', DOOR.x, DOOR.y + 1);
+      await act(m.bots[i]!, 'act.enterPortal', { portalId: DOOR.id }, 700);
+      teleport(m, m.bots[i]!, 'overworld', 12, 12 + i);
+    };
+    await crossAt(0);
+    teleport(m, m.bots[1]!, 'overworld', DOOR.x, DOOR.y + 1);
+    await lift(m, 1, DOOR.id);
+    const [a, b] = [book(m, 1)[0]!, book(m, 1)[1]!];
+    expect(b).toMatchObject({ note: NoteKind.lift, of: '' });
+    await act(m.bots[1]!, 'act.ability', { abilityId: 'dustCompare', targetId: a.id, with: b.id });
+    const cmp = book(m, 1)[2]!;
+    expect(cmp).toMatchObject({ note: NoteKind.comparison, value: 1, of: `${a.id},${b.id}` });
+    // Another hand at the door: no match, and still no name.
+    await crossAt(4);
+    teleport(m, m.bots[1]!, 'overworld', DOOR.x, DOOR.y + 1);
+    await act(m.bots[1]!, 'act.hold', hold('dust', DOOR.id));
+    expect(reasons(m, 1)).toEqual(['SPENT']); // two lifts per match
+    expect(JSON.stringify(book(m, 1))).not.toContain(m.bots[0]!.id);
+    expect(book(m, 0)).toHaveLength(0);
+    expect(book(m, 3)).toHaveLength(0);
+    // No reading is a clue entry: a petition and the Tribunal take none (row 13).
+    for (const e of book(m, 1)) expect(attachable(e)).toBe(false);
+  }, 20000);
+
+  it('a body with no knife killer carries a print of its own; a lift never tells the cause', async () => {
+    const m = await party();
+    const { markDead } = await import('../src/sim/Death');
+    const { spawnBody } = await import('../src/sim/Bodies');
+    markDead(m.room, m.bots[3]!.id, 'poison');
+    spawnBody(m.room, 'overworld', m.bots[3]!.id, 31, ROW);
+    await lift(m, 1, `body_${m.bots[3]!.id}`);
+    await lift(m, 1, `body_${m.bots[3]!.id}`);
+    const [a, b] = [book(m, 1)[0]!, book(m, 1)[1]!];
+    expect(a.clueKind).toBe(b.clueKind);
+    await act(m.bots[1]!, 'act.ability', { abilityId: 'dustCompare', targetId: a.id, with: b.id });
+    expect(book(m, 1)[2]).toMatchObject({ value: 1 });
+    // Only the Detective's card dusts or compares.
+    await act(m.bots[2]!, 'act.hold', hold('dust', `body_${m.bots[3]!.id}`));
+    await act(m.bots[2]!, 'act.ability', { abilityId: 'dustCompare', targetId: a.id, with: b.id });
+    expect(reasons(m, 2)).toEqual(['NOT_YOUR_POWER', 'NOT_YOUR_POWER']);
+  }, 20000);
+
+  it('refuses a door only the duster crossed, an entry that is not its own lift, and nothing in reach', async () => {
+    const m = await party();
+    const dust = (id: string) => act(m.bots[1]!, 'act.hold', hold('dust', id));
+    teleport(m, m.bots[1]!, 'overworld', DOOR.x, DOOR.y + 1);
+    await act(m.bots[1]!, 'act.enterPortal', { portalId: DOOR.id }, 700);
+    teleport(m, m.bots[1]!, 'overworld', DOOR.x, DOOR.y + 1);
+    await dust(DOOR.id); // only its own print there
+    await dust('nothing');
+    await act(m.bots[1]!, 'act.ability', { abilityId: 'dustCompare', targetId: 'entry_1', with: 'entry_2' });
+    expect(reasons(m, 1)).toEqual(['NOTHING_THERE', 'NOTHING_THERE', 'NOTHING_THERE']);
+    expect(book(m, 1)).toHaveLength(0);
+  }, 20000);
+});
+
 describe('Autopsy', () => {
   it('reads the cause and an estimated death tick into the Doctor only, once per body', async () => {
     const m = await party();

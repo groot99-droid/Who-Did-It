@@ -28,6 +28,7 @@ import {
 } from './World';
 import { spawnTeachingClue } from './Clues';
 import { curfewBars } from './economy/rent';
+import { recordCrossings } from './verbs/dust';
 import { reconcileViews } from './Visibility';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
@@ -35,7 +36,7 @@ import { isDeparted } from './vendettas/arrival';
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
 
 /** The portal of `sceneId` nearest to a tile; the other half of a pair, used for the arrival swing. */
-function nearestPortal(sceneId: SceneId, tx: number, ty: number): Portal | null {
+export function nearestPortal(sceneId: SceneId, tx: number, ty: number): Portal | null {
   let best: Portal | null = null;
   let bestD = Infinity;
   for (const portal of scenes[sceneId].portals) {
@@ -195,6 +196,7 @@ export function runPortals(room: PartyRoom): void {
     }
     crossed = true;
     if (p.dead) continue;
+    recordCrossings(room, from, portal, `seat:${req.sessionId}`); // round 10, V1b: the true actor, whatever the face
     swingDoor(room, from, portal.id);
     const arrival = nearestPortal(portal.to, p.x / TILE_PX, p.y / TILE_PX);
     if (arrival) swingDoor(room, portal.to, arrival.id);

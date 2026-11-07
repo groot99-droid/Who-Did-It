@@ -9,6 +9,7 @@ import { tickNeeds } from '../npc/needs';
 import { type Station, phaseClassOf, spanTicks } from '../npc/routine';
 import { firstPortalToward } from '../npc/walk';
 import { simOf } from '../RoomSim';
+import { recordCrossings } from '../verbs/dust';
 import { runTalk } from './talk';
 import { isWorldPhase, navGrid, sceneIndex, sceneKey, tileCentre } from '../World';
 import {
@@ -233,6 +234,7 @@ function cross(room: PartyRoom, f: Figure, portal: Portal): void {
     f.act = null;
     return;
   }
+  recordCrossings(room, sceneKey(f.sceneIdx), portal, `figure:${f.id}`); // round 10, V1b
   f.sceneIdx = sceneIndex(to);
   f.x = tileCentre(spawn.x, TILE_PX);
   f.y = tileCentre(spawn.y, TILE_PX);
