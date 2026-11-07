@@ -21,7 +21,10 @@ import './story.css';
  * network bus and answers a card with `story.continue`. All words come from the messages; the chrome is `copy.ts`.
  */
 
-/** Which card element: the title card names the chapter, a beat speaks, the end card sums up. */
+/**
+ * Which card element: the title card names the chapter, a section card names the section that starts, a beat narrates,
+ * a line card is a scripted NPC speaking (its speaker above the lines, in quotation), the end card sums up.
+ */
 export function cardEl(
   card: StoryCard,
   onContinue: () => void,
@@ -48,10 +51,11 @@ export function cardEl(
       class: `wdi-story wdi-story--${card.kind}`,
       role: 'dialog',
       'aria-modal': 'true',
-      'aria-labelledby': 'story-card-title',
+      'aria-labelledby': card.title ? 'story-card-title' : 'story-card-speaker',
       'data-testid': 'story-card',
       'data-kind': card.kind,
       'data-chapter': card.chapterId,
+      ...(card.sectionId ? { 'data-section': card.sectionId } : {}),
     },
     h(
       'div',
@@ -61,6 +65,13 @@ export function cardEl(
             'div',
             { class: 'wdi-story__portrait', 'data-portrait': card.portrait, 'aria-hidden': 'true' },
             card.portrait.charAt(0),
+          )
+        : null,
+      card.speaker
+        ? h(
+            'p',
+            { id: 'story-card-speaker', class: 'wdi-story__speaker', 'data-testid': 'story-speaker' },
+            card.speaker,
           )
         : null,
       card.title

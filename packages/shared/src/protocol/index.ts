@@ -478,13 +478,17 @@ export interface S2CPayloads {
   tribunalVerdict: { roleId: string };
   /**
    * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
-   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
-   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
-   * is the next chapter's title.
+   * chapter card. `kind` is the chapter's title card, a section card (replaces the title card after a chapter's first
+   * section, docs/story/part2.md), a beat's narration, a scripted NPC line (`line`, part 2) or the chapter's end. Every
+   * string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to
+   * their values; `next` (end cards) is the next chapter's title. `sectionId` (section and line cards) names the section;
+   * `speaker` (line cards) is the speaker's display name, `portrait` its figure; a line card holds several lines.
    */
   'story.card': {
-    kind: 'title' | 'beat' | 'end';
+    kind: 'title' | 'section' | 'beat' | 'line' | 'end';
     chapterId: string;
+    sectionId?: string;
+    speaker?: string;
     title?: string;
     lines: string[];
     portrait?: string;

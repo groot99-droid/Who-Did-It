@@ -43,6 +43,30 @@ export function mockChapterSteps(n: 1 | 2 | 3): Step[] {
   return [
     { card: { kind: 'title', chapterId: id, title, lines: ['Mock role, mock town.', `Set-up line ${n}.`] } },
     { goals: goals(id, 0) },
+    // Part 2, chapter 2 only (chapters 1 and 3 stay as part 1's): a section card, then a scripted NPC's lines.
+    ...(n === 2
+      ? ([
+          {
+            card: {
+              kind: 'section',
+              chapterId: id,
+              sectionId: 'mock2_b',
+              title: 'Second section',
+              lines: ['The card passes to another hand.'],
+            },
+          },
+          {
+            card: {
+              kind: 'line',
+              chapterId: id,
+              sectionId: 'mock2_b',
+              speaker: 'Old Marta',
+              portrait: 'marta',
+              lines: ['The bell tolled for no one last night.', 'Someone rang it all the same.'],
+            },
+          },
+        ] satisfies Step[])
+      : []),
     {
       card: {
         kind: 'beat',
