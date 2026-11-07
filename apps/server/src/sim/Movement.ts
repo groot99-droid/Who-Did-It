@@ -6,6 +6,7 @@ import { moodIdleOf } from './npc/needs';
 import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
 import { isWorldPhase, navGrid, sceneKey } from './World';
 import { bodySpeedPxPerTick, overlayBody } from './body/run';
+import { dragSpeedFactor } from './verbs/coverup';
 import { wakeOnInput } from './Sleep';
 
 const PX_PER_TICK = (tilesPerS: number): number => (tilesPerS * TILE_PX) / TICK_RATE;
@@ -60,7 +61,7 @@ export function applyInputs(room: PartyRoom): void {
       continue;
     }
     if (tick < p.busyUntilTick) continue;
-    const speed = bodySpeedPxPerTick(room, sessionId, p.input); // round 8, 8A: the effects' factors (GDD 3.22)
+    const speed = bodySpeedPxPerTick(room, sessionId, p.input) * dragSpeedFactor(p); // round 8, 8A: the effects' factors (GDD 3.22)
     p.vx = p.input.dx * speed;
     p.vy = p.input.dy * speed;
     const player = room.state.players.get(sessionId);

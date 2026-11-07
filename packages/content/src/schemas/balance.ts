@@ -235,6 +235,14 @@ export const BalanceFile = z.strictObject({
     reachTiles: z.number().positive(),
   }),
   /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  /** Round 10, V2 (GDD 3.4): the cover-up verbs. A dragged body trails the dragger by `dragLagTicks`, lays a smear every
+   *  `dragSmearEveryTiles` tiles (at most `dragSmearMax` a drag), and is hidden when dropped within `spotReachTiles` of a body spot. */
+  coverup: Section({
+    dragSmearEveryTiles: z.number().positive(),
+    dragSmearMax: Count,
+    dragLagTicks: Count,
+    spotReachTiles: z.number().positive(),
+  }),
   figureTalk: Section({
     /** A figure answers from this many tiles. */
     reachTiles: z.number().positive(),

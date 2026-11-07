@@ -10,6 +10,7 @@ import {
   overlapsSolid,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { lockStands, openedDoorState } from './verbs/coverup';
 import { FOOT_HALF_PX, PORTAL_REACH_TILES, StatusBit } from './constants';
 import { statusBitsOf } from './Movement';
 import { rehandle } from './Avatars';
@@ -178,7 +179,7 @@ export function runPortals(room: PartyRoom): void {
       reject(room, req.sessionId, 'BOARDED');
       continue;
     }
-    if (portal.lock !== null && !p.dead) {
+    if (lockStands(room, from, portal.id, portal.lock !== null) && !p.dead) {
       // Keys are inventory items and arrive with M5; until then a keyed door stays locked.
       reject(room, req.sessionId, 'LOCKED');
       continue;
@@ -231,7 +232,9 @@ export function applyProfileToDoors(room: PartyRoom): void {
     for (const portal of scene.portals) {
       const door = state.doors.get(portal.id);
       if (!door) continue;
-      door.state = !profileOpen(portal.minProfile, sim.profile) ? 1 : portal.lock !== null ? 2 : 0;
+      door.state = !profileOpen(portal.minProfile, sim.profile)
+        ? 1
+        : (openedDoorState(room, id, portal.id) ?? (portal.lock !== null ? 2 : 0));
     }
   }
 }

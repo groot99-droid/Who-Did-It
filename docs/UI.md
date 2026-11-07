@@ -2189,3 +2189,18 @@ key the client holds (A414's deck test):
 A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
 a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
 away from a door `TOO_FAR {of: 'door'}`.
+
+#### V2, the cover-up verbs
+
+The copy proposed for Drag body, Clean, Wash and the two door verbs (GDD 3.4). The server sends only the refusal reasons of
+14.43 and the noise kinds `rag`, `skeletonKey` and `crowbar`. 10Y adds the keys and writes these lines into a table here as
+it places them:
+
+- `verb.drag`: "Drag body"; `verb.drag.drop`: "Let go"; `verb.drag.hide`: "Hide the body here".
+- `verb.clean`: "Clean"; `verb.clean.prompt`: "Wipe this clue away ({n} left)".
+- `verb.wash`: "Wash"; `verb.wash.prompt`: "Wash the Blood off".
+- `verb.unlock`: "Skeleton Key"; `verb.unlock.prompt`: "Unlock this door"; `verb.crowbar`: "Crowbar"; `verb.crowbar.prompt`: "Break this door".
+
+A refusal reads its 14.43 line: no Rag or Bucket is `NEED_ITEM {need: 'bloodyRag' | 'bucket'}`, no Skeleton Key
+`NEED_KEY {need: 'skeletonKey'}`, no Crowbar `NEED_TOOL {need: 'crowbar'}`, a card without Drag `NOT_YOUR_POWER`, a door already
+opened `ALREADY_DONE`, a body, clue or door out of reach `TOO_FAR {of: 'body' | 'clue' | 'door'}`.
