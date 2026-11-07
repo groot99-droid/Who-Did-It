@@ -96,7 +96,7 @@ Copied from 6Z's spawn prompt of 2026-10-30, so it survives a compaction.
 2026-10-30: #400 (6Z's docs: seams rows 20 to 22 and the log with the C4 and B6 rulings), #401 and #408 (C4a, C4b),
 #416 (10R's answers: 10V exists, Q-A2 and Q-A4) and the 10X and 10Y fixes. The teardown was read from ROSW
 `teardowns/who-did-it` (read-only clone): the owner's answers there that bear on this scope are "Space is
-information" (the pillar he would defend), "a second layer" (the world competes with the deduction only as a second
+information" (the pillar the owner would defend), "a second layer" (the world competes with the deduction only as a second
 layer), "full anti-cheat", "play differently" (each map) and "all equally" (evolutions, the law, the economy, the maps
 and story mode are one design). The `udgt-consult` skill itself is not installed in this session, so its answers were
 read from `answers.json` and the chapters directly.
@@ -695,7 +695,7 @@ nothing of it beyond the drawn figure.
 
 ## 5. Questions for the owner
 
-Six choices that are really his, each with a default the build takes if he does not answer.
+Six choices that are really the owner's, each with a default the build takes if the owner does not answer.
 
 ### Q-S1. The Ranger's Arrest
 

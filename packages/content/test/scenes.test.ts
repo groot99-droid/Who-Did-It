@@ -33,6 +33,7 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
       'ov.barn -> barn.door',
       'ov.chapel -> chapel.door',
       'ov.well -> cellar.well',
+      'ov.cottage -> cottage_fisher.door',
     ],
   },
   tavern_bar: {
@@ -92,7 +93,7 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
     profile: 'small',
     w: 20,
     h: 14,
-    portals: ['ce.mouth -> forest.cave_side', 'ce.sea -> null.null', 'ce.gallery -> cave_gallery.upper'],
+    portals: ['ce.mouth -> forest.cave_side', 'ce.sea -> sea_exit.cave', 'ce.gallery -> cave_gallery.upper'],
   },
   manor_hall: {
     profile: 'medium',
@@ -215,6 +216,9 @@ const WORLD: Record<string, { profile: Profile; w: number; h: number; portals: s
   crumb_proofing: { profile: 'small', w: 12, h: 10, portals: ['cp.door -> bakery.proofing_room'] },
   // Round 10 (B5): the county jail's cell, outside every map's graph.
   cj_cell: { profile: 'small', w: 12, h: 8, portals: [] },
+  // Round 10 (T6, I42): the Fisher's home, and the sea door behind the boards of the Tin Gallery mouth.
+  cottage_fisher: { profile: 'small', w: 12, h: 9, portals: ['fc.door -> overworld.cottage'] },
+  sea_exit: { profile: 'small', w: 18, h: 10, portals: ['se.cave -> cave_entry.sea', 'se.sea -> null.null'] },
 };
 
 const PROFILES: Profile[] = ['small', 'medium', 'large'];
@@ -263,9 +267,16 @@ describe('scene graph (WORLD 4.3)', () => {
 
   it('marks one-way drops, the hollow log and the boarded sea passage', () => {
     const oneWay = all.flatMap((s) => s.portals.filter((p) => p.oneWay).map((p) => p.id));
-    expect(oneWay.sort()).toEqual(['ba.loft', 'bw.chute', 'fd.sinkhole', 'fo.log', 'mu.balcony']);
+    expect(oneWay.sort()).toEqual(['ba.loft', 'bw.chute', 'fd.sinkhole', 'fo.log', 'mu.balcony', 'se.sea']);
+    // The sea door stays locked until the Thief ships (T6): the boards, then the shingle, then the sea.
     const sea = scenes.cave_entry.portals.find((p) => p.id === 'ce.sea');
-    expect(sea).toMatchObject({ window: 'lowTide', ships: 'V1.5' });
+    expect(sea).toMatchObject({
+      window: 'lowTide',
+      ships: 'V1.5',
+      to: 'sea_exit',
+      lock: { keyId: 'seaBoards' },
+    });
+    expect(scenes.sea_exit.portals.find((q) => q.id === 'se.sea')).toMatchObject({ to: null, ships: 'V1.5' });
   });
 });
 
@@ -335,7 +346,12 @@ describe('profile gating', () => {
   for (const profile of PROFILES) {
     it(`connects every ${profile}-profile scene into one walkable world`, () => {
       // A jail scene (B5) has no portal in: the server places a jailed seat in it.
-      const open = all.filter((s) => s.kind !== 'jail' && opensAt(s.profile, profile));
+      // A scene entered only by portals that ship after V1 (the sea door, T6) is sealed until its step ships.
+      const sealed = (id: string) => {
+        const inbound = all.flatMap((f) => f.portals).filter((p) => p.to === id);
+        return inbound.length > 0 && inbound.every((p) => p.ships !== 'V1');
+      };
+      const open = all.filter((s) => s.kind !== 'jail' && !sealed(s.id) && opensAt(s.profile, profile));
       for (const s of open) {
         // Every spawn an open portal lands on, plus the square spawns, is one walkable region.
         const landing = all.flatMap((from) =>

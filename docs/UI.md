@@ -2141,3 +2141,51 @@ the input code, the touch HUD and the card's "What you can do" panel all read it
 The Run disc is gone. A card's ability takes the slot keys Q, R and F in card order only when it is not passive
 (`cardSlots`), so the Gamekeeper's Last Shot, the Accomplice's Inherit and the professions' Tasks no longer hold a key,
 and the phone's ability discs read the same slots (14.51.1).
+
+### 14.54 Story cards and the goals strip (S3, story mode)
+
+`apps/client/src/ui/story/`; `docs/story/README.md` 3; `docs/round9/phases.md` 8. Story mode draws three full-screen
+cards over the world, one at a time, from the private `story.card` message, and a goals strip from `story.goals`. Both
+reach the player's own client only (`PROTOCOL.md`); every title, line, goal and summary key is copy the server took from
+`story.json`. The client types only the chrome below (`ui/story/copy.ts`).
+
+| Card (`kind`) | Shows | Button (`story.continue`) |
+|---|---|---|
+| `title` | The chapter's name, its set-up lines | `story.card.begin` |
+| `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
+
+A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
+the player). The panel is at most 36 rem wide, scrolls on a short phone and keeps a 44 px button. The title card is
+opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD band, at most 18 rem
+wide, ticks a goal off (struck through, a "done" label for a screen reader) and is hidden while a card is up and when a
+chapter has no goals; an end card clears it.
+
+The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
+opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+`localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
+(Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
+server deals the first card and scene.
+
+Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
+`e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
+fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
+
+### 14.54 The evidence verbs (10V, round 10)
+
+The copy proposed for V1a's Inspect and Plant Clue (GDD 3.4). The server sends only the refusal reasons of 14.43 and
+`clueFound`. 10Y adds the keys and writes these lines into a table here as it places them, since a table row names a
+key the client holds (A414's deck test):
+
+- `verb.inspect`: "Inspect"; `verb.inspect.prompt`: "Inspect with a Lens ({n} left)".
+- `verb.inspect.done.verified`: "Verified: this clue is true."
+- `verb.inspect.done.forged`: "Forged: someone planted this. An Accomplice is in play."
+- `verb.plant`: "Plant Clue"; `verb.plant.pick`: "Plant what?"
+- `verb.plant.footprints`: "Footprints: {height} stride"; `verb.plant.thread`: "Thread: {scarf} wool" (a thread is
+  laid only beside a door).
+- `verb.plant.done`: "Planted. It looks like any other clue."
+- `card.lens`: "Lenses: {n} of {max}. One comes back each day."
+
+A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
+away from a door `TOO_FAR {of: 'door'}`.

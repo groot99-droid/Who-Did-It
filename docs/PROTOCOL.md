@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string }` | 5/s | `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. |
+| `act.ability` | `{ abilityId: string; targetId?: string; kind?: string; value?: number }` | 5/s | `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean; via?: string }` | 5/s | Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |
@@ -45,6 +45,8 @@
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
 | `talk.ask` | `{ targetId: string; ask: 'town' \| 'time' }` | 5/s | Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town` (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure), `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`. |
+| `story.start` | `{ storyId: string; chapterId?: string }` | 2/s | Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId` replays a finished chapter (Q-S4) and defaults to the story's first. |
+| `story.continue` | `Record<string, never>` | 5/s | Story mode: closes the card that is up. Refused 422 with no card up. |
 | `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
 | `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
 | `pair.ask` | `{ targetId: string }` | 2/s | Round 10, B8 (GDD 3.31, seams.md 3 row 10): `targetId` is the asked figure's avatar handle in the asker's scene. |
@@ -85,6 +87,8 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 | `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
+| `story.card` | `{ kind: 'title' \| 'beat' \| 'end'; chapterId: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. |
+| `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
