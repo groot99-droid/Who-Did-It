@@ -23,7 +23,7 @@ import {
 } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { addStack, canAdd, count, take } from '../Inventory';
-import { startLockpick } from '../Minigames';
+import { runJailBoards, startJailGame, startLockpick } from '../Minigames';
 import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
@@ -211,6 +211,7 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
   if (problem) return refuse(room, sessionId, problem, interactionId);
   const mode = interactions.interactions[interactionId as string]?.modes[modeIdx as number];
   // A mode with a mini-game (the lock-pick, round 10 D5) opens it in place of a hold.
+  if (t && mode?.minigame !== undefined && startJailGame(room, sessionId, mode.minigame, t)) return;
   if (mode?.minigame !== undefined && mode.minigame !== 'lockpick')
     return refuse(room, sessionId, { reason: 'NFY', args: { feature: 'this action' } }, interactionId);
   if (t && mode?.minigame === 'lockpick')
@@ -289,6 +290,7 @@ export function runInteract(room: PartyRoom): void {
     for (const [id, s] of scene.propStates)
       if (s.untilTick !== 0 && tick >= s.untilTick) scene.propStates.delete(id);
   });
+  runJailBoards(room);
 }
 
 /** The tool uses worn off a seat's `item` (tests). */

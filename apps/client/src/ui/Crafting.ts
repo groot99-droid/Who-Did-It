@@ -50,6 +50,13 @@ export interface CraftingDeps {
   toggle(recipeId: string): void;
   /** Seconds of the running cast gone, 0..1 of `craftS`. */
   progress(): number;
+  /** Opens the Pockets screen on its crafting square, where a hand recipe is made (round 10, A374). */
+  openSquare?(): void;
+}
+
+/** A hand recipe has no station: the crafting square makes it (GDD 3.14, A13a), not the `craft` hold. */
+export function isHandRecipe(r: Pick<RecipeRow, 'station'>): boolean {
+  return r.station === null;
 }
 
 const STATION_NAME: Record<string, string> = { oven: 'oven', basin: 'basin' };
@@ -57,7 +64,8 @@ const STATION_NAME: Record<string, string> = { oven: 'oven', basin: 'basin' };
 /**
  * The crafting list (UI.md 14.19.3): each recipe in `recipes.json`, its inputs, where it is made and a Make button that
  * starts the `craft` hold. The server decides: a recipe with a `station` needs a prop of that kind in reach, and a
- * refusal comes back as the usual error line. Opens with C.
+ * refusal comes back as the usual error line. A hand recipe (no station) carries no Make: its button points to the
+ * crafting square of the Pockets screen, where it is made (round 10, 10Y, A374; UI.md 14.51.3). Opens with C.
  */
 export function mountCrafting(parent: HTMLElement, deps: CraftingDeps): Panel {
   const list = h('ul', { class: 'wdi-m5b__list', 'data-testid': 'crafting-list' });
@@ -108,17 +116,18 @@ export function mountCrafting(parent: HTMLElement, deps: CraftingDeps): Panel {
         list.replaceChildren(
           ...rows.map((r) => {
             const on = running === r.id;
+            const hand = isHandRecipe(r);
             const button = h(
               'button',
               {
                 type: 'button',
-                class: 'wdi-btn wdi-btn--sm wdi-btn--primary',
+                class: hand ? 'wdi-btn wdi-btn--sm wdi-btn--ghost' : 'wdi-btn wdi-btn--sm wdi-btn--primary',
                 'data-testid': `craft-${r.id}`,
-                disabled: r.missing.length > 0 && !on,
+                disabled: !hand && r.missing.length > 0 && !on,
               },
-              on ? C['craft.stop'] : C['craft.make'],
+              hand ? C['craft.square'] : on ? C['craft.stop'] : C['craft.make'],
             );
-            button.addEventListener('click', () => deps.toggle(r.id));
+            button.addEventListener('click', () => (hand ? deps.openSquare?.() : deps.toggle(r.id)));
             const bar = h('i', {});
             bars.set(r.id, bar);
             return h(

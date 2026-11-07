@@ -1,0 +1,108 @@
+{
+  "id": "sea_exit",
+  "prefix": "se",
+  "name": "The sea door",
+  "zoneId": "sea_exit",
+  "profile": "small",
+  "kind": "exterior",
+  "biome": "cave",
+  "dark": true,
+  "size": { "w": 18, "h": 10 },
+  "notes": "The Thief's way out (round 10, T6; WORLD 4.4, GDD 3.10): the shingle behind the boards at the back of the Tin Gallery mouth, open to the sea. `ce.sea` leads here and stays locked, and `se.sea`, the way out of the map, stays boarded, until the Thief ships (V1.5). Greybox; round 11 draws the art.",
+  "worldRef": "4.4",
+  "portals": [
+    {
+      "id": "se.cave",
+      "from": "sea_exit",
+      "x": 0,
+      "y": 5,
+      "kind": "cave_mouth",
+      "to": "cave_entry",
+      "toSpawn": "sea",
+      "oneWay": false,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1.5"
+    },
+    {
+      "id": "se.sea",
+      "from": "sea_exit",
+      "x": 17,
+      "y": 5,
+      "kind": "cave_mouth",
+      "to": null,
+      "toSpawn": null,
+      "oneWay": true,
+      "lock": null,
+      "window": null,
+      "noise": "door",
+      "elevationDelta": 0,
+      "minProfile": "small",
+      "ships": "V1.5"
+    }
+  ],
+  "spawns": [{ "id": "cave", "x": 1, "y": 5, "z": 0, "facing": "e" }],
+  "spots": [
+    {
+      "id": "se.stalagmite",
+      "kind": "hide",
+      "variant": "stalagmite",
+      "x": 4,
+      "y": 2,
+      "childOnly": false
+    },
+    {
+      "id": "se.crate_pile",
+      "kind": "body",
+      "variant": "cratePile",
+      "x": 12,
+      "y": 7,
+      "childOnly": false
+    }
+  ],
+  "props": [
+    { "id": "se.fallen_log", "kind": "dressing", "x": 9, "y": 2 },
+    { "id": "se.fallen_log_2", "kind": "dressing", "x": 14, "y": 8 }
+  ],
+  "gates": [],
+  "paths": [],
+  "lights": [
+    { "id": "se.lt_moss", "kind": "moss", "x": 3, "y": 7, "radiusTiles": 2 },
+    {
+      "id": "se.lt_sea",
+      "kind": "shaft",
+      "x": 15,
+      "y": 5,
+      "radiusTiles": 4,
+      "phases": ["day", "dusk"]
+    },
+    { "id": "se.lt_moon", "kind": "moon", "x": 15, "y": 5, "radiusTiles": 3, "phases": ["night"] }
+  ],
+  "grid": [
+    "##################",
+    "#................#",
+    "#...H....#.......#",
+    "#................#",
+    "#................#",
+    "DS...............D",
+    "#................#",
+    "#...........B....#",
+    "#.............#..#",
+    "##################"
+  ],
+  "material": [
+    "XXXXXXXXXXXXXXXXXX",
+    "Xrrrrrrrrrrss~~~~X",
+    "XrrrrrrrrPrss~~~~X",
+    "Xrrrrrrrrrrss~~~~X",
+    "Xrrrrrrrrrrss~~~~X",
+    "Xrrrrrrrrrrss~~~~X",
+    "Xrrrrrrrrrrss~~~~X",
+    "Xrrrrrrrrrrss~~~~X",
+    "Xrrrrrrrrrrss~P~~X",
+    "XXXXXXXXXXXXXXXXXX"
+  ]
+}

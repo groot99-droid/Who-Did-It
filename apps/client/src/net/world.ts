@@ -233,7 +233,8 @@ export interface WorldFeed {
   vendetta(): string;
   /** Doors of the scene this client is in. */
   doors(): DoorSnap[];
-  clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number };
+  /** The public clock; `round` (the day count, round 10, y13) tells On the line when the next day is the Final Night. */
+  clock(): { tick: number; phase: number; phaseEndsTick: number; startTick: number; round: number };
   /** Bodies of the scene this client is in. */
   bodies(): BodySnap[];
   /** Clues of the scene this client is in. */

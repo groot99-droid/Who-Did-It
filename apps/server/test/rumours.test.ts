@@ -77,6 +77,20 @@ describe('the rumour ledger (GDD 3.23)', () => {
     expect(SAMPLE).toBeGreaterThan(0);
   });
 
+  it('writes nothing down in the county jail, where only cellmates see each other (B5c)', async () => {
+    const m = await startMatch(colyseus, 3);
+    dress(m, 'baker', 'doctor', 'vicar');
+    setPhase(m, Phase.night);
+    teleport(m, m.bots[0]!, 'cj_cell', 3, 3);
+    teleport(m, m.bots[1]!, 'cj_cell', 5, 3);
+    teleport(m, m.bots[2]!, 'chapel', 4, 4);
+    await sleep(150);
+    sample(m);
+    expect(ledgerOf(m.room).sightings).toEqual([]);
+    deliver(m);
+    expect(ledgerOf(m.room).bag).toBeNull();
+  });
+
   it('fills the bag at the delivery, night first, one slip per look', async () => {
     const m = await startMatch(colyseus, 2);
     dress(m, 'baker', 'doctor');

@@ -46,7 +46,12 @@ function bodyBounds(room: PartyRoom): InvariantFailure | null {
       if (on.stacks < 1 || !Number.isFinite(on.untilTick) || on.untilTick < 0)
         return fail(room, `${id}: ${effect} with ${on.stacks} stacks until tick ${on.untilTick}`);
     if (body.figure) continue;
-    if (body.maxHp !== b.maxHp || body.maxStamina !== b.maxStamina)
+    // Round 10, D8: a lost yard fight lowers a seat's maximum health, never under the floor.
+    if (
+      body.maxHp > b.maxHp ||
+      body.maxHp < Math.min(b.maxHp, balance.jail.yard.maxHpFloor) ||
+      body.maxStamina !== b.maxStamina
+    )
       return fail(room, `${id}: a seat's bounds are ${body.maxHp}/${body.maxStamina}, not the body's`);
     const p = sim.players.get(id);
     if (!p || p.dead) {

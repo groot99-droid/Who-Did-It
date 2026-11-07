@@ -1621,20 +1621,46 @@
     padding: var(--wdi-space-2) var(--wdi-space-3) var(--wdi-space-3);
   }
 
-  /* HUD on a phone: chip left, clock right, log under the clock, toasts above the controls. */
+  /* HUD on a phone (round 10, 10Y, UI.md 14.51.4): the goal chip and the Notebook button own the top row; the clock
+     sits under them at the right, the village's work bar under the clock (match.css), the log and the art switch
+     below that. `--wdi-hud-row2` is the top of the clock's row; the right column adds to it. Side by side at 56vw,
+     the clock painted over the chip's end and the Notebook button. */
+  :root {
+    --wdi-hud-row2: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 52px + var(--wdi-space-2));
+  }
+
   .wdi-hud-chip {
-    max-width: 56vw;
+    min-width: 0;
+    max-width: calc(100vw - 2 * var(--wdi-space-3) - var(--wdi-touch) - var(--wdi-space-2));
   }
 
   .wdi-hud__tc {
+    top: var(--wdi-hud-row2);
     left: auto;
     right: calc(var(--wdi-space-3) + env(safe-area-inset-right));
     transform: none;
   }
 
-  /* Under the clock and the village's work bar (match.css; round 10, 10Y, UI.md 14.51), so no log line hides. */
+  /* Under the clock (44px) and the work bar (30px), so no log line hides. The art switch and the gear share one
+     row under the work bar, the gear in the corner, and the log comes under them: stacked under the log, the
+     gear reached a stack of three toasts, and four log lines pushed it further. */
   .wdi-hud__tr {
-    top: calc(var(--wdi-space-3) + env(safe-area-inset-top) + 88px);
+    top: calc(var(--wdi-hud-row2) + 44px + var(--wdi-space-2) + 30px + var(--wdi-space-2));
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: var(--wdi-space-2);
+  }
+
+  .wdi-hud__tr > .wdi-log,
+  .wdi-hud__tr > .wdi-hud-fps {
+    order: 1;
+    flex-basis: 100%;
+  }
+
+  .wdi-hud__tr > .wdi-settings {
+    order: -1;
   }
 
   .wdi-log {
@@ -1643,6 +1669,14 @@
 
   .wdi-toasts {
     bottom: calc(176px + env(safe-area-inset-bottom));
+  }
+
+  /* The World's stack shows its newest three (48px each) at most: a fourth reached the art switch. Over the band
+     match.css narrows it to what fits above the prompt (14.51.4). */
+  .wdi-hud > .wdi-toasts {
+    max-height: calc(3 * 48px + 2 * var(--wdi-space-2));
+    overflow: hidden;
+    justify-content: flex-end;
   }
 
   .wdi-portraits {

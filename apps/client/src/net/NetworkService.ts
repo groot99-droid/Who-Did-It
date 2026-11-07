@@ -58,6 +58,10 @@ export type NetEvents = {
   error: ErrorPayload;
   /** The live room after a create, join or resume; `null` once it is gone. The router attaches its feeds here. */
   room: Room | null;
+  /** Story mode, private (docs/story/README.md 3): a chapter card; the story layer draws it. */
+  'story.card': ServerMessages['story.card'];
+  /** Story mode, private: the chapter's goals. */
+  'story.goals': ServerMessages['story.goals'];
   /** The connection to the room ended; `consented` is true when the player chose to leave. */
   left: { consented: boolean };
 };
@@ -116,7 +120,14 @@ export interface NetworkService {
 
 // `sceneEnter` is not here: the world feed (ColyseusWorldFeed) registers it once and the router
 // re-emits it on `bus` for the screens that listen (RoleReveal).
-const SERVER_MESSAGES: readonly NetMessageType[] = ['roleReveal', 'phaseChange', 'gameOver', 'error'];
+const SERVER_MESSAGES: readonly NetMessageType[] = [
+  'roleReveal',
+  'phaseChange',
+  'gameOver',
+  'error',
+  'story.card',
+  'story.goals',
+];
 
 /** Minimal view of the room state the lobby needs; the real schema arrives with `@wdi/shared`. */
 interface PlayerState {

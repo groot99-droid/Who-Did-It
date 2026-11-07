@@ -69,10 +69,14 @@ const PHASE_WORD: Record<number, string> = {
 };
 const isDark = (phase: number) => phase === Phase.night || phase === Phase.finalNight;
 
-/** The drawn look of every placed living figure, by scene index. */
+/**
+ * The drawn look of every placed living figure, by scene index. A jail scene is left out (round 10, B5c, seams.md 3
+ * row 19): the figures in the cell are seen by their cellmates only, so no notice, Gazette line or tip names the cell.
+ */
 function figuresByScene(room: PartyRoom): Map<number, string[]> {
   const out = new Map<number, string[]>();
   for (const [idx, key] of scenesWithAvatars(room)) {
+    if (scenes[key].kind === 'jail') continue;
     const looksHere: string[] = [];
     room.state.scenes.get(key)?.avatars.forEach((a) => {
       const look = room.state.players.get(a.lookOf)?.look ?? '';

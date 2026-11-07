@@ -499,6 +499,20 @@ export const BalanceFile = z.strictObject({
    * ceil(`winUnique` x the NPC seats at the deal), at least 1.
    */
   paintTown: Section({ winUnique: Frac }),
+  /**
+   * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
+   * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
+   * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the
+   * turning day; with no kill by the last one's Dusk Train it lapses (C4b).
+   */
+  hitman: Section({
+    byHumans: z.record(
+      z.enum(['3', '4', '5', '6', '7', '8', '9', '10']),
+      z.strictObject({ comes: Chance, human: Chance }),
+    ),
+    days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
+    contractDays: z.number().int().positive(),
+  }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
     transitionS: z.strictObject({ fade: Seconds, iris: Seconds, wipe: Seconds }),
@@ -608,8 +622,38 @@ export const BalanceFile = z.strictObject({
   }),
   /** Round 10, B4 (GDD 3.31): a manhunt runs `durationS` from the warrant's turn. */
   manhunt: Section({ durationS: Seconds }),
-  /** Round 10, B5 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell. */
-  jail: Section({ walkS: Seconds }),
+  /** Round 10, B5 and D8 (GDD 3.27): a cuffed seat walks `walkS` to the county jail's cell, where it may work out. */
+  jail: Section({
+    walkS: Seconds,
+    /** D8: the gym's tap board, and the Strength it gives (damage added to a strike, for the match). */
+    gym: z.strictObject({ difficulty: z.number().int().min(1).max(5), damage: z.number().int().positive() }),
+    /** D8: the yard fight's crates board (right and inside `boardS` wins), what a loss costs, what a win pays. */
+    yard: z.strictObject({
+      difficulty: z.number().int().min(1).max(5),
+      boardS: Seconds,
+      maxHpLoss: z.number().int().positive(),
+      maxHpFloor: z.number().int().positive(),
+      purse: z.number().int().positive(),
+    }),
+    /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
+    scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
+  }),
+  /**
+   * Round 10, B6a (GDD 3.8): the Tribunal's steps (`chargeS`, `caseS`, `defenceS`, then `phases.revealS` and
+   * `phases.immunityS`), the matches that prove a charge (`convictAt`) and murder (`murderAt`), the grace a dismissed
+   * accused has from a new petition, and the fines a charge sets (B6a: from the charge alone).
+   */
+  trial: Section({
+    chargeS: Seconds,
+    caseS: Seconds,
+    defenceS: Seconds,
+    convictAt: Count,
+    murderAt: Count,
+    acquittalGraceS: Seconds,
+    theftFine: Count,
+    trespassFine: Count,
+    rumourFine: Count,
+  }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the
    * stations within `leashTiles` of its post and keeps after a seat that struck it for `angerS`, while that seat

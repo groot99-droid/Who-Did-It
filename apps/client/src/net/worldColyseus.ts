@@ -55,6 +55,7 @@ interface PlayerState {
     onLine?: boolean; // round 10, C1
     fare?: number; // round 10, C2
     paintTown?: boolean; // round 10, C5
+    hitman?: boolean; // round 10, C4 (seams.md 3 row 20): the Hitman turned this seat
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };
@@ -94,6 +95,8 @@ interface GameStateLike {
   phase: number;
   phaseEndsTick: number;
   startTick: number;
+  /** The public day count (`GameState.round`), read by On the line for the last cycle (round 10, y13). */
+  round: number;
   players: Collection<PlayerState> & { get(id: string): PlayerState | undefined };
   scenes: { forEach(cb: (s: SceneStateLike, id: string) => void): void };
 }
@@ -273,7 +276,13 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   clock() {
     const s = this.state;
-    return { tick: s.tick, phase: s.phase, phaseEndsTick: s.phaseEndsTick, startTick: s.startTick };
+    return {
+      tick: s.tick,
+      phase: s.phase,
+      phaseEndsTick: s.phaseEndsTick,
+      startTick: s.startTick,
+      round: s.round,
+    };
   }
 
   sendMove(cmd: MoveCmd): void {

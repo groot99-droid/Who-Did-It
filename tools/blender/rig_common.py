@@ -415,3 +415,33 @@ def ramp_shades(colour: str, ramp: str | None = None) -> tuple[str, str]:
 def ramp_step(ramp: str, step: int) -> str:
     """One step of a named ramp; a negative step counts from the light end."""
     return WORLD_RAMPS[ramp][step]
+
+
+# Blender names a datablock appended beside one the file already holds `<name>.001`, `.002`, ... (pipeline.md 5.4).
+COPY_RE = re.compile(r"^(.+)\.(\d{3,})$")
+
+
+def is_copy_of(name: str, canonical: str) -> bool:
+    """True for the name Blender gives an appended copy of `canonical`: `canonical.001`, `.002`, ..."""
+    m = COPY_RE.match(name)
+    return m is not None and m.group(1) == canonical
+
+
+def remap_copies(blocks, canonical: str) -> list[str]:
+    """Points every user of an appended copy of `canonical` at the rig's own block and drops the copy.
+
+    `blocks` is a `bpy.data` collection (node groups, materials) whose blocks have `name` and `user_remap`. A look
+    appended by `batch_render.import_character` carries its own toon group, which arrives as `WDI_Toon.001`, so the HD
+    smoothing and the `--textured` swap, which edit and look for `WDI_Toon` by name, never reached a figure
+    (round11/look.md 1.3, pipeline.md 5.4; DECISIONS A434). Returns the names remapped, in collection order; without a
+    block named `canonical` nothing is touched.
+    """
+    own = next((b for b in blocks if b.name == canonical), None)
+    if own is None:
+        return []
+    copies = [b for b in blocks if is_copy_of(b.name, canonical)]
+    names = [c.name for c in copies]
+    for copy in copies:
+        copy.user_remap(own)
+        blocks.remove(copy)
+    return names

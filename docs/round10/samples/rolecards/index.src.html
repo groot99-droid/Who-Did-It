@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Role Cards Mock</title>
-<meta name="description" content="Who Did It, round 10 (10R): the trifold role card and the Daybook, a clickable mock filled from packages/content." />
+<meta name="description" content="Who Did It, round 10 (10R): the trifold role card and the Satchel, a clickable mock filled from packages/content." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Alegreya+SC:wght@700&family=Alegreya+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -204,10 +204,10 @@ ul.check li.done::before { background: var(--d-moss); border-color: var(--d-moss
 }
 @keyframes rise { from { transform: translateY(40px); opacity: 0; } }
 
-/* ---- the Daybook (doc 5) ---- */
-.daybook { position: absolute; z-index: 12; top: 64px; right: 12px; bottom: 12px; width: min(620px, calc(100% - 24px)); display: flex; flex-direction: column;
+/* ---- the Satchel (doc 5) ---- */
+.satchel { position: absolute; z-index: 12; top: 64px; right: 12px; bottom: 12px; width: min(620px, calc(100% - 24px)); display: flex; flex-direction: column;
   background: var(--d-paper); border: 2px solid var(--d-line); border-radius: 8px; box-shadow: 0 24px 60px rgb(0 0 0 / 0.45); overflow: hidden; }
-.daybook.opening { animation: slide var(--dur) var(--ease); }
+.satchel.opening { animation: slide var(--dur) var(--ease); }
 @keyframes slide { from { transform: translateX(24px); opacity: 0; } }
 .db-head { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--d-card); border-bottom: 2px solid var(--d-line); }
 .db-head h2 { margin: 0; font: 700 24px/1 var(--f-display); }
@@ -241,7 +241,7 @@ ul.check li.done::before { background: var(--d-moss); border-color: var(--d-moss
 .progress { height: 10px; border-radius: 5px; background: var(--d-rule); overflow: hidden; }
 .progress i { display: block; height: 100%; background: var(--d-mustard); }
 @container (max-width: 760px) {
-  .daybook { inset: 0; width: auto; border-radius: 0; border: 0; }
+  .satchel { inset: 0; width: auto; border-radius: 0; border: 0; }
   .db-tabs { order: 9; border-top: 2px solid var(--d-line); border-bottom: 0; padding-bottom: env(safe-area-inset-bottom); }
   .db-tabs button { flex: 1 0 auto; flex-direction: column; gap: 0; font-size: 11px; min-height: 52px; padding: 4px 8px; }
   .db-tabs .kbd { display: none; }
@@ -389,11 +389,11 @@ const ACTIONS = [
   { id: 'strike', group: 'verb', label: 'Strike', keys: ['X'], touch: 'Strike', line: 'Fists. A small hit that costs stamina. It knocks out, never kills.', ability: 'strike' },
   { id: 'hotbar', group: 'verb', label: 'Hold an item', keys: ['1', '–', '6'], touch: 'Tap the hotbar', line: 'Pick what is in your hand. Use acts with it.' },
   { id: 'card', group: 'screen', label: 'Role card', keys: ['Tab'], touch: 'Tap the goal chip', line: 'This card.' },
-  { id: 'daybook', group: 'screen', label: 'Daybook', keys: ['I'], touch: 'Daybook button', line: 'Pockets, chores, quests, notebook, purse.' },
-  { id: 'daybook.chores', group: 'screen', label: 'Daybook: Chores', keys: ['K'], touch: 'Chores tab' },
-  { id: 'daybook.quests', group: 'screen', label: 'Daybook: Quests', keys: ['J'], touch: 'Quests tab' },
-  { id: 'daybook.notebook', group: 'screen', label: 'Daybook: Notebook', keys: ['N'], touch: 'Notebook tab' },
-  { id: 'daybook.craft', group: 'screen', label: 'Daybook: Craft', keys: ['C'], touch: 'Pockets tab' },
+  { id: 'satchel', group: 'screen', label: 'Satchel', keys: ['I'], touch: 'Satchel button', line: 'Pockets, chores, quests, notebook, purse.' },
+  { id: 'satchel.chores', group: 'screen', label: 'Satchel: Chores', keys: ['K'], touch: 'Chores tab' },
+  { id: 'satchel.quests', group: 'screen', label: 'Satchel: Quests', keys: ['J'], touch: 'Quests tab' },
+  { id: 'satchel.notebook', group: 'screen', label: 'Satchel: Notebook', keys: ['N'], touch: 'Notebook tab' },
+  { id: 'satchel.craft', group: 'screen', label: 'Satchel: Craft', keys: ['C'], touch: 'Pockets tab' },
   { id: 'talk', group: 'verb', label: 'Ask for work', keys: ['T'], touch: 'Use, at a giver', line: 'At a quest giver: see what they want.' },
   { id: 'close', group: 'screen', label: 'Close', keys: ['Esc'], touch: 'Close', line: 'Closes the open screen.' },
 ];
@@ -447,7 +447,7 @@ const MOTIF = { village: '<path d="M2 24V2H24M8 24V8H24" fill="none" stroke="cur
 const src = (text) => h('span', { class: 'chip src' }, text);
 
 // ---- state ----
-const ui = { matchMode: 'world', role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, daybook: null, picked: null, holding: 0, ready: false };
+const ui = { matchMode: 'world', role: 'detective', view: 'desktop', theme: 'light', mode: 'reveal', sources: false, cardOpen: true, panel: 0, satchel: null, picked: null, holding: 0, ready: false };
 const R = () => CONTENT.roles.roles[ui.role];
 const P = () => {
   const base = PROPOSED[ui.role];
@@ -635,10 +635,10 @@ function goPanel(i) {
   syncPager(document.querySelector('.card'));
 }
 function closeCard() { ui.cardOpen = false; render(); setTimeout(() => document.querySelector('.hud-goal')?.focus(), 0); }
-function openCard() { ui.cardOpen = true; ui.daybook = null; ui.mode = 'play'; document.getElementById('m-mode').value = 'play'; render(); }
+function openCard() { ui.cardOpen = true; ui.satchel = null; ui.mode = 'play'; document.getElementById('m-mode').value = 'play'; render(); }
 
-// ---- the Daybook ----
-const DB_TABS = [
+// ---- the Satchel ----
+const SB_TABS = [
   { id: 'pockets', label: 'Pockets', key: 'I' }, { id: 'chores', label: 'Chores', key: 'K' }, { id: 'quests', label: 'Quests', key: 'J' },
   { id: 'notebook', label: 'Notebook', key: 'N' }, { id: 'purse', label: 'Purse', key: '' }, { id: 'self', label: 'You', key: '' },
 ];
@@ -722,18 +722,18 @@ function dbSelf() {
     h('h2', { class: 'sec' }, 'Your seat'),
     h('p', {}, 'Your name, traits and look are what everyone sees. Your card, this book and your cooldowns are yours alone.')];
 }
-function mountDaybook(host) {
-  const tab = ui.daybook;
+function mountSatchel(host) {
+  const tab = ui.satchel;
   const body = { pockets: dbPockets, chores: dbChores, quests: dbQuests, notebook: dbNotebook, purse: dbPurse, self: dbSelf }[tab]();
-  const tabs = h('div', { class: 'db-tabs', role: 'tablist', 'aria-label': 'Daybook' }, DB_TABS.map((t) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(t.id === tab), id: `db-${t.id}`, onclick: () => { ui.daybook = t.id; render(); } }, t.label, t.id === 'purse' && S().fare ? h('i', { class: 'dot', 'aria-label': 'something owed' }) : '', t.key ? h('span', { class: 'kbd' }, t.key) : '')));
-  const book = h('section', { class: `daybook opening ${ui.sources ? 'show-src' : ''}`, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'db-title' },
-    h('div', { class: 'db-head' }, h('h2', { id: 'db-title' }, 'Daybook'), h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'yours alone'), h('span', { style: 'flex:1' }), h('button', { type: 'button', class: 'btn sm', onclick: () => { ui.daybook = null; render(); } }, 'Close', h('span', { class: 'kbd' }, 'Esc'))),
+  const tabs = h('div', { class: 'db-tabs', role: 'tablist', 'aria-label': 'Satchel' }, SB_TABS.map((t) => h('button', { type: 'button', role: 'tab', 'aria-selected': String(t.id === tab), id: `db-${t.id}`, onclick: () => { ui.satchel = t.id; render(); } }, t.label, t.id === 'purse' && S().fare ? h('i', { class: 'dot', 'aria-label': 'something owed' }) : '', t.key ? h('span', { class: 'kbd' }, t.key) : '')));
+  const book = h('section', { class: `satchel opening ${ui.sources ? 'show-src' : ''}`, role: 'dialog', 'aria-modal': 'false', 'aria-labelledby': 'db-title' },
+    h('div', { class: 'db-head' }, h('h2', { id: 'db-title' }, 'Satchel'), h('span', { class: 'mono', style: 'color:var(--d-soft)' }, 'yours alone'), h('span', { style: 'flex:1' }), h('button', { type: 'button', class: 'btn sm', onclick: () => { ui.satchel = null; render(); } }, 'Close', h('span', { class: 'kbd' }, 'Esc'))),
     tabs, h('div', { class: 'db-body', role: 'tabpanel', 'aria-labelledby': `db-${tab}` }, body),
     h('div', { class: 'db-foot' }, 'The world runs on. You can still walk; a hit closes the book.'));
   host.append(book);
   tabs.addEventListener('keydown', (e) => {
-    const i = DB_TABS.findIndex((t) => t.id === ui.daybook);
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { ui.daybook = DB_TABS[(i + (e.key === 'ArrowRight' ? 1 : DB_TABS.length - 1)) % DB_TABS.length].id; render(); document.getElementById(`db-${ui.daybook}`)?.focus(); }
+    const i = SB_TABS.findIndex((t) => t.id === ui.satchel);
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { ui.satchel = SB_TABS[(i + (e.key === 'ArrowRight' ? 1 : SB_TABS.length - 1)) % SB_TABS.length].id; render(); document.getElementById(`db-${ui.satchel}`)?.focus(); }
   });
 }
 
@@ -743,7 +743,7 @@ function mountHud(host) {
   const hud = h('div', { class: 'hud' },
     h('button', { type: 'button', class: 'hud-goal', onclick: openCard, 'aria-label': `Your card. ${fillLater(p.goal)} (Tab)` }, h('span', { class: 'disc' }, svg(GLYPH.card, 18)), h('span', {}, h('b', {}, 'Your card ', h('kbd', { class: 'kbd' }, 'Tab')), h('span', {}, fillLater(p.goal)))),
     h('div', { class: 'hud-clock' }, h('div', { class: 'num' }, '06:40'), h('div', { class: 'mono' }, 'Day')),
-    h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.daybook = ui.daybook ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Daybook (I)' }, 'Daybook', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
+    h('div', { class: 'hud-tr' }, h('button', { type: 'button', class: 'hud-btn', onclick: () => { ui.satchel = ui.satchel ? null : 'pockets'; ui.cardOpen = false; render(); }, 'aria-label': 'Satchel (I)' }, 'Satchel', s.fare ? h('span', { class: 'badge', 'aria-hidden': 'true' }) : '', h('kbd', {}, 'I')), h('button', { type: 'button', class: 'hud-btn', 'aria-label': 'Settings' }, '⚙')),
     h('div', { class: 'hud-body' }, h('div', { class: 'mono' }, 'Health'), h('div', { class: 'bar' }, h('i', { style: 'width:100%;background:var(--wdi-teal)' })), h('div', { class: 'mono' }, 'Stamina'), h('div', { class: 'bar' }, h('i', { style: 'width:72%;background:var(--wdi-lantern)' }))),
     h('div', { class: 'hud-purse num' }, `${s.purse} Scrip`),
     h('nav', { class: 'hotbar', 'aria-label': 'Hotbar' }, s.hotbar.map((st, i) => h('button', { type: 'button', class: i === ui.holding ? 'on' : '', onclick: () => { ui.holding = i; render(); } }, h('span', { class: 'n' }, i + 1), st ? itemName(st[0]) : ''))));
@@ -771,8 +771,8 @@ function render() {
   stage.append(frame);
   mountHud(frame);
   if (ui.cardOpen) mountCard(frame);
-  if (ui.daybook) mountDaybook(frame);
-  if (!ui.cardOpen && !ui.daybook && ui.view === 'desktop') frame.append(h('div', { class: 'legend' }, h('b', {}, 'In play. '), 'Tab or the goal chip reopens the card. I or the Daybook button opens the Daybook; K, J, N and C open it at a tab. Esc closes.'));
+  if (ui.satchel) mountSatchel(frame);
+  if (!ui.cardOpen && !ui.satchel && ui.view === 'desktop') frame.append(h('div', { class: 'legend' }, h('b', {}, 'In play. '), 'Tab or the goal chip reopens the card. I or the Satchel button opens the Satchel; K, J, N and C open it at a tab. Esc closes.'));
   if (ui.cardOpen && ui.view === 'phone') setTimeout(() => { const ps = document.querySelector('.panels'); if (ps) ps.scrollLeft = ui.panel * ps.clientWidth; }, 0);
 }
 
@@ -782,18 +782,18 @@ for (const [id, key] of [['m-match', 'matchMode'], ['m-role', 'role'], ['m-view'
     if (key === 'matchMode' && ui.matchMode === 'paint') { ui.role = 'killer'; document.getElementById('m-role').value = 'killer'; }
     if (key === 'role' && ui.matchMode === 'paint' && ui.role !== 'killer') { ui.matchMode = 'world'; document.getElementById('m-match').value = 'world'; }
     if (key === 'role' || key === 'matchMode') { ui.picked = null; ui.holding = 0; }
-    if (key === 'role' || key === 'mode' || key === 'matchMode') { ui.cardOpen = true; ui.daybook = null; ui.ready = false; ui.panel = 0; }
+    if (key === 'role' || key === 'mode' || key === 'matchMode') { ui.cardOpen = true; ui.satchel = null; ui.ready = false; ui.panel = 0; }
     render();
   });
 }
 document.getElementById('m-src').addEventListener('change', (e) => { ui.sources = e.target.checked; render(); });
-document.getElementById('m-replay').addEventListener('click', () => { ui.mode = 'reveal'; document.getElementById('m-mode').value = 'reveal'; ui.cardOpen = true; ui.ready = false; ui.daybook = null; ui.panel = 0; render(); });
+document.getElementById('m-replay').addEventListener('click', () => { ui.mode = 'reveal'; document.getElementById('m-mode').value = 'reveal'; ui.cardOpen = true; ui.ready = false; ui.satchel = null; ui.panel = 0; render(); });
 document.addEventListener('keydown', (e) => {
   if (e.target.closest('select, input')) return;
-  if (e.key === 'Tab' && !e.shiftKey && !e.target.closest('.card, .daybook')) { e.preventDefault(); ui.cardOpen ? closeCard() : openCard(); return; }
-  if (e.key === 'Escape') { if (ui.daybook) { ui.daybook = null; render(); } else if (ui.cardOpen && ui.mode === 'play') closeCard(); return; }
+  if (e.key === 'Tab' && !e.shiftKey && !e.target.closest('.card, .satchel')) { e.preventDefault(); ui.cardOpen ? closeCard() : openCard(); return; }
+  if (e.key === 'Escape') { if (ui.satchel) { ui.satchel = null; render(); } else if (ui.cardOpen && ui.mode === 'play') closeCard(); return; }
   const tab = { i: 'pockets', k: 'chores', j: 'quests', n: 'notebook', c: 'pockets' }[e.key.toLowerCase()];
-  if (tab && !e.ctrlKey && !e.metaKey) { ui.daybook = ui.daybook === tab ? null : tab; ui.cardOpen = false; render(); }
+  if (tab && !e.ctrlKey && !e.metaKey) { ui.satchel = ui.satchel === tab ? null : tab; ui.cardOpen = false; render(); }
   if (/^[1-6]$/.test(e.key) && !ui.cardOpen) { ui.holding = +e.key - 1; render(); }
 });
 if (matchMedia('(max-width: 760px)').matches) { ui.view = 'phone'; document.getElementById('m-view').value = 'phone'; }
