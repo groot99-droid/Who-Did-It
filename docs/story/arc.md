@@ -460,3 +460,18 @@ Recorded as DECISIONS A515. Every section, cast card and through-line: no issues
 | F14 | Merge #468 once its e2e re-run is green |
 
 All other questions stand on their defaults.
+
+## 8. Part 2 build decisions (owner, 2026-11-07)
+
+Recorded as DECISIONS A517.
+
+| Question | Answer |
+| -------- | ------ |
+| W1 | The Medium's resurrection applies in every game, multiplayer included. Note: it only applies if the Vicar wants to return with the 10X buff (to clarify) |
+| W2 | Build player accounts now, as part of the story work |
+| W3 | Hold the story build until the map revamp lands (read as: P5 content and P6 other towns wait; the engine and client do not) |
+| W4 | One session finishes the five skipped PRs |
+| W5 | Spawn all four verb steps now (V1b, V2, V3, B6d2) |
+| W6 | Spawn P2 and P3 now; P5 waits |
+| W7 | Renumber the story-cards UI.md section |
+| W8 | PR #470 stays open until the owner reads it |
