@@ -150,9 +150,13 @@ next seat or townsperson to walk onto that tile is held for `abilities.json` `sn
 row (3.22); a walker already on the tile when it was set, the setter first, is safe until it steps off. A snare holds
 one walker and is spent. The setter's own Notebook gets a reading naming the look it saw drawn (an impersonation's face,
 never the seat behind it) and the snare's scene. A set snare is shown only to its setter and to seats within
-`balance.json` `snare.seeTiles` of it, and nothing shows who set it. The verb never asks the card: the Ranger's card
-shows Snare, and a Snare bought, crafted or picked up works the same in any hand. Rope and the NPC seats' snares follow
-in K6b; disarming a seen snare, snares on creatures and the client's drawing in K6c.
+`balance.json` `snare.seeTiles` of it, and nothing shows who set it. Anyone holding a Rope frees a held seat in reach at once (`act.ability {abilityId: 'rope', targetId}`); the Rope is
+kept. Neither verb asks the card: the Townsfolk's card shows Rope and the Ranger's Snare, and a Snare or a Rope bought,
+crafted or picked up works the same in any hand. NPC seats (3.12, K6b) do all of it through the same verbs, whatever
+their card: outdoors one sets the Snare it holds by `snare.npc.setChancePer10s`, a stall that sells Snares draws one that
+holds none and can pay, and it buys one there by `snare.npc.buyChance`, and one with a Rope walks to a held seat it sees
+and frees it by `snare.npc.ropeChance`, one roll per held seat; so a set snare, a purchase or a freeing never marks a
+human. Disarming a seen snare, snares on creatures and the client's drawing follow in K6c.
 
 **Tasks.** Village players get 3-5 tasks; the global bar at 100% wins. Each needs a tool from another scene and a 2 s hold at the node: Light the lanterns (Oil from the tavern back room to a square lantern post, night only), Fix the well pump (Wrench from the apothecary bench), Deliver a letter (from the widow's letter box to the tavern dartboard), Mend the fence (2 Planks from the edge of Gallows Wood by the gate to the NE fence; while mended, wolves cannot enter the village), Fetch the flour (from Crumb's Ovens to the tavern); and behind Crumb's Ovens (round 7, A118) Mix the dough (Flour from the bakery's sacks to the mixer), Stoke the oven (Timber from the woodpile at the edge of Gallows Wood to the brick oven), Stock the cold room (a Bucket of well water from the pump to the cold shelves) and Proof the loaves (a Candle from the widow's bedroom to the proofing cabinet), which join the pool the deal draws from, the number dealt and the bar's maths unchanged. Co-op task (Shutter the windows, in the tavern): both players within 2 tiles of the node holding E for 4 s; progress pauses when one releases. Two-player carrying is V1.5. Completing a task writes a Claimed alibi entry (time + scene). Cabal see a fake list that writes entries but never fills the bar. Ghost task completion counts 100% but ghost contribution is capped at 25% of the bar, except the martyred Vicar's (3.20). A full bar in play ends the match for the Village.
 

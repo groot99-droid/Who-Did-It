@@ -5,6 +5,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { bodyOf } from '../src/sim/body/state';
 import { addStack, count } from '../src/sim/Inventory';
 import { handleSnareAbility, heldBySnare } from '../src/sim/snares';
+import { handleOf } from './avatarHelpers';
 import { bootFlowServer, idOf, sim, startParty, until } from './flowHelpers';
 import { act, openRun, setPhase, teleport } from './killHelpers';
 import { type Bot, type Match, move, sleep, stateOf } from './simHelpers';
@@ -50,7 +51,7 @@ describe('Setting a snare (K6)', () => {
     const p = sim(m, 0);
     p.x = (portal.x + 0.5) * TILE_PX;
     p.y = (portal.y + 0.5) * TILE_PX;
-    handleSnareAbility(m.room, idOf(m, 0));
+    handleSnareAbility(m.room, idOf(m, 0), { abilityId: 'snare' });
     teleport(m, m.bots[0]!, SCENE, x + 2, y);
     setPhase(m, Phase.meetingDiscussion);
     await act(m.bots[0]!, 'act.ability', { abilityId: 'snare' });
@@ -121,5 +122,35 @@ describe('A snare springs (K6)', () => {
       true,
     );
     expect(bodyOf(m.room, idOf(m, 1))?.effects.has('slowed')).toBe(true);
+  });
+});
+
+describe('Rope (K6)', () => {
+  it('refuses without a Rope, at a seat not held, out of reach, at its own figure; frees a held seat in reach', async () => {
+    const { m, x, y } = await inForest();
+    give(m, 0, 'snare');
+    await act(m.bots[0]!, 'act.ability', { abilityId: 'snare' });
+    teleport(m, m.bots[0]!, SCENE, x + 6, y);
+    teleport(m, m.bots[2]!, SCENE, x + 1, y);
+    await sleep(150);
+    const target = handleOf(m, m.bots[2]!);
+    await act(m.bots[3]!, 'act.ability', { abilityId: 'rope', targetId: target });
+    give(m, 3, 'rope');
+    teleport(m, m.bots[3]!, SCENE, x + 2, y);
+    await sleep(150);
+    await act(m.bots[3]!, 'act.ability', { abilityId: 'rope', targetId: handleOf(m, m.bots[2]!) });
+    await act(m.bots[3]!, 'act.ability', { abilityId: 'rope', targetId: handleOf(m, m.bots[3]!) });
+    teleport(m, m.bots[2]!, SCENE, x, y);
+    expect(await until(() => heldBySnare(m.room, idOf(m, 2)))).toBe(true);
+    teleport(m, m.bots[3]!, SCENE, x + 5, y);
+    await sleep(150);
+    await act(m.bots[3]!, 'act.ability', { abilityId: 'rope', targetId: handleOf(m, m.bots[2]!) });
+    expect(reasons(m.bots[3]!)).toEqual(['NEED_ITEM', 'NOTHING_TO_CURE', 'NO_TARGET', 'TOO_FAR']);
+    teleport(m, m.bots[3]!, SCENE, x + 1, y);
+    await sleep(150);
+    await act(m.bots[3]!, 'act.ability', { abilityId: 'rope', targetId: handleOf(m, m.bots[2]!) });
+    expect(heldBySnare(m.room, idOf(m, 2))).toBe(false);
+    expect(count(m.room.state.players.get(idOf(m, 3))!, 'rope')).toBe(1); // a Rope is kept
+    expect(reasons(m.bots[3]!)).toHaveLength(4);
   });
 });

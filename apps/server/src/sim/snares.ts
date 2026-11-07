@@ -5,7 +5,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { avatarMemory, avatarOf } from './Avatars';
 import { effectDef, applyEffect } from './body/effects';
 import { bodyOf } from './body/state';
-import type { Verb } from './body/verbs';
+import { type Verb, seatInReach } from './body/verbs';
 import { livingActor } from './Actions';
 import { count, take } from './Inventory';
 import { simOf } from './RoomSim';
@@ -15,7 +15,7 @@ import { isWorldPhase, reject, sceneIndex, sceneKey, tileCentre } from './World'
 
 // Snares and Rope (round 10, K6; GDD 3.5, scope.md 2.5, seams.md 3 row 31). Anyone holding a Snare sets it on the
 // tile it stands on; the next seat or figure to walk onto the tile is held for `snare.params.holdS`, then Slowed, and
-// the layer's Notebook names the look it saw drawn. A set snare is a scene prop
+// the layer's Notebook names the look it saw drawn. A Rope frees a held seat in reach. A set snare is a scene prop
 // sent only to its layer and to seats within `balance.snare.seeTiles`; nothing on the wire names its layer.
 
 interface SetSnare {
@@ -50,7 +50,7 @@ function memoryOf(room: PartyRoom): SnareMemory {
 const tileOf = (px: number): number => Math.floor(px / TILE_PX);
 const holdTicks = (): number => Math.round((abilities.abilities.snare?.params?.holdS ?? 0) * TICK_RATE);
 
-/** Whether a snare holds this seat or figure now (`body/run.ts` stops a held seat's feet; K6b's Rope frees it). */
+/** Whether a snare holds this seat or figure now (`body/run.ts` stops a held seat's feet; a Rope frees it). */
 export const heldBySnare = (room: PartyRoom, id: string): boolean =>
   (memories.get(room)?.held.get(id) ?? 0) > room.state.tick;
 
@@ -77,11 +77,18 @@ function openItemVerb(room: PartyRoom, sessionId: string, id: 'snare' | 'rope'):
   return { def, player, actor, body, tick: room.state.tick };
 }
 
-/**
- * `act.ability {abilityId: 'snare'}` from the dispatch in `Actions.ts`: sets one Snare from the pack on the actor's
- * tile, never on a portal and never on a tile that holds one already.
- */
-export function handleSnareAbility(room: PartyRoom, sessionId: string): void {
+/** `act.ability {abilityId: 'snare' | 'rope'}` from the dispatch in `Actions.ts`. */
+export function handleSnareAbility(
+  room: PartyRoom,
+  sessionId: string,
+  payload: Record<string, unknown>,
+): void {
+  if (payload.abilityId === 'rope') return freeWithRope(room, sessionId, payload.targetId);
+  setSnare(room, sessionId);
+}
+
+/** Sets one Snare from the pack on the actor's tile: never on a portal, never on a tile that holds one already. */
+function setSnare(room: PartyRoom, sessionId: string): void {
   const v = openItemVerb(room, sessionId, 'snare');
   if (!v) return;
   const mem = memoryOf(room);
@@ -110,6 +117,19 @@ export function handleSnareAbility(room: PartyRoom, sessionId: string): void {
   clear.add(sessionId);
   mem.snares.set(id, { sceneIdx: v.actor.sceneIdx, tx, ty, layer: sessionId, clear });
   simOf(room).viewsDirty = true;
+}
+
+/** Frees a held seat in reach with a Rope, which is kept. The actor's own figure is no target (`seatInReach`). */
+function freeWithRope(room: PartyRoom, sessionId: string, handle: unknown): void {
+  const v = openItemVerb(room, sessionId, 'rope');
+  if (!v) return;
+  const target = seatInReach(room, sessionId, v, handle);
+  if (target === null) return;
+  if (!heldBySnare(room, target)) {
+    reject(room, sessionId, 'NOTHING_TO_CURE');
+    return;
+  }
+  memoryOf(room).held.delete(target);
 }
 
 /** The living seats and figures standing on a tile of a scene: seat ids and figure ids. */

@@ -9,6 +9,7 @@ import { handleSell } from '../economy/shops';
 import { interactReady } from '../interact/resolve';
 import { sceneIndex } from '../World';
 import type { Station } from './routine';
+import { maybeBuySnare, snareShopAt } from './snares';
 
 // The chores of an NPC seat (round 10, D1; GDD 3.12 "Chores", LW 1.8): the stations it can work for real, what it
 // sells at a counter, and the rule that nothing waits on it. Every action goes through the verb a human uses.
@@ -41,16 +42,18 @@ export function workable(room: PartyRoom, player: PlayerState, st: Station): boo
   if (otherAt(room, player.id, st.propId)) return false;
   const hold = holdOf(st);
   if (hold === 'interact') return interactReady(room, player, st.scene, st.propId);
-  if (hold === 'shop') return sellables(player, st.propId).length > 0;
+  if (hold === 'shop')
+    return sellables(player, st.propId).length > 0 || snareShopAt(room, player, st.propId) !== undefined; // K6b
   if (hold === 'errand') return owesFare(room, player.id); // round 10, C2b: the Clerk's books, only while owing
   return true;
 }
 
-/** At a counter: opens the shop with the human verb, then sells all it holds that the shop buys. */
+/** At a counter: opens the shop with the human verb, sells all it holds that the shop buys, and may buy a Snare. */
 export function sellAt(room: PartyRoom, id: string, player: PlayerState, st: Station): void {
   const shopId = shopAt(st.propId);
   if (shopId === undefined || simOf(room).players.get(id)?.sceneIdx !== sceneIndex(st.scene)) return;
   handleHold(room, id, { action: 'shop', targetId: st.propId, on: true });
   for (const itemId of sellables(player, st.propId))
     handleSell(room, id, { shopId, itemId, qty: count(player, itemId) });
+  maybeBuySnare(room, id, player, st.propId); // round 10, K6b: a Snare, as a human buys one
 }
