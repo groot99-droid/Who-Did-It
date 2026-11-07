@@ -36,7 +36,7 @@ import { isDeparted } from './vendettas/arrival';
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
 
 /** The portal of `sceneId` nearest to a tile; the other half of a pair, used for the arrival swing. */
-export function nearestPortal(sceneId: SceneId, tx: number, ty: number): Portal | null {
+function nearestPortal(sceneId: SceneId, tx: number, ty: number): Portal | null {
   let best: Portal | null = null;
   let bestD = Infinity;
   for (const portal of scenes[sceneId].portals) {
