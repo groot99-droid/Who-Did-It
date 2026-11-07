@@ -101,10 +101,16 @@ describe('sections in a room', () => {
 
       const cards = sr.cards.map((c) => c.card);
       const titles = cards.filter((c) => c.kind === 'title');
-      expect(titles.map((c) => c.title)).toEqual(['Probe Chapter', probe().chapters[0]!.sections[1]!.title]);
+      expect(titles.map((c) => c.title)).toEqual(['Probe Chapter']);
+      const sectionCards = cards.filter((c) => c.kind === 'section');
+      expect(sectionCards.map((c) => [c.title, c.chapterId])).toEqual([
+        [probe().chapters[0]!.sections[1]!.title, 'probe_chapter'],
+      ]);
       expect(cards.filter((c) => c.kind === 'end')).toHaveLength(1); // the chapter's, none between its sections
       expect(cards.at(-1)!.kind).toBe('end');
-      const order = cards.map((c) => (c.kind === 'beat' ? c.lines[0] : c.kind));
+      const order = cards.map((c) =>
+        c.kind === 'beat' ? c.lines[0] : c.kind === 'section' ? 'section' : c.kind,
+      );
       expect(order.indexOf('The second section.')).toBeGreaterThan(order.indexOf('title'));
       expect(order.indexOf('end')).toBeGreaterThan(order.indexOf('The second section.'));
 
@@ -121,14 +127,14 @@ describe('sections in a room', () => {
     try {
       const sr = await startStoryRoom(colyseus, { storyId: ID });
       play(sr, { maxTicks: 600, until: (r) => r.cards.some((c) => c.card.lines[0] === 'Moll sees it all.') });
-      const lines = sr.cards.map((c) => c.card).filter((c) => c.kind === 'beat');
+      const lines = sr.cards.map((c) => c.card).filter((c) => c.kind === 'line');
       const watch = lines.find((c) => c.lines[0] === 'The watch is awake.')!;
       const holder = [...sr.room.state.players.values()].find((p) => p.priv.role.roleId === 'watchman')!;
       expect(humanSeat(sr)).not.toBe([...sr.room.state.players].find(([, p]) => p === holder)![0]);
-      expect(watch.title).toBe(holder.name);
+      expect(watch.speaker).toBe(holder.name);
       expect(watch.portrait).toBe(holder.look || 'watchman'); // the card's look before the deal publishes looks
       const moll = lines.find((c) => c.lines[0] === 'Moll sees it all.')!;
-      expect([moll.title, moll.portrait]).toEqual(['Mother Moll', 'villager']);
+      expect([moll.speaker, moll.portrait]).toEqual(['Mother Moll', 'villager']);
       expect(sr.room.state.phase).not.toBe(Phase.lobby);
     } finally {
       delete storyArc.stories[ID];

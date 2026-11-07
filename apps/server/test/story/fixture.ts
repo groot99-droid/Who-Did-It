@@ -38,8 +38,10 @@ export const STORY_MSG = {
 } as const;
 
 export interface StoryCard {
-  kind: 'title' | 'beat' | 'end';
+  kind: 'title' | 'section' | 'beat' | 'line' | 'end';
   chapterId: string;
+  sectionId?: string;
+  speaker?: string;
   title?: string;
   lines: string[];
   portrait?: string;
@@ -312,7 +314,7 @@ export class StoryDigest {
   }
 
   finish(sr: StoryRoom): string {
-    for (const c of sr.cards) this.hash.update(`card ${c.tick} ${c.card.kind} ${c.card.chapterId}\n`);
+    for (const c of sr.cards) this.hash.update(`card ${c.tick} ${c.card.kind} ${c.card.sectionId}\n`);
     for (const e of sr.events)
       if (e.kind.startsWith('story.'))
         this.hash.update(`${e.tick} ${e.kind} ${JSON.stringify(e.data ?? {})}\n`);

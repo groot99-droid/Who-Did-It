@@ -16,6 +16,7 @@ export interface ActionHost {
     speaker: string | undefined,
     portrait: string | undefined,
     goalId: string | undefined,
+    spoken?: boolean,
   ): void;
 }
 
@@ -72,7 +73,7 @@ function say(host: ActionHost, line: ArcLine['say']): void {
   // The look the table sees (`publishLooks`): a cover shows as its cover, never as the card it hides.
   const worn = card?.cover === true ? held?.priv.coverLook : card?.look;
   const look = line.portrait ?? (held?.look || worn || undefined);
-  host.card(line.text, name, look, line.goal);
+  host.card(line.text, name, look, line.goal, true);
 }
 
 /** Runs one action once. */

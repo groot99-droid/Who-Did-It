@@ -28,8 +28,12 @@ import { type Latches, hear, holds } from './triggers';
 
 /** The `story.card` payload (docs/story/README.md 3); S3 owns the wire constants and the client. */
 export interface StoryCard {
-  kind: 'title' | 'beat' | 'end';
+  kind: 'title' | 'section' | 'beat' | 'line' | 'end';
+  /** The arc chapter's id; `sectionId` is the running section's (the wire of docs/story/part2.md, P3's A518). */
   chapterId: string;
+  sectionId?: string;
+  /** A `line` card's speaker: a seat's public name or a named figure. */
+  speaker?: string;
   title?: string;
   lines: string[];
   portrait?: string;
@@ -221,7 +225,7 @@ function sendGoals(room: PartyRoom, state: StoryState): void {
   const chapter = chapterOf(state);
   if (chapter === undefined) return;
   send(room, state, STORY_MSG.goals, {
-    chapterId: chapter.id,
+    chapterId: chapter.chapter.id,
     goals: chapter.goals.map((g) => ({ id: g.id, text: g.text, done: state.goalsDone.has(g.id) })),
   });
 }
@@ -297,8 +301,9 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
   // The first section of an arc chapter opens with the chapter's card; every later section has its own (arc E1).
   const opening = chapter.first ? [chapter.chapter.setup, chapter.setup] : [chapter.setup];
   raise(room, state, {
-    kind: 'title',
-    chapterId: chapter.id,
+    kind: chapter.first ? 'title' : 'section',
+    chapterId: chapter.chapter.id,
+    sectionId: chapter.id,
     title: chapter.first ? chapter.chapter.title : chapter.title,
     lines: [...new Set(opening), ...handed.map((h) => h.text)],
   });
@@ -324,7 +329,8 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
   const next = state.units[state.chapterIdx + 1];
   const endCard: StoryCard = {
     kind: 'end',
-    chapterId: chapter.id,
+    chapterId: chapter.chapter.id,
+    sectionId: chapter.id,
     title: chapter.title,
     lines: failed ? [card.failedLine] : card.lines,
     summary,
@@ -450,12 +456,13 @@ export function runStory(room: PartyRoom): void {
   const host = {
     room,
     humanId: state.humanId,
-    card: (line: string, speaker?: string, portrait?: string, goalId?: string) => {
+    card: (line: string, speaker?: string, portrait?: string, goalId?: string, spoken?: boolean) => {
       const goal = chapter.goals.find((g) => !state.goalsDone.has(g.id) && g.id !== goalId);
       raise(room, state, {
-        kind: 'beat',
-        chapterId: chapter.id,
-        ...(speaker !== undefined && { title: speaker }),
+        kind: spoken === true ? 'line' : 'beat',
+        chapterId: chapter.chapter.id,
+        sectionId: chapter.id,
+        ...(speaker !== undefined && (spoken === true ? { speaker } : { title: speaker })),
         lines: [line],
         ...(portrait !== undefined && { portrait }),
         ...(goal !== undefined && { goal: goal.text }),
