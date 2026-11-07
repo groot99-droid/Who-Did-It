@@ -68,6 +68,26 @@ describe('the story layer', () => {
     expect(parent.byTestId('story-next')).toBeUndefined();
   });
 
+  it('draws a section card and an NPC line card with the speaker, lines and section id', () => {
+    const { parent, mock } = rig();
+    mock.start('mock2');
+    parent.byTestId('story-continue')?.click(); // title -> section
+    const section = parent.byTestId('story-card');
+    expect(section?.getAttribute('data-kind')).toBe('section');
+    expect(section?.getAttribute('data-section')).toBe('mock2_b');
+    expect(parent.byTestId('story-title')?.content).toBe('Second section');
+    parent.byTestId('story-continue')?.click(); // section -> line
+    const line = parent.byTestId('story-card');
+    expect(line?.getAttribute('data-kind')).toBe('line');
+    expect(parent.byTestId('story-speaker')?.content).toBe('Old Marta');
+    expect(
+      parent
+        .all()
+        .filter((n) => n.attrs.get('data-testid') === 'story-line')
+        .map((l) => l.content),
+    ).toEqual(['The bell tolled for no one last night.', 'Someone rang it all the same.']);
+  });
+
   it('the mock network answers story.start on its bus', () => {
     const net = new MockNetwork();
     const seen: string[] = [];

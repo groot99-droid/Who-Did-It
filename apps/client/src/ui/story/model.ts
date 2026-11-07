@@ -28,12 +28,12 @@ export const onGoals = (state: StoryState, goals: StoryGoals): StoryState => ({ 
 /** `story.continue` closed the card that was up. */
 export const closeCard = (state: StoryState): StoryState => ({ ...state, card: null });
 
-/** The label of a title, beat or end card's button. An end card with no `next` closes the story. */
+/** The label of a card's button: Begin on the chapter's title card, Continue on the rest, and an end card with no `next` closes the story. */
 export function cardButton(
   card: StoryCard,
 ): 'story.card.begin' | 'story.card.continue' | 'story.card.next' | 'story.card.finish' {
   if (card.kind === 'title') return 'story.card.begin';
-  if (card.kind === 'beat') return 'story.card.continue';
+  if (card.kind !== 'end') return 'story.card.continue';
   return card.next ? 'story.card.next' : 'story.card.finish';
 }
 

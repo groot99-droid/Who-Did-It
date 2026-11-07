@@ -2153,6 +2153,8 @@ reach the player's own client only (`PROTOCOL.md`); every title, line, goal and 
 |---|---|---|
 | `title` | The chapter's name, its set-up lines | `story.card.begin` |
 | `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `section` (part 2) | The section's name and set-up line; replaces the chapter title card after the chapter's first section (A515/A517 owner answers) | `story.card.continue` |
+| `line` (part 2) | A scripted NPC speaking: the speaker's name (`speaker`), the portrait, several lines shown as speech in quotation marks and italics (rich lines, darker folk-horror tone, A515 F1/F2) | `story.card.continue` |
 | `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
 
 A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for

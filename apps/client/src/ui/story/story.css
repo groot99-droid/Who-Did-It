@@ -15,7 +15,8 @@
 }
 
 /* The title card is the darkest; a beat lets the room show behind it a little; the end card sums up. */
-.wdi-story--beat {
+.wdi-story--beat,
+.wdi-story--line {
   background: var(--wdi-scrim);
 }
 
@@ -51,7 +52,8 @@
   overflow-wrap: anywhere;
 }
 
-.wdi-story--beat .wdi-story__line {
+.wdi-story--beat .wdi-story__line,
+.wdi-story--line .wdi-story__line {
   font-size: 1.15rem;
 }
 
@@ -162,4 +164,34 @@
   margin: 0;
   color: var(--wdi-text-muted);
   font-size: 0.9rem;
+}
+
+/* A section card (chapter 2 on): a quieter title, the world still dim behind it. */
+.wdi-story--section .wdi-story__panel {
+  border-top: 2px solid var(--wdi-text-muted);
+}
+
+/* A scripted NPC line: the speaker's name, then the lines as speech. Darker and slower than narration (A515 F1/F2). */
+.wdi-story--line .wdi-story__panel {
+  border-left: 3px solid var(--wdi-text-muted);
+}
+
+.wdi-story__speaker {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wdi-story--line .wdi-story__line {
+  font-style: italic;
+}
+
+.wdi-story--line .wdi-story__line::before {
+  content: '\201C';
+}
+
+.wdi-story--line .wdi-story__line::after {
+  content: '\201D';
 }

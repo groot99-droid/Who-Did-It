@@ -63,6 +63,19 @@ for (const [name, width, height, query] of [
 
       await page.getByTestId('story-continue').click();
       await expect(card).toHaveAttribute('data-chapter', 'mock2');
+
+      // Part 2: a section card after the chapter's title card, then a scripted NPC's lines.
+      await page.getByTestId('story-continue').click();
+      await expect(card).toHaveAttribute('data-kind', 'section');
+      await expect(card).toHaveAttribute('data-section', 'mock2_b');
+      await fits(card.locator('.wdi-story__panel'), width, height);
+      await page.screenshot({ path: info.outputPath(`story-section-${name}.png`), animations: 'disabled' });
+      await page.getByTestId('story-continue').click();
+      await expect(card).toHaveAttribute('data-kind', 'line');
+      await expect(page.getByTestId('story-speaker')).toHaveText('Old Marta');
+      await expect(page.getByTestId('story-line')).toHaveCount(2);
+      await fits(card.locator('.wdi-story__panel'), width, height);
+      await page.screenshot({ path: info.outputPath(`story-line-${name}.png`), animations: 'disabled' });
     });
   });
 }
