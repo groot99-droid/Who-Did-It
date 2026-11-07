@@ -12,6 +12,10 @@ export const UiStyle = z.strictObject({
     text: z.literal('Inter'),
     pixelDisplay: z.literal('Press Start 2P'),
     pixelText: z.literal('Pixelify Sans'),
+    /** The dossier's faces (round 10, A257): the role card and the Satchel only. */
+    dossierDisplay: z.literal('Alegreya SC'),
+    dossierText: z.literal('Alegreya Sans'),
+    dossierMono: z.literal('IBM Plex Mono'),
   }),
   typeScalePx: z.strictObject({
     displayXl: Px,
