@@ -77,6 +77,38 @@ for (const [name, width, height, query] of [
       await fits(card.locator('.wdi-story__panel'), width, height);
       await page.screenshot({ path: info.outputPath(`story-line-${name}.png`), animations: 'disabled' });
     });
+
+    test('the last end card is followed by the end screen with every chapter and what was earned', async ({
+      page,
+    }, info) => {
+      await page.goto(`/Who-Did-It/?mock=1${query}`);
+      await page.evaluate(() =>
+        localStorage.setItem('wdi:achv', JSON.stringify({ bakerDone: '2026-11-07' })),
+      );
+      await page.getByTestId('menu-story').click();
+      await page.getByLabel('Your name').fill('Hana');
+      await page.getByTestId('story-begin').click();
+      const card = page.getByTestId('story-card');
+      for (let i = 0; i < 12 && !(await page.getByTestId('story-finale').count()); i++) {
+        if (
+          (await card.count()) &&
+          (await card.getAttribute('data-chapter')) === 'mock3' &&
+          (await card.getAttribute('data-kind')) === 'end'
+        ) {
+          await expect(page.getByTestId('story-next')).toHaveCount(0);
+        }
+        if (await card.count()) await page.getByTestId('story-continue').click();
+        else await page.waitForTimeout(100);
+      }
+      const finale = page.getByTestId('story-finale');
+      await expect(finale).toBeVisible();
+      await expect(page.getByTestId('finale-chapter')).toHaveCount(3);
+      await expect(page.getByTestId('finale-earned')).toContainText('Flour on the Hands');
+      await fits(finale.locator('.wdi-story__panel'), width, height);
+      await page.screenshot({ path: info.outputPath(`story-finale-${name}.png`), animations: 'disabled' });
+      await page.getByTestId('story-end-close').click();
+      await expect(finale).toHaveCount(0);
+    });
   });
 }
 

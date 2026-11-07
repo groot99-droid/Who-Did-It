@@ -17,9 +17,24 @@ export const MOCK_STORY_CATALOG: StoryCatalogEntry[] = [
     title: 'Mock story',
     blurb: 'Three short chapters that exist to test the cards.',
     chapters: [
-      { id: 'mock1', title: 'First chapter', setup: 'A short set-up line for the first chapter.' },
-      { id: 'mock2', title: 'Second chapter', setup: 'A short set-up line for the second chapter.' },
-      { id: 'mock3', title: 'Third chapter', setup: 'A short set-up line for the third chapter.' },
+      {
+        id: 'mock1',
+        title: 'First chapter',
+        setup: 'A short set-up line for the first chapter.',
+        summary: 'One line on what happened in the first chapter.',
+      },
+      {
+        id: 'mock2',
+        title: 'Second chapter',
+        setup: 'A short set-up line for the second chapter.',
+        summary: 'One line on what happened in the second chapter.',
+      },
+      {
+        id: 'mock3',
+        title: 'Third chapter',
+        setup: 'A short set-up line for the third chapter.',
+        summary: 'One line on what happened in the third chapter.',
+      },
     ],
   },
 ];
