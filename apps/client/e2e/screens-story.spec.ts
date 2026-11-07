@@ -79,3 +79,36 @@ for (const [name, width, height, query] of [
     });
   });
 }
+
+// Save and resume (docs/accounts/plan.md 5): the server's `story.saved` at a chapter break lands in the device store,
+// and the Story menu offers Continue from the chapter it names. The mock plays the server's part.
+for (const [name, width, height, query] of [
+  ['390w', 390, 844, '&touch=1'],
+  ['1280x720', 1280, 720, ''],
+] as const) {
+  test(`a chapter break saves, and the Story menu continues from it at ${name}`, async ({ page }, info) => {
+    await page.setViewportSize({ width, height });
+    await page.goto(`/Who-Did-It/?mock=1${query}`);
+    await page.getByTestId('menu-story').click();
+    await expect(page.getByTestId('story-resume')).toHaveCount(0);
+    await page.getByLabel('Your name').fill('Hana');
+    await page.getByTestId('story-begin').click();
+    await page.getByTestId('story-continue').click(); // title -> beat
+    await page.getByTestId('story-continue').click(); // beat -> chapter 1's end card (saved)
+    await expect(page.getByTestId('story-card')).toHaveAttribute('data-kind', 'end');
+    await expect
+      .poll(() => page.evaluate(() => localStorage.getItem('wdi:story:save')))
+      .toContain('"nextChapterId":"mock2"');
+
+    await page.goto(`/Who-Did-It/?mock=1${query}`); // a new visit: only the device store remembers
+    await page.getByTestId('menu-story').click();
+    const resume = page.getByTestId('story-resume');
+    await expect(resume).toHaveAttribute('data-chapter', 'mock2');
+    await expect(resume).toContainText('Chapter 2');
+    await page.screenshot({ path: info.outputPath(`story-resume-${name}.png`), animations: 'disabled' });
+    await page.getByLabel('Your name').fill('Hana');
+    await resume.click();
+    await expect(page.getByTestId('story-card')).toHaveAttribute('data-chapter', 'mock2');
+    await expect(page.getByTestId('story-title')).toHaveText('Second chapter');
+  });
+}

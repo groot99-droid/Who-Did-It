@@ -5,6 +5,8 @@ export const STORY_COPY = {
   'story.menu.title': 'Story',
   'story.menu.name': 'Your name',
   'story.menu.begin': 'Begin the story',
+  'story.menu.continue': 'Continue',
+  'story.menu.continueAt': 'Continue from {chapter}',
   'story.menu.replay': 'Replay',
   'story.menu.done': 'Finished',
   'story.menu.locked': 'Play the chapters in order',

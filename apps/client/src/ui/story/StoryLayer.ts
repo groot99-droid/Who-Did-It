@@ -1,6 +1,7 @@
 import type { NetworkService } from '../../net/NetworkService';
 import { h, type Screen } from '../dom';
 import { STORY_COPY as C } from './copy';
+import { deviceSaveStore, type StorySaveStore } from './save';
 import {
   cardButton,
   closeCard,
@@ -134,7 +135,11 @@ export function goalsEl(goals: StoryGoals): HTMLElement {
   );
 }
 
-export function mountStoryLayer(parent: HTMLElement, net: Pick<NetworkService, 'bus' | 'send'>): Screen {
+export function mountStoryLayer(
+  parent: HTMLElement,
+  net: Pick<NetworkService, 'bus' | 'send'>,
+  saves: StorySaveStore = deviceSaveStore(),
+): Screen {
   let state: StoryState = emptyStory();
   let cardNode: HTMLElement | null = null;
   let goalsNode: HTMLElement | null = null;
@@ -169,11 +174,14 @@ export function mountStoryLayer(parent: HTMLElement, net: Pick<NetworkService, '
     if (state.card === null) render();
   };
   net.bus.on('story.card', card);
+  const saved = (m: { save: Parameters<StorySaveStore['write']>[0] }) => saves.write(m.save);
   net.bus.on('story.goals', goals);
+  net.bus.on('story.saved', saved);
   return {
     destroy: () => {
       net.bus.off('story.card', card);
       net.bus.off('story.goals', goals);
+      net.bus.off('story.saved', saved);
       cardNode?.remove();
       goalsNode?.remove();
     },
