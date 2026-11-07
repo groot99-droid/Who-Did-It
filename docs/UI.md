@@ -2142,7 +2142,7 @@ The Run disc is gone. A card's ability takes the slot keys Q, R and F in card or
 (`cardSlots`), so the Gamekeeper's Last Shot, the Accomplice's Inherit and the professions' Tasks no longer hold a key,
 and the phone's ability discs read the same slots (14.51.1).
 
-### 14.54 Story cards and the goals strip (S3, story mode)
+### 14.61 Story cards and the goals strip (S3, story mode)
 
 `apps/client/src/ui/story/`; `docs/story/README.md` 3; `docs/round9/phases.md` 8. Story mode draws three full-screen
 cards over the world, one at a time, from the private `story.card` message, and a goals strip from `story.goals`. Both
