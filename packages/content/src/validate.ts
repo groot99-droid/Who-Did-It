@@ -30,7 +30,7 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
-import type { StoryFile } from './schemas/story.js';
+import type { StoryArcFile, StoryFile } from './schemas/story.js';
 import { checkStory } from './validateStory.js';
 import type { AchievementsFile } from './schemas/achievements.js';
 import { checkAchievements } from './validateAchievements.js';
@@ -74,7 +74,9 @@ export interface Content {
   lore: LoreFile;
   /** Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines. */
   talk: TalkFile;
-  /** Story mode (docs/story/README.md): the fixed stories. */
+  /** Story mode (docs/story/arc.md 5): the stories as written, chapters of sections. */
+  storyArc: StoryArcFile;
+  /** Story mode, the part-1 view of `storyArc`: one play per section (`storyPlays`), until the engine reads sections. */
   story: StoryFile;
   /** Round 10, E1 (GDD 3.28): the achievements' trees and steps. */
   achievements: AchievementsFile;
