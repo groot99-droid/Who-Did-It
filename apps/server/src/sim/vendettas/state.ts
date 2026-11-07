@@ -29,6 +29,7 @@ export function eligibleVendettas(room: PartyRoom, card: string, dealt: readonly
   return Object.values(vendettas.vendettas).filter(
     (v) =>
       v.role === card &&
+      v.arrival !== true &&
       (v.maps === undefined || v.maps.includes(map)) &&
       (v.needsCard === undefined || dealt.includes(v.needsCard)) &&
       (v.needsScene === undefined || profileOpen(scenes[v.needsScene].profile, profile)),
@@ -77,6 +78,12 @@ export function privateVendetta(room: PartyRoom, seat: string): string {
   if (roles.roles[card]?.abilities.includes('kill') === true) return '';
   const mates = [...(player?.priv?.cabalMates ?? [])];
   return mates.flatMap((m) => heldOf(room).get(m) ?? []).join(',');
+}
+
+/** Takes `seat`'s vendetta away, or sets it (`null` clears): story mode's seat handover moves a vendetta with its card. */
+export function setVendetta(room: PartyRoom, seat: string, id: string | null): void {
+  if (id === null) heldOf(room).delete(seat);
+  else if (vendettas.vendettas[id]) heldOf(room).set(seat, id);
 }
 
 /** Gives `seat` the vendetta `id` (tests and the debug start, which deal no card through `dealMainDeck`). */
