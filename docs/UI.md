@@ -2189,3 +2189,19 @@ key the client holds (A414's deck test):
 A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
 a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
 away from a door `TOO_FAR {of: 'door'}`.
+
+#### The hiding spots and the kit verbs (V3)
+
+Proposed for 10Y, who adds the keys and writes the lines into a table as it places them (A414's deck test). The
+server sends `Private.hiding` (the spot id, '' when none), the hider's `NoteKind.checked` Notebook entry and Chalk
+marks as clues:
+
+- `verb.hide`: "Hide"; `verb.hide.prompt`: "Hide in the {spot}"; `verb.hide.slit`: "You are hiding. Burst Out [E]".
+- `verb.check`: "Check"; `verb.check.prompt`: "Look inside the {spot}"; `verb.check.empty`: "Nobody there."
+- `verb.burst`: "Burst Out".
+- `note.checked`: "{who} opened my {spot} at {time}." (`of` is the face shown; the spot is the hider's own scene).
+- `verb.chalk`: "Chalk"; `verb.chalk.pick`: "Draw which mark?"; `clue.chalk`: "A chalk mark. Someone drew it here."
+- `verb.shifty`: "Act Shifty"; `verb.fakeBlood`: "Fake Blood"; `verb.fakeBlood.spent`: "You have used your Fake Blood."
+
+A refusal reads its 14.43 line: a taken spot is `BUSY`, a spot out of reach `TOO_FAR {of: 'door'}`, an adult at a
+crawlspace `NOTHING_THERE`, a cooling Chalk or Act Shifty `COOLDOWN`, a second Fake Blood `SPENT {what: 'match'}`.

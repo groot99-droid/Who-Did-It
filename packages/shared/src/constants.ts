@@ -40,6 +40,8 @@ export const ClueKind = {
   scuffle: 10,
   /** Round 10 (D5c, seams.md 3 row 12, GDD 3.29): scratches round a lock a pick opened; `value` and `dir` are 0 for everyone. */
   scratch: 11,
+  /** Round 10 (V3, seams.md 3 row 38, GDD 3.2): a Chalk mark on the floor; `value` the symbol, `dir` 0. */
+  chalk: 12,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
@@ -94,6 +96,8 @@ export const NoteKind = {
   contract: 9,
   /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
   notice: 10,
+  /** Round 10 (V3, seams.md 3 row 38, GDD 3.7): a hider's own entry that a Check opened its spot; `of` is the face the checker showed. */
+  checked: 11,
 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 

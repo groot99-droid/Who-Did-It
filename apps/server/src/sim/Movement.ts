@@ -7,6 +7,7 @@ import { type MoveInput, type PlayerSim, simOf } from './RoomSim';
 import { isWorldPhase, navGrid, sceneKey } from './World';
 import { bodySpeedPxPerTick, overlayBody } from './body/run';
 import { wakeOnInput } from './Sleep';
+import { isHiding } from './verbs/hiding';
 
 const PX_PER_TICK = (tilesPerS: number): number => (tilesPerS * TILE_PX) / TICK_RATE;
 
@@ -54,7 +55,7 @@ export function applyInputs(room: PartyRoom): void {
   for (const [sessionId, p] of sim.players) {
     p.vx = 0;
     p.vy = 0;
-    if (!walking || !p.placed || p.input === null) continue;
+    if (!walking || !p.placed || p.input === null || isHiding(room, sessionId)) continue; // V3: a hider stays
     if (tick - p.input.tick > INPUT_STALE_TICKS) {
       p.input = null;
       continue;
