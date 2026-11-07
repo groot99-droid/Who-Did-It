@@ -12,7 +12,7 @@ import { isVerbPhase, isWorldPhase, reject, sceneKey } from '../World';
 
 // Round 10, V3 (10V; GDD 3.2 and 3.7): the hiding spots (Hide, Check, Burst Out) and the three small kit verbs
 // (Chalk, Act Shifty, Fake Blood). Who is in which spot lives in room memory; the only wire is `Private.hiding`
-// (the hider's own client), the hider's Notebook entry (`NoteKind.checked`) and the chalk clue (seams.md 3, row 38).
+// (the hider's own client), the hider's Notebook entry (`NoteKind.checked`) and the chalk clue (seams.md 3, row 39).
 
 export const HIDE_HOLD = 'hide';
 export const CHECK_HOLD = 'check';
