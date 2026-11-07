@@ -58,6 +58,8 @@ describe('story cards', () => {
   it('names the button by kind; an end card without a next chapter closes the story', () => {
     expect(cardButton(title)).toBe('story.card.begin');
     expect(cardButton({ kind: 'beat', chapterId: 'c', lines: [] })).toBe('story.card.continue');
+    expect(cardButton({ kind: 'section', chapterId: 'c', lines: [] })).toBe('story.card.continue');
+    expect(cardButton({ kind: 'line', chapterId: 'c', lines: [] })).toBe('story.card.continue');
     expect(cardButton(end)).toBe('story.card.next');
     expect(cardButton({ kind: 'end', chapterId: 'c', lines: [] })).toBe('story.card.finish');
   });

@@ -62,6 +62,8 @@ export type NetEvents = {
   'story.card': ServerMessages['story.card'];
   /** Story mode, private: the chapter's goals. */
   'story.goals': ServerMessages['story.goals'];
+  /** Story mode, private: the save at a chapter break; the device store keeps it. */
+  'story.saved': ServerMessages['story.saved'];
   /** Round 10, E1 (GDD 3.28), private: a step or an achievement is done; the device records it. */
   achv: ServerMessages['achv'];
   /** The connection to the room ended; `consented` is true when the player chose to leave. */
@@ -129,6 +131,7 @@ const SERVER_MESSAGES: readonly NetMessageType[] = [
   'error',
   'story.card',
   'story.goals',
+  'story.saved',
   'achv',
 ];
 

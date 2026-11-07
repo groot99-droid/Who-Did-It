@@ -1,6 +1,7 @@
 import type { NetworkService } from '../../net/NetworkService';
 import { h, type Screen } from '../dom';
 import { STORY_COPY as C } from './copy';
+import { deviceSaveStore, type StorySaveStore } from './save';
 import {
   cardButton,
   closeCard,
@@ -21,7 +22,10 @@ import './story.css';
  * network bus and answers a card with `story.continue`. All words come from the messages; the chrome is `copy.ts`.
  */
 
-/** Which card element: the title card names the chapter, a beat speaks, the end card sums up. */
+/**
+ * Which card element: the title card names the chapter, a section card names the section that starts, a beat narrates,
+ * a line card is a scripted NPC speaking (its speaker above the lines, in quotation), the end card sums up.
+ */
 export function cardEl(
   card: StoryCard,
   onContinue: () => void,
@@ -48,10 +52,11 @@ export function cardEl(
       class: `wdi-story wdi-story--${card.kind}`,
       role: 'dialog',
       'aria-modal': 'true',
-      'aria-labelledby': 'story-card-title',
+      'aria-labelledby': card.title ? 'story-card-title' : 'story-card-speaker',
       'data-testid': 'story-card',
       'data-kind': card.kind,
       'data-chapter': card.chapterId,
+      ...(card.sectionId ? { 'data-section': card.sectionId } : {}),
     },
     h(
       'div',
@@ -61,6 +66,13 @@ export function cardEl(
             'div',
             { class: 'wdi-story__portrait', 'data-portrait': card.portrait, 'aria-hidden': 'true' },
             card.portrait.charAt(0),
+          )
+        : null,
+      card.speaker
+        ? h(
+            'p',
+            { id: 'story-card-speaker', class: 'wdi-story__speaker', 'data-testid': 'story-speaker' },
+            card.speaker,
           )
         : null,
       card.title
@@ -123,7 +135,11 @@ export function goalsEl(goals: StoryGoals): HTMLElement {
   );
 }
 
-export function mountStoryLayer(parent: HTMLElement, net: Pick<NetworkService, 'bus' | 'send'>): Screen {
+export function mountStoryLayer(
+  parent: HTMLElement,
+  net: Pick<NetworkService, 'bus' | 'send'>,
+  saves: StorySaveStore = deviceSaveStore(),
+): Screen {
   let state: StoryState = emptyStory();
   let cardNode: HTMLElement | null = null;
   let goalsNode: HTMLElement | null = null;
@@ -158,11 +174,14 @@ export function mountStoryLayer(parent: HTMLElement, net: Pick<NetworkService, '
     if (state.card === null) render();
   };
   net.bus.on('story.card', card);
+  const saved = (m: { save: Parameters<StorySaveStore['write']>[0] }) => saves.write(m.save);
   net.bus.on('story.goals', goals);
+  net.bus.on('story.saved', saved);
   return {
     destroy: () => {
       net.bus.off('story.card', card);
       net.bus.off('story.goals', goals);
+      net.bus.off('story.saved', saved);
       cardNode?.remove();
       goalsNode?.remove();
     },

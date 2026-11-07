@@ -2153,6 +2153,8 @@ reach the player's own client only (`PROTOCOL.md`); every title, line, goal and 
 |---|---|---|
 | `title` | The chapter's name, its set-up lines | `story.card.begin` |
 | `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `section` (part 2) | The section's name and set-up line; replaces the chapter title card after the chapter's first section (A515/A517 owner answers) | `story.card.continue` |
+| `line` (part 2) | A scripted NPC speaking: the speaker's name (`speaker`), the portrait, several lines shown as speech in quotation marks and italics (rich lines, darker folk-horror tone, A515 F1/F2) | `story.card.continue` |
 | `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
 
 A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
@@ -2166,6 +2168,14 @@ opens the chapter list of the story: each chapter with its set-up line, finished
 `localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
 (Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
 server deals the first card and scene.
+
+**Save and resume (part 2, P3 2/3).** The server saves at each chapter break and sends the save in the private
+`story.saved`; the client keeps it whole on the device (`localStorage['wdi:story:save']`, one slot per story, never rolled
+back to an older `rev`, a damaged value is no save) behind the `StorySaveStore` interface (`ui/story/save.ts`), which a
+signed-in account replaces (`docs/accounts/plan.md` 5). The Story menu shows a **Continue from Chapter N** row
+(`story-resume`) above Begin when the saved `nextChapterId` is a chapter this build knows; it sends
+`story.start { storyId, resume }` with the save untouched. The client never composes or edits a save, and the server
+re-validates and decides.
 
 Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
