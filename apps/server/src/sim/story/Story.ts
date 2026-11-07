@@ -1,5 +1,5 @@
 import { generateId } from '@colyseus/core';
-import { balance, type Chapter, type Story, story as storyFile } from '@wdi/content';
+import { type ArcStory as Story, balance, storyArc } from '@wdi/content';
 import { ItemStack, Phase } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { newSeat } from '../../rooms/handlers/lobby';
@@ -15,6 +15,7 @@ import { SCENE_KEYS } from '../World';
 import { endMatch } from '../Win';
 import type { FixedSeeds } from '../seeds';
 import { runAction } from './actions';
+import { type Unit, unitsOf } from './units';
 import { holderOf, switchRole } from './handover';
 import { type Latches, hear, holds } from './triggers';
 
@@ -43,9 +44,11 @@ export type StoryCommand = { kind: 'continue'; seat: string };
 
 export interface StoryState {
   story: Story;
+  /** The story's sections in play order: the running unit is `units[chapterIdx]` (arc E1). */
+  units: Unit[];
   /** The one human seat's id, fixed for the whole story (the client's session id). */
   humanId: string;
-  /** Index of the running chapter, -1 before the first one starts. */
+  /** Index of the running section in `units` (the part-1 name stays), -1 before the first one starts. */
   chapterIdx: number;
   chapterStartTick: number;
   /** A chapter has ended and its end card is up (or queued); no beats run until the next one starts. */
@@ -79,7 +82,7 @@ export function registerStory(story: Story): void {
 }
 
 export function resolveStory(storyId: string): Story | null {
-  return registry.get(storyId) ?? storyFile.stories[storyId] ?? null;
+  return registry.get(storyId) ?? storyArc.stories[storyId] ?? null;
 }
 
 export function storyOf(room: PartyRoom): StoryState | null {
@@ -133,6 +136,7 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
 
   const state: StoryState = {
     story,
+    units: unitsOf(story),
     humanId,
     chapterIdx: -1,
     chapterStartTick: 0,
@@ -156,7 +160,7 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     if (!ev.kind.startsWith('story.') || ev.kind === 'story.enter' || ev.kind === 'story.pickup')
       state.inbox.push(ev);
   });
-  const first = story.chapters[0];
+  const first = state.units[0];
   if (first !== undefined) flowOf(room).fixedDeal = { [humanId]: first.roleId };
   if (opts.start !== false) queueAutoStart(room);
   return state;
@@ -211,7 +215,7 @@ function raise(room: PartyRoom, state: StoryState, card: StoryCard): void {
   else showCard(room, state, card);
 }
 
-const chapterOf = (state: StoryState): Chapter | undefined => state.story.chapters[state.chapterIdx];
+const chapterOf = (state: StoryState): Unit | undefined => state.units[state.chapterIdx];
 
 function sendGoals(room: PartyRoom, state: StoryState): void {
   const chapter = chapterOf(state);
@@ -234,7 +238,8 @@ function completeGoal(room: PartyRoom, state: StoryState, goalId: string): void 
 // --- chapters ------------------------------------------------------------------------------------------------------
 
 /** Fast-forwards the clock across a break to the chapter's `startPhase` (a hint; never backwards). */
-function seekPhase(room: PartyRoom, chapter: Chapter): void {
+function seekPhase(room: PartyRoom, chapter: Unit): void {
+  if (chapter.startPhase === undefined) return;
   const { cycle, part } = chapter.startPhase;
   const s = room.state;
   if (s.phase < Phase.grace || s.phase === Phase.gameOver) return;
@@ -256,16 +261,16 @@ function giveItem(room: PartyRoom, state: StoryState, ref: string): void {
 }
 
 function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
-  const chapter = state.story.chapters[idx];
+  const chapter = state.units[idx];
   if (chapter === undefined) return;
-  const previous = state.story.chapters[idx - 1];
+  const previous = state.units[idx - 1];
   if (idx > 0) {
     switchRole(
       room,
       state.humanId,
       chapter.roleId,
       chapter.look,
-      new Set(state.story.chapters.map((c) => c.roleId)),
+      new Set(state.units.map((c) => c.roleId)),
       chapter.vendetta,
     );
     seekPhase(room, chapter);
@@ -287,13 +292,15 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterStart',
-    data: { chapterId: chapter.id, chapter: chapter.id, index: idx },
+    data: { chapterId: chapter.id, chapter: chapter.id, index: idx, arcChapter: chapter.chapter.id },
   });
+  // The first section of an arc chapter opens with the chapter's card; every later section has its own (arc E1).
+  const opening = chapter.first ? [chapter.chapter.setup, chapter.setup] : [chapter.setup];
   raise(room, state, {
     kind: 'title',
     chapterId: chapter.id,
-    title: chapter.title,
-    lines: [chapter.setup, ...handed.map((h) => h.text)],
+    title: chapter.first ? chapter.chapter.title : chapter.title,
+    lines: [...new Set(opening), ...handed.map((h) => h.text)],
   });
   sendGoals(room, state);
 }
@@ -304,28 +311,32 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
   state.ended = true;
   state.failed = failed;
   state.cards = []; // beat cards the player has not read yet are moot
-  const summary = Object.fromEntries(chapter.end.summaryKeys.map((k) => [k, state.counters[k] ?? 0]));
+  // A break inside an arc chapter has no card unless the section names one; a failure or the match's end always does.
+  const card = chapter.endCard ?? (failed || state.final ? chapter.chapter.end : null);
+  const keys = (chapter.endCard ?? chapter.chapter.end).summaryKeys;
+  const summary = Object.fromEntries(keys.map((k) => [k, state.counters[k] ?? 0]));
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterEnd',
     data: { chapterId: chapter.id, chapter: chapter.id, failed, summary },
   });
-  const next = state.story.chapters[state.chapterIdx + 1];
-  const card: StoryCard = {
+  if (card === null) return afterEndCard(room, state);
+  const next = state.units[state.chapterIdx + 1];
+  const endCard: StoryCard = {
     kind: 'end',
     chapterId: chapter.id,
     title: chapter.title,
-    lines: failed ? [chapter.end.failedLine] : chapter.end.lines,
+    lines: failed ? [card.failedLine] : card.lines,
     summary,
-    ...(next !== undefined && { next: next.title }),
+    ...(next !== undefined && { next: next.first ? next.chapter.title : next.title }),
   };
-  if (state.cardUp) state.cards.push(card);
-  else showCard(room, state, card);
+  if (state.cardUp) state.cards.push(endCard);
+  else showCard(room, state, endCard);
 }
 
 /** The end card was dismissed: the next chapter starts, or the story is over. */
 function afterEndCard(room: PartyRoom, state: StoryState): void {
-  if (!state.final && state.chapterIdx + 1 < state.story.chapters.length)
+  if (!state.final && state.chapterIdx + 1 < state.units.length)
     startChapter(room, state, state.chapterIdx + 1);
   else finishStory(room, state);
 }
@@ -424,7 +435,7 @@ export function runStory(room: PartyRoom): void {
     count(state, ev, seatOf);
     chapter.goals.forEach((g) => g.trigger && hear(g.trigger, `g:${g.id}`, ev, state.latches, seatOf));
     chapter.beats.forEach((b) => hear(b.trigger, `b:${b.id}`, ev, state.latches, seatOf));
-    hear(chapter.end.trigger, 'end', ev, state.latches, seatOf);
+    hear(chapter.end, 'end', ev, state.latches, seatOf);
     if (ev.kind === 'end') {
       state.final = true; // the match itself ended (a win): this chapter's end card is the story's last
       return endChapter(room, state, false);
@@ -462,5 +473,5 @@ export function runStory(room: PartyRoom): void {
     });
     runAction(host, beat.action);
   }
-  if (holds(chapter.end.trigger, 'end', tick, state.latches)) endChapter(room, state, false);
+  if (holds(chapter.end, 'end', tick, state.latches)) endChapter(room, state, false);
 }

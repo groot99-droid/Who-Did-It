@@ -13,7 +13,8 @@ import { isNpcSeat } from '../../src/sim/Npc';
 import { ANY_SIM, onSim } from '../../src/sim/events/bus';
 import { simOf } from '../../src/sim/RoomSim';
 import { enableStory, queueStoryContinue, registerStory, storyQueued } from '../../src/sim/story/Story';
-import { type Story, story as storyFile } from '@wdi/content';
+import { storyArc } from '@wdi/content';
+import { unitsOf } from '../../src/sim/story/units';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -68,9 +69,17 @@ export interface StoryDef {
 
 // --- what exists yet -------------------------------------------------------------------------------------------
 
-/** The stories of `story.json` as plays (one part-1 chapter per section; docs/story/arc.md 5, until P2 retires the view). */
+/**
+ * The stories of `story.json` as the engine plays them: one entry of `chapters` per *section* (docs/story/arc.md E1;
+ * the part-1 name for the running unit is kept), in play order.
+ */
 export function loadStoryFile(): Record<string, StoryDef> | null {
-  return storyFile.stories as unknown as Record<string, StoryDef>;
+  return Object.fromEntries(
+    Object.entries(storyArc.stories).map(([id, st]) => [
+      id,
+      { ...st, chapters: unitsOf(st).map((u) => ({ ...u, beats: u.beats })) } as unknown as StoryDef,
+    ]),
+  );
 }
 
 /** The story id the tests play; README 1 names it. */
@@ -160,8 +169,8 @@ export async function startStoryRoom(
   };
   captureSent(sr);
   onSim(room, ANY_SIM, (ev) => sr.events.push({ ...ev }));
-  // The engine resolves a story by id from its registry; the content file's story is registered as it stands.
-  registerStory(def as unknown as Story);
+  // The engine resolves a story by id: the content file's own arc, as it stands.
+  registerStory(storyArc.stories[storyId]!);
   enableStory(room, storyId, { humanId });
   opts.afterEnable?.(room);
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);

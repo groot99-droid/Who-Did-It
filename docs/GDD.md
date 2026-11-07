@@ -1585,10 +1585,13 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **The room.** A story room is a `party` room the story engine (`sim/story`) turns into an auto room with one human.
   The human is the leader; the NPC seats keep fixed ids; the clock runs at 1x and is never sped up. Nothing a client
   sends changes the speed.
-- **Chapters.** A story is a list of chapters played in order. Each names the card the player holds for it. Chapter
-  one's card is dealt to the player at the deal (the deck's own fixed-deal request); a later chapter moves the
-  player's seat to its card at the break (the handover below). A chapter ends when its end trigger fires, or at once
-  when the player's seat dies, and either way the next chapter starts, so a story is always finishable.
+- **Chapters and sections.** A story is a list of chapters played in order; a chapter is a list of sections, and the
+  section is the unit that runs. Each section names the card the player holds for it. The first section's card is
+  dealt to the player at the deal (the deck's own fixed-deal request); a later section moves the player's seat to its
+  card at the break (the handover below). A section ends when its end trigger fires, or at once when the player's
+  seat dies, and either way the next section starts, so a story is always finishable. A chapter's first section opens
+  with the chapter's card, every later section with its own; a break between two sections of a chapter shows no end
+  card unless the section names one, and a chapter's last section ends with the chapter's end card.
 - **Cards and the pause.** A chapter's title card, a beat's card and a chapter's end card are shown to the player
   alone and pause the clock until the player's continue. This is the only pause in any mode other than the admin
   room (3.19): the world waits only because no second human is wronged by it. A role card is dismissed by the
@@ -1597,7 +1600,9 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   client alone; no public field, no other seat's view and no bus event names a chapter, a goal or the player's card
   with its holder.
 - **Beats.** A chapter's beats are each a trigger on the sim event bus (or on the chapter's own clock) and an action:
-  a card, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. Each fires once, and a goal is
+  a card, a spoken line, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. A spoken line is
+  said by the seat that holds a named card, under that seat's public name and look as the table sees them (a cover
+  speaks as its cover), or by a named figure with no seat. Each fires once, and a goal is
   done when its beat fires. The player's own scene changes and pickups reach the bus as `story.enter` and
   `story.pickup`. The chapter's tick count stops while a card holds the clock.
 - **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
