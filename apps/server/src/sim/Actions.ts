@@ -8,6 +8,7 @@ import { handleBodyAbility } from './body/verbs';
 import { handleHold } from './Hold';
 import { handleImpersonate } from './Impersonate';
 import { handleKill } from './Kill';
+import { handleDerringer } from './vendettas/dayWeapon';
 import { emitSim } from './events/bus';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
@@ -60,6 +61,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     // Round 5 (locked dispatch): Impersonate is 5F's, the night powers and the Last Shot are 5G's.
     case 'impersonate':
       return handleImpersonate(room, sessionId, payload);
+    case 'derringer': // round 10, C4b: the Hitman's day weapon (GDD 3.33)
+      return handleDerringer(room, sessionId, payload);
     case 'confession':
     case 'keepWatch':
     case 'remedy':

@@ -191,6 +191,8 @@ describe('the round-6 invariants', () => {
       'killClues',
       'figureNotSeat', // round 8, 8E (GDD 3.24)
       'bodyBounds', // round 8, 8A: the body's module registers on `Auto`'s import path, before the vendettas'
+      'storyOneHuman', // story mode (docs/story/README.md 2)
+      'storyBeatsOnce',
       'scripConserved',
       'taskBar',
       'hiveNoSecrets',

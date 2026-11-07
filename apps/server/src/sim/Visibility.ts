@@ -9,6 +9,7 @@ import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
 import { figureOfHandle } from './townsfolk/figures';
 import { isOnLine } from './Train';
+import { isDeparted } from './vendettas/arrival';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
 
 export { SCENE_KEYS, sceneKey };
@@ -83,8 +84,9 @@ export function reconcileViews(room: PartyRoom): void {
       sim.views.set(client.sessionId, held);
     }
 
-    // Round 10 (C1): a seat on the line holds no avatar and no scene until the Train brings it back.
-    const onLine = isOnLine(room, client.sessionId);
+    // Round 10 (C1): a seat on the line holds no avatar and no scene until the Train brings it back; a Hitman who
+    // boarded the Dusk Train (C4b) holds none again.
+    const onLine = isOnLine(room, client.sessionId) || isDeparted(room, client.sessionId); // C4b: the Dusk Train
     const want = onLine ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
