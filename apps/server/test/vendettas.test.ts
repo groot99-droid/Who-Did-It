@@ -30,7 +30,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { STRONGBOX_ITEM, strongboxOf } from '../src/sim/vendettas/heist';
 import { act, errorCodes, setPhase, teleport } from './killHelpers';
 import { markDead } from '../src/sim/Death';
-import { CONTRACT_QUEST, openContract } from '../src/sim/vendettas/contract';
+import { CONTRACT_QUEST, offerContract, openContract } from '../src/sim/vendettas/contract';
 import { matchEvents } from '../src/sim/auto/log';
 import { countsVote } from '../src/sim/vendettas/conversion';
 import { vendettaGoalFor } from '../src/sim/vendettas/goal';
@@ -99,15 +99,10 @@ describe('the draw', () => {
   it('offers the Zealot only with a Vicar dealt, the Bandit only where the manor is open, both only on HollowMere', () => {
     const room = fakeRoom();
     const small = (cards: string[]) => ids(eligibleVendettas(room, 'killer', [...deal(5, cards).values()]));
-    expect(small(['killer', 'vicar'])).toEqual(['zealot', 'activist', 'hitman']);
-    expect(small(['killer'])).toEqual(['activist', 'hitman']);
+    expect(small(['killer', 'vicar'])).toEqual(['zealot', 'activist']);
+    expect(small(['killer'])).toEqual(['activist']);
     const medium = [...deal(8, ['killer', 'vicar']).values()];
-    expect(ids(eligibleVendettas(room, 'killer', medium))).toEqual([
-      'zealot',
-      'activist',
-      'bandit',
-      'hitman',
-    ]);
+    expect(ids(eligibleVendettas(room, 'killer', medium))).toEqual(['zealot', 'activist', 'bandit']);
     expect(ids(eligibleVendettas(fakeRoom('blackpine'), 'killer', medium))).toEqual(['zealot', 'activist']);
     expect(eligibleVendettas(room, 'accomplice', medium)).toEqual([]);
   });
@@ -141,8 +136,8 @@ describe('the draw', () => {
       const id = vendettaOf(room, 's0')?.id ?? '';
       seen.set(id, (seen.get(id) ?? 0) + 1);
     }
-    expect([...seen.keys()].sort()).toEqual(['activist', 'bandit', 'hitman', 'zealot']);
-    for (const n of seen.values()) expect(Math.abs(n - 750)).toBeLessThan(150);
+    expect([...seen.keys()].sort()).toEqual(['activist', 'bandit', 'zealot']);
+    for (const n of seen.values()) expect(Math.abs(n - 1000)).toBeLessThan(150);
   });
 
   it("shows an Accomplice its Killers' goals on its own card and a villager nothing", () => {
@@ -337,13 +332,6 @@ describe('the contract in a match', () => {
     Bot3: 'townsfolk',
     Bot4: 'townsfolk',
   };
-  const arrive = (m: Match) =>
-    emitSim(m.room, {
-      tick: m.room.state.tick,
-      kind: 'train.arrive',
-      sceneId: 'overworld',
-      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
-    });
   /** A landed Knife strike as `sim/Kill.ts` sends it: the `kill` event, then the death. */
   const knife = (m: Match, by: string, victim: string) => {
     emitSim(m.room, { tick: m.room.state.tick, kind: 'kill', seat: victim, data: { by } });
@@ -354,7 +342,7 @@ describe('the contract in a match', () => {
     const m = await startMatch(colyseus, 5, ROLES);
     const hitman = idOf(m, 0);
     holdVendetta(m.room, hitman, 'hitman');
-    arrive(m);
+    offerContract(m.room, hitman); // round 10, C4b: the arrival's mailing (the first train's is retired)
     await until(() => openContract(m.room, hitman) !== null);
     return { m, hitman, target: openContract(m.room, hitman)!.target };
   };
@@ -443,12 +431,7 @@ describe('the vendetta invariants', () => {
     const m = await startMatch(colyseus, 5, ROLES);
     const hitman = idOf(m, 0);
     holdVendetta(m.room, hitman, 'hitman');
-    emitSim(m.room, {
-      tick: m.room.state.tick,
-      kind: 'train.arrive',
-      sceneId: 'overworld',
-      data: { map: 'hollowmere', station: 'overworld.platform', round: 1 },
-    });
+    offerContract(m.room, hitman); // round 10, C4b: the arrival's mailing (the first train's is retired)
     await until(() => openContract(m.room, hitman) !== null);
     await act(m.bots[0] as Bot, 'quest.accept', { questId: CONTRACT_QUEST });
     emitStep(m.room, hitman, 'vendetta.contract.done');

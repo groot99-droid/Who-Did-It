@@ -32,6 +32,8 @@ import crumbMixing from '../data/scenes/crumb_mixing.nav.json' with { type: 'jso
 import crumbOven from '../data/scenes/crumb_oven.nav.json' with { type: 'json' };
 import crumbProofing from '../data/scenes/crumb_proofing.nav.json' with { type: 'json' };
 import cjCell from '../data/scenes/cj_cell.nav.json' with { type: 'json' };
+import cottageFisher from '../data/scenes/cottage_fisher.nav.json' with { type: 'json' };
+import seaExit from '../data/scenes/sea_exit.nav.json' with { type: 'json' };
 import { Profile } from './schemas/balance.js';
 import { SCENE_IDS, type SceneId } from './schemas/scene.js';
 
@@ -91,6 +93,8 @@ const navJson: Record<SceneId, unknown> = {
   crumb_oven: crumbOven,
   crumb_proofing: crumbProofing,
   cj_cell: cjCell,
+  cottage_fisher: cottageFisher,
+  sea_exit: seaExit,
 };
 
 function parseNavs(): Record<SceneId, NavFile> {

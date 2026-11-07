@@ -30,6 +30,8 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
+import type { StoryFile } from './schemas/story.js';
+import { checkStory } from './validateStory.js';
 import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
@@ -70,6 +72,8 @@ export interface Content {
   lore: LoreFile;
   /** Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines. */
   talk: TalkFile;
+  /** Story mode (docs/story/README.md): the fixed stories. */
+  story: StoryFile;
   /** Round 10 (A9; GDD 3.14): the logic table. */
   interactions: InteractionsFile;
 }
@@ -275,6 +279,7 @@ export function validateContent(c: Content): string[] {
   // Round 8 (GDD 3.26): the shelf reader's books, letters, ledgers and clippings.
   checkLore(c, err);
   checkTalk(c, err);
+  checkStory(c, err);
   // Round 10 (A9; GDD 3.14): the logic table's classes and the census of every prop.
   checkInteractions(c, err);
 
