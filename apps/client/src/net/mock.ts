@@ -2,6 +2,7 @@ import balanceJson from '@wdi/content/data/balance.json';
 import mitt, { type Emitter } from 'mitt';
 import { MOCK_BOTS, MOCK_NPC_NAMES, MOCK_ROLE_REVEAL } from './fixtures';
 import type { MeetingFeed } from './meeting';
+import { StoryMock } from './mock/storyMock';
 import { MockMeetingFeed, type MockMeetingRequest } from './mock/meetingMock';
 import {
   defaultSettings,
@@ -88,7 +89,12 @@ export class MockNetwork implements NetworkService {
     return false;
   }
 
+  /** Story mode's mock server path (docs/story/README.md 3): answers `story.start` and `story.continue` on the bus. */
+  private readonly story = new StoryMock((type, payload) => this.bus.emit(type, payload as never));
+
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
+    if (type === 'story.start') this.story.start((payload as ClientMessages['story.start']).chapterId);
+    if (type === 'story.continue') this.story.continue();
     const room = this.lobby;
     if (room === null) return;
     // Mirrors the server: Start is leader-only and needs one human; the rest of the party is Ready.
