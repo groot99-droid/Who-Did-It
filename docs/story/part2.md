@@ -1,6 +1,6 @@
 # Story mode, part 2: the full story
 
-Written 2026-11-06 from the owner's answers (`docs/story/questions.md`, DECISIONS A431). Part 1 (`README.md`) shipped four
+Written 2026-11-06 from the owner's answers (`docs/story/questions.md`, DECISIONS A516). Part 1 (`README.md`) shipped four
 single-role chapters (#463). Part 2 makes story mode the whole lore: every role has a part, each chapter is built around
 what happens in the town, and the player moves between roles inside a chapter.
 

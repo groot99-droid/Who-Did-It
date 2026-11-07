@@ -440,3 +440,23 @@ Each has a default that holds until you answer.
   Embezzler) and the Baron's arrival appear in lines only. Default: yes; a map request is P6's or a later round's.
 - **Q-A12. Length.** Sixteen sections, each about a part-1 chapter's length or shorter, is roughly four times part 1.
   Default: accept; P5 keeps each section short and every end has a tick fallback.
+
+## 7. Answers (owner, 2026-11-07)
+
+Recorded as DECISIONS A515. Every section, cast card and through-line: no issues. Changes:
+
+| Question | Answer |
+| -------- | ------ |
+| Q-A5 | A played section for any NPC-only card once its verbs ship |
+| Q-A9 | A failure replays the section only |
+| Q-A10 | The player plays the Vicar's ghost for a short section; in the solo game the Medium must be found to resurrect them (new rule) |
+| Q-A11 | Request map additions now, inside a full map revamp (new camera angles, Blender the primary asset source) |
+| F1 | Tone: darker, closer to folk horror |
+| F2 | Rich NPC lines, several per section |
+| F3 | The martyr's death is shown fully, with weight |
+| F4 | 5.4 waits for B6; merge the other PRs the story needs now |
+| F5 | Build the unbuilt verbs before their sections |
+| F10 | Saves linked to the account (sign-in) |
+| F14 | Merge #468 once its e2e re-run is green |
+
+All other questions stand on their defaults.
