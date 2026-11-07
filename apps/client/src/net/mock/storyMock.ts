@@ -102,14 +102,15 @@ export class StoryMock {
   private cardUp = false;
 
   constructor(
-    private readonly emit: <K extends 'story.card' | 'story.goals'>(
+    private readonly emit: <K extends 'story.card' | 'story.goals' | 'story.saved'>(
       type: K,
       payload: ServerMessages[K],
     ) => void,
   ) {}
 
-  start(chapterId?: string): void {
-    const n = Number(chapterId?.replace('mock', '')) as 1 | 2 | 3;
+  start(chapterId?: string, resume?: ServerMessages['story.saved']['save']): void {
+    // A resume starts the chapter the save names; the real server re-validates it (docs/accounts/plan.md 5).
+    const n = Number((resume?.nextChapterId ?? chapterId)?.replace('mock', '')) as 1 | 2 | 3;
     this.chapter = n === 2 || n === 3 ? n : 1;
     this.load();
     this.run();
@@ -127,6 +128,22 @@ export class StoryMock {
     this.run();
   }
 
+  /** The save at the end of the current chapter: break state only, as the device store keeps it. */
+  private save(): ServerMessages['story.saved']['save'] {
+    const finished = [1, 2, 3].filter((n) => n <= this.chapter).map((n) => `mock${n}`);
+    return {
+      v: 1,
+      storyId: MOCK_STORY_ID,
+      nextChapterId: this.chapter < 3 ? `mock${this.chapter + 1}` : null,
+      finished,
+      handOn: [],
+      replayUsed: [],
+      summaries: [],
+      rev: this.chapter,
+      savedAt: 0,
+    };
+  }
+
   private load(): void {
     this.steps = mockChapterSteps(this.chapter);
     this.at = 0;
@@ -138,6 +155,7 @@ export class StoryMock {
       const step = this.steps[this.at++]!;
       if ('goals' in step) this.emit('story.goals', step.goals);
       else {
+        if (step.card.kind === 'end') this.emit('story.saved', { save: this.save() });
         this.emit('story.card', step.card);
         this.cardUp = true;
         return;

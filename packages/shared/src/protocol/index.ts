@@ -117,9 +117,28 @@ export const S2C = {
   storyCard: 'story.card',
   /** Story mode, private to the player's own client: the chapter's goals and which are done. */
   storyGoals: 'story.goals',
+  /** Story mode, part 2 (docs/accounts/plan.md 5), private to the player's own client: the save at a chapter break. */
+  storySaved: 'story.saved',
   /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
   achv: 'achv',
 } as const;
+
+/**
+ * A story save as it crosses the wire (docs/accounts/plan.md 5). The accounts session owns the validating schema
+ * (`StorySave`); the client reads only the fields named here and passes the whole object back unchanged.
+ */
+export interface StorySaveWire {
+  v: number;
+  storyId: string;
+  /** The chapter a Continue starts; `null` when the story is finished. */
+  nextChapterId: string | null;
+  finished: string[];
+  handOn: unknown[];
+  replayUsed: string[];
+  summaries: unknown[];
+  rev: number;
+  savedAt: number;
+}
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
@@ -345,9 +364,11 @@ export interface C2SPayloads {
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
    * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
-   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   * replays a finished chapter (Q-S4) and defaults to the story's first. `resume` (part 2) is the save the client was
+   * last given by `story.saved`, sent back untouched: the device store has no other copy (docs/accounts/plan.md 5). The
+   * server re-validates it and decides; the client never composes one.
    */
-  'story.start': { storyId: string; chapterId?: string };
+  'story.start': { storyId: string; chapterId?: string; resume?: StorySaveWire };
   /** Story mode: closes the card that is up. Refused 422 with no card up. */
   'story.continue': Record<string, never>;
   /**
@@ -496,6 +517,12 @@ export interface S2CPayloads {
     summary?: Record<string, number>;
     next?: string;
   };
+  /**
+   * Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break
+   * (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it
+   * back as `story.start.resume`. It holds break state only, no secret of a live match.
+   */
+  'story.saved': { save: StorySaveWire };
   /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
   'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
   /**

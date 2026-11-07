@@ -44,9 +44,13 @@ export class Landing extends Phaser.Scene {
         ...(flags.mock ? {} : { listParties: fetchParties }),
         stories,
         // A story room is a private party with one human: no lobby; the server deals the first card and scene.
-        onStory: async (name, storyId, chapterId) => {
+        onStory: async (name, storyId, chapterId, resume) => {
           await net.create(name, { visibility: 'private' });
-          net.send('story.start', { storyId, ...(chapterId ? { chapterId } : {}) });
+          net.send('story.start', {
+            storyId,
+            ...(chapterId ? { chapterId } : {}),
+            ...(resume ? { resume } : {}),
+          });
         },
         onJoin: async (code, name) => enterLobby(await net.join(code, name)),
         explainFailure: async () => (!flags.mock && (await buildIsStale()) ? REFRESH_MESSAGE : null),

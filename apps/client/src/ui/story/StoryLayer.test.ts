@@ -5,6 +5,7 @@ import { StoryMock } from '../../net/mock/storyMock';
 import type { NetEvents } from '../../net/NetworkService';
 import { FakeNode, installFakeDom } from '../main/fakeDom';
 import { mountStoryLayer } from './StoryLayer';
+import type { StorySaveStore } from './save';
 
 (FakeNode.prototype as unknown as { focus(): void }).focus = () => undefined;
 
@@ -86,6 +87,30 @@ describe('the story layer', () => {
         .filter((n) => n.attrs.get('data-testid') === 'story-line')
         .map((l) => l.content),
     ).toEqual(['The bell tolled for no one last night.', 'Someone rang it all the same.']);
+  });
+
+  it('hands each story.saved to the save store, whole', () => {
+    const bus = mitt<NetEvents>();
+    const written: unknown[] = [];
+    const saves: StorySaveStore = {
+      read: () => null,
+      write: (x) => void written.push(x),
+      clear: () => undefined,
+    };
+    mountStoryLayer(root() as unknown as HTMLElement, { bus, send: (() => undefined) as never }, saves);
+    const save = {
+      v: 1,
+      storyId: 's',
+      nextChapterId: 'c2',
+      finished: ['c1'],
+      handOn: [],
+      replayUsed: [],
+      summaries: [],
+      rev: 1,
+      savedAt: 0,
+    };
+    bus.emit('story.saved', { save });
+    expect(written).toEqual([save]);
   });
 
   it('the mock network answers story.start on its bus', () => {
