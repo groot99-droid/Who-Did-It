@@ -65,6 +65,7 @@ const STREAMS = {
   locks: 1, // round 10, D5
   pairing: 1, // round 10, B8
   barks: 1, // round 10, M1
+  hitman: 1, // round 10, C4
 } satisfies Record<StreamName, 1>;
 export const AUTO_STREAMS = Object.keys(STREAMS) as StreamName[];
 
@@ -87,6 +88,9 @@ export function autoOptionsProblem(opts: AutoOptions): string | null {
     return 'duplicate npcIds';
   return null;
 }
+
+/** Story mode's hook beside `enableAuto` (docs/story/README.md 2); the engine lives in `sim/story`. */
+export { enableStory } from '../story/Story';
 
 export function autoOf(room: PartyRoom): AutoState | null {
   return simOf(room).auto;

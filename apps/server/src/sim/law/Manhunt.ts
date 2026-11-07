@@ -8,7 +8,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { isOnLine } from '../Train';
 import { isVerbPhase, reject, sceneKey } from '../World';
 import { isJailed, jailSeat, untilDawnS } from './Jail';
-import { holdPetitions, warrantsOf } from './Petition';
+import { type Warrant, holdPetitions, warrantsOf } from './Petition';
 
 /**
  * The manhunt (round 10, B4; GDD 3.31, `world-mode.md` 3.1; seams.md 3 row 14). A passed petition's warrant waits its
@@ -29,6 +29,7 @@ interface Hunt {
   charge: string;
   watchers: readonly string[];
   untilTick: number;
+  warrant: Warrant;
 }
 
 /** A cuff the manhunt made: the seat held, for B5's cell and Tribunal. Room memory only. */
@@ -37,6 +38,8 @@ export interface Cuffed {
   accused: string;
   charge: string;
   tick: number;
+  /** The warrant hunted: B6a's Tribunal tries it. */
+  warrant: Warrant;
 }
 
 interface ManhuntMemory {
@@ -158,7 +161,7 @@ export function cuffSeat(room: PartyRoom, seat: string): void {
   const p = simOf(room).players.get(seat);
   if (!hunt || !p || !hunting(room)) return;
   const tick = room.state.tick;
-  m.cuffed.push({ seat, accused: hunt.accused, charge: hunt.charge, tick });
+  m.cuffed.push({ seat, accused: hunt.accused, charge: hunt.charge, tick, warrant: hunt.warrant });
   jailSeat(room, seat, drawnAs(room, seat) || seat);
   room.state.manhunt.state = ManhuntState.cuffed;
   // Every hold on the hunt stops: the figure is held.
@@ -246,6 +249,7 @@ export function runManhunt(room: PartyRoom): void {
       charge: warrant.charge,
       watchers: warrant.watchers,
       untilTick: until,
+      warrant,
     };
     m.nextSampleTick = tick;
     row.accused = warrant.accused;

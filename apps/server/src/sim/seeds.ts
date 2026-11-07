@@ -49,6 +49,7 @@ export type StreamName =
   | 'homes'
   | 'locks' // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
   | 'pairing' // round 10, B8: Walk with me's answer delays and rolls (public-safe, seams.md 1)
+  | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
   | 'barks'; // round 10, M1: a bark's idle gap, reaction roll and line, keyed by actor id (public, seams.md 3 row 36)
 
 /** Four 32-bit seed words of one sfc32 stream. */
