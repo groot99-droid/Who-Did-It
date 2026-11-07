@@ -72,6 +72,10 @@ export const C2S = {
   hq: 'act.hq',
   /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
   payRent: 'act.payRent',
+  /** Story mode (docs/story/README.md 3): start the story `storyId` from the title screen; `sim/story/` (S2) handles it. */
+  storyStart: 'story.start',
+  /** Story mode: close the story card that is up; queued and consumed inside `step()`. */
+  storyContinue: 'story.continue',
 } as const;
 
 export const S2C = {
@@ -107,6 +111,12 @@ export const S2C = {
   shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
+  /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): a death sentence's true role, to every client. */
+  tribunalVerdict: 'tribunalVerdict',
+  /** Story mode (docs/story/README.md 3), private to the player's own client: a chapter card. */
+  storyCard: 'story.card',
+  /** Story mode, private to the player's own client: the chapter's goals and which are done. */
+  storyGoals: 'story.goals',
 } as const;
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
@@ -148,10 +158,11 @@ export type MeetingReason = 'body' | 'bell' | 'missing' | 'final';
  * Gamekeeper's Last Shot (GDD 3.2); `wolf` is a mob kill in the dark (GDD 3.15, round 6, Session 6G). Round 8
  * (GDD 3.22, Session 8A): `creature` is a kill by any other creature. Round 10 (A6) retires `bled` and `sickened`:
  * Bleeding and Poisoned stop at 1 health, so only the Knife, a vote and a creature's bite end a life; the two ids
- * are never reused.
+ * are never reused. Append-only. Round 10, C4b: `derringer`, the Hitman's day weapon (GDD 3.33), never returned by
+ * the Train.
  */
-export type DeathCause = 'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature';
-/**
+export type DeathCause =
+  'knife' | 'ejected' | 'vanished' | 'poison' | 'shot' | 'wolf' | 'creature' | 'derringer'; /**
  * Chat channels the server derives (GDD 3.5); the client never chooses one. Round 8 (GDD 3.8, 8T): `notes` is the
  * meeting notes, reached only by `chat.note`, whose lines carry no speaker.
  */
@@ -332,6 +343,13 @@ export interface C2SPayloads {
    */
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
+   * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
+   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   */
+  'story.start': { storyId: string; chapterId?: string };
+  /** Story mode: closes the card that is up. Refused 422 with no card up. */
+  'story.continue': Record<string, never>;
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -372,7 +390,9 @@ export interface S2CPayloads {
   /**
    * `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody
    * held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the
-   * unique count the win needed and each Killer seat's unique and total kills.
+   * unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21):
+   * `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in
+   * `alsoWon`; `stopped` died before boarding).
    */
   gameOver: {
     winner: number;
@@ -381,6 +401,7 @@ export interface S2CPayloads {
     alsoWon?: string[];
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
+    hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -449,6 +470,29 @@ export interface S2CPayloads {
    * scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`).
    */
   mugPrompt: { muggerId: string; endsTick: number };
+  /**
+   * Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role
+   * of the seat held (the one card that goes out before game over, as an ejection's does).
+   */
+  tribunalVerdict: { roleId: string };
+  /**
+   * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
+   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
+   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
+   * is the next chapter's title.
+   */
+  'story.card': {
+    kind: 'title' | 'beat' | 'end';
+    chapterId: string;
+    title?: string;
+    lines: string[];
+    portrait?: string;
+    goal?: string;
+    summary?: Record<string, number>;
+    next?: string;
+  };
+  /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
+  'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -499,6 +543,8 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
+  'story.start': 2,
+  'story.continue': 5,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

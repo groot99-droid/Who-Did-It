@@ -21,6 +21,7 @@
     "grid:export": "pnpm --filter @wdi/grid export",
     "bots:soak": "pnpm --filter @wdi/bots soak",
     "bots:live": "pnpm --filter @wdi/bots live",
+    "bots:story": "pnpm --filter @wdi/bots story",
     "auto": "pnpm --filter @wdi/auto start",
     "e2e": "pnpm --filter @wdi/client test:e2e"
   },
