@@ -501,7 +501,24 @@ that day alone: its purpose is to even the match. The numbers go in `balance.jso
 
 **The Medium is an NPC gate** (owner: "the Medium is just an NPC gate"). The Medium of the rite is an
 always-present, unkillable NPC at the Zealot's hideout, not a dealt card or a seat. It needs no card, so nothing is
-dealt for it and it draws on no secret random stream (`sim/seeds.ts`).
+dealt for it and it draws on no secret random stream (`sim/seeds.ts`). **The NPC gate replaces the dealt Medium
+card** (owner, 2026-11-08).
+
+**Knock-on of retiring the Medium card** (a roster change: whoever builds it changes the GDD in the same pull request;
+nothing is changed now):
+
+- `packages/content/data/roles.json`: the `medium` entry (V2, `firstPlayable: false`, start kit Seance Chalk and
+  Candles, ability `seance`). Retire it rather than delete it, so no id is reused (ids are append-only).
+- `packages/content/data/abilities.json` `seance` and `items.json` `seanceChalk`: kept for the NPC's rite or retired
+  with the card.
+- GDD 3.1 (the deck note "the Medium (V2) join when they ship", and the Medium lobby toggle), the GDD 3.2 Medium row
+  and its seance power, and the V2 list of GDD 3.10.
+- The deck tables: the Medium is in no `roles.json` deck today, so no deal row, role count or parity changes.
+- The coverage check of P1 (`storyCoverage`, a story marked `full`) lists every card of `roles.json`, so a retired
+  card must leave that list.
+- Nothing in `story.json`, `looks.json` or `achievements.json` names the Medium today; `docs/round10/rolecards.md`
+  does, and is updated with the GDD.
+- Wire ids: any role or ability id the wire carries is retired, never renumbered or reused.
 
 **The way there.** The Zealot's hideout sits in the **deep woods**; the dead Vicar goes there through the world, as
 given (no teleport is designed). The deep woods are a map-revamp location: new scene ids with a new prefix,
@@ -520,9 +537,6 @@ Still open for the owner:
 
 1. **The buff list.** Confirm the candidate list above (aura, Righteous Stride, Divine Judgement) against "area
    spread, speed, health".
-2. **The Medium card.** `roles.json` keeps a Medium card (GDD 3.2, V2: the seance at a body). Does that dealt card
-   stay as it is beside the hideout's NPC, or does the NPC replace it?
-
 ### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
 
 A requirement for the map revamp (A515 Q-A11): every role gets its own unique building, and each building has an
