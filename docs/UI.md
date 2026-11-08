@@ -2190,14 +2190,19 @@ A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`,
 a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
 away from a door `TOO_FAR {of: 'door'}`.
 
-### 14.55 Autopsy (10V, round 10, V1b)
+### 14.55 Dust, Compare and Autopsy (10V, round 10, V1b)
 
-Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows the
-reading by its `note` (`autopsy`) and never offers it for a petition. 10Y adds the keys and writes the table as it places
-them (A414's deck test):
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows each
+reading by its `note` (`lift`, `comparison`, `autopsy`) and never offers it for a petition. 10Y adds the keys and writes
+the table as it places them (A414's deck test):
 
+- `verb.dust`: "Dust for prints"; `verb.dust.prompt`: "Dust ({n} left)".
+- `note.lift`: "A print lifted from {where}"; `note.lift.body`: "from the body of {name}"; `note.lift.door`: "from a door".
+- `verb.compare`: "Compare prints"; `verb.compare.pick`: "Compare which two?"
+- `note.comparison.match`: "The prints match."; `note.comparison.nomatch`: "The prints do not match." (no name, ever).
 - `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
   "poison", "a shot", "something else", and the time shown as an estimate.
 
-Refusals read their 14.43 lines: a body out of reach is `TOO_FAR {of: 'body'}`, a body read twice
-`ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
+Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
+`TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
+read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
