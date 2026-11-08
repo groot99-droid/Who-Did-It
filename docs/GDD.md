@@ -1608,6 +1608,11 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
   player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
   except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **The cast.** A chapter may name the cards at the table. After the player's own card has moved at the chapter's
+  first section, every card the cast names that nobody holds is dealt to an NPC seat whose card the cast does not name
+  (dead seats first, then in seat order), as a newcomer off the morning train: the seat's kit and view are the card's
+  own, its routine starts over, and a dead seat is made whole. A Knife holder never gives up its seat. A cover card
+  walks as another card of the cast. A replay of a section changes no card.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
