@@ -18,6 +18,12 @@ export const STORY_COPY = {
   'story.card.goal': 'Goal',
   'story.card.summary': 'What you did',
   'story.card.upNext': 'Up next',
+  'story.end.title': 'The story so far',
+  'story.end.chapter': 'Chapter {n}: {title}',
+  'story.end.failed': 'Lost',
+  'story.end.achievements': 'Earned',
+  'story.end.none': 'Nothing earned yet',
+  'story.end.close': 'Close',
   'story.goals.title': 'Goals',
   'story.goals.done': 'done',
 } as const;

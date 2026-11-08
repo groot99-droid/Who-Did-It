@@ -3,11 +3,14 @@ import {
   cardButton,
   chapterRows,
   closeCard,
+  earnedStoryAchievements,
   emptyStory,
+  endScreenChapters,
   goalsLeft,
   markFinished,
   onCard,
   onGoals,
+  parseOutcomes,
   readFinished,
   summaryLabel,
   summaryRows,
@@ -101,5 +104,53 @@ describe('chapter list', () => {
         setItem: () => undefined,
       }),
     ).not.toThrow();
+  });
+});
+
+describe('the end screen model', () => {
+  const story = {
+    id: 's',
+    title: 'S',
+    blurb: '',
+    chapters: [
+      { id: 'a', title: 'A', setup: 'set a', summary: 'sum a' },
+      { id: 'b', title: 'B', setup: 'set b' },
+    ],
+  };
+
+  it('reads outcomes defensively and ignores what is not a chapter outcome', () => {
+    expect(
+      parseOutcomes([null, 3, { nope: 1 }, { chapterId: 'a', failed: true, counters: { x: 2, y: 'z' } }]),
+    ).toEqual([{ chapterId: 'a', failed: true, counters: { x: 2 } }]);
+  });
+
+  it('lists every chapter in order; this session end cards win over the save; the summary falls back to the set-up', () => {
+    const rows = endScreenChapters(
+      story,
+      [{ chapterId: 'a', failed: true, counters: { loavesBaked: 1, doors: 5 } }],
+      { a: { loavesBaked: 4 } },
+    );
+    expect(rows.map((r) => [r.n, r.title, r.summary, r.failed])).toEqual([
+      [1, 'A', 'sum a', true],
+      [2, 'B', 'set b', false],
+    ]);
+    expect(rows[0]!.rows).toEqual([
+      { key: 'loavesBaked', label: 'Loaves baked', value: 4 },
+      { key: 'doors', label: 'Doors', value: 5 },
+    ]);
+    expect(rows[1]!.rows).toEqual([]);
+  });
+
+  it('names only the story-tree achievements the device earned', () => {
+    const file = {
+      achievements: {
+        a: { id: 'a', tree: 'story', title: 'Story A' },
+        b: { id: 'b', tree: 'work', title: 'Work B' },
+        c: { id: 'c', tree: 'story', title: 'Story C' },
+      },
+    };
+    expect(earnedStoryAchievements(file, { a: '2026-11-07', b: '2026-11-07' })).toEqual([
+      { id: 'a', title: 'Story A' },
+    ]);
   });
 });
