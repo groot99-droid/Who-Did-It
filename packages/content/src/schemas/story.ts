@@ -32,6 +32,8 @@ export const STORY_STREAMS = [
   'locks',
   'pairing',
   'hitman',
+  'trialTick',
+  'trialChance',
   'autopsy',
 ] as const;
 
