@@ -777,7 +777,7 @@ server, and one consequence that fires at most once per match; the bus carries i
 events that name no seat (`vendettas.json` `emits`, `fires`).
 
 - **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
-  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
+  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **160 s**
   (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
   Vicar's vote counts for nothing (`vendetta.conversion.doubt`, the consequence). To every other seat it is an
   ordinary abstention: the Vicar's voted mark stays down and the tally leaves it out, while the meeting still ends
