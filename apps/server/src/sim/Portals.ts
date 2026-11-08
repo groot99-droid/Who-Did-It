@@ -29,6 +29,7 @@ import {
 } from './World';
 import { spawnTeachingClue } from './Clues';
 import { curfewBars } from './economy/rent';
+import { recordCrossings } from './verbs/dust';
 import { reconcileViews } from './Visibility';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
@@ -196,6 +197,7 @@ export function runPortals(room: PartyRoom): void {
     }
     crossed = true;
     if (p.dead) continue;
+    recordCrossings(room, from, portal, `seat:${req.sessionId}`); // round 10, V1b: the true actor, whatever the face
     swingDoor(room, from, portal.id);
     const arrival = nearestPortal(portal.to, p.x / TILE_PX, p.y / TILE_PX);
     if (arrival) swingDoor(room, portal.to, arrival.id);

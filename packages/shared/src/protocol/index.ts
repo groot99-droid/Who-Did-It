@@ -152,7 +152,9 @@ export type HoldAction =
   | 'clean'
   | 'wash'
   | 'unlock'
-  | 'crowbar';
+  | 'crowbar'
+  // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
+  | 'dust';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -262,8 +264,11 @@ export interface C2SPayloads {
    * `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat`
    * (Impersonate, the night powers, Last Shot) a seat id.
    */
-  /** `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. */
-  'act.ability': { abilityId: string; targetId?: string; kind?: string; value?: number };
+  /**
+   * `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. `with` is
+   * Compare's second lift (V1b); `targetId` the first, both of the seat's own Notebook entries.
+   */
+  'act.ability': { abilityId: string; targetId?: string; kind?: string; value?: number; with?: string };
   /** Re-validated every tick. */
   /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
   'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
