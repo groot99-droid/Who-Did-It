@@ -503,6 +503,10 @@ that day alone: its purpose is to even the match. The numbers go in `balance.jso
 always-present, unkillable NPC at the Zealot's hideout, not a dealt card or a seat. It needs no card, so nothing is
 dealt for it and it draws on no secret random stream (`sim/seeds.ts`).
 
+**The way there.** The Zealot's hideout sits in the **deep woods**; the dead Vicar goes there through the world, as
+given (no teleport is designed). The deep woods are a map-revamp location: new scene ids with a new prefix,
+append-only.
+
 **Same match, next day.** The return is the next day of the same match. This supersedes the owner brief's next-match
 return (`flow.ascendedVicarCandidate`, stepping off the morning train), kept here only as the old path. The brief's
 list (the 10x conversion aura, Righteous Stride, Divine Judgement) is the candidate buff list, to confirm with the
@@ -514,10 +518,9 @@ now.
 
 Still open for the owner:
 
-1. **Getting there.** How the dead Vicar reaches the Zealot's hideout.
-2. **The buff list.** Confirm the candidate list above (aura, Righteous Stride, Divine Judgement) against "area
+1. **The buff list.** Confirm the candidate list above (aura, Righteous Stride, Divine Judgement) against "area
    spread, speed, health".
-3. **The Medium card.** `roles.json` keeps a Medium card (GDD 3.2, V2: the seance at a body). Does that dealt card
+2. **The Medium card.** `roles.json` keeps a Medium card (GDD 3.2, V2: the seance at a body). Does that dealt card
    stay as it is beside the hideout's NPC, or does the NPC replace it?
 
 ### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
@@ -525,11 +528,12 @@ Still open for the owner:
 A requirement for the map revamp (A515 Q-A11): every role gets its own unique building, and each building has an
 **anti-theme** building. Known pairs so far:
 
-| Role | Building | Anti-theme |
-| ---- | -------- | ---------- |
-| Vicar | the chapel | the Zealot's hideout |
-| Bandit | (to name) | the detective's police station |
-| Activist | (to name) | the post office |
+| Role | Its own building | Anti-theme building |
+| ---- | ---------------- | ------------------- |
+| Vicar | the chapel | the Zealot's hideout, in the deep woods |
+| Bandit | a detective's or police station, themed against the Bandit | (to name) |
+| Activist | the post office | (to name) |
 
-Read as given; the owner to confirm which side of each pair is the role's own building. Scene, portal and spawn ids
+For the Bandit and the Activist the owner names the role's own building, themed as its opposite: the Bandit's is a
+detective's or police station, the Activist's a post office. Scene, portal and spawn ids
 stay frozen: every new building adds new ids with new prefixes, append-only (GDD 3.13, WORLD 4.3).
