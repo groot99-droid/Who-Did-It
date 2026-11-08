@@ -40,6 +40,8 @@ export const ClueKind = {
   scuffle: 10,
   /** Round 10 (D5c, seams.md 3 row 12, GDD 3.29): scratches round a lock a pick opened; `value` and `dir` are 0 for everyone. */
   scratch: 11,
+  /** Round 10 (V3, seams.md 3 row 39, GDD 3.2): a Chalk mark on the floor; `value` the symbol, `dir` 0. */
+  chalk: 13,
   /** Round 10 (V1b, seams.md 3 row 24, GDD 3.2): a Doctor's Autopsy reading; `value` an `AutopsyCause`, the entry's `tick` the estimate. */
   timeOfDeath: 12,
 } as const;
@@ -96,6 +98,8 @@ export const NoteKind = {
   contract: 9,
   /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
   notice: 10,
+  /** Round 10 (V3, seams.md 3 row 39, GDD 3.7): a hider's own entry that a Check opened its spot; `of` is the face the checker showed. */
+  checked: 14,
   /** Round 10 (V1b, row 24, GDD 3.2): a Dust lift, the seat's own reading; `of` is the body's victim, '' for a door. */
   lift: 11,
   /** Round 10 (V1b): a Compare of two lifts; `value` 1 match, 0 no match; `of` lists the two entry ids, comma-joined. */

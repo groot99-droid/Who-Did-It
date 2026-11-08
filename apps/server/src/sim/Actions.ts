@@ -14,6 +14,7 @@ import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
 import { handlePlantClue } from './verbs/evidence';
+import { handleKitAbility } from './verbs/hiding';
 import { handleCompare } from './verbs/dust';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
@@ -83,6 +84,16 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
       return handleBodyAbility(room, sessionId, payload);
     case 'plantClue':
       return handlePlantClue(room, sessionId, payload, livingActor); // round 10, V1a (GDD 3.2)
+    case 'chalk':
+    case 'actShifty':
+    case 'fakeBlood':
+      return handleKitAbility(
+        room,
+        sessionId,
+        payload.abilityId as 'chalk' | 'actShifty' | 'fakeBlood',
+        payload,
+        livingActor,
+      ); // round 10, V3 (GDD 3.2)
     case 'dustCompare':
       return handleCompare(room, sessionId, payload, livingActor); // round 10, V1b (GDD 3.2)
     default:

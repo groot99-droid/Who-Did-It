@@ -18,6 +18,7 @@ import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
 import { PLANT_HOLD, handleInspectHold, runEvidence, tickInspect, tickPlant } from './verbs/evidence';
 import { writeClueEntry } from './verbs/notebook';
+import { CHECK_HOLD, HIDE_HOLD, runHiding, tickCheck, tickHide } from './verbs/hiding';
 import { dropDrag, handleCoverupHold, isCoverupHold, tickCoverup } from './verbs/coverup';
 import { handleDustHold, tickDust } from './verbs/dust';
 import { handleAutopsyHold, tickAutopsy } from './verbs/autopsy';
@@ -110,6 +111,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
 
 /** Re-validates every hold each tick (ARCHITECTURE 5.6) and completes the ones whose cast has run. */
 export function runHolds(room: PartyRoom): void {
+  runHiding(room); // round 10, V3: a dead seat or a closed world lets its hider out
   runEvidence(room); // round 10, V1a: the Lens refill at dawn and `lensCharges` (sim/verbs/evidence.ts)
   const tick = room.state.tick;
   const castTicks = Math.round(
@@ -139,6 +141,14 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'inspect') {
       tickInspect(room, sessionId, p); // round 10, V1a: the Lens Inspect
+      continue;
+    }
+    if (hold.action === HIDE_HOLD) {
+      tickHide(room, sessionId, p); // round 10, V3
+      continue;
+    }
+    if (hold.action === CHECK_HOLD) {
+      tickCheck(room, sessionId, p); // round 10, V3
       continue;
     }
     if (hold.action === 'dust') {
