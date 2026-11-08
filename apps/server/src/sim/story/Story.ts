@@ -217,9 +217,14 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     inbox: [],
   };
   states.set(room, state);
-  // The runner's own outputs stay out of its inbox; `story.enter` and `story.pickup` are the triggers' to hear.
+  // The runner's own outputs stay out of its inbox; `story.enter`, `story.pickup` and `story.picked` are the triggers' to hear.
   onSim(room, ANY_SIM, (ev) => {
-    if (!ev.kind.startsWith('story.') || ev.kind === 'story.enter' || ev.kind === 'story.pickup')
+    if (
+      !ev.kind.startsWith('story.') ||
+      ev.kind === 'story.enter' ||
+      ev.kind === 'story.pickup' ||
+      ev.kind === 'story.picked'
+    )
       state.inbox.push(ev);
   });
   const at = opts.resume === undefined ? -1 : resumeIndex(state.units, opts.resume);

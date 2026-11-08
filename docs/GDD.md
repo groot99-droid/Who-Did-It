@@ -1629,6 +1629,10 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   once: it waits, the player keeping the card they hold and the town running, until the trigger holds. The Knife's
   inheritance (3.2) emits the sim event `inherit` (the seat is its `seat`) for it; a story gives the trigger a tick
   fallback so it always moves on. When it holds, the section starts as any other, the player taking the card.
+- **Pick events.** A lock the player opens with the lock-pick (3.29) emits the sim event `story.picked` with the
+  picker's `seat` and `data: { lock }` (the prop id), so a goal or a section end can be "open the hall door". The
+  story runner hears it like `story.enter` and `story.pickup`. The reader (3.26) has no server path (the server keeps
+  nothing of what a seat read), so there is no `story.read` yet.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
