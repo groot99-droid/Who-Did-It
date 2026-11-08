@@ -35,6 +35,7 @@ import { decaySeconds, spawnClue } from './Clues';
 import { JAIL_GAMES, type JailGame, addStrength, loseMaxHp, markPlayed, playedToday } from './JailGames';
 import { addStack, canAdd, count, take } from './Inventory';
 import { movePurse, TOWN } from './economy/purse';
+import { emitSim } from './events/bus';
 import { emitNoise } from './Noise';
 import { isVerbPhase, reject, sceneIndex, tileCentre } from './World';
 import { refusal, sendRefusal, type Refusal } from './refusal';
@@ -182,6 +183,13 @@ function lockResult(
   state.state = after.state;
   state.untilTick = after.respawnS === null ? 0 : room.state.tick + Math.round(after.respawnS * TICK_RATE);
   room.state.scenes.get(lock.sceneId)?.propStates.set(lock.propId, state);
+  // Story mode (arc E9): a section's goal can be "open the hall door". Server-internal, like every bus event.
+  emitSim(room, {
+    tick: room.state.tick,
+    kind: 'story.picked',
+    seat: sessionId,
+    data: { lock: lock.propId },
+  });
   const mode = interactions.interactions[lock.interactionId]?.modes.find((m) => m.minigame === 'lockpick');
   // The scratch is the same for every picker (seams.md 3 row 12); the fine rolls on `locks`, a stream no client sees.
   if (mode?.leaves === 'scratch') leaveScratch(room, lock);

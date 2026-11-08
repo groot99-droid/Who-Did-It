@@ -13,6 +13,7 @@ import {
 } from '@wdi/shared';
 import { balanceOf } from '../src/sim/economy/purse';
 import { addStack, count } from '../src/sim/Inventory';
+import { onSim } from '../src/sim/events/bus';
 import { briefingLine } from '../src/sim/law/Briefing';
 import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
 import { fixSeeds } from './seedHelpers';
@@ -68,6 +69,17 @@ describe('the lock-pick', () => {
     await pick(p);
     expect(refusals(p).at(-1)).toMatchObject({ reason: 'NEED_TOOL' });
     expect(starts(p)).toHaveLength(0);
+  });
+
+  it('emits story.picked with the lock for the picker when the door opens (arc E9)', async () => {
+    const p = await atDoor(1);
+    const heard: { seat?: string; data?: Record<string, unknown> }[] = [];
+    onSim(p.room, 'story.picked', (ev) => heard.push(ev));
+    await pick(p);
+    const msg = starts(p)[0]!.payload as { public: LockpickPublic };
+    await answer(p, honest(msg.public));
+    expect(doorState(p)).toBe('open');
+    expect(heard).toEqual([expect.objectContaining({ seat: p.humans[0]!.id, data: { lock: DOOR } })]);
   });
 
   it('sends the picker the pins, set points and band, and opens the door on a full trace', async () => {
