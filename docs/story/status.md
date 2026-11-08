@@ -81,3 +81,4 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-08 P2: E4 NPC Killer vendetta on `claude/story-p2-npcvendetta`: `npcVendetta` set per section, GDD 3.34, A582, `test/story/npcvendetta.test.ts`. E3 is PR #487 (Complete, awaiting merge).
 - 2026-11-08 P2: E3 no early win on `claude/story-p2-nowin`: `endMatch` holds a win before the last section (`holdMatch`, `story.win`), the section ends done. GDD 3.34, A581, `test/story/nowin.test.ts`.
 - 2026-11-08 P2: #487 (E3) and #488 (E4) merged. E5 fixed Hitman on `claude/story-p2-hitman`: `hitman: {mark}` turns the player at section start, GDD 3.34, A583, `test/story/hitman.test.ts`.
+- 2026-11-08 P2: #489 (E5) merged. E6 heir section on `claude/story-p2-heir`: `startWhen` waits after the previous section, `inherit` event from `runInherit`, GDD 3.34, A584, `test/story/heir.test.ts`.

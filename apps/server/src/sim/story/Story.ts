@@ -81,6 +81,8 @@ export interface StoryState {
   final: boolean;
   /** A match win was held (E3) and ends the running section as done at the next story step. */
   heldWin: boolean;
+  /** The next section is waiting for its `startWhen` (arc E6): the unit, its latches, and the tick the wait began. */
+  waiting: { idx: number; latches: Latches; since: number } | null;
   /** The story is over (its last end card was dismissed, or the match ended). */
   over: boolean;
   /** A card is up and the clock waits for `story.continue`. */
@@ -202,6 +204,7 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     now: opts.now ?? Date.now,
     final: false,
     heldWin: false,
+    waiting: null,
     over: false,
     cardUp: false,
     cards: [],
@@ -504,9 +507,12 @@ function afterEndCard(room: PartyRoom, state: StoryState): void {
   if (state.replaying) {
     state.replaying = false;
     startChapter(room, state, state.chapterIdx, true);
-  } else if (!state.final && state.chapterIdx + 1 < state.units.length)
-    startChapter(room, state, state.chapterIdx + 1);
-  else finishStory(room, state);
+  } else if (!state.final && state.chapterIdx + 1 < state.units.length) {
+    const next = state.chapterIdx + 1;
+    // E6: a section with a `startWhen` waits for it; the player keeps the card they hold meanwhile.
+    if (state.units[next]?.startWhen === undefined) startChapter(room, state, next);
+    else state.waiting = { idx: next, latches: { set: new Set() }, since: room.state.tick };
+  } else finishStory(room, state);
 }
 
 function finishStory(room: PartyRoom, state: StoryState): void {
@@ -597,6 +603,18 @@ export function runStory(room: PartyRoom): void {
     return;
   }
   const chapter = chapterOf(state);
+  if (state.waiting !== null) {
+    const wait = state.waiting;
+    const when = state.units[wait.idx]?.startWhen;
+    if (when !== undefined) {
+      for (const ev of events) hear(when, 'start', ev, wait.latches, seatOf);
+      if (holds(when, 'start', room.state.tick - wait.since, wait.latches)) {
+        state.waiting = null;
+        startChapter(room, state, wait.idx);
+      }
+    }
+    return;
+  }
   if (chapter === undefined || state.ended) return;
   if (state.heldWin) {
     state.heldWin = false;
