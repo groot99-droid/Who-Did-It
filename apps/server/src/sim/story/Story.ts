@@ -17,7 +17,7 @@ import type { FixedSeeds } from '../seeds';
 import { runAction } from './actions';
 import { type Unit, unitsOf } from './units';
 import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
-import { holderOf, switchRole } from './handover';
+import { castTable, holderOf, switchRole } from './handover';
 import { type Latches, hear, holds } from './triggers';
 
 /**
@@ -330,6 +330,9 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
     const player = room.state.players.get(state.humanId);
     if (player) player.look = chapter.look;
   }
+  // The chapter's cast (arc E2): after the seat's own card has moved, every card the cast names has a seat.
+  if (chapter.first && !replay && chapter.chapter.cast !== undefined)
+    castTable(room, state.humanId, chapter.chapter.cast);
   state.seen.items = null; // a new card's kit is not a pickup
   if (chapter.first && !replay) {
     state.totals = {};
