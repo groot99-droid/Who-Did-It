@@ -188,6 +188,15 @@ export function checkStory(
       if (!(a.questStep.quest in c.quests.quests)) err(`${at}: unknown quest ${a.questStep.quest}`);
     } else if ('npcOrder' in a) {
       if (!(a.npcOrder.npcId in c.roles.roles)) err(`${at}: npcOrder names unknown role ${a.npcOrder.npcId}`);
+      const { order, args } = a.npcOrder;
+      if (order !== 'goTo') err(`${at}: npcOrder ${order} is not an order (only goTo)`);
+      else {
+        const sceneId = args?.scene;
+        const scene = typeof sceneId === 'string' ? sceneOf(sceneId) : undefined;
+        if (!scene) err(`${at}: npcOrder goTo needs args.scene, a scene id (got ${String(sceneId)})`);
+        else if (args?.spawn !== undefined && !scene.spawns.some((s) => s.id === args.spawn))
+          err(`${at}: scene ${String(sceneId)} has no spawn ${String(args.spawn)}`);
+      }
     } else if ('spawn' in a) {
       const { kind, at: where } = a.spawn;
       if (!(kind in c.clues.clues) && !(kind in c.items.items))

@@ -26,7 +26,11 @@ const spawnOf = (sceneId: SceneId, id: string | undefined) => {
   return list.find((s) => s.id === id) ?? list[0];
 };
 
-/** `goTo`: the NPC seat that holds the card `roleId` travels to a spawn of `scene` (across scenes, as a hunt does). */
+/**
+ * `goTo`: the NPC seat that holds the card `roleId` travels to a spawn of `scene` (across scenes, as a hunt does):
+ * `args.spawn` names the spawn, else the scene's first. Staging at a break (arc E14): a section's `tick: 0` beat sends
+ * a card where its opening needs it, because a break swaps cards where the bodies stand.
+ */
 function npcOrder(
   host: ActionHost,
   roleId: string,
@@ -37,7 +41,8 @@ function npcOrder(
   const seat = holderOf(room, host.humanId, roleId);
   const scene = args?.scene;
   if (order !== 'goTo' || seat === null || typeof scene !== 'string' || !isSceneId(scene)) return;
-  const spawn = spawnOf(scene, undefined);
+  const at = args?.spawn;
+  const spawn = spawnOf(scene, typeof at === 'string' ? at : undefined);
   if (spawn === undefined) return;
   const brain = npcMemory(room).brain(seat);
   brain.path = null;

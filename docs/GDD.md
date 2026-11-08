@@ -1678,6 +1678,7 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   every section. A trigger writes it as `{ event: 'story.company', seat: 'player', data: { with: 'vicar' } }`. It is the
   shape of the conversion's shared time (3.20) without its vendetta.
 - **Cutscene and bell.** A beat's `cutscene` action plays the cutscene for the table (`cutscene { id, scope: 'all' }`, once, and the server never waits for a client) and still emits `story.cutscene`. A `meeting: true` action rings the bell for the player's seat: a meeting opens at the next world-phase step, and its reveal is where the memorial (3.20) plays when a seat under the Vicar's look has died by the Knife. A story that wants the memorial rings a meeting if no NPC does.
+- **Staging.** A break swaps cards between two bodies where they stand, so the card a section needs is where the last section left it. A section stages its own opening: a beat at `tick: 0` with `npcOrder goTo` sends the seat holding a card to a scene (`args.scene`), to a named spawn of it with `args.spawn`, on foot as a hunt travels. `goTo` is the only order; the validator refuses any other order, a missing or unknown scene and an unknown spawn.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
