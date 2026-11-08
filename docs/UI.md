@@ -2164,7 +2164,7 @@ wide, ticks a goal off (struck through, a "done" label for a screen reader) and 
 chapter has no goals; an end card clears it.
 
 The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
-opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+opens the chapter list of the story (the arc's chapters, since P2's #479; a chapter holds several sections): each chapter with its set-up line, finished chapters marked and replayable (kept in
 `localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
 (Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
 server deals the first card and scene.
@@ -2177,6 +2177,13 @@ signed-in account replaces (`docs/accounts/plan.md` 5). The Story menu shows a *
 `story.start { storyId, resume }` with the save untouched. The client never composes or edits a save, and the server
 re-validates and decides.
 
-Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
+**End screen (part 2, P3 3/3).** When the player closes the story's last end card (one with no `next`), a dedicated
+screen (`story-finale`) lists every chapter of the story in order: its number and title, its one-line `summary` from the
+content (the set-up line when a chapter has none), a "Lost" mark for a chapter the save says failed, and its counters
+(the chapter's end-card counters of this session win over the save's). Below, the **story-tree achievements** this device
+has earned (`readEarned()` with titles from `achievements.json`), or "Nothing earned yet". One button closes it. The
+save's `summaries` are read defensively as `{ chapterId, failed?, counters? }` (proposed to P2); anything else is ignored.
+
+Screens `story-menu`, `story-title`, `story-section`, `story-line`, `story-resume`, `story-finale`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
 fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
