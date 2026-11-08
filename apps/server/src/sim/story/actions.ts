@@ -1,9 +1,10 @@
 import { type ArcAction, type ArcLine, type SceneId, roles, scenes } from '@wdi/content';
-import { ClueKind, TILE_PX } from '@wdi/shared';
+import { ClueKind, S2C, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { spawnClue } from '../Clues';
 import { emitSim } from '../events/bus';
 import { npcMemory } from '../npc/memory';
+import { simOf } from '../RoomSim';
 import { isSceneId, sceneIndex, tileCentre } from '../World';
 import { holderOf } from './handover';
 
@@ -84,9 +85,12 @@ export function runAction(host: ActionHost, action: ArcAction): void {
   else if ('npcOrder' in action)
     npcOrder(host, action.npcOrder.npcId, action.npcOrder.order, action.npcOrder.args);
   else if ('spawn' in action) spawnAt(host, action.spawn.kind, action.spawn.at);
-  else if ('cutscene' in action)
+  else if ('cutscene' in action) {
     emitSim(host.room, { tick: host.room.state.tick, kind: 'story.cutscene', data: { id: action.cutscene } });
-  else
+    host.room.broadcast(S2C.cutscene, { id: action.cutscene, scope: 'all' }); // E12: it plays, it is not an event only
+  } else if ('meeting' in action) {
+    simOf(host.room).meetingRequests.push({ reason: 'bell', callerId: host.humanId }); // E12: the reveal plays the memorial
+  } else
     emitSim(host.room, {
       tick: host.room.state.tick,
       kind: 'story.questStep',
