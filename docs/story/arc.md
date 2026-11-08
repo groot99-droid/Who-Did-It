@@ -500,16 +500,20 @@ die or be stopped before the rite (wording to confirm with the owner).
 **The buff's length and strength.** It lasts the whole next day and is tuned so that the Vicar could plausibly win
 that day alone: its purpose is to even the match. The numbers go in `balance.json` and the GDD only.
 
+**Same match, next day.** The return is the next day of the same match. This supersedes the owner brief's next-match
+return (`flow.ascendedVicarCandidate`, stepping off the morning train), kept here only as the old path. The brief's
+list (the 10x conversion aura, Righteous Stride, Divine Judgement) is the candidate buff list, to confirm with the
+owner beside "area spread, speed, health".
+
+**The martyr's task weight is gated too.** GDD 3.20's `tasks.martyrWeight` applies only after the Medium's
+resurrection; with no rite a martyr's ghost counts as any ghost. GDD 3.20 changes to match when this is built, not
+now.
+
 Still open for the owner:
 
-1. **This match or the next.** The owner brief returns the Ascended Vicar in the room's **next match**
-   (`flow.ascendedVicarCandidate`, stepping off the morning train), while this rule returns him the **next day of the
-   same match**. Which holds, and does the brief's list (aura, Righteous Stride, Divine Judgement) stand as the buff?
-2. **The martyr's task weight.** Does the rite also gate GDD 3.20's `tasks.martyrWeight`, or does a martyr's ghost
-   keep it with no rite?
-3. **The Medium's safety.** Confirm the wording: the Medium cannot die or be prevented before the rite. What happens
+1. **The Medium's safety.** Confirm the wording: the Medium cannot die or be prevented before the rite. What happens
    when the Medium is undealt (the Medium is V2 and not in today's decks, GDD 3.1), or is the Vicar's own seat?
-4. **Getting there.** How the dead Vicar reaches the Zealot's hideout, and whether the Medium is drawn there or is
+2. **Getting there.** How the dead Vicar reaches the Zealot's hideout, and whether the Medium is drawn there or is
    always there.
 
 ### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
