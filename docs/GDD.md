@@ -1625,6 +1625,10 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
   sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
   section lets the seat go, its contract and its flag with it.
+- **Night-power events.** A night power that lands (Hear Confession, Keep Watch, Remedy, Nightshade), by a human or
+  an NPC, emits the sim event `nightPower` with the user's `seat` and `data: { ability, target }`, so a section or a
+  goal can end on it (`{ event: 'nightPower', seat: 'player', data: { ability: 'confession' } }`). It is server-side only:
+  no client message and no admin feed carries it.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
