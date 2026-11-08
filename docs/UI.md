@@ -2204,3 +2204,15 @@ it places them:
 A refusal reads its 14.43 line: no Rag or Bucket is `NEED_ITEM {need: 'bloodyRag' | 'bucket'}`, no Skeleton Key
 `NEED_KEY {need: 'skeletonKey'}`, no Crowbar `NEED_TOOL {need: 'crowbar'}`, a card without Drag `NOT_YOUR_POWER`, a door already
 opened `ALREADY_DONE`, a body, clue or door out of reach `TOO_FAR {of: 'body' | 'clue' | 'door'}`.
+
+### 14.55 Autopsy (10V, round 10, V1b)
+
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows the
+reading by its `note` (`autopsy`) and never offers it for a petition. 10Y adds the keys and writes the table as it places
+them (A414's deck test):
+
+- `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
+  "poison", "a shot", "something else", and the time shown as an estimate.
+
+Refusals read their 14.43 lines: a body out of reach is `TOO_FAR {of: 'body'}`, a body read twice
+`ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.

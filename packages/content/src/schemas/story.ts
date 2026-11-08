@@ -34,6 +34,7 @@ export const STORY_STREAMS = [
   'hitman',
   'trialTick',
   'trialChance',
+  'autopsy',
 ] as const;
 
 const Word = z.number().int().min(0).max(0xffffffff);
