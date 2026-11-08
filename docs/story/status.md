@@ -81,5 +81,6 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-08 P2: E4 NPC Killer vendetta on `claude/story-p2-npcvendetta`: `npcVendetta` set per section, GDD 3.34, A582, `test/story/npcvendetta.test.ts`. E3 is PR #487 (Complete, awaiting merge).
 - 2026-11-08 P2: E3 no early win on `claude/story-p2-nowin`: `endMatch` holds a win before the last section (`holdMatch`, `story.win`), the section ends done. GDD 3.34, A581, `test/story/nowin.test.ts`.
 - 2026-11-08 P2: #487 (E3) and #488 (E4) merged. E5 fixed Hitman on `claude/story-p2-hitman`: `hitman: {mark}` turns the player at section start, GDD 3.34, A583, `test/story/hitman.test.ts`.
+- 2026-11-08 P2: #489 (E5) merged; #490 (E6) Complete awaiting merge. E8 night-power events on `claude/story-p2-nightpower`: `nightPower` from `applyPower`, GDD 3.34, A585, `test/story/nightpower.test.ts`.
 - 2026-11-08 P2: #489 (E5) merged. E6 heir section on `claude/story-p2-heir`: `startWhen` waits after the previous section, `inherit` event from `runInherit`, GDD 3.34, A584, `test/story/heir.test.ts`.
 - 2026-11-08 P2: #490 (E6) merged, #491 (E8) Complete awaiting merge. E9 on `claude/story-p2-readpick`: `story.picked` built; `story.read` NOT built (no reader exists server or client; A586 says why). `test/story/picked.test.ts`, a case in `test/lockpick.test.ts`.
