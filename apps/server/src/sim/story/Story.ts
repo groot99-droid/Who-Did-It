@@ -58,6 +58,10 @@ export interface StoryState {
   /** A chapter has ended and its end card is up (or queued); no beats run until the next one starts. */
   ended: boolean;
   failed: boolean;
+  /** Sections whose one replay is spent (A515: a failure replays the section once, then the story moves on). */
+  replayUsed: Set<string>;
+  /** The end card that is up (or queued) ends in a replay of the same section. */
+  replaying: boolean;
   /** The match ended mid-chapter: this chapter is the last one. */
   final: boolean;
   /** The story is over (its last end card was dismissed, or the match ended). */
@@ -146,6 +150,8 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     chapterStartTick: 0,
     ended: false,
     failed: false,
+    replayUsed: new Set(),
+    replaying: false,
     final: false,
     over: false,
     cardUp: false,
@@ -264,11 +270,12 @@ function giveItem(room: PartyRoom, state: StoryState, ref: string): void {
   settle(player);
 }
 
-function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
+function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = false): void {
   const chapter = state.units[idx];
   if (chapter === undefined) return;
   const previous = state.units[idx - 1];
-  if (idx > 0) {
+  if (idx > 0 || replay) {
+    // A replay is the same card again: the view starts over and the player is made whole where they stand.
     switchRole(
       room,
       state.humanId,
@@ -296,7 +303,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterStart',
-    data: { chapterId: chapter.id, chapter: chapter.id, index: idx, arcChapter: chapter.chapter.id },
+    data: { chapterId: chapter.id, chapter: chapter.id, index: idx, arcChapter: chapter.chapter.id, replay },
   });
   // The first section of an arc chapter opens with the chapter's card; every later section has its own (arc E1).
   const opening = chapter.first ? [chapter.chapter.setup, chapter.setup] : [chapter.setup];
@@ -319,11 +326,16 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
   // A break inside an arc chapter has no card unless the section names one; a failure or the match's end always does.
   const card = chapter.endCard ?? (failed || state.final ? chapter.chapter.end : null);
   const keys = (chapter.endCard ?? chapter.chapter.end).summaryKeys;
+  // A failure replays the section once (A515); a second failure, or a match that has ended, moves on.
+  const replay =
+    failed && !state.final && room.state.phase !== Phase.gameOver && !state.replayUsed.has(chapter.id);
+  if (replay) state.replayUsed.add(chapter.id);
+  state.replaying = replay;
   const summary = Object.fromEntries(keys.map((k) => [k, state.counters[k] ?? 0]));
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterEnd',
-    data: { chapterId: chapter.id, chapter: chapter.id, failed, summary },
+    data: { chapterId: chapter.id, chapter: chapter.id, failed, replay, summary },
   });
   if (card === null) return afterEndCard(room, state);
   const next = state.units[state.chapterIdx + 1];
@@ -334,7 +346,9 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
     title: chapter.title,
     lines: failed ? [card.failedLine] : card.lines,
     summary,
-    ...(next !== undefined && { next: next.first ? next.chapter.title : next.title }),
+    ...(replay
+      ? { next: chapter.first ? chapter.chapter.title : chapter.title }
+      : next !== undefined && { next: next.first ? next.chapter.title : next.title }),
   };
   if (state.cardUp) state.cards.push(endCard);
   else showCard(room, state, endCard);
@@ -342,7 +356,10 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
 
 /** The end card was dismissed: the next chapter starts, or the story is over. */
 function afterEndCard(room: PartyRoom, state: StoryState): void {
-  if (!state.final && state.chapterIdx + 1 < state.units.length)
+  if (state.replaying) {
+    state.replaying = false;
+    startChapter(room, state, state.chapterIdx, true);
+  } else if (!state.final && state.chapterIdx + 1 < state.units.length)
     startChapter(room, state, state.chapterIdx + 1);
   else finishStory(room, state);
 }
