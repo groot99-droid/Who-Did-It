@@ -6,7 +6,8 @@ import { skipIntro } from './helpers';
 // closes it by a queued command, and the world runs behind it. The mock path is `screens-story.spec.ts`.
 //
 
-const FIRST_CHAPTER = 'ch1_baker';
+// The first arc chapter (`story.json`): cards and the menu name chapters, a chapter holds sections.
+const FIRST_CHAPTER = 'act1_line';
 
 for (const [name, width, height, query] of [
   ['390x844', 390, 844, '?touch=1'],
@@ -21,7 +22,7 @@ for (const [name, width, height, query] of [
     test('Story starts the first chapter: a title card from the sim, then the world', async ({ page }) => {
       await page.goto(`/Who-Did-It/${query}`);
       await page.getByTestId('menu-story').click();
-      await expect(page.getByTestId('story-chapter')).toHaveCount(4);
+      await expect(page.getByTestId('story-chapter')).toHaveCount(3);
       await page.getByLabel('Your name').fill('Hana');
       await page.getByTestId('story-begin').click();
 
