@@ -1,7 +1,7 @@
 import { storyArc } from '@wdi/content';
 import { describe, expect, it } from 'vitest';
 import { DeviceSaveStore, type StorySave, parseStorySave } from '../../src/accounts/saves';
-import { resumeIndex } from '../../src/sim/story/Story';
+import { replayFrom, resumeIndex } from '../../src/sim/story/Story';
 import { unitsOf } from '../../src/sim/story/units';
 import { chaptersStarted, humanRole, play, startStoryRoom } from './fixture';
 import { STORY_MAX_TICKS, describeChapters, storyServer } from './suite';
@@ -72,6 +72,24 @@ describe('resumeIndex', () => {
     expect(resumeIndex(units, good({ nextChapterId: 'nowhere' }))).toBe(-1);
     expect(resumeIndex(units, good({ nextChapterId: arc.chapters[0]!.id, finished: [] }))).toBe(-1); // start over
     expect(resumeIndex(units, good({ nextChapterId: null }))).toBe(-1); // finished story
+  });
+});
+
+describe('replayFrom', () => {
+  const two = good({
+    nextChapterId: arc.chapters[2]!.id,
+    finished: [arc.chapters[0]!.id, arc.chapters[1]!.id],
+    summaries: [{ chapterId: arc.chapters[0]!.id }, { chapterId: arc.chapters[1]!.id }],
+  });
+  it('narrows a save to the chapters before a finished chapter, which then resumes there', () => {
+    const back = replayFrom(two, arc.chapters[1]!.id);
+    expect(back.finished).toEqual([arc.chapters[0]!.id]);
+    expect(resumeIndex(units, back)).toBe(units.findIndex((u) => u.chapter === arc.chapters[1]));
+    expect(resumeIndex(units, replayFrom(two, arc.chapters[0]!.id))).toBe(-1); // chapter one: from the start
+  });
+  it('leaves a save alone for a chapter it has not finished', () => {
+    expect(replayFrom(two, arc.chapters[2]!.id)).toBe(two);
+    expect(replayFrom(two, 'nowhere')).toBe(two);
   });
 });
 

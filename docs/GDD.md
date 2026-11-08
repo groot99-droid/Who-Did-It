@@ -1613,7 +1613,7 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
   break with what the finished chapter hands on. A guest's save is kept on their own device: the server sends it to
   that client alone and, when the story is started again with a save, checks its shape, its sizes and that it fits the
-  story's chapters in order, and starts from the beginning when it does not. An account store replaces the device's
+  story's chapters in order, and starts from the beginning when it does not. A start that names a chapter the save has finished replays from that chapter on. An account store replaces the device's
   behind the same interface.
 - **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
   vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the

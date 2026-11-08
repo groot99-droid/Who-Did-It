@@ -224,7 +224,7 @@ export function queueStoryContinue(room: PartyRoom, seat: string): void {
 /**
  * `story.start { storyId, chapterId? }` (the title screen): the sender's room becomes the story room straight from the
  * lobby, with the sender as the one human, and the story starts. An unknown story, a room that is not a lone
- * human's lobby, or a second start is ignored; a chapter replay starts at chapter one for now (Q-S4).
+ * human's lobby, or a second start is ignored; `chapterId` replays a finished chapter of the save (`replayFrom`).
  */
 export function handleStoryStart(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const { storyId } = payload;
@@ -237,7 +237,9 @@ export function handleStoryStart(room: PartyRoom, seat: string, payload: Record<
       send: (t, p) => room.clients.getById(seat)?.send(t, p),
       resume: payload.resume,
     };
-    const save = saveStoreFor(ctx).get(ctx, storyId);
+    const kept = saveStoreFor(ctx).get(ctx, storyId);
+    const save =
+      kept !== null && typeof payload.chapterId === 'string' ? replayFrom(kept, payload.chapterId) : kept;
     enableStory(room, storyId, { humanId: seat, ...(save !== null && { resume: save }) });
   } catch {
     // an unknown story id, or a lobby with more than one human: nothing starts
@@ -426,6 +428,15 @@ function saveBreak(room: PartyRoom, state: StoryState, chapter: Unit): void {
   };
   const ctx: SaveCtx = { seat: state.humanId, send: (t, p) => send(room, state, t, p) };
   saveStoreFor(ctx).put(ctx, save);
+}
+
+/**
+ * `story.start { chapterId }` (Q-S4): the save narrowed to the chapters before a finished `chapterId`, so the story
+ * continues from that chapter. A chapter the save has not finished is not offered; the save comes back as it was.
+ */
+export function replayFrom(save: StorySave, chapterId: string): StorySave {
+  const at = save.finished.indexOf(chapterId);
+  return at < 0 ? save : { ...save, nextChapterId: chapterId, finished: save.finished.slice(0, at) };
 }
 
 /**
