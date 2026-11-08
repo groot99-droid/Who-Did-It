@@ -480,32 +480,27 @@ Recorded as DECISIONS A517.
 ### 8.1 W1 clarified (owner, 2026-11-08)
 
 Recorded as the DECISIONS A517 addendum. The Vicar dies a martyr (GDD 3.20, the martyr's due) and comes back the next
-day as the **10X Vicar**, who fights alongside the Zealot. The return is gated: **the Medium must resurrect the Vicar
+day as the **10X Vicar**, who fights **against** the Zealot. The return is gated: **the Medium must resurrect the Vicar
 first**. Without the Medium's rite there is no return and no 10X buff. The rule holds in every game, story and
-multiplayer alike. Nothing is built until the owner answers the open details below; any number they settle goes in
-`balance.json` and the GDD only.
+multiplayer alike.
+
+**The 10X buff** is a new power, not only the martyr's task weight of GDD 3.20 (`tasks.martyrWeight`): the Vicar's
+power of conversion goes from one seat at a time to an **area spread**, with other buffs besides (speed, health and
+the like). Nothing is built until the owner answers the open details below; every number goes in `balance.json` and
+the GDD only.
 
 Open details for the owner:
 
-1. **The 10X buff, concretely.** GDD 3.20 already has a 10X rule: the martyr's ghost's tasks count
-   `tasks.martyrWeight` times for `tasks.martyrS`, with no rite. Is the 10X buff that same rule, now gated behind the
-   rite (so with no rite the ghost gets only the plain ghost cap), or is it a new power for a living, returned Vicar
-   (and if so, which verbs or stats)? Does it still end with the match?
-2. **Alongside the Zealot.** The Zealot is a Killer's vendetta against the Vicar's flock (3.20), and the Vicar is
-   Village. Does the 10X Vicar change sides, fight the Zealot, or is "alongside" meant as "in the same holy war"?
-3. **Where the rite happens.** At the Vicar's body, at the grave, in the chapel, or at a place of the Medium's
-   (the seance of GDD 3.2 is held at a body)? Does the body have to be found and kept unburied first?
-4. **Its cost.** What the Medium spends (Seance Chalk, Candles, a cooldown, time held, the night), and whether the
+1. **Where the rite happens.** At the Vicar's body, at the grave, in the chapel, or at a place of the Medium's (the
+   seance of GDD 3.2 is held at a body)? Does the body have to be found first?
+2. **Its cost.** What the Medium spends (Seance Chalk, Candles, a cooldown, time held, the night), and whether the
    Medium gives up the seance's other uses that day.
-5. **Can it fail or be interrupted?** Is there a hold that a kill, a meeting or a move breaks, a chance, or a Cabal
-   counter (for example the Cabal ghosts' lie of 3.2)? Can it be tried again?
-6. **Once per what.** Once per match, per Vicar, or per Medium? Can a second martyr be raised?
-7. **No Medium.** The Medium is V2 and not in today's decks (GDD 3.1). If the Medium is undealt, dead, never found
-   (in the solo story: never reached), or is the Vicar's own seat, does the Vicar stay a plain ghost? Does a dead
-   Medium's ghost still count?
-8. **The next day.** Does the Vicar return at dawn after the rite, or on the day after the death even if the rite
-   came later? Where do they stand when they return, and with what (role card, inventory, cover)?
-9. **What the table sees.** Is the return public, like the martyr's reveal, or private to some seats? A return must
-   not reveal a cover or a Cabal seat beyond what the figure shows (CLAUDE.md, role secrecy).
-10. **The solo story.** Q-A10 says the player plays the Vicar's ghost and must find the Medium. Is the Medium then an
-    NPC who performs the rite once found, and does the story's section end on the return?
+3. **Can it fail or be interrupted?** A hold that a kill, a meeting or a move breaks, a chance, a Cabal counter? Can
+   it be tried again, and is it once per match?
+4. **No Medium.** The Medium is V2 and not in today's decks (GDD 3.1). If the Medium is undealt, dead or never found
+   (in the solo story: never reached), the Vicar stays a plain ghost; does the martyr's task weight of 3.20 still
+   apply then, or does the rite gate it too?
+5. **The buff's numbers and verbs.** Which power is the Vicar's "conversion": today the Vicar's own verb is Hear
+   Confession (one seat's faction per night, GDD 3.2), and conversion is the Zealot's vendetta against the Vicar
+   (3.20). What the area spread does to the seats it reaches, its radius and duration, and the speed and health
+   values (`balance.json` and the GDD only).
