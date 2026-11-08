@@ -2205,3 +2205,34 @@ marks as clues:
 
 A refusal reads its 14.43 line: a taken spot is `BUSY`, a spot out of reach `TOO_FAR {of: 'door'}`, an adult at a
 crawlspace `NOTHING_THERE`, a cooling Chalk or Act Shifty `COOLDOWN`, a second Fake Blood `SPENT {what: 'match'}`.
+#### V2, the cover-up verbs
+
+The copy proposed for Drag body, Clean, Wash and the two door verbs (GDD 3.4). The server sends only the refusal reasons of
+14.43 and the noise kinds `rag`, `skeletonKey` and `crowbar`. 10Y adds the keys and writes these lines into a table here as
+it places them:
+
+- `verb.drag`: "Drag body"; `verb.drag.drop`: "Let go"; `verb.drag.hide`: "Hide the body here".
+- `verb.clean`: "Clean"; `verb.clean.prompt`: "Wipe this clue away ({n} left)".
+- `verb.wash`: "Wash"; `verb.wash.prompt`: "Wash the Blood off".
+- `verb.unlock`: "Skeleton Key"; `verb.unlock.prompt`: "Unlock this door"; `verb.crowbar`: "Crowbar"; `verb.crowbar.prompt`: "Break this door".
+
+A refusal reads its 14.43 line: no Rag or Bucket is `NEED_ITEM {need: 'bloodyRag' | 'bucket'}`, no Skeleton Key
+`NEED_KEY {need: 'skeletonKey'}`, no Crowbar `NEED_TOOL {need: 'crowbar'}`, a card without Drag `NOT_YOUR_POWER`, a door already
+opened `ALREADY_DONE`, a body, clue or door out of reach `TOO_FAR {of: 'body' | 'clue' | 'door'}`.
+
+### 14.55 Dust, Compare and Autopsy (10V, round 10, V1b)
+
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows each
+reading by its `note` (`lift`, `comparison`, `autopsy`) and never offers it for a petition. 10Y adds the keys and writes
+the table as it places them (A414's deck test):
+
+- `verb.dust`: "Dust for prints"; `verb.dust.prompt`: "Dust ({n} left)".
+- `note.lift`: "A print lifted from {where}"; `note.lift.body`: "from the body of {name}"; `note.lift.door`: "from a door".
+- `verb.compare`: "Compare prints"; `verb.compare.pick`: "Compare which two?"
+- `note.comparison.match`: "The prints match."; `note.comparison.nomatch`: "The prints do not match." (no name, ever).
+- `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
+  "poison", "a shot", "something else", and the time shown as an estimate.
+
+Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
+`TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
+read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.

@@ -15,6 +15,7 @@ import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
 import { handlePlantClue } from './verbs/evidence';
 import { handleKitAbility } from './verbs/hiding';
+import { handleCompare } from './verbs/dust';
 import { isVerbPhase, reject, sceneKey, tileCentre } from './World';
 
 /** Dispatches the `act.*` verbs of the Round 3 brief; every payload is untrusted. */
@@ -93,6 +94,8 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
         payload,
         livingActor,
       ); // round 10, V3 (GDD 3.2)
+    case 'dustCompare':
+      return handleCompare(room, sessionId, payload, livingActor); // round 10, V1b (GDD 3.2)
     default:
       reject(room, sessionId, 'NFY', { feature: 'this action' });
   }
