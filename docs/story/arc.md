@@ -489,18 +489,35 @@ power of conversion goes from one seat at a time to an **area spread**, with oth
 the like). Nothing is built until the owner answers the open details below; every number goes in `balance.json` and
 the GDD only.
 
-Open details for the owner:
+**The rite.** When the Vicar dies he meets the Medium in the **Zealot's hideout**, the anti-theme of the Vicar's
+chapel. The rite costs nothing and cannot be interrupted. The Medium has no cause to die: read as the Medium cannot
+die or be stopped before the rite (wording to confirm with the owner).
 
-1. **Where the rite happens.** At the Vicar's body, at the grave, in the chapel, or at a place of the Medium's (the
-   seance of GDD 3.2 is held at a body)? Does the body have to be found first?
-2. **Its cost.** What the Medium spends (Seance Chalk, Candles, a cooldown, time held, the night), and whether the
-   Medium gives up the seance's other uses that day.
-3. **Can it fail or be interrupted?** A hold that a kill, a meeting or a move breaks, a chance, a Cabal counter? Can
-   it be tried again, and is it once per match?
-4. **No Medium.** The Medium is V2 and not in today's decks (GDD 3.1). If the Medium is undealt, dead or never found
-   (in the solo story: never reached), the Vicar stays a plain ghost; does the martyr's task weight of 3.20 still
-   apply then, or does the rite gate it too?
-5. **The buff's numbers and verbs.** Which power is the Vicar's "conversion": today the Vicar's own verb is Hear
-   Confession (one seat's faction per night, GDD 3.2), and conversion is the Zealot's vendetta against the Vicar
-   (3.20). What the area spread does to the seats it reaches, its radius and duration, and the speed and health
-   values (`balance.json` and the GDD only).
+**The buff's length and strength.** It lasts the whole next day and is tuned so that the Vicar could plausibly win
+that day alone: its purpose is to even the match. The numbers go in `balance.json` and the GDD only.
+
+Still open for the owner:
+
+1. **Which power spreads.** Today the Vicar's own verb is Hear Confession (one seat's faction per night, GDD 3.2) and
+   conversion is the Zealot's vendetta against the Vicar (3.20). Is the area spread Hear Confession reaching everyone
+   nearby, or a new conversion power, and what does it do to the seats it reaches?
+2. **The martyr's task weight.** Does the rite also gate GDD 3.20's `tasks.martyrWeight`, or does a martyr's ghost
+   keep it with no rite?
+3. **The Medium's safety.** Confirm the wording: the Medium cannot die or be prevented before the rite. What happens
+   when the Medium is undealt (the Medium is V2 and not in today's decks, GDD 3.1), or is the Vicar's own seat?
+4. **Getting there.** How the dead Vicar reaches the Zealot's hideout, and whether the Medium is drawn there or is
+   always there.
+
+### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
+
+A requirement for the map revamp (A515 Q-A11): every role gets its own unique building, and each building has an
+**anti-theme** building. Known pairs so far:
+
+| Role | Building | Anti-theme |
+| ---- | -------- | ---------- |
+| Vicar | the chapel | the Zealot's hideout |
+| Bandit | (to name) | the detective's police station |
+| Activist | (to name) | the post office |
+
+Read as given; the owner to confirm which side of each pair is the role's own building. Scene, portal and spawn ids
+stay frozen: every new building adds new ids with new prefixes, append-only (GDD 3.13, WORLD 4.3).
