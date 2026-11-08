@@ -1613,6 +1613,10 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   (dead seats first, then in seat order), as a newcomer off the morning train: the seat's kit and view are the card's
   own, its routine starts over, and a dead seat is made whole. A Knife holder never gives up its seat. A cover card
   walks as another card of the cast. A replay of a section changes no card.
+- **No early win.** A match win before the story's last section (the task bar full, parity, a Thief's escape, a Hitman
+  boarding the Dusk Train, the Final Night's verdict) does not end the room. It ends the running section as done, with
+  the section's own break, and the story moves on; the sim emits `story.win` once for it. Only a win in the last section
+  ends the match. A win that is still true (parity) is held again at the next check, so it can end the next section too.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
