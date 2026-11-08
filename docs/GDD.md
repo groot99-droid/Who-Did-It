@@ -1625,6 +1625,10 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
   sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
   section lets the seat go, its contract and its flag with it.
+- **Night-power events.** A night power that lands (Hear Confession, Keep Watch, Remedy, Nightshade), by a human or
+  an NPC, emits the sim event `nightPower` with the user's `seat` and `data: { ability, target }`, so a section or a
+  goal can end on it (`{ event: 'nightPower', seat: 'player', data: { ability: 'confession' } }`). It is server-side only:
+  no client message and no admin feed carries it.
 - **The heir section.** A section may name `startWhen`. When the section before it ends, the story does not start it at
   once: it waits, the player keeping the card they hold and the town running, until the trigger holds. The Knife's
   inheritance (3.2) emits the sim event `inherit` (the seat is its `seat`) for it; a story gives the trigger a tick

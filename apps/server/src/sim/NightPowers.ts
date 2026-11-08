@@ -16,6 +16,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { spawnBody } from './Bodies';
 import { knockedOut } from './body/effects';
 import { markDead } from './Death';
+import { emitSim } from './events/bus';
 import { finishFinalNight } from './FinalNight';
 import { factionOf, flowOf } from './Flow';
 import { closeAims, handleLastShot, runNpcShots, startAim } from './LastShot';
@@ -142,6 +143,8 @@ function applyPower(room: PartyRoom, seat: string, ability: string, target: stri
   used.add(ability);
   mem.used.set(seat, used);
   player.priv.cooldownEndTick.set(ability, SPENT_TONIGHT);
+  // Story mode (arc E8): a section may end on a night power. Server-internal: the admin feed lists its own kinds.
+  emitSim(room, { tick: room.state.tick, kind: 'nightPower', seat, data: { ability, target } });
 }
 
 /**
