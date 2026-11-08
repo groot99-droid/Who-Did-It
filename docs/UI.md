@@ -2164,7 +2164,7 @@ wide, ticks a goal off (struck through, a "done" label for a screen reader) and 
 chapter has no goals; an end card clears it.
 
 The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
-opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+opens the chapter list of the story (the arc's chapters, since P2's #479; a chapter holds several sections): each chapter with its set-up line, finished chapters marked and replayable (kept in
 `localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
 (Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
 server deals the first card and scene.
