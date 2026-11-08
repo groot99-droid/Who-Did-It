@@ -484,9 +484,13 @@ day as the **10X Vicar**, who fights **against** the Zealot. The return is gated
 first**. Without the Medium's rite there is no return and no 10X buff. The rule holds in every game, story and
 multiplayer alike.
 
-**The 10X buff** is a new power, not only the martyr's task weight of GDD 3.20 (`tasks.martyrWeight`): the Vicar's
-power of conversion goes from one seat at a time to an **area spread**, with other buffs besides (speed, health and
-the like). Nothing is built until the owner answers the open details below; every number goes in `balance.json` and
+**The 10X buff** is the Vicar's conversion power, upgraded from one seat at a time to an **area spread**, with other
+buffs besides (speed, health and the like). Conversion has always been in the design, though only Hear Confession is
+built: the prayer channel fills a seat's faith meter and converts it to the Religious, and converting everyone is the
+Vicar's win (`docs/round6/owner-brief.md`, the Vicar's catalyst; `docs/round9/world-mode.md`, the role goals and the
+sermon; `docs/round10/scope.md` I9, marked not built). The owner brief's "10x Ascended Return" already names the
+upgraded powers: a 10x conversion aura, Righteous Stride (faster, breaks locked doors) and Divine Judgement (once a
+match, drops disguises and stuns). Nothing is built until the owner answers the open details below; every number goes in `balance.json` and
 the GDD only.
 
 **The rite.** When the Vicar dies he meets the Medium in the **Zealot's hideout**, the anti-theme of the Vicar's
@@ -498,9 +502,9 @@ that day alone: its purpose is to even the match. The numbers go in `balance.jso
 
 Still open for the owner:
 
-1. **Which power spreads.** Today the Vicar's own verb is Hear Confession (one seat's faction per night, GDD 3.2) and
-   conversion is the Zealot's vendetta against the Vicar (3.20). Is the area spread Hear Confession reaching everyone
-   nearby, or a new conversion power, and what does it do to the seats it reaches?
+1. **This match or the next.** The owner brief returns the Ascended Vicar in the room's **next match**
+   (`flow.ascendedVicarCandidate`, stepping off the morning train), while this rule returns him the **next day of the
+   same match**. Which holds, and does the brief's list (aura, Righteous Stride, Divine Judgement) stand as the buff?
 2. **The martyr's task weight.** Does the rite also gate GDD 3.20's `tasks.martyrWeight`, or does a martyr's ghost
    keep it with no rite?
 3. **The Medium's safety.** Confirm the wording: the Medium cannot die or be prevented before the rite. What happens
