@@ -1,6 +1,6 @@
 import { generateId } from '@colyseus/core';
 import { type ArcStory as Story, balance, storyArc } from '@wdi/content';
-import { ItemStack, Phase } from '@wdi/shared';
+import { ItemStack, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { newSeat } from '../../rooms/handlers/lobby';
 import { applyClock, autoOf, enableAuto, queueAutoStart } from '../auto/Auto';
@@ -11,7 +11,7 @@ import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
-import { SCENE_KEYS } from '../World';
+import { SCENE_KEYS, isWorldPhase } from '../World';
 import { endMatch } from '../Win';
 import type { FixedSeeds } from '../seeds';
 import { runAction } from './actions';
@@ -96,6 +96,8 @@ export interface StoryState {
   queue: StoryCommand[];
   /** The human's scene and item counts last tick, to emit `story.enter` and `story.pickup` on a change. */
   seen: { scene: string; items: Map<string, number> | null };
+  /** Ticks the player has shared a scene with each seat this section, and the cards already heard (arc E10). */
+  company: { ticks: Map<string, number>; heard: Set<string> };
   /** Bus events heard since the last `runStory`, in emission order. */
   inbox: SimEvent[];
 }
@@ -214,16 +216,18 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     counters: {},
     queue: [],
     seen: { scene: '', items: null },
+    company: { ticks: new Map(), heard: new Set() },
     inbox: [],
   };
   states.set(room, state);
-  // The runner's own outputs stay out of its inbox; `story.enter`, `story.pickup` and `story.picked` are the triggers' to hear.
+  // The runner's own outputs stay out of its inbox; `story.enter`, `story.pickup`, `story.picked` and `story.company` are the triggers' to hear.
   onSim(room, ANY_SIM, (ev) => {
     if (
       !ev.kind.startsWith('story.') ||
       ev.kind === 'story.enter' ||
       ev.kind === 'story.pickup' ||
-      ev.kind === 'story.picked'
+      ev.kind === 'story.picked' ||
+      ev.kind === 'story.company'
     )
       state.inbox.push(ev);
   });
@@ -382,6 +386,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
     const mark = holderOf(room, state.humanId, chapter.hitman.mark);
     if (mark !== null) turnForStory(room, state.humanId, mark);
   }
+  state.company = { ticks: new Map(), heard: new Set() };
   state.seen.items = null; // a new card's kit is not a pickup
   if (chapter.first && !replay) {
     state.totals = {};
@@ -573,6 +578,32 @@ function watchPlayer(room: PartyRoom, state: StoryState): void {
     if (state.seen.items !== null && qty > (state.seen.items.get(item) ?? 0))
       emitSim(room, { tick: room.state.tick, kind: 'story.pickup', seat: state.humanId, data: { item } });
   state.seen.items = now;
+  watchCompany(room, state, p);
+}
+
+/**
+ * `story.company` { with: roleId } once the player has shared a scene, in a world phase, with the seat holding that card
+ * for `balance.story.companyS` seconds this section (arc E10: "keep the Vicar company"). Heard once per card per section.
+ */
+function watchCompany(room: PartyRoom, state: StoryState, me: { sceneIdx: number }): void {
+  if (!isWorldPhase(room.state.phase) || simOf(room).players.get(state.humanId)?.dead === true) return;
+  const need = balance.story.companyS * TICK_RATE;
+  for (const [id, player] of room.state.players) {
+    const them = simOf(room).players.get(id);
+    const card = player.priv?.role.roleId;
+    if (id === state.humanId || card === undefined || state.company.heard.has(card)) continue;
+    if (!them || them.dead || !them.placed || them.sceneIdx !== me.sceneIdx) continue;
+    const ticks = (state.company.ticks.get(id) ?? 0) + 1;
+    state.company.ticks.set(id, ticks);
+    if (ticks < need) continue;
+    state.company.heard.add(card);
+    emitSim(room, {
+      tick: room.state.tick,
+      kind: 'story.company',
+      seat: state.humanId,
+      data: { with: card },
+    });
+  }
 }
 
 // --- the stage -----------------------------------------------------------------------------------------------------

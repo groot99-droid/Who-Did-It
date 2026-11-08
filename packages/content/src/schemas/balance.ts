@@ -500,6 +500,11 @@ export const BalanceFile = z.strictObject({
    */
   paintTown: Section({ winUnique: Frac }),
   /**
+   * Story mode (GDD 3.34): the seconds the player must share a scene with the seat holding a card, in a world phase,
+   * for `story.company` to be heard (arc E10; the shape of the conversion's shared time, 3.20).
+   */
+  story: Section({ companyS: z.number().positive() }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the

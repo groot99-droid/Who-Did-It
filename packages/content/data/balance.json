@@ -431,6 +431,7 @@
     "gddRef": "3.22"
   },
   "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
+  "story": { "companyS": 20, "gddRef": "3.34" },
   "hitman": {
     "byHumans": {
       "3": { "comes": 0.5, "human": 0 },
