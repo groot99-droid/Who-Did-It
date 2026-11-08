@@ -1613,7 +1613,11 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
   on the card the player already holds changes no card; it starts the view over and sets its vendetta. The vendetta
   then runs as in 3.20 (the Bandit's heist, the Activist's sabotage).
-- **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
+- **A dead player.** The section ends as failed and its end card says so. A failed section replays once (the owner's
+  A515): the player's seat is made whole where it stands, the section's goals, beats and counters start over, and the
+  card, its view and its hand-over items are dealt again; the world is not rewound. A second failure of the same
+  section ends it for good and the next section starts, so a story is always finishable. A match that has ended
+  allows no replay.
 - **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
   seat, and it is the story's own.
 

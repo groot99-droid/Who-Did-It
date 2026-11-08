@@ -64,6 +64,8 @@ Each session appends to its own section only. Newest line last.
 
 - 2026-11-07 P2 started (owner answers A515/A517: a failure replays the section once; the Vicar's ghost may be played briefly; no Medium resurrection; the save is a device save behind an interface an account can replace). PR 1 `claude/story-p2-sections` (E1 sections, E7 `say`): `sim/story/units.ts`, `Story.ts` reads the arc, `actions.ts` speaks lines, GDD 3.34, A555, `test/story/sections.test.ts`. Next: replay-once of a section, the save interface, the cast (E2), the NPC Killer's vendetta (E4), then E3, E5, E6, E8 to E10.
 
+- 2026-11-08 P2: #479 (sections, `say`) MERGED. PR 2 `claude/story-p2-replay`: a failed section replays once in place (A576, GDD 3.34), `replayUsed` and the `replay` flag on the chapter events, death tests for the replay and the second failure. Next: the save port (accounts plan 5), then E2 the cast.
+
 ## P3. Story client (part 2)
 
 - 2026-11-07 P3 started (branch claude/story-p3-cards off claude/story-part2). Read the brief, part2.md, arc.md 5, the client story UI, A515-A517 (in open #470). No P2 PR or branch exists yet, so the new wire is proposed here. Plan, three PRs: (1) section and NPC-line cards (`story.card` kinds `section` and `line`, fields `sectionId`, `speaker`); (2) save and resume behind a `StorySaveStore` interface with a device implementation, the menu Continue; (3) the end screen with the five chapter summaries and the achievements earned. Map-bound content and the Medium rule: nothing built.
