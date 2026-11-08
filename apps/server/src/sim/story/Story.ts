@@ -76,6 +76,8 @@ export interface StoryState {
   now: () => number;
   /** The match ended mid-chapter: this chapter is the last one. */
   final: boolean;
+  /** A match win was held (E3) and ends the running section as done at the next story step. */
+  heldWin: boolean;
   /** The story is over (its last end card was dismissed, or the match ended). */
   over: boolean;
   /** A card is up and the clock waits for `story.continue`. */
@@ -125,6 +127,26 @@ export interface StoryOptions {
 }
 
 /** The ids of the story's NPC seats, stable across runs. */
+/**
+ * E3, no early win: a match win (task bar, parity, Thief escape, Hitman boarding, the Final Night verdict) before the
+ * story's last section does not end the room. It is held: the running section ends as done at the next story step and
+ * the story moves on. Only the last section's win ends the match. True when the win was held.
+ */
+export function holdMatch(room: PartyRoom, outcome: string): boolean {
+  const state = storyOf(room);
+  if (state === null || state.over || state.final || state.chapterIdx < 0) return false;
+  if (state.chapterIdx >= state.units.length - 1) return false;
+  if (!state.ended && !state.heldWin) {
+    state.heldWin = true;
+    emitSim(room, {
+      tick: room.state.tick,
+      kind: 'story.win',
+      data: { chapterId: state.units[state.chapterIdx]?.id, outcome },
+    });
+  }
+  return true;
+}
+
 export const storyNpcIds = (story: Story): string[] =>
   Array.from({ length: story.roster.npcCount }, (_, i) => `${story.id}:npc${i}`);
 
@@ -176,6 +198,7 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     chapterFailed: false,
     now: opts.now ?? Date.now,
     final: false,
+    heldWin: false,
     over: false,
     cardUp: false,
     cards: [],
@@ -557,6 +580,10 @@ export function runStory(room: PartyRoom): void {
   }
   const chapter = chapterOf(state);
   if (chapter === undefined || state.ended) return;
+  if (state.heldWin) {
+    state.heldWin = false;
+    return endChapter(room, state, false);
+  }
 
   for (const ev of events) {
     count(state, ev, seatOf);
