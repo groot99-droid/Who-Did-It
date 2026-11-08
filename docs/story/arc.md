@@ -494,11 +494,14 @@ match, drops disguises and stuns). Nothing is built until the owner answers the 
 the GDD only.
 
 **The rite.** When the Vicar dies he meets the Medium in the **Zealot's hideout**, the anti-theme of the Vicar's
-chapel. The rite costs nothing and cannot be interrupted. The Medium has no cause to die: read as the Medium cannot
-die or be stopped before the rite (wording to confirm with the owner).
+chapel. The rite costs nothing and cannot be interrupted. The Medium has no cause to die: it is an unkillable NPC (below).
 
 **The buff's length and strength.** It lasts the whole next day and is tuned so that the Vicar could plausibly win
 that day alone: its purpose is to even the match. The numbers go in `balance.json` and the GDD only.
+
+**The Medium is an NPC gate** (owner: "the Medium is just an NPC gate"). The Medium of the rite is an
+always-present, unkillable NPC at the Zealot's hideout, not a dealt card or a seat. It needs no card, so nothing is
+dealt for it and it draws on no secret random stream (`sim/seeds.ts`).
 
 **Same match, next day.** The return is the next day of the same match. This supersedes the owner brief's next-match
 return (`flow.ascendedVicarCandidate`, stepping off the morning train), kept here only as the old path. The brief's
@@ -511,10 +514,11 @@ now.
 
 Still open for the owner:
 
-1. **The Medium's safety.** Confirm the wording: the Medium cannot die or be prevented before the rite. What happens
-   when the Medium is undealt (the Medium is V2 and not in today's decks, GDD 3.1), or is the Vicar's own seat?
-2. **Getting there.** How the dead Vicar reaches the Zealot's hideout, and whether the Medium is drawn there or is
-   always there.
+1. **Getting there.** How the dead Vicar reaches the Zealot's hideout.
+2. **The buff list.** Confirm the candidate list above (aura, Righteous Stride, Divine Judgement) against "area
+   spread, speed, health".
+3. **The Medium card.** `roles.json` keeps a Medium card (GDD 3.2, V2: the seance at a body). Does that dealt card
+   stay as it is beside the hideout's NPC, or does the NPC replace it?
 
 ### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
 
