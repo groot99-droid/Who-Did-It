@@ -1613,6 +1613,9 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   (dead seats first, then in seat order), as a newcomer off the morning train: the seat's kit and view are the card's
   own, its routine starts over, and a dead seat is made whole. A Knife holder never gives up its seat. A cover card
   walks as another card of the cast. A replay of a section changes no card.
+- **The NPC Killer's vendetta.** A section may name `npcVendetta`: while it runs, the NPC seat that holds the Killer card
+  holds that vendetta, with its progress started over (not on a replay). A section whose player holds the Killer card
+  sets nothing. When the player takes the card at the next break the vendetta travels with it, progress started over.
 - **No early win.** A match win before the story's last section (the task bar full, parity, a Thief's escape, a Hitman
   boarding the Dusk Train, the Final Night's verdict) does not end the room. It ends the running section as done, with
   the section's own break, and the story moves on; the sim emits `story.win` once for it. Only a win in the last section
