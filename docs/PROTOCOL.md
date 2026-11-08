@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string }` | 5/s | `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. |
+| `act.ability` | `{ abilityId: string; targetId?: string; kind?: string; value?: number; with?: string }` | 5/s | `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. `with` is Compare's second lift (V1b); `targetId` the first, both of the seat's own Notebook entries. |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean; via?: string }` | 5/s | Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |
@@ -53,6 +53,7 @@
 | `pair.answer` | `{ yes: boolean }` | 2/s | - |
 | `petition.open` | `{ accused: string; charge: string; entries: string[] }` | 2/s | `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. |
 | `petition.sign` | `{ id: string }` | 2/s | - |
+| `trial.file` | `{ accused: string; charge: string; entries: string[] }` | 2/s | - |
 | `craft.grid` | `{ size: 2 \| 3; cells: Array<string \| null> }` | 5/s | Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches, `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
@@ -69,7 +70,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; hitman?: { seatId: string; day: number; stage: 'arrived' \| 'killed' \| 'boarded' \| 'stopped' }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21): `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in `alsoWon`; `stopped` died before boarding). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; hitman?: { seatId: string; day: number; stage: 'arrived' \| 'killed' \| 'boarded' \| 'stopped' }; /** Round 10, B6d (row 35): the Killer reached the end trial's close unconvicted (the Unseen victory). */ unseen?: boolean; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21): `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in `alsoWon`; `stopped` died before boarding). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
@@ -221,7 +222,14 @@ export type HoldAction =
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
   | 'sleep'
   // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
-  | 'cuff';
+  | 'cuff'
+  // Round 10 (V2, GDD 3.4; seams.md 3 row 38): the cover-up verbs. `drag` is above.
+  | 'clean'
+  | 'wash'
+  | 'unlock'
+  | 'crowbar'
+  // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
+  | 'dust';
 ```
 
 ```ts

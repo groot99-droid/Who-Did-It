@@ -62,7 +62,7 @@ Each session appends to its own section only. Newest line last.
 
 ## P2. Engine (part 2)
 
-- 2026-11-07 P2 started (owner answers A515/A517: a failure replays the section once; the Vicar's ghost may be played briefly; no Medium resurrection; the save is a device save behind an interface an account can replace). PR 1 `claude/story-p2-sections` (E1 sections, E7 `say`): `sim/story/units.ts`, `Story.ts` reads the arc, `actions.ts` speaks lines, GDD 3.34, A555, `test/story/sections.test.ts`. Next: replay-once of a section, the save interface, the cast (E2), the NPC Killer's vendetta (E4), then E3, E5, E6, E8 to E10.
+- 2026-11-07 P2 started (owner answers A515/A517: a failure replays the section once; the Vicar's ghost may be played briefly; no Medium resurrection; the save is a device save behind an interface an account can replace). PR 1 `claude/story-p2-sections` (E1 sections, E7 `say`): `sim/story/units.ts`, `Story.ts` reads the arc, `actions.ts` speaks lines, GDD 3.34, A589 (renumbered from A555 at the base merge), `test/story/sections.test.ts`. Next: replay-once of a section, the save interface, the cast (E2), the NPC Killer's vendetta (E4), then E3, E5, E6, E8 to E10.
 
 - 2026-11-08 P2: #479 (sections, `say`) MERGED. PR 2 `claude/story-p2-replay`: a failed section replays once in place (A579, GDD 3.34), `replayUsed` and the `replay` flag on the chapter events, death tests for the replay and the second failure. Next: the save port (accounts plan 5), then E2 the cast.
 
