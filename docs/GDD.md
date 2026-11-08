@@ -1637,6 +1637,11 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   picker's `seat` and `data: { lock }` (the prop id), so a goal or a section end can be "open the hall door". The
   story runner hears it like `story.enter` and `story.pickup`. The reader (3.26) has no server path (the server keeps
   nothing of what a seat read), so there is no `story.read` yet.
+- **Company.** The sim event `story.company` with `data: { with: <role id> }` and the player's `seat` is heard once
+  the player has shared a scene, in a world phase and with both seats alive and placed, with the seat holding that card
+  for `story.companyS` seconds (`balance.json`) of that section; once per card per section, and the count starts over at
+  every section. A trigger writes it as `{ event: 'story.company', seat: 'player', data: { with: 'vicar' } }`. It is the
+  shape of the conversion's shared time (3.20) without its vendetta.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
