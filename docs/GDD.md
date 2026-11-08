@@ -1608,6 +1608,13 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
   player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
   except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
+  counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
+  holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
+  break with what the finished chapter hands on. A guest's save is kept on their own device: the server sends it to
+  that client alone and, when the story is started again with a save, checks its shape, its sizes and that it fits the
+  story's chapters in order, and starts from the beginning when it does not. A start that names a chapter the save has finished replays from that chapter on. An account store replaces the device's
+  behind the same interface.
 - **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
   vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the
   chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
