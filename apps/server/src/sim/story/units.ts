@@ -28,6 +28,8 @@ export interface Unit {
   npcVendetta?: string | undefined;
   /** The mail turns the player in this section; the contract's mark is the seat holding this role (arc E5). */
   hitman?: { mark: string } | undefined;
+  /** The section waits for this after the previous one ends (arc E6, the heir). */
+  startWhen?: Trigger | undefined;
   startPhase?: { cycle: number; part: 'day' | 'night' } | undefined;
   goals: ChapterGoal[];
   beats: ArcBeat[];
@@ -54,6 +56,7 @@ const unitOf = (chapter: ArcChapter, s: Section, i: number): Unit => {
     vendetta: s.vendetta,
     npcVendetta: s.npcVendetta,
     hitman: s.hitman,
+    startWhen: s.startWhen,
     startPhase: s.startPhase ?? (first ? chapter.startPhase : undefined),
     goals: s.goals,
     beats: s.beats,

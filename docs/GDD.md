@@ -1625,6 +1625,10 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
   sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
   section lets the seat go, its contract and its flag with it.
+- **The heir section.** A section may name `startWhen`. When the section before it ends, the story does not start it at
+  once: it waits, the player keeping the card they hold and the town running, until the trigger holds. The Knife's
+  inheritance (3.2) emits the sim event `inherit` (the seat is its `seat`) for it; a story gives the trigger a tick
+  fallback so it always moves on. When it holds, the section starts as any other, the player taking the card.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
