@@ -24,6 +24,8 @@ export interface Unit {
   roleId: string;
   look?: string | undefined;
   vendetta?: string | undefined;
+  /** The vendetta the NPC Killer holds while this section runs (arc E4). */
+  npcVendetta?: string | undefined;
   startPhase?: { cycle: number; part: 'day' | 'night' } | undefined;
   goals: ChapterGoal[];
   beats: ArcBeat[];
@@ -48,6 +50,7 @@ const unitOf = (chapter: ArcChapter, s: Section, i: number): Unit => {
     roleId: s.roleId,
     look: s.look,
     vendetta: s.vendetta,
+    npcVendetta: s.npcVendetta,
     startPhase: s.startPhase ?? (first ? chapter.startPhase : undefined),
     goals: s.goals,
     beats: s.beats,

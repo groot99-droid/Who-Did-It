@@ -19,6 +19,8 @@ import { type Unit, unitsOf } from './units';
 import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
 import { castTable, holderOf, switchRole } from './handover';
 import { type Latches, hear, holds } from './triggers';
+import { resetProgress } from '../vendettas/progress';
+import { setVendetta } from '../vendettas/state';
 
 /**
  * Story mode's engine (docs/story/README.md 2, GDD 3.34): one human seat among NPC seats on the auto harness, seeds
@@ -333,6 +335,15 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
   // The chapter's cast (arc E2): after the seat's own card has moved, every card the cast names has a seat.
   if (chapter.first && !replay && chapter.chapter.cast !== undefined)
     castTable(room, state.humanId, chapter.chapter.cast);
+  // E4: the Killer the player meets already holds the section's vendetta, its progress started over. When the player
+  // takes the card at the next break the vendetta travels with it (`switchRole`).
+  if (chapter.npcVendetta !== undefined && !replay) {
+    const killer = holderOf(room, state.humanId, 'killer');
+    if (killer !== null) {
+      setVendetta(room, killer, chapter.npcVendetta);
+      resetProgress(room, killer);
+    }
+  }
   state.seen.items = null; // a new card's kit is not a pickup
   if (chapter.first && !replay) {
     state.totals = {};
