@@ -148,6 +148,11 @@ export type HoldAction =
   | 'sleep'
   // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
   | 'cuff'
+  // Round 10 (V2, GDD 3.4; seams.md 3 row 38): the cover-up verbs. `drag` is above.
+  | 'clean'
+  | 'wash'
+  | 'unlock'
+  | 'crowbar'
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
   | 'dust';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */

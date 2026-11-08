@@ -18,6 +18,7 @@ import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
 import { PLANT_HOLD, handleInspectHold, runEvidence, tickInspect, tickPlant } from './verbs/evidence';
 import { writeClueEntry } from './verbs/notebook';
+import { dropDrag, handleCoverupHold, isCoverupHold, tickCoverup } from './verbs/coverup';
 import { handleDustHold, tickDust } from './verbs/dust';
 import { handleAutopsyHold, tickAutopsy } from './verbs/autopsy';
 
@@ -54,7 +55,9 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   const { action, targetId, on } = payload;
   if (typeof on !== 'boolean') return;
   if (!on) {
-    p.hold = null;
+    if (p.hold?.action === 'drag')
+      dropDrag(room, p, true); // round 10, V2: a release beside a body spot hides the body
+    else p.hold = null;
     return;
   }
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
@@ -82,6 +85,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if (action === 'sleep') return handleSleepHold(room, sessionId, targetId); // round 10, A7 (GDD 3.32)
   if (action === 'errand') return handleErrandHold(room, sessionId, targetId); // round 10, C2b (GDD 3.23)
   if (action === 'cuff') return handleCuffHold(room, sessionId, targetId); // round 10, B4 (GDD 3.31)
+  if (isCoverupHold(action)) return handleCoverupHold(room, sessionId, action, targetId); // round 10, V2 (GDD 3.4)
   if (action === 'inspect') return handleInspectHold(room, sessionId, targetId); // round 10, V1a (GDD 3.2)
   if (action === 'dust') return handleDustHold(room, sessionId, targetId); // round 10, V1b (GDD 3.2)
   if (action === 'autopsy') return handleAutopsyHold(room, sessionId, targetId); // round 10, V1b (GDD 3.2)
@@ -127,6 +131,10 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'cuff') {
       tickCuff(room, sessionId, p); // round 10, B4
+      continue;
+    }
+    if (isCoverupHold(hold.action)) {
+      tickCoverup(room, sessionId, p); // round 10, V2: drag, clean, wash, unlock, crowbar
       continue;
     }
     if (hold.action === 'inspect') {
