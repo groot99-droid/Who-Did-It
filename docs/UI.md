@@ -2189,3 +2189,15 @@ key the client holds (A414's deck test):
 A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
 a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
 away from a door `TOO_FAR {of: 'door'}`.
+
+### 14.55 Autopsy (10V, round 10, V1b)
+
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows the
+reading by its `note` (`autopsy`) and never offers it for a petition. 10Y adds the keys and writes the table as it places
+them (A414's deck test):
+
+- `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
+  "poison", "a shot", "something else", and the time shown as an estimate.
+
+Refusals read their 14.43 lines: a body out of reach is `TOO_FAR {of: 'body'}`, a body read twice
+`ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.

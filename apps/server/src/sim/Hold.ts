@@ -18,6 +18,7 @@ import { handleErrandHold, tickErrandHold } from './economy/fare';
 import { handleCuffHold, tickCuff } from './law/Manhunt';
 import { PLANT_HOLD, handleInspectHold, runEvidence, tickInspect, tickPlant } from './verbs/evidence';
 import { writeClueEntry } from './verbs/notebook';
+import { handleAutopsyHold, tickAutopsy } from './verbs/autopsy';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -81,6 +82,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if (action === 'errand') return handleErrandHold(room, sessionId, targetId); // round 10, C2b (GDD 3.23)
   if (action === 'cuff') return handleCuffHold(room, sessionId, targetId); // round 10, B4 (GDD 3.31)
   if (action === 'inspect') return handleInspectHold(room, sessionId, targetId); // round 10, V1a (GDD 3.2)
+  if (action === 'autopsy') return handleAutopsyHold(room, sessionId, targetId); // round 10, V1b (GDD 3.2)
   // Round 10, A10: the logic table's resolver (sim/interact/resolve.ts), beside the legacy actions above.
   if (action === 'interact' && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64) {
     const via = typeof payload.via === 'string' && payload.via.length <= 64 ? payload.via : undefined;
@@ -127,6 +129,10 @@ export function runHolds(room: PartyRoom): void {
     }
     if (hold.action === 'inspect') {
       tickInspect(room, sessionId, p); // round 10, V1a: the Lens Inspect
+      continue;
+    }
+    if (hold.action === 'autopsy') {
+      tickAutopsy(room, sessionId, p); // round 10, V1b: a reading of a body
       continue;
     }
     if (hold.action === PLANT_HOLD) {
