@@ -52,7 +52,7 @@ const living = (room: PartyRoom, seat: string): boolean => {
  * Mails `seat` its mark, once, at the Hitman's turning (round 10, C4a): a living human outside the
  * holder's Cabal when one is free (gdd-map 3.20), else any other living seat, drawn on `contract` keyed by the seat.
  */
-export function offerContract(room: PartyRoom, seat: string): void {
+export function offerContract(room: PartyRoom, seat: string, mark?: string): void {
   const held = contractsOf(room);
   if (held.has(seat) || progressOf(room, seat).over || !living(room, seat)) return;
   const mates = new Set(room.state.players.get(seat)?.priv?.cabalMates ?? []);
@@ -66,11 +66,23 @@ export function offerContract(room: PartyRoom, seat: string): void {
     progressOf(room, seat).over = true;
     return;
   }
-  const target = from[Math.floor(room.seeds.get('contract', seat)() * from.length)]!;
+  // A story names the mark (arc E5): the draw is not made, so a story's contract is the same on every run.
+  const target =
+    mark !== undefined && living(room, mark) && mark !== seat
+      ? mark
+      : from[Math.floor(room.seeds.get('contract', seat)() * from.length)]!;
   held.set(seat, { target, accepted: false });
   addNote(room, seat, NoteKind.contract, target);
   emitStep(room, seat, 'vendetta.contract.offered');
   if (isNpcSeat(room, seat)) accept(room, seat);
+}
+
+/** Forgets the seat's contract and its quest (a story section that turned the player has ended, arc E5). */
+export function forgetContract(room: PartyRoom, seat: string): void {
+  contractsOf(room).delete(seat);
+  const priv = room.state.players.get(seat)?.priv;
+  const quest = priv?.quests.find((q) => q.id === CONTRACT_QUEST);
+  if (quest && priv) priv.quests.splice(priv.quests.indexOf(quest), 1);
 }
 
 /** Accepts the seat's open contract if it is not yet (the Derringer's shot, C4b); returns whether it is accepted. */

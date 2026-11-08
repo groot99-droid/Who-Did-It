@@ -1620,6 +1620,11 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   boarding the Dusk Train, the Final Night's verdict) does not end the room. It ends the running section as done, with
   the section's own break, and the story moves on; the sim emits `story.win` once for it. Only a win in the last section
   ends the match. A win that is still true (parity) is held again at the next check, so it can end the next section too.
+- **A fixed Hitman.** A section that names `hitman: {mark}` turns the player's seat when it starts, whatever the arrival
+  draw said (a story room has one human, below the floor of 3.33): the seat keeps its card and look, holds the `hitman`
+  vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
+  sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
+  section lets the seat go, its contract and its flag with it.
 - **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
   counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
   holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its

@@ -19,6 +19,7 @@ import { type Unit, unitsOf } from './units';
 import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
 import { castTable, holderOf, switchRole } from './handover';
 import { type Latches, hear, holds } from './triggers';
+import { releaseStoryHitman, turnForStory } from '../vendettas/arrival';
 import { resetProgress } from '../vendettas/progress';
 import { setVendetta } from '../vendettas/state';
 
@@ -366,6 +367,12 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
       setVendetta(room, killer, chapter.npcVendetta);
       resetProgress(room, killer);
     }
+  }
+  // E5: a section that turns the player: the mail's Hitman is the player's seat, the mark the seat holding `mark`.
+  releaseStoryHitman(room, state.humanId);
+  if (chapter.hitman !== undefined) {
+    const mark = holderOf(room, state.humanId, chapter.hitman.mark);
+    if (mark !== null) turnForStory(room, state.humanId, mark);
   }
   state.seen.items = null; // a new card's kit is not a pickup
   if (chapter.first && !replay) {
