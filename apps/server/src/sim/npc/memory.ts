@@ -7,6 +7,10 @@ export const playRng = (room: PartyRoom, id: string): Rng => room.seeds.get('npc
 /** This seat's timing stream (`npcTiming:<seatId>`): the ready, vote and night-power ticks, the Last Shot delay. */
 export const timingRng = (room: PartyRoom, id: string): Rng => room.seeds.get('npcTiming', id);
 
+/** B6d2: this seat's trial streams (`trialTick:<seatId>`, `trialChance:<seatId>`), kept apart from every public draw. */
+export const trialTickRng = (room: PartyRoom, id: string): Rng => room.seeds.get('trialTick', id);
+export const trialChanceRng = (room: PartyRoom, id: string): Rng => room.seeds.get('trialChance', id);
+
 /** A path over one scene's tiles toward a goal, followed for about a second before it is rebuilt. */
 export interface PathPlan {
   key: string;
@@ -88,6 +92,14 @@ export class Brain {
   fallbackUntilTick = -1;
   /** The uniforms of the vote tick (suspect roll, suspect tie, fallback seat), drawn once per meeting. */
   voteRolls: readonly [number, number, number] | null = null;
+  /**
+   * Round 10, B6d2 (GDD 3.12): the step of a Tribunal or the end trial this seat has drawn for, the tick it acts on,
+   * its chance roll, and whether it has acted. Drawn by every NPC, whatever its card or Notebook.
+   */
+  trialKey = '';
+  trialAtTick = -1;
+  trialRoll = 1;
+  trialActed = false;
   /** Clues sighted (and rolled for), and the one chosen for collecting with the scene it lies in. */
   readonly seenClues = new Set<string>();
   pendingClue = '';
