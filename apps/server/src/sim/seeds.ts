@@ -23,6 +23,9 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `talk`: an NPC seat's meeting notes, keyed by seat id (round 8, 8T, GDD 3.8), so a note moves no other stream;
  * - `townsfolk`: the ambient townsfolk figures (round 8, 8E, GDD 3.24), keyed by figure id, never a secret draw;
  * - `homes`: each human seat's home (round 10, A7, GDD 3.32), drawn in seat order and never from the card;
+ * - `autopsy`: a Doctor's time-of-death error (round 10, V1b, GDD 3.2), keyed by seat id and secret;
+ * - `trialTick`, `trialChance`: an NPC seat's tick and its chance to present at a Tribunal or file at the end trial,
+ *   keyed by seat id, drawn card-blind by every NPC (round 10, B6d2, GDD 3.12); never shared with a public draw;
  * - `locks`: each lock's pin set points (round 10, D5, GDD 3.29), keyed by prop id; the picker's client is sent them.
  * - `barks`: an NPC seat's or a figure's idle gaps, reaction rolls and lines (round 10, M1, GDD 3.5), keyed by the
  *   actor's id, a seat's or a figure's alike; public-safe, and no secret draw shares it.
@@ -49,7 +52,10 @@ export type StreamName =
   | 'homes'
   | 'locks' // round 10, D5: the lock-pick's set points, keyed by lock id, a puzzle and never a secret draw
   | 'pairing' // round 10, B8: Walk with me's answer delays and rolls (public-safe, seams.md 1)
+  | 'autopsy' // round 10, V1b: an Autopsy's time-of-death offset, keyed by seat (secret, seams.md 1)
   | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
+  | 'trialTick' // round 10, B6d2: the tick an NPC presents or files on, keyed by seat id (card-blind)
+  | 'trialChance' // round 10, B6d2: whether it does, keyed by seat id (card-blind)
   | 'barks'; // round 10, M1: a bark's idle gap, reaction roll and line, keyed by actor id (public, seams.md 3 row 36)
 
 /** Four 32-bit seed words of one sfc32 stream. */

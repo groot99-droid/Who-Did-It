@@ -24,6 +24,7 @@ import { handlePetitionOpen, handlePetitionSign } from './law/Petition';
 import { handleFile } from './law/EndTrial';
 import { handlePresent } from './law/Tribunal';
 import { wakeOnInput } from './Sleep';
+import { handleBurst, handleCheck, handleHide } from './verbs/hiding';
 import { handleStoryStart, queueStoryContinue } from './story/Story';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
@@ -176,8 +177,18 @@ export function runCommands(room: PartyRoom): void {
       case C2S.trialFile: // round 10, B6d: a case at the end trial
         handleFile(room, cmd.sessionId, payload);
         break;
+      // Round 10, V3 (GDD 3.7): the hiding spots.
+      case C2S.hide:
+        handleHide(room, cmd.sessionId, payload);
+        break;
+      case C2S.check:
+        handleCheck(room, cmd.sessionId, payload);
+        break;
+      case C2S.burst:
+        handleBurst(room, cmd.sessionId, payload);
+        break;
       default:
-        // act.interact, hide, check and burst arrive with M4+; queued and ignored until then.
+        // act.interact arrives with M4+; queued and ignored until then.
         break;
     }
   }

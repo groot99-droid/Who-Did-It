@@ -6,6 +6,7 @@ import { beginAim } from './NightPowers';
 import { emitSim } from './events/bus';
 import { onPaintDeath } from './paintTown';
 import { simOf } from './RoomSim';
+import { recordDeath } from './verbs/readings';
 import { boardLine, returnsOnTrain } from './Train';
 import { sceneKey } from './World';
 
@@ -23,6 +24,7 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
   if (!p || p.dead) return;
   p.dead = true;
   p.hold = null;
+  recordDeath(room, victimId, cause, killerId); // round 10, V1b: a body's cause and print (room memory only)
   sim.deaths.push(
     killerId === undefined
       ? { playerId: victimId, cause, tick: room.state.tick }

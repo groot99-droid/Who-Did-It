@@ -235,6 +235,8 @@ export const Private = schema(
     cooldownEndTick: t.map('uint32'),
     ledger: t.array(LedgerLine),
     lensCharges: u8(),
+    /** Round 10 (V3, seams.md 3 row 39): the hiding spot this seat is in; '' when it is in none. Own client only. */
+    hiding: str(),
     myVote: str(),
     /** Own scene index in SCENE_IDS order: the only scene index on the wire, and only to its owner. */
     sceneId: u8(),
