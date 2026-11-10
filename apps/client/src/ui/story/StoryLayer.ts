@@ -122,6 +122,7 @@ export function cardEl(
 
 /** The strip of goals: what is asked and what is done, small enough to sit over the corner of a phone. */
 export function goalsEl(goals: StoryGoals): HTMLElement {
+  const next = goals.goals.find((g) => !g.done)?.id;
   return h(
     'aside',
     { class: 'wdi-story-goals wdi-glass', 'data-testid': 'story-goals', 'data-chapter': goals.chapterId },
@@ -132,7 +133,11 @@ export function goalsEl(goals: StoryGoals): HTMLElement {
       ...goals.goals.map((g) =>
         h(
           'li',
-          { class: g.done ? 'is-done' : '', 'data-goal': g.id, 'data-done': String(g.done) },
+          {
+            class: `${g.done ? 'is-done' : ''}${g.id === next ? ' is-next' : ''}`.trim(),
+            'data-goal': g.id,
+            'data-done': String(g.done),
+          },
           h('span', { class: 'wdi-story-goals__mark', 'aria-hidden': 'true' }, g.done ? '✓' : '○'),
           h('span', {}, g.text),
           g.done ? h('span', { class: 'wdi-sr-only' }, ` (${C['story.goals.done']})`) : null,
