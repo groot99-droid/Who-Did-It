@@ -32,6 +32,9 @@ export const STORY_STREAMS = [
   'locks',
   'pairing',
   'hitman',
+  'trialTick',
+  'trialChance',
+  'autopsy',
 ] as const;
 
 const Word = z.number().int().min(0).max(0xffffffff);
@@ -80,6 +83,7 @@ export type StoryAction =
       goal?: string | undefined;
     }
   | { cutscene: string }
+  | { meeting: true }
   | { questStep: { quest: string; step: string } }
   | { npcOrder: { npcId: string; order: string; args?: Record<string, unknown> | undefined } }
   | { spawn: { kind: string; at: string } }
@@ -98,6 +102,8 @@ export const StoryAction: z.ZodType<StoryAction> = z.lazy(() =>
       goal: Id.optional(),
     }),
     z.strictObject({ cutscene: Id }),
+    /** Rings the bell: a meeting opens at the next world-phase step (a reveal follows, so the memorial can play). */
+    z.strictObject({ meeting: z.literal(true) }),
     z.strictObject({ questStep: z.strictObject({ quest: Id, step: Id }) }),
     z.strictObject({
       npcOrder: z.strictObject({

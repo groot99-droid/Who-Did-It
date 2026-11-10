@@ -9,7 +9,7 @@ import { simOf } from '../RoomSim';
 import { isJailed } from '../law/Jail';
 import { isOnLine } from '../Train';
 import { sceneKey } from '../World';
-import { lapseContract, offerContract } from './contract';
+import { forgetContract, lapseContract, offerContract } from './contract';
 import { holdVendetta, vendettaHolders, vendettaOf } from './state';
 
 /**
@@ -39,6 +39,8 @@ interface Arrival {
   turnedDay: number;
   killDay: number | null;
   boarded: boolean;
+  /** Story mode turned this seat (arc E5): it never boards the Dusk Train; its section ends it. */
+  story?: boolean;
 }
 
 /** How far the Hitman got (`gameOver.hitman.stage`, seams.md 3 row 21). */
@@ -133,6 +135,42 @@ export function onDeliveryArrival(room: PartyRoom, round: number): void {
   systemLine(room, HITMAN_ARRIVE_LINE);
 }
 
+/**
+ * Story mode (arc E5, GDD 3.34): a section turns the player's seat at its start, whatever the draw said (a story room
+ * has one human, below the arrival's human floor). The seat keeps its card and look and takes the `hitman` vendetta
+ * (the section's own), the Derringer and a contract whose mark is `markSeat`. No line is sent. Returns whether it turned.
+ */
+export function turnForStory(room: PartyRoom, seat: string, markSeat: string): boolean {
+  const player = room.state.players.get(seat);
+  if (!player || simOf(room).players.get(seat)?.dead === true) return false;
+  forgetContract(room, seat);
+  arrivals.set(room.seeds, {
+    day: null,
+    human: true,
+    turned: seat,
+    turnedDay: room.state.round,
+    killDay: null,
+    boarded: false,
+    story: true,
+  });
+  holdVendetta(room, seat, HITMAN_VENDETTA);
+  player.priv.hitman = true;
+  if (canAdd(player, DERRINGER_ITEM, 1)) addStack(player, DERRINGER_ITEM, 1);
+  offerContract(room, seat, markSeat);
+  return true;
+}
+
+/** A story section turned `seat` and has ended: the Hitman's mail leaves the seat (the Derringer goes with the card). */
+export function releaseStoryHitman(room: PartyRoom, seat: string): void {
+  const a = arrivals.get(room.seeds);
+  if (a?.story !== true || a.turned !== seat) return;
+  a.turned = null;
+  a.story = false;
+  forgetContract(room, seat);
+  const player = room.state.players.get(seat);
+  if (player) player.priv.hitman = false;
+}
+
 /** The Derringer's item id (`items.json`, role-bound, kept at death; `dayWeapon.ts`). */
 export const DERRINGER_ITEM = 'derringer';
 
@@ -158,7 +196,7 @@ export function onShotArrival(room: PartyRoom, seat: string, onMark: boolean): v
 export function onDuskArrival(room: PartyRoom, round: number): void {
   const a = arrivals.get(room.seeds);
   const seat = a?.turned;
-  if (!a || seat === null || seat === undefined || a.boarded) return;
+  if (!a || seat === null || seat === undefined || a.boarded || a.story === true) return;
   const p = simOf(room).players.get(seat);
   const player = room.state.players.get(seat);
   if (!p || !player || p.dead) return;

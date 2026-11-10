@@ -15,6 +15,7 @@ import { simOf } from '../../src/sim/RoomSim';
 import { enableStory, queueStoryContinue, registerStory, storyQueued } from '../../src/sim/story/Story';
 import { storyArc } from '@wdi/content';
 import { unitsOf } from '../../src/sim/story/units';
+import type { StorySave } from '../../src/accounts/saves';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -138,6 +139,8 @@ export interface StartOptions {
   invariantsEvery?: number;
   /** Runs between `enableStory` and the first step: a test that changes the seed words does it here. */
   afterEnable?: (room: PartyRoom) => void;
+  /** A validated save to continue from (plan 5). */
+  resume?: StorySave;
 }
 
 /**
@@ -173,7 +176,7 @@ export async function startStoryRoom(
   onSim(room, ANY_SIM, (ev) => sr.events.push({ ...ev }));
   // The engine resolves a story by id: the content file's own arc, as it stands.
   registerStory(storyArc.stories[storyId]!);
-  enableStory(room, storyId, { humanId });
+  enableStory(room, storyId, { humanId, ...(opts.resume !== undefined && { resume: opts.resume }) });
   opts.afterEnable?.(room);
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);
   if (room.state.phase === Phase.lobby) throw new Error('startStoryRoom: the story did not start');

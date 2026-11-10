@@ -235,6 +235,14 @@ export const BalanceFile = z.strictObject({
     reachTiles: z.number().positive(),
   }),
   /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  /** Round 10, V2 (GDD 3.4): the cover-up verbs. A dragged body trails the dragger by `dragLagTicks`, lays a smear every
+   *  `dragSmearEveryTiles` tiles (at most `dragSmearMax` a drag), and is hidden when dropped within `spotReachTiles` of a body spot. */
+  coverup: Section({
+    dragSmearEveryTiles: z.number().positive(),
+    dragSmearMax: Count,
+    dragLagTicks: Count,
+    spotReachTiles: z.number().positive(),
+  }),
   figureTalk: Section({
     /** A figure answers from this many tiles. */
     reachTiles: z.number().positive(),
@@ -298,6 +306,11 @@ export const BalanceFile = z.strictObject({
     night: z.strictObject({ leaveDelayS: Span }),
     /** The vote tick: this fraction of the discussion plus the vote time, from the discussion's start. */
     vote: z.strictObject({ windowFrac: FracSpan }),
+    /**
+     * Round 10, B6d2 (GDD 3.12): an NPC seat's tick in a Tribunal's case (or defence) or the end trial's filing is this
+     * fraction of the step, and the chance it presents or files when the tick comes.
+     */
+    trial: z.strictObject({ windowFrac: FracSpan, presentChance: Chance, fileChance: Chance }),
     /** The ready delay on the role card and in the lobby. */
     ready: z.strictObject({ delayS: Span }),
     /**
@@ -499,6 +512,11 @@ export const BalanceFile = z.strictObject({
    * ceil(`winUnique` x the NPC seats at the deal), at least 1.
    */
   paintTown: Section({ winUnique: Frac }),
+  /**
+   * Story mode (GDD 3.34): the seconds the player must share a scene with the seat holding a card, in a world phase,
+   * for `story.company` to be heard (arc E10; the shape of the conversion's shared time, 3.20).
+   */
+  story: Section({ companyS: z.number().positive() }),
   /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`

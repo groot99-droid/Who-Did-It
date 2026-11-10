@@ -1,9 +1,10 @@
 import { type ArcAction, type ArcLine, type SceneId, roles, scenes } from '@wdi/content';
-import { ClueKind, TILE_PX } from '@wdi/shared';
+import { ClueKind, S2C, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { spawnClue } from '../Clues';
 import { emitSim } from '../events/bus';
 import { npcMemory } from '../npc/memory';
+import { simOf } from '../RoomSim';
 import { isSceneId, sceneIndex, tileCentre } from '../World';
 import { holderOf } from './handover';
 
@@ -25,7 +26,11 @@ const spawnOf = (sceneId: SceneId, id: string | undefined) => {
   return list.find((s) => s.id === id) ?? list[0];
 };
 
-/** `goTo`: the NPC seat that holds the card `roleId` travels to a spawn of `scene` (across scenes, as a hunt does). */
+/**
+ * `goTo`: the NPC seat that holds the card `roleId` travels to a spawn of `scene` (across scenes, as a hunt does):
+ * `args.spawn` names the spawn, else the scene's first. Staging at a break (arc E14): a section's `tick: 0` beat sends
+ * a card where its opening needs it, because a break swaps cards where the bodies stand.
+ */
 function npcOrder(
   host: ActionHost,
   roleId: string,
@@ -36,7 +41,8 @@ function npcOrder(
   const seat = holderOf(room, host.humanId, roleId);
   const scene = args?.scene;
   if (order !== 'goTo' || seat === null || typeof scene !== 'string' || !isSceneId(scene)) return;
-  const spawn = spawnOf(scene, undefined);
+  const at = args?.spawn;
+  const spawn = spawnOf(scene, typeof at === 'string' ? at : undefined);
   if (spawn === undefined) return;
   const brain = npcMemory(room).brain(seat);
   brain.path = null;
@@ -84,9 +90,12 @@ export function runAction(host: ActionHost, action: ArcAction): void {
   else if ('npcOrder' in action)
     npcOrder(host, action.npcOrder.npcId, action.npcOrder.order, action.npcOrder.args);
   else if ('spawn' in action) spawnAt(host, action.spawn.kind, action.spawn.at);
-  else if ('cutscene' in action)
+  else if ('cutscene' in action) {
     emitSim(host.room, { tick: host.room.state.tick, kind: 'story.cutscene', data: { id: action.cutscene } });
-  else
+    host.room.broadcast(S2C.cutscene, { id: action.cutscene, scope: 'all' }); // E12: it plays, it is not an event only
+  } else if ('meeting' in action) {
+    simOf(host.room).meetingRequests.push({ reason: 'bell', callerId: host.humanId }); // E12: the reveal plays the memorial
+  } else
     emitSim(host.room, {
       tick: host.room.state.tick,
       kind: 'story.questStep',

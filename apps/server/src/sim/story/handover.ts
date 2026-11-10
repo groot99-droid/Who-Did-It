@@ -230,3 +230,94 @@ function reviveHuman(room: PartyRoom, humanId: string): void {
     ensureBody(room, humanId);
   }
 }
+
+// --- the cast (arc.md E2) -------------------------------------------------------------------------------------------
+
+const holdsKnife = (card: string): boolean => roles.roles[card]?.abilities.includes('kill') === true;
+const isCover = (card: string): boolean => roles.roles[card]?.cover === true;
+
+/**
+ * The look a newcomer on a cover card walks as: the look of the first card of the cast that is not a cover card, not
+ * the one a Cabal mate already wears (a cover pick is never a mate's, `handleCoverPick`).
+ */
+function coverFor(room: PartyRoom, cast: readonly string[], seat: string): string {
+  const mates = [...(room.state.players.get(seat)?.priv.cabalMates ?? [])];
+  const taken = new Set(mates.map((m) => room.state.players.get(m)?.priv.coverLook));
+  const looks = cast.filter((c) => !isCover(c)).map((c) => roles.roles[c]?.look ?? '');
+  return looks.find((l) => l !== '' && !taken.has(l)) ?? looks[0] ?? '';
+}
+
+/** Puts `roleId` on an NPC seat as a newcomer off the morning train: its kit and view are the card's own. */
+function seatNewcomer(room: PartyRoom, seat: string, roleId: string): void {
+  const player = room.state.players.get(seat);
+  const def = roles.roles[roleId];
+  if (!player || !def) return;
+  const priv = player.priv;
+  priv.role.roleId = roleId;
+  priv.role.team = Team[def.faction as TeamId];
+  priv.role.evolvedFrom = '';
+  priv.inventory.slots.clear();
+  def.startKit.forEach((k, i) => {
+    const stack = new ItemStack();
+    stack.defId = k.item;
+    stack.qty = k.qty;
+    stack.slot = i;
+    priv.inventory.slots.push(stack);
+  });
+  priv.inventory.selected = 0;
+  clearPrivateView(player); // an NPC seat holds no task list (`dealTasks`): the newcomer's view is empty
+  const mem = npcMemory(room);
+  mem.brains.delete(seat);
+  releaseClaims(mem, seat);
+  reviveHuman(room, seat); // a dead seat is made whole where it lies: the newcomer is a different body
+}
+
+/**
+ * Makes the table hold the chapter's cast (arc E2). Every card of `cast` that no seat holds is dealt to an NPC seat
+ * whose card the cast does not name, dead seats first, then in seat order; a Knife holder never gives up its seat, and
+ * the human's seat is the handover's. The card comes as a newcomer: the seat's kit and private view are the card's own, a cover card walks as another card of the cast, and the Cabal's mates are drawn again. Returns the seats
+ * that changed, in order. A cast card with no seat to take it (more cards than free seats) stays undealt.
+ */
+export function castTable(room: PartyRoom, humanId: string, cast: readonly string[]): string[] {
+  const named = new Set(cast);
+  const held = new Set<string>();
+  for (const player of room.state.players.values()) held.add(player.priv?.role.roleId ?? '');
+  const free = [...room.state.players.entries()]
+    .filter(
+      ([id, p]) =>
+        id !== humanId && !named.has(p.priv?.role.roleId ?? '') && !holdsKnife(p.priv?.role.roleId ?? ''),
+    )
+    .map(([id]) => id)
+    .sort(
+      (a, b) =>
+        Number(simOf(room).players.get(b)?.dead === true) - Number(simOf(room).players.get(a)?.dead === true),
+    );
+  const changed: string[] = [];
+  for (const card of cast) {
+    const seat = free[0];
+    if (held.has(card) || holdsKnife(card) || seat === undefined) continue;
+    free.shift();
+    seatNewcomer(room, seat, card);
+    held.add(card);
+    changed.push(seat);
+  }
+  if (changed.length === 0) return changed;
+  refreshMates(room);
+  for (const seat of changed) {
+    const priv = room.state.players.get(seat)?.priv;
+    if (priv && isCover(priv.role.roleId)) priv.coverLook = coverFor(room, cast, seat);
+  }
+  for (const seat of changed) {
+    const player = room.state.players.get(seat);
+    if (!player) continue;
+    player.look = isCover(player.priv.role.roleId)
+      ? player.priv.coverLook
+      : (roles.roles[player.priv.role.roleId]?.look ?? '');
+    for (const mate of player.priv.cabalMates) {
+      const look = room.state.players.get(mate)?.priv.coverLook;
+      if (look) player.priv.mateLooks.set(mate, look);
+    }
+  }
+  simOf(room).viewsDirty = true;
+  return changed;
+}

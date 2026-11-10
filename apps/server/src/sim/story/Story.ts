@@ -1,6 +1,6 @@
 import { generateId } from '@colyseus/core';
 import { type ArcStory as Story, balance, storyArc } from '@wdi/content';
-import { ItemStack, Phase } from '@wdi/shared';
+import { ItemStack, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { newSeat } from '../../rooms/handlers/lobby';
 import { applyClock, autoOf, enableAuto, queueAutoStart } from '../auto/Auto';
@@ -11,13 +11,17 @@ import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
 import { isNpcSeat } from '../Npc';
 import { simOf } from '../RoomSim';
-import { SCENE_KEYS } from '../World';
+import { SCENE_KEYS, isWorldPhase } from '../World';
 import { endMatch } from '../Win';
 import type { FixedSeeds } from '../seeds';
 import { runAction } from './actions';
 import { type Unit, unitsOf } from './units';
-import { holderOf, switchRole } from './handover';
+import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
+import { castTable, holderOf, switchRole } from './handover';
 import { type Latches, hear, holds } from './triggers';
+import { releaseStoryHitman, turnForStory } from '../vendettas/arrival';
+import { resetProgress } from '../vendettas/progress';
+import { setVendetta } from '../vendettas/state';
 
 /**
  * Story mode's engine (docs/story/README.md 2, GDD 3.34): one human seat among NPC seats on the auto harness, seeds
@@ -58,8 +62,27 @@ export interface StoryState {
   /** A chapter has ended and its end card is up (or queued); no beats run until the next one starts. */
   ended: boolean;
   failed: boolean;
+  /** Sections whose one replay is spent (A515: a failure replays the section once, then the story moves on). */
+  replayUsed: Set<string>;
+  /** The end card that is up (or queued) ends in a replay of the same section. */
+  replaying: boolean;
+  /** Where the story started: 0, or the first section of the chapter a resumed save continues (plan 5). */
+  startIdx: number;
+  /** Arc chapters finished so far, in order, and what the end screen shows of each: the save's body. */
+  finished: string[];
+  summaries: ChapterSummary[];
+  /** The save's revision; each break writes the next. */
+  rev: number;
+  /** Counters summed over the sections of the running arc chapter, and whether any section failed for good. */
+  totals: Record<string, number>;
+  chapterFailed: boolean;
+  now: () => number;
   /** The match ended mid-chapter: this chapter is the last one. */
   final: boolean;
+  /** A match win was held (E3) and ends the running section as done at the next story step. */
+  heldWin: boolean;
+  /** The next section is waiting for its `startWhen` (arc E6): the unit, its latches, and the tick the wait began. */
+  waiting: { idx: number; latches: Latches; since: number } | null;
   /** The story is over (its last end card was dismissed, or the match ended). */
   over: boolean;
   /** A card is up and the clock waits for `story.continue`. */
@@ -73,6 +96,8 @@ export interface StoryState {
   queue: StoryCommand[];
   /** The human's scene and item counts last tick, to emit `story.enter` and `story.pickup` on a change. */
   seen: { scene: string; items: Map<string, number> | null };
+  /** Ticks the player has shared a scene with each seat this section, and the cards already heard (arc E10). */
+  company: { ticks: Map<string, number>; heard: Set<string> };
   /** Bus events heard since the last `runStory`, in emission order. */
   inbox: SimEvent[];
 }
@@ -102,9 +127,33 @@ export interface StoryOptions {
   humanName?: string;
   /** Queue the start at once (default). */
   start?: boolean;
+  /** A validated save to continue from (`resumeIndex` found its place); the story starts at that chapter. */
+  resume?: StorySave;
+  /** The clock for a save's `savedAt` (default: the wall clock; a replay digest never reads it). */
+  now?: () => number;
 }
 
 /** The ids of the story's NPC seats, stable across runs. */
+/**
+ * E3, no early win: a match win (task bar, parity, Thief escape, Hitman boarding, the Final Night verdict) before the
+ * story's last section does not end the room. It is held: the running section ends as done at the next story step and
+ * the story moves on. Only the last section's win ends the match. True when the win was held.
+ */
+export function holdMatch(room: PartyRoom, outcome: string): boolean {
+  const state = storyOf(room);
+  if (state === null || state.over || state.final || state.chapterIdx < 0) return false;
+  if (state.chapterIdx >= state.units.length - 1) return false;
+  if (!state.ended && !state.heldWin) {
+    state.heldWin = true;
+    emitSim(room, {
+      tick: room.state.tick,
+      kind: 'story.win',
+      data: { chapterId: state.units[state.chapterIdx]?.id, outcome },
+    });
+  }
+  return true;
+}
+
 export const storyNpcIds = (story: Story): string[] =>
   Array.from({ length: story.roster.npcCount }, (_, i) => `${story.id}:npc${i}`);
 
@@ -146,7 +195,18 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     chapterStartTick: 0,
     ended: false,
     failed: false,
+    replayUsed: new Set(),
+    replaying: false,
+    startIdx: 0,
+    finished: [],
+    summaries: [],
+    rev: 0,
+    totals: {},
+    chapterFailed: false,
+    now: opts.now ?? Date.now,
     final: false,
+    heldWin: false,
+    waiting: null,
     over: false,
     cardUp: false,
     cards: [],
@@ -156,15 +216,31 @@ export function enableStory(room: PartyRoom, storyId: string, opts: StoryOptions
     counters: {},
     queue: [],
     seen: { scene: '', items: null },
+    company: { ticks: new Map(), heard: new Set() },
     inbox: [],
   };
   states.set(room, state);
-  // The runner's own outputs stay out of its inbox; `story.enter` and `story.pickup` are the triggers' to hear.
+  // The runner's own outputs stay out of its inbox; `story.enter`, `story.pickup`, `story.picked` and `story.company` are the triggers' to hear.
   onSim(room, ANY_SIM, (ev) => {
-    if (!ev.kind.startsWith('story.') || ev.kind === 'story.enter' || ev.kind === 'story.pickup')
+    if (
+      !ev.kind.startsWith('story.') ||
+      ev.kind === 'story.enter' ||
+      ev.kind === 'story.pickup' ||
+      ev.kind === 'story.picked' ||
+      ev.kind === 'story.company'
+    )
       state.inbox.push(ev);
   });
-  const first = state.units[0];
+  const at = opts.resume === undefined ? -1 : resumeIndex(state.units, opts.resume);
+  if (opts.resume !== undefined && at > 0) {
+    const sections = new Set(state.units.slice(0, at).map((u) => u.id));
+    state.startIdx = at;
+    state.finished = [...opts.resume.finished];
+    state.summaries = opts.resume.summaries.filter((m) => opts.resume!.finished.includes(m.chapterId));
+    state.replayUsed = new Set(opts.resume.replayUsed.filter((id) => sections.has(id)));
+    state.rev = opts.resume.rev;
+  }
+  const first = state.units[state.startIdx];
   if (first !== undefined) flowOf(room).fixedDeal = { [humanId]: first.roleId };
   if (opts.start !== false) queueAutoStart(room);
   return state;
@@ -186,14 +262,23 @@ export function queueStoryContinue(room: PartyRoom, seat: string): void {
 /**
  * `story.start { storyId, chapterId? }` (the title screen): the sender's room becomes the story room straight from the
  * lobby, with the sender as the one human, and the story starts. An unknown story, a room that is not a lone
- * human's lobby, or a second start is ignored; a chapter replay starts at chapter one for now (Q-S4).
+ * human's lobby, or a second start is ignored; `chapterId` replays a finished chapter of the save (`replayFrom`).
  */
 export function handleStoryStart(room: PartyRoom, seat: string, payload: Record<string, unknown>): void {
   const { storyId } = payload;
   if (typeof storyId !== 'string' || storyOf(room) !== null || room.state.phase !== Phase.lobby) return;
   if (room.state.leaderId !== seat) return;
   try {
-    enableStory(room, storyId, { humanId: seat });
+    // `resume` is the save the client was last given by `story.saved`; the device store re-validates it (plan 5).
+    const ctx: SaveCtx = {
+      seat,
+      send: (t, p) => room.clients.getById(seat)?.send(t, p),
+      resume: payload.resume,
+    };
+    const kept = saveStoreFor(ctx).get(ctx, storyId);
+    const save =
+      kept !== null && typeof payload.chapterId === 'string' ? replayFrom(kept, payload.chapterId) : kept;
+    enableStory(room, storyId, { humanId: seat, ...(save !== null && { resume: save }) });
   } catch {
     // an unknown story id, or a lobby with more than one human: nothing starts
   }
@@ -264,11 +349,12 @@ function giveItem(room: PartyRoom, state: StoryState, ref: string): void {
   settle(player);
 }
 
-function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
+function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = false): void {
   const chapter = state.units[idx];
   if (chapter === undefined) return;
   const previous = state.units[idx - 1];
-  if (idx > 0) {
+  if (idx > 0 || replay) {
+    // A replay is the same card again: the view starts over and the player is made whole where they stand.
     switchRole(
       room,
       state.humanId,
@@ -282,7 +368,30 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
     const player = room.state.players.get(state.humanId);
     if (player) player.look = chapter.look;
   }
+  // The chapter's cast (arc E2): after the seat's own card has moved, every card the cast names has a seat.
+  if (chapter.first && !replay && chapter.chapter.cast !== undefined)
+    castTable(room, state.humanId, chapter.chapter.cast);
+  // E4: the Killer the player meets already holds the section's vendetta, its progress started over. When the player
+  // takes the card at the next break the vendetta travels with it (`switchRole`).
+  if (chapter.npcVendetta !== undefined && !replay) {
+    const killer = holderOf(room, state.humanId, 'killer');
+    if (killer !== null) {
+      setVendetta(room, killer, chapter.npcVendetta);
+      resetProgress(room, killer);
+    }
+  }
+  // E5: a section that turns the player: the mail's Hitman is the player's seat, the mark the seat holding `mark`.
+  releaseStoryHitman(room, state.humanId);
+  if (chapter.hitman !== undefined) {
+    const mark = holderOf(room, state.humanId, chapter.hitman.mark);
+    if (mark !== null) turnForStory(room, state.humanId, mark);
+  }
+  state.company = { ticks: new Map(), heard: new Set() };
   state.seen.items = null; // a new card's kit is not a pickup
+  if (chapter.first && !replay) {
+    state.totals = {};
+    state.chapterFailed = false;
+  }
   state.chapterIdx = idx;
   state.chapterStartTick = room.state.tick;
   state.ended = false;
@@ -296,7 +405,7 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number): void {
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterStart',
-    data: { chapterId: chapter.id, chapter: chapter.id, index: idx, arcChapter: chapter.chapter.id },
+    data: { chapterId: chapter.id, chapter: chapter.id, index: idx, arcChapter: chapter.chapter.id, replay },
   });
   // The first section of an arc chapter opens with the chapter's card; every later section has its own (arc E1).
   const opening = chapter.first ? [chapter.chapter.setup, chapter.setup] : [chapter.setup];
@@ -319,11 +428,21 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
   // A break inside an arc chapter has no card unless the section names one; a failure or the match's end always does.
   const card = chapter.endCard ?? (failed || state.final ? chapter.chapter.end : null);
   const keys = (chapter.endCard ?? chapter.chapter.end).summaryKeys;
+  // A failure replays the section once (A515); a second failure, or a match that has ended, moves on.
+  const replay =
+    failed && !state.final && room.state.phase !== Phase.gameOver && !state.replayUsed.has(chapter.id);
+  if (replay) state.replayUsed.add(chapter.id);
+  state.replaying = replay;
+  if (!replay) {
+    for (const [k, n] of Object.entries(state.counters)) state.totals[k] = (state.totals[k] ?? 0) + n;
+    state.chapterFailed ||= failed;
+    if (chapter.last || state.final) saveBreak(room, state, chapter);
+  }
   const summary = Object.fromEntries(keys.map((k) => [k, state.counters[k] ?? 0]));
   emitSim(room, {
     tick: room.state.tick,
     kind: 'story.chapterEnd',
-    data: { chapterId: chapter.id, chapter: chapter.id, failed, summary },
+    data: { chapterId: chapter.id, chapter: chapter.id, failed, replay, summary },
   });
   if (card === null) return afterEndCard(room, state);
   const next = state.units[state.chapterIdx + 1];
@@ -334,17 +453,76 @@ function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
     title: chapter.title,
     lines: failed ? [card.failedLine] : card.lines,
     summary,
-    ...(next !== undefined && { next: next.first ? next.chapter.title : next.title }),
+    ...(replay
+      ? { next: chapter.first ? chapter.chapter.title : chapter.title }
+      : next !== undefined && { next: next.first ? next.chapter.title : next.title }),
   };
   if (state.cardUp) state.cards.push(endCard);
   else showCard(room, state, endCard);
 }
 
+/** The save at an arc chapter's break (plan 5): written by the server from what it ran, then handed to the store. */
+function saveBreak(room: PartyRoom, state: StoryState, chapter: Unit): void {
+  const keys = chapter.chapter.end.summaryKeys;
+  const counters = Object.fromEntries(keys.map((k) => [k, state.totals[k] ?? 0]));
+  state.finished.push(chapter.chapter.id);
+  state.summaries.push({
+    chapterId: chapter.chapter.id,
+    ...(state.chapterFailed && { failed: true }),
+    counters,
+  });
+  const next = state.units[state.chapterIdx + 1];
+  const save: StorySave = {
+    v: 1,
+    storyId: state.story.id,
+    nextChapterId: state.final || next === undefined ? null : next.chapter.id,
+    finished: [...state.finished],
+    handOn: chapter.handOn,
+    replayUsed: [...state.replayUsed],
+    summaries: state.summaries.map((m) => ({ ...m })),
+    rev: ++state.rev,
+    savedAt: state.now(),
+  };
+  const ctx: SaveCtx = { seat: state.humanId, send: (t, p) => send(room, state, t, p) };
+  saveStoreFor(ctx).put(ctx, save);
+}
+
+/**
+ * `story.start { chapterId }` (Q-S4): the save narrowed to the chapters before a finished `chapterId`, so the story
+ * continues from that chapter. A chapter the save has not finished is not offered; the save comes back as it was.
+ */
+export function replayFrom(save: StorySave, chapterId: string): StorySave {
+  const at = save.finished.indexOf(chapterId);
+  return at < 0 ? save : { ...save, nextChapterId: chapterId, finished: save.finished.slice(0, at) };
+}
+
+/**
+ * Where a validated save continues: the first section of its `nextChapterId`, when `finished` is exactly the chapters
+ * before it in order; -1 (start over) for a save that does not fit the story.
+ */
+export function resumeIndex(units: readonly Unit[], save: StorySave): number {
+  const idx = units.findIndex((u) => u.first && u.chapter.id === save.nextChapterId);
+  if (idx <= 0) return -1;
+  const before = units
+    .slice(0, idx)
+    .filter((u) => u.first)
+    .map((u) => u.chapter.id);
+  return before.length === save.finished.length && before.every((id, i) => id === save.finished[i])
+    ? idx
+    : -1;
+}
+
 /** The end card was dismissed: the next chapter starts, or the story is over. */
 function afterEndCard(room: PartyRoom, state: StoryState): void {
-  if (!state.final && state.chapterIdx + 1 < state.units.length)
-    startChapter(room, state, state.chapterIdx + 1);
-  else finishStory(room, state);
+  if (state.replaying) {
+    state.replaying = false;
+    startChapter(room, state, state.chapterIdx, true);
+  } else if (!state.final && state.chapterIdx + 1 < state.units.length) {
+    const next = state.chapterIdx + 1;
+    // E6: a section with a `startWhen` waits for it; the player keeps the card they hold meanwhile.
+    if (state.units[next]?.startWhen === undefined) startChapter(room, state, next);
+    else state.waiting = { idx: next, latches: { set: new Set() }, since: room.state.tick };
+  } else finishStory(room, state);
 }
 
 function finishStory(room: PartyRoom, state: StoryState): void {
@@ -400,6 +578,32 @@ function watchPlayer(room: PartyRoom, state: StoryState): void {
     if (state.seen.items !== null && qty > (state.seen.items.get(item) ?? 0))
       emitSim(room, { tick: room.state.tick, kind: 'story.pickup', seat: state.humanId, data: { item } });
   state.seen.items = now;
+  watchCompany(room, state, p);
+}
+
+/**
+ * `story.company` { with: roleId } once the player has shared a scene, in a world phase, with the seat holding that card
+ * for `balance.story.companyS` seconds this section (arc E10: "keep the Vicar company"). Heard once per card per section.
+ */
+function watchCompany(room: PartyRoom, state: StoryState, me: { sceneIdx: number }): void {
+  if (!isWorldPhase(room.state.phase) || simOf(room).players.get(state.humanId)?.dead === true) return;
+  const need = balance.story.companyS * TICK_RATE;
+  for (const [id, player] of room.state.players) {
+    const them = simOf(room).players.get(id);
+    const card = player.priv?.role.roleId;
+    if (id === state.humanId || card === undefined || state.company.heard.has(card)) continue;
+    if (!them || them.dead || !them.placed || them.sceneIdx !== me.sceneIdx) continue;
+    const ticks = (state.company.ticks.get(id) ?? 0) + 1;
+    state.company.ticks.set(id, ticks);
+    if (ticks < need) continue;
+    state.company.heard.add(card);
+    emitSim(room, {
+      tick: room.state.tick,
+      kind: 'story.company',
+      seat: state.humanId,
+      data: { with: card },
+    });
+  }
 }
 
 // --- the stage -----------------------------------------------------------------------------------------------------
@@ -431,11 +635,27 @@ export function runStory(room: PartyRoom): void {
   watchPlayer(room, state);
   const events = state.inbox.splice(0);
   if (state.chapterIdx < 0) {
-    if (events.some((e) => e.kind === 'start')) startChapter(room, state, 0);
+    if (events.some((e) => e.kind === 'start')) startChapter(room, state, state.startIdx);
     return;
   }
   const chapter = chapterOf(state);
+  if (state.waiting !== null) {
+    const wait = state.waiting;
+    const when = state.units[wait.idx]?.startWhen;
+    if (when !== undefined) {
+      for (const ev of events) hear(when, 'start', ev, wait.latches, seatOf);
+      if (holds(when, 'start', room.state.tick - wait.since, wait.latches)) {
+        state.waiting = null;
+        startChapter(room, state, wait.idx);
+      }
+    }
+    return;
+  }
   if (chapter === undefined || state.ended) return;
+  if (state.heldWin) {
+    state.heldWin = false;
+    return endChapter(room, state, false);
+  }
 
   for (const ev of events) {
     count(state, ev, seatOf);

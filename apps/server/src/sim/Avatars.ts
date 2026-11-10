@@ -6,6 +6,7 @@ import { settleDisguise } from './Impersonate';
 import { lightBurns } from './mobs/light';
 import { dayPartOf } from './mobs/spawn';
 import { type PlayerSim, simOf } from './RoomSim';
+import { isHiding } from './verbs/hiding';
 import { reconcileNear } from './Visibility';
 import { sceneKey } from './World';
 
@@ -228,6 +229,7 @@ export function resolveHandle(room: PartyRoom, actorSeat: string, handle: unknow
   if (!actor) return null;
   if (seat === undefined) return null;
   if (seat === actorSeat) return null;
+  if (isHiding(room, seat)) return null; // round 10, V3: nobody names a hider
   return memory.sceneOf.get(handle) === sceneKey(actor.sceneIdx) ? seat : null;
 }
 
