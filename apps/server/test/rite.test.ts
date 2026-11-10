@@ -33,6 +33,8 @@ afterEach(() => void (balance.rite.holdS = holdS));
 const { scene: SITE, spawn: SPAWN } = balance.rite.site;
 type Rite = { stage: string; medium?: string; endsTick?: number };
 const riteOf = (m: Match, i: number) => eventsOf(m.bots[i]!, S2C.rite) as Rite[];
+type Killed = { roles: Record<string, string> };
+const killedOf = (m: Match, i: number) => eventsOf(m.bots[i]!, S2C.killed) as Killed[];
 const errorsOf = (m: Match, i: number) => eventsOf(m.bots[i]!, S2C.error) as { reason?: string }[];
 const hold = (m: Match, i: number, targetId: string) =>
   m.bots[i]!.room.send('act.hold', { action: 'rite', targetId, on: true });
@@ -125,5 +127,64 @@ describe("the Medium's rite (story R3)", () => {
     expect(errorsOf(m, 3).at(-1)?.reason).toBe('NOT_IN_PLAY');
     expect(riteOf(m, 2)).toEqual([]);
     expect(riteOf(m, 3)).toEqual([]);
+  });
+});
+
+describe("the martyr's return (story R4)", () => {
+  /** The shade (Bot0) at the Medium: begins the rite and waits for it to be done. */
+  async function rite(m: Match): Promise<void> {
+    const { x, y } = site();
+    teleport(m, m.bots[0]!, SITE as 'forest_deep', x + 1, y);
+    hold(m, 0, mediumHandle(m.room)!);
+    await sleep(Math.ceil(balance.rite.holdS * 1000) + 300);
+  }
+  const toDay = async (m: Match) => {
+    setPhase(m, Phase.day);
+    await sleep(200);
+  };
+
+  it('a rite before the day: back at the site at the day, alive, whole, its cooldowns where they stood', async () => {
+    const m = await night();
+    const vicar = m.bots[0]!.id;
+    const priv = playerOf(m, m.bots[0]!).priv;
+    priv.cooldownEndTick.set('confession', m.room.state.tick + 100);
+    markDead(m.room, vicar, 'knife', m.bots[1]!.id);
+    const died = m.room.state.tick;
+    await rite(m);
+    expect(playerOf(m, m.bots[0]!).alive).toBe(true); // the roster never showed it dead: no meeting yet
+    expect(simOf(m.room).players.get(vicar)!.dead).toBe(true);
+    await toDay(m);
+    const p = simOf(m.room).players.get(vicar)!;
+    expect({ dead: p.dead, placed: p.placed }).toEqual({ dead: false, placed: true });
+    expect(avatarMemory(m.room).sceneOf.get(avatarMemory(m.room).handleOf.get(vicar)!)).toBe(SITE);
+    expect(priv.body.hp).toBe(balance.body.maxHp);
+    expect(priv.cooldownEndTick.get('confession')).toBeGreaterThan(died + 100);
+    expect(riteOf(m, 0).at(-1)).toEqual({ stage: 'returned' });
+    for (const i of [1, 2, 3, 4]) expect(riteOf(m, i)).toEqual([]);
+    for (const room of m.room.state.scenes.values()) expect(room.bodies.has(`body_${vicar}`)).toBe(false);
+  });
+
+  it('no rite, or a rite too late: no return; the shade is a ghost at the day and the Medium refuses it', async () => {
+    const m = await night();
+    markDead(m.room, m.bots[0]!.id, 'knife', m.bots[1]!.id);
+    await sleep(150);
+    await toDay(m);
+    expect(simOf(m.room).players.get(m.bots[0]!.id)!.dead).toBe(true);
+    expect(Object.keys(killedOf(m, 0).at(-1)!.roles)).toHaveLength(5);
+    await rite(m);
+    expect(errorsOf(m, 0).at(-1)?.reason).toBe('NOT_IN_PLAY');
+    expect(riteOf(m, 0).map((r) => r.stage)).toEqual(['open']);
+  });
+
+  it('a cover in the Vicar look comes back the same way', async () => {
+    const m = await startMatch(colyseus, 5, { Bot0: 'drifter', Bot1: 'killer' });
+    playerOf(m, m.bots[0]!).look = 'vicar';
+    setPhase(m, Phase.night);
+    await sleep(150);
+    markDead(m.room, m.bots[0]!.id, 'knife', m.bots[1]!.id);
+    await rite(m);
+    await toDay(m);
+    expect(simOf(m.room).players.get(m.bots[0]!.id)!.dead).toBe(false);
+    expect(riteOf(m, 0).at(-1)).toEqual({ stage: 'returned' });
   });
 });

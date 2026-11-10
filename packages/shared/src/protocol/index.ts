@@ -561,9 +561,10 @@ export interface S2CPayloads {
   /**
    * Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade
    * (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick`
-   * is the tick it is done on; it cannot be interrupted) and `done` when it is.
+   * is the tick it is done on; it cannot be interrupted), `done` when it is, and (R4) `returned` when the seat lives
+   * again at the next day.
    */
-  rite: { stage: 'open' | 'begun' | 'done'; medium?: string; endsTick?: number };
+  rite: { stage: 'open' | 'begun' | 'done' | 'returned'; medium?: string; endsTick?: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

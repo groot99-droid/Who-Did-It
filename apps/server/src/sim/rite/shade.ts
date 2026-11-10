@@ -13,31 +13,30 @@ import { sceneKey } from '../World';
  * on the line does (C1): its `killed` names no role, its view holds no ghost and no ghost tag (`Visibility.ts`), and
  * the ghost channel neither reaches it nor takes its lines (`Chat.ts`). One shade per match: the first such death.
  * At the next day phase (or the Final Night) a shade still waiting becomes an ordinary ghost, and only then is it
- * sent every seat's role. The Medium's rite (R3) is what brings a shade back instead. Room memory only.
+ * sent every seat's role. A shade whose rite is done comes back instead (`rite.ts`, R4). Room memory only.
  */
 interface ShadeMemory {
   /** The match's shade while it waits; null before the death and once it has become a ghost (or returned). */
   seat: string | null;
   /** The seat that was this match's shade, kept after the wait ends: the martyr is one seat per match. */
   martyr: string | null;
+  /** The tick the shade died on: a return resumes its cooldowns where they stood. */
+  deathTick: number;
 }
 
 const memories = new WeakMap<PartyRoom, ShadeMemory>();
 const VICAR_LOOK = roles.roles.vicar?.look ?? null;
-/** The phases that close a shade's wait: a new day, or the Final Night that replaces one. */
-const DAWNS: readonly number[] = [Phase.day, Phase.finalNight];
+/** The phases that close a shade's wait: a new day, or the Final Night that replaces one (`rite.ts` hears them). */
+export const DAWNS: readonly number[] = [Phase.day, Phase.finalNight];
 
 function memoryOf(room: PartyRoom): ShadeMemory {
   let memory = memories.get(room);
   if (memory) return memory;
-  memories.set(room, (memory = { seat: null, martyr: null }));
+  memories.set(room, (memory = { seat: null, martyr: null, deathTick: 0 }));
   const m = memory;
   onSim(room, 'start', () => {
     m.seat = null;
     m.martyr = null;
-  });
-  onSim(room, 'phase', (e) => {
-    if (DAWNS.includes(e.data?.to as number)) expireShade(room, m);
   });
   return memory;
 }
@@ -67,18 +66,30 @@ export function becomesShade(room: PartyRoom, seat: string, cause: DeathCause): 
   if (memory.martyr !== null) return false;
   memory.martyr = seat;
   memory.seat = seat;
+  memory.deathTick = room.state.tick;
   return true;
 }
 
-/** Ends the wait: the shade is now what it would have been, an ordinary ghost (R3's return goes before this). */
-function expireShade(room: PartyRoom, memory: ShadeMemory): void {
-  const seat = memory.seat;
-  if (seat === null) return;
+/** Ends the shade's wait without a ghost (R4's return): its seat and death tick, or null when none waits. */
+export function endShade(room: PartyRoom): { seat: string; deathTick: number } | null {
+  const memory = memories.get(room);
+  const seat = memory?.seat ?? null;
+  if (!memory || seat === null) return null;
   memory.seat = null;
+  simOf(room).viewsDirty = true;
+  return { seat, deathTick: memory.deathTick };
+}
+
+/** Ends the wait with no rite done (`rite.ts`, at the next day): the shade is now an ordinary ghost. */
+export function expireShade(room: PartyRoom): void {
+  const ended = endShade(room);
+  if (ended) ghostView(room, ended.seat);
+}
+
+/** A ghost's view of the roles, late: a second `killed`, with no cutscene, since the death already played its own. */
+export function ghostView(room: PartyRoom, seat: string): void {
   const p = simOf(room).players.get(seat);
   if (!p) return;
-  simOf(room).viewsDirty = true;
-  // A ghost's view of the roles, late: no cutscene, since the death already played its own.
   room.clients
     .getById(seat)
     ?.send(S2C.killed, { sceneId: sceneKey(p.sceneIdx), cause: 'knife', roles: rolesOf(room) });
