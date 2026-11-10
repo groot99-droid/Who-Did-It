@@ -2,6 +2,7 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, economy } from '@wdi/content';
 import { Phase } from '@wdi/shared';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { handleHold } from '../src/sim/Hold';
 import { addStack, count } from '../src/sim/Inventory';
 import { maybeBuySnare, snareShopAt } from '../src/sim/npc/snares';
 import { simOf } from '../src/sim/RoomSim';
@@ -67,7 +68,7 @@ describe('NPC seats and snares (K6b)', () => {
     const { x, y } = openRun('forest', 6);
     placeSeat(party, human, 'forest', x, y);
     addStack(party.room.state.players.get(human)!, 'snare', 1);
-    send(party.humans[0]!, 'act.ability', { abilityId: 'snare' }, 0);
+    await send(party.humans[0]!, 'act.ability', { abilityId: 'snare' }, 40);
     advance(party, 3);
     expect(party.room.state.scenes.get('forest')!.snares.size).toBe(1);
     placeSeat(party, human, 'forest', x + 4, y);
@@ -96,6 +97,7 @@ describe('NPC seats and snares (K6b)', () => {
     expect(snareShopAt(party.room, player, economy.shops.store!.prop)).toBeUndefined();
     npcRow.buyChance = 1;
     placeSeat(party, npc, 'forest', 16, 22);
+    handleHold(party.room, npc, { action: 'shop', targetId: stall, on: true }); // as `sellAt` opens it first
     maybeBuySnare(party.room, npc, player, stall);
     expect(count(player, 'snare')).toBe(1);
     expect(snareShopAt(party.room, player, stall)).toBeUndefined(); // one at a time
