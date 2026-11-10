@@ -58,6 +58,7 @@ parent `session_01M5mAcXthXUMxUcnHeznJEZ`) are another project: leave them.
 
 ## Archival routine
 
+STOPPED on 2026-11-10 at the owner's request (disabled, not deleted; re-enable with `update_trigger enabled=true`).
 Scheduled task `trig_01GJNA6wgCRBQ5otxwnCgZaB`, hourly, fires into the orchestrator session. First routine
 `trig_01RZfT2Cp4tdespASrPWEx5o` is disabled: it had no connectors, so its sessions lacked the session tools.
 Rule: archive a session only if idle, untouched for over an hour, status bucket completed, work merged or
