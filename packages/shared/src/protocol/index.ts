@@ -33,6 +33,8 @@ export const C2S = {
   petitionOpen: 'petition.open',
   /** Round 10, B3: sign the open petition. */
   petitionSign: 'petition.sign',
+  /** Round 10, B6d (GDD 3.8, seams.md 3 row 35): file a case at the Final Night's end trial. */
+  trialFile: 'trial.file',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -117,7 +119,28 @@ export const S2C = {
   storyCard: 'story.card',
   /** Story mode, private to the player's own client: the chapter's goals and which are done. */
   storyGoals: 'story.goals',
+  /** Story mode, part 2 (docs/accounts/plan.md 5), private to the player's own client: the save at a chapter break. */
+  storySaved: 'story.saved',
+  /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
+  achv: 'achv',
 } as const;
+
+/**
+ * A story save as it crosses the wire (docs/accounts/plan.md 5). The accounts session owns the validating schema
+ * (`StorySave`); the client reads only the fields named here and passes the whole object back unchanged.
+ */
+export interface StorySaveWire {
+  v: number;
+  storyId: string;
+  /** The chapter a Continue starts; `null` when the story is finished. */
+  nextChapterId: string | null;
+  finished: string[];
+  handOn: unknown[];
+  replayUsed: string[];
+  summaries: unknown[];
+  rev: number;
+  savedAt: number;
+}
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
@@ -145,7 +168,14 @@ export type HoldAction =
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
   | 'sleep'
   // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
-  | 'cuff';
+  | 'cuff'
+  // Round 10 (V2, GDD 3.4; seams.md 3 row 38): the cover-up verbs. `drag` is above.
+  | 'clean'
+  | 'wash'
+  | 'unlock'
+  | 'crowbar'
+  // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
+  | 'dust';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -255,7 +285,11 @@ export interface C2SPayloads {
    * `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat`
    * (Impersonate, the night powers, Last Shot) a seat id.
    */
-  'act.ability': { abilityId: string; targetId?: string };
+  /**
+   * `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. `with` is
+   * Compare's second lift (V1b); `targetId` the first, both of the seat's own Notebook entries.
+   */
+  'act.ability': { abilityId: string; targetId?: string; kind?: string; value?: number; with?: string };
   /** Re-validated every tick. */
   /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
   'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
@@ -343,9 +377,11 @@ export interface C2SPayloads {
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
    * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
-   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   * replays a finished chapter (Q-S4) and defaults to the story's first. `resume` (part 2) is the save the client was
+   * last given by `story.saved`, sent back untouched: the device store has no other copy (docs/accounts/plan.md 5). The
+   * server re-validates it and decides; the client never composes one.
    */
-  'story.start': { storyId: string; chapterId?: string };
+  'story.start': { storyId: string; chapterId?: string; resume?: StorySaveWire };
   /** Story mode: closes the card that is up. Refused 422 with no card up. */
   'story.continue': Record<string, never>;
   /**
@@ -362,6 +398,7 @@ export interface C2SPayloads {
   /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
   'petition.open': { accused: string; charge: string; entries: string[] };
   'petition.sign': { id: string };
+  'trial.file': { accused: string; charge: string; entries: string[] };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
@@ -401,6 +438,8 @@ export interface S2CPayloads {
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
     hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
+    /** Round 10, B6d (row 35): the Killer reached the end trial's close unconvicted (the Unseen victory). */
+    unseen?: boolean;
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -476,13 +515,17 @@ export interface S2CPayloads {
   tribunalVerdict: { roleId: string };
   /**
    * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
-   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
-   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
-   * is the next chapter's title.
+   * chapter card. `kind` is the chapter's title card, a section card (replaces the title card after a chapter's first
+   * section, docs/story/part2.md), a beat's narration, a scripted NPC line (`line`, part 2) or the chapter's end. Every
+   * string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to
+   * their values; `next` (end cards) is the next chapter's title. `sectionId` (section and line cards) names the section;
+   * `speaker` (line cards) is the speaker's display name, `portrait` its figure; a line card holds several lines.
    */
   'story.card': {
-    kind: 'title' | 'beat' | 'end';
+    kind: 'title' | 'section' | 'beat' | 'line' | 'end';
     chapterId: string;
+    sectionId?: string;
+    speaker?: string;
     title?: string;
     lines: string[];
     portrait?: string;
@@ -490,8 +533,19 @@ export interface S2CPayloads {
     summary?: Record<string, number>;
     next?: string;
   };
+  /**
+   * Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break
+   * (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it
+   * back as `story.start.resume`. It holds break state only, no secret of a live match.
+   */
+  'story.saved': { save: StorySaveWire };
   /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
   'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
+  /**
+   * Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step
+   * (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only.
+   */
+  achv: { id: string; step: number; steps: number; done: boolean };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -542,6 +596,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
+  'trial.file': 2,
   'story.start': 2,
   'story.continue': 5,
 };

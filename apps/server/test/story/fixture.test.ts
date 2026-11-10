@@ -1,17 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { STORY_ID, StoryDigest, chaptersReady, loadStoryFile, storyDef, storyReady } from './fixture';
 
-// The fixture's own checks: they run before the engine and the content exist, and keep running after.
-// `WDI_STORY_REQUIRED=1` (CI turns it on once S1 and S2 have merged) turns "not there yet" into a failure, so the
-// story suites cannot be skipped by accident after the integration lands.
+// The fixture's own checks. S1's content and S2's engine are merged, so the story suites run unconditionally; this
+// test fails if either goes missing, so a suite can never be skipped without anyone seeing.
 
 describe('the story test fixture', () => {
-  it('knows whether the story content and engine are in', () => {
-    expect(typeof storyReady()).toBe('boolean');
-    if (process.env.WDI_STORY_REQUIRED === '1') {
-      expect(storyDef(), `S1 has not merged story.json with ${STORY_ID}`).not.toBeNull();
-      expect(chaptersReady(), 'S2 has not merged the beat runner and the seat handover').toBe(true);
-    }
+  it('has the story content and the engine, so no story suite is skipped', () => {
+    expect(storyReady()).toBe(true);
+    expect(storyDef(), `story.json has no ${STORY_ID}`).not.toBeNull();
+    expect(chaptersReady(), 'the beat runner and the seat handover are in sim/story/').toBe(true);
   });
 
   it('reads story.json by the README shape when it exists', () => {

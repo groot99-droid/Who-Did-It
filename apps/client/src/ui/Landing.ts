@@ -1,3 +1,5 @@
+import { ACHV_COPY } from './achievements/copy';
+import { openAchievements } from './achievements/AchievementsPanel';
 import type { PartyVisibility } from '../net/protocol';
 import { readAudioSettings, onAudioSettings, writeAudioSettings } from '../view/audioSettings';
 import { MENU_COPY as C, fill } from './copy';
@@ -11,6 +13,7 @@ import { profileCode, readProfile } from './menu/profileModel';
 import { openQuitDialog } from './menu/quit';
 import { STORY_COPY } from './story/copy';
 import type { StoryCatalogEntry } from './story/model';
+import type { StorySaveWire } from '@wdi/shared/protocol';
 import { openStoryMenu } from './story/StoryMenu';
 import { openStartDialog } from './menu/startDialog';
 import { titleLetters } from './theme/title';
@@ -33,7 +36,7 @@ export interface LandingOptions {
   /** Story mode (docs/story/README.md): the stories the title screen's Story entry lists; none hides the entry. */
   stories?: readonly StoryCatalogEntry[];
   /** Creates the story room and starts the story; `chapterId` replays a finished chapter. */
-  onStory?(name: string, storyId: string, chapterId?: string): Promise<void>;
+  onStory?(name: string, storyId: string, chapterId?: string, resume?: StorySaveWire): Promise<void>;
   /** The music bus, so the menu theme can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
@@ -81,6 +84,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
   const join = menuButton(C['menu.join'], '⇥');
   const story = menuButton(STORY_COPY['story.menu.entry'], '★');
   story.setAttribute('data-testid', 'menu-story');
+  const trophies = menuButton(ACHV_COPY['achv.menu.entry'], '★');
+  trophies.setAttribute('data-testid', 'menu-trophies');
   const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+');
   const friends = menuButton(C['menu.friends'], '☰');
   const settingsBtn = menuButton(C['menu.settings'], '⚙');
@@ -127,6 +132,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
       }),
     ),
   );
+  trophies.addEventListener('click', () => show((onClose) => openAchievements({ root, onClose })));
   quit.addEventListener('click', () =>
     show((onClose) =>
       openQuitDialog({ root, onClose, leave: opts.onQuit ?? (async () => undefined), music: opts.music }),
@@ -192,6 +198,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         start,
         ...((opts.stories?.length ?? 0) > 0 && opts.onStory ? [story] : []),
         join,
+        trophies,
         profile,
         friends,
         settingsBtn,

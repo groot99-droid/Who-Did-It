@@ -222,6 +222,8 @@
       "target": "ground",
       "castS": 0,
       "requires": "chalk",
+      "cooldownS": 5,
+      "params": { "symbols": 4 },
       "effect": "Draws a floor mark visible to everyone.",
       "ships": "V1",
       "gddRef": "3.2"

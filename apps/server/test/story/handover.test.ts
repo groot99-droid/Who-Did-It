@@ -1,6 +1,7 @@
 import { expect, it } from 'vitest';
 import { isNpcSeat } from '../../src/sim/Npc';
 import { runInvariants } from '../../src/sim/auto/invariants';
+import { vendettaOf } from '../../src/sim/vendettas/state';
 import {
   chaptersStarted,
   humanRole,
@@ -37,6 +38,14 @@ describeChapters('the seat handover (README 2)', () => {
         expect(runInvariants(sr.room), `invariants at the start of ${ch.id}`).toEqual([]);
 
         const me = humanSeat(sr);
+        // A Killer chapter's vendetta sits on the player's seat, and the Killer card is held once.
+        if ((ch as { vendetta?: string }).vendetta !== undefined) {
+          expect(vendettaOf(sr.room, me)?.id, `vendetta at ${ch.id}`).toBe(
+            (ch as { vendetta?: string }).vendetta,
+          );
+          const killers = [...sr.room.state.players.values()].filter((p) => p.priv.role.roleId === ch.roleId);
+          expect(killers.length, `holders of ${ch.roleId} at ${ch.id}`).toBe(1);
+        }
         const priv = sr.room.state.players.get(me)!.priv;
         // A fresh deal writes no notebook line, and nothing of the last chapter's private view rides along
         // unless the previous chapter names a `handOn`.

@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `input.move` | `{ seq: number; dx: number; dy: number; sprint: boolean; sneak: boolean }` | 25/s | 20 Hz; one applied per tick, newest wins; the vector is normalised server-side. |
 | `act.interact` | `{ targetId: string }` | 5/s | - |
-| `act.ability` | `{ abilityId: string; targetId?: string }` | 5/s | `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat` (Impersonate, the night powers, Last Shot) a seat id. |
+| `act.ability` | `{ abilityId: string; targetId?: string; kind?: string; value?: number; with?: string }` | 5/s | `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. `with` is Compare's second lift (V1b); `targetId` the first, both of the seat's own Notebook entries. |
 | `act.hold` | `{ action: HoldAction; targetId: string; on: boolean; via?: string }` | 5/s | Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. |
 | `act.hide` | `{ spotId: string }` | 5/s | - |
 | `act.check` | `{ spotId: string }` | 5/s | - |
@@ -45,7 +45,7 @@
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
 | `talk.ask` | `{ targetId: string; ask: 'town' \| 'time' }` | 5/s | Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town` (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure), `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`. |
-| `story.start` | `{ storyId: string; chapterId?: string }` | 2/s | Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId` replays a finished chapter (Q-S4) and defaults to the story's first. |
+| `story.start` | `{ storyId: string; chapterId?: string; resume?: StorySaveWire }` | 2/s | Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId` replays a finished chapter (Q-S4) and defaults to the story's first. `resume` (part 2) is the save the client was last given by `story.saved`, sent back untouched: the device store has no other copy (docs/accounts/plan.md 5). The server re-validates it and decides; the client never composes one. |
 | `story.continue` | `Record<string, never>` | 5/s | Story mode: closes the card that is up. Refused 422 with no card up. |
 | `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
 | `inv.select` | `{ slot: number }` | 10/s | Round 10, A12 (GDD 3.30): the hotbar slot whose item is held; refused `BAD_REQUEST` outside the hotbar. |
@@ -53,6 +53,7 @@
 | `pair.answer` | `{ yes: boolean }` | 2/s | - |
 | `petition.open` | `{ accused: string; charge: string; entries: string[] }` | 2/s | `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. |
 | `petition.sign` | `{ id: string }` | 2/s | - |
+| `trial.file` | `{ accused: string; charge: string; entries: string[] }` | 2/s | - |
 | `craft.grid` | `{ size: 2 \| 3; cells: Array<string \| null> }` | 5/s | Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product inside `step()`. Refused `GRID_BOUND` for a role-bound item, `GRID_NO_RECIPE` when nothing matches, `NEED_MATERIALS` when the seat holds fewer than the cells show, `NEED_STATION` for a 3x3 away from a workbench. |
 
 Every C->S message is queued and consumed inside the server step; nothing mutates state in a message callback.
@@ -69,7 +70,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
 | `voteResult` | `{ tally: Record<string, number>; ejectedId?: string; role?: string }` | `tally` counts votes per target id and `"skip"`; voters are never named (GDD 3.8). |
-| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; hitman?: { seatId: string; day: number; stage: 'arrived' \| 'killed' \| 'boarded' \| 'stopped' }; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21): `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in `alsoWon`; `stopped` died before boarding). |
+| `gameOver` | `{ winner: number; roles: Record<string, string>; summary: string; alsoWon?: string[]; undealt?: string[]; paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> }; hitman?: { seatId: string; day: number; stage: 'arrived' \| 'killed' \| 'boarded' \| 'stopped' }; /** Round 10, B6d (row 35): the Killer reached the end trial's close unconvicted (the Unseen victory). */ unseen?: boolean; }` | `roles` are the final roles; `alsoWon` lists an ejected Drifter among the winners, `undealt` the cards nobody held (GDD 3.1, 3.8). Round 10 (C5, seams.md row 18): `paintTown`, in a Paint The Town Red match only, the unique count the win needed and each Killer seat's unique and total kills. Round 10 (C4b, seams.md row 21): `hitman`, when the Hitman came: the turned seat, its day, and how far it got (`boarded` won the Contract, in `alsoWon`; `stopped` died before boarding). |
 | `noise` | `{ sceneId: string; x: number; y: number; kind: string }` | - |
 | `shout` | `{ sceneId: string; x: number; y: number }` | Where the shout rang; names no seat, no card and no body. |
 | `error` | `{ code: ErrorCode; msg: string; reason?: RefusalReason; args?: RefusalArgs; interaction?: string }` | A refusal, to the refused client only (round 10, A1; docs/round9/failures.md 6.1). `reason` is a `RefusalReason` (append-only), `args` its ids and numbers, `interaction` the logic-table entry that refused; `code` is `REASON_CODE[reason]`. The client shows the reason's line, never `msg`, which stays for logs and for a server site not yet converted. |
@@ -86,8 +87,10 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 | `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
-| `story.card` | `{ kind: 'title' \| 'beat' \| 'end'; chapterId: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. |
+| `story.card` | `{ kind: 'title' \| 'section' \| 'beat' \| 'line' \| 'end'; chapterId: string; sectionId?: string; speaker?: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the chapter's title card, a section card (replaces the title card after a chapter's first section, docs/story/part2.md), a beat's narration, a scripted NPC line (`line`, part 2) or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. `sectionId` (section and line cards) names the section; `speaker` (line cards) is the speaker's display name, `portrait` its figure; a line card holds several lines. |
+| `story.saved` | `{ save: StorySaveWire }` | Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it back as `story.start.resume`. It holds break state only, no secret of a live match. |
 | `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
+| `achv` | `{ id: string; step: number; steps: number; done: boolean }` | Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -219,7 +222,14 @@ export type HoldAction =
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
   | 'sleep'
   // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
-  | 'cuff';
+  | 'cuff'
+  // Round 10 (V2, GDD 3.4; seams.md 3 row 38): the cover-up verbs. `drag` is above.
+  | 'clean'
+  | 'wash'
+  | 'unlock'
+  | 'crowbar'
+  // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
+  | 'dust';
 ```
 
 ```ts

@@ -12,14 +12,10 @@ import { markDead } from '../../src/sim/Death';
 import { isNpcSeat } from '../../src/sim/Npc';
 import { ANY_SIM, onSim } from '../../src/sim/events/bus';
 import { simOf } from '../../src/sim/RoomSim';
-import {
-  enableStory,
-  queueStoryContinue,
-  queueStoryStart,
-  registerStory,
-  storyQueued,
-} from '../../src/sim/story/Story';
-import type { Story } from '../../src/sim/story/types';
+import { enableStory, queueStoryContinue, registerStory, storyQueued } from '../../src/sim/story/Story';
+import { storyArc } from '@wdi/content';
+import { unitsOf } from '../../src/sim/story/units';
+import type { StorySave } from '../../src/accounts/saves';
 import { type Party, advance, lobbyOf, pauseClock } from '../npcHelpers';
 
 /**
@@ -43,8 +39,10 @@ export const STORY_MSG = {
 } as const;
 
 export interface StoryCard {
-  kind: 'title' | 'beat' | 'end';
+  kind: 'title' | 'section' | 'beat' | 'line' | 'end';
   chapterId: string;
+  sectionId?: string;
+  speaker?: string;
   title?: string;
   lines: string[];
   portrait?: string;
@@ -74,14 +72,17 @@ export interface StoryDef {
 
 // --- what exists yet -------------------------------------------------------------------------------------------
 
-/** `story.json` read straight off disk (README 1 fixes its shape), or null while S1's file has not merged. */
+/**
+ * The stories of `story.json` as the engine plays them: one entry of `chapters` per *section* (docs/story/arc.md E1;
+ * the part-1 name for the running unit is kept), in play order.
+ */
 export function loadStoryFile(): Record<string, StoryDef> | null {
-  const path = fileURLToPath(new URL('../../../../packages/content/data/story.json', import.meta.url));
-  try {
-    return (JSON.parse(readFileSync(path, 'utf8')) as { stories: Record<string, StoryDef> }).stories;
-  } catch {
-    return null;
-  }
+  return Object.fromEntries(
+    Object.entries(storyArc.stories).map(([id, st]) => [
+      id,
+      { ...st, chapters: unitsOf(st).map((u) => ({ ...u, beats: u.beats })) } as unknown as StoryDef,
+    ]),
+  );
 }
 
 /** The story id the tests play; README 1 names it. */
@@ -138,6 +139,8 @@ export interface StartOptions {
   invariantsEvery?: number;
   /** Runs between `enableStory` and the first step: a test that changes the seed words does it here. */
   afterEnable?: (room: PartyRoom) => void;
+  /** A validated save to continue from (plan 5). */
+  resume?: StorySave;
 }
 
 /**
@@ -171,11 +174,10 @@ export async function startStoryRoom(
   };
   captureSent(sr);
   onSim(room, ANY_SIM, (ev) => sr.events.push({ ...ev }));
-  // The engine resolves a story by id from its registry; the content file's story is registered as it stands.
-  registerStory(def as unknown as Story);
-  enableStory(room, storyId, { humanId });
+  // The engine resolves a story by id: the content file's own arc, as it stands.
+  registerStory(storyArc.stories[storyId]!);
+  enableStory(room, storyId, { humanId, ...(opts.resume !== undefined && { resume: opts.resume }) });
   opts.afterEnable?.(room);
-  queueStoryStart(room);
   for (let i = 0; i < 5 && room.state.phase === Phase.lobby; i++) stepRoom(sr, 1, opts.invariantsEvery ?? 0);
   if (room.state.phase === Phase.lobby) throw new Error('startStoryRoom: the story did not start');
   return sr;
@@ -315,7 +317,7 @@ export class StoryDigest {
   }
 
   finish(sr: StoryRoom): string {
-    for (const c of sr.cards) this.hash.update(`card ${c.tick} ${c.card.kind} ${c.card.chapterId}\n`);
+    for (const c of sr.cards) this.hash.update(`card ${c.tick} ${c.card.kind} ${c.card.sectionId}\n`);
     for (const e of sr.events)
       if (e.kind.startsWith('story.'))
         this.hash.update(`${e.tick} ${e.kind} ${JSON.stringify(e.data ?? {})}\n`);

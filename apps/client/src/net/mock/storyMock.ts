@@ -17,9 +17,24 @@ export const MOCK_STORY_CATALOG: StoryCatalogEntry[] = [
     title: 'Mock story',
     blurb: 'Three short chapters that exist to test the cards.',
     chapters: [
-      { id: 'mock1', title: 'First chapter', setup: 'A short set-up line for the first chapter.' },
-      { id: 'mock2', title: 'Second chapter', setup: 'A short set-up line for the second chapter.' },
-      { id: 'mock3', title: 'Third chapter', setup: 'A short set-up line for the third chapter.' },
+      {
+        id: 'mock1',
+        title: 'First chapter',
+        setup: 'A short set-up line for the first chapter.',
+        summary: 'One line on what happened in the first chapter.',
+      },
+      {
+        id: 'mock2',
+        title: 'Second chapter',
+        setup: 'A short set-up line for the second chapter.',
+        summary: 'One line on what happened in the second chapter.',
+      },
+      {
+        id: 'mock3',
+        title: 'Third chapter',
+        setup: 'A short set-up line for the third chapter.',
+        summary: 'One line on what happened in the third chapter.',
+      },
     ],
   },
 ];
@@ -43,6 +58,30 @@ export function mockChapterSteps(n: 1 | 2 | 3): Step[] {
   return [
     { card: { kind: 'title', chapterId: id, title, lines: ['Mock role, mock town.', `Set-up line ${n}.`] } },
     { goals: goals(id, 0) },
+    // Part 2, chapter 2 only (chapters 1 and 3 stay as part 1's): a section card, then a scripted NPC's lines.
+    ...(n === 2
+      ? ([
+          {
+            card: {
+              kind: 'section',
+              chapterId: id,
+              sectionId: 'mock2_b',
+              title: 'Second section',
+              lines: ['The card passes to another hand.'],
+            },
+          },
+          {
+            card: {
+              kind: 'line',
+              chapterId: id,
+              sectionId: 'mock2_b',
+              speaker: 'Old Marta',
+              portrait: 'marta',
+              lines: ['The bell tolled for no one last night.', 'Someone rang it all the same.'],
+            },
+          },
+        ] satisfies Step[])
+      : []),
     {
       card: {
         kind: 'beat',
@@ -78,14 +117,15 @@ export class StoryMock {
   private cardUp = false;
 
   constructor(
-    private readonly emit: <K extends 'story.card' | 'story.goals'>(
+    private readonly emit: <K extends 'story.card' | 'story.goals' | 'story.saved'>(
       type: K,
       payload: ServerMessages[K],
     ) => void,
   ) {}
 
-  start(chapterId?: string): void {
-    const n = Number(chapterId?.replace('mock', '')) as 1 | 2 | 3;
+  start(chapterId?: string, resume?: ServerMessages['story.saved']['save']): void {
+    // A resume starts the chapter the save names; the real server re-validates it (docs/accounts/plan.md 5).
+    const n = Number((resume?.nextChapterId ?? chapterId)?.replace('mock', '')) as 1 | 2 | 3;
     this.chapter = n === 2 || n === 3 ? n : 1;
     this.load();
     this.run();
@@ -103,6 +143,22 @@ export class StoryMock {
     this.run();
   }
 
+  /** The save at the end of the current chapter: break state only, as the device store keeps it. */
+  private save(): ServerMessages['story.saved']['save'] {
+    const finished = [1, 2, 3].filter((n) => n <= this.chapter).map((n) => `mock${n}`);
+    return {
+      v: 1,
+      storyId: MOCK_STORY_ID,
+      nextChapterId: this.chapter < 3 ? `mock${this.chapter + 1}` : null,
+      finished,
+      handOn: [],
+      replayUsed: [],
+      summaries: [],
+      rev: this.chapter,
+      savedAt: 0,
+    };
+  }
+
   private load(): void {
     this.steps = mockChapterSteps(this.chapter);
     this.at = 0;
@@ -114,6 +170,7 @@ export class StoryMock {
       const step = this.steps[this.at++]!;
       if ('goals' in step) this.emit('story.goals', step.goals);
       else {
+        if (step.card.kind === 'end') this.emit('story.saved', { save: this.save() });
         this.emit('story.card', step.card);
         this.cardUp = true;
         return;

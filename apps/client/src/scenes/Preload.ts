@@ -1,3 +1,4 @@
+import { mountAchievements } from '../ui/achievements/AchievementsLayer';
 import Phaser from 'phaser';
 import { installWorldRouter } from '../net/worldRouter';
 import { installArtSwitch } from '../view/artSwap';
@@ -7,6 +8,7 @@ import { mountLoadingScreen } from '../view/LoadingScreen';
 import { MusicBus } from '../view/MusicBus';
 import { installMusicDirector } from '../view/MusicDirector';
 import { overlayRoot } from '../ui/dom';
+import { storyCatalog } from '../ui/story/catalog';
 import { mountStoryLayer } from '../ui/story/StoryLayer';
 import { REG_MUSIC, getFlags, getNet } from './registry';
 import { firstScene, hasStudioMarker } from '../studio/route';
@@ -26,7 +28,8 @@ export class Preload extends Phaser.Scene {
     ensureGreybox(this.textures);
     installArtSwitch(this.game, flags.art, base);
     installWorldRouter(this.game, getNet(this), { mock: flags.mock });
-    mountStoryLayer(overlayRoot(), getNet(this)); // story mode's cards and goals strip (private story.card, story.goals)
+    mountStoryLayer(overlayRoot(), getNet(this), undefined, () => storyCatalog(flags.mock)); // story mode's cards and goals strip (private story.card, story.goals)
+    mountAchievements(overlayRoot(), getNet(this)); // round 10, E1: the private `achv` toasts and the device record
     // Round 6 (locked call sites): the music bus and its director (6L), the loading screen (6K), the admin route (6D).
     this.registry.set(REG_MUSIC, new MusicBus());
     installMusicDirector(this.game, getNet(this));

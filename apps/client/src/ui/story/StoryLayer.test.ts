@@ -5,6 +5,8 @@ import { StoryMock } from '../../net/mock/storyMock';
 import type { NetEvents } from '../../net/NetworkService';
 import { FakeNode, installFakeDom } from '../main/fakeDom';
 import { mountStoryLayer } from './StoryLayer';
+import { MOCK_STORY_CATALOG } from '../../net/mock/storyMock';
+import type { StorySaveStore } from './save';
 
 (FakeNode.prototype as unknown as { focus(): void }).focus = () => undefined;
 
@@ -66,6 +68,78 @@ describe('the story layer', () => {
     }
     expect(parent.byTestId('story-card')?.getAttribute('data-chapter')).toBe('mock3');
     expect(parent.byTestId('story-next')).toBeUndefined();
+  });
+
+  it('draws a section card and an NPC line card with the speaker, lines and section id', () => {
+    const { parent, mock } = rig();
+    mock.start('mock2');
+    parent.byTestId('story-continue')?.click(); // title -> section
+    const section = parent.byTestId('story-card');
+    expect(section?.getAttribute('data-kind')).toBe('section');
+    expect(section?.getAttribute('data-section')).toBe('mock2_b');
+    expect(parent.byTestId('story-title')?.content).toBe('Second section');
+    parent.byTestId('story-continue')?.click(); // section -> line
+    const line = parent.byTestId('story-card');
+    expect(line?.getAttribute('data-kind')).toBe('line');
+    expect(parent.byTestId('story-speaker')?.content).toBe('Old Marta');
+    expect(
+      parent
+        .all()
+        .filter((n) => n.attrs.get('data-testid') === 'story-line')
+        .map((l) => l.content),
+    ).toEqual(['The bell tolled for no one last night.', 'Someone rang it all the same.']);
+  });
+
+  it('hands each story.saved to the save store, whole', () => {
+    const bus = mitt<NetEvents>();
+    const written: unknown[] = [];
+    const saves: StorySaveStore = {
+      read: () => null,
+      write: (x) => void written.push(x),
+      clear: () => undefined,
+    };
+    mountStoryLayer(root() as unknown as HTMLElement, { bus, send: (() => undefined) as never }, saves);
+    const save = {
+      v: 1,
+      storyId: 's',
+      nextChapterId: 'c2',
+      finished: ['c1'],
+      handOn: [],
+      replayUsed: [],
+      summaries: [],
+      rev: 1,
+      savedAt: 0,
+    };
+    bus.emit('story.saved', { save });
+    expect(written).toEqual([save]);
+  });
+
+  it('shows the end screen with every chapter, once the last end card is closed', async () => {
+    const bus = mitt<NetEvents>();
+    const mock = new StoryMock((type, payload) => bus.emit(type, payload as never));
+    const parent = root();
+    mountStoryLayer(
+      parent as unknown as HTMLElement,
+      {
+        bus,
+        send: ((type: string) => {
+          if (type === 'story.continue') mock.continue();
+        }) as never,
+      },
+      { read: () => null, write: () => undefined, clear: () => undefined },
+      async () => MOCK_STORY_CATALOG,
+    );
+    mock.start('mock3');
+    let guard = 0;
+    while (parent.byTestId('story-card') && guard++ < 20) parent.byTestId('story-continue')?.click();
+    await new Promise((r) => setTimeout(r, 0));
+    const finale = parent.byTestId('story-finale');
+    expect(finale).toBeDefined();
+    const chapters = parent.all().filter((n) => n.attrs.get('data-testid') === 'finale-chapter');
+    expect(chapters).toHaveLength(3);
+    expect(chapters[2]!.content).toContain('Loaves baked');
+    parent.byTestId('story-end-close')?.click();
+    expect(parent.byTestId('story-finale')).toBeUndefined();
   });
 
   it('the mock network answers story.start on its bus', () => {

@@ -19,7 +19,7 @@ registerInvariant('storyOneHuman', (room) => {
 registerInvariant('storyBeatsOnce', (room) => {
   const state = storyOf(room);
   if (state === null || state.chapterIdx < 0) return null;
-  const own = new Set(state.story.chapters[state.chapterIdx]?.beats.map((b) => b.id));
+  const own = new Set(state.units[state.chapterIdx]?.beats.map((b) => b.id));
   const seen = new Set<string>();
   for (const id of state.fired) {
     if (seen.has(id) || !own.has(id))

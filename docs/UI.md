@@ -2153,6 +2153,8 @@ reach the player's own client only (`PROTOCOL.md`); every title, line, goal and 
 |---|---|---|
 | `title` | The chapter's name, its set-up lines | `story.card.begin` |
 | `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `section` (part 2) | The section's name and set-up line; replaces the chapter title card after the chapter's first section (A515/A517 owner answers) | `story.card.continue` |
+| `line` (part 2) | A scripted NPC speaking: the speaker's name (`speaker`), the portrait, several lines shown as speech in quotation marks and italics (rich lines, darker folk-horror tone, A515 F1/F2) | `story.card.continue` |
 | `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
 
 A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
@@ -2163,13 +2165,94 @@ chapter has no goals; an end card clears it. At 600 px and under it shrinks to o
 beside the clock, because the phone's top band is full.
 
 The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
-opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+opens the chapter list of the story (the arc's chapters, since P2's #479; a chapter holds several sections): each chapter with its set-up line, finished chapters marked and replayable (kept in
 `localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
 (Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
 server deals the first card and scene.
 
-Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
+**Save and resume (part 2, P3 2/3).** The server saves at each chapter break and sends the save in the private
+`story.saved`; the client keeps it whole on the device (`localStorage['wdi:story:save']`, one slot per story, never rolled
+back to an older `rev`, a damaged value is no save) behind the `StorySaveStore` interface (`ui/story/save.ts`), which a
+signed-in account replaces (`docs/accounts/plan.md` 5). The Story menu shows a **Continue from Chapter N** row
+(`story-resume`) above Begin when the saved `nextChapterId` is a chapter this build knows; it sends
+`story.start { storyId, resume }` with the save untouched. The client never composes or edits a save, and the server
+re-validates and decides.
+
+**End screen (part 2, P3 3/3).** When the player closes the story's last end card (one with no `next`), a dedicated
+screen (`story-finale`) lists every chapter of the story in order: its number and title, its one-line `summary` from the
+content (the set-up line when a chapter has none), a "Lost" mark for a chapter the save says failed, and its counters
+(the chapter's end-card counters of this session win over the save's). Below, the **story-tree achievements** this device
+has earned (`readEarned()` with titles from `achievements.json`), or "Nothing earned yet". One button closes it. The
+save's `summaries` are read defensively as `{ chapterId, failed?, counters? }` (proposed to P2); anything else is ignored.
+
+Screens `story-menu`, `story-title`, `story-section`, `story-line`, `story-resume`, `story-finale`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
 fixture story). `e2e/screens-story-live.spec.ts` plays the same entry against the real server: Story, Begin, the title and
 opening beat cards, the map's cutscene, then the HUD with the goals strip pinned top-left. Screenshots land in the specs'
 output like `screens.spec.ts`'s.
+
+### 14.54 The evidence verbs (10V, round 10)
+
+The copy proposed for V1a's Inspect and Plant Clue (GDD 3.4). The server sends only the refusal reasons of 14.43 and
+`clueFound`. 10Y adds the keys and writes these lines into a table here as it places them, since a table row names a
+key the client holds (A414's deck test):
+
+- `verb.inspect`: "Inspect"; `verb.inspect.prompt`: "Inspect with a Lens ({n} left)".
+- `verb.inspect.done.verified`: "Verified: this clue is true."
+- `verb.inspect.done.forged`: "Forged: someone planted this. An Accomplice is in play."
+- `verb.plant`: "Plant Clue"; `verb.plant.pick`: "Plant what?"
+- `verb.plant.footprints`: "Footprints: {height} stride"; `verb.plant.thread`: "Thread: {scarf} wool" (a thread is
+  laid only beside a door).
+- `verb.plant.done`: "Planted. It looks like any other clue."
+- `card.lens`: "Lenses: {n} of {max}. One comes back each day."
+
+A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
+away from a door `TOO_FAR {of: 'door'}`.
+
+#### The hiding spots and the kit verbs (V3)
+
+Proposed for 10Y, who adds the keys and writes the lines into a table as it places them (A414's deck test). The
+server sends `Private.hiding` (the spot id, '' when none), the hider's `NoteKind.checked` Notebook entry and Chalk
+marks as clues:
+
+- `verb.hide`: "Hide"; `verb.hide.prompt`: "Hide in the {spot}"; `verb.hide.slit`: "You are hiding. Burst Out [E]".
+- `verb.check`: "Check"; `verb.check.prompt`: "Look inside the {spot}"; `verb.check.empty`: "Nobody there."
+- `verb.burst`: "Burst Out".
+- `note.checked`: "{who} opened my {spot} at {time}." (`of` is the face shown; the spot is the hider's own scene).
+- `verb.chalk`: "Chalk"; `verb.chalk.pick`: "Draw which mark?"; `clue.chalk`: "A chalk mark. Someone drew it here."
+- `verb.shifty`: "Act Shifty"; `verb.fakeBlood`: "Fake Blood"; `verb.fakeBlood.spent`: "You have used your Fake Blood."
+
+A refusal reads its 14.43 line: a taken spot is `BUSY`, a spot out of reach `TOO_FAR {of: 'door'}`, an adult at a
+crawlspace `NOTHING_THERE`, a cooling Chalk or Act Shifty `COOLDOWN`, a second Fake Blood `SPENT {what: 'match'}`.
+#### V2, the cover-up verbs
+
+The copy proposed for Drag body, Clean, Wash and the two door verbs (GDD 3.4). The server sends only the refusal reasons of
+14.43 and the noise kinds `rag`, `skeletonKey` and `crowbar`. 10Y adds the keys and writes these lines into a table here as
+it places them:
+
+- `verb.drag`: "Drag body"; `verb.drag.drop`: "Let go"; `verb.drag.hide`: "Hide the body here".
+- `verb.clean`: "Clean"; `verb.clean.prompt`: "Wipe this clue away ({n} left)".
+- `verb.wash`: "Wash"; `verb.wash.prompt`: "Wash the Blood off".
+- `verb.unlock`: "Skeleton Key"; `verb.unlock.prompt`: "Unlock this door"; `verb.crowbar`: "Crowbar"; `verb.crowbar.prompt`: "Break this door".
+
+A refusal reads its 14.43 line: no Rag or Bucket is `NEED_ITEM {need: 'bloodyRag' | 'bucket'}`, no Skeleton Key
+`NEED_KEY {need: 'skeletonKey'}`, no Crowbar `NEED_TOOL {need: 'crowbar'}`, a card without Drag `NOT_YOUR_POWER`, a door already
+opened `ALREADY_DONE`, a body, clue or door out of reach `TOO_FAR {of: 'body' | 'clue' | 'door'}`.
+
+### 14.55 Dust, Compare and Autopsy (10V, round 10, V1b)
+
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows each
+reading by its `note` (`lift`, `comparison`, `autopsy`) and never offers it for a petition. 10Y adds the keys and writes
+the table as it places them (A414's deck test):
+
+- `verb.dust`: "Dust for prints"; `verb.dust.prompt`: "Dust ({n} left)".
+- `note.lift`: "A print lifted from {where}"; `note.lift.body`: "from the body of {name}"; `note.lift.door`: "from a door".
+- `verb.compare`: "Compare prints"; `verb.compare.pick`: "Compare which two?"
+- `note.comparison.match`: "The prints match."; `note.comparison.nomatch`: "The prints do not match." (no name, ever).
+- `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
+  "poison", "a shot", "something else", and the time shown as an estimate.
+
+Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
+`TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
+read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
