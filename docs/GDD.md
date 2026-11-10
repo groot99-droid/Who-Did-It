@@ -853,7 +853,12 @@ release changes nothing). Once a match. Only the shade is told: that the rite is
 on the Train's respawn path (3.22 "On the line"): its public `alive` true, its body gone from the scene, full health
 and stamina and no effects, its card, kit, notebook and quests kept and its cooldowns resumed where they stood. The
 return follows the look, as the martyr does, so it says nothing of a cover; only the seat is told. A shade with no
-rite done by then becomes an ordinary ghost and never returns; the rite is then refused. The buff is being built (R5).
+rite done by then becomes an ordinary ghost and never returns; the rite is then refused. **The 10X buff** (R5, A604;
+R-Q1): the returned martyr wears the private effect **Ascended** (3.22) until that day's dusk: `rite.buff.speedFactor`
+(1.3x) speed and `rite.buff.maxHpFactor` (2x) maximum health, and it comes back at that maximum. At dusk the effect
+comes off and the maximum falls back, taking any health above it. A return at the Final Night has no dusk ahead, so the
+buff lasts to the match's end. The buff follows the look like the return: it shows no sign, and only its speed is seen.
+The conversion aura waits on the conversion itself (I9; R6).
 The martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
 the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
 
@@ -960,6 +965,7 @@ figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspec
 | Knocked out | see above | `body.koS` | fists, a mugging, the slingshot | time, a meeting | down |
 | Indebted | an economy status (3.23, 8D) | until paid | unpaid rent | paying | none |
 | Charmed | one silent charge: the first killing Knife strike spends it and leaves the seat Wounded at 1 health | until spent | the well (7M, stations.md 4) | being spent | none |
+| Ascended | `rite.buff.speedFactor` (1.3x) speed and `rite.buff.maxHpFactor` (2x) maximum health | until the next dusk | the martyr's return (3.20, R5) | dusk | none |
 
 Rows that another system writes onto the body's effect list (Indebted, 3.23) are left as the body's clock finds
 them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is set by the

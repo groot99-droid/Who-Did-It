@@ -5,6 +5,7 @@ import { ensureBody, removeBody } from '../body/state';
 import { startMartyrWindow } from '../Memorial';
 import { enterScene } from '../Portals';
 import { simOf } from '../RoomSim';
+import { grantBuff } from './buff';
 
 /**
  * The martyr's return (story R4, GDD 3.20, DECISIONS A603; A600 R-Q5). At the first day phase (or the Final Night)
@@ -29,6 +30,7 @@ export function returnMartyr(room: PartyRoom, seat: string, deathTick: number): 
   for (const s of room.state.scenes.values()) s.bodies.delete(`body_${seat}`);
   removeBody(room, seat);
   ensureBody(room, seat); // a fresh body: full health, full stamina, no effects
+  grantBuff(room, seat); // R5: the 10X Vicar's speed and health until dusk
   const cooldowns = player.priv.cooldownEndTick;
   for (const [key, end] of cooldowns) if (end > deathTick) cooldowns.set(key, end + (tick - deathTick));
   sim.viewsDirty = true;

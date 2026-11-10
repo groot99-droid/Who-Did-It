@@ -1971,7 +1971,8 @@ as a block, a tension gauge with the snap line. The set points are felt, never d
 a phone) and a jolt of the pin when a lifted pin crosses its band under light tension. Pointer: press a pin and drag
 it up and down; hold the pick button for tension and let go to try the pin. Keyboard: Left and Right choose the pin,
 Up and Down lift it, Space or Enter holds and lets go. The answer is the trace the server replays. D4a adds the effect
-Resistant (`icon_effect_resistant`), named by the data and with no copy of its own.
+Resistant (`icon_effect_resistant`), named by the data and with no copy of its own. Story R5 adds Ascended (`icon_effect_ascended`, a halo over a rising
+arrow), the 10X Vicar's buff (GDD 3.20), the same way: the own body panel only, no sign on the figure.
 
 | Line | Text | Where |
 |---|---|---|
