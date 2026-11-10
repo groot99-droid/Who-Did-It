@@ -476,3 +476,78 @@ Recorded as DECISIONS A517.
 | W6 | Spawn P2 and P3 now; P5 waits |
 | W7 | Renumber the story-cards UI.md section |
 | W8 | PR #470 stays open until the owner reads it |
+
+### 8.1 W1 clarified (owner, 2026-11-08)
+
+Recorded as the DECISIONS A517 addendum. The Vicar dies a martyr (GDD 3.20, the martyr's due) and comes back the next
+day as the **10X Vicar**, who fights **against** the Zealot. The return is gated: **the Medium must resurrect the Vicar
+first**. Without the Medium's rite there is no return and no 10X buff. The rule holds in every game, story and
+multiplayer alike.
+
+**The 10X buff** is the Vicar's conversion power, upgraded from one seat at a time to an **area spread**, with other
+buffs besides (speed, health and the like). Conversion has always been in the design, though only Hear Confession is
+built: the prayer channel fills a seat's faith meter and converts it to the Religious, and converting everyone is the
+Vicar's win (`docs/round6/owner-brief.md`, the Vicar's catalyst; `docs/round9/world-mode.md`, the role goals and the
+sermon; `docs/round10/scope.md` I9, marked not built). The owner brief's "10x Ascended Return" already names the
+upgraded powers: a 10x conversion aura, Righteous Stride (faster, breaks locked doors) and Divine Judgement (once a
+match, drops disguises and stuns). Nothing is built until the owner answers the open details below; every number goes in `balance.json` and
+the GDD only.
+
+**The rite.** When the Vicar dies he meets the Medium in the **Zealot's hideout**, the anti-theme of the Vicar's
+chapel. The rite costs nothing and cannot be interrupted. The Medium has no cause to die: it is an unkillable NPC (below).
+
+**The buff's length and strength.** It lasts the whole next day and is tuned so that the Vicar could plausibly win
+that day alone: its purpose is to even the match. The numbers go in `balance.json` and the GDD only.
+
+**The Medium is an NPC gate** (owner: "the Medium is just an NPC gate"). The Medium of the rite is an
+always-present, unkillable NPC at the Zealot's hideout, not a dealt card or a seat. It needs no card, so nothing is
+dealt for it and it draws on no secret random stream (`sim/seeds.ts`). **The NPC gate replaces the dealt Medium
+card** (owner, 2026-11-08).
+
+**Knock-on of retiring the Medium card** (a roster change: whoever builds it changes the GDD in the same pull request;
+nothing is changed now):
+
+- `packages/content/data/roles.json`: the `medium` entry (V2, `firstPlayable: false`, start kit Seance Chalk and
+  Candles, ability `seance`). Retire it rather than delete it, so no id is reused (ids are append-only).
+- `packages/content/data/abilities.json` `seance` and `items.json` `seanceChalk`: kept for the NPC's rite or retired
+  with the card.
+- GDD 3.1 (the deck note "the Medium (V2) join when they ship", and the Medium lobby toggle), the GDD 3.2 Medium row
+  and its seance power, and the V2 list of GDD 3.10.
+- The deck tables: the Medium is in no `roles.json` deck today, so no deal row, role count or parity changes.
+- The coverage check of P1 (`storyCoverage`, a story marked `full`) lists every card of `roles.json`, so a retired
+  card must leave that list.
+- Nothing in `story.json`, `looks.json` or `achievements.json` names the Medium today; `docs/round10/rolecards.md`
+  does, and is updated with the GDD.
+- Wire ids: any role or ability id the wire carries is retired, never renumbered or reused.
+
+**The way there.** The Zealot's hideout sits in the **deep woods**; the dead Vicar goes there through the world, as
+given (no teleport is designed). The deep woods are a map-revamp location: new scene ids with a new prefix,
+append-only.
+
+**Same match, next day.** The return is the next day of the same match. This supersedes the owner brief's next-match
+return (`flow.ascendedVicarCandidate`, stepping off the morning train), kept here only as the old path. The brief's
+list (the 10x conversion aura, Righteous Stride, Divine Judgement) is the candidate buff list, to confirm with the
+owner beside "area spread, speed, health".
+
+**The martyr's task weight is gated too.** GDD 3.20's `tasks.martyrWeight` applies only after the Medium's
+resurrection; with no rite a martyr's ghost counts as any ghost. GDD 3.20 changes to match when this is built, not
+now.
+
+Still open for the owner:
+
+1. **The buff list.** Confirm the candidate list above (aura, Righteous Stride, Divine Judgement) against "area
+   spread, speed, health".
+### 8.2 Map revamp: a building for every role (owner, 2026-11-08)
+
+A requirement for the map revamp (A515 Q-A11): every role gets its own unique building, and each building has an
+**anti-theme** building. Known pairs so far:
+
+| Role | Its own building | Anti-theme building |
+| ---- | ---------------- | ------------------- |
+| Vicar | the chapel | the Zealot's hideout, in the deep woods |
+| Bandit | a detective's or police station, themed against the Bandit | (to name) |
+| Activist | the post office | (to name) |
+
+For the Bandit and the Activist the owner names the role's own building, themed as its opposite: the Bandit's is a
+detective's or police station, the Activist's a post office. Scene, portal and spawn ids
+stay frozen: every new building adds new ids with new prefixes, append-only (GDD 3.13, WORLD 4.3).
