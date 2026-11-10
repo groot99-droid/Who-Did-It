@@ -12,6 +12,7 @@ import {
 } from './npc/memory';
 import { runHive } from './npc/hive';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
+import { runTrialNpc } from './npc/trial';
 import { drawPersonas, releaseClaims } from './npc/routine';
 import { runNpcLight } from './npc/lights';
 import { runWorldNpc } from './npc/world';
@@ -86,7 +87,8 @@ export function runNpcs(room: PartyRoom): void {
     else if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
     else if (state.phase === Phase.meetingDiscussion || state.phase === Phase.meetingVote) {
       runMeetingVotes(room, mem, brain, player, p);
-    } else if (isWorldPhase(state.phase)) {
+    } else if (state.phase === Phase.tribunal) runTrialNpc(room, brain, player, p);
+    else if (isWorldPhase(state.phase)) {
       runWorldNpc(room, mem, brain, player, p);
       if (!p.dead && p.placed) runNpcLight(room, id, p); // round 10, K3: lights by the rule a person would follow
     }
