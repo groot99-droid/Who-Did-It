@@ -35,7 +35,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 
 **Traits.** Each player is dealt a unique triple from 27 combinations, from a random stream of its own (never the deal's): **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored, on top of the drawn figure scale of `metrics.json` `iso.figureScale`, round 8), **Scarf** red/green/blue (every character wears a storm scarf, a tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare. The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. (M5a) Height and scarf are drawn on the character in the world; the hat is not, since every character keeps its own headgear, and it shows as a glyph on the nameplate, on the role card and in the meeting roster. Traits are dealt apart from the cards, so they still say nothing about a role, and a kill leaves the killer's own traits whatever look they wear (3.4, 3.17). Traits appear on the role card, the HUD chip tooltip and the meeting roster.
 
-**The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5), the Thief (V1.5) and the Medium (V2) join when they ship. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
+**The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5) and the Thief (V1.5) join when they ship. The Medium card is retired (DECISIONS A600): the Medium is an NPC at the rite site, not a card (3.20), so no deck deals it and its id stays in `roles.json` unused. Lobby toggles (Thief, faction-only reveal) are V1.5.
 
 ### 3.2 Role cards
 
@@ -58,7 +58,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (60 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
 | **Ranger** (Village, V1.5) | No | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
 | **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the sea door at the back of the cave holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
-| **Medium** (Village, V2) | No | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
+| **Medium** (retired, A600) | — | — | — | Retired with Seance and Seance Chalk: the Medium is the NPC of the rite (3.20), not a card. The ids stay in the data so none is reused. | — | — |
 
 The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 start kit. Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Salts, Medkit and Rope reach 1.5 tiles; Bandage is instant and knocks both players back 1 tile; Plant Clue takes 2 s; Dust takes 2 s; the Slingshot reaches 5 tiles; Act Shifty's fake rings use the run radius. Universal verbs: Report and the Bell reach 2 tiles; Collect is a 2 s hold. `abilities.json` holds every verb with a number; an item's `use` points at its verb.
 
@@ -304,7 +304,7 @@ The Knife works only after dark (3.3), about 330 s of each 810 s cycle (round 10
 
 **V1.5**: Ranger (Arrest), Thief, Heirlooms, the cave's sea door, Handcuffs, Forged Alibi, the Killer's Lock door, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility (dark scenes first, M5b; 3.13), Lottie reveal, Light2D experiment, spectator mode.
 
-**V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
+**V2**: the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
 
 ### 3.11 The quick mode (removed)
 
@@ -840,6 +840,9 @@ before that reveal or after the ten minutes count as any ghost's. The boost ends
 into the room's next one. A full bar in play wins
 for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
 Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
+
+**The Medium's rite** (DECISIONS A517 addendum, A600; `docs/story/rite.md`) is being built: an NPC Medium at the rite site
+will gate the martyr's return as the 10X Vicar and the martyr's task weight. Until it lands the rules above stand.
 
 ### 3.21 Parties, profiles and friends
 

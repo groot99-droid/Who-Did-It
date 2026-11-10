@@ -49,7 +49,10 @@ export function checkStory(
       const cat = `${at} chapter ${ch.id}`;
       unique(ch.id, cat);
       const cast = ch.cast === undefined ? null : new Set(ch.cast);
-      for (const r of ch.cast ?? []) if (!(r in c.roles.roles)) err(`${cat}: cast names unknown role ${r}`);
+      for (const r of ch.cast ?? []) {
+        if (!(r in c.roles.roles)) err(`${cat}: cast names unknown role ${r}`);
+        else if (c.roles.roles[r]!.retired !== undefined) err(`${cat}: cast names retired role ${r}`);
+      }
       if (ch.cast && ch.cast.length > story.roster.npcCount + 1)
         err(`${cat}: cast of ${ch.cast.length} does not fit ${story.roster.npcCount + 1} seats`);
 
@@ -84,6 +87,7 @@ export function checkStory(
   ): void {
     const card = c.roles.roles[s.roleId];
     if (!card) err(`${sat}: unknown role ${s.roleId}`);
+    else if (card.retired !== undefined) err(`${sat}: plays retired role ${s.roleId}`);
     else if (cast && !cast.has(s.roleId)) err(`${sat}: card ${s.roleId} is not in the chapter's cast`);
     if (s.look !== undefined && !(s.look in c.looks.looks)) err(`${sat}: unknown look ${s.look}`);
     if (card && s.look === undefined && card.look == null)

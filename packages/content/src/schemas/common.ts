@@ -24,6 +24,12 @@ export const GddRef = z.string().regex(/^\d+(\.\d+)*$/, 'gddRef is a section num
 export const Ships = z.enum(['V1', 'V1.1', 'V1.5', 'V2']);
 export type Ships = z.infer<typeof Ships>;
 
+/**
+ * The DECISIONS row that retired a record (e.g. "A600"). A retired id stays in its file so it is never reused or
+ * renumbered, and nothing deals, grants or plays it (validate.ts).
+ */
+export const Retired = z.string().regex(/^A\d+$/, 'retired names a DECISIONS row like A600');
+
 export const Faction = z.enum(['village', 'cabal', 'neutral']);
 export type Faction = z.infer<typeof Faction>;
 

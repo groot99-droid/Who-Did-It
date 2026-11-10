@@ -1,5 +1,15 @@
 import { z } from 'zod';
-import { Faction, GddRef, Id, LookId, PaletteToken, PrefixedId, Ships, byPlayerCount } from './common.js';
+import {
+  Faction,
+  GddRef,
+  Id,
+  LookId,
+  PaletteToken,
+  PrefixedId,
+  Retired,
+  Ships,
+  byPlayerCount,
+} from './common.js';
 
 export const KitEntry = z.strictObject({ item: Id, qty: z.number().int().positive() });
 
@@ -39,6 +49,8 @@ export const Role = z.strictObject({
   /** A profession names the class row it plays as; every rules field equals that row's (validate.ts). */
   plays: Id.optional(),
   townWork: TownWork,
+  /** Retired (common.ts `Retired`): kept so its id is never reused; nothing deals, grants or plays it. */
+  retired: Retired.optional(),
   ships: Ships,
   /** Part of the M3 first playable (GDD 3.10). */
   firstPlayable: z.boolean(),

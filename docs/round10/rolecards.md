@@ -137,7 +137,8 @@ give it at this branch.
 | **Lamplighter, Baker, Fisher, Tinner** | "Q Tasks" is a key for a passive (A1). All four share one goal line. | The goal repeated in the card text. | That they ring the Bell more often than other cards (`bellPulls`), their one edge. Chalk and Rope are R and F, which a phone cannot reach (A3). How a chore writes an alibi. |
 | **Drifter** | "Counts as nobody for parity". "Fake Blood: (meetings show portraits)". | Both lines. | That dying to the Killer loses. That Fake Blood is F, which a phone cannot reach (A3). |
 | Butler, Child | Not dealt until M4 (GDD 3.1). | — | No look yet. The new card draws them when they ship. |
-| Ranger, Thief, Medium | Not shipped (V1.5, V2). | — | The same. The card reads `ships` and never draws an unshipped card. |
+| Ranger, Thief | Not shipped (V1.5). | — | The same. The card reads `ships` and never draws an unshipped card. |
+| Medium | Retired (DECISIONS A600): the Medium is the NPC of the rite (GDD 3.20), not a card. | — | Never drawn; the id stays unused. |
 
 ## 2. The trifold
 
@@ -501,7 +502,7 @@ The build writes only the rows whose step has merged and leaves the rest of the 
   - Act Shifty: Ring fake footsteps where you stand.
   - Fake Blood: Show Blood on yourself in the world, once a match.
 
-**Butler, Child, Ranger, Thief, Medium.** Never drawn until they ship. Their drafts are written with their build.
+**Butler, Child, Ranger, Thief.** Never drawn until they ship. Their drafts are written with their build. The Medium card is retired (DECISIONS A600) and has no draft.
 
 ### 4.4 Vendettas (panel 2 of a Killer and an Accomplice)
 
