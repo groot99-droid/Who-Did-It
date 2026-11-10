@@ -123,6 +123,8 @@ export const S2C = {
   storySaved: 'story.saved',
   /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
   achv: 'achv',
+  /** Story R3 (GDD 3.20), private to the martyr's shade: the Medium's rite is open, begun or done. */
+  rite: 'rite',
 } as const;
 
 /**
@@ -556,6 +558,12 @@ export interface S2CPayloads {
    * (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only.
    */
   achv: { id: string; step: number; steps: number; done: boolean };
+  /**
+   * Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade
+   * (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick`
+   * is the tick it is done on; it cannot be interrupted) and `done` when it is.
+   */
+  rite: { stage: 'open' | 'begun' | 'done'; medium?: string; endsTick?: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

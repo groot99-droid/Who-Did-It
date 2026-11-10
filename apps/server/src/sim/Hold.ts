@@ -22,6 +22,7 @@ import { CHECK_HOLD, HIDE_HOLD, runHiding, tickCheck, tickHide } from './verbs/h
 import { dropDrag, handleCoverupHold, isCoverupHold, tickCoverup } from './verbs/coverup';
 import { handleDustHold, tickDust } from './verbs/dust';
 import { handleAutopsyHold, tickAutopsy } from './verbs/autopsy';
+import { RITE_HOLD, handleRiteHold } from './rite/rite';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -61,6 +62,9 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
     else p.hold = null;
     return;
   }
+  // Story R3 (GDD 3.20): the shade's rite at the Medium, before the living checks (a shade has no body to block it).
+  if (action === RITE_HOLD && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64)
+    return handleRiteHold(room, sessionId, targetId);
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
   // Round 6 (locked call sites): the M5b holds go to their owners' files (6F); each refuses until it lands.
   if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {

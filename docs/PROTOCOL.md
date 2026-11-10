@@ -91,6 +91,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `story.saved` | `{ save: StorySaveWire }` | Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it back as `story.start.resume`. It holds break state only, no secret of a live match. |
 | `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
 | `achv` | `{ id: string; step: number; steps: number; done: boolean }` | Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only. |
+| `rite` | `{ stage: 'open' \| 'begun' \| 'done'; medium?: string; endsTick?: number }` | Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick` is the tick it is done on; it cannot be interrupted) and `done` when it is. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 

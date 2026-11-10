@@ -3,6 +3,7 @@ import { Phase, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type SimEvent, onSim } from './events/bus';
 import { flowOf } from './Flow';
+import { runRite } from './rite/rite';
 import { martyrSeatOf, watchShades } from './rite/shade';
 
 /**
@@ -48,6 +49,7 @@ const memories = new WeakMap<PartyRoom, MemorialMemory>();
 
 export function runMemorial(room: PartyRoom): void {
   watchShades(room); // story R2: the martyr's shade
+  runRite(room); // story R3: the Medium at the rite site, and the rite
   const known = memories.get(room);
   if (known) {
     closeWindow(room, known.martyr);

@@ -518,6 +518,16 @@ export const BalanceFile = z.strictObject({
    */
   story: Section({ companyS: z.number().positive() }),
   /**
+   * Story R3 (GDD 3.20, DECISIONS A602): the Medium's rite. The Medium stands at `site` (a scene and one of its
+   * spawns: data, so the map revamp moves it without code); a shade within `reachTiles` of it starts the rite, which
+   * runs `holdS` and cannot be interrupted.
+   */
+  rite: Section({
+    holdS: Seconds,
+    reachTiles: Tiles,
+    site: z.strictObject({ scene: z.string().min(1), spawn: z.string().min(1) }),
+  }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the

@@ -127,6 +127,11 @@ export function validateContent(c: Content): string[] {
   }
   // The main deck, covers, professions and looks (GDD 3.1, 3.9, 3.17).
   checkDecksAndLooks(c, err);
+  // Story R3 (GDD 3.20, A602): the Medium's rite site is a scene and one of its spawns.
+  const site = balance.rite.site;
+  if (!scenes[site.scene]) err(`balance.json rite.site: unknown scene ${site.scene}`);
+  else if (!scenes[site.scene]!.spawns.some((sp) => sp.id === site.spawn))
+    err(`balance.json rite.site: unknown spawn ${site.scene}.${site.spawn}`);
 
   // Abilities and items refer to each other.
   for (const ab of Object.values(abilities.abilities)) {
