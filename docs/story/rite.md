@@ -35,7 +35,7 @@ brief for a new session, called **R** below. It restates no number: every number
 
 ## 3. Questions to settle before code (each has a default)
 
-R asks the owner through the orchestrator, then logs the answers in DECISIONS before building on them.
+**Answered (owner, 2026-11-10): the defaults on all of R-Q1 to R-Q8.** R logs them as a DECISIONS row in its first PR.
 
 - **R-Q1. The buff list.** Is it the owner brief's three (a 10x conversion aura, Righteous Stride, Divine Judgement),
   or "area spread, speed, health"? Default: the area-spread conversion aura, plus a speed and health buff. Righteous
