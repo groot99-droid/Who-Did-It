@@ -98,6 +98,20 @@ describe('story.json', () => {
     expect(broken(spawnAt('unicorn', 'bakery'))).toEqual([expect.stringContaining('no clue or item')]);
   });
 
+  it('rejects an npcOrder that is no goTo, or goes to no scene or spawn (arc E14)', () => {
+    const order = (o: string, args?: Record<string, unknown>) => (c: Content) =>
+      (section(c).beats[0]!.action = { npcOrder: { npcId: 'killer', order: o, ...(args && { args }) } });
+    expect(broken(order('goTo', { scene: 'bakery' }))).toEqual([]);
+    expect(broken(order('flee', { scene: 'bakery' }))).toEqual([expect.stringContaining('is not an order')]);
+    expect(broken(order('goTo'))).toEqual([expect.stringContaining('needs args.scene')]);
+    expect(broken(order('goTo', { scene: 'nowhere' }))).toEqual([
+      expect.stringContaining('needs args.scene'),
+    ]);
+    expect(broken(order('goTo', { scene: 'bakery', spawn: 'nope' }))).toEqual([
+      expect.stringContaining('has no spawn nope'),
+    ]);
+  });
+
   it('rejects a goal nothing can complete', () => {
     const errs = broken((c) => section(c).goals.push({ id: 'gOrphan', text: 'Never' }));
     expect(errs).toEqual([expect.stringContaining('goal gOrphan has no trigger')]);
