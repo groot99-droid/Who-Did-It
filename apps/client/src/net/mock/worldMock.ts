@@ -47,6 +47,19 @@ import { TASKS } from '../../ui/tasks';
 
 const FOOT_HALF_PX = (metricsJson.collisionBoxTiles * TILE_PX) / 2;
 const PORTAL_REACH_TILES = balanceJson.doors.reachTiles;
+/** Story R7: the mock's Medium (a figure, no seat; GDD 3.20). */
+const MOCK_MEDIUM = 'mock-medium';
+const MEDIUM_AVATAR: AvatarSnap = {
+  handle: MOCK_MEDIUM,
+  lookOf: 'villager',
+  height: 1,
+  x: 0,
+  y: 0,
+  yaw: Math.PI,
+  animId: 0,
+  statusBits: 0,
+  transitUntilTick: 0,
+};
 const TRANSIT_TICKS = Math.round(balanceJson.doors.transitS * TICK_RATE);
 const SWING_TICKS = Math.round(balanceJson.doors.swingS * TICK_RATE);
 const DIRS = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
@@ -171,6 +184,9 @@ export class MockWorldFeed implements WorldFeed {
   private aimEndsTick = -1;
   private bloodyUntil = 0;
   private ghost = false;
+  /** Story R7: ?ghost=shade dies as the martyr's shade, with a Medium figure beside it (stays put at the death). */
+  private shade = false;
+  private medium: { x: number; y: number } | null = null;
   /** `?cutscene=1`: the mock Start sends the HollowMere opening and a ghost's kill names its cutscene, like the server (round 6, 6J). */
   private opening = false;
   private killPending = false;
@@ -194,6 +210,7 @@ export class MockWorldFeed implements WorldFeed {
     this.phaseEndsTick = PHASE_ORDER[this.phaseIdx]!.ticks;
     this.round = this.phaseIdx >= 1 ? 1 : 0;
     this.still = q.get('bots') === 'still';
+    this.shade = q.get('ghost') === 'shade';
     this.ghost = q.get('ghost') === '1';
     this.opening = q.get('cutscene') === '1';
     const names = [selfName, ...BOT_NAMES];
@@ -294,10 +311,20 @@ export class MockWorldFeed implements WorldFeed {
     if (this.ghost && this.opening) {
       this.ghost = false;
       this.killPending = true;
-    } else if (this.ghost) window.setTimeout(() => this.emitKilled(), 0);
+    } else if (this.shade)
+      this.killPending = true; // story R7: the shade's `killed` must reach a World that listens (as the cutscene's)
+    else if (this.ghost) window.setTimeout(() => this.emitKilled(), 0);
   }
 
   private emitKilled(): void {
+    if (this.shade) {
+      // Story R7 (GDD 3.20): the shade dies with the message, as on the server, and is told no roles; the server's
+      // next tick opens the rite at the Medium.
+      this.ghost = true;
+      this.bus.emit('killed', { sceneId: 'overworld', cause: 'knife', roles: {}, shade: true });
+      window.setTimeout(() => this.bus.emit('rite', { stage: 'open', medium: MOCK_MEDIUM }), 50);
+      return;
+    }
     this.bus.emit('killed', {
       sceneId: 'overworld',
       cause: 'knife',
@@ -367,6 +394,11 @@ export class MockWorldFeed implements WorldFeed {
         statusBits: pr.statusBits,
         transitUntilTick: pr.transitUntilTick,
       });
+    }
+    if (this.shade && (me.x !== 0 || me.y !== 0)) {
+      // Story R7: the Medium, a figure with no seat, one tile east of where the placed shade first stood.
+      const at = (this.medium ??= { x: me.x + TILE_PX, y: me.y });
+      out.push({ ...MEDIUM_AVATAR, x: at.x, y: at.y });
     }
     return out;
   }
@@ -491,6 +523,23 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {
+    if (action === 'rite' && on && this.shade && targetId === MOCK_MEDIUM) {
+      // Story R7: the rite runs `rite.holdS`, then the seat returns two seconds later (the server's next day).
+      this.bus.emit('rite', {
+        stage: 'begun',
+        endsTick: this.tick + Math.round(balanceJson.rite.holdS * TICK_RATE),
+      });
+      window.setTimeout(() => this.bus.emit('rite', { stage: 'done' }), balanceJson.rite.holdS * 1000);
+      window.setTimeout(
+        () => {
+          this.ghost = false;
+          this.shade = false;
+          this.bus.emit('rite', { stage: 'returned' });
+        },
+        balanceJson.rite.holdS * 1000 + 2000,
+      );
+      return;
+    }
     if (action === 'task') {
       // Round 7 (7M, GDD 3.5): the co-op hold, with a phantom second hand that joins after a second.
       const task = TASKS[targetId];

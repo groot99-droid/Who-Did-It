@@ -46,6 +46,8 @@ import { mountM5bLayer, type M5bLayer } from '../ui/M5bLayer';
 import { mountShopLayer, type ShopLayer } from '../ui/shop/ShopLayer'; // round 8, 8C (locked)
 import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // round 8, 8D
 import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
+import { RITE_COPY } from '../ui/copy/rite'; // story R7
+import { type RiteLayer, mountRiteLayer, riteShade } from '../ui/rite/RiteLayer'; // story R7
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
 import { type LineScreen, bellsNext, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
@@ -169,6 +171,8 @@ export class World extends Phaser.Scene {
   private shop: ShopLayer | null = null; // round 8, 8C (locked)
   private civic: CivicLayer | null = null; // round 8, 8D
   private sleepLayer: SleepLayer | null = null; // round 10, A8
+  private riteLayer: RiteLayer | null = null; // story R7: the martyr's shade and the Medium's rite
+  private shadeDeath = false; // story R7: the last death was the martyr's shade's, not a ghost's
   private purse: PurseHud | null = null; // round 8, 8C (locked)
   private mug: MugPrompt | null = null;
   private cutscenes!: CutscenePlayer;
@@ -261,6 +265,7 @@ export class World extends Phaser.Scene {
     this.shop = mountShopLayer(this); // round 8, 8C (locked)
     this.civic = mountCivicLayer(this); // round 8, 8D
     this.sleepLayer = mountSleepLayer(this); // round 10, A8
+    this.riteLayer = mountRiteLayer(this, (text, kind, ms) => this.hud.toast(text, kind, undefined, ms)); // story R7
     this.entities = new EntityView(this, feed.selfId);
 
     this.hud = new Hud(overlayRoot());
@@ -320,7 +325,8 @@ export class World extends Phaser.Scene {
     };
     const onFound = () => this.clueFound();
     // Round 6, 6J (locked): the death cutscene plays, then the ghost handoff as before.
-    const onKilled = (m: { cutsceneId?: string; cause?: string; sceneId?: string }) => {
+    const onKilled = (m: { cutsceneId?: string; cause?: string; sceneId?: string; shade?: boolean }) => {
+      this.shadeDeath = m.shade === true; // story R7: the martyr's shade (GDD 3.20)
       const memory = lineOf(this.feed); // round 10, C1b: the screen's centre line, how and where (y13)
       memory.cause = m.cause as DeathCause | undefined;
       memory.sceneId = m.sceneId;
@@ -395,6 +401,7 @@ export class World extends Phaser.Scene {
       this.shop?.destroy(); // round 8, 8C (locked)
       this.civic?.destroy(); // round 8, 8D
       this.sleepLayer?.destroy(); // round 10, A8
+      this.riteLayer?.destroy(); // story R7
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
       this.line?.destroy(); // round 10, C1b
@@ -518,6 +525,7 @@ export class World extends Phaser.Scene {
     if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
     if (this.civic?.use(down)) return; // round 8, 8D: an altar, the mailbag, a rack, the back room, a station, a bank
     if (this.sleepLayer?.use(down)) return; // round 10, A8: a bed in reach at dusk or night
+    if (this.riteLayer?.use(down)) return; // story R7: the shade at the Medium
     if (this.m5b?.use(down)) return;
     if (down) this.startUse();
     else this.endUse();
@@ -804,12 +812,14 @@ export class World extends Phaser.Scene {
     const dead = this.feed.dead();
     if (dead === this.wasDead) return;
     this.wasDead = dead;
+    // Story R7: the martyr's shade is no ghost (GDD 3.20); it is told so, and the rite layer shows the way.
+    const shade = this.shadeDeath || riteShade(this.feed);
     this.entities.setGhost(dead);
-    this.hud.setGhost(dead);
+    this.hud.setGhost(dead, shade ? RITE_COPY['shade.toast'] : undefined);
     this.touch?.setAbilitiesEnabled(!dead);
     if (dead) {
       this.endUse();
-      this.hud.toast(C['toast.ghost'], 'hazard', undefined, 5000);
+      this.hud.toast(shade ? RITE_COPY['shade.toast'] : C['toast.ghost'], 'hazard', undefined, 5000);
       this.audio.play('scream');
     }
   }

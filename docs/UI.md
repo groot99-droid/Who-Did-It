@@ -2254,3 +2254,23 @@ the table as it places them (A414's deck test):
 Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
 `TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
 read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
+
+### 14.56 The Medium's rite (story R7)
+
+Story R7 (GDD 3.20, DECISIONS A605; `docs/story/rite.md`). Only the martyr's shade sees any of it, and every line follows
+the private `rite` messages (`ui/rite/RiteLayer.ts`, its lines in `ui/copy/rite.ts`). The Medium is drawn like any
+figure, in its look (`villager` until the art gives it one). The shade keeps a living seat's view: the role chip and
+the death toast say it is a shade, not a ghost, and it gets no ghost line. While the rite is open, a banner names the
+rite site's scene. Within `rite.reachTiles` of the Medium, the prompt shows; E or a tap on it sends
+`act.hold { action: 'rite', targetId: <the Medium's handle> }`. While the rite runs, the banner counts the seconds
+down. A toast marks the end of the rite and another the return. The buff shows only in the body panel, as Ascended
+(`icon_effect_ascended`, 14.48). The rite's state lives with the feed, so it outlives the World's restart at every door.
+
+| Line | Text | Where |
+|---|---|---|
+| the shade (`shade.toast`) | You are a shade | the role chip, and a 5 s toast at the death, in place of "You are a ghost" |
+| the way (`shade.banner`) | You are a shade. Find the Medium in {place} before day breaks. | the banner while the rite is open; {place} is the name of `rite.site.scene` |
+| the prompt (`prompt`) | Press E: take the rite | the prompt, within reach of the Medium while the rite is open |
+| the hold (`begun`) | The rite: {s} s | the banner while the rite runs, in whole seconds |
+| done (`done`) | The rite is done. You return at daybreak. | toast, 6 s |
+| back (`returned`) | You are back, stronger until dusk. | toast, 6 s, at the return |
