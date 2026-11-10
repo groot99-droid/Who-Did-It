@@ -415,8 +415,18 @@ export interface S2CPayloads {
   sceneEnter: { sceneId: string; spawn: string; facing: string };
   /** Private. */
   clueFound: { entryId: string };
-  /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
-  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
+  /**
+   * Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). Empty for a
+   * seat on the line (C1) and for the martyr's shade (story R2, GDD 3.8), which says `shade`; a shade that becomes a
+   * ghost at the next day is sent a second `killed`, with the roles and no cutscene.
+   */
+  killed: {
+    sceneId: string;
+    cause: DeathCause;
+    roles: Record<string, string>;
+    cutsceneId?: string;
+    shade?: boolean;
+  };
   /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };

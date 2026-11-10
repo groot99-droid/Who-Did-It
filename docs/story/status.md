@@ -92,3 +92,4 @@ Each session appends to its own section only. Newest line last.
 ## R. The rite
 
 - 2026-11-10 R started (brief `docs/story/rite.md`, PR #501; the owner took every default of R-Q1 to R-Q8). R takes DECISIONS rows A600 to A607. R1 (`claude/story-r-medium-card`): the Medium card, Seance and Seance Chalk retired (`retired: "A600"`), validators and `storyCoverage` skip them; GDD 3.1, 3.2, 3.10.
+- 2026-11-10 R2 (`claude/story-r-shade`, stacked on R1): the martyr is a shade from its death (A601): no roles, a living view, no ghost channel, until the next day. **Question R-Q9** (proposed default built): R-Q4 says a shade becomes a ghost at the next dawn, R-Q5 says no rite by the end of that day means no return. R2 reads the wait as ending when the next day (or the Final Night) begins, so the rite must be done the night of the death and the return is that morning. If the owner meant the end of the next day, only `rite/shade.ts` `DAWNS` and the return phase change.

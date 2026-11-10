@@ -119,7 +119,13 @@ export type WorldFeedEvents = {
   noise: NoisePulse;
   error: ErrorPayload;
   /** Private: this player was killed and is now a ghost. */
-  killed: { sceneId: string; cause: string; roles: Record<string, string>; cutsceneId?: string };
+  killed: {
+    sceneId: string;
+    cause: string;
+    roles: Record<string, string>;
+    cutsceneId?: string;
+    shade?: boolean;
+  };
   /** Private: a collect finished; the entry is in `notebook()`. */
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };

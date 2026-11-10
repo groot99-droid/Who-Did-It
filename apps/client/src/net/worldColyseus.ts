@@ -108,8 +108,9 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('sceneEnter', (m: SceneEnter) => this.bus.emit('sceneEnter', m));
     room.onMessage('noise', (m: NoisePulse) => this.bus.emit('noise', m));
     room.onMessage('killed', (m: WorldFeedEvents['killed']) => {
-      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost.
-      const onLine = Object.keys(m.roles ?? {}).length === 0;
+      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost. Story R2: the
+      // martyr's shade names no role either, but it is dead and walks as a ghost (its view stays a living seat's).
+      const onLine = m.shade !== true && Object.keys(m.roles ?? {}).length === 0;
       this.ghost = !onLine;
       this.line = onLine;
       this.bus.emit('killed', m);

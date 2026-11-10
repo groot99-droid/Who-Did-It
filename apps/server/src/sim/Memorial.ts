@@ -1,8 +1,9 @@
-import { balance, roles } from '@wdi/content';
+import { balance } from '@wdi/content';
 import { Phase, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { type SimEvent, onSim } from './events/bus';
 import { flowOf } from './Flow';
+import { martyrSeatOf, watchShades } from './rite/shade';
 
 /**
  * The Vicar's martyrdom (round 7, GDD 3.20, docs/round7/vendettas.md 3, A113). Everything public follows the look
@@ -16,6 +17,9 @@ import { flowOf } from './Flow';
  * source), so the seat the film mourns, chosen by the look like the film, becomes the match's martyr at that reveal,
  * and each real task its ghost finishes in the `tasks.martyrS` seconds from then counts `tasks.martyrWeight` times on
  * the bar (`Minigames.ts`; the owner's ten minutes, A121). The window's end is snapshotted on the tick it passes.
+ *
+ * Story R2 (A600): from its death the martyr is a shade (`rite/shade.ts`), which names it: the first Knife death of
+ * the match under the Vicar's look.
  */
 export const MEMORIAL_VICAR = 'memorialVicar';
 const VICAR = 'vicar';
@@ -43,6 +47,7 @@ export interface Martyr {
 const memories = new WeakMap<PartyRoom, MemorialMemory>();
 
 export function runMemorial(room: PartyRoom): void {
+  watchShades(room); // story R2: the martyr's shade
   const known = memories.get(room);
   if (known) {
     closeWindow(room, known.martyr);
@@ -65,7 +70,8 @@ export function runMemorial(room: PartyRoom): void {
 function onDeath(room: PartyRoom, memory: MemorialMemory, e: SimEvent): void {
   const player = e.seat === undefined ? undefined : room.state.players.get(e.seat);
   if (!player || e.data?.cause !== 'knife') return;
-  if (player.look !== '' && player.look === roles.roles[VICAR]?.look) memory.mourned = e.seat!;
+  // Story R2: the mourned seat is the match's shade, the first Knife death under the Vicar's look (`rite/shade.ts`).
+  if (!memory.played && martyrSeatOf(room) === e.seat) memory.mourned = e.seat;
   if (player.priv?.role.roleId === VICAR) memory.candidate = e.seat!;
 }
 
