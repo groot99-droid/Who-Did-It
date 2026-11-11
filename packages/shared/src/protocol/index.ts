@@ -177,7 +177,9 @@ export type HoldAction =
   | 'unlock'
   | 'crowbar'
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
-  | 'dust';
+  | 'dust'
+  // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
+  | 'rite';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
