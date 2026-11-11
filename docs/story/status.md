@@ -91,3 +91,7 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-08 P2: #493 (E10) merged. E11 NOT built: the server has no hiding mechanic (no hide spots, Check or Burst Out) and none of silentHide, witness, pickpocket, smoke, plantClue or crowbar-on-doors is in `handleAbility`; each is a main-game rules change, so it waits on the orchestrator or owner. E12 on `claude/story-p2-cutscene`: `cutscene` action plays, `meeting: true` rings the bell, GDD 3.34, A588, `test/story/cutscene.test.ts`.
 - 2026-11-08 P2: E14 staging on `claude/story-p2-staging`: `npcOrder goTo` gains `args.spawn`, the validator checks order, scene and spawn, GDD 3.34, A591, `test/story/staging.test.ts`. E10, E12 and E13 are in; E11's witness, pickpocket and smoke wait on the owner. E1 to E14 are done or held.
 - 2026-11-08 P2: #494 (base merge) and #495 (E12) merged. E13 on `claude/story-p2-e13`: GDD 3.20 prose corrected to `shareS` 160 s (data wins), A590. The silenced-vote consequence follows B6c (voting retires); the Zealot section's goal (arc.md 3.2) waits on it. Nothing to build.
+
+## R. The rite
+
+- 2026-11-10 R started (brief `docs/story/rite.md`, PR #501; the owner took every default of R-Q1 to R-Q8). R takes DECISIONS rows A600 to A607. R1 (`claude/story-r-medium-card`): the Medium card, Seance and Seance Chalk retired (`retired: "A600"`), validators and `storyCoverage` skip them; GDD 3.1, 3.2, 3.10.

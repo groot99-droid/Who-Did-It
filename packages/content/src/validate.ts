@@ -111,10 +111,16 @@ export function validateContent(c: Content): string[] {
   // Roles: kits and abilities.
   const cardAbilities = new Set<string>();
   for (const role of Object.values(roles.roles)) {
-    for (const k of role.startKit) if (!isItem(k.item)) err(`role ${role.id}: unknown item ${k.item}`);
+    for (const k of role.startKit) {
+      if (!isItem(k.item)) err(`role ${role.id}: unknown item ${k.item}`);
+      else if (role.retired === undefined && items.items[k.item]!.retired !== undefined)
+        err(`role ${role.id}: kit holds retired item ${k.item}`);
+    }
     for (const a of role.abilities) {
       cardAbilities.add(a);
       if (!isAbility(a)) err(`role ${role.id}: unknown ability ${a}`);
+      else if (role.retired === undefined && abilities.abilities[a]!.retired !== undefined)
+        err(`role ${role.id}: holds retired ability ${a}`);
       else if (abilities.abilities[a]?.scope !== 'role') err(`role ${role.id}: ${a} is not a role ability`);
     }
     if ((role.faction === 'cabal') !== (role.winsWith === 'cabal')) err(`role ${role.id}: faction/winsWith`);
@@ -664,6 +670,7 @@ function checkDecksAndLooks(c: Content, err: (msg: string) => void): void {
         continue;
       }
       if (role.ships !== 'V1') err(`${where}: deals unshipped role ${id}`);
+      if (role.retired !== undefined) err(`${where}: deals retired role ${id}`);
       if (lookIdOf(id) === null) err(`${where}: ${id} has no look`);
       if (classRows.has(id)) err(`${where}: lists the class row ${id}`);
     }

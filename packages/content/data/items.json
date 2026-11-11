@@ -413,6 +413,7 @@
     },
     "seanceChalk": {
       "id": "seanceChalk",
+      "retired": "A600",
       "name": "Seance Chalk",
       "kind": "tool",
       "roleBound": true,

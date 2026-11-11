@@ -8,6 +8,30 @@ function broken(edit: (c: Content) => void): string[] {
 }
 
 describe('validateContent rejects', () => {
+  // DECISIONS A600: the Medium card, Seance and Seance Chalk are retired; their ids stay so none is ever reused.
+  it('a retired card in a deck, or a live card holding a retired ability or item', () => {
+    expect(content.roles.roles.medium?.retired).toBe('A600');
+    expect(broken((c) => (c.roles.roles.medium!.ships = 'V1'))).toEqual([]);
+    expect(
+      broken((c) => {
+        c.roles.roles.medium!.ships = 'V1';
+        c.roles.roles.medium!.look = c.roles.roles.vicar!.look;
+        c.roles.decks['5']!.cards[6] = 'medium';
+      }),
+    ).toEqual(expect.arrayContaining([expect.stringContaining('deals retired role medium')]));
+    expect(
+      broken((c) => {
+        c.roles.roles.vicar!.abilities.push('seance');
+        c.roles.roles.vicar!.startKit.push({ item: 'seanceChalk', qty: 1 });
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.stringContaining('role vicar: holds retired ability seance'),
+        expect.stringContaining('role vicar: kit holds retired item seanceChalk'),
+      ]),
+    );
+  });
+
   it('a portal to a missing spawn', () => {
     expect(
       broken((c) => {

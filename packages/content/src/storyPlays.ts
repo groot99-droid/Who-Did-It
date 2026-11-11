@@ -64,7 +64,10 @@ export function flatAction(a: ArcAction, roles: RolesFile): StoryAction {
   };
 }
 
-/** The cards of roles.json that no section plays and no line's `by` names (part2.md Q-P2), in roles.json order. */
+/**
+ * The cards of roles.json that no section plays and no line's `by` names (part2.md Q-P2), in roles.json order. A
+ * retired card (DECISIONS A600) is in no deck, so it needs no part.
+ */
 export function storyCoverage(story: ArcStory, roles: RolesFile): string[] {
   const seen = new Set<string>();
   const walk = (a: ArcAction): void => {
@@ -76,5 +79,7 @@ export function storyCoverage(story: ArcStory, roles: RolesFile): string[] {
       seen.add(s.roleId);
       s.beats.forEach((b) => walk(b.action));
     }
-  return Object.keys(roles.roles).filter((r) => !seen.has(r));
+  return Object.values(roles.roles)
+    .filter((r) => r.retired === undefined && !seen.has(r.id))
+    .map((r) => r.id);
 }
