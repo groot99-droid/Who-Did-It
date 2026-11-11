@@ -65,7 +65,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `roleReveal` | `RoleRevealPayload` | Private. |
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
-| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
+| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string; shade?: boolean; }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). Empty for a seat on the line (C1) and for the martyr's shade (story R2, GDD 3.8), which says `shade`; a shade that becomes a ghost at the next day is sent a second `killed`, with the roles and no cutscene. |
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |

@@ -9,6 +9,7 @@ import { isHiding } from './verbs/hiding';
 import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
 import { figureOfHandle } from './townsfolk/figures';
+import { isShade } from './rite/shade';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
@@ -124,7 +125,7 @@ function reconcileAvatars(
   const sim = simOf(room);
   const memory = avatarMemory(room);
   const held = heldOf(room, sessionId);
-  const ghostViewer = viewerSim.dead;
+  const ghostViewer = viewerSim.dead && !isShade(room, sessionId); // story R2: a shade keeps a living seat's view
   const wanted = new Set<string>();
   // Round 10, x5 (A353, A160's open line): the living figures of the scene, under the same dark rule as a seat.
   const figures = new Set<string>();
@@ -142,7 +143,7 @@ function reconcileAvatars(
       }
       const p = sim.players.get(seat);
       if (!p?.placed) return;
-      if (p.dead && !ghostViewer) return;
+      if (p.dead && !ghostViewer && seat !== sessionId) return; // a shade still holds its own figure
       if (seat !== sessionId && isHiding(room, seat)) return; // round 10, V3: a hider is in no other view
       // Round 6, 6G (locked): a living viewer in the dark sees only within its sight; this only ever removes.
       if (!ghostViewer && !canSee(room, viewerSim, p)) return;
@@ -187,7 +188,7 @@ function reconcileAvatars(
       held.ghost.add(handle);
     }
   }
-  syncNear(room, held, view, viewerSim);
+  syncNear(room, held, view, viewerSim, ghostViewer);
 }
 
 /** `clues.blood.params.visibleTiles` in px: the range Blood is seen from (GDD 3.4; the client's guard reads it too). */
@@ -203,17 +204,24 @@ export function reconcileNear(room: PartyRoom): void {
   for (const client of room.clients) {
     const viewerSim = sim.players.get(client.sessionId);
     if (!client.view || !viewerSim || isAdminClient(room, client.sessionId)) continue;
-    syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim);
+    const ghostViewer = viewerSim.dead && !isShade(room, client.sessionId);
+    syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim, ghostViewer);
   }
 }
 
-function syncNear(room: PartyRoom, held: HeldAvatars, view: StateView, viewerSim: PlayerSim): void {
+function syncNear(
+  room: PartyRoom,
+  held: HeldAvatars,
+  view: StateView,
+  viewerSim: PlayerSim,
+  ghostViewer: boolean,
+): void {
   for (const handle of held.plain) {
     const avatar = avatarOf(room, handle);
     if (!avatar) continue;
     // Round 10, x5 (A353): a figure's row is held plain, never with the near tag (its `nearBits` are never sent).
     if (figureOfHandle(room, handle) !== undefined) continue;
-    const near = viewerSim.dead || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
+    const near = ghostViewer || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
     if (near && !held.near.has(handle)) {
       view.add(avatar, VIEW_TAG.near);
       held.near.add(handle);

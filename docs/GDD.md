@@ -178,7 +178,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 
 **Doors** have four server states: open, closed, locked, broken. Any door unlocks from the inside for anyone. Killer locks expire after 45 s. From outside you see the door swing for 3 s; the entering player is in a 0.6 s `transit` state, encoded to both scenes at the door with the nameplate hidden.
 
-**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen.
+**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen. **The martyr's shade** (story R2, DECISIONS A600): the martyr (3.20) is no ghost from its death but a shade. It walks as a ghost does (through walls and portals, unseen by the living, finishing its own tasks) with a living seat's view: its death names no role, it sees no ghost and only what its sight reaches, the ghost channel neither reaches it nor takes its lines, and it cannot speak in a meeting. A shade still waiting when the next day begins (or the Final Night) becomes an ordinary ghost and is shown every role then.
 
 ### 3.8 Meetings, voting and win conditions
 
@@ -842,7 +842,9 @@ for the Village, so a Killer that strikes the Vicar hands the village a fast clo
 Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 
 **The Medium's rite** (DECISIONS A517 addendum, A600; `docs/story/rite.md`) is being built: an NPC Medium at the rite site
-will gate the martyr's return as the 10X Vicar and the martyr's task weight. Until it lands the rules above stand.
+will gate the martyr's return as the 10X Vicar and the martyr's task weight. Until it lands the rules above stand,
+except that the martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
+the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
 
 ### 3.21 Parties, profiles and friends
 

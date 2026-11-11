@@ -7,6 +7,7 @@ import { emitSim } from './events/bus';
 import { onPaintDeath } from './paintTown';
 import { simOf } from './RoomSim';
 import { recordDeath } from './verbs/readings';
+import { becomesShade } from './rite/shade';
 import { boardLine, returnsOnTrain } from './Train';
 import { sceneKey } from './World';
 
@@ -17,6 +18,7 @@ import { sceneKey } from './World';
  * Round 5 (locked call sites): the victim's avatar is re-handled (5F) and a dying Gamekeeper's aim (5G) defers
  * `killed` until the aim closes. Round 10 (C1): a death the morning Train brings back puts the seat on the line
  * instead (`Train.ts`): no Last Shot, and its `killed` carries no roles, since a seat that returns sees no ghost view.
+ * Story R2 (A600): the martyr's death makes a shade (`rite/shade.ts`): its `killed` carries no roles and says `shade`.
  */
 export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, killerId?: string): void {
   const sim = simOf(room);
@@ -38,8 +40,9 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
   rehandle(room, victimId, false);
   if (onLine) boardLine(room, victimId);
   else if (beginAim(room, victimId, cause)) return;
+  const shade = !onLine && becomesShade(room, victimId, cause); // story R2: the martyr walks with a living view
   const roles: Record<string, string> = {};
-  if (!onLine) for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
+  if (!onLine && !shade) for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
   // Round 6, 6J (locked call site): the death's cutscene id, from the pure rule over the cutscene index.
   const cutsceneId = deathCutsceneFor(cutscenes, cause);
   room.clients.getById(victimId)?.send(S2C.killed, {
@@ -47,5 +50,6 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
     cause,
     roles,
     ...(cutsceneId === null ? {} : { cutsceneId }),
+    ...(shade && { shade }),
   });
 }
