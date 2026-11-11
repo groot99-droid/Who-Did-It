@@ -1011,3 +1011,12 @@
   max-width: 32rem;
   color: var(--wdi-night-text-muted);
 }
+
+/* Story I9b (UI.md 14.57): the dealt Vicar's converted count, a pill pinned under the goal strip on every width. */
+.wdi-m5b .wdi-converted {
+  position: fixed;
+  top: 84px;
+  left: var(--wdi-space-3);
+  margin: 0;
+  pointer-events: none;
+}

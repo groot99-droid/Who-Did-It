@@ -49,6 +49,7 @@ interface PlayerState {
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
     faith?: number; // round 8, 8D
+    converted?: number; // story I9
     asleep?: boolean; // round 10, A7
     inBed?: number;
     inBedOf?: number;
@@ -120,6 +121,7 @@ export class ColyseusWorldFeed implements WorldFeed {
       if (m.stage === 'returned') this.ghost = false;
       this.bus.emit('rite', m);
     });
+    room.onMessage('conversion', (m: WorldFeedEvents['conversion']) => this.bus.emit('conversion', m)); // story I9
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
     room.onMessage('aim', (m: WorldFeedEvents['aim']) => this.bus.emit('aim', m));
@@ -423,6 +425,10 @@ export class ColyseusWorldFeed implements WorldFeed {
   // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
   faith(): number {
     return this.state.players.get(this.selfId)?.priv?.faith ?? 0;
+  }
+
+  converted(): number {
+    return this.state.players.get(this.selfId)?.priv?.converted ?? 0;
   }
 
   hqTiers(): Record<string, number> {

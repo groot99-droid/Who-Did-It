@@ -2277,3 +2277,22 @@ down. A toast marks the end of the rite and another the return. The buff shows o
 | the hold (`begun`) | The rite: {s} s | the banner while the rite runs, in whole seconds |
 | done (`done`) | The rite is done. You return at daybreak. | toast, 6 s |
 | back (`returned`) | You are back, stronger until dusk. | toast, 6 s, at the return |
+
+### 14.57 Conversion and the sermon (story I9b)
+
+Story I9b (GDD 3.23, DECISIONS A606). Every line follows the seat's own private view (`ui/conversion/SermonLayer.ts`,
+its lines in `ui/copy/conversion.ts`); no line names a seat. A seat in the Vicar's look standing within the bell's
+reach by day, that has not preached a sermon to its end today, sees the sermon prompt beside the bell's own prompt. A
+tap of E still rings the bell; E held half a second, or a tap on the sermon prompt, sends `act.hold { action:
+'sermon', targetId: 'bell' }`, and the banner counts the sermon down. Walking off the bell ends it (the server gives
+nothing). The dealt Vicar's view shows its converted count (`Private.converted`) as a pill under the goal strip once
+it is above zero; it is a number only. The mock: `?vicar=bell` plays the Vicar's look one tile below the bell.
+
+| Line | Text | Where |
+|---|---|---|
+| the prompt (`prompt`) | Hold E: preach a sermon | the prompt, at the bell by day, once a day |
+| the sermon (`preaching`) | Preaching: {s} s. Stay by the bell. | the banner while the sermon runs, in whole seconds |
+| heard (`heard`, `heardOne`, `heardNone`) | Your sermon reached {n} souls. / Your sermon reached one soul. / Nobody stayed for your sermon. | toast, 6 s, to the preacher at the end |
+| converted (`converted`) | Your faith is whole. You are converted. | toast, 6 s, to the converted seat alone |
+| the count (`count`) | Converted: {n} | the pill under the goal strip, on the dealt Vicar's view |
+| Peaceful (`peaceful`) | The whole parish is converted. Your Peaceful route is met. | toast, 8 s, to the dealt Vicar alone |
