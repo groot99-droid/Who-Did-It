@@ -841,9 +841,16 @@ into the room's next one. A full bar in play wins
 for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
 Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
 
-**The Medium's rite** (DECISIONS A517 addendum, A600; `docs/story/rite.md`) is being built: an NPC Medium at the rite site
-will gate the martyr's return as the 10X Vicar and the martyr's task weight. Until it lands the rules above stand,
-except that the martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
+**The Medium's rite** (DECISIONS A517 addendum, A600, A602; `docs/story/rite.md`) gates the martyr's return as the 10X
+Vicar and the martyr's task weight. **The Medium** is an NPC, not a card: one figure standing at the rite site
+(`balance.json` `rite.site`, a scene and a spawn; a test site, the Fenwood's `wood_side`, until the map revamp names the
+Zealot's hideout in the deep woods) on a map that holds that scene. It has no seat, no deal and no random stream; the
+Knife cannot name it and nothing can kill it. It looks like any townsfolk figure and is seen by the same dark rule.
+**The rite** is a hold at the Medium: the martyr's shade within `rite.reachTiles` (1.5 tiles) of it begins the rite,
+which takes `rite.holdS` (8 s), costs nothing and cannot be interrupted (the shade stands still until it is done; a
+release changes nothing). Once a match. Only the shade is told: that the rite is open, begun and done. The return and
+the buff are being built (R4, R5); until they land a shade whose rite is done still becomes a ghost at the next day,
+and the rules above stand, except that the martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
 the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
 
 ### 3.21 Parties, profiles and friends

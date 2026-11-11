@@ -9,6 +9,7 @@ import { isHiding } from './verbs/hiding';
 import { isAdminClient, reconcileAdminView } from './auto/AdminView';
 import { canSee } from './Sight';
 import { figureOfHandle } from './townsfolk/figures';
+import { mediumHandle, mediumSighted } from './rite/rite';
 import { isShade } from './rite/shade';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
@@ -133,6 +134,15 @@ function reconcileAvatars(
     const scene = room.state.scenes.get(sceneKey(viewerSim.sceneIdx));
     scene?.avatars.forEach((_avatar, handle) => {
       const seat = memory.seatOf.get(handle);
+      if (seat === undefined && handle === mediumHandle(room)) {
+        // Story R3: the Medium stands like a figure, under the same dark rule, never with the ghost tag.
+        const medium = mediumSighted(room);
+        if (!medium || medium.sceneIdx !== viewerSim.sceneIdx) return;
+        if (!ghostViewer && !canSee(room, viewerSim, medium)) return;
+        wanted.add(handle);
+        figures.add(handle);
+        return;
+      }
       if (seat === undefined) {
         const f = figureOfHandle(room, handle);
         if (!f || f.dead || f.sceneIdx !== viewerSim.sceneIdx) return;
@@ -220,7 +230,7 @@ function syncNear(
     const avatar = avatarOf(room, handle);
     if (!avatar) continue;
     // Round 10, x5 (A353): a figure's row is held plain, never with the near tag (its `nearBits` are never sent).
-    if (figureOfHandle(room, handle) !== undefined) continue;
+    if (figureOfHandle(room, handle) !== undefined || handle === mediumHandle(room)) continue;
     const near = ghostViewer || Math.hypot(avatar.x - viewerSim.x, avatar.y - viewerSim.y) <= NEAR_PX;
     if (near && !held.near.has(handle)) {
       view.add(avatar, VIEW_TAG.near);

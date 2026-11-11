@@ -8,6 +8,15 @@ function broken(edit: (c: Content) => void): string[] {
 }
 
 describe('validateContent rejects', () => {
+  it('a rite site that is not a scene and one of its spawns (story R3)', () => {
+    expect(broken((c) => (c.balance.rite.site = { scene: 'nowhere', spawn: 'x' }))).toEqual([
+      'balance.json rite.site: unknown scene nowhere',
+    ]);
+    expect(broken((c) => (c.balance.rite.site.spawn = 'nope'))).toEqual([
+      'balance.json rite.site: unknown spawn forest_deep.nope',
+    ]);
+  });
+
   // DECISIONS A600: the Medium card, Seance and Seance Chalk are retired; their ids stay so none is ever reused.
   it('a retired card in a deck, or a live card holding a retired ability or item', () => {
     expect(content.roles.roles.medium?.retired).toBe('A600');

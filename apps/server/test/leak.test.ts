@@ -1,5 +1,5 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, clues } from '@wdi/content';
+import { balance, clues, scenes } from '@wdi/content';
 import { Phase, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
@@ -7,6 +7,7 @@ import { clockOf } from '../src/sim/auto/clock';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
 import { markDead } from '../src/sim/Death';
+import { mediumHandle } from '../src/sim/rite/rite';
 import { isShade } from '../src/sim/rite/shade';
 import { canSee } from '../src/sim/Sight';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
@@ -228,6 +229,27 @@ describe('the leak audit (8L)', () => {
     await sleep(300);
     expect(events(shade, 'killed')).toEqual([expect.objectContaining({ roles: {}, shade: true })]);
     expect(events(shade, 'chat.msg')).toEqual([]);
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('the Medium’s rite (story R3): only the shade is told, and the Medium is a figure to every view', async () => {
+    const m = await startParty(colyseus, 6); // seat 0 holds the Knife; seats 4 and 5 are Townsfolk
+    setPhase(m, Phase.night);
+    const { scene, spawn } = balance.rite.site;
+    const sp = scenes[scene as 'forest_deep'].spawns.find((s) => s.id === spawn)!;
+    const [killer, shade] = [m.bots[0]!, m.bots[4]!];
+    m.room.state.players.get(shade.id)!.look = 'vicar';
+    teleport(m, m.bots[5]!, scene as 'forest_deep', sp.x - 1, sp.y); // a living seat beside the Medium
+    const a = audit(m);
+    markDead(m.room, shade.id, 'knife', killer.id);
+    teleport(m, shade, scene as 'forest_deep', sp.x + 1, sp.y);
+    moved(m, a);
+    expect(await until(() => events(shade, 'rite').length === 1)).toBe(true);
+    shade.room.send('act.hold', { action: 'rite', targetId: mediumHandle(m.room), on: true });
+    expect(await until(() => events(shade, 'rite').length === 2)).toBe(true);
+    const checked = a.checked;
+    expect(await until(() => a.checked > checked + 10, 10_000)).toBe(true);
+    for (const bot of m.bots) if (bot !== shade) expect(events(bot, 'rite')).toEqual([]);
     expect(a.leaks).toEqual([]);
   });
 
