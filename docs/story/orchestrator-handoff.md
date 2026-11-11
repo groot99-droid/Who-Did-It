@@ -48,6 +48,10 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
   #502 (R1), #505 (R2), #507 (R3), #508 (R4), #509 (R5), #510 (R7) and #511 (status log). R6 (conversion aura) waits on I9;
   R8 (story section) waits on the map revamp. R fixed three e2e/server races on the way (`skipOpening` helper, `npc.spec`
   NPC-vote assumption, `figuresInView.test.ts`), which bears on open decision 10.
+- I9 (conversion: Faith, `conversion.faithAt`, sermon hold at the bell) is being built by R on `claude/story-i9-conversion`
+  (DECISIONS A606). The owner wants the Vicar to ring the bell every 60 s; the number belongs in `balance.json` and GDD 3.23 only.
+- The finisher holds two owner grants, both for #441 only: the `invariants.test.ts` seed offset and the `npcChores.test.ts`
+  `heldBySnare` edit. S3's work is done; S3 was told to target `claude/story-part2`, not this branch. Nothing is archived unasked.
 - Nothing from `claude/story-part2` has gone to the production base. Merging it there deploys and needs the owner's say-so.
 - The finisher reports it squash-merged #438 (x16, `act()` tick wait) into the production base as `0c3550b` on
   what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
