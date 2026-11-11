@@ -105,3 +105,4 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-11 merged: #507 (R3) squash-merged into `claude/story-part2`, all checks green.
 - 2026-11-11 merged: #508 (R4) squash-merged into `claude/story-part2`, all checks green.
 - 2026-11-11 merged: #509 (R5) squash-merged into `claude/story-part2`, all checks green after a race older than R was fixed in it (`figuresInView` waits for the arriving figures too).
+- 2026-11-11 merged: #510 (R7) squash-merged into `claude/story-part2`, all checks green. R1 to R5 and R7 are all in `claude/story-part2`; R6 (waits on I9) and R8 (waits on the map revamp) stay open.
