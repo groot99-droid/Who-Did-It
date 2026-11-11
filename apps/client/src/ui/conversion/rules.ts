@@ -18,8 +18,9 @@ export function canPreach(o: {
   phase: number;
   dead: boolean;
   nearBell: boolean;
-  round: number;
-  preachedRound: number;
+  tick: number;
+  /** The tick this seat's last sermon ended on, or -1. */
+  preachedTick: number;
 }): boolean {
   return (
     VICAR_LOOK !== null &&
@@ -27,7 +28,7 @@ export function canPreach(o: {
     o.phase === Phase.day &&
     !o.dead &&
     o.nearBell &&
-    o.preachedRound !== o.round
+    (o.preachedTick < 0 || o.tick - o.preachedTick >= balance.conversion.sermonCooldownS * TICK_RATE)
   );
 }
 

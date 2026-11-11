@@ -31,11 +31,11 @@ export function mountSermonLayer(
   return feed ? new Layer(scene, feed, toast, ring, bell, parent) : null;
 }
 
-/** The round this feed's seat last preached to the end, kept per feed so it outlives the World's restarts. */
-const preached = new WeakMap<WorldFeed, { round: number }>();
-function preachedOf(feed: WorldFeed): { round: number } {
+/** The tick this feed's seat last preached to the end, kept per feed so it outlives the World's restarts. */
+const preached = new WeakMap<WorldFeed, { tick: number }>();
+function preachedOf(feed: WorldFeed): { tick: number } {
   let m = preached.get(feed);
-  if (!m) preached.set(feed, (m = { round: -1 }));
+  if (!m) preached.set(feed, (m = { tick: -1 }));
   return m;
 }
 
@@ -44,7 +44,7 @@ class Layer implements SermonLayer {
   private readonly banner: HTMLElement;
   private readonly prompt: HTMLButtonElement;
   private readonly count: HTMLElement;
-  private readonly memory: { round: number };
+  private readonly memory: { tick: number };
   private able = false;
   /** The tick a sermon was asked for, or -1. */
   private startTick = -1;
@@ -93,7 +93,7 @@ class Layer implements SermonLayer {
 
     const onConversion = (m: { kind: string; heard?: number }) => {
       if (m.kind === 'sermon') {
-        this.memory.round = this.feed.clock().round;
+        this.memory.tick = this.feed.clock().tick;
         this.startTick = -1;
         this.toast(heardLine(m.heard ?? 0), 'warm', 6000);
       } else if (m.kind === 'converted') this.toast(C.converted, 'warm', 6000);
@@ -145,8 +145,8 @@ class Layer implements SermonLayer {
       phase: clock.phase,
       dead: this.feed.dead(),
       nearBell,
-      round: clock.round,
-      preachedRound: this.memory.round,
+      tick: clock.tick,
+      preachedTick: this.memory.tick,
     });
     if (this.startTick >= 0 && !this.able) this.startTick = -1; // left the bell or the day: the server ended it
     this.prompt.hidden = !this.able || this.startTick >= 0;

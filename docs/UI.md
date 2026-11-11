@@ -2282,7 +2282,7 @@ down. A toast marks the end of the rite and another the return. The buff shows o
 
 Story I9b (GDD 3.23, DECISIONS A606). Every line follows the seat's own private view (`ui/conversion/SermonLayer.ts`,
 its lines in `ui/copy/conversion.ts`); no line names a seat. A seat in the Vicar's look standing within the bell's
-reach by day, that has not preached a sermon to its end today, sees the sermon prompt beside the bell's own prompt. A
+reach by day, that has not ended a sermon within `conversion.sermonCooldownS`, sees the sermon prompt beside the bell's own prompt. A
 tap of E still rings the bell; E held half a second, or a tap on the sermon prompt, sends `act.hold { action:
 'sermon', targetId: 'bell' }`, and the banner counts the sermon down. Walking off the bell ends it (the server gives
 nothing). The dealt Vicar's view shows its converted count (`Private.converted`) as a pill under the goal strip once
@@ -2290,7 +2290,7 @@ it is above zero; it is a number only. The mock: `?vicar=bell` plays the Vicar's
 
 | Line | Text | Where |
 |---|---|---|
-| the prompt (`prompt`) | Hold E: preach a sermon | the prompt, at the bell by day, once a day |
+| the prompt (`prompt`) | Hold E: preach a sermon | the prompt, at the bell by day, again after the sermon's cooldown |
 | the sermon (`preaching`) | Preaching: {s} s. Stay by the bell. | the banner while the sermon runs, in whole seconds |
 | heard (`heard`, `heardOne`, `heardNone`) | Your sermon reached {n} souls. / Your sermon reached one soul. / Nobody stayed for your sermon. | toast, 6 s, to the preacher at the end |
 | converted (`converted`) | Your faith is whole. You are converted. | toast, 6 s, to the converted seat alone |
