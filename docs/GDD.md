@@ -1126,8 +1126,8 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
   `conversion.faithAt`, and stays converted for the match whatever it spends later. It alone is told; nobody learns
   another seat's Faith or conversion. The dealt Vicar's own view counts the other seats converted
   (`Private.converted`), never naming one. **The sermon**: by day, a seat in the Vicar's look on the hub within the
-  bell's reach holds `act.hold {action: 'sermon'}` for `conversion.sermonS`, standing still, once a day; it calls no
-  meeting and spends no bell pull. Leaving the bell, the day or its life ends it with nothing. Every other living seat
+  bell's reach holds `act.hold {action: 'sermon'}` for `conversion.sermonS`, standing still, and may preach again
+  `conversion.sermonCooldownS` after a sermon ends (owner, 2026-11-11); it calls no meeting and spends no bell pull. Leaving the bell, the day or its life ends it with nothing. Every other living seat
   within `conversion.sermonTiles` of the bell for at least `conversion.listenS` of it gains `conversion.sermonFaith`
   Faith, once a day; the preacher is told how many heard, never who. The sermon follows the look, like the martyr
   (3.20): a cover in the Vicar's look preaches to the same effect, so no listener's Faith tells a cover. **Peaceful**:

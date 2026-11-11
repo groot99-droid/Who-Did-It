@@ -443,6 +443,7 @@
   "conversion": {
     "faithAt": 60,
     "sermonS": 30,
+    "sermonCooldownS": 60,
     "sermonTiles": 6,
     "listenS": 20,
     "sermonFaith": 10,

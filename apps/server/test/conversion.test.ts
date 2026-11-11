@@ -14,7 +14,7 @@ import { type Match, startMatch } from './simHelpers';
 // count and the Peaceful route, which is recorded and never ends the match.
 
 let colyseus: ColyseusTestServer;
-const { sermonS, listenS } = balance.conversion;
+const { sermonS, listenS, sermonCooldownS } = balance.conversion;
 beforeAll(async () => {
   process.env.WDI_DEBUG = '1';
   colyseus = await boot(createServer({ ipBurst: 1e5, ipPerMin: 1e8, globalPerMin: 1e8 }));
@@ -27,10 +27,12 @@ beforeEach(async () => {
   await colyseus.cleanup();
   balance.conversion.sermonS = 0.6; // a short sermon for the test clock
   balance.conversion.listenS = 0.3;
+  balance.conversion.sermonCooldownS = 0.8;
 });
 afterEach(() => {
   balance.conversion.sermonS = sermonS;
   balance.conversion.listenS = listenS;
+  balance.conversion.sermonCooldownS = sermonCooldownS;
 });
 
 type Conversion = { kind: string; heard?: number };
@@ -73,7 +75,7 @@ describe('conversion (story I9)', () => {
     expect(isConverted(m.room, m.bots[2]!.id)).toBe(true);
   });
 
-  it('the sermon gives Faith to those within range for listenS, once a day, and tells the preacher a count', async () => {
+  it('the sermon gives Faith to those within range for listenS, again after the cooldown, a listener once a day', async () => {
     const m = await day();
     atBell(m, 0, 0);
     atBell(m, 2, 2); // within sermonTiles
@@ -86,9 +88,14 @@ describe('conversion (story I9)', () => {
     expect(priv(m, 3).faith).toBe(0);
     expect(priv(m, 0).faith).toBe(0);
     expect(conversionOf(m, 0).at(-1)).toEqual({ kind: 'sermon', heard: 1 });
-    preach(m, 0); // once a day
-    await sleep(200);
-    expect(errorsOf(m, 0).at(-1)?.reason).toBe('ALREADY_DONE');
+    preach(m, 0); // within sermonCooldownS of the last one
+    await sleep(100);
+    expect(errorsOf(m, 0).at(-1)?.reason).toBe('COOLDOWN');
+    await sleep(900);
+    preach(m, 0); // after it: a second sermon, but a listener is paid once a day
+    await sleep(1200);
+    expect(conversionOf(m, 0).at(-1)).toEqual({ kind: 'sermon', heard: 0 });
+    expect(priv(m, 2).faith).toBe(balance.conversion.sermonFaith);
   });
 
   it('only the Vicar look preaches, by day, at the bell; leaving it breaks a sermon with nothing given', async () => {

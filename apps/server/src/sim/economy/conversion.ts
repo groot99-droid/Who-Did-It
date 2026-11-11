@@ -13,7 +13,8 @@ import { checkPeaceful, resetPeaceful } from '../routes/peaceful';
  * altar, the cot (`SleepRest.ts`) and the sermon below, so the check runs every tick over every seat.
  *
  * **The sermon.** `act.hold { action: 'sermon', targetId: 'bell' }`: a seat in the Vicar's public look, by day, on the
- * hub within the bell's reach, preaches for `conversion.sermonS`, standing still, once a day. Moving, leaving the day
+ * hub within the bell's reach, preaches for `conversion.sermonS`, standing still, and may preach again `conversion.sermonCooldownS` after a sermon
+ * ends (owner, 2026-11-11). Moving, leaving the day
  * or dying ends it with nothing. Every other living seat within `conversion.sermonTiles` of the bell for at least
  * `conversion.listenS` of it gains `conversion.sermonFaith`, once a day. The Faith follows the **look**, like the
  * martyr (A600 R-Q3): a listener's own Faith is its private view, so a sermon that gave nothing under a cover would
@@ -29,9 +30,9 @@ const VICAR_LOOK = roles.roles.vicar?.look ?? null;
 interface ConversionMemory {
   /** The seats converted this match. */
   converted: Set<string>;
-  /** The day counter (one more at every day phase), for the once-a-day rules. */
+  /** The day counter (one more at every day phase), for the listener's once-a-day rule. */
   day: number;
-  /** The day each seat last preached a sermon to its end. */
+  /** The tick each seat's last sermon ended on (preached to its end), for the cooldown. */
   preached: Map<string, number>;
   /** The day each seat last gained a sermon's Faith. */
   heard: Map<string, number>;
@@ -123,7 +124,12 @@ export function handleSermonHold(room: PartyRoom, seat: string): void {
   if (p.dead || !p.placed) return reject(room, seat, 'NOT_IN_PLAY');
   if (room.state.tick < p.busyUntilTick) return reject(room, seat, 'BUSY');
   if (!nearBell(room, p, bellReach())) return reject(room, seat, 'TOO_FAR', { of: 'bell' });
-  if (memory.preached.get(seat) === memory.day) return reject(room, seat, 'ALREADY_DONE');
+  const last = memory.preached.get(seat);
+  if (
+    last !== undefined &&
+    room.state.tick - last < Math.round(balance.conversion.sermonCooldownS * TICK_RATE)
+  )
+    return reject(room, seat, 'COOLDOWN');
   if (p.hold?.action === SERMON_HOLD) return;
   p.hold = { action: SERMON_HOLD, targetId: 'bell', startTick: room.state.tick };
   memory.listening.clear();
@@ -160,7 +166,7 @@ function runSermon(room: PartyRoom, memory: ConversionMemory): void {
   }
   if (room.state.tick - p.hold!.startTick < Math.round(balance.conversion.sermonS * TICK_RATE)) return;
   p.hold = null;
-  memory.preached.set(seat, memory.day);
+  memory.preached.set(seat, room.state.tick);
   const need = Math.round(balance.conversion.listenS * TICK_RATE);
   let heard = 0;
   for (const [id, ticks] of memory.listening) {
