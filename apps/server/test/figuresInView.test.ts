@@ -72,8 +72,14 @@ describe("figures in a seat's view (round 10, x5, A353)", () => {
     const next = elsewhere ? sceneKey(elsewhere.sceneIdx) : 'tavern_bar';
     teleport(m, viewer, next, elsewhere ? tileOf(elsewhere.x) + 1 : 6, elsewhere ? tileOf(elsewhere.y) : 6);
     settle(m, viewer);
-    expect(await until(() => !figuresHeld(m, viewer).some((h) => here.includes(h)), 4000)).toBe(true);
-    const there = figuresIn(m, simOf(m.room).players.get(viewer.id)!.sceneIdx);
+    // The old scene's figures leaving and the new scene's arriving can land in different patches: wait for both.
+    const thereNow = (): string[] => figuresIn(m, simOf(m.room).players.get(viewer.id)!.sceneIdx);
+    const settled = (): boolean => {
+      const held = figuresHeld(m, viewer);
+      return !held.some((h) => here.includes(h)) && JSON.stringify(held) === JSON.stringify(thereNow());
+    };
+    expect(await until(settled, 4000)).toBe(true);
+    const there = thereNow();
     expect(figuresHeld(m, viewer)).toEqual(there);
     if (elsewhere) expect(there).toContain(elsewhere.handle);
   });

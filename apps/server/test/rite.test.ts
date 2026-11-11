@@ -1,10 +1,13 @@
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { balance, scenes } from '@wdi/content';
-import { Phase, S2C } from '@wdi/shared';
+import { EffectId, Phase, S2C } from '@wdi/shared';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server';
 import { avatarMemory, avatarOf } from '../src/sim/Avatars';
+import { hasEffect, speedFactorOf } from '../src/sim/body/effects';
+import { bodyOf } from '../src/sim/body/state';
 import { markDead } from '../src/sim/Death';
+import { runInvariants } from '../src/sim/auto/invariants';
 import { simOf } from '../src/sim/RoomSim';
 import { mediumHandle, riteDone } from '../src/sim/rite/rite';
 import { avatarsHeld } from './avatarHelpers';
@@ -130,6 +133,8 @@ describe("the Medium's rite (story R3)", () => {
   });
 });
 
+const bodyFailures = (m: Match) => runInvariants(m.room).filter((f) => f.name === 'bodyBounds');
+
 describe("the martyr's return (story R4)", () => {
   /** The shade (Bot0) at the Medium: begins the rite and waits for it to be done. */
   async function rite(m: Match): Promise<void> {
@@ -157,7 +162,7 @@ describe("the martyr's return (story R4)", () => {
     const p = simOf(m.room).players.get(vicar)!;
     expect({ dead: p.dead, placed: p.placed }).toEqual({ dead: false, placed: true });
     expect(avatarMemory(m.room).sceneOf.get(avatarMemory(m.room).handleOf.get(vicar)!)).toBe(SITE);
-    expect(priv.body.hp).toBe(balance.body.maxHp);
+    expect(priv.body.hp).toBe(balance.body.maxHp * balance.rite.buff.maxHpFactor); // R5's buff
     expect(priv.cooldownEndTick.get('confession')).toBeGreaterThan(died + 100);
     expect(riteOf(m, 0).at(-1)).toEqual({ stage: 'returned' });
     for (const i of [1, 2, 3, 4]) expect(riteOf(m, i)).toEqual([]);
@@ -186,5 +191,47 @@ describe("the martyr's return (story R4)", () => {
     await toDay(m);
     expect(simOf(m.room).players.get(m.bots[0]!.id)!.dead).toBe(false);
     expect(riteOf(m, 0).at(-1)).toEqual({ stage: 'returned' });
+  });
+
+  // Story R5 (GDD 3.20 and 3.22, DECISIONS A604): the 10X Vicar's speed and health from the return to the next dusk.
+  it('the return day: the buff raises speed and maximum health, and dusk takes it off', async () => {
+    const m = await night();
+    const vicar = m.bots[0]!.id;
+    markDead(m.room, vicar, 'knife', m.bots[1]!.id);
+    await rite(m);
+    await toDay(m);
+    const body = bodyOf(m.room, vicar)!;
+    const { speedFactor, maxHpFactor } = balance.rite.buff;
+    expect(hasEffect(body, 'ascended')).toBe(true);
+    expect(speedFactorOf(body)).toBeCloseTo(speedFactor);
+    expect({ hp: body.hp, maxHp: body.maxHp }).toEqual({
+      hp: balance.body.maxHp * maxHpFactor,
+      maxHp: balance.body.maxHp * maxHpFactor,
+    });
+    const priv = playerOf(m, m.bots[0]!).priv;
+    expect([...priv.body.effects].map((e) => e.id)).toContain(EffectId.ascended);
+    for (const i of [1, 2, 3, 4])
+      expect([...playerOf(m, m.bots[i]!).priv.body.effects].map((e) => e.id)).not.toContain(
+        EffectId.ascended,
+      );
+    expect(bodyFailures(m)).toEqual([]);
+
+    setPhase(m, Phase.dusk);
+    await sleep(200);
+    expect(hasEffect(body, 'ascended')).toBe(false);
+    expect(speedFactorOf(body)).toBe(1);
+    expect({ hp: body.hp, maxHp: body.maxHp }).toEqual({ hp: balance.body.maxHp, maxHp: balance.body.maxHp });
+    expect(bodyFailures(m)).toEqual([]);
+  });
+
+  it('no rite, no buff: a seat that never returned wears nothing', async () => {
+    const m = await night();
+    markDead(m.room, m.bots[0]!.id, 'knife', m.bots[1]!.id);
+    await toDay(m);
+    expect(bodyOf(m.room, m.bots[0]!.id)).toBeUndefined();
+    for (const bot of m.bots) {
+      const body = bodyOf(m.room, bot.id);
+      if (body) expect(hasEffect(body, 'ascended')).toBe(false);
+    }
   });
 });

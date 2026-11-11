@@ -144,6 +144,8 @@ export const EffectId = {
   exhausted: 13,
   /** Round 10, D4a (GDD 3.14): a dish's poison resistance until it wears off; private, no status bit. */
   resistant: 14,
+  /** Story R5 (GDD 3.20): the 10X Vicar's buff from the martyr's return to the next dusk; private, no status bit. */
+  ascended: 15,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

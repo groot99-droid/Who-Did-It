@@ -520,12 +520,14 @@ export const BalanceFile = z.strictObject({
   /**
    * Story R3 (GDD 3.20, DECISIONS A602): the Medium's rite. The Medium stands at `site` (a scene and one of its
    * spawns: data, so the map revamp moves it without code); a shade within `reachTiles` of it starts the rite, which
-   * runs `holdS` and cannot be interrupted.
+   * runs `holdS` and cannot be interrupted. Story R5: the returned martyr's buff until dusk multiplies its speed by
+   * `buff.speedFactor` and its maximum health by `buff.maxHpFactor`.
    */
   rite: Section({
     holdS: Seconds,
     reachTiles: Tiles,
     site: z.strictObject({ scene: z.string().min(1), spawn: z.string().min(1) }),
+    buff: z.strictObject({ speedFactor: z.number().min(1), maxHpFactor: z.number().min(1) }),
   }),
   /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
