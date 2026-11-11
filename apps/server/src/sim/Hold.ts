@@ -23,6 +23,7 @@ import { dropDrag, handleCoverupHold, isCoverupHold, tickCoverup } from './verbs
 import { handleDustHold, tickDust } from './verbs/dust';
 import { handleAutopsyHold, tickAutopsy } from './verbs/autopsy';
 import { RITE_HOLD, handleRiteHold } from './rite/rite';
+import { SERMON_HOLD, handleSermonHold } from './economy/conversion';
 
 const CLUE_TEACHING = 'clue_teaching';
 
@@ -66,6 +67,7 @@ export function handleHold(room: PartyRoom, sessionId: string, payload: Record<s
   if (action === RITE_HOLD && typeof targetId === 'string' && targetId.length > 0 && targetId.length <= 64)
     return handleRiteHold(room, sessionId, targetId);
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
+  if (action === SERMON_HOLD) return handleSermonHold(room, sessionId); // story I9 (GDD 3.23): the Vicar's sermon
   // Round 6 (locked call sites): the M5b holds go to their owners' files (6F); each refuses until it lands.
   if ((action === 'gather' || action === 'craft') && typeof targetId === 'string' && targetId.length > 0) {
     if (action === 'gather') handleGather(room, sessionId, targetId);
@@ -135,6 +137,7 @@ export function runHolds(room: PartyRoom): void {
       else tickCraft(room, sessionId, p);
       continue;
     }
+    if (hold.action === SERMON_HOLD) continue; // story I9: the sermon runs in `economy/conversion.ts`
     if (hold.action === 'cuff') {
       tickCuff(room, sessionId, p); // round 10, B4
       continue;

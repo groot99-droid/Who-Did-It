@@ -1122,6 +1122,18 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
     under your public name ("the charge is a matter for the Church"), clears every vote cast so far, and for
     `faith.sealShieldS` refuses any vote naming you. The shield ends with the meeting. The full heresy trial waits for
     R9's Tribunal.
+- **Conversion** (story I9, A606; round 10 scope I9). A seat is converted once its Faith reaches
+  `conversion.faithAt`, and stays converted for the match whatever it spends later. It alone is told; nobody learns
+  another seat's Faith or conversion. The dealt Vicar's own view counts the other seats converted
+  (`Private.converted`), never naming one. **The sermon**: by day, a seat in the Vicar's look on the hub within the
+  bell's reach holds `act.hold {action: 'sermon'}` for `conversion.sermonS`, standing still, once a day; it calls no
+  meeting and spends no bell pull. Leaving the bell, the day or its life ends it with nothing. Every other living seat
+  within `conversion.sermonTiles` of the bell for at least `conversion.listenS` of it gains `conversion.sermonFaith`
+  Faith, once a day; the preacher is told how many heard, never who. The sermon follows the look, like the martyr
+  (3.20): a cover in the Vicar's look preaches to the same effect, so no listener's Faith tells a cover. **Peaceful**:
+  the dealt Vicar's route is met the first time every other living, placed seat (NPC seats too) is converted, with at
+  least one, before the Final Night. The dealt Vicar alone is told; the route is recorded for the ledger and never ends
+  the match. NPC seats do not seek out a sermon yet.
 
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it

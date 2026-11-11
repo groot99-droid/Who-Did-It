@@ -289,6 +289,11 @@ export const Private = schema(
     hitman: bool(),
     /** Round 10, C4b (seams.md 3 row 21): the Hitman boarded the Dusk Train and left play. Own view only. */
     departed: bool(),
+    /**
+     * Story I9 (GDD 3.23, A606; seams row 28): on the dealt Vicar's own view, how many other seats are converted.
+     * A count, never a name; 0 on every other view.
+     */
+    converted: u8(),
   },
   'Private',
 );
