@@ -48,12 +48,17 @@ export function workable(room: PartyRoom, player: PlayerState, st: Station): boo
   return true;
 }
 
-/** At a counter: opens the shop with the human verb, sells all it holds that the shop buys, and may buy a Snare. */
-export function sellAt(room: PartyRoom, id: string, player: PlayerState, st: Station): void {
+/**
+ * At a counter: opens the shop with the human verb, sells all it holds that the shop buys, and may buy a Snare. Returns
+ * whether the visit earns the pause before the next action: a sale (or a counter it could not reach) does, a visit that
+ * only looked at the Snares does not, so that it never stands at the counter longer than a seat that sold something.
+ */
+export function sellAt(room: PartyRoom, id: string, player: PlayerState, st: Station): boolean {
   const shopId = shopAt(st.propId);
-  if (shopId === undefined || simOf(room).players.get(id)?.sceneIdx !== sceneIndex(st.scene)) return;
+  if (shopId === undefined || simOf(room).players.get(id)?.sceneIdx !== sceneIndex(st.scene)) return true;
   handleHold(room, id, { action: 'shop', targetId: st.propId, on: true });
-  for (const itemId of sellables(player, st.propId))
-    handleSell(room, id, { shopId, itemId, qty: count(player, itemId) });
+  const goods = sellables(player, st.propId);
+  for (const itemId of goods) handleSell(room, id, { shopId, itemId, qty: count(player, itemId) });
   maybeBuySnare(room, id, player, st.propId); // round 10, K6b: a Snare, as a human buys one
+  return goods.length > 0;
 }

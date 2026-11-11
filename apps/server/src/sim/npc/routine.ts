@@ -810,12 +810,10 @@ function runWork(
   if (hold === 'shop') {
     // A counter: one sale of what it holds, then the pause before the next action.
     if (act.traded !== true) {
-      sellAt(room, id, player, st);
+      const sold = sellAt(room, id, player, st);
       act.traded = true;
-      act.untilTick = Math.min(
-        act.untilTick,
-        tick + spanTicks(playRng(room, id), balance.npc.routine.workPauseS),
-      );
+      const pause = spanTicks(playRng(room, id), balance.npc.routine.workPauseS); // always drawn: the count is fixed
+      act.untilTick = Math.min(act.untilTick, sold ? tick + pause : tick); // round 10, K6b: no pause for a look at Snares
     }
     return stand(p);
   }
