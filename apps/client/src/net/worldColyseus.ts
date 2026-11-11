@@ -115,6 +115,10 @@ export class ColyseusWorldFeed implements WorldFeed {
       this.line = onLine;
       this.bus.emit('killed', m);
     });
+    // Story R4 (GDD 3.20): the martyr the Medium's rite brought back lives again; R7 draws the rest of the rite.
+    room.onMessage('rite', (m: { stage?: string }) => {
+      if (m.stage === 'returned') this.ghost = false;
+    });
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
     room.onMessage('aim', (m: WorldFeedEvents['aim']) => this.bus.emit('aim', m));

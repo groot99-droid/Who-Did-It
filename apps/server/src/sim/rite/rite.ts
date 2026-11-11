@@ -8,7 +8,8 @@ import { mapScenesOf } from '../MapSites';
 import { refusal, sendRefusal, type Refusal } from '../refusal';
 import { simOf } from '../RoomSim';
 import { isWorldPhase, sceneIndex, tileCentre } from '../World';
-import { isShade, shadeOf } from './shade';
+import { returnMartyr } from './return';
+import { DAWNS, endShade, expireShade, ghostView, isShade, shadeOf } from './shade';
 
 /**
  * The Medium and its rite (story R3, GDD 3.20, DECISIONS A602; `docs/story/rite.md`). The Medium is an NPC gate,
@@ -19,7 +20,7 @@ import { isShade, shadeOf } from './shade';
  * sends `act.hold { action: 'rite', targetId: <the Medium's handle> }`; the rite then runs `rite.holdS` and cannot
  * be interrupted (the shade stands still, a release changes nothing, nothing reaches a shade). It costs nothing. Its
  * messages go to the shade alone: `rite { stage: 'open', medium }` once it is a shade, `begun` and `done`.
- * Room memory only; R4 reads `riteDone` for the return.
+ * Room memory only. At the next day the shade comes back if its rite is done (`return.ts`, R4), else it is a ghost.
  */
 const MEDIUM_LOOK = 'villager';
 export const RITE_HOLD = 'rite';
@@ -46,6 +47,15 @@ function memoryOf(room: PartyRoom): RiteMemory {
     m.told = null;
     m.running = null;
     m.done = null;
+  });
+  // Story R4 (A600 R-Q4, R-Q5): the next day ends the shade's wait: back at the site if its rite is done, else a ghost.
+  onSim(room, 'phase', (e) => {
+    if (!DAWNS.includes(e.data?.to as number)) return;
+    const shade = shadeOf(room);
+    if (shade === null) return;
+    if (m.done !== shade) return expireShade(room);
+    const ended = endShade(room)!;
+    if (!returnMartyr(room, ended.seat, ended.deathTick)) ghostView(room, ended.seat);
   });
   return memory;
 }

@@ -4,7 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { createServer } from '../src/server';
 import { markDead } from '../src/sim/Death';
 import { martyrOf } from '../src/sim/Memorial';
-import { isShade, shadeOf } from '../src/sim/rite/shade';
+import { isShade, martyrSeatOf, shadeOf } from '../src/sim/rite/shade';
 import { avatarMemory } from '../src/sim/Avatars';
 import { avatarsHeld } from './avatarHelpers';
 import { eventsOf, playerOf, setPhase, sleep, teleport } from './killHelpers';
@@ -46,10 +46,11 @@ describe("the martyr's shade (story R2)", () => {
     expect(isShade(m.room, vicar)).toBe(true);
     expect(killedOf(m, 0)).toEqual([expect.objectContaining({ roles: {}, shade: true })]);
 
-    // The meeting's reveal mourns the shade: it is the match's martyr.
+    // The meeting's reveal mourns the shade: it is the match's martyr (its due waits for the rite, R4).
     setPhase(m, Phase.reveal);
     await sleep(200);
-    expect(martyrOf(m.room)?.seat).toBe(vicar);
+    expect(martyrSeatOf(m.room)).toBe(vicar);
+    expect(martyrOf(m.room)).toBeNull();
 
     setPhase(m, Phase.day);
     await sleep(200);
