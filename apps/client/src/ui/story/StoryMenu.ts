@@ -111,7 +111,11 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
             )
           : null;
       if (replay) {
-        replay.addEventListener('click', () => void submit(story.id, row.id));
+        // A guest's save lives on this device, so a replay sends it along: the server replays only a chapter its save finished.
+        replay.addEventListener(
+          'click',
+          () => void submit(story.id, row.id, saves.read(story.id) ?? undefined),
+        );
         buttons.push(replay);
       }
       return h(
