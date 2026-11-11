@@ -1,6 +1,6 @@
 # Story mode part 2: orchestrator handoff
 
-Written 2026-11-10 (updated the same day after #498, #499, #500, #501 and the finisher's report) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
+Written 2026-11-10 (updated 2026-11-11 after #498 to #511 and the finisher's report) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
 session can resume without the chat. It restates no rule or number: those stay in `docs/GDD.md` and
 `packages/content/data/balance.json`. Decisions the owner makes belong in `docs/DECISIONS.md`.
 
@@ -44,7 +44,11 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
   Still owed: P2 sends one summary of what the engine can do for P5 and what is blocked.
 - PR #499 (P0's Medium / 10x Vicar docs) is merged into `claude/story-part2` on the owner's word. Still open from it:
   whether "deep woods" is the existing `forest_deep` (the Fenwood), and the Bandit's and Activist's anti-theme buildings.
-- Session R's PRs are drafts into `claude/story-part2`; they wait for the orchestrator's or the owner's word to merge.
+- Session R's PRs are all merged into `claude/story-part2` on the owner's word (confirmed to the orchestrator 2026-11-10):
+  #502 (R1), #505 (R2), #507 (R3), #508 (R4), #509 (R5), #510 (R7) and #511 (status log). R6 (conversion aura) waits on I9;
+  R8 (story section) waits on the map revamp. R fixed three e2e/server races on the way (`skipOpening` helper, `npc.spec`
+  NPC-vote assumption, `figuresInView.test.ts`), which bears on open decision 10.
+- Nothing from `claude/story-part2` has gone to the production base. Merging it there deploys and needs the owner's say-so.
 - The finisher reports it squash-merged #438 (x16, `act()` tick wait) into the production base as `0c3550b` on
   what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
   instruction. Confirm it was intended.
@@ -54,8 +58,8 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
 | Session | Id | State | Rule |
 |---|---|---|---|
 | Orchestrator | `session_01M5mAcY1JPqjhPmoZ8CZDFp` | running | never archive |
-| P0 design | `session_01M5mAcXYe29zVwSB7eQSKQ5` | #499 and #501 merged; waiting on owner for the open items above | keep until the open items are answered |
-| Story R: the Medium's rite and the 10X Vicar | `session_01M5mAcVS17U3fpdfpYurWpn` | spawned by P0; builds R1 to R5 then R7; R6 (conversion aura) waits on I9, R8 (story section) waits on the map revamp | keep; never archive unasked |
+| P0 design | `session_01M5mAcXYe29zVwSB7eQSKQ5` | #499 and #501 merged; waiting on owner for the open items above | keep until the open items are answered; check live status before archiving (an archive on 2026-11-10 was reversed) |
+| Story R: the Medium's rite and the 10X Vicar | `session_01M5mAcVS17U3fpdfpYurWpn` | spawned by P0; R1 to R5 and R7 built and merged (#502 to #511), nothing open; R6 (conversion aura) waits on I9, R8 (story section) waits on the map revamp | keep until R6 and R8 unblock; never archive unasked |
 | P2 sections engine | `session_01M5mAcVG1b3xhGH76C6nUHz` | review-ready (E14) | keep until merged and summarised |
 | Skipped-PR finisher (#437, #438, #435, #440, #441, K6b) | `session_01M5mAcY9qbhZ1CAniTBr7xH` | everything pushed (2026-11-10). #438 merged into the base (see above). #437 not merged: `e2e` failed twice on `match.spec.ts:169` (hud-clock hidden at startMatch), re-run spent, needs the base's e2e history or the trace (artifact 13597323394, run 42422463137). #435, #440, #441 not merged: each needs a base re-merge, the full server suite, `pnpm auto` at 50 and CI. #440 also has the Handcuffs prices/grant (owner) and an npcStuck failure in match 30 (forest near wall (9,14)) needing a nav fix or routing to 10F/10X. #441 is about 680 lines, over the 400-line rule: owner decides split or accept | keep until these are resolved; never archive unasked |
 | Accounts plan | `session_01M5mAcXu65m2U47WM1R6aso` | draft docs PR #472 | keep while #472 is open; account PR sessions A2+ spawn after Q1 to Q14 |
