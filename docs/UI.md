@@ -2160,9 +2160,10 @@ reach the player's own client only (`PROTOCOL.md`); every title, line, goal and 
 
 A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
 the player). The panel is at most 36 rem wide, scrolls on a short phone and keeps a 44 px button. The title card is
-opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD band, at most 18 rem
+opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD's goal band (76 px down), at most 18 rem
 wide, ticks a goal off (struck through, a "done" label for a screen reader) and is hidden while a card is up and when a
-chapter has no goals; an end card clears it.
+chapter has no goals; an end card clears it. At 600 px and under it shrinks to one line, the next open goal, 10.5 rem wide
+beside the clock, because the phone's top band is full.
 
 The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
 opens the chapter list of the story (the arc's chapters, since P2's #479; a chapter holds several sections): each chapter with its set-up line, finished chapters marked and replayable (kept in
@@ -2187,7 +2188,9 @@ save's `summaries` are read defensively as `{ chapterId, failed?, counters? }` (
 
 Screens `story-menu`, `story-title`, `story-section`, `story-line`, `story-resume`, `story-finale`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
-fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
+fixture story). `e2e/screens-story-live.spec.ts` plays the same entry against the real server: Story, Begin, the title and
+opening beat cards, the map's cutscene, then the HUD with the goals strip pinned top-left. Screenshots land in the specs'
+output like `screens.spec.ts`'s.
 
 ### 14.54 The evidence verbs (10V, round 10)
 
