@@ -119,7 +119,15 @@ export type WorldFeedEvents = {
   noise: NoisePulse;
   error: ErrorPayload;
   /** Private: this player was killed and is now a ghost. */
-  killed: { sceneId: string; cause: string; roles: Record<string, string>; cutsceneId?: string };
+  killed: {
+    sceneId: string;
+    cause: string;
+    roles: Record<string, string>;
+    cutsceneId?: string;
+    shade?: boolean;
+  };
+  /** Private to the martyr's shade (story R3 to R5, GDD 3.20): the Medium's rite is open, begun, done or returned. */
+  rite: S2CPayloads['rite'];
   /** Private: a collect finished; the entry is in `notebook()`. */
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };

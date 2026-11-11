@@ -162,8 +162,9 @@ export class Hud {
   }
 
   /** The line under "Your goal"; a ghost reads "You are a ghost" here as well as in the log. */
-  setGhost(on: boolean): void {
-    this.chipRole.textContent = on ? C['ghost.label'] : C['hud.goal'];
+  /** Ghost mode's chip; `label` replaces "You are a ghost" (story R7: the martyr's shade, GDD 3.20). */
+  setGhost(on: boolean, label?: string): void {
+    this.chipRole.textContent = on ? (label ?? C['ghost.label']) : C['hud.goal'];
   }
 
   onNotebook(handler: () => void): void {

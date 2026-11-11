@@ -15,6 +15,7 @@ export { MENU_COPY } from './menu';
 export { TOWNSFOLK_COPY, figureName, townsfolkLostLine } from './townsfolk';
 export { MUG_COPY } from './mug';
 export { SLEEP_COPY } from './sleep'; // round 10, A8
+export { RITE_COPY } from './rite'; // story R7
 export { REFUSAL_COPY, refusalLine } from './refusals'; // round 10, A1
 
 /** Replaces `{key}` placeholders; a missing key is left as is so the gap shows in a test. */

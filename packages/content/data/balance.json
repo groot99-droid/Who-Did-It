@@ -440,6 +440,13 @@
   },
   "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
   "story": { "companyS": 20, "gddRef": "3.34" },
+  "rite": {
+    "holdS": 8,
+    "reachTiles": 1.5,
+    "site": { "scene": "forest_deep", "spawn": "wood_side" },
+    "buff": { "speedFactor": 1.3, "maxHpFactor": 2 },
+    "gddRef": "3.20"
+  },
   "hitman": {
     "byHumans": {
       "3": { "comes": 0.5, "human": 0 },

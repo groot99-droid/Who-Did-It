@@ -82,6 +82,9 @@ describe('story.json', () => {
     expect(broken((c) => (section(c).roleId = 'bandit'))).toEqual([
       expect.stringContaining('unknown role bandit'),
     ]);
+    expect(broken((c) => (section(c).roleId = 'medium'))).toEqual(
+      expect.arrayContaining([expect.stringContaining('plays retired role medium')]),
+    );
     expect(broken((c) => (section(c).beats[0]!.action = { cutscene: 'noSuchScene' }))).toEqual([
       expect.stringContaining('unknown cutscene noSuchScene'),
     ]);
@@ -149,8 +152,11 @@ describe('story.json', () => {
     expect(broken((c) => (act(c).cast = ['baker', 'watchman', 'nobody']))).toEqual([
       expect.stringContaining('cast names unknown role nobody'),
     ]);
-    const all = Object.keys(content.roles.roles);
+    const all = Object.keys(content.roles.roles).filter((r) => content.roles.roles[r]!.retired === undefined);
     expect(broken((c) => (act(c).cast = all))).toEqual([expect.stringContaining('does not fit')]);
+    expect(broken((c) => (act(c).cast = ['baker', 'watchman', 'medium']))).toEqual([
+      expect.stringContaining('cast names retired role medium'),
+    ]);
     const say = (by: string) => (c: Content) => {
       act(c).cast = ['baker', 'watchman'];
       section(c).beats[0]!.action = { say: { text: 'Evening.', by } };
@@ -202,6 +208,7 @@ describe('story.json', () => {
     const missing = storyCoverage(arc(content), content.roles);
     expect(missing).not.toContain('baker');
     expect(missing).toContain('vicar');
+    expect(missing).not.toContain('medium'); // retired (DECISIONS A600): in no deck, so it needs no part
     const errs = broken((c) => (arc(c).full = true));
     expect(errs).toEqual([
       expect.stringContaining('is marked full but these cards have no section and no line'),

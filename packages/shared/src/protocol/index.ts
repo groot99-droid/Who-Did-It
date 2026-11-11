@@ -123,6 +123,8 @@ export const S2C = {
   storySaved: 'story.saved',
   /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
   achv: 'achv',
+  /** Story R3 (GDD 3.20), private to the martyr's shade: the Medium's rite is open, begun or done. */
+  rite: 'rite',
 } as const;
 
 /**
@@ -175,7 +177,9 @@ export type HoldAction =
   | 'unlock'
   | 'crowbar'
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
-  | 'dust';
+  | 'dust'
+  // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
+  | 'rite';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -415,8 +419,18 @@ export interface S2CPayloads {
   sceneEnter: { sceneId: string; spawn: string; facing: string };
   /** Private. */
   clueFound: { entryId: string };
-  /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
-  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
+  /**
+   * Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). Empty for a
+   * seat on the line (C1) and for the martyr's shade (story R2, GDD 3.8), which says `shade`; a shade that becomes a
+   * ghost at the next day is sent a second `killed`, with the roles and no cutscene.
+   */
+  killed: {
+    sceneId: string;
+    cause: DeathCause;
+    roles: Record<string, string>;
+    cutsceneId?: string;
+    shade?: boolean;
+  };
   /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
@@ -546,6 +560,13 @@ export interface S2CPayloads {
    * (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only.
    */
   achv: { id: string; step: number; steps: number; done: boolean };
+  /**
+   * Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade
+   * (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick`
+   * is the tick it is done on; it cannot be interrupted), `done` when it is, and (R4) `returned` when the seat lives
+   * again at the next day.
+   */
+  rite: { stage: 'open' | 'begun' | 'done' | 'returned'; medium?: string; endsTick?: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

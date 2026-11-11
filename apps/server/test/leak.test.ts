@@ -1,11 +1,14 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { balance, clues } from '@wdi/content';
+import { balance, clues, scenes } from '@wdi/content';
 import { Phase, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { clockOf } from '../src/sim/auto/clock';
 import { StatusBit } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
+import { markDead } from '../src/sim/Death';
+import { mediumHandle } from '../src/sim/rite/rite';
+import { isShade } from '../src/sim/rite/shade';
 import { canSee } from '../src/sim/Sight';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
 import { avatarsHeld } from './avatarHelpers';
@@ -65,7 +68,8 @@ interface Audit {
 function stateLeaks(m: Match, bot: Bot): string[] {
   const out: string[] = [];
   const viewer = simOf(m.room).players.get(bot.id);
-  if (!viewer || viewer.dead) return out; // a ghost sees everything (GDD 3.17)
+  // A ghost sees everything (GDD 3.17); the martyr's shade (story R2) is judged as a living seat.
+  if (!viewer || (viewer.dead && !isShade(m.room, bot.id))) return out;
   const state = stateOf(bot);
   state.players.forEach((p, id) => {
     if (id === bot.id) return;
@@ -202,6 +206,50 @@ describe('the leak audit (8L)', () => {
     await sleep(200);
     expect(events(m.bots[1]!, 'achv')).toEqual([]);
     expect(events(m.bots[0]!, 'achv').map((p) => p['id'])).toEqual(['lightFingers', 'bloodOnHands']);
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('the martyr’s shade (story R2): its view and its messages are a living seat’s, no role and no ghost', async () => {
+    const m = await startParty(colyseus, 6); // seat 0 holds the Knife; seats 4 and 5 are Townsfolk
+    setPhase(m, Phase.night);
+    for (const i of [0, 3, 4, 5]) teleport(m, m.bots[i]!, 'forest', 7 + i - 3, 1);
+    const [killer, shade, ghost] = [m.bots[0]!, m.bots[4]!, m.bots[5]!];
+    m.room.state.players.get(shade.id)!.look = 'vicar';
+    m.room.state.players.get(ghost.id)!.look = 'doctor';
+    const a = audit(m);
+    markDead(m.room, ghost.id, 'knife', killer.id); // a ghost beside it, then the shade
+    markDead(m.room, shade.id, 'knife', killer.id);
+    moved(m, a);
+    expect(isShade(m.room, shade.id)).toBe(true);
+    const checked = a.checked;
+    expect(await until(() => a.checked > checked + 10, 10_000)).toBe(true);
+    expect(m.room.state.phase).toBe(Phase.night);
+    expect(avatarsHeld(shade).length).toBeGreaterThan(1); // its own figure and the living within its sight
+    ghost.room.send('chat.say', { text: 'over here' });
+    await sleep(300);
+    expect(events(shade, 'killed')).toEqual([expect.objectContaining({ roles: {}, shade: true })]);
+    expect(events(shade, 'chat.msg')).toEqual([]);
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('the Medium’s rite (story R3): only the shade is told, and the Medium is a figure to every view', async () => {
+    const m = await startParty(colyseus, 6); // seat 0 holds the Knife; seats 4 and 5 are Townsfolk
+    setPhase(m, Phase.night);
+    const { scene, spawn } = balance.rite.site;
+    const sp = scenes[scene as 'forest_deep'].spawns.find((s) => s.id === spawn)!;
+    const [killer, shade] = [m.bots[0]!, m.bots[4]!];
+    m.room.state.players.get(shade.id)!.look = 'vicar';
+    teleport(m, m.bots[5]!, scene as 'forest_deep', sp.x - 1, sp.y); // a living seat beside the Medium
+    const a = audit(m);
+    markDead(m.room, shade.id, 'knife', killer.id);
+    teleport(m, shade, scene as 'forest_deep', sp.x + 1, sp.y);
+    moved(m, a);
+    expect(await until(() => events(shade, 'rite').length === 1)).toBe(true);
+    shade.room.send('act.hold', { action: 'rite', targetId: mediumHandle(m.room), on: true });
+    expect(await until(() => events(shade, 'rite').length === 2)).toBe(true);
+    const checked = a.checked;
+    expect(await until(() => a.checked > checked + 10, 10_000)).toBe(true);
+    for (const bot of m.bots) if (bot !== shade) expect(events(bot, 'rite')).toEqual([]);
     expect(a.leaks).toEqual([]);
   });
 

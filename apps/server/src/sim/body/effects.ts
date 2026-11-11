@@ -76,13 +76,16 @@ export function cureWith(
   return cured;
 }
 
-/** Product of the `speedFactor`s on; 0 while an effect forbids moving. */
+/**
+ * Product of the `speedFactor`s on; 0 while an effect forbids moving. The 10X Vicar's `ascended` (story R5, GDD 3.20)
+ * is the one effect that speeds a body up, by `balance.json` `rite.buff.speedFactor`.
+ */
 export function speedFactorOf(body: Body): number {
   let factor = 1;
   for (const id of body.effects.keys()) {
     const def = effectDef(id);
     if (def.noMove) return 0;
-    factor *= def.speedFactor ?? 1;
+    factor *= id === 'ascended' ? balance.rite.buff.speedFactor : (def.speedFactor ?? 1);
   }
   return factor;
 }
