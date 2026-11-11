@@ -125,6 +125,8 @@ export const S2C = {
   achv: 'achv',
   /** Story R3 (GDD 3.20), private to the martyr's shade: the Medium's rite is open, begun or done. */
   rite: 'rite',
+  /** Story I9 (GDD 3.23), private to one seat's own client: it is converted, or (to the Vicar) the parish is. */
+  conversion: 'conversion',
 } as const;
 
 /**
@@ -179,7 +181,9 @@ export type HoldAction =
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
   | 'dust'
   // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
-  | 'rite';
+  | 'rite'
+  // Story I9 (GDD 3.23): the Vicar preaches at the hub's bell (`targetId` is 'bell').
+  | 'sermon';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -567,6 +571,12 @@ export interface S2CPayloads {
    * again at the next day.
    */
   rite: { stage: 'open' | 'begun' | 'done' | 'returned'; medium?: string; endsTick?: number };
+  /**
+   * Story I9 (GDD 3.23, A606), private to one seat's own client and never in public state: `converted` to a seat whose
+   * Faith reached `conversion.faithAt` (once a match), `sermon` to the preacher when its sermon ends (`heard` is how
+   * many seats it reached, never who), `peaceful` to the dealt Vicar when every other living seat is converted.
+   */
+  conversion: { kind: 'converted' | 'sermon' | 'peaceful'; heard?: number };
 }
 
 export type ErrorPayload = S2CPayloads['error'];

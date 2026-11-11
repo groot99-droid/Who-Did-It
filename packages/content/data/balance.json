@@ -440,6 +440,15 @@
   },
   "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
   "story": { "companyS": 20, "gddRef": "3.34" },
+  "conversion": {
+    "faithAt": 60,
+    "sermonS": 30,
+    "sermonCooldownS": 60,
+    "sermonTiles": 6,
+    "listenS": 20,
+    "sermonFaith": 10,
+    "gddRef": "3.23"
+  },
   "rite": {
     "holdS": 8,
     "reachTiles": 1.5,
