@@ -1,6 +1,6 @@
 # Story mode part 2: orchestrator handoff
 
-Written 2026-11-10 by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
+Written 2026-11-10 (updated the same day after #498, #499, #500, #501 and the finisher's report) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
 session can resume without the chat. It restates no rule or number: those stay in `docs/GDD.md` and
 `packages/content/data/balance.json`. Decisions the owner makes belong in `docs/DECISIONS.md`.
 
@@ -17,9 +17,9 @@ session can resume without the chat. It restates no rule or number: those stay i
 
 | # | Decision | Where it waits |
 |---|---|---|
-| 1 | Vicar / Medium rule: reply `go` so P0 pushes `claude/story-p0-w1-medium` and opens a draft PR into `claude/story-part2`; confirm the buff list (conversion aura, Righteous Stride, Divine Judgement) | P0 session `session_01M5mAcXYe29zVwSB7eQSKQ5` |
-| 2 | Medium hideout location: Fenwood (`forest_deep`) or a new location (own building, deep woods) | design |
-| 3 | Seance power: keep or retire | design |
+| 1 | ANSWERED. Vicar / Medium rule: #499 merged; the buff list is speed, health and the conversion aura. Rite brief `docs/story/rite.md` (#501); the owner took the defaults on R-Q1 to R-Q8 | done |
+| 2 | Medium hideout location: Fenwood (`forest_deep`) or a new location (own building, deep woods). The rite site is data, so it can move without code | design |
+| 3 | ANSWERED. Seance is retired with the Medium card | done |
 | 4 | Anti-theme wording (Bandit = detective/police, Activist = post office; each role gets its own building) | design |
 | 5 | `story.read` (GDD 3.26): build or drop | design |
 | 6 | Witness, pickpocket and smoke: build or not | design |
@@ -40,16 +40,24 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
 
 - PR #471 (UI renumber 14.54 to 14.61): open, unmerged, deploys the base.
 - `claude/story-part2` into the base.
-- P2's E14 PR: merge when CI is green; then send one summary of what the engine can do for P5 and what is blocked.
+- P2's E14 PR (#497) is merged into `claude/story-part2` (seen 2026-11-10; the orchestrator did not merge it).
+  Still owed: P2 sends one summary of what the engine can do for P5 and what is blocked.
+- PR #499 (P0's Medium / 10x Vicar docs) is merged into `claude/story-part2` on the owner's word. Still open from it:
+  whether "deep woods" is the existing `forest_deep` (the Fenwood), and the Bandit's and Activist's anti-theme buildings.
+- Session R's PRs are drafts into `claude/story-part2`; they wait for the orchestrator's or the owner's word to merge.
+- The finisher reports it squash-merged #438 (x16, `act()` tick wait) into the production base as `0c3550b` on
+  what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
+  instruction. Confirm it was intended.
 
 ## Sessions
 
 | Session | Id | State | Rule |
 |---|---|---|---|
 | Orchestrator | `session_01M5mAcY1JPqjhPmoZ8CZDFp` | running | never archive |
-| P0 design | `session_01M5mAcXYe29zVwSB7eQSKQ5` | blocked on owner | never archive |
+| P0 design | `session_01M5mAcXYe29zVwSB7eQSKQ5` | #499 and #501 merged; waiting on owner for the open items above | keep until the open items are answered |
+| Story R: the Medium's rite and the 10X Vicar | `session_01M5mAcVS17U3fpdfpYurWpn` | spawned by P0; builds R1 to R5 then R7; R6 (conversion aura) waits on I9, R8 (story section) waits on the map revamp | keep; never archive unasked |
 | P2 sections engine | `session_01M5mAcVG1b3xhGH76C6nUHz` | review-ready (E14) | keep until merged and summarised |
-| Skipped-PR finisher (#437, #438, #435, #440, #441, K6b) | `session_01M5mAcY9qbhZ1CAniTBr7xH` | has not reported; #440 needs a grant request about the Handcuffs store and prices | never archive |
+| Skipped-PR finisher (#437, #438, #435, #440, #441, K6b) | `session_01M5mAcY9qbhZ1CAniTBr7xH` | everything pushed (2026-11-10). #438 merged into the base (see above). #437 not merged: `e2e` failed twice on `match.spec.ts:169` (hud-clock hidden at startMatch), re-run spent, needs the base's e2e history or the trace (artifact 13597323394, run 42422463137). #435, #440, #441 not merged: each needs a base re-merge, the full server suite, `pnpm auto` at 50 and CI. #440 also has the Handcuffs prices/grant (owner) and an npcStuck failure in match 30 (forest near wall (9,14)) needing a nav fix or routing to 10F/10X. #441 is about 680 lines, over the 400-line rule: owner decides split or accept | keep until these are resolved; never archive unasked |
 | Accounts plan | `session_01M5mAcXu65m2U47WM1R6aso` | draft docs PR #472 | keep while #472 is open; account PR sessions A2+ spawn after Q1 to Q14 |
 | S3 protocol and client cards | `session_01M5mAcVBQXcEMEdJztvpJ1j` | review-ready, status unchecked | check before archiving |
 
