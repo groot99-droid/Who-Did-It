@@ -80,6 +80,12 @@ export function privateVendetta(room: PartyRoom, seat: string): string {
   return mates.flatMap((m) => heldOf(room).get(m) ?? []).join(',');
 }
 
+/** Takes `seat`'s vendetta away, or sets it (`null` clears): story mode's seat handover moves a vendetta with its card. */
+export function setVendetta(room: PartyRoom, seat: string, id: string | null): void {
+  if (id === null) heldOf(room).delete(seat);
+  else if (vendettas.vendettas[id]) heldOf(room).set(seat, id);
+}
+
 /** Gives `seat` the vendetta `id` (tests and the debug start, which deal no card through `dealMainDeck`). */
 export function holdVendetta(room: PartyRoom, seat: string, id: string): void {
   if (vendettas.vendettas[id]) heldOf(room).set(seat, id);

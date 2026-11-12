@@ -35,6 +35,8 @@ export const C2S = {
   petitionOpen: 'petition.open',
   /** Round 10, B3: sign the open petition. */
   petitionSign: 'petition.sign',
+  /** Round 10, B6d (GDD 3.8, seams.md 3 row 35): file a case at the Final Night's end trial. */
+  trialFile: 'trial.file',
   vote: 'meeting.vote',
   say: 'chat.say',
   /** Round 8 (GDD 3.8 "Meeting notes", 8T): a line for the meeting notes, which carry no speaker. */
@@ -74,6 +76,10 @@ export const C2S = {
   hq: 'act.hq',
   /** Round 8 (GDD 3.23, 8D): pay the rent due, at the bank or to the Company Clerk in reach. */
   payRent: 'act.payRent',
+  /** Story mode (docs/story/README.md 3): start the story `storyId` from the title screen; `sim/story/` (S2) handles it. */
+  storyStart: 'story.start',
+  /** Story mode: close the story card that is up; queued and consumed inside `step()`. */
+  storyContinue: 'story.continue',
 } as const;
 
 export const S2C = {
@@ -109,6 +115,12 @@ export const S2C = {
   shout: 'shout',
   /** Round 8 (GDD 3.24): a mugger's demand, private to the target; sent by Session 8E's `mug.ts`. */
   mugPrompt: 'mugPrompt',
+  /** Round 10, B6a (GDD 3.8, seams.md 3 row 22): a death sentence's true role, to every client. */
+  tribunalVerdict: 'tribunalVerdict',
+  /** Story mode (docs/story/README.md 3), private to the player's own client: a chapter card. */
+  storyCard: 'story.card',
+  /** Story mode, private to the player's own client: the chapter's goals and which are done. */
+  storyGoals: 'story.goals',
   /** Round 10, C4d (GDD 3.33, seams.md 3 row 37), private to the reader: the Clerk's rent ledger. */
   ledger: 'ledger',
 } as const;
@@ -139,7 +151,14 @@ export type HoldAction =
   // Round 10 (A7, GDD 3.32): lie down in a bed, a cot or an inn bed in reach.
   | 'sleep'
   // Round 10 (B4, GDD 3.31): cuff a figure drawn as the hunted accused, by its handle.
-  | 'cuff';
+  | 'cuff'
+  // Round 10 (V2, GDD 3.4; seams.md 3 row 38): the cover-up verbs. `drag` is above.
+  | 'clean'
+  | 'wash'
+  | 'unlock'
+  | 'crowbar'
+  // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
+  | 'dust';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -249,7 +268,11 @@ export interface C2SPayloads {
    * `targetId` names the target per the ability's `target`: `player` (Kill, Bandage) an avatar handle, `seat`
    * (Impersonate, the night powers, Last Shot) a seat id.
    */
-  'act.ability': { abilityId: string; targetId?: string };
+  /**
+   * `kind` and `value` are Plant Clue's (round 10, V1a): a plantable clue id and the trait index it shows. `with` is
+   * Compare's second lift (V1b); `targetId` the first, both of the seat's own Notebook entries.
+   */
+  'act.ability': { abilityId: string; targetId?: string; kind?: string; value?: number; with?: string };
   /** Re-validated every tick. */
   /** Round 10 (A10): `via` names the item an `interact` hold should use when a prop takes several verbs. */
   'act.hold': { action: HoldAction; targetId: string; on: boolean; via?: string };
@@ -336,6 +359,13 @@ export interface C2SPayloads {
    */
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
+   * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
+   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   */
+  'story.start': { storyId: string; chapterId?: string };
+  /** Story mode: closes the card that is up. Refused 422 with no card up. */
+  'story.continue': Record<string, never>;
+  /**
    * Round 10, C4d (GDD 3.33, seams.md 3 row 37): `propId` is a `ledger` prop in the reader's reach (HollowMere's
    * `bk.ledger`). Answered with `ledger`. Refused `TOO_FAR`, `PHASE_CLOSED`, `NOT_IN_PLAY`, `IN_JAIL`.
    */
@@ -354,6 +384,7 @@ export interface C2SPayloads {
   /** `accused` a roster seat id; `charge` a `laws.json` crime id; `entries` the opener's Notebook entry ids. */
   'petition.open': { accused: string; charge: string; entries: string[] };
   'petition.sign': { id: string };
+  'trial.file': { accused: string; charge: string; entries: string[] };
   /**
    * Round 10, A13 (GDD 3.30): the crafting grid, row by row: `size` 2 (the pocket square) or 3 (at a workbench) and
    * `size * size` cells, each an item id or null. The server matches a recipe, takes the inputs and gives the product
@@ -393,6 +424,8 @@ export interface S2CPayloads {
     undealt?: string[];
     paintTown?: { target: number; killers: Array<{ seatId: string; unique: number; total: number }> };
     hitman?: { seatId: string; day: number; stage: 'arrived' | 'killed' | 'boarded' | 'stopped' };
+    /** Round 10, B6d (row 35): the Killer reached the end trial's close unconvicted (the Unseen victory). */
+    unseen?: boolean;
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
   /** Where the shout rang; names no seat, no card and no body. */
@@ -462,6 +495,29 @@ export interface S2CPayloads {
    */
   mugPrompt: { muggerId: string; endsTick: number };
   /**
+   * Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role
+   * of the seat held (the one card that goes out before game over, as an ejection's does).
+   */
+  tribunalVerdict: { roleId: string };
+  /**
+   * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
+   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
+   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
+   * is the next chapter's title.
+   */
+  'story.card': {
+    kind: 'title' | 'beat' | 'end';
+    chapterId: string;
+    title?: string;
+    lines: string[];
+    portrait?: string;
+    goal?: string;
+    summary?: Record<string, number>;
+    next?: string;
+  };
+  /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
+  'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
+  /**
    * Private to the reader, round 10, C4d (GDD 3.33, seams.md 3 row 37): every rent hardship of the match so far, oldest
    * first, by the day it struck and the struck seat's `Player.look` then (a `looks.json` id). No seat, handle, name,
    * card, cover or other hardship; every reader at a tick gets the same rows.
@@ -518,6 +574,9 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'pair.answer': 2,
   'petition.open': 2,
   'petition.sign': 2,
+  'trial.file': 2,
+  'story.start': 2,
+  'story.continue': 5,
 };
 
 // Round 10, A1: the codes live beside the refusal reasons that derive them (`REASON_CODE`).

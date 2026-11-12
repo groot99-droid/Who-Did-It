@@ -65,7 +65,7 @@ export function handleEat(room: PartyRoom, sessionId: string, abilityId = 'eat')
   v.body.lastAteTick = v.tick;
   cureWith(room, sessionId, v.body, item, true);
   if ((effectDef('fatigued').cures as readonly string[]).includes(item)) v.body.stamina = v.body.maxStamina;
-  // A dish gives its buff for the rest of the day; a second dish replaces the first (round 10, D4a, GDD 3.14).
+  // A dish gives its buff until the next dawn (`dishes.ts`); a second dish replaces the first (round 10, D4a and x11, GDD 3.14).
   const buff = items.items[item]?.buff as EffectKey | undefined;
   if (buff !== undefined) {
     for (const id of effectsOn(v.body)) if (effectDef(id).dish) cureEffect(room, sessionId, v.body, id);
