@@ -24,7 +24,7 @@ export const WORLD_COPY = {
   'prompt.ability': '{ability} {target}',
   'prompt.ability.cooldown': '{ability} in {s} s',
   'touch.use': 'Use',
-  'touch.run': 'Run',
+  'touch.run': 'Move. Push to the rim to run.', // round 10, R1: the stick's name (UI.md 14.53.1)
   'touch.sneak': 'Sneak',
 
   // 14.3 Refusals

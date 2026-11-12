@@ -25,7 +25,9 @@
     "crumb_cold",
     "crumb_mixing",
     "crumb_oven",
-    "crumb_proofing"
+    "crumb_proofing",
+    "cottage_fisher",
+    "sea_exit"
   ],
   "hub": "overworld",
   "startSpawns": [

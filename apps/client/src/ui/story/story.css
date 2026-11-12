@@ -1,0 +1,165 @@
+/* Story mode (docs/story/README.md 3, UI.md "Story cards"): full-screen chapter cards and the goals strip. */
+.wdi-story {
+  position: fixed;
+  inset: 0;
+  z-index: var(--wdi-z-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: safe center;
+  padding: var(--wdi-space-4, 16px);
+  overflow-y: auto;
+  color: var(--wdi-text);
+  background: var(--wdi-bg);
+  text-align: center;
+  pointer-events: auto;
+}
+
+/* The title card is the darkest; a beat lets the room show behind it a little; the end card sums up. */
+.wdi-story--beat {
+  background: var(--wdi-scrim);
+}
+
+.wdi-story__panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--wdi-space-4, 16px);
+  width: min(100%, 36rem);
+  padding: var(--wdi-space-5, 24px) var(--wdi-space-4, 16px);
+  box-sizing: border-box;
+}
+
+.wdi-story__title {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: clamp(1.6rem, 6vw, 2.6rem);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.wdi-story__body {
+  display: grid;
+  gap: var(--wdi-space-3, 12px);
+}
+
+.wdi-story__line,
+.wdi-story__goal,
+.wdi-story__next {
+  margin: 0;
+  max-width: 32rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.wdi-story--beat .wdi-story__line {
+  font-size: 1.15rem;
+}
+
+.wdi-story__goal,
+.wdi-story__next {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-story__portrait {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid var(--wdi-text-muted);
+  font-family: var(--wdi-font-display);
+  font-size: 2rem;
+  text-transform: uppercase;
+}
+
+.wdi-story__summary {
+  width: 100%;
+  text-align: left;
+}
+
+.wdi-story__summary dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--wdi-space-1, 4px) var(--wdi-space-4, 16px);
+  margin: 0;
+}
+
+.wdi-story__summary dt {
+  color: var(--wdi-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.wdi-story__summary dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.wdi-story__go {
+  min-width: 10rem;
+  min-height: 44px;
+}
+
+/* The goals strip: top-left under the HUD band on a desktop, full width but short on a phone. */
+.wdi-story-goals {
+  position: fixed;
+  top: 56px;
+  left: var(--wdi-space-3, 12px);
+  z-index: var(--wdi-z-hud);
+  max-width: min(18rem, calc(100vw - 2 * var(--wdi-space-3, 12px)));
+  padding: var(--wdi-space-2, 8px) var(--wdi-space-3, 12px);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.wdi-story-goals ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--wdi-space-1, 4px);
+}
+
+.wdi-story-goals li {
+  display: flex;
+  gap: var(--wdi-space-2, 8px);
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+
+.wdi-story-goals li.is-done {
+  color: var(--wdi-text-muted);
+  text-decoration: line-through;
+}
+
+.wdi-story-goals__mark {
+  flex: none;
+}
+
+/* The chapter list the title screen's Story opens. */
+.wdi-story-chapters {
+  display: grid;
+  gap: var(--wdi-space-2, 8px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wdi-story-chapters li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--wdi-space-1, 4px) var(--wdi-space-3, 12px);
+  align-items: center;
+  text-align: left;
+}
+
+.wdi-story-chapters li[data-state='locked'] {
+  color: var(--wdi-text-muted);
+}
+
+.wdi-story-chapters__setup {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--wdi-text-muted);
+  font-size: 0.9rem;
+}

@@ -34,6 +34,7 @@ export const Clue = z.strictObject({
     'hunger',
     /** Round 10 (D5c): a lock was picked here. */
     'picked',
+    'marked',
   ]),
   /** A physical object in a scene that can be collected (hold E) into the Notebook. */
   inWorld: z.boolean(),
