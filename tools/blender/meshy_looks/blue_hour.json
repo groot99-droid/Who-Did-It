@@ -3,7 +3,7 @@
   "sky": {
     "zenith": [0.023, 0.035, 0.086],
     "horizon": [0.094, 0.138, 0.265],
-    "glow": [0.68, 0.26, 0.10],
+    "glow": [0.68, 0.26, 0.1],
     "glow_azimuth": 212.0,
     "glow_width": 100.0,
     "glow_height": 0.28,
@@ -26,10 +26,10 @@
     "mere_density": 0.11
   },
   "lights": {
-    "lantern": {"energy": 240.0, "volume": 1.2, "bulb": 34.0},
-    "headlamp": {"energy": 520.0},
-    "window": {"energy": 110.0},
-    "teal": {"energy": 55.0}
+    "lantern": { "energy": 240.0, "volume": 1.2, "bulb": 34.0 },
+    "headlamp": { "energy": 520.0 },
+    "window": { "energy": 110.0 },
+    "teal": { "energy": 55.0 }
   },
   "emissive": {
     "strength": 2.0
@@ -44,7 +44,7 @@
     "count": 7000,
     "radius": 0.0075,
     "speed": 0.8,
-    "wind": [0.20, -0.08]
+    "wind": [0.2, -0.08]
   },
   "color": {
     "exposure": 1.35
