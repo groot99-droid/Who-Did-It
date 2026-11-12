@@ -404,7 +404,7 @@ Forest and cave scenes already carry the places where M5b puts resource nodes, c
 **Isometric presentation (M5a).** Both modes show the world in a 2:1 dimetric isometric view, seen from the south-east (SPRITES 10, WORLD 4.2):
 
 - A tile is a 128 x 64 px diamond. World north points to the upper right of the screen, and straight up is world north-west.
-- Characters, props, buildings and ground are pre-rendered from that one camera. Each player picks an **art style** at the click of a button, in the lobby or the in-match menu, without leaving the match: **8-bit** (the default, a pixel-art finish), **Low poly** (the same renders without the finish, smooth-filtered) or **HD** (the same renders at twice the display scale with soft shadows: a smooth textured finish on figures and props, lit materials under a sky on buildings and the kit, A164). HD is offered only where the device can hold it: a screen at least 900 px tall, at least 4 GB of device memory where the browser reports it, and WebGL textures of 4096 px (`style.json` `artStyles` `requires`); elsewhere it shows disabled with the reason, and a stored HD pick falls back to 8-bit. HD's files are fetched only when a player picks it. The pick is the player's own, kept in the browser and never sent to the server, so two players at one table may see different styles (`style.json` `artStyles`, A79). Only the picture changes: an HD frame covers the same screen pixels as its 8-bit frame.
+- Characters, props, buildings and ground are pre-rendered from that one camera. Each player picks an **art style** at the click of a button in the lobby, and the pick is fixed from Start to game over: a match never changes its look, and its settings panel names the pick and sends to the lobby to change it (round 10, S5, A534). The styles: **8-bit** (the default, a pixel-art finish), **Low poly** (the same renders without the finish, smooth-filtered) or **HD** (the same renders at twice the display scale with soft shadows: a smooth textured finish on figures and props, lit materials under a sky on buildings and the kit, A164). HD is offered only where the device can hold it: a screen at least 900 px tall, at least 4 GB of device memory where the browser reports it, and WebGL textures of 4096 px (`style.json` `artStyles` `requires`); elsewhere it shows disabled with the reason, and a stored HD pick falls back to 8-bit. HD's files are fetched only when a player picks it. The pick is the player's own, kept in the browser and never sent to the server, so two players at one table may see different styles (`style.json` `artStyles`, A79). Only the picture changes: an HD frame covers the same screen pixels as its 8-bit frame.
 - Only the picture changes. The server, every rule, distance and radius in this document, the collision box and every id stay on the square 64 px grid.
 
 **Interiors are cutaways.** The north and west walls stand at full height, the south and east walls are drawn as low sills, and inner walls are drawn at half height, so a room can always be read.
@@ -545,6 +545,8 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 | Rubble | Pickaxe as the rock pile, or bare hands | 12 s | 1 Stone | 0 | 600 s |
 | Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
 | Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
+
+**The forge chain** (round 10, S3; `logic-table.md` 7.1, 8.1 and 8.2, owner answer LT9: BlackPine first). A **kiln** (the two charcoal kilns of `bp_woods`) smelts 1 Tin Ore and 1 Stone into a **Tin Ingot** (5 s; kind `deliverable`, an intermediate like Planks). At the **forge** of `bp_smithy`, 3 Ingots and 1 Timber make an **Iron axe** (`cut` 2, 40 uses; 6 s) or an **Iron pickaxe** (`break` 2, `dig` 1, 40 uses; 6 s), and 1 Ingot and 1 Tin Ore a **Fine pick** (`pick` 2; 5 s); at the **anvil** 6 Ingots make **Tin mail** (8 s) and 3 a **Tin helm** (6 s). The kiln, forge and anvil are stations (prop kinds `kiln`, `forge`, `anvil`, formerly `decor`); every one of these recipes is made on BlackPine only (`maps`), and, because the smithy opens with the medium party profile, from that profile (`profile`: a small party is not asked to forge). Hollowmere reaches tier 2 by carrying ingots or tools across. The first **tier-2 wall**: the fallen logs of the forests (stem `fallen_log`, class `thickLog`) are felled only with a `cut` 2 tool (`fellThickLog`: 5 s, 3 to 4 Logs, wears the tool by 2, back in 300 s); a plain axe is refused `NEED_TOOL` naming the Iron axe. The grindstone, the Miner's cap lamp and Warmth are not part of this step. No item here is role-bound; the Fine pick opens what a plain lock pick opens, and tier-3 locks are for later.
 
 **Logs** are the raw wood of a pile; they stack as a material and become Timber only at a saw (round 10, D3): the mill's
 head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
@@ -987,7 +989,7 @@ an NPC, counts the inspector's drawn face the sum of their `suspicion` more; the
 inspected seat a card-blind hunch. Nothing a third client receives depends on a match. An `inert` row names a role
 or figure of a later round and never holds.
 
-**Armour** (round 10, D6a; owner answer LW8). An item with an `armor` block (`items.json`; kind `armour`) worn in the body or head slot (3.30) is armour. Its `tier` picks a factor from `balance.json` `armor.tierMult` (body 0.80, 0.65, 0.50; head 0.90, 0.80); the factors of the worn items multiply, and for a creature's bite so does the Lodge's `creatureDmg` perk (3.23), and the damage never falls below `armor.cap` (0.5) of what the row would have dealt. It applies to every attack that goes through the damage table (the fists, a mugging, the slingshot, a guard's blow, a creature); only a creature's bite is also cut by the Lodge perk; the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The Leather jerkin (tier 2) also halves how fast a Bleeding drains health (a Bleeding has no timer, so "stops sooner" is a slower drain) and costs stamina regeneration (x0.9); an item may also carry `speedMult`. Armour is private: nothing on the wire shows it, there is no inspect line and the figure is not drawn with it; it is not role-bound and drops on death. The Quilted coat is sold at the general stores; the jerkin waits for hide (skinning, D6b). Not built yet: Warmth at night, a Miner's cap with a lamp, louder footsteps, tin mail and tin helm.
+**Armour** (round 10, D6a; owner answer LW8). An item with an `armor` block (`items.json`; kind `armour`) worn in the body or head slot (3.30) is armour. Its `tier` picks a factor from `balance.json` `armor.tierMult` (body 0.80, 0.65, 0.50; head 0.90, 0.80); the factors of the worn items multiply, and for a creature's bite so does the Lodge's `creatureDmg` perk (3.23), and the damage never falls below `armor.cap` (0.5) of what the row would have dealt. It applies to every attack that goes through the damage table (the fists, a mugging, the slingshot, a guard's blow, a creature); only a creature's bite is also cut by the Lodge perk; the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The Leather jerkin (tier 2) also halves how fast a Bleeding drains health (a Bleeding has no timer, so "stops sooner" is a slower drain) and costs stamina regeneration (x0.9); an item may also carry `speedMult`. Armour is private: nothing on the wire shows it, there is no inspect line and the figure is not drawn with it; it is not role-bound and drops on death. The Quilted coat is sold at the general stores; the jerkin waits for hide (skinning, D6b). **Tin mail** (body, tier 3) halves Bleeding and Poisoned drains, costs stamina regeneration (x0.8) and walking speed (x0.95); the **Tin helm** (head, tier 2) halves how long a Dazed lasts (a `dazed` resist is a factor on the duration, taken when the effect starts) and costs a little regeneration (x0.95). Both are forged (3.14). Not built yet: Warmth at night, a Miner's cap with a lamp, louder footsteps (the mail's extra footstep tile).
 
 **Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game has no use yet (the stew and the pie, D4b). The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
 
@@ -1236,10 +1238,23 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
   figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
 - **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
-- **Flee** (a chase of `chaseS`, the share taken if the mugger reaches the target) and **Fight** (strikes on both
-  sides, 3.22) are part two of A180, after 8A's fists; until then both answers are refused.
+- **Flee** (round 10, S4): a chase of `chaseS` (_proposed_ 5 s). The mugger runs after the target at its own walking
+  pace (a figure `townsfolk.walkTilesPerS`, an NPC seat its usual walk) and takes the share only if it comes within
+  `reachTiles`; a target that outpaces it, or leaves the scene, keeps its purse. A scuffle is left either way.
+- **Fight** (round 10, S4): for `fightS` (_proposed_ 9 s) the two stand in reach and trade a blow every `fightHitS`
+  (_proposed_ 1.5 s) on 8A's fists (3.22): the target's `strike` row on the mugger, the mugger's `mugging` row on the
+  target, each cut by the striker's Weakened and the other's armour, with no stamina cost. A target the blows knock
+  out is taken for the share; a mugger whose next blow would knock it out is beaten off and goes (a figure is never
+  knocked out); one still standing at `fightS` gives up. A target that steps out of reach turns the fight into a
+  chase. The target's blows are the exchange itself, not a strike it aims.
 
-A mugged NPC seat pays. Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
+A mugged NPC seat draws, when the threat ends, once, from its own choices stream and blind to its card and mood, both
+what it answers and when: Pay _proposed_ 40 %, Flee 20 %, Fight 20 %, or silence 20 % (`moods.mug.npcAnswer`), the
+answer landing at a tick uniform between `npcAnswerMinS` (_proposed_ 1.5 s) and `answerS`, never on the prompt's first
+tick; a silent seat lets the window run out and is taken for the share, as a human who does not answer. If the target
+leaves the scene or the mugging ends first, nothing lands. Its Flee runs to the nearest open portal of the
+scene, else straight away from the mugger, and its Fight stands and trades blows, both on the human's paths above.
+Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
 stood showing the mugger's height, and a robbed seat angry at its mugger
 (`anger.robbed`); each side waits `cooldownS` before another roll touches it, and a meeting drops a mugging under
 way. Only the target hears of a mugging: the prompt is private and everything else is the drawn figure.
@@ -1573,13 +1588,33 @@ the Hitman: the mail turns a townsman into one.
   kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
   frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
   his death), and a boarded Hitman joins `alsoWon`.
-- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
-  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
-  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
-  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
-  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
-  black-wax mailbag and the crow on the station roof; a turned NPC seat
-  stopping its routine.
+- **The dormant role** (C4c). From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
+  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
+  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own.
+- **Hardships** (C4c; F4 b2 to b5). At every morning delivery, the same tick as the turning, the secret stream
+  `hardship` strikes `hardship.atOnce` (1 or 2) seats, each with a kind (robbed, a failed harvest, fined, rent, illness,
+  a lost shipment), and each runs thin and dear exactly as the dormant role for `hardship.recoverS` (one day). The pool
+  reads only public facts: a seat shown alive on the roster whose look owns a stall and that has no hardship running,
+  human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
+  the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
+  stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger; it boards no house (a boarding would
+  tell it from the Hitman's look without the ledger), so a struck human keeps their bed.
+- **The Clerk's rent ledger** (C4d; F4 b5 and 2.7). Reading the Clerk's books on HollowMere (`bk.ledger`, in reach,
+  in a world phase, alive and out of jail) shows the reader alone every rent hardship of the match so far, oldest
+  first: the day it struck and the look the struck seat wore then. It never shows a seat, a name, a card, a cover, a
+  hardship of another kind or a real boarding (3.23's, the seat's own economy), and every reader at a moment sees the
+  same rows. Reading it takes the trip; nothing public carries it, the read has no hold, clip or noise, and the server
+  keeps nothing of who read. The rows are the town's lead: a dark, dear look that isn't in the ledger went dark for a
+  reason other than rent. NPC seats read it too, as a person would: at each trip they pick, a draw on their own
+  stream sends one to stand at the books for the errand's length, holding nothing, with the chance
+  `hardship.readLedger.before` until the Hitman's line has gone out and `after` it (P 0 and 0.1), so a stop at the
+  Clerk's books marks no one.
+- Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
+  contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
+  station (10B); Blackpine's ledger (it has no `ledger` prop); the cold station and the dark window (a home's window
+  state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.
 
 ### 3.34 Story mode
 

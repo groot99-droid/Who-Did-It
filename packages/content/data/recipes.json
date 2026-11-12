@@ -119,6 +119,65 @@
       "craftS": 6,
       "maps": ["hollowmere"]
     },
+    "tinIngot": {
+      "id": "tinIngot",
+      "out": "tinIngot",
+      "qty": 1,
+      "in": [{ "item": "tinOre", "qty": 1 }, { "item": "stone", "qty": 1 }],
+      "station": "kiln",
+      "craftS": 5,
+      "maps": ["blackpine"]
+    },
+    "ironAxe": {
+      "id": "ironAxe",
+      "out": "ironAxe",
+      "qty": 1,
+      "in": [{ "item": "tinIngot", "qty": 3 }, { "item": "timber", "qty": 1 }],
+      "station": "forge",
+      "craftS": 6,
+      "maps": ["blackpine"],
+      "profile": "medium"
+    },
+    "ironPickaxe": {
+      "id": "ironPickaxe",
+      "out": "ironPickaxe",
+      "qty": 1,
+      "in": [{ "item": "tinIngot", "qty": 3 }, { "item": "timber", "qty": 1 }],
+      "station": "forge",
+      "craftS": 6,
+      "maps": ["blackpine"],
+      "profile": "medium"
+    },
+    "finePick": {
+      "id": "finePick",
+      "out": "finePick",
+      "qty": 1,
+      "in": [{ "item": "tinIngot", "qty": 1 }, { "item": "tinOre", "qty": 1 }],
+      "station": "forge",
+      "craftS": 5,
+      "maps": ["blackpine"],
+      "profile": "medium"
+    },
+    "tinMail": {
+      "id": "tinMail",
+      "out": "tinMail",
+      "qty": 1,
+      "in": [{ "item": "tinIngot", "qty": 6 }],
+      "station": "anvil",
+      "craftS": 8,
+      "maps": ["blackpine"],
+      "profile": "medium"
+    },
+    "tinHelm": {
+      "id": "tinHelm",
+      "out": "tinHelm",
+      "qty": 1,
+      "in": [{ "item": "tinIngot", "qty": 3 }],
+      "station": "anvil",
+      "craftS": 6,
+      "maps": ["blackpine"],
+      "profile": "medium"
+    },
     "leatherJerkin": {
       "id": "leatherJerkin",
       "out": "leatherJerkin",

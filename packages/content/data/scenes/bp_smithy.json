@@ -42,12 +42,12 @@
   "props": [
     {
       "id": "bf.forge",
-      "kind": "decor",
+      "kind": "forge",
       "x": 7,
       "y": 1,
       "footprint": { "x": 6, "y": 1, "w": 3, "h": 1 }
     },
-    { "id": "bf.anvil", "kind": "decor", "x": 7, "y": 4 },
+    { "id": "bf.anvil", "kind": "anvil", "x": 7, "y": 4 },
     { "id": "bf.trough", "kind": "basin", "x": 3, "y": 3 },
     { "id": "bf.tool_rack", "kind": "decor", "x": 2, "y": 1 },
     { "id": "bf.window", "kind": "dressing", "x": 4, "y": 1 },
