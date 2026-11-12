@@ -96,7 +96,7 @@ Copied from 6Z's spawn prompt of 2026-10-30, so it survives a compaction.
 2026-10-30: #400 (6Z's docs: seams rows 20 to 22 and the log with the C4 and B6 rulings), #401 and #408 (C4a, C4b),
 #416 (10R's answers: 10V exists, Q-A2 and Q-A4) and the 10X and 10Y fixes. The teardown was read from ROSW
 `teardowns/who-did-it` (read-only clone): the owner's answers there that bear on this scope are "Space is
-information" (the pillar he would defend), "a second layer" (the world competes with the deduction only as a second
+information" (the pillar the owner would defend), "a second layer" (the world competes with the deduction only as a second
 layer), "full anti-cheat", "play differently" (each map) and "all equally" (evolutions, the law, the economy, the maps
 and story mode are one design). The `udgt-consult` skill itself is not installed in this session, so its answers were
 read from `answers.json` and the chapters directly.
@@ -598,6 +598,11 @@ Every row joins schema version 7 in merge order. The leak test of round 8 (A170)
 Pull requests under 400 lines, each with its tests; GDD changes in the same pull request. "After" names a pull request
 of this plan or of the live sessions. Models by section 0's rule.
 
+**Who builds each step (6Z, A276).** The steps and their order stand. 6Z gave the Opus steps of the three Sonnet
+sessions to Opus sessions, and `docs/SESSIONS.md` (Round 10, the briefs) and `docs/round10/README.md` win where this
+section names another session: 10S builds world mode itself (W1a, W1b, W2 to W8; the census named a new session, 10W)
+and then M5; 10N also builds K6, T1 and M2; 10A builds K1 and T4; 10B builds T5; 10C builds V1 to V4.
+
 ### 4.1 Wave 1 (sent to 6Z; no seams row, no open question)
 
 | PR | What | Paths | Tests | After | Model |
@@ -608,7 +613,7 @@ of this plan or of the live sessions. Models by section 0's rule.
 | S4 | The mugging's Flee and Fight (GDD 3.24) | `sim/townsfolk/mug.ts` | flee's share only if caught; fight's strikes both ways | none | Sonnet (10D) |
 | S5 | The art style in the menu only (world-mode 10) | `view/Hud.ts`, `scenes/Meeting.ts`, `scenes/World.ts`, `ui/artStyle/`, `view/artStyle.ts`, GDD 3.13 | no switch in a match; a request refuses while a match runs | y9 (#402) if it touches `Hud.ts` | Sonnet (10Y) |
 
-### 4.2 Session 10W: world mode (Opus, 800k)
+### 4.2 Session 10S: world mode (Opus, 800k)
 
 | PR | What | Paths | Tests | After |
 |---|---|---|---|---|
@@ -683,14 +688,14 @@ nothing of it beyond the drawn figure.
 ### 4.8 Order
 
 1. Wave 1 now. 10K, 10T and 10M start their first pull requests that have no "after".
-2. 10W starts W1a when B6c merges, and runs W1a, W1b, W2 to W8 in order. 10N starts when W1b merges (N2 earlier, after 10V's
+2. 10S starts W1a when B6c merges, and runs W1a, W1b, W2 to W8 in order. 10N starts when W1b merges (N2 earlier, after 10V's
    hiding spots).
 3. The vendettas follow 10C's last step, the town's T5 follows 10B's last.
 4. 10Z sweeps after every one of these, as seams.md 7 says.
 
 ## 5. Questions for the owner
 
-Six choices that are really his, each with a default the build takes if he does not answer.
+Six choices that are really the owner's, each with a default the build takes if the owner does not answer.
 
 ### Q-S1. The Ranger's Arrest
 

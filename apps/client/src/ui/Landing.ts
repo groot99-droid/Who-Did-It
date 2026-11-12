@@ -9,6 +9,9 @@ import type { ListParties } from './menu/partyListModel';
 import { openProfilePanel } from './menu/profile';
 import { profileCode, readProfile } from './menu/profileModel';
 import { openQuitDialog } from './menu/quit';
+import { STORY_COPY } from './story/copy';
+import type { StoryCatalogEntry } from './story/model';
+import { openStoryMenu } from './story/StoryMenu';
 import { openStartDialog } from './menu/startDialog';
 import { titleLetters } from './theme/title';
 import { mountSettingsPanel } from './SettingsPanel';
@@ -27,6 +30,10 @@ export interface LandingOptions {
   explainFailure?(): Promise<string | null>;
   /** The consented leave of the current party, for Quit; the scene passes `net.leave`. */
   onQuit?(): Promise<void>;
+  /** Story mode (docs/story/README.md): the stories the title screen's Story entry lists; none hides the entry. */
+  stories?: readonly StoryCatalogEntry[];
+  /** Creates the story room and starts the story; `chapterId` replays a finished chapter. */
+  onStory?(name: string, storyId: string, chapterId?: string): Promise<void>;
   /** The music bus, so the menu theme can start on the first tap (round 6, 6K). */
   music?: { crossfadeTo(playlistId: string | null): void } | undefined;
 }
@@ -72,6 +79,8 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
 
   const start = menuButton(C['menu.start'], '▶', 'wdi-glass-btn--primary');
   const join = menuButton(C['menu.join'], '⇥');
+  const story = menuButton(STORY_COPY['story.menu.entry'], '★');
+  story.setAttribute('data-testid', 'menu-story');
   const profile = menuButton(readProfile() ? C['menu.profile.edit'] : C['menu.profile'], '+');
   const friends = menuButton(C['menu.friends'], '☰');
   const settingsBtn = menuButton(C['menu.settings'], '⚙');
@@ -106,6 +115,18 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
     ),
   );
   join.addEventListener('click', () => openCode(null, true));
+  story.addEventListener('click', () =>
+    show((onClose) =>
+      openStoryMenu({
+        root,
+        stories: opts.stories ?? [],
+        name: remembered(),
+        onClose,
+        onStart: opts.onStory ?? (async () => undefined),
+        ...(opts.explainFailure ? { explainFailure: opts.explainFailure } : {}),
+      }),
+    ),
+  );
   quit.addEventListener('click', () =>
     show((onClose) =>
       openQuitDialog({ root, onClose, leave: opts.onQuit ?? (async () => undefined), music: opts.music }),
@@ -169,6 +190,7 @@ export function mountLanding(root: HTMLElement, opts: LandingOptions): Screen {
         'nav',
         { class: 'wdi-menu__nav', 'aria-label': C['menu.title.label'] },
         start,
+        ...((opts.stories?.length ?? 0) > 0 && opts.onStory ? [story] : []),
         join,
         profile,
         friends,
