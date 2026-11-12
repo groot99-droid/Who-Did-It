@@ -123,3 +123,4 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-12 R8c (`claude/story-r8c-handover`, stacked on R8b; the owner chose "swap the two bodies"): E15, the shade handover (`story/shadeHandover.ts`): after the card handover the player's seat and the martyr's exchange places, life, health, corpse, figure and the shade's mark; GDD 3.34. E17's skipped section next.
 - 2026-11-12 merged: #529 (R8c) squash-merged into `claude/story-part2`, all checks green.
 - 2026-11-12 R8d (`claude/story-r8d-skip`, stacked on R8c): E17's skipped section: `onlyIf: 'shade'` on a section skips it, ended at once and not failed (`story.skip`), when no shade waits as it starts; GDD 3.34. R8's engine needs E15 to E17 are all built; 3.4's `story.json` entry waits on P5's chapter 3.
+- 2026-11-12 merged: #532 (R8d) squash-merged into `claude/story-part2`, all checks green. R8's engine needs E15 to E17 are all in; 3.4's `story.json` entry waits on P5's chapter 3.
