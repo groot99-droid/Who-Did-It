@@ -1234,10 +1234,23 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
   figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
 - **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
-- **Flee** (a chase of `chaseS`, the share taken if the mugger reaches the target) and **Fight** (strikes on both
-  sides, 3.22) are part two of A180, after 8A's fists; until then both answers are refused.
+- **Flee** (round 10, S4): a chase of `chaseS` (_proposed_ 5 s). The mugger runs after the target at its own walking
+  pace (a figure `townsfolk.walkTilesPerS`, an NPC seat its usual walk) and takes the share only if it comes within
+  `reachTiles`; a target that outpaces it, or leaves the scene, keeps its purse. A scuffle is left either way.
+- **Fight** (round 10, S4): for `fightS` (_proposed_ 9 s) the two stand in reach and trade a blow every `fightHitS`
+  (_proposed_ 1.5 s) on 8A's fists (3.22): the target's `strike` row on the mugger, the mugger's `mugging` row on the
+  target, each cut by the striker's Weakened and the other's armour, with no stamina cost. A target the blows knock
+  out is taken for the share; a mugger whose next blow would knock it out is beaten off and goes (a figure is never
+  knocked out); one still standing at `fightS` gives up. A target that steps out of reach turns the fight into a
+  chase. The target's blows are the exchange itself, not a strike it aims.
 
-A mugged NPC seat pays. Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
+A mugged NPC seat draws, when the threat ends, once, from its own choices stream and blind to its card and mood, both
+what it answers and when: Pay _proposed_ 40 %, Flee 20 %, Fight 20 %, or silence 20 % (`moods.mug.npcAnswer`), the
+answer landing at a tick uniform between `npcAnswerMinS` (_proposed_ 1.5 s) and `answerS`, never on the prompt's first
+tick; a silent seat lets the window run out and is taken for the share, as a human who does not answer. If the target
+leaves the scene or the mugging ends first, nothing lands. Its Flee runs to the nearest open portal of the
+scene, else straight away from the mugger, and its Fight stands and trades blows, both on the human's paths above.
+Every mugging ends with `mug.end` on the bus, a `scuffle` clue (3.4) where the target
 stood showing the mugger's height, and a robbed seat angry at its mugger
 (`anger.robbed`); each side waits `cooldownS` before another roll touches it, and a meeting drops a mugging under
 way. Only the target hears of a mugging: the prompt is private and everything else is the drawn figure.
@@ -1572,13 +1585,33 @@ the Hitman: the mail turns a townsman into one.
   his death), and a boarded Hitman joins `alsoWon`. On the client (UI.md 14.51.7) the Derringer takes the next free Q, R
   or F slot (and a touch disc) while the own pack holds it, a departed seat sees the Departed screen in place of the
   world, and the end panel draws one line for the Hitman's stage and names a boarded Hitman as one under Also won.
-- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
-  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
-  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
-  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
-  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
-  black-wax mailbag and the crow on the station roof; a turned NPC seat
-  stopping its routine.
+- **The dormant role** (C4c). From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
+  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
+  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own.
+- **Hardships** (C4c; F4 b2 to b5). At every morning delivery, the same tick as the turning, the secret stream
+  `hardship` strikes `hardship.atOnce` (1 or 2) seats, each with a kind (robbed, a failed harvest, fined, rent, illness,
+  a lost shipment), and each runs thin and dear exactly as the dormant role for `hardship.recoverS` (one day). The pool
+  reads only public facts: a seat shown alive on the roster whose look owns a stall and that has no hardship running,
+  human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
+  the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
+  stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger; it boards no house (a boarding would
+  tell it from the Hitman's look without the ledger), so a struck human keeps their bed.
+- **The Clerk's rent ledger** (C4d; F4 b5 and 2.7). Reading the Clerk's books on HollowMere (`bk.ledger`, in reach,
+  in a world phase, alive and out of jail) shows the reader alone every rent hardship of the match so far, oldest
+  first: the day it struck and the look the struck seat wore then. It never shows a seat, a name, a card, a cover, a
+  hardship of another kind or a real boarding (3.23's, the seat's own economy), and every reader at a moment sees the
+  same rows. Reading it takes the trip; nothing public carries it, the read has no hold, clip or noise, and the server
+  keeps nothing of who read. The rows are the town's lead: a dark, dear look that isn't in the ledger went dark for a
+  reason other than rent. NPC seats read it too, as a person would: at each trip they pick, a draw on their own
+  stream sends one to stand at the books for the errand's length, holding nothing, with the chance
+  `hardship.readLedger.before` until the Hitman's line has gone out and `after` it (P 0 and 0.1), so a stop at the
+  Clerk's books marks no one.
+- Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
+  contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
+  station (10B); Blackpine's ledger (it has no `ledger` prop); the cold station and the dark window (a home's window
+  state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.
 
 ### 3.34 Story mode
 
