@@ -79,7 +79,7 @@ into `claude/story-part2`, and merging needs the orchestrator's word.
 | R5 | `claude/story-r-buff` | The 10X buff for the return day: speed and health on GDD 3.22's effect table, numbers in `balance.json` `rite.buff.*`; the buff ends at dusk; GDD 3.20 and 3.22 | R-Q1, R4 |
 | R6 | `claude/story-r6-aura` | The conversion aura: while the dealt Vicar is ascended, seats within `rite.aura.tiles` gain Faith (`addFaith`), and I9 converts them (A607) | I9 (#515, merged), R-Q1, R-Q3 |
 | R7 | `claude/story-r-client` | Client: the Medium's figure, the shade's view (no roles), the rite prompt and hold, the return, and the buff on the HUD. UI.md rows, e2e at 390w and 1280x720 with `--trace off` | R3 to R5 |
-| R8 | (P5, later) | Story: a section after `arc.md` 3.2 where the player takes the shade to the rite and plays the 10X Vicar against the Zealot. P0 adds it to `arc.md` first | R4, R5; P5 is on hold until the map revamp |
+| R8 | `claude/story-r8-*` | Story: `arc.md` 3.4 (drafted by R, A608), after the Doctor's 3.3, where the player takes the shade to the rite and plays the 10X Vicar against the Zealot. R8a the draft; R8b to R8d the engine needs E15 to E17; 3.4's `story.json` entry with P5's chapter 3 | R4, R5; the entry waits on P5 (W3) |
 
 R6 is the only piece that needs work outside R. Until I9 builds conversion, the return day carries speed and health
 only. GDD 3.20 says so, so the "could win that day" tuning is checked again when R6 lands.

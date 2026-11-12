@@ -115,3 +115,4 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-12 R6 (`claude/story-r6-aura`, from `claude/story-part2` after #515): the dealt Vicar's conversion aura on the return day, `rite.aura.*`, private Faith through I9's `addFaith` (A607).
 - 2026-11-12 merged: #521 (R6) squash-merged into `claude/story-part2`, all checks green. R1 to R7, I9 and I9b are all in `claude/story-part2`; R8 waits on the map revamp. The aura's `rite.aura.*` numbers wait on the owner.
 - 2026-11-12 the owner kept the aura's `rite.aura.*` numbers as built (A607).
+- 2026-11-12 R8a (`claude/story-r8-section`, on the owner's word): `arc.md` 3.4 "The Strength of Ten" drafted after the Doctor's 3.3, engine needs E15 to E17, questions R8-Q1 to R8-Q6 with defaults (A608). The engine needs come next; the `story.json` entry waits on P5's chapter 3.

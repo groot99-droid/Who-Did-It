@@ -21,12 +21,13 @@ killer". The arc plays them in that order, one act each, and ends on the law. Fi
 | --- | -------------------- | ------------------------------------------------------------------------ | -------------------------------------------------- | ------------------------ |
 | 1   | The End of the Line  | The train, the stranger's gold, the new Vicar's arrival, the first night | Baker, Lamplighter, Watchman                       | cycle 1                  |
 | 2   | The Stranger's Score | The sea door at low tide, the strongbox, the boy in the crate            | Thief, Killer (`bandit`), Child                    | cycle 2 to the dawn of 3 |
-| 3   | Light and Ash        | The holy war: confession, doubt, the martyr and the lavender field       | Vicar, Killer (`zealot`), Doctor                   | cycles 3 to 4            |
+| 3   | Light and Ash        | The holy war: confession, doubt, the martyr and the lavender field       | Vicar, Killer (`zealot`), Doctor, Vicar (the shade) | cycles 3 to 4            |
 | 4   | The Works            | The mine shut, the strike, the works undone, the Knife ready             | Tinner, Killer (`activist`), Herbalist             | cycle 5                  |
 | 5   | The Black-Wax Letter | The Baron's contract, the Knife passes, the case closes                  | Accomplice, Gamekeeper (`hitman`), Heir, Detective | cycles 6 to the end      |
 
-Sixteen sections on fourteen cards: the Killer card is played three times, once per vendetta; the Hitman's contract
-is played on the Gamekeeper card, which the mail turns (GDD 3.33). The six other cards (Butler, Townsfolk, Drifter,
+Seventeen sections on fourteen cards: the Killer card is played three times, once per vendetta; the Vicar card twice,
+alive in 3.1 and as the martyr's shade, then the 10X Vicar, in 3.4 (story R8, `rite.md`); the Hitman's contract is
+played on the Gamekeeper card, which the mail turns (GDD 3.33). The six other cards (Butler, Townsfolk, Drifter,
 Ranger, Medium, Fisher) are named scripted NPCs who speak in the sections (section 3).
 
 Part 1's four chapters become four of these sections, with their copy kept: `ch1_baker` is 1.1, `ch2_watchman` is
@@ -72,7 +73,9 @@ legendary score is the strongbox the train loads into Vane Manor (Book I 5.III; 
 Clerk keeps two columns, Light and Ash (`holyWar`); the Gamekeeper has written to "the new priest" (`oneShot`). The
 Zealot keeps the Vicar company until his flock doubts him, and then takes the martyr's road for him. The memorial
 (`memorialVicar`) plays at the reveal: the swaying lavender field the whole town dreams and will not report
-(`lavenderField`). The holy war is the chapter: section 1 is the Light, section 2 the Ash (section 3.2 below).
+(`lavenderField`). The holy war is the chapter: section 1 is the Light, section 2 the Ash (section 3.2 below). Then
+the Medium's rite (GDD 3.20): the martyr's shade walks to the Zealot's hideout, and the Vicar comes back for one day
+with the strength of ten, against the man who killed him (3.4).
 
 **What it hands on.** The Vicar's last words (a `letter` handOn on `lavenderField`).
 
@@ -185,13 +188,38 @@ moves on; P5 picks the ticks. `E<n>` names an engine need of section 4.
   (`vendetta.conversion.doubt`); after dark, take the martyr's road for him with the Knife (Q-A3).
 - NPCs: the Vicar (now NPC) preaches; **the Medium** (a line, E2) says she hears a field of lavender; the Fisher.
 
-**3.3 The Strength of Ten.** Card `doctor`.
+**3.3 The Lavender Field.** Card `doctor`. (Titled "The Strength of Ten" until R8, which moves that title to 3.4.)
 
 - Why: someone must read the dead and keep the living; the Doctor is who comes to a body (`roles.json` doctor).
 - Start: chained. End: `story.cutscene` (`memorialVicar`) has played and the meeting's reveal ends, or a tick.
 - Play: reach the Vicar's body, bandage the living (`bandage`, `salts`), report it; the meeting and the memorial film.
 - NPCs: the Medium; the Undertaker's Register is read aloud (`undertakersRegister`, a lore line); the town's dream
-  (`lavenderField`) as the chapter's end card. The martyr's due (GDD 3.20) runs here: E3.
+  (`lavenderField`) at the reveal. The martyr's due (GDD 3.20) no longer runs here: the rite gates it, so it runs in
+  3.4 (E3).
+
+**3.4 The Strength of Ten.** Card `vicar`, played as the martyr's shade and then as the 10X Vicar. New (story R8,
+`rite.md`; GDD 3.20; A600 to A607).
+
+- Why: no rite, no return (GDD 3.20). The martyr's road does not end at the Knife: the Medium waits at the Zealot's
+  hideout in the deep woods, the chapel's anti-theme (8.2), and the Vicar comes back for one day against his killer.
+  It comes after the Doctor, not straight after 3.2, because the return takes the body from the scene: the body has
+  to lie where it fell for 3.3's report, its meeting and the memorial film (R8-Q1).
+- Start: chained (night of cycle 3), only if the match has a martyr (3.2 ended on the Knife, not on its tick); with no
+  martyr the section is skipped and the chapter ends (E17). The break is a **shade handover** (E15): the player takes
+  the martyr's body as its shade, and does not carry the Vicar card into the Doctor's living body.
+- End: `phase` to dusk of cycle 4, when Ascended comes off, with the player alive (done). A second death fails the
+  chapter (Q-A9). With no rite done by the next day's start the shade becomes a ghost and never returns (GDD 3.20):
+  the section ends there, not failed, and the chapter ends on its own lines (R8-Q2). A tick fallback as every section.
+- Play, the night: walk as the shade (through walls and portals, unseen by the living, no roles shown: R-Q4) from the
+  chapel out through the `forest` gate to the hideout (`balance.json` `rite.site`), find the Medium, and hold the rite
+  (`rite.holdS`). Play, the day: come back at the hideout at dawn wearing Ascended (`rite.buff.*`: the speed and the
+  health), walk into a town that buried you the night before, ring the bell and preach (the sermon, I9,
+  `conversion.*`), let the aura win the flock (`rite.aura.*`, R6), and finish real tasks while the martyr's due runs
+  (`tasks.martyrS`, `tasks.martyrWeight`). The Zealot cannot strike by day; the goal is the flock, and he is named at
+  the day's meeting if the town will hear it (an optional goal, R8-Q4).
+- NPCs: **the Medium** (the NPC of the rite, not a card: lines at the hideout); the Zealot (the seat holding `killer`
+  with `zealot`, the body the player left at 3.3's break) sees the dead man walk in at dawn; the Fisher comes to the
+  bell at last; the town's dream (`lavenderField`) as the chapter's end card.
 
 ### Chapter 4, The Works
 
@@ -272,7 +300,7 @@ moves on; P5 picks the ticks. `E<n>` names an engine need of section 4.
 | `thief`       | 2.1                                              | 1.1, 1.2, 1.3, 2.3, 5.4  | The stranger; dealt as an NPC from chapter 1 (E2) |
 | `killer`      | 2.2 (`bandit`), 3.2 (`zealot`), 4.2 (`activist`) | 2.1, 3.1, 4.1, 5.1, 5.2  | Own look in all three (A4 changed)                |
 | `child`       | 2.3                                              | 5.4                      | `silentHide`, `witness` unbuilt (E11)             |
-| `vicar`       | 3.1                                              | 1.1, 1.2, 3.2            | The Light                                         |
+| `vicar`       | 3.1, 3.4                                         | 1.1, 1.2, 3.2            | The Light; the shade and the 10X Vicar (R8)       |
 | `doctor`      | 3.3                                              | 4.3                      |                                                   |
 | `tinner`      | 4.1                                              | 4.2                      |                                                   |
 | `herbalist`   | 4.3                                              |                          |                                                   |
@@ -283,7 +311,7 @@ moves on; P5 picks the ticks. `E<n>` names an engine need of section 4.
 | `butler`      |                                                  | 2.1, 2.2                 | NPC only: `lockUnlock`, `ledger` unbuilt          |
 | `fisher`      |                                                  | 1.3, 2.1, 3.1, 3.2       | NPC only: the man who will not confess            |
 | `ranger`      |                                                  | 1.2                      | NPC only: V1.5, `shoot`/`arrest`/`snare` unbuilt  |
-| `medium`      |                                                  | 3.2, 3.3                 | NPC only: V2, `seance` unbuilt                    |
+| `medium`      |                                                  | 3.2, 3.3, 3.4            | Retired card (A600); the rite's NPC in 3.4        |
 | `townsfolk`   |                                                  | 4.1, 4.2                 | NPC only: the plain neighbour                     |
 | `drifter`     |                                                  | 5.1, 5.3, 5.4            | NPC only: `actShifty`, `fakeBlood` unbuilt        |
 
@@ -294,7 +322,7 @@ moves on; P5 picks the ticks. `E<n>` names an engine need of section 4.
 | Card                 | `vicar`                                                                             | `killer`, vendetta `zealot` (`needsCard: vicar`)                 |
 | The other side       | The NPC Killer holding `zealot`, in the chapel                                      | The NPC holding `vicar`: the body the player just left           |
 | What the player does | The altar, the Clerk's columns, Hear Confession                                     | Keep him company (`sown`), silence his vote (`doubt`), the Knife |
-| What it sets up      | The doubt is near, not sown (the NPC's progress starts over at the break, GDD 3.34) | The martyr; the memorial in 3.3                                  |
+| What it sets up      | The doubt is near, not sown (the NPC's progress starts over at the break, GDD 3.34) | The martyr; the memorial in 3.3; the rite and the return in 3.4  |
 | Lore                 | `confessionBook`, `holyWar`, `oneShot`                                              | `holyWar` (the Ash column), `lavenderField`                      |
 
 Both sections are one chapter and the same two bodies: the break swaps the cards and nothing else.
@@ -325,6 +353,7 @@ Both sections are one chapter and the same two bodies: the break swaps the cards
 | 3.1 | `chapel`, `manor_hall`                  |                 |                     | (NPC `zealot`)   | `confessionBook`, `holyWar`, `oneShot`     | E8, E9                                                          |
 | 3.2 | `chapel`, `overworld`                   |                 |                     | `zealot`         | `holyWar`                                  | `vendetta.conversion.sown`, `.doubt`, `meeting`, `kill`         |
 | 3.3 | `chapel`, `cellar`                      |                 | `memorialVicar`     |                  | `lavenderField`, `undertakersRegister`     | `bell`, `meeting`, `story.cutscene`                             |
+| 3.4 | `chapel`, `forest`, `rite.site`         |                 |                     | (NPC `zealot`)   | `lavenderField`                            | E15, E16, E17 (`rite.*`), `phase`, `bell`, the sermon, `meeting` |
 | 4.1 | `overworld`                             |                 |                     | (NPC `activist`) | `gazetteMorning`                           | `fixPump`, `mendFence`, `rent.paid`, E10                        |
 | 4.2 | `overworld`                             |                 |                     | `activist`       |                                            | `vendetta.sabotage.tampered`, `.wrecked`                        |
 | 4.3 | `apoth_shop`, `forest_deep`             | `mollsHerbs`    |                     |                  | `fieldGuide`                               | night powers (E8), `phase`                                      |
@@ -342,7 +371,7 @@ memorial must really play (E12).
 | --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
 | E1  | Sections: a chapter holds sections in order; each section has its own card, vendetta, goals, beats and end; a section break is a handover (`switchRole`) without a chapter end card; a section card (title and setup) replaces the chapter title card for every section after the first                                                                                                                                                                                                                                                           | all                               |
 | E2  | **The story's cast.** The story names the cards at the table per chapter (a fixed deal of every seat, not `roles.json` `decks`), up to the room's seat cap (`balance.json` `players`). At a chapter break, a card the new chapter casts and nobody holds is dealt to an NPC seat whose card the chapter does not cast, dead seats first, made whole as a newcomer off the morning train. Needed for the Thief from 1.1, and for the Butler, Child, Gamekeeper, Tinner, Townsfolk, Drifter, Ranger and Medium, none of which the 8-seat deck holds | 1.1, 1.2, 2.1, 2.3, 3.1, 4.1, 5.1 |
-| E3  | **No early win.** Before the last section, no match win ends the room: the Village task bar (the martyr's due in 3.3 makes it fast), parity, a Thief escape, a Hitman boarding. Proposed: a win before the last section ends the running section as done, and the story moves on; only the last section's win ends the match                                                                                                                                                                                                                      | 3.3, 4.2, 5.2, 5.4                |
+| E3  | **No early win.** Before the last section, no match win ends the room: the Village task bar (the martyr's due in 3.4 makes it fast), parity, a Thief escape, a Hitman boarding. Proposed: a win before the last section ends the running section as done, and the story moves on; only the last section's win ends the match                                                                                                                                                                                                                      | 3.4, 4.2, 5.2, 5.4                |
 | E4  | **The NPC Killer's vendetta** per section (`npcVendetta`): so the Killer the player meets in 2.1, 3.1, 4.1 is already the Bandit, the Zealot, the Activist. Its progress starts over at the break when the player takes the card (GDD 3.34)                                                                                                                                                                                                                                                                                                       | 2.1, 3.1, 4.1                     |
 | E5  | **A fixed Hitman.** The arrival never comes below its human floor (`hitman.byHumans`); a story names the section, the seat to turn (the player's) and the contract's mark (a role id: the seat holding `killer`)                                                                                                                                                                                                                                                                                                                                  | 5.2                               |
 | E6  | **The heir section.** A section may start on a card a seat evolved into (`heir`), waiting until a seat holds it; and `runInherit` emits a bus event (none today) for the trigger                                                                                                                                                                                                                                                                                                                                                                  | 5.3                               |
@@ -354,6 +383,9 @@ memorial must really play (E12).
 | E12 | **Cutscenes that play** from a beat (today an event only), and the memorial in a story room (it is played by a meeting's reveal, so it needs a meeting: 3.3 rings one if no NPC does)                                                                                                                                                                                                                                                                                                                                                             | 1.1, 3.3                          |
 | E13 | **Holy-war rules vs. B6.** The Zealot's consequence is a silenced vote at a meeting (GDD 3.20). If B6 retires voting before P5 builds 3.2, the goal follows whatever B6 makes of `vendetta.conversion.doubt`. Also: GDD 3.20's prose and `balance.json` `vendettas.conversion.shareS` disagree; the data wins and the GDD owner should fix the prose                                                                                                                                                                                              | 3.2                               |
 | E14 | **Staging at a break.** A break swaps cards between two bodies where they stand (A415), so the stranger "moves" to where the Watchman ended. P5 stages each section's opening with `npcOrder goTo` before the break, or writes setup copy that names no place                                                                                                                                                                                                                                                                                     | 2.1, 3.2, 5.2, 5.3                |
+| E15 | **The shade handover** (R8). The break into 3.4 gives the player the martyr's body as its shade, not the Vicar card in the player's living body (`switchRole` moves cards between bodies where they stand, A415, and makes a dead human whole). The Doctor's body, which the player leaves, goes on as an NPC holding the Doctor card; nothing public changes but who drives each body (R8-Q5) | 3.4 |
+| E16 | **A shade is not a failed death** (R8). Q-A9 fails a chapter on the human's death; a human who is the rite's shade (GDD 3.20) has not failed. Only a death after the return fails 3.4 | 3.4 |
+| E17 | **The rite on the bus, and a skipped section.** The rite's stages (`open`, `begun`, `done`, `returned`; today only the private `rite` message) as sim events naming the shade's seat, so a goal and an end can read them; and a section that starts only when a condition holds (3.4: the match has a martyr), skipped otherwise | 3.4 |
 
 Replay-once and the save at each chapter break are part2.md's (P2, P3) and need nothing more from the arc than this:
 a chapter is the unit of both; a death in any section fails the chapter (Q-A9).
@@ -551,3 +583,35 @@ A requirement for the map revamp (A515 Q-A11): every role gets its own unique bu
 For the Bandit and the Activist the owner names the role's own building, themed as its opposite: the Bandit's is a
 detective's or police station, the Activist's a post office. Scene, portal and spawn ids
 stay frozen: every new building adds new ids with new prefixes, append-only (GDD 3.13, WORLD 4.3).
+
+### 8.3 R8: the martyr's section (draft by story R, 2026-11-12)
+
+The owner asked R to draft the section `rite.md` R8 names ("the player takes the shade to the rite and plays the 10X
+Vicar against the Zealot"); it is 3.4 above, with E15 to E17 in 4.2. Each question has a default that holds until the
+owner answers.
+
+- **R8-Q1. Where the section goes.** After the Doctor's 3.3, not straight after 3.2 as `rite.md` first put it: the
+  return takes the body from the scene, and 3.3 needs the body for its report, its meeting and the memorial. The
+  shade keeps until the next day's start, so 3.3 runs in the same night. Default: 3.4. The Doctor's section takes the
+  title "The Lavender Field" and gives "The Strength of Ten" to 3.4.
+- **R8-Q2. No rite in time.** If the night ends before the rite is done, the shade becomes a ghost and the Vicar
+  stays dead (GDD 3.20). Default: 3.4 ends there, not failed, and the chapter ends on its lines. Alternative: the
+  chapter fails and replays once (Q-A9).
+- **R8-Q3. Q-A10 changes.** Q-A10's default was that the player never plays the Vicar's ghost after 3.2. The player
+  now plays his shade, which is not a ghost: it sees no roles and no Cabal or ghost line (R-Q4). Default: yes; Q-A10
+  still holds for an ordinary ghost.
+- **R8-Q4. "Against the Zealot".** The Knife strikes only at dusk and at night, and the buff ends at dusk, so the
+  return day is fought with the flock, not the Knife. Default: the goals are the rite, the return, the bell and one
+  sermon; a converted seat (the player's own private count, I9) and the Zealot named at the day's meeting are optional
+  goals. Alternative: a goal that the Zealot be ejected that day, which a single human cannot be sure of.
+- **R8-Q5. The shade handover (E15).** Default: the bodies stay where they are and only who drives them changes, so
+  the public names and looks of both bodies stay as they were (nothing public says a story break happened). R builds
+  it in the engine and its leak test proves it.
+- **R8-Q6. The site.** The hideout is `rite.site`: the Fenwood's `wood_side` today, the map revamp's hideout when it
+  names one (R-Q2; the Blender revamp, first commit `753b563d`, adds no scene ids yet). 3.4's copy says "the hideout"
+  and never "the Fenwood", so a new site is a one-line data change.
+
+**What R builds now and what waits.** The engine needs E15 to E17 are engine work, which W3 does not hold; R builds
+them on `claude/story-part2`, each PR under 400 lines with its tests and GDD 3.34. 3.4 as content in `story.json`
+needs chapter 3's 3.1 to 3.3, which are P5's and wait on the map revamp (W3); R writes 3.4's entry when P5 writes the
+chapter, or the owner says to write chapter 3 now.
