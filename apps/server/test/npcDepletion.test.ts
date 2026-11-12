@@ -39,7 +39,9 @@ describe('depletion', () => {
     for (const [id, it] of Object.entries(interactions.interactions)) {
       if (it.after === undefined) continue;
       const stays = it.after.respawnS === null;
-      expect(stays, id).toBe(['crateNailed', 'lockedDoor'].includes(it.target));
+      expect(stays, id).toBe(
+        ['crateNailed', 'lockedDoor', 'containerOpen', 'containerLocked'].includes(it.target),
+      );
     }
   });
 

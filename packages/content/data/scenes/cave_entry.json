@@ -91,7 +91,7 @@
       "childOnly": false
     }
   ],
-  "props": [],
+  "props": [{ "id": "ce.tin_crate", "kind": "dressing", "x": 8, "y": 5 }],
   "gates": [],
   "paths": [],
   "lights": [
@@ -136,7 +136,7 @@
     "XrmmmrrrrrrrrrrrrrrX",
     "XrmmmrrrrrrrrrrrrrrX",
     "XrrrrrrRRrrrrrrmmmrX",
-    "XrrrrrrRRrrrrrrmmmrX",
+    "XrrrrrrRPrrrrrrmmmrX",
     "XrrRrrrrrrrrrrrmmmrX",
     "XrrRrrrrrrrrrrrrrrrX",
     "XrrRrrrrrrrrRRRrrrrX",

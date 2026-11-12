@@ -464,6 +464,7 @@
     "gddRef": "3.22"
   },
   "paintTown": { "winUnique": 0.5, "gddRef": "3.8" },
+  "moodHooks": { "chance": 0.6, "gddRef": "3.24" },
   "hitman": {
     "byHumans": {
       "3": { "comes": 0.5, "human": 0 },

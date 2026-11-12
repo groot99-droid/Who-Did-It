@@ -32,6 +32,7 @@ export function handleBodyAbility(
       return handleCure(room, sessionId, payload.abilityId, payload);
     case 'eat':
     case 'eatHerbBread':
+    case 'eatStew':
       return handleEat(room, sessionId, payload.abilityId);
     case 'skin':
       return handleSkin(room, sessionId);
