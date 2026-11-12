@@ -1,0 +1,149 @@
+/*
+ * The dossier: the paper of the role card and the Satchel (docs/UI.md 2, A257); needs tokens.css. Light or dark
+ * follows the device unless the root says `data-paper="light"` or `"dark"`. Every pair is measured in UI.md 10.
+ */
+
+.wdi-dossier {
+  --_page: var(--wdi-vellum);
+  --_sheet: var(--wdi-sheet);
+  --_well: var(--wdi-well);
+  --_rule: var(--wdi-rule);
+  --_ink: var(--wdi-ink);
+  --_soft: var(--wdi-pencil);
+  --_number: var(--wdi-ochre);
+  --_done: var(--wdi-moss);
+  --_forged: var(--wdi-brick);
+  --_focus: var(--wdi-focus);
+  font-family: var(--wdi-font-dossier-text);
+  font-size: var(--wdi-text-md);
+  line-height: var(--wdi-leading-text);
+  color: var(--_ink);
+  background: var(--_page);
+}
+
+.wdi-dossier[data-paper='dark'] {
+  --_page: var(--wdi-carbon);
+  --_sheet: var(--wdi-graphite);
+  --_well: var(--wdi-cellar);
+  --_rule: var(--wdi-seam);
+  --_ink: var(--wdi-bone);
+  --_soft: var(--wdi-ash);
+  --_number: var(--wdi-mustard);
+  --_done: var(--wdi-sage);
+  --_forged: var(--wdi-blush);
+  --_focus: var(--wdi-moon);
+}
+
+@media (prefers-color-scheme: dark) {
+  .wdi-dossier:not([data-paper='light']) {
+    --_page: var(--wdi-carbon);
+    --_sheet: var(--wdi-graphite);
+    --_well: var(--wdi-cellar);
+    --_rule: var(--wdi-seam);
+    --_ink: var(--wdi-bone);
+    --_soft: var(--wdi-ash);
+    --_number: var(--wdi-mustard);
+    --_done: var(--wdi-sage);
+    --_forged: var(--wdi-blush);
+    --_focus: var(--wdi-moon);
+  }
+}
+
+.wdi-dossier :focus-visible {
+  outline: 2px solid var(--_focus);
+  outline-offset: 2px;
+}
+
+/* A section head: small caps over a 2 px ink rule. */
+.wdi-dossier__head {
+  margin: 0 0 var(--wdi-space-3);
+  padding-bottom: var(--wdi-space-1);
+  border-bottom: 2px solid var(--_ink);
+  font-family: var(--wdi-font-dossier-display);
+  font-size: var(--wdi-display-sm);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* The eyebrow over a head; numbers take `--_number` with the mono face where they sit. */
+.wdi-dossier__eyebrow {
+  font-family: var(--wdi-font-dossier-mono);
+  font-size: var(--wdi-text-xs);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--_number);
+}
+
+.wdi-dossier__hint {
+  font-size: var(--wdi-text-sm);
+  color: var(--_soft);
+}
+
+/* A card on the page: a 1 px rule and 8 px corners. */
+.wdi-dossier__card {
+  padding: var(--wdi-space-4);
+  background: var(--_sheet);
+  border: 1px solid var(--_rule);
+  border-radius: 8px;
+}
+
+/* A well, the Proposed box: what to do next. No soft or forged text in a dark well (UI.md 10). */
+.wdi-dossier__well {
+  padding: var(--wdi-space-3) var(--wdi-space-4);
+  background: var(--_well);
+  border-left: 3px solid var(--_number);
+  border-radius: 0 8px 8px 0;
+}
+
+/* A mono chip (keys, counts) and an outlined pill (states, tags). */
+.wdi-dossier__chip,
+.wdi-dossier__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wdi-space-1);
+  padding: 0 var(--wdi-space-2);
+  min-height: 24px;
+  font-family: var(--wdi-font-dossier-mono);
+  font-size: var(--wdi-text-xs);
+  border: 1px solid var(--_rule);
+  border-radius: var(--wdi-radius-xs);
+  background: var(--_sheet);
+}
+
+.wdi-dossier__pill {
+  font-family: var(--wdi-font-dossier-text);
+  font-weight: 500;
+  border-color: currentColor;
+  border-radius: var(--wdi-radius-pill);
+}
+
+.wdi-dossier__pill.is-done {
+  color: var(--_done);
+}
+
+.wdi-dossier__pill.is-forged {
+  color: var(--_forged);
+}
+
+/* Buttons: 6 px corners; the primary is ink on mustard on both papers (9.88). */
+.wdi-dossier__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--wdi-space-2);
+  min-height: var(--wdi-touch);
+  padding: var(--wdi-space-2) var(--wdi-space-4);
+  font: inherit;
+  font-weight: 700;
+  color: var(--_ink);
+  background: var(--_sheet);
+  border: 1px solid var(--_ink);
+  border-radius: var(--wdi-radius-sm);
+  cursor: pointer;
+}
+
+.wdi-dossier__btn--primary {
+  color: var(--wdi-ink);
+  background: var(--wdi-mustard);
+}

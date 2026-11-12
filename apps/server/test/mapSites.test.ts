@@ -33,6 +33,9 @@ describe('map sites (GDD 3.13, round 5 X5)', () => {
       'crumb_mixing',
       'crumb_oven',
       'crumb_proofing',
+      // Round 10 (T6, I42): the Fisher's home and the sea door.
+      'cottage_fisher',
+      'sea_exit',
     ]);
   });
 });

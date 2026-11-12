@@ -12,6 +12,7 @@ import {
 } from './npc/memory';
 import { runHive } from './npc/hive';
 import { readyOnRoleCard, runMeetingVotes } from './npc/meeting';
+import { runTrialNpc } from './npc/trial';
 import { drawPersonas, releaseClaims } from './npc/routine';
 import { runWorldNpc } from './npc/world';
 import { simOf } from './RoomSim';
@@ -85,7 +86,8 @@ export function runNpcs(room: PartyRoom): void {
     else if (state.phase === Phase.roleReveal) readyOnRoleCard(room, mem, brain, player);
     else if (state.phase === Phase.meetingDiscussion || state.phase === Phase.meetingVote) {
       runMeetingVotes(room, mem, brain, player, p);
-    } else if (isWorldPhase(state.phase)) runWorldNpc(room, mem, brain, player, p);
+    } else if (state.phase === Phase.tribunal) runTrialNpc(room, brain, player, p);
+    else if (isWorldPhase(state.phase)) runWorldNpc(room, mem, brain, player, p);
   }
 }
 
