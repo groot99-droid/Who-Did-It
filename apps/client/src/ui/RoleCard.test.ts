@@ -10,6 +10,7 @@ import {
   ROLE_CARD_SECONDS,
   roleTitle,
   TRAIT_LABELS,
+  holdsVendetta,
   vendettaLines,
 } from './RoleCard';
 import { VENDETTA_COPY } from './copy/vendettas';
@@ -117,6 +118,12 @@ describe('vendetta lines (GDD 3.20, round 10 A354)', () => {
       { label: '', goal: `Your Killer’s vendetta: ${VENDETTA_COPY['vendetta.goal.zealot']}` },
       { label: '', goal: `Your Killer’s vendetta: ${VENDETTA_COPY['vendetta.goal.hitman']}` },
     ]);
+  });
+
+  it('reads a turned card as the holder of the Hitman’s contract (round 10, C4a)', () => {
+    expect(holdsVendetta(false, 'hitman')).toBe(true);
+    expect(holdsVendetta(false, 'zealot,bandit')).toBe(false);
+    expect(vendettaLines('hitman', holdsVendetta(false, 'hitman'))[0]?.label).toBe('Vendetta: ');
   });
 
   it('shows nothing for an empty view, an unknown id or an inherited name', () => {

@@ -532,7 +532,7 @@
       "pantry": "bakery tavern_bar tavern_back crumb_cold crumb_mixing crumb_oven crumb_proofing",
       "toolshed": "barn bp_camp bp_mill bp_woods",
       "mineStash": "bp_mine bp_deep cave_entry cave_gallery",
-      "domestic": "widow_bedroom widow_parlour manor_upper",
+      "domestic": "widow_bedroom widow_parlour manor_upper cottage_fisher",
       "valuables": "manor_hall bp_office",
       "armoury": "bp_lodge bp_smithy",
       "forager": "forest forest_deep"
@@ -577,7 +577,8 @@
         "scarecrow ship_wheel show_globe tin_cabinet_x writing_desk bunks_n bunks_s clamp",
         "crepe den drowned_lantern flume gearing hanging_oak ledger_desk map_table",
         "mess_table ore_cart pegs pump_beam refuge_table rope shelves tally_board telephone",
-        "trestle mortar_x"
+        "trestle mortar_x",
+        "cot"
       ]
     }
   }
