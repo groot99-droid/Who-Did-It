@@ -1,0 +1,40 @@
+https://polyhaven.com/license (as read on 2026-11-12: polyhaven-materials-license-2026-11-12.txt)
+
+Poly Haven assets licence
+
+All assets on Poly Haven are licensed as CC0 1.0 Universal (public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The licence and the public API terms are those recorded earlier the same day in
+polyhaven-materials-license-2026-11-12.txt, unchanged from the copy saved on 2026-10-23
+(polyhaven-materials-license-2026-10-23.txt). The licence covers every Poly Haven asset, models as well as
+textures.
+
+Textures added to the material library lock on 2026-11-12 (diffuse, normal and roughness maps, 1k and 2k jpg,
+via https://api.polyhaven.com/files/<id>, pinned by md5 in tools/blender/materials/polyhaven.lock.json),
+for the ground, rock and timber of the 3D wild scenes (Gallows Wood, The Fenwood, the Tin Gallery):
+- forrest_ground_03: Forest Ground 03 (Rob Tuytel)
+- quarry_wall_02: Quarry Wall 02 (Dimitrios Savva)
+- raw_wooden_floor_01: Raw Wooden Floor 01 (Charlotte Baglioni)
+- rocks_ground_08: Rocks Ground 08 (Rob Tuytel)
+- seaside_rock: Seaside Rock (Dimitrios Savva)
+- snow_03: Snow 03 (Rob Tuytel)
+
+Models taken on 2026-11-12, the first Poly Haven models in the repository (each the 1k glTF, or the 1k .blend
+where the glTF drops an alpha or opacity map, with every .bin and texture file it includes, via
+https://api.polyhaven.com/files/<id>, pinned by md5 in tools/blender/materials/polyhaven_models.lock.json and
+fetched by tools/blender/materials/fetch_models.py), for the rocks, plants and props of the same scenes:
+- dry_branches_medium_01: Dry Branches Medium 01 (Rico Cilliers), 1k glTF
+- fern_02: Fern 02 (Rico Cilliers, Rob Tuytel), 1k .blend
+- grass_medium_02: Grass Medium 02 (Rico Cilliers), 1k .blend
+- picke_dirty_01: Picke Dirty 01 (Dennis Halbeck), 1k glTF
+- rock_07: Rock 07 (Jenelle van Heerden), 1k glTF
+- rock_face_01: Rock Face 01 (Dario Barresi), 1k glTF
+- rock_face_02: Rock Face 02 (Dario Barresi, Rico Cilliers), 1k glTF
+- rock_moss_set_01: Rock Moss Set 01 (Kless Gyzen), 1k glTF
+- rock_moss_set_02: Rock Moss Set 02 (Kless Gyzen), 1k glTF
+- rusted_spade_01: Rusted Spade 01 (Blemonade), 1k glTF
+- shrub_02: Shrub 02 (Rico Cilliers), 1k .blend
+- single_root: Single Root (Jenelle van Heerden), 1k glTF
+- tree_stump_01: Tree Stump 01 (Rob Tuytel), 1k glTF
+- wooden_lantern_01: Wooden Lantern 01 (James Ray Cock), 1k .blend
