@@ -53,7 +53,8 @@ export type StreamName =
   | 'autopsy' // round 10, V1b: an Autopsy's time-of-death offset, keyed by seat (secret, seams.md 1)
   | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
   | 'trialTick' // round 10, B6d2: the tick an NPC presents or files on, keyed by seat id (card-blind)
-  | 'trialChance'; // round 10, B6d2: whether it does, keyed by seat id (card-blind);
+  | 'trialChance' // round 10, B6d2: whether it does, keyed by seat id (card-blind)
+  | 'hardship'; // round 10, C4c: how many seats a delivery strikes, which, and the kind (secret)
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

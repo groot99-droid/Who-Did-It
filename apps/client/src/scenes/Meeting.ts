@@ -9,9 +9,7 @@ import { NOTES_COPY } from '../ui/copy/notes';
 import { mountMeetingNotes } from '../ui/meetingNotes';
 import { mountMeetingPapers } from '../ui/econ/meetingPapers';
 import { overlayRoot } from '../ui/dom';
-import { mountMatchArtSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { drawPortrait } from '../ui/portrait';
-import { ART_STYLE_CHANGED } from '../view/artStyle';
 import { outsOf } from '../ui/meetingText';
 import type { AudioBus } from '../view/AudioBus';
 import { REG_AUDIO } from './registry';
@@ -60,16 +58,11 @@ export class Meeting extends Phaser.Scene {
       if (outsOf(result).length > 0) audio?.play('stamp');
       refresh();
     };
-    // A style switch (A79): the portraits are drawn from the textures, so paint them again.
-    const onArtStyle = () => this.screen?.repaintPortraits();
-    this.game.events.on(ART_STYLE_CHANGED, onArtStyle);
-    const artSwitch = mountMatchArtSwitch(overlayRoot());
+    // No art switch over the meeting (round 10, S5, A534): the style is fixed from Start to game over.
     feed.bus.on('voteResult', onResult);
     feed.bus.on('chat.msg', refresh);
     feed.bus.on('phaseChange', refresh);
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.game.events.off(ART_STYLE_CHANGED, onArtStyle);
-      artSwitch.destroy();
       feed.bus.off('voteResult', onResult);
       feed.bus.off('chat.msg', refresh);
       feed.bus.off('phaseChange', refresh);
