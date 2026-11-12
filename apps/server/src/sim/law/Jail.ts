@@ -60,6 +60,24 @@ export const isJailed = (room: PartyRoom, seat: string): boolean => memoryOf(roo
 export const isPinned = (room: PartyRoom, seat: string): boolean =>
   memoryOf(room).held.get(seat)?.pinned === true;
 
+/** Whether a jailed seat has been placed in the cell (its walk is over): B6a's Tribunal opens then. */
+export const inCell = (room: PartyRoom, seat: string): boolean =>
+  memoryOf(room).held.get(seat)?.placeAt === -1;
+
+/** B6a: a dismissal or a paid fine releases the seat at the Tribunal's Return, onto the square, with no line. */
+export function releaseToSquare(room: PartyRoom, seat: string): void {
+  const m = memoryOf(room);
+  if (m.held.has(seat)) release(room, m, seat, true);
+}
+
+/** B6a: the paused world resumed after a Tribunal, so every held seat's release tick moves by the pause. */
+export function rescheduleReleases(room: PartyRoom): void {
+  for (const seat of memoryOf(room).held.keys()) {
+    const priv = room.state.players.get(seat)?.priv;
+    if (priv) priv.jailUntilTick = nextReleaseTick(room);
+  }
+}
+
 /** The seconds until the releasing train, for `IN_JAIL {untilDawn}`. */
 export const untilDawnS = (room: PartyRoom, seat: string): number =>
   Math.max(
@@ -100,11 +118,11 @@ export function jailSeat(room: PartyRoom, seat: string, face: string): void {
  * Sets the seat down at the station with the manifest line, or at the map's meeting spawns with no line where no
  * station is, then unpins it.
  */
-function release(room: PartyRoom, m: JailMemory, seat: string): void {
+function release(room: PartyRoom, m: JailMemory, seat: string, toSquare = false): void {
   const held = m.held.get(seat);
   const p = simOf(room).players.get(seat);
   const player = room.state.players.get(seat);
-  const station = stationOf(room);
+  const station = toSquare ? undefined : stationOf(room);
   m.held.delete(seat);
   if (!held || !p || !player) return;
   player.priv.jailUntilTick = 0;

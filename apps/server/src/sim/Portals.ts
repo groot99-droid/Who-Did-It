@@ -10,6 +10,7 @@ import {
   overlapsSolid,
 } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { lockStands, openedDoorState } from './verbs/coverup';
 import { FOOT_HALF_PX, PORTAL_REACH_TILES, StatusBit } from './constants';
 import { statusBitsOf } from './Movement';
 import { rehandle } from './Avatars';
@@ -28,8 +29,10 @@ import {
 } from './World';
 import { spawnTeachingClue } from './Clues';
 import { curfewBars } from './economy/rent';
+import { recordCrossings } from './verbs/dust';
 import { reconcileViews } from './Visibility';
 import { isOnLine } from './Train';
+import { isDeparted } from './vendettas/arrival';
 
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
 
@@ -124,7 +127,7 @@ export function placeNewPlayers(room: PartyRoom): void {
   const starts = startSpawnsOf(room);
   let placedAny = false;
   for (const [sessionId, p] of sim.players) {
-    if (p.placed || isOnLine(room, sessionId)) continue; // round 10, C1: the Train places a returning seat
+    if (p.placed || isOnLine(room, sessionId) || isDeparted(room, sessionId)) continue; // C1, C4b: off the map
     const player = room.state.players.get(sessionId);
     if (!player) continue;
     const site = starts[p.ordinal % starts.length]!;
@@ -177,7 +180,7 @@ export function runPortals(room: PartyRoom): void {
       reject(room, req.sessionId, 'BOARDED');
       continue;
     }
-    if (portal.lock !== null && !p.dead) {
+    if (lockStands(room, from, portal.id, portal.lock !== null) && !p.dead) {
       // Keys are inventory items and arrive with M5; until then a keyed door stays locked.
       reject(room, req.sessionId, 'LOCKED');
       continue;
@@ -194,6 +197,7 @@ export function runPortals(room: PartyRoom): void {
     }
     crossed = true;
     if (p.dead) continue;
+    recordCrossings(room, from, portal, `seat:${req.sessionId}`); // round 10, V1b: the true actor, whatever the face
     swingDoor(room, from, portal.id);
     const arrival = nearestPortal(portal.to, p.x / TILE_PX, p.y / TILE_PX);
     if (arrival) swingDoor(room, portal.to, arrival.id);
@@ -230,7 +234,9 @@ export function applyProfileToDoors(room: PartyRoom): void {
     for (const portal of scene.portals) {
       const door = state.doors.get(portal.id);
       if (!door) continue;
-      door.state = !profileOpen(portal.minProfile, sim.profile) ? 1 : portal.lock !== null ? 2 : 0;
+      door.state = !profileOpen(portal.minProfile, sim.profile)
+        ? 1
+        : (openedDoorState(room, id, portal.id) ?? (portal.lock !== null ? 2 : 0));
     }
   }
 }

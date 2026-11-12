@@ -4,6 +4,7 @@ import { WORLD_COPY as C } from '../ui/copy';
 import { BODY_COPY } from '../ui/copy/body'; // round 8, 8A
 import { h } from '../ui/dom';
 import '../view/hud.css';
+import { cardSlots } from './actions';
 import type { InputSource } from './InputController';
 import { stickVector } from './vectors';
 
@@ -33,14 +34,16 @@ export interface AbilityDisc {
  */
 export function abilityDiscs(card: Pick<RoleRevealPayload, 'abilities'> | null | undefined): AbilityDisc[] {
   if (!card) return [];
+  // Round 10, R1: the slot letter from the action table's slots (passives take none), never the wire's positional key.
+  const slots = cardSlots(card.abilities);
   return card.abilities
     .filter((a) => ABILITY_KINDS[a.id]?.kind === 'active')
-    .map((a) => ({ slot: a.key, id: a.id, name: a.name }));
+    .map((a) => ({ slot: slots.find((s) => s.id === a.id)?.key ?? '', id: a.id, name: a.name }));
 }
 
 /**
- * One stick and the discs: the card's abilities (Q, R, F; `setAbilities`) in a row over a cluster of Use (E), Run,
- * Sneak and Strike (X); Use, the abilities and Strike held-free, Run and Sneak held. Shown on touch screens or with
+ * One stick and the discs: the card's abilities (Q, R, F; `setAbilities`) in a row over a cluster of Use (E), Sneak
+ * and Strike (X). Pushing the stick to its rim runs; Sneak toggles (round 10, R1, Q-C3). Shown on touch screens or with
  * ?touch=1.
  */
 export class TouchControls implements InputSource {
@@ -60,18 +63,28 @@ export class TouchControls implements InputSource {
     private readonly handlers: TouchHandlers,
   ) {
     this.knob = h('div', { class: 'wdi-stick__knob' });
-    const stick = h('div', { class: 'wdi-stick', 'aria-label': 'Move' }, this.knob);
+    const stick = h(
+      'div',
+      { class: 'wdi-stick', 'aria-label': C['touch.run'], title: C['touch.run'] },
+      this.knob,
+    );
     this.useBtn = this.disc('E', C['touch.use'], {
       class: 'wdi-touch-btn--primary',
       'data-testid': 'touch-use',
     });
-    const run = this.disc('Run', C['touch.run']);
-    const sneak = this.disc('Shift', C['touch.sneak']);
+    // Round 10, R1 (rolecards.md Q-C3): Run is the stick pushed to its rim; Sneak is a toggle, not a held disc.
+    const sneak = this.disc('Shift', C['touch.sneak'], {
+      'aria-pressed': 'false',
+      'data-testid': 'touch-sneak',
+    });
     const strike = this.disc('X', BODY_COPY['body.strike'], { 'data-testid': 'touch-strike' }); // round 8, 8A
     this.press(this.useBtn, handlers.onUse);
     this.press(strike, (on) => on && handlers.onStrike()); // round 8, 8A
-    this.press(run, (on) => (this.run = on));
-    this.press(sneak, (on) => (this.sneakOn = on));
+    sneak.addEventListener('click', () => {
+      this.sneakOn = !this.sneakOn;
+      sneak.setAttribute('aria-pressed', String(this.sneakOn));
+      sneak.classList.toggle('is-on', this.sneakOn);
+    });
     this.abilityRow = h('div', { class: 'wdi-touch-abilities', 'data-testid': 'touch-abilities' });
     this.root = h(
       'div',
@@ -81,7 +94,7 @@ export class TouchControls implements InputSource {
         'div',
         { class: 'wdi-hud__br' },
         this.abilityRow,
-        h('div', { class: 'wdi-touch-cluster' }, this.useBtn, run, sneak, strike), // round 8, 8A
+        h('div', { class: 'wdi-touch-cluster' }, this.useBtn, sneak, strike), // round 8, 8A
       ),
     );
     parent.append(this.root);
@@ -91,6 +104,7 @@ export class TouchControls implements InputSource {
       const ox = e.clientX - (r.left + r.width / 2);
       const oy = e.clientY - (r.top + r.height / 2);
       this.vec = stickVector(ox, oy, RADIUS);
+      this.run = Math.hypot(ox, oy) >= RADIUS; // the rim: run
       const len = Math.min(RADIUS, Math.hypot(ox, oy)) || 0;
       const a = Math.atan2(oy, ox);
       this.knob.style.transform = `translate(calc(-50% + ${Math.cos(a) * len}px), calc(-50% + ${Math.sin(a) * len}px))`;
@@ -99,6 +113,7 @@ export class TouchControls implements InputSource {
       if (e.pointerId !== this.stickPointer) return;
       this.stickPointer = null;
       this.vec = { dx: 0, dy: 0 };
+      this.run = false;
       this.knob.style.transform = '';
     };
     stick.addEventListener('pointerdown', (e) => {

@@ -3,14 +3,15 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Bots: lobby swarm (Playwright and lobby runs), walkers that report, vote and strike, and the 30 minute match soak (no tasks).",
+  "description": "Bots: lobby swarm, the story bot (Playwright and lobby runs), walkers that report, vote and strike, and the 30 minute match soak (no tasks).",
   "scripts": {
     "start": "tsx swarm.ts",
     "walk": "tsx --conditions=development walk.ts",
     "soak": "tsx --conditions=development soak.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "live": "tsx live.ts"
+    "live": "tsx live.ts",
+    "story": "tsx --conditions=development story.ts"
   },
   "dependencies": {
     "@colyseus/sdk": "^0.18.5",

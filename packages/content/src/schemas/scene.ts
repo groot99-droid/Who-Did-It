@@ -55,6 +55,9 @@ export const SCENE_IDS = [
   'crumb_proofing',
   // Round 10 (B5, A369): the county jail's cell, a `jail` scene outside every map's graph (WORLD 4.4).
   'cj_cell',
+  // Round 10 (T6, I42): the Fisher's home and the sea door behind the Tin Gallery mouth (WORLD 4.4).
+  'cottage_fisher',
+  'sea_exit',
 ] as const;
 export type SceneId = (typeof SCENE_IDS)[number];
 
