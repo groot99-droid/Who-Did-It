@@ -91,6 +91,19 @@ ROLES: dict[str, Role] = {
     "gravel": Role("gravel", 1.0, "stone"),
     "gravel_stones": Role("gravel_stones", 1.0, "stone"),
     "gravel_floor": Role("gravel_floor", 1.0, "stone"),
+    # snow: the 3D HollowMere scene (meshy_village_build.py) lies under it; the game's ground tiles have none
+    "snow": Role("snow_02", 2.0, "bone"),
+    "snow_field": Role("snow_field_aerial", 80.0, "bone", note="aerial scale: drifts across a whole field"),
+    # the wild places of the 3D scenes (Gallows Wood, The Fenwood, the Tin Gallery): metres = the scan's real width
+    "pine_needles": Role("forrest_ground_03", 2.0, "litter",
+                         note="fallen pine needles on soil (`needles`' forrest_ground_01 is not a needle scan)"),
+    "snow_trodden": Role("snow_03", 2.0, "bone",
+                         note="trampled snow with mud showing; forest trails, the stand-in for frozen mud"),
+    "mine_wall": Role("quarry_wall_02", 1.8, "stone", note="layered quarry stone; gallery and adit walls"),
+    "mine_floor": Role("rocks_ground_08", 3.0, "stone", note="muddy ground, scattered rock, damp patches; mine floors"),
+    "timber_rough": Role("raw_wooden_floor_01", 2.0, "wood",
+                         note="rough-sawn planks with nail holes; mine timbering, lagging, walkways"),
+    "wet_rock": Role("seaside_rock", 2.0, "stone", note="dark cliff rock with a wet sheen; the sea door, the sump"),
 }
 
 # Today's `env/kits.py` names as roles, so a caller swaps `SURFACE_TEXTURES[name]` for `LEGACY_SURFACES[name]`

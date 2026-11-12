@@ -1,0 +1,58 @@
+{
+  "name": "blue_hour",
+  "sky": {
+    "zenith": [0.023, 0.035, 0.086],
+    "horizon": [0.094, 0.138, 0.265],
+    "glow": [0.68, 0.26, 0.1],
+    "glow_azimuth": 212.0,
+    "glow_width": 100.0,
+    "glow_height": 0.28,
+    "horizon_height": 0.55,
+    "ground": [0.045, 0.055, 0.095],
+    "light": 1.0,
+    "stars": 0.05,
+    "moon_disc": 2.0,
+    "moon_size": 3.2,
+    "moon_halo": 0.08
+  },
+  "moon": {
+    "energy": 0.38,
+    "soft_angle": 5.0,
+    "volume": 1.0
+  },
+  "fog": {
+    "density": 0.008,
+    "height": 6.0,
+    "mere_density": 0.11
+  },
+  "lights": {
+    "lantern": { "energy": 240.0, "volume": 1.2, "bulb": 34.0 },
+    "headlamp": { "energy": 520.0 },
+    "window": { "energy": 110.0 },
+    "teal": { "energy": 55.0 }
+  },
+  "emissive": {
+    "strength": 2.0
+  },
+  "snow": {
+    "tint": [0.96, 0.97, 0.99],
+    "shade": [0.72, 0.76, 0.84],
+    "cobble_roughness": 0.15,
+    "roof": 0.85
+  },
+  "snowfall": {
+    "count": 7000,
+    "radius": 0.0075,
+    "speed": 0.8,
+    "wind": [0.2, -0.08]
+  },
+  "color": {
+    "exposure": 1.35
+  },
+  "post": {
+    "bloom": 0.7,
+    "bloom_threshold": 0.8,
+    "lift": [1.0, 1.001, 1.004],
+    "gamma": [0.95, 0.95, 0.95]
+  }
+}
