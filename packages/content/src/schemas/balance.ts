@@ -235,6 +235,14 @@ export const BalanceFile = z.strictObject({
     reachTiles: z.number().positive(),
   }),
   /** Round 10, D9c (GDD 3.24 "Talk to a figure"): asking a townsperson, a named figure or a Constable. */
+  /** Round 10, V2 (GDD 3.4): the cover-up verbs. A dragged body trails the dragger by `dragLagTicks`, lays a smear every
+   *  `dragSmearEveryTiles` tiles (at most `dragSmearMax` a drag), and is hidden when dropped within `spotReachTiles` of a body spot. */
+  coverup: Section({
+    dragSmearEveryTiles: z.number().positive(),
+    dragSmearMax: Count,
+    dragLagTicks: Count,
+    spotReachTiles: z.number().positive(),
+  }),
   figureTalk: Section({
     /** A figure answers from this many tiles. */
     reachTiles: z.number().positive(),
@@ -298,6 +306,11 @@ export const BalanceFile = z.strictObject({
     night: z.strictObject({ leaveDelayS: Span }),
     /** The vote tick: this fraction of the discussion plus the vote time, from the discussion's start. */
     vote: z.strictObject({ windowFrac: FracSpan }),
+    /**
+     * Round 10, B6d2 (GDD 3.12): an NPC seat's tick in a Tribunal's case (or defence) or the end trial's filing is this
+     * fraction of the step, and the chance it presents or files when the tick comes.
+     */
+    trial: z.strictObject({ windowFrac: FracSpan, presentChance: Chance, fileChance: Chance }),
     /** The ready delay on the role card and in the lobby. */
     ready: z.strictObject({ delayS: Span }),
     /**
@@ -637,6 +650,22 @@ export const BalanceFile = z.strictObject({
     }),
     /** D8: scrubbing's pour board and its wage (the hour off the sentence is NFY, GDD 3.27). */
     scrub: z.strictObject({ difficulty: z.number().int().min(1).max(5), wage: z.number().int().positive() }),
+  }),
+  /**
+   * Round 10, B6a (GDD 3.8): the Tribunal's steps (`chargeS`, `caseS`, `defenceS`, then `phases.revealS` and
+   * `phases.immunityS`), the matches that prove a charge (`convictAt`) and murder (`murderAt`), the grace a dismissed
+   * accused has from a new petition, and the fines a charge sets (B6a: from the charge alone).
+   */
+  trial: Section({
+    chargeS: Seconds,
+    caseS: Seconds,
+    defenceS: Seconds,
+    convictAt: Count,
+    murderAt: Count,
+    acquittalGraceS: Seconds,
+    theftFine: Count,
+    trespassFine: Count,
+    rumourFine: Count,
   }),
   /**
    * Round 10, B1 (GDD 3.24, F4 2.2): the guard figures, the Constables and the Company Clerk. A guard walks only the

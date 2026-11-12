@@ -192,6 +192,13 @@
     "gddRef": "3.7"
   },
   "doors": { "swingS": 3, "transitS": 0.6, "sceneFadeS": 0.4, "gddRef": "3.7", "reachTiles": 1.5 },
+  "coverup": {
+    "dragSmearEveryTiles": 4,
+    "dragSmearMax": 6,
+    "dragLagTicks": 4,
+    "spotReachTiles": 1.5,
+    "gddRef": "3.4"
+  },
   "figureTalk": { "reachTiles": 2, "delayS": 1.5, "cooldownS": 30, "gddRef": "3.24" },
   "tasks": {
     "cabalFakeList": true,
@@ -253,6 +260,7 @@
     },
     "night": { "leaveDelayS": { "min": 0, "max": 45 } },
     "vote": { "windowFrac": { "min": 0.3, "max": 0.9 } },
+    "trial": { "windowFrac": { "min": 0.1, "max": 0.8 }, "presentChance": 0.7, "fileChance": 0.8 },
     "ready": { "delayS": { "min": 2, "max": 9 } },
     "aloneKill": { "afterS": 90, "sightTiles": 20 },
     "nightPower": { "windowFrac": { "min": 0.1, "max": 0.8 }, "lastShotS": { "min": 2, "max": 8 } },
@@ -476,5 +484,17 @@
     "yard": { "difficulty": 3, "boardS": 20, "maxHpLoss": 10, "maxHpFloor": 80, "purse": 2 },
     "scrub": { "difficulty": 2, "wage": 1 },
     "gddRef": "3.27"
+  },
+  "trial": {
+    "chargeS": 5,
+    "caseS": 30,
+    "defenceS": 30,
+    "convictAt": 2,
+    "murderAt": 2,
+    "acquittalGraceS": 30,
+    "theftFine": 6,
+    "trespassFine": 4,
+    "rumourFine": 3,
+    "gddRef": "3.8"
   }
 }

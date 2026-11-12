@@ -5,6 +5,8 @@ import { systemLine } from '../economy/rumours';
 import { emitSim, onSim } from '../events/bus';
 import { simOf } from '../RoomSim';
 import { runJail } from './Jail';
+import { runEndTrial } from './EndTrial';
+import { runTribunal } from './Tribunal';
 import { runManhunt } from './Manhunt';
 import { runPetition } from './Petition';
 import { figuresOf } from '../townsfolk/figures';
@@ -113,6 +115,8 @@ export function runLaw(room: PartyRoom): void {
   runPetition(room); // round 10, B3: petitions
   runManhunt(room); // round 10, B4: the manhunt
   runJail(room); // round 10, B5: the county jail
+  runTribunal(room); // round 10, B6a: the Tribunal
+  runEndTrial(room); // round 10, B6d: the Final Night's end trial
   const memory = memoryOf(room);
   if (room.state.phase === Phase.lobby) {
     memory.pending = [];
