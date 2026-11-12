@@ -56,7 +56,8 @@ export type StreamName =
   | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
   | 'trialTick' // round 10, B6d2: the tick an NPC presents or files on, keyed by seat id (card-blind)
   | 'trialChance' // round 10, B6d2: whether it does, keyed by seat id (card-blind)
-  | 'barks'; // round 10, M1: a bark's idle gap, reaction roll and line, keyed by actor id (public, seams.md 3 row 36)
+  | 'barks' // round 10, M1: a bark's idle gap, reaction roll and line, keyed by actor id (public, seams.md 3 row 36)
+  | 'hardship'; // round 10, C4c: how many seats a delivery strikes, which, and the kind (secret)
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

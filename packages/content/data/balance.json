@@ -306,6 +306,10 @@
       "answerS": 6,
       "share": 0.3,
       "chaseS": 5,
+      "fightS": 9,
+      "fightHitS": 1.5,
+      "npcAnswerMinS": 1.5,
+      "npcAnswer": { "pay": 0.4, "flee": 0.2, "fight": 0.2, "silent": 0.2 },
       "cooldownS": 420
     },
     "weights": {
@@ -473,6 +477,14 @@
     },
     "days": [3, 5],
     "contractDays": 2,
+    "dormantOutput": 0.5,
+    "gddRef": "3.33"
+  },
+  "hardship": {
+    "atOnce": [1, 2],
+    "recoverS": 480,
+    "kinds": ["robbed", "harvest", "fined", "rent", "illness", "shipment"],
+    "readLedger": { "before": 0, "after": 0.1 },
     "gddRef": "3.33"
   },
   "armor": {

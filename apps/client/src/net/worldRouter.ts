@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import balance from '@wdi/content/data/balance.json';
 import { refusalFrame, type RefusalArgMap, type RefusalReason } from '@wdi/shared/protocol';
 import { portalTransition, transition } from '../view/Transition';
+import { lockArtStyle } from '../view/artStyle';
 import { REG_MEETING, type MeetingFeed } from './meeting';
 import { ColyseusMeetingFeed } from './meetingColyseus';
 import type { MockNetwork } from './mock';
@@ -19,6 +20,7 @@ import { ColyseusWorldFeed } from './worldColyseus';
 //   sceneEnter after meetingStart         -> stop Meeting, start World (the reveal is over)
 //   gameOver                              -> stop World and Meeting, start GameOver
 //   phase back to lobby                   -> start Lobby
+//   roleReveal                            -> the art style is fixed until game over, the lobby or `left` (S5)
 
 export interface RouterOptions {
   mock: boolean;
@@ -80,6 +82,7 @@ export function installWorldRouter(
 
   const onGameOver = () => {
     meetingOpen = false;
+    lockArtStyle(false);
     stopScene('Meeting');
     stopScene('World');
     stopScene('RoleReveal');
@@ -89,6 +92,7 @@ export function installWorldRouter(
   const onPhaseChange = ({ phase }: { phase: number }) => {
     if (phase !== PHASE_LOBBY || net.code === null) return;
     meetingOpen = false;
+    lockArtStyle(false);
     stopInput();
     if (options.mock) {
       mockStarted = false;
@@ -129,17 +133,21 @@ export function installWorldRouter(
 
   // The role card text feeds the HUD chip and the deck chip. Held in memory only, shown to this
   // player only.
-  const onReveal = (payload: { team: string; goal: string; deck?: string[] }) =>
+  const onReveal = (payload: { team: string; goal: string; deck?: string[] }) => {
+    // Round 10, S5 (A534): from Start the art style is fixed; game over, the lobby and `left` lift the lock.
+    lockArtStyle(true);
     game.registry.set(REG_ROLE_CHIP, {
       team: payload.team,
       goal: payload.goal,
       ...(payload.deck !== undefined && { deck: payload.deck }),
     });
+  };
   net.bus.on('roleReveal', onReveal as never);
   stops.push(() => net.bus.off('roleReveal', onReveal as never));
 
   // A lost connection mid-match leaves the in-match screens behind; take them down and go to the landing.
   const onLeft = () => {
+    lockArtStyle(false);
     if (game.scene.isActive('Lobby') || game.scene.isActive('Landing')) return;
     dropFeeds();
     for (const key of MATCH_SCENES) stopScene(key);

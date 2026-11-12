@@ -36,6 +36,7 @@ export const STORY_STREAMS = [
   'trialChance',
   'autopsy',
   'barks',
+  'hardship', // round 10, C4c (DECISIONS A390): the morning delivery's hardships
 ] as const;
 
 const Word = z.number().int().min(0).max(0xffffffff);

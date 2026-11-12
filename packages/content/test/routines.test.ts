@@ -138,9 +138,9 @@ describe('C2: validateContent rejects (routines)', () => {
   it('rule 3: a scene prop of an unclassified kind', () => {
     expect(
       broken((c) => {
-        c.scenes.overworld.props.find((p) => p.id === 'ov.pump')!.kind = 'anvil';
+        c.scenes.overworld.props.find((p) => p.id === 'ov.pump')!.kind = 'foundry';
       }),
-    ).toEqual(has('routines.json: prop kind "anvil" (ov.pump) is neither a station nor ignored'));
+    ).toEqual(has('routines.json: prop kind "foundry" (ov.pump) is neither a station nor ignored'));
   });
 
   it('rule 4: a holds key that is not a station kind, and an unknown light kind', () => {
