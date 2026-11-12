@@ -2149,6 +2149,30 @@ never sent (A79). `e2e/artStyle.spec.ts` picks in the lobby, starts the match an
 
 Frozen test id: `settings-art-style` (the row).
 
+#### 14.51.7 The Hitman's Derringer, Departed and the end panel (10Y, C4b)
+
+C4b's client half (GDD 3.33; DECISIONS A574), client only: it reads `Private.departed` and `gameOver.hitman` as seams.md
+3 rows 20 and 21 put them on the wire. **The Derringer** is an item ability that reaches the pack mid-match, so it
+takes the slot after the card's own (`input/actions.ts` `withPackAbilities`; Q, R or F, and a touch disc labelled
+Derringer) while the own pack holds one, and fires as any player-target ability at the nearest figure in reach. The
+spent shot leaves the pack, and the slot and disc go with it. **Departed** (`ui/Departed.ts`) stands in for the world
+of a Hitman who boarded the Dusk Train, in the On-the-line screen's night colours, with no button; it hides while a
+meeting is open, since he may still speak and vote there. **The end panel** (`ui/main/overMain.ts`) draws one line for
+the Hitman's stage under its own heading, and a boarded Hitman under Also won reads `over.alsoWon.hitman`.
+`input/actions.test.ts`, `ui/Departed.test.ts` and `ui/main/main.test.ts` cover the three.
+
+| Line | Text | Where |
+|---|---|---|
+| the departed title (`departed.title`) | Departed | Departed, top band and the screen's label |
+| the departed line (`departed.body`) | The Dusk Train carries you out of the valley. The Contract is done; you have won. | Departed, centre |
+| the meeting note (`departed.meeting`) | You take no more part in the town, but a meeting still calls you to speak and vote. | Departed, under the centre line |
+| the Hitman heading (`over.hitman`) | The Hitman | End panel, over the Hitman's line |
+| arrived (`over.hitman.arrived`) | {name} was turned on day {day} and never shot the mark. | End panel, a living Hitman who never shot his mark |
+| killed (`over.hitman.killed`) | {name} was turned on day {day} and shot the mark, but never boarded the Dusk Train. | End panel |
+| boarded (`over.hitman.boarded`) | {name} was turned on day {day}, shot the mark and boarded the Dusk Train. | End panel |
+| stopped (`over.hitman.stopped`) | {name} was turned on day {day} and died before boarding the Dusk Train. | End panel |
+| a boarded Hitman also won (`over.alsoWon.hitman`) | {name} boarded the Dusk Train as the Hitman | End panel, Also won, in place of `over.alsoWon.row` |
+
 ### 14.53 The role cards and the Satchel (10R, round 10)
 
 `docs/round10/rolecards.md`. The keys and touch controls come from one table, `apps/client/src/input/actions.ts` (R1):
