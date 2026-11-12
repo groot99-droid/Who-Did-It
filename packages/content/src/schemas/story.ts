@@ -274,6 +274,8 @@ export const Section = z.strictObject({
    * return is not a failure; a death after the return is, as in any section (Q-A9).
    */
   shade: z.literal(true).optional(),
+  /** Arc E17 (R8, arc.md 3.4): the section is skipped, ended at once and not failed, unless a shade waits as it starts. */
+  onlyIf: z.literal('shade').optional(),
   goals: z.array(ChapterGoal).min(1),
   beats: z.array(ArcBeat).min(1),
   /** Ends the section (with a tick fallback inside an `any`, so a story always moves on). */
