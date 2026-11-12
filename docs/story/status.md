@@ -114,3 +114,4 @@ Each session appends to its own section only. Newest line last.
 - 2026-11-12 merged: #518 (I9b) squash-merged into `claude/story-part2`, all checks green. The owner granted, after the fact, the one existing-test edit of #515 (the lock-pick snap wait in `screens.spec.ts`, 5 s to 20 s, assertion unchanged).
 - 2026-11-12 R6 (`claude/story-r6-aura`, from `claude/story-part2` after #515): the dealt Vicar's conversion aura on the return day, `rite.aura.*`, private Faith through I9's `addFaith` (A607).
 - 2026-11-12 merged: #521 (R6) squash-merged into `claude/story-part2`, all checks green. R1 to R7, I9 and I9b are all in `claude/story-part2`; R8 waits on the map revamp. The aura's `rite.aura.*` numbers wait on the owner.
+- 2026-11-12 the owner kept the aura's `rite.aura.*` numbers as built (A607).
