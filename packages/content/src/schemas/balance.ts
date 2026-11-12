@@ -397,6 +397,18 @@ export const BalanceFile = z.strictObject({
       answerS: Seconds,
       share: Chance,
       chaseS: Seconds,
+      /** Round 10, S4: a Fight lasts `fightS`; the two sides trade a blow every `fightHitS`. */
+      fightS: Seconds,
+      fightHitS: Seconds,
+      /** Round 10, S4: the weights of an NPC seat's answer to a mugging (drawn once on its own `npcPlay` stream). */
+      /** Round 10, S4: the earliest an NPC seat's answer lands after the prompt opens (a reaction floor). */
+      npcAnswerMinS: Seconds,
+      npcAnswer: z.strictObject({
+        pay: z.number().nonnegative(),
+        flee: z.number().nonnegative(),
+        fight: z.number().nonnegative(),
+        silent: z.number().nonnegative(),
+      }),
       cooldownS: Seconds,
     }),
     weights: z.strictObject({
@@ -513,6 +525,12 @@ export const BalanceFile = z.strictObject({
    */
   paintTown: Section({ winUnique: Frac }),
   /**
+   * Round 10 (GDD 3.24, T6): the mood hooks. A seat or figure whose mood is not Calm narrows its next work trip with
+   * this chance (`moodPool`): Scared to its home or a lit scene, Hungry to the bakery, Angry to the scene of the seat it
+   * is angry at, Desperate to a scene nobody stands in.
+   */
+  moodHooks: Section({ chance: Chance }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the
@@ -525,6 +543,22 @@ export const BalanceFile = z.strictObject({
     ),
     days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
     contractDays: z.number().int().positive(),
+    /** The turned seat's stall stocks this of a day's stock; it equals `respawn.stockMult` (F4 b1, C4c). */
+    dormantOutput: Frac,
+  }),
+  /**
+   * Round 10, C4c (GDD 3.33, F4 b2 to b5): at every morning delivery, `atOnce` (inclusive) seats wearing a stall's look
+   * are struck by a hardship, each of a `kinds` row, and run thin and dear for `recoverS`, as the Hitman's turned seat.
+   */
+  hardship: Section({
+    atOnce: z.tuple([z.number().int().nonnegative(), z.number().int().positive()]),
+    recoverS: Seconds,
+    kinds: z.array(z.enum(['robbed', 'harvest', 'fined', 'rent', 'illness', 'shipment'])).min(1),
+    /**
+     * C4d (seams.md 3 row 37): at each trip an NPC seat picks, the chance it goes to read the Clerk's rent ledger, on its
+     * own stream: `before` the Hitman's arrival line has gone out, `after` it (a public trigger).
+     */
+    readLedger: z.strictObject({ before: Chance, after: Chance }),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({

@@ -18,11 +18,13 @@ import { handleHold } from '../Hold';
 import { mapScenesOf } from '../MapSites';
 import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
-import { holdOf, otherAt, sellAt, workable } from './chores';
+import { holdAt, holdOf, otherAt, sellAt, workable } from './chores';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
+import { moodPool } from './moodHooks';
 import { moodWeights } from './needs';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
 import { vendettaGoalFor } from '../vendettas/goal';
+import { drawLedgerRead, readLedgerDone } from '../economy/ledger';
 
 // The NPC routine (GDD 3.12 "Routines", "Night"; npc.md 7): the persona, the stations and the one-tick brain that
 // walks to a station, stands at it, strolls and idles. `world.ts` calls `runRoutine` (or `runHome` in an unlit
@@ -396,13 +398,15 @@ function pickStation(
   const map = mapScenesOf(room);
   const here = sceneKey(p.sceneIdx);
   const litOnly = cls === 'night';
+  drawLedgerRead(room, player.id, rng); // round 10, C4d: a trip to read the rent ledger is one more open station
   const base = openStations(room, mem, brain, player, p, cls);
   // One hop at a time: a trip never passes through a scene without its dwell (the hunt below is the exception: it ignores the dwell).
   const adjacent = adjacentScenes(here, sim.profile, map, litOnly);
   const own = base.filter((st) => st.scene === here);
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
-  let pool = dwellRun ? (other.length > 0 ? other : own) : own;
+  let pool: readonly Station[] = dwellRun ? (other.length > 0 ? other : own) : own;
+  pool = moodPool(room, brain, player.id, brain.persona?.home ?? null, p, pool, rng); // round 10, T6b: the mood hooks
   // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights (7H's
   // `vendettaGoalFor`, no draw). It keeps the dwell and the one-hop rule, so it reads like any routine trip: in the
   // goal scene the seat works there; elsewhere, once the dwell has run, its next trip is to the next scene on the way.
@@ -762,6 +766,7 @@ function runTravel(
   // for the dwell; one without is a stop of an idle's length, which counts as the stand between actions (D1).
   const worked = holdOf(st) !== undefined;
   if (!worked) brain.rested = true;
+  if (holdOf(st) === 'errand') readLedgerDone(room, id); // C4d: a reader stands the errand's length, holding nothing
   brain.act = {
     kind: 'work',
     // Round 10, C2b: the errand's visit lasts its whole hold (`respawn.errandS`) and the pause before it.
@@ -806,7 +811,7 @@ function runWork(
     brain.goalKey = '';
     return stand(p);
   }
-  const hold = holdOf(st);
+  const hold = holdAt(room, id, st);
   if (hold === 'shop') {
     // A counter: one sale of what it holds, then the pause before the next action.
     if (act.traded !== true) {

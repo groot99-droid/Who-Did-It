@@ -156,6 +156,7 @@ describe('the privacy rule (npc.md part 2, section 2)', () => {
       boulder: 'interact',
       rockPile: 'interact',
       orePile: 'interact',
+      grindstone: 'interact', // round 10, x9 review (6Z's grant): the stone is a chore while a tool is worn
       counter: 'shop',
       ledger: 'errand', // round 10, C2b (6Z's grant)
     });
@@ -422,7 +423,7 @@ describe('the privacy rule, plumbing (P1b, P4)', () => {
       const human = party.humans[0]!.id;
       const seat = party.room.state.players.get(human)!;
       // D1: a hold key is a class id or a kind; the keys with no prop on the S1 map are named, so a lookup bug fails.
-      const NO_STATION_ON_S1 = ['timberSet'];
+      const NO_STATION_ON_S1 = ['timberSet', 'grindstone']; // the stone stands on BlackPine alone (x9)
       const stations = stationsOf(mapScenesOf(party.room), simOf(party.room).profile);
       const missing = Object.keys(routines.holds).filter(
         (k) => !stations.some((s) => (s.cls ?? s.kind) === k),
@@ -961,7 +962,8 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
       // empty here.
       else if (name === 'loot') expect(key ?? '', k).toBe('');
       // Round 10 (A7): the human seats' homes, drawn once on the first world tick from their own stream.
-      else expect(['npcNames', 'nodes', 'body', 'homes'], k).toContain(name);
+      // Round 10 (C4c): the morning delivery's hardships, a secret stream no NPC draw shares.
+      else expect(['npcNames', 'nodes', 'body', 'homes', 'hardship'], k).toContain(name);
     }
   });
 

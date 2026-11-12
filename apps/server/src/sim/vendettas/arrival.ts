@@ -79,6 +79,10 @@ export const arrivalDraw = (room: PartyRoom): Readonly<Arrival> | undefined => a
 /** Whether `seat` is the turned seat (the Hitman). Server memory: no field but its own `Private.hitman`. */
 export const isTurned = (room: PartyRoom, seat: string): boolean => arrivals.get(room.seeds)?.turned === seat;
 
+/** Whether the arrival line has gone out (public: every seat was sent it; never who was turned). C4d. */
+export const arrivalLineSent = (room: PartyRoom): boolean =>
+  (arrivals.get(room.seeds)?.turned ?? null) !== null;
+
 /**
  * The seats the letter may turn: living, free, wearing their own card's look (no cover, Cabal or Thief card: its
  * `townWork` is not `worn`), holding no vendetta and no vendetta's partner card, and with room in the pack for the
