@@ -107,6 +107,40 @@ const WORLD_KEYS = {
 } as const;
 const OPPOSITE: Record<string, string> = { KeyW: 'KeyS', KeyS: 'KeyW', KeyA: 'KeyD', KeyD: 'KeyA' };
 
+/**
+ * Walks the watcher bot to the host, so the host kills it where the host stands, away from the NPCs. Since round 8
+ * (8R) an NPC that sees a body suspects every seat within its sight radius of itself (`sim/npc/world.ts` `observe`;
+ * by day and dusk a body anywhere outdoors is in sight), and it may then vote for the Killer: the host's spawn lies
+ * beyond that radius of every NPC spawn, the watcher's lies right at its edge.
+ */
+async function walkWatcherToHost(w: { swarm: Swarm; view: () => StateView }, ms = 20_000): Promise<void> {
+  const room = w.swarm.rooms[0]!;
+  let seq = 1_000_000;
+  const move = (dx: number, dy: number) =>
+    room.send('input.move', { seq: ++seq, dx, dy, sprint: false, sneak: false });
+  let turn = 0;
+  let last: { x: number; y: number } | undefined;
+  let lastAt = Date.now();
+  for (const t0 = Date.now(); Date.now() - t0 < ms && tilesBetween(w.view(), 'Watch1', 'Hana') > 0.9;) {
+    const me = positionOf(w.view(), 'Watch1');
+    const host = positionOf(w.view(), 'Hana');
+    if (!me || !host) break;
+    if (last && Math.hypot(me.x - last.x, me.y - last.y) >= TILE_PX / 4) {
+      last = { x: me.x, y: me.y };
+      lastAt = Date.now();
+    } else if (!last) last = { x: me.x, y: me.y };
+    else if (Date.now() - lastAt > 1000) {
+      turn++; // blocked for a second (a wall, a fence): a quarter turn for the next stretch
+      lastAt = Date.now();
+    }
+    const angle = Math.atan2(host.y - me.y, host.x - me.x) + ((turn % 4) * Math.PI) / 2;
+    move(Math.sign(Math.round(Math.cos(angle) * 2)), Math.sign(Math.round(Math.sin(angle) * 2)));
+    await sleep(100);
+  }
+  move(0, 0);
+  await sleep(300);
+}
+
 /** Walk the host toward a named seat with the keys of each world axis that is off, until in reach. */
 async function approach(page: Page, v: () => StateView, target: string, ms = 20_000): Promise<boolean> {
   const pos = (name: string) => positionOf(v(), name);
@@ -177,7 +211,9 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     w.swarm.rooms[0]!.send('debug.npc', { walk: false });
     w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true });
 
-    // First kill: the watcher. The host reports the body; three NPCs and the host are still alive.
+    // First kill: the watcher, at the host's spawn, away from the NPCs, so none suspects the host and all three
+    // vote Skip below. The host reports the body; three NPCs and the host are still alive.
+    await walkWatcherToHost(w);
     await approach(page, w.view, 'Watch1');
     await page.keyboard.press('KeyQ');
     await expect.poll(() => w.view().scenes.get('overworld')?.bodies.size ?? 0).toBe(1);

@@ -103,6 +103,7 @@ describe('needs', () => {
 
   it('the dark outdoors at night without a light frightens, and company calms', async () => {
     const { party, a } = await world();
+    party.room.state.players.get(a)!.priv.inventory.slots.clear(); // without a light: K3 seats light the one they hold
     const n = needsFor(party, a);
     holdPhase(party, Phase.night, 3600);
     // Alone in the dark: the human stays on the overworld.
