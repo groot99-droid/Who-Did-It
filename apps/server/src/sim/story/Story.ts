@@ -9,7 +9,9 @@ import { ANY_SIM, type SimEvent, emitSim, onSim } from '../events/bus';
 import { flowOf, setPhase } from '../Flow';
 import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
+import { martyrOf } from '../Memorial';
 import { isNpcSeat } from '../Npc';
+import { martyrSeatOf } from '../rite/shade';
 import { simOf } from '../RoomSim';
 import { SCENE_KEYS, isWorldPhase } from '../World';
 import { endMatch } from '../Win';
@@ -606,6 +608,15 @@ function watchCompany(room: PartyRoom, state: StoryState, me: { sceneIdx: number
   }
 }
 
+/**
+ * Arc E16 (R8, arc.md 3.4): in a section that plays the shade, the player's death is no failure while it is the
+ * match's martyr and has not come back (a waiting shade, or a ghost whose wait lapsed with no rite). Once the rite has
+ * brought it back, a death fails the chapter as in any section (Q-A9).
+ */
+function waitsAsShade(room: PartyRoom, state: StoryState, unit: Unit): boolean {
+  return unit.shade && martyrSeatOf(room) === state.humanId && martyrOf(room)?.seat !== state.humanId;
+}
+
 // --- the stage -----------------------------------------------------------------------------------------------------
 
 /**
@@ -669,7 +680,8 @@ export function runStory(room: PartyRoom): void {
   }
 
   const tick = room.state.tick - state.chapterStartTick;
-  if (simOf(room).players.get(state.humanId)?.dead) return endChapter(room, state, true);
+  if (simOf(room).players.get(state.humanId)?.dead && !waitsAsShade(room, state, chapter))
+    return endChapter(room, state, true);
 
   for (const g of chapter.goals)
     if (g.trigger && holds(g.trigger, `g:${g.id}`, tick, state.latches)) completeGoal(room, state, g.id);

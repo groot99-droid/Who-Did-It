@@ -269,6 +269,11 @@ export const Section = z.strictObject({
   startWhen: Trigger.optional(),
   /** Arc E5: the mail turns the player in this section, and the contract's mark is the seat holding this card. */
   hitman: z.strictObject({ mark: Id }).optional(),
+  /**
+   * Arc E16 (R8, arc.md 3.4): the player plays the match's martyr as its shade (GDD 3.20). Its death before the
+   * return is not a failure; a death after the return is, as in any section (Q-A9).
+   */
+  shade: z.literal(true).optional(),
   goals: z.array(ChapterGoal).min(1),
   beats: z.array(ArcBeat).min(1),
   /** Ends the section (with a tick fallback inside an `any`, so a story always moves on). */

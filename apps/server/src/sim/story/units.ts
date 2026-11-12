@@ -30,6 +30,8 @@ export interface Unit {
   hitman?: { mark: string } | undefined;
   /** The section waits for this after the previous one ends (arc E6, the heir). */
   startWhen?: Trigger | undefined;
+  /** The player plays the match's martyr as its shade: its death before the return is no failure (arc E16, R8). */
+  shade: boolean;
   startPhase?: { cycle: number; part: 'day' | 'night' } | undefined;
   goals: ChapterGoal[];
   beats: ArcBeat[];
@@ -57,6 +59,7 @@ const unitOf = (chapter: ArcChapter, s: Section, i: number): Unit => {
     npcVendetta: s.npcVendetta,
     hitman: s.hitman,
     startWhen: s.startWhen,
+    shade: s.shade === true,
     startPhase: s.startPhase ?? (first ? chapter.startPhase : undefined),
     goals: s.goals,
     beats: s.beats,
