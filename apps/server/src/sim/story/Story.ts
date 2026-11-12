@@ -11,7 +11,7 @@ import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
 import { martyrOf } from '../Memorial';
 import { isNpcSeat } from '../Npc';
-import { martyrSeatOf } from '../rite/shade';
+import { martyrSeatOf, shadeOf } from '../rite/shade';
 import { simOf } from '../RoomSim';
 import { SCENE_KEYS, isWorldPhase } from '../World';
 import { endMatch } from '../Win';
@@ -355,6 +355,9 @@ function giveItem(room: PartyRoom, state: StoryState, ref: string): void {
 function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = false): void {
   const chapter = state.units[idx];
   if (chapter === undefined) return;
+  // Arc E17 (R8): a section that needs a waiting shade (`onlyIf: 'shade'`), with none (the Knife never found the
+  // Vicar's look, or the wait is over), is skipped: no handover, no card of its own, ended at once and not failed.
+  if (chapter.onlyIfShade && !replay && shadeOf(room) === null) return skipSection(room, state, idx);
   const previous = state.units[idx - 1];
   if (idx > 0 || replay) {
     // A replay is the same card again: the view starts over and the player is made whole where they stand.
@@ -422,6 +425,28 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
     lines: [...new Set(opening), ...handed.map((h) => h.text)],
   });
   sendGoals(room, state);
+}
+
+/**
+ * Arc E17 (R8): `idx` is skipped. It becomes the running unit only to end at once, not failed: a section's break
+ * (none) or, when it is its chapter's last, the chapter's end card and save, as any end. `story.skip` names it.
+ */
+function skipSection(room: PartyRoom, state: StoryState, idx: number): void {
+  const unit = state.units[idx]!;
+  if (unit.first) {
+    state.totals = {};
+    state.chapterFailed = false;
+  }
+  state.chapterIdx = idx;
+  state.chapterStartTick = room.state.tick;
+  state.ended = false;
+  state.failed = false;
+  state.fired = [];
+  state.latches = { set: new Set() };
+  state.goalsDone = new Set();
+  state.counters = {};
+  emitSim(room, { tick: room.state.tick, kind: 'story.skip', data: { chapterId: unit.id } });
+  endChapter(room, state, false);
 }
 
 function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {

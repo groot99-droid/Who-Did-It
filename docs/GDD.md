@@ -1710,7 +1710,9 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   name move), and then the two seats exchange bodies: where each stands, whether it lives, its health, its corpse and
   its figure. The player is then the shade where the martyr fell, with the Vicar's card; the seat it left goes on
   alive where the player stood, as the NPC holding the player's old card. Every other per-seat memory stays with its
-  seat. With no waiting shade the section starts as any other.
+  seat. With no waiting shade the section starts as any other, unless it names `onlyIf: 'shade'` (`arc.md` E17): then
+  it is skipped, with no handover and no card of its own, and ends at once, not failed (the sim event `story.skip`
+  names it); as its chapter's last section, the chapter's end card and save follow as at any end.
 - **Night-power events.** A night power that lands (Hear Confession, Keep Watch, Remedy, Nightshade), by a human or
   an NPC, emits the sim event `nightPower` with the user's `seat` and `data: { ability, target }`, so a section or a
   goal can end on it (`{ event: 'nightPower', seat: 'player', data: { ability: 'confession' } }`). It is server-side only:
