@@ -157,7 +157,27 @@ export function actionOfCode(code: string): ActionId | null {
 /** The slot rows in slot order (Q, R, F). */
 export const SLOT_ACTIONS = ['slot1', 'slot2', 'slot3'] as const satisfies readonly ActionId[];
 
-const KIND = abilitiesJson.abilities as unknown as Record<string, { kind: string }>;
+const KIND = abilitiesJson.abilities as unknown as Record<string, { kind: string; name: string }>;
+
+/**
+ * Round 10, C4b (GDD 3.33; UI.md 14.51.7): the item abilities a slot takes while the own pack holds their item. The
+ * Hitman's Derringer arrives in the pack mid-match and is spent by its one shot; it is no card's row, so the slots
+ * add it after the card's own while the pack holds one.
+ */
+export const PACK_SLOT_ABILITIES = ['derringer'] as const;
+
+/** The card's ability rows and, after them, each pack ability whose item the own pack holds (C4b). */
+export function withPackAbilities(
+  card: readonly { id: string; name: string }[] | null | undefined,
+  pack: readonly { defId: string }[],
+): { id: string; name: string }[] {
+  const out = (card ?? []).map((a) => ({ id: a.id, name: a.name }));
+  for (const id of PACK_SLOT_ABILITIES) {
+    if (out.some((a) => a.id === id) || !pack.some((s) => s.defId === id)) continue;
+    out.push({ id, name: KIND[id]?.name ?? id });
+  }
+  return out;
+}
 
 /** One of a card's slots: the action that fires it, its key letter and the ability it holds. */
 export interface CardSlot {

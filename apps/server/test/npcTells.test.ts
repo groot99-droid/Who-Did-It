@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
+import { balance } from '@wdi/content';
 import { Phase, TICK_RATE } from '@wdi/shared';
 import { spawnBody } from '../src/sim/Bodies';
 import { npcMemory } from '../src/sim/npc/memory';
@@ -205,6 +206,17 @@ describe('E3: the detector, pure', () => {
     });
     rec.ticks.unshift({ ...rec.ticks[0]!, tick: 999, phase: Phase.day, seats: new Map(rec.ticks[0]!.seats) });
     expect(codes(rec)).toContain('T12');
+  });
+
+  it('an NPC at a lit bakery station through the night class is not T7, the same stand in the forest is', () => {
+    // Round 10 (x13, A433): the `bake` activity opens Crumb's lit rooms at night; working there is no "out in the dark".
+    const limit = (balance.npc.night.leaveDelayS.max + 45 + 15) * TICK_RATE;
+    const at = (scene: string) =>
+      synth(limit, Phase.night, (_tick, seats) => {
+        for (const s of seats.values()) s.scene = sceneIndex(scene);
+      });
+    expect(codes(at('crumb_oven'))).not.toContain('T7');
+    expect(codes(at('forest'))).toContain('T7');
   });
 
   void TICK_RATE;

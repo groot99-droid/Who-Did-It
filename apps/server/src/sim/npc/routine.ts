@@ -595,6 +595,7 @@ function endAct(brain: Brain): void {
   const act = brain.act;
   if (act && (act.kind === 'travel' || act.kind === 'work')) brain.lastStationId = act.stationId;
   brain.act = null;
+  brain.holdTries = 0; // the tries count one visit's holds: none outlives it
 }
 
 /** Drops the claims of seat `id` (all of them, or all but `keep`). */
@@ -815,12 +816,12 @@ function runWork(
   if (hold === 'shop') {
     // A counter: one sale of what it holds, then the pause before the next action.
     if (act.traded !== true) {
-      sellAt(room, id, player, st);
+      const sold = sellAt(room, id, player, st);
       act.traded = true;
-      act.untilTick = Math.min(
-        act.untilTick,
-        tick + spanTicks(playRng(room, id), balance.npc.routine.workPauseS),
-      );
+      const pause = spanTicks(playRng(room, id), balance.npc.routine.workPauseS); // always drawn: the count is fixed
+      act.untilTick = Math.min(act.untilTick, sold ? tick + pause : tick); // round 10, K6b: no pause for a look at Snares
+      // The pause at the counter holds nothing, so it is the stand between actions (D1): no idle follows it.
+      if (sold) brain.rested = true;
     }
     return stand(p);
   }

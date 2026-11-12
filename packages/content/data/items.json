@@ -579,6 +579,80 @@
       "ships": "V1",
       "gddRef": "3.14"
     },
+    "shapedPastry": {
+      "id": "shapedPastry",
+      "name": "Shaped pastry",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Proofed dough shaped at the tables, ready for a filling.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "berryFilling": {
+      "id": "berryFilling",
+      "name": "Berry filling",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Berries stewed in the cold room, for a tart.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "gameFilling": {
+      "id": "gameFilling",
+      "name": "Game filling",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Game chopped and seasoned in the cold room, for a pie.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "mushroomGameFilling": {
+      "id": "mushroomGameFilling",
+      "name": "Mushroom and game filling",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Mushrooms and game from the cold room, for a pasty.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "gamePie": {
+      "id": "gamePie",
+      "name": "Game Pie",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "tooltip": "Too fine to eat on the road: the market pays well for it.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "berryTart": {
+      "id": "berryTart",
+      "name": "Berry Tart",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eatBerryTart",
+      "buff": "heartened",
+      "tooltip": "Eat it for a hardier body until the next dawn.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "minersPasty": {
+      "id": "minersPasty",
+      "name": "Miner's Pasty",
+      "kind": "food",
+      "roleBound": false,
+      "onDeath": "drops",
+      "use": "eatMinersPasty",
+      "buff": "tireless",
+      "tooltip": "Eat it and running costs no stamina for a while.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "quiltedCoat": {
       "id": "quiltedCoat",
       "name": "Quilted coat",

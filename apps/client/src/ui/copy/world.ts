@@ -109,4 +109,7 @@ export const WORLD_COPY = {
     'Your card, your Notebook and your quests come back with you, and what you wear. Your coins lie where you fell; your pack is lost.',
   'line.back': 'You are back.',
   'line.quests.none': 'You hold no work.', // y13: the read-only quest list on the line
+  'departed.title': 'Departed', // C4b (UI.md 14.51.7): the Hitman who boarded the Dusk Train
+  'departed.body': 'The Dusk Train carries you out of the valley. The Contract is done; you have won.',
+  'departed.meeting': 'You take no more part in the town, but a meeting still calls you to speak and vote.',
 } as const satisfies Record<string, string>;

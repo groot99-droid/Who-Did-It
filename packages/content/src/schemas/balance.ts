@@ -727,6 +727,12 @@ export const BalanceFile = z.strictObject({
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
   /**
+   * Round 10, K3 (GDD 3.5, I28, I29): Handcuffs cut a cuff hold to `handcuffsHoldMult` of `law.cuffHoldS`; an NPC seat
+   * lights a light it holds a delay within `npcLightDelayS` after the rule a human would follow says to (dusk, night,
+   * a dark scene), drawn on `npcTiming`.
+   */
+  kit: Section({ handcuffsHoldMult: Chance, npcLightDelayS: Span }),
+  /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
    * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
    * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
@@ -756,6 +762,18 @@ export const BalanceFile = z.strictObject({
     cotFaith: z.number().int().nonnegative(),
     /** The last active player awake, alone this long while the rest sleep, is Exhausted the next day. */
     holdoutGraceS: Seconds,
+  }),
+  /**
+   * Round 10, K6 (GDD 3.5, seams.md 3 row 31): a set snare is sent to its layer and to seats within `seeTiles` of it.
+   * The hold is `abilities.json` `snare.params.holdS`, then Slowed.
+   */
+  snare: Section({
+    seeTiles: Tiles,
+    /**
+     * K6b (GDD 3.12): an NPC seat outdoors sets the Snare it holds by `setChancePer10s`; at a stall that sells one it
+     * buys a Snare by `buyChance`; it frees a held seat it sees with its Rope by `ropeChance`, one roll per held seat.
+     */
+    npc: z.strictObject({ setChancePer10s: z.number().min(0), buyChance: Frac, ropeChance: Frac }),
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

@@ -1,5 +1,4 @@
 import abilitiesJson from '@wdi/content/data/abilities.json';
-import type { RoleRevealPayload } from '@wdi/shared/protocol';
 import { WORLD_COPY as C } from '../ui/copy';
 import { BODY_COPY } from '../ui/copy/body'; // round 8, 8A
 import { h } from '../ui/dom';
@@ -32,7 +31,9 @@ export interface AbilityDisc {
  * order, labelled with the row's name. A passive or a hold ability gets none: a key does nothing for them either
  * (`World.useAbility`; rolecards.md 1.2 A2), so the disc would be a dead button.
  */
-export function abilityDiscs(card: Pick<RoleRevealPayload, 'abilities'> | null | undefined): AbilityDisc[] {
+export function abilityDiscs<A extends { id: string; name: string }>(
+  card: { readonly abilities: readonly A[] } | null | undefined,
+): AbilityDisc[] {
   if (!card) return [];
   // Round 10, R1: the slot letter from the action table's slots (passives take none), never the wire's positional key.
   const slots = cardSlots(card.abilities);

@@ -106,6 +106,11 @@ export const NoteKind = {
   comparison: 12,
   /** Round 10 (V1b): an Autopsy; `of` is the victim, `value` the `AutopsyCause`, `tick` the estimated death. */
   autopsy: 13,
+  /**
+   * Round 10, K6 (GDD 3.5, seams.md 3 row 31): the layer's own snare caught a walker; `of` is the drawn look (a `looks.json`
+   * id), never a seat, and `sceneId` the snare's scene.
+   */
+  snared: 15,
 } as const;
 /** `NotebookEntry.value` of an autopsy (round 10, V1b): the cause as the Doctor reads it. */
 export const AutopsyCause = { knife: 0, creature: 1, poison: 2, shot: 3, other: 4 } as const;
@@ -144,6 +149,10 @@ export const EffectId = {
   exhausted: 13,
   /** Round 10, D4a (GDD 3.14): a dish's poison resistance until it wears off; private, no status bit. */
   resistant: 14,
+  /** Round 10, D4b (GDD 3.14): the Berry Tart's extra maximum health until the next dawn; private, no status bit. */
+  heartened: 15,
+  /** Round 10, D4b (GDD 3.14): the Miner's Pasty's running without stamina cost for a while; private, no status bit. */
+  tireless: 16,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

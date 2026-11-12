@@ -26,6 +26,12 @@ export const DECK_COPY = {
   'over.undealt.none': 'No card was left in the box.',
   'over.alsoWon': 'Also won',
   'over.alsoWon.row': '{name} was ejected as the Drifter',
+  'over.alsoWon.hitman': '{name} boarded the Dusk Train as the Hitman',
+  'over.hitman': 'The Hitman',
+  'over.hitman.arrived': '{name} was turned on day {day} and never shot the mark.',
+  'over.hitman.killed': '{name} was turned on day {day} and shot the mark, but never boarded the Dusk Train.',
+  'over.hitman.boarded': '{name} was turned on day {day}, shot the mark and boarded the Dusk Train.',
+  'over.hitman.stopped': '{name} was turned on day {day} and died before boarding the Dusk Train.',
 } as const satisfies Record<string, string>;
 
 export type DeckCopyId = keyof typeof DECK_COPY;
