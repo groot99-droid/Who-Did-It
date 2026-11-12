@@ -18,7 +18,16 @@ import { artStyles, type ArtStyle } from './palette.ts';
 import { finishRender } from './pixel.ts';
 
 /** Resource ids (`resources.json`) in file order; a node's frames are `node_<snake id>/<state>`. */
-export const RESOURCE_IDS = ['timber', 'stone', 'tinOre', 'resin', 'herb', 'mushroom', 'logs'] as const;
+export const RESOURCE_IDS = [
+  'timber',
+  'stone',
+  'tinOre',
+  'resin',
+  'herb',
+  'mushroom',
+  'berries',
+  'logs',
+] as const;
 export type ResourceId = (typeof RESOURCE_IDS)[number];
 /**
  * Every node drawn on the `nodes` page: the resources, then the coins a knockout or a mugging drops (8C, GDD 3.23),

@@ -65,6 +65,7 @@ describe('recipeRows', () => {
       'proofedDough',
       'snare',
       'spade',
+      'stew',
       'tinHelm',
       'tinIngot',
       'tinMail',
