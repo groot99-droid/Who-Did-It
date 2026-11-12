@@ -148,7 +148,8 @@ its GDD text in the same PR (CLAUDE.md):
 
 ## 8. Open questions for the owner
 
-1. The scale (section 4): (a), (b) or (c)?
+1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today. A 3D interior is built from
+   its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior.
 3. Does the net loft (`netloft`) get an interior?
 4. Should the 3D interiors replace the game's 2.5D interior art (sprites rendered from them), or are they for film and
