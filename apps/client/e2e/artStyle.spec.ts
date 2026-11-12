@@ -3,8 +3,9 @@ import { fileURLToPath } from 'node:url';
 import { expect, test, type Page } from '@playwright/test';
 import { createParty } from './fixtures/party';
 
-// The art-style switch (A79) on the mocks, with tiny fixture low-poly and HD manifests: the match stays up, the
-// textures change by key, and a failed swap keeps the old style. The 8-bit root manifest is real plus a fixture
+// The art-style switch (A79) on the mocks, with tiny fixture low-poly and HD manifests: the pick is made in the lobby
+// and is fixed from Start to game over (round 10, S5, A534), the textures change by key, and a failed swap keeps the
+// old style. The 8-bit root manifest is real plus a fixture
 // image (a 4 px tile); the low-poly fixture re-skins it at 8 px with the `linear` filter, and the HD fixture at
 // 8 px with `texels: 2` (A164). HD is gated on the device (art.md 3): the tests shape the browser's answers.
 
@@ -79,14 +80,31 @@ const probe = (page: Page, key: string): Promise<Probe> =>
 const active = (page: Page, scene: string) =>
   page.evaluate((s) => window.__wdiGame!.scene.isActive(s), scene);
 
-async function toWorld(page: Page, query = ''): Promise<void> {
-  await page.goto(`/Who-Did-It/?mock=1${query}`);
+async function toLobby(page: Page): Promise<void> {
+  await page.goto('/Who-Did-It/?mock=1');
   await createParty(page, 'Hana');
+}
+
+/** Start, the card and Ready: from the lobby to the World and its HUD. */
+async function startMatch(page: Page): Promise<void> {
   await expect(page.getByTestId('start')).toBeEnabled();
   await page.getByTestId('start').click();
   await page.getByTestId('confirm-start').click();
   await page.getByTestId('ready').click();
   await expect(page.getByTestId('hud-clock')).toBeVisible();
+}
+
+/** Round 10, S5 (A534): a match holds no switch; its settings panel names the pick read only (UI.md 14.51.6). */
+async function expectFixedStyle(page: Page, name: string): Promise<void> {
+  const hud = page.getByTestId('hud');
+  await expect(hud.getByTestId('art-style')).toHaveCount(0);
+  await hud.getByTestId('settings-gear').click();
+  const row = hud.getByTestId('settings-art-style');
+  await expect(row).toBeVisible();
+  await expect(row).toContainText(name);
+  await expect(row).toContainText('Change it in the lobby.');
+  await hud.getByTestId('settings-gear').click();
+  await expect(row).toBeHidden();
 }
 
 test('the lobby offers 8-bit, low poly and HD on a desktop', async ({ page }) => {
@@ -130,69 +148,69 @@ test('a phone sees HD disabled with the reason, and a stored HD pick falls back'
   await expect(sw.getByTestId('art-style-8bit')).toHaveAttribute('aria-checked', 'true');
 });
 
-test('HD loads only when picked, swaps mid-match at its texel factor, and swaps back', async ({ page }) => {
+test('HD loads only when picked in the lobby, at its texel factor, and the match keeps it', async ({
+  page,
+}) => {
   await device(page, 'desktop');
   await fixtures(page);
   const hdRequests: string[] = [];
   page.on('request', (r) => {
     if (r.url().includes('/assets/hd/')) hdRequests.push(r.url());
   });
-  await toWorld(page);
+  await toLobby(page);
   // Lazy: nothing under assets/hd/ is fetched before the pick.
   expect(hdRequests).toEqual([]);
   const before = await probe(page, 'tiles_grass');
   expect(before.width).toBe(4);
-  await page.getByTestId('hud').getByTestId('art-style-hd').click();
+  const sw = page.getByTestId('lobby-settings').getByTestId('art-style');
+  await sw.getByTestId('art-style-hd').click();
   await expect(page.locator('html')).toHaveAttribute('data-art-style', 'hd');
   await expect.poll(() => probe(page, 'tiles_grass').then((p) => p.width)).toBe(8);
   expect(hdRequests.some((u) => u.endsWith('/assets/hd/manifest.json'))).toBe(true);
   expect(hdRequests.some((u) => u.endsWith('/assets/hd/tiles_grass.png'))).toBe(true);
-  await expect(page.getByTestId('hud-clock')).toBeVisible();
-  await expect.poll(() => active(page, 'World')).toBe(true);
   expect(await page.evaluate(() => localStorage.getItem('wdi.artStyle'))).toBe('hd');
-  // And back to 8-bit mid-match.
-  await page.getByTestId('hud').getByTestId('art-style-8bit').click();
-  await expect(page.locator('html')).toHaveAttribute('data-art-style', '8bit');
-  await expect.poll(() => probe(page, 'tiles_grass').then((p) => p.width)).toBe(4);
-  await expect(page.getByTestId('hud-clock')).toBeVisible();
-  expect(await active(page, 'World')).toBe(true);
+  // Fixed from Start (S5): the match runs in HD, offers no switch, and says where the pick is changed.
+  await startMatch(page);
+  await expect.poll(() => active(page, 'World')).toBe(true);
+  await expect(page.locator('html')).toHaveAttribute('data-art-style', 'hd');
+  expect((await probe(page, 'tiles_grass')).width).toBe(8);
+  await expectFixedStyle(page, 'HD');
 });
 
-test('switching in the world swaps the textures and keeps the match', async ({ page }) => {
+test('switching in the lobby swaps the textures, and the match keeps the pick with no switch', async ({
+  page,
+}) => {
   await device(page, 'desktop');
   await fixtures(page);
-  await toWorld(page);
-  expect(await active(page, 'World')).toBe(true);
+  await toLobby(page);
   const before = await probe(page, 'tiles_grass');
   expect(before.width).toBe(4);
-  await page.getByTestId('hud').getByTestId('art-style-lowpoly').click();
+  const sw = page.getByTestId('lobby-settings').getByTestId('art-style');
+  await sw.getByTestId('art-style-lowpoly').click();
   await expect(page.locator('html')).toHaveAttribute('data-art-style', 'lowpoly');
   await expect.poll(() => probe(page, 'tiles_grass').then((p) => p.width)).toBe(8);
   const after = await probe(page, 'tiles_grass');
   expect(after.scale).not.toBe(before.scale);
-  // Still in the match: the World runs again over the same connection and the HUD is back.
-  await expect(page.getByTestId('hud-clock')).toBeVisible();
+  await expect(sw.getByTestId('art-style-lowpoly')).toHaveAttribute('aria-checked', 'true');
+  // The World starts over the swapped textures and keeps them: no restart, no switch, the pick named in the panel.
+  await startMatch(page);
   await expect.poll(() => active(page, 'World')).toBe(true);
-  expect(await active(page, 'Landing')).toBe(false);
   expect(await active(page, 'Lobby')).toBe(false);
-  await expect(page.getByTestId('hud').getByTestId('art-style-lowpoly')).toHaveAttribute(
-    'aria-checked',
-    'true',
-  );
-  // And back.
-  await page.getByTestId('hud').getByTestId('art-style-8bit').click();
-  await expect.poll(() => probe(page, 'tiles_grass').then((p) => p.width)).toBe(4);
-  expect((await probe(page, 'tiles_grass')).scale).toBe(before.scale);
+  await expect(page.locator('html')).toHaveAttribute('data-art-style', 'lowpoly');
+  expect((await probe(page, 'tiles_grass')).width).toBe(8);
+  expect((await probe(page, 'tiles_grass')).scale).toBe(after.scale);
+  await expectFixedStyle(page, 'Low poly');
 });
 
 test('a failed swap stays on the old style and says so', async ({ page }) => {
   await device(page, 'desktop');
   await fixtures(page, { lowpoly: false });
-  await toWorld(page);
-  await page.getByTestId('hud').getByTestId('art-style-lowpoly').click();
+  await toLobby(page);
+  const sw = page.getByTestId('lobby-settings').getByTestId('art-style');
+  await sw.getByTestId('art-style-lowpoly').click();
   await expect(page.getByTestId('art-notice')).toBeVisible();
-  await expect(page.getByTestId('hud').getByTestId('art-style-8bit')).toHaveAttribute('aria-checked', 'true');
+  await expect(sw.getByTestId('art-style-8bit')).toHaveAttribute('aria-checked', 'true');
+  await expect(page.locator('html')).toHaveAttribute('data-art-style', '8bit');
   expect((await probe(page, 'tiles_grass')).width).toBe(4);
-  expect(await active(page, 'World')).toBe(true);
-  await expect(page.getByTestId('hud-clock')).toBeVisible();
+  expect(await active(page, 'Lobby')).toBe(true);
 });

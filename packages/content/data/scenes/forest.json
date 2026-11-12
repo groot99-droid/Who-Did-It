@@ -234,7 +234,9 @@
     { "id": "fo.nd_resin_1", "resource": "resin", "x": 12, "y": 22, "pool": "galResin" },
     { "id": "fo.nd_herb_0", "resource": "herb", "x": 17, "y": 27, "pool": "galHerbs" },
     { "id": "fo.nd_herb_1", "resource": "herb", "x": 33, "y": 9, "pool": "galHerbs" },
-    { "id": "fo.nd_stone_0", "resource": "stone", "x": 6, "y": 24 }
+    { "id": "fo.nd_stone_0", "resource": "stone", "x": 6, "y": 24 },
+    { "id": "fo.nd_berries_0", "resource": "berries", "x": 11, "y": 13, "pool": "galBerries" },
+    { "id": "fo.nd_berries_1", "resource": "berries", "x": 29, "y": 19, "pool": "galBerries" }
   ],
   "grid": [
     "######D#################################",
