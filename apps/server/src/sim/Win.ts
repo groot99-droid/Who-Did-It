@@ -10,7 +10,7 @@ import { resetNightForLobby } from './NightPowers';
 import { simOf } from './RoomSim';
 import { mapIdOfRoom } from './MapSites';
 import { isNpcSeat, resetNpcsForLobby } from './Npc';
-import { restoreSeats } from './seatIds';
+import { restoreSeats } from './seatRekey';
 import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
 import { isOnLine } from './Train';
 import { hitmanGameOver, isDeparted } from './vendettas/arrival';

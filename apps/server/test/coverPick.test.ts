@@ -1,3 +1,4 @@
+import { matchMaker } from '@colyseus/core';
 import { ColyseusTestServer, boot } from '@colyseus/testing';
 import { deckFor, looks, roles } from '@wdi/content';
 import {
@@ -18,6 +19,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { flowOf } from '../src/sim/Flow';
 import { MatchSeeds } from '../src/sim/seeds';
+import { seatOf } from '../src/sim/seatIds';
 import { fixSeeds } from './seedHelpers';
 
 // Stand-in for 5G's `dealMainDeck` until its PR merges (deck-wire.md 4.4): the same call, `dealDeck` on the `deal`
@@ -117,7 +119,12 @@ function dealWords(n: number, pred: (undealt: string[]) => boolean): [number, nu
   throw new Error('no seed words');
 }
 
-const idOf = (bot: Bot): string => bot.room.sessionId;
+// Round 10, W1a (owner test-body grant, 2026-11-12, #447): a world match re-keys its seats at Start, so a bot's seat
+// is found through `seatOf`; in the lobby it is still the session id.
+const idOf = (bot: Bot): string =>
+  seatOf(matchMaker.getLocalRoomById(bot.room.roomId) as unknown as PartyRoom, {
+    sessionId: bot.room.sessionId,
+  });
 const roleOf = (p: { room: PartyRoom }, bot: Bot): string =>
   p.room.state.players.get(idOf(bot))?.priv.role.roleId ?? '';
 const isCover = (card: string): boolean => roles.roles[card]?.cover === true;

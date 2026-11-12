@@ -20,6 +20,7 @@ import { buildRoleReveal, startRefusal } from '../src/rooms/handlers/lobby';
 import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { flowOf } from '../src/sim/Flow';
+import { seatOf } from '../src/sim/seatIds';
 
 const opts = (name: string) => ({ name, build: BUILD_VERSION, deviceId: `dev-${name}` });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -78,7 +79,8 @@ describe('Start (leader only, consumed inside the step)', () => {
       const cards = received<RoleRevealPayload>(bot, S2C.roleReveal);
       expect(cards).toHaveLength(1);
       const card = cards[0] as RoleRevealPayload;
-      const own = stateOf(bot).players.get(bot.room.sessionId) as PlayerState;
+      // Round 10, W1a (owner test-body grant, 2026-11-12, #447): the seat id, which a world match re-keys at Start.
+      const own = stateOf(bot).players.get(seatOf(room, bot.room)) as PlayerState;
       expect(own.priv?.role.roleId).toBe(card.roleId);
       expect(own.alive).toBe(true);
       expect(card.inventory.length).toBeGreaterThan(0);
@@ -141,7 +143,8 @@ describe('Start (leader only, consumed inside the step)', () => {
     const { bots, room } = await party(4);
     bots[0]?.room.send(C2S.lobbyStart, {});
     await sleep(300);
-    expect(startRefusal(room, bots[0]?.room.sessionId as string)).toBe(ErrorCode.wrongPhase);
+    // Round 10, W1a (owner test-body grant, 2026-11-12, #447): the seat id, which a world match re-keys at Start.
+    expect(startRefusal(room, seatOf(room, bots[0]!.room))).toBe(ErrorCode.wrongPhase);
   });
 
   it('only changes state inside a step', async () => {
@@ -210,7 +213,8 @@ describe('privacy after Start', () => {
     for (const bot of bots) {
       let own = 0;
       stateOf(bot).players.forEach((p: PlayerState, id: string) => {
-        if (id === bot.room.sessionId) {
+        if (id === seatOf(room, bot.room)) {
+          // Round 10, W1a (owner test-body grant, 2026-11-12, #447): the seat id, which a world match re-keys at Start.
           own++;
           expect(p.priv?.role.roleId).toBe(room.state.players.get(id)?.priv?.role.roleId);
         } else {
@@ -237,7 +241,8 @@ describe('privacy after Start', () => {
     let cabal = 0;
     for (const bot of bots) {
       const card = received<RoleRevealPayload>(bot, S2C.roleReveal)[0] as RoleRevealPayload;
-      const own = stateOf(bot).players.get(bot.room.sessionId) as PlayerState;
+      // Round 10, W1a (owner test-body grant, 2026-11-12, #447): the seat id, which a world match re-keys at Start.
+      const own = stateOf(bot).players.get(seatOf(room, bot.room)) as PlayerState;
       const mates = [...(own.priv?.cabalMates ?? [])];
       if (card.team === 'cabal') {
         cabal++;
