@@ -55,6 +55,7 @@ interface PlayerState {
     onLine?: boolean; // round 10, C1
     fare?: number; // round 10, C2
     paintTown?: boolean; // round 10, C5
+    hitman?: boolean; // round 10, C4 (seams.md 3 row 20): the Hitman turned this seat
     avatar?: string;
     coverLook?: string;
     mateLooks?: { forEach(cb: (look: string, seat: string) => void): void };

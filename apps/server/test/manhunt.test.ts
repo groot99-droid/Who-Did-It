@@ -26,6 +26,7 @@ import {
   stateOf,
   toWorld,
 } from './npcHelpers';
+import { fitting, tried } from './tribunalHelpers';
 
 /**
  * The manhunt (round 10, B4; GDD 3.31; seams.md 3 row 14): a passed petition's warrant hunts its accused for
@@ -67,7 +68,7 @@ const reasons = (h: Human): string[] =>
 /** Seat 0 opens against `accused` and two others sign (2 of 4 humans): the petition passes, the manhunt opens. */
 function warrant(party: Party, accused: string): void {
   const [a, ...rest] = ids(party);
-  handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: [] });
+  handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: fitting(party, a, accused) });
   for (const id of rest.filter((x) => x !== accused).slice(0, 2))
     handlePetitionSign(party.room, id, { id: party.room.state.petition.id });
   advance(party, 1);
@@ -109,6 +110,7 @@ describe('the manhunt (GDD 3.31)', () => {
     // warrant may run.
     expect(isJailed(party.room, d)).toBe(true);
     advance(party, S(balance.jail.walkS) + 1);
+    tried(party, d); // B6a: the cell opened the Tribunal
     const round = party.room.state.round + 1;
     emitSim(party.room, { tick: party.room.state.tick, kind: 'train.arrive', data: { round } });
     advance(party, 2);
@@ -116,6 +118,7 @@ describe('the manhunt (GDD 3.31)', () => {
     expect(row(party).state).toBe(ManhuntState.none);
     expect(simOf(party.room).players.get(d)!.busyUntilTick).toBeLessThanOrEqual(party.room.state.tick);
     // A seat killed while held walks free as a ghost.
+    placeSeat(party, a, 'overworld', 34, 21); // B6a: the Tribunal gathered the opener on the square
     warrant(party, c);
     placeSeat(party, a, 'overworld', 36, 22);
     placeSeat(party, c, 'overworld', 37, 22);

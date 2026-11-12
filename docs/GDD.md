@@ -43,10 +43,10 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 
 | Role | Cover | Win | Start kit | Abilities (max 3) | Card text | Beware |
 |---|---|---|---|---|---|---|
-| **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the Final Night vote fails | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife, and the two of you are knocked back a tile each along the strike, whichever protection held (A393); the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 135 s CD from the drop): for 45 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
+| **Killer** (Cabal) | Yes | Parity (6+), or living Village <= 1 (4-5), or the end trial does not convict it (Unseen) | Knife (bound), Skeleton Key, Bloody Rag x2, Bucket | **Kill** (CD by table; resolved on the validated tick; spawns clues; you gain Blood 60 s) (M3: reach 1.5 tiles plus what the target moved in the last 250 ms, with a clear straight line; a protected target voids the strike, spends the protection, and you still gain Blood and rest the Knife, and the two of you are knocked back a tile each along the strike, whichever protection held (A393); the victim becomes a ghost at once, the body and both clues appear in the scene, a scream rings within 8 tiles.) (M5a: only at dusk, at night and in the Final Night hunt.) **Impersonate** (dusk, night and the Final Night hunt; 135 s CD from the drop): for 45 s your character shows one living seat's name, look, scarf and hat glyph, at your own height; the face changes and drops only out of sight, except that your next Knife strike drops it in place with a puff (3.17). **Drag body** (hold E, 50% speed; into a body spot = hidden; leaves a drag smear). | Walk in a borrowed character. Strike after dark when the room is empty, clean one clue, wash at the well, then be the loudest voice asking who did it. | Clues match your own traits whatever face you wear; your height never changes; Blood shows within 3 tiles; a guarded target voids your kill. |
 | **Accomplice** (Cabal) | Yes | As Killer | Plant Kit x3, Crowbar | **Plant Clue** (180 s CD): a footprint or thread with chosen traits. **Crowbar**: break a locked door (5 s, noise 10). (M5a) **Inherit**: when the last Killer dies or is ejected the Knife passes to you (kill CD +10 s; your Hunger clock starts in the round you inherit). The seat then plays as the **heir** card (`roles.json` `heir`: the Accomplice's kit and Plant Clue and Crowbar, plus the Knife); its public look is unchanged and only a private message tells it. | You never hold the knife, only the alibi. Forge trails, break the right doors, vouch at the right moment. | Inspect marks plants Forged; a Forged entry tells the village an Accomplice exists; your cover is a claim someone may test. |
-| **Detective** (Village) | No | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare**: lift a print (2 charges) and compare any two: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
-| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (180 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the blackout, the Claimed entries and the knockback are built, `abilities.json` `bandage.params` holds their numbers.) the target survives the next kill attempt within 60 s; both are knocked back (as on any voided strike, A393), the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified. **Salts**: cure Slowed or Poisoned (3.22). | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
+| **Detective** (Village) | No | All Cabal dead or ejected | Magnifier, Notebook, Lens x3, Fingerprint Kit | **Inspect** (3 s, 1 Lens; +1 Lens per meeting, max 3; round 10, V1a: once a day, 3.4): reveals a clue's hidden attribute, exposes forgeries, marks it Verified. **Dust / Compare** (round 10, V1b: 3.4): lift a print (2 charges) from a body or a door and compare any two of your lifts: Match / No match. | Collect, inspect, cross-reference. Your Verified clues narrow the board; the village does the rest. | Prime target; the Rag erases clues; forgeries cost Lenses; Compare never gives a name. If you die the Magnifier drops and anyone can Inspect in 6 s. |
+| **Doctor** (Village) | No | Village | Medkit x2, Bandage x2, Salts x1 | **Bandage** (180 s CD, not self): (M3: instant, 1.5 tiles, one Bandage from the kit; the blackout, the Claimed entries and the knockback are built, `abilities.json` `bandage.params` holds their numbers.) the target survives the next kill attempt within 60 s; both are knocked back (as on any voided strike, A393), the target's screen blacks out 1.5 s and gets the attacker's height as a Claimed entry; witnesses within 3 tiles get height + scarf as Claimed; the attacker still gains Blood. **Autopsy** (8 s): time of death +/-45 s and cause (knife / wolf / poison / shot), posts Verified (round 10, V1b: 3.4). **Salts**: cure Slowed or Poisoned (3.22). | Keep people alive and read the dead. Your autopsy says when; that is what breaks alibis. | Two-Killer games outpace your bandages. |
 | **Vicar** (Village) | No | Village | Candle x2, Pocket Watch | (M5a) **Hear Confession** (night power, once per night, not self): pick a seat from the list; your Notebook gets its faction (Village, Cabal or Neutral) as Verified. | Everyone in HollowMere confesses to you sooner or later. Each night, learn where one soul stands, then choose how much to say. | Everyone can see you are the Vicar, the Cabal first among them; if your card was not dealt, a Cabal player may wear your face and lie in your name. |
 | **Watchman** (Village) | No | Village | Lantern, Pocket Watch | (M5a) **Keep Watch** (night power, once per night; not self, and never the seat you watched the night before): the seat survives the first Knife strike before the night ends; the strike fails as on a Bandaged target, and your Notebook gets "Your watch held" as Verified. | You walk the lanes after dark. Each night, choose one door to stand by; if a blade comes for that soul tonight, it fails. | You cannot watch yourself or the same soul two nights running; poison and the Gamekeeper's shot go past you. |
 | **Herbalist** (Village) | No | Village | Remedy x1, Nightshade x1, Candle | (M5a) **Remedy** (night power, once per match, self allowed): the seat survives the first Knife strike before the next meeting opens; your Notebook records it when it holds. **Nightshade** (night power, once per match, not self): the seat dies when the night ends, wherever it stands, and leaves no trait clues. | One bottle saves, one bottle ends. Pour the first where the knife will fall and the second only where you are certain. | Nightshade kills a villager as readily as a killer, and a Remedy cannot stop it. |
@@ -82,7 +82,7 @@ The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 star
 | Meeting: vote | Open from 15 s into the discussion (`meeting.minVoteS`, 3.8); ends early when all living players have voted | 25 s after discussion |
 | Reveal | Tally with names; ejected role revealed | 8 s (held for an ejected Gamekeeper's Last Shot) |
 | Immunity | No kills, no noise; everyone spread at the hub; then a new day (M3: the day restarts in full and the cycle count rises) | 15 s |
-| Final Night | The day that would start cycle 6 begins with no winner yet | 135 s hunt, then the trial: a 120 s discussion and the vote |
+| Final Night | The day that would start cycle 6 begins with no winner yet | 135 s hunt, then the end trial (3.8): the gathering, `finalNight.trialS` of filing, the readings |
 | Game over | Winner, every role and look, the undealt cards, the summary; then the lobby again with the same code and seats | 20 s |
 
 (M3) The match clock starts when grace begins; the Knife's first cooldown starts when grace ends, and a meeting that opens during a world phase restarts the cycle at a full day once immunity ends. A cycle (day, dusk and night) is 810 s; a match is 12 cycles and the Final Night, about 170 minutes of world time (round 10, A5: the owner's "days should now last 8 minutes and nights last 5, keep the game play as it was before but prolong everything"; the match length is followup-4 2.8, which supersedes round 8's 5 cycles of A171). Round 10 scales every clock by the factor of `world-mode.md` 7: D = 4 for what runs by day, N = 3 for what runs after dark, C = 3.5 for what runs through the cycle, and keeps a person's own actions (holds, reach, movement, mini-games), the pauses and every count per cycle. Doors, locks, bodies and clues persist across phases. All timers are tick-based (20 Hz) in state and rendered through a server-time offset.
@@ -113,14 +113,25 @@ A knife kill spawns, server-side: the Body; **2 of the 3 trait clues** (seeded c
 | Snagged felt on the exit door frame | Hat | 1 cycle | Detective (Dust) |
 | Blood on the killer's sprite | "Bloody" within 3 tiles | 60 s, or a 3 s wash at the well or a basin, leaving a Wet Bucket clue for 90 s | Anyone |
 | Fingerprints (last 3 touchers of doors, items, bodies, kept server-side) | Match / No match | 1 cycle | Detective (Compare) |
+
+**Round 10, V1b (10V): Dust, Compare and Autopsy.** Each reading is an entry in the reader's own Notebook with a `note` of its own (a lift, a comparison, an autopsy), so a petition and the Tribunal take none (3.31); nothing public moves at a lift, a comparison or an autopsy. **Dust** is a hold (`act.hold {action: 'dust', targetId}`, `dustCompare.castS`) at a body or a door in reach, for a card with Dust / Compare and a Fingerprint Kit, `usesPerMatch` lifts a match. A body's print is its knife killer's true seat, whatever face the killer wore; a body that had no knife killer (poison, a creature, a shot) carries a print of its own that matches only another lift of that body, so a lift never tells the cause. A door keeps its last `touchersKept` crossers, every figure that crosses, seat or not, a seat by its true actor and a figure without a seat by an id of its own; Dust lifts the most recent crosser other than the duster, so a lift never tells a seat from a figure or a human from an NPC. The lift keeps the print's owner in room memory only. **Compare** (`act.ability {abilityId: 'dustCompare', targetId, with}`) takes two of the seat's own lifts and writes Match or No match with the two entry ids; it never names a seat. **Autopsy** is a hold (`act.hold {action: 'autopsy', targetId}`, 8 s) at a body in reach, once per body per seat, for a card with Autopsy: the cause (knife, any creature, poison, a shot or other; a shot is the Last Shot's or the Hitman's derringer) and an estimated death tick, the true tick plus an offset of at most `timeOfDeathErrorS` drawn on the secret `autopsy` stream. Its entry names the victim, as the Body already does.
 | Drag smear | Trail to the body spot; Verified when Inspected | 1 cycle | Anyone |
 | Time of death | +/-45 s | – | Doctor |
 | Silhouette | Height + scarf | – | Child |
 | Ledger | Last house entered per player | Per meeting | Butler |
 | Dropped items | The dead player's inventory | Never | Anyone |
 | Scratches (round 10, D5c; on the tile of a lock a pick opened) | That a lock was picked, never by whom: `value` and `dir` are 0 for every picker | 2 cycles | Anyone |
+| Chalk mark (round 10, V3; on the tile the Chalk-bearer stood on) | That someone drew symbol `value` (0 to 3) here, never who: `dir` is 0 for every drawer. It cannot be collected | 1 cycle | Anyone |
 
-Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb. **Round 10, B2:** the Constables verify every collectible clue at `law.speedMult` times a Detective's rate and brief its kind, scene and trait to everyone `law.briefingAfterS` after it appears (3.31).
+Wolf kills spawn Fur and Claw Marks (decay 1 cycle), no footprints. Collecting: stand on a clue, hold E 2 s; it enters the Notebook with trait, scene and time. (M3: Footprints and Thread only; the hold is cancelled by moving, releasing, dying or a meeting, and several players may collect the same clue.) The Rag erases 1 clue (3 s, noise 4). Washing needs the Bucket and water (the well or a basin). A Wounded player's drips fade after 20 s; a one-way drop leaves a 90 s footprint trail (height) at the landing. Each scene keeps at most 40 clues; past that the oldest Claimed clue is collected first. Plants are indistinguishable until Inspected. **Round 10, V1a (10V): the Lens and the plant.** A collect is Claimed for every card, the Detective's too; only a Lens verifies. Inspect is a hold at a collectible clue in reach (`act.hold {action: 'inspect'}`): it needs a Magnifier and a Lens in the pockets, takes `inspect.castS` for a card with Inspect and `droppedMagnifierCastS` for anyone else holding a Magnifier, is cancelled like a collect, and on completion spends one Lens and writes the inspector's own entry for that clue, or updates the one it collected: **Forged** for a plant, else **Verified**. The Lens sets only the status: a clue's hidden attribute (the felt's hat, when the kill lays felt) will be a reading entry of its own, never written over the entry's `value`. A clue already read Verified or Forged in that Notebook is refused before the Lens is spent. A card with Inspect gets `lensPerMeeting` Lenses back once at each new day (the day counter, so no pause runs it twice), up to `lensMax` (world mode has no daily meeting), and `Private.lensCharges` shows its count. Plant Clue (`act.ability {abilityId: 'plantClue', kind, value}`) spends one Plant Kit and lays a Footprints clue (`kind` `footprints`, `value` a height index, its trail toward the nearest portal) on the planter's tile, or a Thread (`thread`, a scarf index) on the walkable tile beside the nearest portal, as a kill's thread lies, refused unless that portal is within door reach (`TOO_FAR`): every wire field follows the true rule for its kind, so where a plant lies never gives it away. Either comes with the clue's usual decay, cap and Constables' briefing; it is a cast of `castS` that runs as a hold (cancelled by moving, like a collect), so the planter's figure shows only what any hold shows and makes no noise; the kit is spent and the clue laid when it completes. A plant is a clue like any other on the wire and names no planter: only the planted mark, kept in room memory, tells it apart, and only a Lens reads that mark, into the inspector's own Notebook. A Forged entry never attaches to a petition (3.31); a Claimed or Corroborated plant counts until someone verifies it. When two different players collect the same physical clue it becomes **Corroborated** and counts as Verified for the suspect set; Townsfolk therefore have a deduction verb. **Round 10, B2:** the Constables verify every collectible clue at `law.speedMult` times a Detective's rate and brief its kind, scene and trait to everyone `law.briefingAfterS` after it appears (3.31).
+
+**Round 10, V2 (10V; DECISIONS A555): the cover-up verbs.** Each is an `act.hold` the server re-validates every tick, cancelled by moving (Drag excepted), a crossing, a death or a meeting, and each shows only what any watcher of the scene sees:
+
+- **Drag body** (the Killer card's `dragBody`; `act.hold {action: 'drag', targetId: bodyId}` at a body in door reach; `on: false` lets go). The body trails the dragger by `coverup.dragLagTicks` and the dragger walks at `abilities.json` `dragBody` `speedFactor` (0.5). A Drag smear (3.4 table, public like any clue, `value` 0) lies at the body's start tile and every `coverup.dragSmearEveryTiles` tiles after it, at most `coverup.dragSmearMax` a drag. Letting go within `coverup.spotReachTiles` of a body spot of the scene hides the body: it leaves the scene's state at once, so a watcher sees only that it is gone, and the server keeps it for a Check (V3). One seat drags a body at a time; a drag rings nothing.
+- **Clean** (a Bloody Rag; `act.hold {action: 'clean', targetId: clueId}`): after `abilities.json` `rag` `castS` (3 s) the clue is erased from the scene, one Rag is spent, and `noise.rag` rings at the clue (kind `rag`). Notebook entries already written stay. Any collectible clue; Blood on a figure is washed, not cleaned.
+- **Wash** (a Bucket; `act.hold {action: 'wash', targetId: propId}` at a basin or a pump in door reach, only while the seat is Bloody): after `wash` `castS` (3 s) the seat's Blood is gone and a Wet Bucket clue lies beside the water. The Bucket is not spent. It rings nothing.
+- **The keyed door** (`Portals.ts`): a portal with a `lock` stays locked until a verb opens it. **Skeleton Key** (`act.hold {action: 'unlock', targetId: portalId}`, `skeletonKey` `castS` 3 s, `noise.skeletonKey`) opens it for the match and keeps the seat among the door's last three touchers (the print, read by Dust). **Crowbar** (`act.hold {action: 'crowbar', targetId: portalId}`, `crowbar` `castS` 5 s, `noise.crowbar`) breaks it for good. The door's public state becomes open or broken (`DoorState`); both items are the seat's own kit and a dead seat's drop (3.5).
+- A seat on a map without a keyed door has nothing for the key or the Crowbar to open; the logic-table doors (3.14, 3.29) keep their own verbs.
 
 **Blood is held by the server** (round 8, 8L, A170): a client receives a figure's Blood only while it stands within the Blood clue's range of that figure (`clues.json` `blood.params.visibleTiles`), or when it is a ghost; nobody further away is sent it at all, and the client draws it only within the same range. The killer's own client always knows it is bloody.
 
@@ -160,16 +171,37 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 
 **Hiding spots** (wardrobe, hay pile, under bed, barrel; crawlspaces for the Child) hold one player; **body spots** (cellar dump, crypt niche, hay pile) are separate objects. Entering takes 1 s, noise 2; the hidden player sees a slit view and keeps one action, **Burst Out** (E): instant, stuns the Checker 1 s, noise 6. **Check** (E, 2 s) opens a spot; a Check on an occupied spot writes a Verified Notebook entry for the hider ("X opened my wardrobe at 3:12"), so checking is evidence.
 
+**Hiding, as built** (round 10, V3, DECISIONS A578). Hide, Check and Burst Out are `act.hide`, `act.check` and `act.burst {spotId}`, one spot at a time, from within `doors.reachTiles` of a `hide` spot of your scene. A hider is in no other seat's view and cannot be named as a target; it does not walk (its moves are ignored) and its own screen shows the slit (`Private.hiding` holds the spot id). Entering is a hold of `hide.castS` with noise `noise.hide`; the Child's Silent hide takes no time and makes no noise, and a `childOnly` crawlspace is hidden in or Checked only by a seat with Silent hide, an adult being told there is nothing there. A spot holds one hider; a second is refused as busy. **A completed Check gives the hider up**: it leaves the spot at once and stands there, with no noise and no stun, and the hider's own Notebook gets a Verified entry (`NoteKind.checked`, the scene and the tick) whose `of` is the face the checker's figure showed (an impersonation shows the face it wears, so the entry never names a seat beyond what the hider saw). **Burst Out** is instant: it frees the hider, cancels every Check in progress on that spot, Stuns each checker for `burstOut.params.stunS` and rings `noise.burst`. A death or a closed world lets every hider out.
+
+**Chalk, Act Shifty and Fake Blood** (round 10, V3). Chalk (`act.ability {abilityId: 'chalk', value}`, `value` the symbol 0 to 3, a cooldown of `chalk.cooldownS`) needs the Chalk item and lays a Chalk mark (3.4) on the seat's tile, public to the scene. Act Shifty rings `noise.run` where the seat stands (kind `run`, heard by seats and NPCs alike) and cools for its `cooldownS`. Fake Blood sets the Blood bit on the seat's figure for `durationS`, once a match; it is the bit a kill sets, near-only like it (3.4), so to anyone close it reads as a kill's Blood.
+
+
 **Doors** have four server states: open, closed, locked, broken. Any door unlocks from the inside for anyone. Killer locks expire after 45 s. From outside you see the door swing for 3 s; the entering player is in a 0.6 s `transit` state, encoded to both scenes at the door with the nameplate hidden.
 
 **Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen.
 
 ### 3.8 Meetings, voting and win conditions
 
-- **Village** wins when all Cabal are dead or ejected, tasks reach 100%, or the Final Night vote ejects a Cabal member.
-- **Cabal** wins at parity (living Cabal >= living Village; Thief counts as Village, Drifter as nobody) at 6+ players; at 4-5 when living Village <= 1; or when the Final Night vote ejects nobody or a non-Cabal player.
+- **Village** wins when all Cabal are dead or ejected, tasks reach 100%, or the end trial convicts a Killer of murder (round 10, B6d).
+- **Cabal** wins at parity (living Cabal >= living Village; Thief counts as Village, Drifter as nobody) at 6+ players; at 4-5 when living Village <= 1; or when the end trial closes without convicting a Killer (the Killer's Unseen victory, `gameOver.unseen`).
 - **Drifter** wins alone when ejected, and the match goes on. (M5a) The end screen lists an ejected Drifter among the winners (`gameOver.alsoWon`) whichever faction then wins; a Drifter who is killed, poisoned or shot loses. A Drifter ejected by the Final Night vote wins beside the Cabal.
-- **Final Night** (the day that would start cycle 6 begins without a winner, 3.3): night lighting, wolves roam the village, Cabal kill CD 20 s, a 45 s hunt with clues still spawning, then the trial, a 120 s discussion and a forced vote with no Skip and the Case Board open; a tie ejects nobody and the Cabal wins.
+- **Final Night** (the day that would start cycle 6 begins without a winner, 3.3): night lighting, wolves roam the village, Cabal kill CD 20 s, a 45 s hunt with clues still spawning, then the **end trial** (round 10, B6d; `docs/round9/phases.md` 5; seams.md
+  3 row 35), which replaced the forced vote in every match:
+  - **The gathering** (3 s): the deaths revealed and the living placed on the square, as for the Tribunal below.
+  - **The filing** (`finalNight.trialS`): every living seat at the gathering may file one case (`trial.file`), one
+    accused and a charge with up to `meeting.presentPerPlayer` of its own clue entries; a second filing replaces its
+    first. A jailed seat files nothing (the Final Night's bells have emptied the cell, 3.27). Filings against one
+    accused join into one case: its cards in filing order, no clue twice, the first filer's charge unless a later one
+    charges murder. The cases are public (`GameState.endTrial`): accused, charge, a count of filers, and each card
+    with its filer, as a Tribunal's presenters are.
+  - **The readings**, strongest first (more matches, then fewer exclusions, then filed earliest), each for
+    `phases.revealS` on the Tribunal's row with the Tribunal's verdict on the accused itself. A death sentence hangs
+    the accused and shows its role; a lesser sentence is only read out. The first murder conviction of a Killer ends
+    the trial for the Village. With no case, "The Killer walks free" is read for `phases.revealS`.
+  - **The close.** The match always ends: a win the deaths already decided first, else the Village after a Killer's
+    conviction, else the Cabal, with the Killer's Unseen victory (`gameOver.unseen`). In Paint The Town Red every case
+    is read and the Village wins at the close unless the town was painted (the rule below).
+  - NPC seats file by the one rule of 3.12 ("Presenting and filing"), at the filing's `npc.trial.windowFrac`.
 - Tie or Skip majority: nobody ejected. After two consecutive no-ejection meetings (Drifter ejections count as none) the next vote has Skip disabled and ejects only a player holding at least ceil(living/3) votes; otherwise nobody is ejected and the next cycle has no grace.
 - **Hunger**: a Killer with no Knife strike in 2 full rounds leaves glowing footprints until they strike (3.3).
 - **Last Shot** (M5a): an ejected Gamekeeper shoots during the reveal (3.2); the win check runs after the shot, with both seats out.
@@ -193,6 +225,36 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
   - Not built yet: the Knife on the guards and their return on the morning train (C5's guard step), and, until the
     Constables' petitions land (10B), the Constables filing their own petitions with no human on the town side (12,
     R3). Until then a match ends by deaths, the unique count, the pillars or the end trial.
+- **The Tribunal** (round 10, B6a; `docs/round9/phases.md` 4, `world-mode.md` 5; seams.md 3 row 22). The trial of
+  the seat a manhunt cuffed (3.31). It opens when that seat is placed in the county jail's cell (3.27), never during
+  the Final Night, as a phase of its own (`Phase.tribunal`) under which the world is paused; when it ends, the world
+  phase it paused resumes with the seconds it had left. Like a meeting it reveals the deaths so far, ends every
+  attendee's impersonation and wakes the knocked out, and every living seat is placed at the meeting spawns, except
+  the held seat, which stays in the cell (the dock) still in the face it was cuffed in, the other jailed seats and the
+  seats on the line.
+  - **The steps:** the charge (`trial.chargeS`, _proposed_ 5 s), the case (`trial.caseS`, 30 s), the defence
+    (`trial.defenceS`, 30 s), the verdict (`phases.revealS`) and the Return (`phases.immunityS`).
+  - **The accused** is the warrant's seat throughout (3.31), never the seat held: a seat cuffed in the accused's face
+    is tried as the accused, and the accused, free on the square, defends.
+  - **The scales** start with the warrant's entries (shown under the Constables' badge, with no opener) and take what
+    the attendees present (`act.present`), up to `meeting.presentPerPlayer` each: in the case, any attendee; in the
+    defence, the accused, and others only an exclusion. A jailed seat other than the accused presents nothing, and a
+    clue already on the scales is refused. Each entry weighs from the accused's public traits only: a backed
+    (Verified or Corroborated, as the presenter's Notebook shows it) trait entry is a match when it fits and an
+    exclusion when it does not. Claimed, Forged-as-shown and Doubted testimony (3.20) weigh nothing; a role's reading
+    (the felt's hat) weighs only when its reader presents it, and a reading in the warrant weighs nothing.
+  - **The verdict.** Any exclusion dismisses. `trial.murderAt` (_proposed_ 2) matches prove murder, and
+    `trial.convictAt` (_proposed_ 2) any other charge; a murder charge short of `murderAt` is dismissed (the petition
+    names no lesser charge).
+  - **The sentence follows the charge**, on the seat held. Murder: death, by the usual death path and for good, the
+    true role shown to everyone (`tribunalVerdict`), so a seat hanged in another's face is shown as itself. Robbery,
+    assault, sabotage and conspiring: jail until the next morning train (3.27). Theft, trespass and a rumour turned to
+    a case: a fine from the charge alone (`trial.theftFine` 6, `trial.trespassFine` 4, `trial.rumourFine` 3 Scrip),
+    taken from the purse and never the bank; a purse short of it gives what it holds and serves the shortfall in jail
+    until the morning train (the verdict says so). A dismissal or a paid fine releases the held seat onto the square
+    at the Return, and a dismissed accused may not be petitioned again for `trial.acquittalGraceS` (30 s). The
+    role-specific sentences (demotion, defrocking, goods returned, the Drifter and the Gamekeeper) are B6b's; the
+    Final Night's end trial is B6d's, and voting retires in B6c.
 - Disconnect over 60 s = death with cause "vanished" and a body at the last position; reconnection within 60 s resumes the same role. (M3: a player who leaves during play becomes a ghost at once with no body; the window and the body arrive with reconnection in M7, A30.)
 - No Clue Surge. A wrong ejection adds 15 s to the next discussion instead.
 - (Round 8, 8L, A190) **The vote delay.** A vote cast in the first 15 s of a meeting (`meeting.minVoteS`, Final Night's included) is refused with the reason, so a vote agreed before the meeting cannot land before anyone has spoken; the portraits and Skip wait out the delay with a countdown, and a vote is changeable as before once it opens. `minVoteS` stays under the shortest discussion (the content check). It replaces `meeting.voteOpensImmediately`.
@@ -236,7 +298,7 @@ The Knife works only after dark (3.3), about 330 s of each 810 s cycle (round 10
 
 ### 3.10 V1 cut list
 
-**First playable (M3, "Mafia with walking")**: lobby, 5-char codes, reconnection in lobby; roles Killer / Detective / Doctor / Townsfolk; traits height + scarf; overworld 40x30 greybox + tavern (2 rooms) + widow cottage (2 rooms) + forest + cave entry; kill, body, Blood tint, two clues, Notebook, Detective auto-Verified; report / bell; meeting with portraits, chat, secret vote, eject + reveal; checkWin; ghosts with ghost chat.
+**First playable (M3, "Mafia with walking")**: lobby, 5-char codes, reconnection in lobby; roles Killer / Detective / Doctor / Townsfolk; traits height + scarf; overworld 40x30 greybox + tavern (2 rooms) + widow cottage (2 rooms) + forest + cave entry; kill, body, Blood tint, two clues, Notebook, Detective auto-Verified (round 10, V1a: retired; only a Lens verifies, 3.4); report / bell; meeting with portraits, chat, secret vote, eject + reveal; checkWin; ghosts with ghost chat.
 
 **V1 (beta)**: everything in 3.1-3.9 marked V1: Butler, Child, Accomplice, Drifter; Lens charges, Dust / Compare, Autopsy, Bandage, Ledger, Witness, Plant Clue, Rag, Bucket; Case Board with suspect sets and Corroborated; 6 task types incl. 1 co-op; wolves, fence; hiding spots, Burst Out, Check; door states, Skeleton Key, Crowbar; Hunger, Final Night vote, missing-person roll-call; quick-chat, Cabal and ghost channels; scene profiles Small / Medium / Large; 10-player rules; the n+2 deck, professions, public looks and covers, Impersonate, the Vicar, Watchman, Herbalist and Gamekeeper (M5a).
 
@@ -261,6 +323,7 @@ The section keeps its number so 3.12 to 3.21 keep theirs.
   (`talk.npc.notesPerMeeting`), at ticks drawn over 0.05-0.8 (`talk.npc.windowFrac`) of the discussion plus the vote
   time from its own `talk:<seatId>` stream, and a note the limits refuse waits for the next tick. Its lines come from
   the templates of 3.25 and name seats only by name.
+- **Presenting and filing (round 10, B6d2; seams.md 3 row 35).** NPC seats present at a Tribunal and file at the end trial by one rule, closing B6a's tell where only humans presented. Every NPC seat, whatever its card or Notebook, draws on entering each Tribunal step (case, defence) and the end trial's filing a tick over `npc.trial.windowFrac` (0.1-0.8) of the step from `trialTick:<seatId>` and a roll from `trialChance:<seatId>`, two streams of their own that nothing public shares (`sim/seeds.ts`). At its tick, with chance `npc.trial.presentChance` (0.7) at a Tribunal or `npc.trial.fileChance` (0.8) at the end trial, it acts through the same handler a human uses and is refused for the same reasons (dead, on the line, jailed unless it is the accused). **Tribunal:** in the case a witness presents its backed (Verified or Corroborated) Notebook entries that match the accused, up to `meeting.presentPerPlayer`; in the defence the accused NPC presents its backed exclusions. A Cabal NPC never presents against a Cabal accused. **End trial:** it files a `murder` charge against the seat its vote rule would pick (above, with Skip refused, as the forced vote refused it), attaching its backed matching entries up to `meeting.presentPerPlayer`. An NPC with no backed entry presents and files nothing, and nothing waits on an NPC. A meeting has no presenting yet (the Inquest, B7, reuses this rule), so none is added there. The result is public as a human's is, with the NPC's seat as `presenter`; nothing on the wire says it is an NPC.
 - **Animation (M5a, every seat).** A seat shows `interact` (`Presence.animId` 4) on every tick an `act.hold` of its own runs, whatever the hold, human or NPC; it shows `walk` only on a tick its body actually moved, so a seat pushing against a wall stands idle instead of walking in place; `idle` otherwise. One `interact` id serves every hold, as one `swing` serves every strike, so the animation never tells one action or role from another.
 - **Difficulty.** A lobby setting, Easy / Normal / Hard, default `npc.defaultDifficulty`. It is enabled only when the party holds at least `npc.difficultyMinNpcs` NPC seats; with fewer, NPCs play the default. The setting and the mode survive the return to the lobby after a match (M3c). Each level is a row of `balance.json` `npc.difficulty`:
 
@@ -328,6 +391,8 @@ A rule that says "the square" or "the overworld" means the map's hub and these s
 
 HollowMere's new forest and cave close a loop from the Medium profile up: the village, Gallows Wood, the Fenwood, the Flooded Gallery, the Tin Gallery mouth and back to Gallows Wood. A one-way sinkhole also drops from the Fenwood into the Gallery. Below Medium their doors stay boarded, so a small party keeps the old, tighter HollowMere with one forest and one cave. BlackPine is the tighter and wilder map. Its loop runs from the camp through the woods, in at the Workings' vent drift and back out of the adit. A one-way log chute drops from the woods to the camp. The Large profile adds a second way under the hill: the woods' drowned adit to the Deep Level, and the Deep Level's ladder up to the Workings.
 
+**New places (round 10, T6, A242; WORLD 4.4).** HollowMere gains two greybox scenes and a light, with ids appended to `SCENE_IDS`: `cottage_fisher` (prefix `fc`, the Fisher's home, a Small house reached by `ov.cottage` on the quay lane at the overworld's south-east) and `sea_exit` (prefix `se`, a Small dark cave: the shingle behind the Tin Gallery mouth's boards, with the sea door `se.sea` as the way out of the map). `ce.sea` now leads to `sea_exit.cave` but carries a lock (`seaBoards`) that no item opens, so the door stays boarded in play until the Thief ships (V1.5), and `se.sea` stays a target-less V1.5 portal. A scene entered only by portals that ship after V1 is sealed: the graph check does not ask the hub to reach it and it does not count as the map's Small cave. The south-east light is `ov.lt_southeast`, the Company's lamp on an iron post (`ov.lantern_pole_2`) at the mere's south-east edge, lit dusk and night. The art is round 11's; the greyboxes use existing prop classes.
+
 **Biomes.** Every scene has a biome: `village` (a settlement exterior), `house` (rooms), `forest` or `cave`. The biome picks the scene's default ground and walls, its ambient sound bed and its look. It changes no rule except the darkness of caves (below). **Every map has at least one forest and one cave open at the Small profile**, so every party size has both. In M5a they are where hiding is easiest and the night is darkest:
 
 - Forests are trails 2-3 tiles wide through dense trees, opening into clearings, with loops and chokepoints.
@@ -350,7 +415,8 @@ Doors into buildings sit on a south or east face, so they are always in sight. M
 **Controls.**
 
 - The keys W, A, S and D (or the arrows) walk straight up, left, down and right on the screen. Two keys together walk along the grid.
-- A touch stick walks where the thumb points.
+- A touch stick walks where the thumb points; pushed to its rim it runs, and a Sneak toggle beside it sneaks (round 10, R1).
+- Every key and touch control of a match is one row of the client's action table (`apps/client/src/input/actions.ts`, `docs/round10/rolecards.md` 3). The card's abilities that are not passive take Q, R and F in card order; a passive takes no key.
 - The speed in tiles is unchanged (3.7).
 
 **Lighting by phase and scene (M5a).** The world is drawn under a darkness layer that follows the phase (`metrics.json` `lighting.ambient`):
@@ -701,8 +767,8 @@ contract) and `train.delivery` the strongbox (the Bandit's heist).
 
 **The draw (7H).** At the deal, every seat dealt a card that carries vendettas (the Killer; `vendettas.json`
 `role`) draws one, uniformly among the rows the match allows: the Zealot only when a seat is dealt the Vicar, the
-Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit and the Hitman
-only on HollowMere, where the Train runs. A seat with no row allowed draws none. Each seat draws from a stream of
+Bandit only when the manor hall is open at the party's size (Medium and Large, 3.13), the Bandit only on HollowMere,
+where the Train runs. The Hitman's row is never drawn at the deal (round 10, C4a: an `arrival` row, 3.33). A seat with no row allowed draws none. Each seat draws from a stream of
 its own (`vendetta`, keyed by seat), so the draw moves no other draw. The two Killers of a 10-seat deck draw
 apart and may draw the same row. The vendetta stays with its seat: it ends
 when the seat dies or is ejected, and an Accomplice who inherits the Knife (3.2) inherits none.
@@ -741,9 +807,9 @@ events that name no seat (`vendettas.json` `emits`, `fires`).
   (`vendetta.heist.cracked`, the consequence) puts the Strongbox item in the Bandit's inventory (it needs a free
   slot), leaves a footprint of the Bandit's own height at the box as a kill does (3.4), and readies the Knife at
   once. The strongbox is in one inventory at most.
-- **Contract: the Hitman (7H).** At the first Train arrival of the match the mail brings the Hitman a sealed
-  letter (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living seats
-  other than the Hitman and its Cabal mates, written to the Hitman's own Notebook. The Hitman accepts it as a
+- **Contract: the Hitman (7H; round 10, C4a, 3.33).** The Hitman's own mail turns him (3.33) and brings him a
+  sealed letter at once (`vendetta.contract.offered`): a target drawn from the mail stream (`contract`) among the living
+  seats other than the Hitman and its Cabal mates, a human when one is free, written to the Hitman's own Notebook. The Hitman accepts it as a
   quest of kind `contract` (3.16; the quest `contract` of its own quest list, with no giver and no `quests.json`
   row) from anywhere (`vendetta.contract.accepted`), with the Accept button on that Notebook entry while the
   offer is open; an NPC Hitman accepts at once. The button reads the public roster, so after a private death of
@@ -1219,8 +1285,10 @@ station with the manifest line "{name} steps off the train."; the Final Night's 
 the line. Its own view shows `Private.jailUntilTick`, the train's tick (0 when not jailed); nothing public says who is
 jailed. While jailed a seat is not active for sleeping (3.32) and cannot open or sign a petition, cuff, or use the
 Knife (`IN_JAIL {untilDawn}`). A meeting leaves it in the cell; it votes and talks as usual. Only its cellmates see
-it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. A death in
-jail takes the usual death path. The manhunt stays cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
+it there: the rumour ledger (3.23) never samples the cell, so no notice, Gazette line or tip names it. The Tribunal
+(3.8) opens when the seat is placed in the cell; a dismissal or a paid fine releases it onto the square at the Return,
+and `jailUntilTick` keeps the cuff's value until then. A death in jail takes the usual death path. The manhunt stays
+cuffed until the seat leaves jail or dies; then the next warrant may run. On a map
 with no station (BlackPine) the first dawn of a later round sets the seat down at the map's meeting spawns instead, with
 no line, and `jailUntilTick` is that dawn's tick; the Final Night does the same there (6Z's default).
 
@@ -1472,4 +1540,85 @@ out.
 
 ### 3.33 The Hitman's arrival
 
-Round 10, C4 (`docs/round9/gdd-map.md` 2.7). Not built yet: the step that builds it writes this section.
+Round 10, C4 (`docs/round9/world-mode.md` 1.5, followup-4 2.6; seams.md 3 row 20; DECISIONS A350). Nobody is dealt
+the Hitman: the mail turns a townsman into one.
+
+- **The draw.** At the deal of the main mode, on the secret stream `hitman`, the server draws three things and tells
+  nobody: whether he comes, by the human seats at the deal (`hitman.byHumans`: from 0.5 at 3 humans to 1 at 10, never
+  below 3 humans), the day (`hitman.days`: 3 to 5, uniform), and whether a human is turned (`hitman.byHumans`
+  `human`: 0 at 3 humans, 0.15 at 4, 0.25 at 5, 0.4 at 6, rising to 1 at 10). He comes only where the Train runs
+  (3.3; BlackPine has no station, so no delivery), and there is no Hitman in Paint The Town Red (3.8). The Killer
+  never draws the Hitman's row (3.20).
+- **The turning.** On that day's `train.delivery`, the black-wax letter reaches one seat that is living, free (not on
+  the line, 3.22, and not in jail, 3.24), wears its own card's look (never a cover, a Cabal card or the Thief), holds
+  no vendetta, is not a vendetta's partner card (the Zealot's Vicar) and has room for the Derringer, drawn on `hitman`. A human draw turns an eligible human, else an
+  eligible NPC seat; an NPC draw turns an eligible NPC seat only, so `human` is a ceiling (0 at 3 humans turns no
+  human ever). With no seat in that pool he never comes. The turned seat keeps its card (its `roleId`, its abilities,
+  its town work), its look and every public field; it holds the `hitman` vendetta, its own view's `Private.hitman` is
+  set until the lobby, and its mark is mailed to it at once (3.20, a human when one is free). Its side is its own: it
+  shares neither the Village's win nor the Cabal's, and its only victory is the Contract (C4b).
+- **The sign.** At the turning every seat's chat log gets one system line that names nobody, "A stranger's coat was
+  seen on the 6:10", the same whether a human or an NPC seat was turned. Nothing is sent when he does not come.
+- **The Derringer** (C4b). The turned seat's own pack gets the Derringer (`items.json`, role-bound and kept at death
+  like the Knife, so no robbery, search, loot or death drop moves or shows it). It is one shot, by day only
+  (`abilities.json` `derringer`, reach `rangeTiles`), with every refusal of the Knife's path (3.2), the jail's
+  `IN_JAIL` among them. It may be fired only at a figure drawn with the mark's face (`Avatar.lookOf`): the test reads
+  the drawn figure, never the seat behind it, so the real mark drawn as someone else is refused like any figure, and
+  an impersonator drawn as the mark dies in its place while the contract stays open. Its death's cause is `derringer`, which the morning Train never returns (R4); it
+  makes the Last Shot's noise and lays no clue of a look. A shot at the mark accepts an open contract first.
+- **The Dusk Train and the Contract** (C4b). At the Dusk Train's departure (3.22), a Hitman who shot his mark that day
+  and stands, living, in the station's scene within `train.hearTiles` of the platform boards it: the Contract
+  victory, the same day. He leaves play: unplaced, so his figure leaves every view as any leaving figure does, with
+  no scene, no avatars and no ghost view of his own; his own view's `Private.departed` is set, and the roster keeps
+  him alive. The match goes on and the win check counts him for nobody. Until B6's Tribunal he stays a living seat
+  in every public respect: he may be voted for and ejected as any seat (his boarded win stands), and a departed
+  human may vote and speak at a meeting, whose all-voted early end waits on his vote as on any living seat's. A Hitman who killed but missed that day's Dusk Train does not win. With no
+  kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
+  frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
+  his death), and a boarded Hitman joins `alsoWon`.
+- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
+  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
+  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
+  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
+  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
+  black-wax mailbag and the crow on the station roof; a turned NPC seat
+  stopping its routine.
+
+### 3.34 Story mode
+
+Story round (`docs/story/README.md`; `docs/round9/world-mode.md` 9, owner answers WM1 and WM1B). One human plays one
+fixed story: a match of the auto harness (3.19) with exactly one human seat, every other seat an NPC (3.12), the
+story's map, and the seed words of every random stream fixed by the story, so the same story replays tick for tick.
+No number is stated here: the roster, the seed words and the chapters are in `story.json`, the rest in
+`balance.json` under `story`.
+
+- **The room.** A story room is a `party` room the story engine (`sim/story`) turns into an auto room with one human.
+  The human is the leader; the NPC seats keep fixed ids; the clock runs at 1x and is never sped up. Nothing a client
+  sends changes the speed.
+- **Chapters.** A story is a list of chapters played in order. Each names the card the player holds for it. Chapter
+  one's card is dealt to the player at the deal (the deck's own fixed-deal request); a later chapter moves the
+  player's seat to its card at the break (the handover below). A chapter ends when its end trigger fires, or at once
+  when the player's seat dies, and either way the next chapter starts, so a story is always finishable.
+- **Cards and the pause.** A chapter's title card, a beat's card and a chapter's end card are shown to the player
+  alone and pause the clock until the player's continue. This is the only pause in any mode other than the admin
+  room (3.19): the world waits only because no second human is wronged by it. A role card is dismissed by the
+  chapter's title card.
+- **Secrecy.** Role secrecy (3.17) holds exactly as in a match. The story's cards and goals reach the player's own
+  client alone; no public field, no other seat's view and no bus event names a chapter, a goal or the player's card
+  with its holder.
+- **Beats.** A chapter's beats are each a trigger on the sim event bus (or on the chapter's own clock) and an action:
+  a card, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. Each fires once, and a goal is
+  done when its beat fires. The player's own scene changes and pickups reach the bus as `story.enter` and
+  `story.pickup`. The chapter's tick count stops while a card holds the clock.
+- **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
+  player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
+  except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
+  vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the
+  chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
+  on the card the player already holds changes no card; it starts the view over and sets its vendetta. The vendetta
+  then runs as in 3.20 (the Bandit's heist, the Activist's sabotage).
+- **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
+- **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
+  seat, and it is the story's own.
+

@@ -12,6 +12,7 @@ import { Avatar, type AvatarState, MAX_PLAYERS, MIN_PLAYERS_TO_START, type Rng, 
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, newHandle } from '../Avatars';
 import { spawnBody } from '../Bodies';
+import { recordDeath } from '../verbs/readings';
 import { ensureBody, removeBody } from '../body/state';
 import { AnimId } from '../constants';
 import { emitSim } from '../events/bus';
@@ -397,6 +398,7 @@ export function hurtFigure(room: PartyRoom, id: string, kills: boolean): boolean
  */
 function killFigure(room: PartyRoom, f: Figure): void {
   f.dead = true;
+  recordDeath(room, f.id, 'creature'); // round 10, V1b: a figure's body carries a print of its own
   f.act = null;
   f.moving = false;
   dropHandle(room, f);
