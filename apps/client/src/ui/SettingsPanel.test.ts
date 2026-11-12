@@ -13,7 +13,14 @@ describe('settings panel', () => {
 
   it('has copy for every control', () => {
     expect(Object.keys(SETTINGS_COPY)).toEqual(
-      expect.arrayContaining(['settings.open', 'settings.music', 'settings.sfx', 'settings.mute']),
+      expect.arrayContaining([
+        'settings.open',
+        'settings.music',
+        'settings.sfx',
+        'settings.mute',
+        'settings.artStyle',
+        'settings.artStyle.lobby',
+      ]),
     );
   });
 });
