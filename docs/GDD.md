@@ -553,6 +553,17 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 | Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
 | Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
 
+**Containers and loot** (round 10, S1, A286; logic-table 6). The barrels, crates, sacks, shelves and chests of the
+world are containers. An open one (any dressing or decor prop the census calls a container and no other class names) is
+searched bare-handed in 2 s; a locked one (footlocker, blanket chest, safe, tin cabinet) is picked with the lock-pick
+(3.29) or forced with a `pry` tool in 4 s, which rings `crowbar`; a nailed crate stays the tool wall above.
+Each match will deal a share of each scene's containers (`activeFrac`), kept off doors, spawns and hiding spots
+(`keepClearTiles`), with a cap and a spacing on chests, and roll each from its scene's or its stem's loot table
+(`interactions.json` `lootTables` and `containers`) at a tier set by its distance from the hub in portal hops
+(`tierHops`; a dark cave is the top tier, a chest at least `chestMinTier`). What a container holds goes to its opener
+alone; the scene sees only that it was searched, opened or broken. Six new containers stand in the woods and the caves.
+The three verbs answer `NFY` until the deal lands (S1b).
+
 **The forge chain** (round 10, S3; `logic-table.md` 7.1, 8.1 and 8.2, owner answer LT9: BlackPine first). A **kiln** (the two charcoal kilns of `bp_woods`) smelts 1 Tin Ore and 1 Stone into a **Tin Ingot** (5 s; kind `deliverable`, an intermediate like Planks). At the **forge** of `bp_smithy`, 3 Ingots and 1 Timber make an **Iron axe** (`cut` 2, 40 uses; 6 s) or an **Iron pickaxe** (`break` 2, `dig` 1, 40 uses; 6 s), and 1 Ingot and 1 Tin Ore a **Fine pick** (`pick` 2; 5 s); at the **anvil** 6 Ingots make **Tin mail** (8 s) and 3 a **Tin helm** (6 s). The kiln, forge and anvil are stations (prop kinds `kiln`, `forge`, `anvil`, formerly `decor`); every one of these recipes is made on BlackPine only (`maps`), and, because the smithy opens with the medium party profile, from that profile (`profile`: a small party is not asked to forge). Hollowmere reaches tier 2 by carrying ingots or tools across. The first **tier-2 wall**: the fallen logs of the forests (stem `fallen_log`, class `thickLog`) are felled only with a `cut` 2 tool (`fellThickLog`: 5 s, 3 to 4 Logs, wears the tool by 2, back in 300 s); a plain axe is refused `NEED_TOOL` naming the Iron axe. The grindstone, the Miner's cap lamp and Warmth are not part of this step. No item here is role-bound; the Fine pick opens what a plain lock pick opens, and tier-3 locks are for later.
 
 **Logs** are the raw wood of a pile; they stack as a material and become Timber only at a saw (round 10, D3): the mill's
