@@ -48,6 +48,7 @@ import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // rou
 import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { RITE_COPY } from '../ui/copy/rite'; // story R7
 import { type RiteLayer, mountRiteLayer, riteShade } from '../ui/rite/RiteLayer'; // story R7
+import { type SermonLayer, mountSermonLayer } from '../ui/conversion/SermonLayer'; // story I9b
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
 import { type LineScreen, bellsNext, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
@@ -172,6 +173,7 @@ export class World extends Phaser.Scene {
   private civic: CivicLayer | null = null; // round 8, 8D
   private sleepLayer: SleepLayer | null = null; // round 10, A8
   private riteLayer: RiteLayer | null = null; // story R7: the martyr's shade and the Medium's rite
+  private sermonLayer: SermonLayer | null = null; // story I9b: the Vicar's sermon and the conversion toasts
   private shadeDeath = false; // story R7: the last death was the martyr's shade's, not a ghost's
   private purse: PurseHud | null = null; // round 8, 8C (locked)
   private mug: MugPrompt | null = null;
@@ -273,6 +275,15 @@ export class World extends Phaser.Scene {
     bodyMotion(this.bodyHud.root); // round 8, 8H (locked): hit flash, fresh and cured effect chips (UI.md 9)
     this.hud.setChip((this.registry.get(REG_ROLE_CHIP) as HudChip | undefined) ?? null);
     this.purse = mountPurseHud(this, feed, this.hud.root.querySelector('.wdi-hud__tl') ?? this.hud.root); // round 8, 8C (locked)
+    this.sermonLayer = mountSermonLayer(
+      this,
+      (text, kind, ms) => this.hud.toast(text, kind, undefined, ms),
+      () => {
+        this.feed.bell();
+        this.audio.play('bell');
+      },
+      () => (this.bell ? { ...this.bell, reach: BELL_REACH_PX } : null),
+    ); // story I9b
     void Promise.all([loadMapName(this.matchMap()), loadSceneName(this.sceneId)]).then(([map, scene]) =>
       this.hud.say(fill(C['hud.scene'], { map, scene }), 1500),
     );
@@ -402,6 +413,7 @@ export class World extends Phaser.Scene {
       this.civic?.destroy(); // round 8, 8D
       this.sleepLayer?.destroy(); // round 10, A8
       this.riteLayer?.destroy(); // story R7
+      this.sermonLayer?.destroy(); // story I9b
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
       this.line?.destroy(); // round 10, C1b
@@ -523,6 +535,7 @@ export class World extends Phaser.Scene {
   /** E / Use: the M5b layer takes it for a node or a giver in reach; otherwise the clue, body, bell and door verbs. */
   private useKey(down: boolean): void {
     if (this.shop?.use(down)) return; // round 8, 8C (locked): a shop counter in reach
+    if (this.sermonLayer?.use(down)) return; // story I9b: the Vicar look at the bell, by day (a tap still rings)
     if (this.civic?.use(down)) return; // round 8, 8D: an altar, the mailbag, a rack, the back room, a station, a bank
     if (this.sleepLayer?.use(down)) return; // round 10, A8: a bed in reach at dusk or night
     if (this.riteLayer?.use(down)) return; // story R7: the shade at the Medium

@@ -128,6 +128,8 @@ export type WorldFeedEvents = {
   };
   /** Private to the martyr's shade (story R3 to R5, GDD 3.20): the Medium's rite is open, begun, done or returned. */
   rite: S2CPayloads['rite'];
+  /** Story I9 (GDD 3.23), private to this seat: it is converted, its sermon ended (a count), or the parish is. */
+  conversion: S2CPayloads['conversion'];
   /** Private: a collect finished; the entry is in `notebook()`. */
   clueFound: { entryId: string };
   phaseChange: { phase: number; endsTick: number };
@@ -277,6 +279,8 @@ export interface WorldFeed {
   sell(shopId: string, itemId: string, qty: number): void;
   /** Round 8, 8D (GDD 3.23): this player's own Faith, `Private.faith`. */
   faith(): number;
+  /** Story I9 (GDD 3.23): on the dealt Vicar's view, how many other seats are converted (`Private.converted`); else 0. */
+  converted(): number;
   /** Round 10 (A7, GDD 3.32): whether this seat sleeps and, while it does, how many active players are in bed of how many. */
   sleeping(): { asleep: boolean; inBed: number; inBedOf: number };
   /** Round 8, 8D: each HQ station's bought tier by station id (`GameState.hq`, public; a station absent is unbuilt). */

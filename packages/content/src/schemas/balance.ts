@@ -521,13 +521,15 @@ export const BalanceFile = z.strictObject({
    * Story R3 (GDD 3.20, DECISIONS A602): the Medium's rite. The Medium stands at `site` (a scene and one of its
    * spawns: data, so the map revamp moves it without code); a shade within `reachTiles` of it starts the rite, which
    * runs `holdS` and cannot be interrupted. Story R5: the returned martyr's buff until dusk multiplies its speed by
-   * `buff.speedFactor` and its maximum health by `buff.maxHpFactor`.
+   * `buff.speedFactor` and its maximum health by `buff.maxHpFactor`. Story R6: while the dealt Vicar wears it, every
+   * other seat within `aura.tiles` gains `aura.faithPerS` Faith a second.
    */
   rite: Section({
     holdS: Seconds,
     reachTiles: Tiles,
     site: z.strictObject({ scene: z.string().min(1), spawn: z.string().min(1) }),
     buff: z.strictObject({ speedFactor: z.number().min(1), maxHpFactor: z.number().min(1) }),
+    aura: z.strictObject({ tiles: Tiles, faithPerS: z.number().positive() }),
   }),
   /**
    * Story I9 (GDD 3.23, DECISIONS A606; round 10 scope I9): conversion. A seat is converted once its private Faith

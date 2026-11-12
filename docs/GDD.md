@@ -858,7 +858,10 @@ R-Q1): the returned martyr wears the private effect **Ascended** (3.22) until th
 (1.3x) speed and `rite.buff.maxHpFactor` (2x) maximum health, and it comes back at that maximum. At dusk the effect
 comes off and the maximum falls back, taking any health above it. A return at the Final Night has no dusk ahead, so the
 buff lasts to the match's end. The buff follows the look like the return: it shows no sign, and only its speed is seen.
-The conversion aura waits on the conversion itself (I9; R6).
+**The conversion aura** (R6, A607; R-Q1, R-Q3): while the **dealt** Vicar wears Ascended, every other living, placed
+seat in its scene within `rite.aura.tiles` (4 tiles) of it gains `rite.aura.faithPerS` (3) Faith a second, to the Faith
+cap, and is converted at `conversion.faithAt` (3.23). The aura follows the dealt card, not the look: a cover in the
+Vicar's look comes back with the buff and no aura. It draws nothing and tells no one; each seat sees only its own Faith.
 The martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
 the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
 

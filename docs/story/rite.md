@@ -77,7 +77,7 @@ into `claude/story-part2`, and merging needs the orchestrator's word.
 | R3 | `claude/story-r-rite` | The Medium NPC at the rite site: an unkillable figure (no seat, no deal, no secret stream) in `sim/npc` or `sim/townsfolk`; the rite as a hold at the NPC, uninterruptible and free; a private `rite` message to the shade; the rite site as data; `balance.json` `rite.*` for the hold; GDD 3.20 | R-Q2, R2 |
 | R4 | `claude/story-r-return` | The return at the next day's start (R-Q5) on the Train's respawn path: `alive` true, at the site, the cooldowns where they stood; the gated `martyrWeight` (R-Q6, `Minigames.ts`); `Flow.ascendedVicarCandidate` removed (R-Q8); GDD 3.20; tests for no rite, rite before day, rite late, and a cover martyr | R3 |
 | R5 | `claude/story-r-buff` | The 10X buff for the return day: speed and health on GDD 3.22's effect table, numbers in `balance.json` `rite.buff.*`; the buff ends at dusk; GDD 3.20 and 3.22 | R-Q1, R4 |
-| R6 | (later) | The conversion aura: an area-spread conversion | **I9 conversion**, which is not built, and R-Q1 |
+| R6 | `claude/story-r6-aura` | The conversion aura: while the dealt Vicar is ascended, seats within `rite.aura.tiles` gain Faith (`addFaith`), and I9 converts them (A607) | I9 (#515, merged), R-Q1, R-Q3 |
 | R7 | `claude/story-r-client` | Client: the Medium's figure, the shade's view (no roles), the rite prompt and hold, the return, and the buff on the HUD. UI.md rows, e2e at 390w and 1280x720 with `--trace off` | R3 to R5 |
 | R8 | (P5, later) | Story: a section after `arc.md` 3.2 where the player takes the shade to the rite and plays the 10X Vicar against the Zealot. P0 adds it to `arc.md` first | R4, R5; P5 is on hold until the map revamp |
 
