@@ -16,6 +16,9 @@
         "coldShelves",
         "doughMixer",
         "brickOven",
+        "kiln",
+        "forge",
+        "anvil",
         "proofingCabinet"
       ]
     },

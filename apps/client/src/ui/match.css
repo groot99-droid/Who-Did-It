@@ -291,7 +291,8 @@
   accent-color: var(--wdi-night-accent);
 }
 
-.wdi-settings .wdi-settings__value {
+.wdi-settings .wdi-settings__value,
+.wdi-settings .wdi-settings__note {
   font-family: var(--wdi-font-text);
   color: var(--wdi-night-text-muted);
 }

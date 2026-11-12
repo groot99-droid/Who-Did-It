@@ -30,8 +30,13 @@ export function applyEffect(
 ): void {
   const tick = room.state.tick;
   // A dish's resistance shortens a Poisoned that starts; Nightshade (`flow.poisoned`) never reads it (round 10, D4a).
+  // A tin helm's daze resistance does the same for Dazed (round 10, S3).
   const scaled =
-    id === 'poisoned' ? Math.round(durationTicks * factorOf(body, (d) => d.poisonFactor)) : durationTicks;
+    id === 'poisoned'
+      ? Math.round(durationTicks * factorOf(body, (d) => d.poisonFactor))
+      : id === 'dazed'
+        ? Math.round(durationTicks * (armourOf(room, target).resist.dazed ?? 1))
+        : durationTicks;
   const untilTick = scaled > 0 ? tick + scaled : 0;
   const on = body.effects.get(id);
   if (on) {
