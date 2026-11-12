@@ -6,6 +6,8 @@ export interface AutoArgs {
   difficulty: 'easy' | 'normal' | 'hard';
   seats: number;
   json: boolean;
+  /** Round 10, x14 (A453): decode a shadow view per seat and check it against the server every tick. */
+  views: boolean;
 }
 
 const DEFAULTS: AutoArgs = {
@@ -15,6 +17,7 @@ const DEFAULTS: AutoArgs = {
   difficulty: 'normal',
   seats: 6,
   json: false,
+  views: false,
 };
 
 /** Null on a flag it does not know or a value it cannot read. */
@@ -24,6 +27,10 @@ export function parseArgs(argv: readonly string[]): AutoArgs | null {
     const flag = argv[i];
     if (flag === '--json') {
       out.json = true;
+      continue;
+    }
+    if (flag === '--views') {
+      out.views = true;
       continue;
     }
     const value = argv[i + 1];
