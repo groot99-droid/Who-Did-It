@@ -1,0 +1,13 @@
+{
+  "name": "slate_storm",
+  "sky": {
+    "zenith": [0.013, 0.017, 0.030],
+    "horizon": [0.060, 0.070, 0.100],
+    "glow": [0.16, 0.12, 0.11],
+    "glow_height": 0.10,
+    "stars": 0.15
+  },
+  "fog": {"density": 0.018},
+  "snowfall": {"count": 9000, "radius": 0.008, "speed": 1.6, "wind": [1.4, -0.5]},
+  "color": {"exposure": 1.35}
+}

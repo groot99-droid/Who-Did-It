@@ -1,0 +1,48 @@
+{
+  "name": "last_lantern",
+  "sky": {
+    "zenith": [0.006, 0.010, 0.022],
+    "horizon": [0.020, 0.027, 0.046],
+    "glow": [0.036, 0.036, 0.048],
+    "glow_width": 55.0,
+    "glow_height": 0.12,
+    "horizon_height": 0.28,
+    "ground": [0.004, 0.005, 0.009],
+    "stars": 0.3,
+    "moon_disc": 2.2,
+    "moon_size": 2.4
+  },
+  "moon": {
+    "energy": 0.25,
+    "azimuth": 314.0,
+    "elevation": 28.0,
+    "volume": 1.0
+  },
+  "fog": {
+    "density": 0.017,
+    "height": 5.5,
+    "color": [0.84, 0.80, 0.76],
+    "anisotropy": 0.45,
+    "mere_density": 0.065,
+    "mere_top": 3.0
+  },
+  "lights": {
+    "lantern": {"energy": 400.0, "color": [1.0, 0.48, 0.15], "volume": 1.0, "bulb": 55.0},
+    "lamp": {"energy": 85.0, "color": [1.0, 0.46, 0.13], "volume": 0.9},
+    "headlamp": {"color": [1.0, 0.74, 0.42], "volume": 0.2},
+    "window": {"energy": 240.0, "color": [1.0, 0.54, 0.20], "volume": 0.6},
+    "teal": {"energy": 100.0, "color": [0.17, 0.88, 0.92], "volume": 0.8},
+    "shrine": {"energy": 60.0, "color": [1.0, 0.42, 0.10]},
+    "drowned": {"energy": 60.0, "color": [0.22, 0.92, 0.76], "volume": 1.4}
+  },
+  "emissive": {"strength": 3.5},
+  "snowfall": {"count": 5500, "radius": 0.009, "speed": 0.85, "wind": [0.22, -0.10]},
+  "color": {"exposure": 0.9},
+  "post": {
+    "bloom": 1.0,
+    "bloom_threshold": 0.55,
+    "bloom_size": 0.7,
+    "saturation": 1.10,
+    "gain": [1.04, 1.0, 0.92]
+  }
+}

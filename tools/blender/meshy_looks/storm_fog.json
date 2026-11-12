@@ -1,0 +1,45 @@
+{
+  "name": "storm_fog",
+  "sky": {
+    "zenith": [0.012, 0.017, 0.029],
+    "horizon": [0.024, 0.031, 0.046],
+    "glow": [0.058, 0.070, 0.092],
+    "glow_azimuth": 322.0,
+    "glow_width": 45.0,
+    "glow_height": 0.9,
+    "horizon_height": 0.6,
+    "ground": [0.026, 0.033, 0.048],
+    "light": 1.0,
+    "stars": 0.0,
+    "moon_disc": 0.55,
+    "moon_size": 3.2,
+    "moon_halo": 0.12
+  },
+  "moon": {
+    "soft_angle": 18.0,
+    "volume": 0.8
+  },
+  "fog": {
+    "density": 0.050,
+    "height": 9.0,
+    "color": [0.82, 0.87, 0.95],
+    "anisotropy": 0.5,
+    "mere_density": 0.08,
+    "patchiness": 0.4
+  },
+  "lights": {
+    "lantern": {"energy": 250.0, "volume": 0.4, "bulb": 110.0},
+    "lamp": {"energy": 75.0, "volume": 0.5},
+    "headlamp": {"volume": 0.2},
+    "window": {"energy": 110.0, "volume": 0.11},
+    "drowned": {"volume": 0.35}
+  },
+  "snow": {"joint_snow": 0.85, "roof": 0.95},
+  "snowfall": {"count": 9000, "radius": 0.012, "speed": 1.5, "wind": [1.2, -0.5]},
+  "color": {"look": "AgX - Medium High Contrast", "exposure": 1.6},
+  "post": {
+    "bloom": 0.75,
+    "bloom_threshold": 0.7,
+    "bloom_size": 0.65
+  }
+}

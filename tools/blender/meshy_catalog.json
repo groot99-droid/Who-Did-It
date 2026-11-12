@@ -1,0 +1,680 @@
+{
+ "note": "Meshy models, original Meshy textures kept (no toon re-material). size_m = longest bounding-box side in metres at human scale (a door is about 2.1 m), front = the side that carries the door or sign as the model is stored (S = -y; `none` for trees, posts and walls). Both were set on 2026-11-11 from orientation sheets (meshy_orient_sheets.py) read by two independent reviewers per model. Origin = footprint centre at ground.",
+ "models": {
+  "Abandoned_Tin_Mine": {
+   "file": "Abandoned_Tin_Mine.glb",
+   "kind": "building",
+   "size_m": 7.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Rock outcrop with a timber-propped mine adit on its south face: a weathered sign reading \"TIN GALLERY\" on a frame above the lintel, an ore cart on narrow-gau..."
+  },
+  "Blackpine_Bunkhouse": {
+   "file": "Blackpine_Bunkhouse.glb",
+   "kind": "building",
+   "size_m": 14.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Long, low single-storey log bunkhouse with a shingle gable roof (ridge east-west) carrying a short chimney and several stovepipes, and a full-length posted p..."
+  },
+  "Blackpine_Mining_Office_Bank": {
+   "file": "Blackpine_Mining_Office_Bank.glb",
+   "kind": "building",
+   "size_m": 8.35,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Western false-front timber office and bank: gable-peaked false front with a large sign reading \"BLACKPINE MINING CO.\" over \"OFFICE & BANK\", a shingled porch ..."
+  },
+  "Error_Deletion_Ray": {
+   "file": "Error_Deletion_Ray.glb",
+   "kind": "prop",
+   "size_m": 0.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "W",
+   "note": "Anachronistic sci-fi ray gun: tan ringed barrel with a yellow emitter tip and cyan energy wisps, cyan canister under the barrel, pistol grip, exposed circuit..."
+  },
+  "Frontier_Bakery": {
+   "file": "Frontier_Bakery.glb",
+   "kind": "building",
+   "size_m": 11.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Single-storey Old West false-front bakery with a cream and yellow facade, shingled roof hipped at the front, and a porch with barrels"
+  },
+  "Frontier_Detective_Bureau": {
+   "file": "Frontier_Detective_Bureau.glb",
+   "kind": "building",
+   "size_m": 10.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Two-storey weathered timber courthouse with blue trim, a tall false front, covered front porch with steps and a barrel, and stone chimneys at the two north c..."
+  },
+  "Frontier_Post_Office": {
+   "file": "Frontier_Post_Office.glb",
+   "kind": "building",
+   "size_m": 9.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Single-storey weathered plank post office with dark red trim, a false front, a front porch stacked with crates and parcels, and an angled stovepipe on the ea..."
+  },
+  "Frostbitten_Fisherman_s_Wharf": {
+   "file": "Frostbitten_Fisherman_s_Wharf.glb",
+   "kind": "building",
+   "size_m": 9.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Dark weathered timber fisherman's shack on a mortared stone foundation, L-shaped with a tall steep-gabled main block on the west and a lower gabled wing on t..."
+  },
+  "Frostbitten_Woodshed": {
+   "file": "Frostbitten_Woodshed.glb",
+   "kind": "building",
+   "size_m": 4.2,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Small lean-to firewood shed of weathered grey planks with a snow-dusted single-pitch plank roof that drops toward the south"
+  },
+  "Frostbound_Bell_Tower": {
+   "file": "Frostbound_Bell_Tower.glb",
+   "kind": "prop",
+   "size_m": 5.55,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Open timber-frame bell tower: four splayed legs with knee braces carry a shingled gable roof (ridge north-south) over a hanging bell with a pull rope"
+  },
+  "Frostbound_County_Jail": {
+   "file": "Frostbound_County_Jail.glb",
+   "kind": "building",
+   "size_m": 6.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "One-room stone jail with a snowy shingle gable roof (ridge north-south), a chimney on the east slope and a timber porch across the south gable; the board in ..."
+  },
+  "Frostbound_Freight_Dock": {
+   "file": "Frostbound_Freight_Dock.glb",
+   "kind": "building",
+   "size_m": 8.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Raised timber loading platform on cross-braced posts, stacked with crates and barrels along its north edge"
+  },
+  "Frostbound_Gate": {
+   "file": "Frostbound_Gate.glb",
+   "kind": "kit",
+   "size_m": 5.2,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Rustic picket-fence section with a braced gate leaf just east of a taller centre post that carries a hanging lantern"
+  },
+  "Frostbound_Notice_Board": {
+   "file": "Frostbound_Notice_Board.glb",
+   "kind": "prop",
+   "size_m": 2.85,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Roofed, double-sided timber notice board on a snowy rock slab: snow-dusted plank roof, papers pinned across both faces (no legible text), dead vines on the p..."
+  },
+  "Frostbound_Outpost": {
+   "file": "Frostbound_Outpost.glb",
+   "kind": "building",
+   "size_m": 17.0,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Palisaded lookout outpost on a tall rock outcrop: log cabin with a stone chimney on the W/NW side, a roofed timber watchtower on the NE side tied to the cabi..."
+  },
+  "Frostbound_Rails": {
+   "file": "Frostbound_Rails.glb",
+   "kind": "kit",
+   "size_m": 17.0,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "none",
+   "note": "Straight kit length of railway track running E-W on a raised, snow-dusted rocky ballast bed with rounded ends: two rails on closely spaced timber sleepers"
+  },
+  "Frostbound_Union_Hall": {
+   "file": "Frostbound_Union_Hall.glb",
+   "kind": "building",
+   "size_m": 17.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Large two-storey log-and-timber hall with steep slate roofs, dormers and stone chimneys, L-shaped in plan with the notch at the SE corner"
+  },
+  "Frostbound_Warden_Gate": {
+   "file": "Frostbound_Warden_Gate.glb",
+   "kind": "kit",
+   "size_m": 4.0,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "N",
+   "note": "Rough fence-style gate panel: two tall end posts joined by lashed rails carrying sharpened stakes of uneven height, hung with small charms/talismans, on an h..."
+  },
+  "Frostbound_Waymarker": {
+   "file": "Frostbound_Waymarker.glb",
+   "kind": "prop",
+   "size_m": 2.8,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Weathered timber waymarker signpost on a low mound of stones and roots: vine-wrapped central post carrying three crossed finger boards, hanging bone/twig cha..."
+  },
+  "Frostbound_Waystation": {
+   "file": "Frostbound_Waystation.glb",
+   "kind": "building",
+   "size_m": 12.5,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Raised timber-and-stone platform carrying a small gabled log cabin (stone chimney, lit windows on its S and N faces) at the east end and an open snow-roofed ..."
+  },
+  "Frostbound_Wishing_Well": {
+   "file": "Frostbound_Wishing_Well.glb",
+   "kind": "prop",
+   "size_m": 2.9,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Round rubble-stone well with a shingled gable roof on two braced posts, pulley wheel and rope, bundles of dried herbs and charms hanging from the eaves, a sp..."
+  },
+  "Frostbound_Witch_Hut": {
+   "file": "Frostbound_Witch_Hut.glb",
+   "kind": "building",
+   "size_m": 4.7,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Open-fronted witch's hut or stall: steep shingled gable roof with crossed horn-like ridge finials and a cobweb in each gable, stone rear and low side walls, ..."
+  },
+  "Frosted_Hearth_Cabin": {
+   "file": "Frosted_Hearth_Cabin.glb",
+   "kind": "building",
+   "size_m": 9.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Dark weathered plank cabin with a shingled gable roof, a large stone chimney on the west gable, a covered south porch cluttered with hanging tools and goods,..."
+  },
+  "Frostgrave_Chapel": {
+   "file": "Frostgrave_Chapel.glb",
+   "kind": "building",
+   "size_m": 13.0,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Gothic timber chapel with a steep slate roof, horn-like finials at the eaves and a bell-cote tower over the south entrance end; red-glowing lancet windows on..."
+  },
+  "Frostwood_Sawmill": {
+   "file": "Frostwood_Sawmill.glb",
+   "kind": "building",
+   "size_m": 10.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Two-storey weathered-timber water-powered sawmill with a gabled open porch on the south under a two-line sign whose lower word reads SAWMILL (the smaller upp..."
+  },
+  "Frostwood_Witch_Hut": {
+   "file": "Frostwood_Witch_Hut.glb",
+   "kind": "building",
+   "size_m": 10.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Crooked fairy-tale log cottage with a steep sagging shingle roof, a stone chimney on the east side, vines over the west roof and a dead tree at the south-wes..."
+  },
+  "Frozen_Crypt_of_Bones": {
+   "file": "Frozen_Crypt_of_Bones.glb",
+   "kind": "building",
+   "size_m": 7.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "A chunk of snow-crusted, root-covered rocky hillside holding a crypt entrance: a braced wooden double door on the left of the south face and a timber-framed ..."
+  },
+  "Frozen_Lantern_Post": {
+   "file": "Frozen_Lantern_Post.glb",
+   "kind": "prop",
+   "size_m": 3.2,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Frost-covered timber lamp post with a short cross-arm near the top and a glowing glazed lantern hanging from the east end of the arm"
+  },
+  "Hale_Barn": {
+   "file": "Hale_Barn.glb",
+   "kind": "building",
+   "size_m": 12.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Red gambrel-roofed timber barn with a dark shingle roof, a central cupola with a running-horse weather vane, and white signboards reading HALE BARN with a ho..."
+  },
+  "Mallory_Apothecary": {
+   "file": "Mallory_Apothecary.glb",
+   "kind": "building",
+   "size_m": 6.65,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Small single-storey plank shop with a tall false front, shingled gable roof and a snow-dusted front porch on a low stone footing"
+  },
+  "The_Drowned_Lantern": {
+   "file": "The_Drowned_Lantern.glb",
+   "kind": "building",
+   "size_m": 9.35,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Single-storey timber tavern on a stone plinth: a main north-south gabled block with a chimney, a cross-gabled wing on the north-west, and a gabled open porch..."
+  },
+  "The_Winter_Forge": {
+   "file": "The_Winter_Forge.glb",
+   "kind": "building",
+   "size_m": 6.3,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Open-fronted timber smithy with a steep shingled gable roof on a roughly 0.5 m high stone floor slab, with a stone chimney rising at the centre of the north ..."
+  },
+  "The_Witching_Lantern": {
+   "file": "The_Witching_Lantern.glb",
+   "kind": "prop",
+   "size_m": 2.15,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Crooked forked branch post wrapped in thorny vine, with a hook at the tip holding a lit kerosene hurricane lantern"
+  },
+  "Tycoon_s_Manor": {
+   "file": "Tycoon_s_Manor.glb",
+   "kind": "building",
+   "size_m": 18.25,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Large two-storey-plus-attic Queen Anne Victorian mansion in weathered green clapboard with cream trim: a balustraded front porch, two-storey bay windows on t..."
+  },
+  "Vicars_Chapel": {
+   "file": "Vicars_Chapel.glb",
+   "kind": "building",
+   "size_m": 9.75,
+   "batch": "web-2026-11-08",
+   "tris": 80000,
+   "front": "S",
+   "note": "Small weathered clapboard chapel on a stone foundation with a steep brown shingle gable roof, an open belfry with bell and cross over the entrance gable, dou..."
+  },
+  "widow_cottage": {
+   "file": "widow_cottage.glb",
+   "kind": "building",
+   "size_m": 6.0,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Small one-room plank cottage on a rubble-stone foundation with a snow-patched shingle gable roof (ridge east-west), a brick chimney at the east end and icicl..."
+  },
+  "emergency_bell": {
+   "file": "emergency_bell.glb",
+   "kind": "prop",
+   "size_m": 3.2,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Large alarm bell hung from a timber yoke in a four-post cross-braced frame under a small snow-patched shingle gable roof (ridge running north-south), standin..."
+  },
+  "village_pump": {
+   "file": "village_pump.glb",
+   "kind": "prop",
+   "size_m": 1.8,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Cast-iron hand pump with a finial top and long curved handle on a small square snow-dusted plank platform (about 1.2 x 1.4 m), with a stone trough and iron d..."
+  },
+  "kit_chest": {
+   "file": "kit_chest.glb",
+   "kind": "prop",
+   "size_m": 0.9,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "N",
+   "note": "Iron-bound wooden trunk with a flat lid, two iron straps running over the lid, ring handles on both short ends and a hasp lock on one long side"
+  },
+  "steam_locomotive": {
+   "file": "steam_locomotive.glb",
+   "kind": "vehicle",
+   "size_m": 10.95,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "W",
+   "note": "Small 1880s-style American steam locomotive (4-4-0 look) with a flared stack, box headlamp, cowcatcher, red-trimmed cab with open sides and red spoked drivin..."
+  },
+  "rail_car": {
+   "file": "rail_car.glb",
+   "kind": "vehicle",
+   "size_m": 10.4,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "E",
+   "note": "Snow-covered wooden passenger coach with a clerestory roof, eight arched windows per side, open end platforms with railings and steps, an end door at each en..."
+  },
+  "station_platform": {
+   "file": "station_platform.glb",
+   "kind": "building",
+   "size_m": 8.6,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Raised timber railway platform with a small gabled ticket booth at the east end (snowy roof, stovepipe), a bench, a barrel, a railing along the back and west..."
+  },
+  "marsh_dock_skiff": {
+   "file": "marsh_dock_skiff.glb",
+   "kind": "building",
+   "size_m": 9.5,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Small plank fishing hut with a snow-patched gabled roof and chimney on a timber dock raised on piles, with barrels, crates, a hoist post with a hanging block..."
+  },
+  "company_lamp_post": {
+   "file": "company_lamp_post.glb",
+   "kind": "prop",
+   "size_m": 3.5,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "none",
+   "note": "Ornate cast-iron street lamp: four-sided glazed lantern with a finial and snow on its cap, on a fluted column with a stepped square pedestal about 0.7 m wide"
+  },
+  "fisher_cottage": {
+   "file": "fisher_cottage.glb",
+   "kind": "building",
+   "size_m": 8.0,
+   "batch": "api-2026-11-11-batch1",
+   "tris": null,
+   "front": "S",
+   "note": "Small timber fisherman's cottage on a stone footing with a slate roof (ridge north-south), a stone chimney on the west wall, a south porch with arched door, ..."
+  },
+  "mine_adit": {
+   "file": "mine_adit.glb",
+   "kind": "building",
+   "size_m": 8.75,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Timber-framed mine portal with a snow-dusted gabled plank roof set into a free-standing, snow-capped rock outcrop"
+  },
+  "ore_cart": {
+   "file": "ore_cart.glb",
+   "kind": "prop",
+   "size_m": 1.7,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "W",
+   "note": "Plank-sided, iron-strapped mine ore cart with a tapered tub, four spoked iron wheels and snow on the rim, heaped with dark ore or coal"
+  },
+  "charcoal_kiln": {
+   "file": "charcoal_kiln.glb",
+   "kind": "building",
+   "size_m": 6.25,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Earth-and-turf mound charcoal kiln braced with leaning timber poles, with a short iron chimney on top and a modelled white smoke puff"
+  },
+  "mother_moll_hut": {
+   "file": "mother_moll_hut.glb",
+   "kind": "building",
+   "size_m": 6.3,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Small one-room log cabin with a snow-dusted sod roof weighted with stones and a rusty stovepipe chimney with a modelled smoke wisp"
+  },
+  "log_chute": {
+   "file": "log_chute.glb",
+   "kind": "building",
+   "size_m": 11.5,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "W",
+   "note": "Timber trestle log chute: a plank-sided, iced trough carrying three logs slopes from a small snow-roofed head-house on a braced tower at the east end down to..."
+  },
+  "broken_trestle": {
+   "file": "broken_trestle.glb",
+   "kind": "kit",
+   "size_m": 32.0,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "A wrecked timber railway trestle on its own chunk of snowy, rocky gully terrain: two deck stubs with low railings on cross-braced timber bents face each othe..."
+  },
+  "log_pond_landing": {
+   "file": "log_pond_landing.glb",
+   "kind": "building",
+   "size_m": 12.25,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Small snow-roofed log cabin with a stovepipe chimney near the north end of the roof and an open porch on its south gable, opening onto a raised plank landing..."
+  },
+  "shift_bell_post": {
+   "file": "shift_bell_post.glb",
+   "kind": "prop",
+   "size_m": 3.5,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Heavy iron-banded timber post on a snow-capped stone footing, carrying a braced cantilever arm under a small snow-dusted shingle gable roof whose ridge runs ..."
+  },
+  "powder_kegs": {
+   "file": "powder_kegs.glb",
+   "kind": "prop",
+   "size_m": 1.4,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "none",
+   "note": "Rope-lashed stack of about five or six small iron-hooped wooden powder kegs in two tiers, with a plank crate at the east end and an oil lantern standing on t..."
+  },
+  "timber_crib": {
+   "file": "timber_crib.glb",
+   "kind": "prop",
+   "size_m": 2.2,
+   "batch": "api-2026-11-11-batch2",
+   "tris": null,
+   "front": "S",
+   "note": "Square open timber crib frame: four heavy corner posts tied by bolted horizontal beams and thinner rails at several levels, some vertical planking low on the..."
+  },
+  "pine_tall": {
+   "file": "pine_tall.glb",
+   "kind": "kit",
+   "size_m": 14.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "none",
+   "note": "Tall, narrow snow-laden conifer with a bare brown lower trunk and drooping boughs carrying heavy snow"
+  },
+  "pine_short": {
+   "file": "pine_short.glb",
+   "kind": "kit",
+   "size_m": 7.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "none",
+   "note": "Short, squat, gnarled pine with a thick twisted trunk and a wide rounded crown buried in snow, on a snowy mound with a few rocks"
+  },
+  "dead_tree": {
+   "file": "dead_tree.glb",
+   "kind": "kit",
+   "size_m": 6.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "none",
+   "note": "Leafless, twisted dead tree with a thick spiralling trunk and claw-like bare branches lightly dusted with snow, on a snow-and-earth root mound with grass tufts"
+  },
+  "hanging_oak": {
+   "file": "hanging_oak.glb",
+   "kind": "kit",
+   "size_m": 9.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "S",
+   "note": "Massive old oak with a very thick trunk (about 2.4 m across) and sparse brown dead leaves, with snow on the limbs and roots"
+  },
+  "hollow_log": {
+   "file": "hollow_log.glb",
+   "kind": "kit",
+   "size_m": 3.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "E",
+   "note": "Fallen hollow log lying east-west, open right through, with rough bark, moss and snow along the top"
+  },
+  "boulder_set": {
+   "file": "boulder_set.glb",
+   "kind": "kit",
+   "size_m": 2.5,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "none",
+   "note": "Cluster of three weathered grey-brown boulders, one large at the north and two smaller at the south-west and south-east, with moss or lichen patches, snow ca..."
+  },
+  "cliff_section": {
+   "file": "cliff_section.glb",
+   "kind": "kit",
+   "size_m": 11.5,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "S",
+   "note": "Thin slab (0.83 m deep) of layered rock cliff with snowy ledges, icicles and diagonal timber shoring on its south face"
+  },
+  "drystone_wall": {
+   "file": "drystone_wall.glb",
+   "kind": "kit",
+   "size_m": 4.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "S",
+   "note": "Straight modular length of drystone wall topped with dead brambles or brush and patches of snow, with two small lanterns hanging from iron brackets on the so..."
+  },
+  "split_rail_fence": {
+   "file": "split_rail_fence.glb",
+   "kind": "kit",
+   "size_m": 7.75,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "none",
+   "note": "Zig-zag run of weathered wooden split-rail fence: four three-rail panels on five snow-capped posts, footprint about 1 m deep because of the zig-zag"
+  },
+  "graveyard_set": {
+   "file": "graveyard_set.glb",
+   "kind": "kit",
+   "size_m": 5.0,
+   "batch": "api-2026-11-11-batch3",
+   "tris": null,
+   "front": "S",
+   "note": "Small raised graveyard plot on an oval stone-rimmed, snow-dusted dirt mound: a tall carved stone cross at the north end, several leaning headstones, an iron ..."
+  },
+  "crates_barrels": {
+   "file": "crates_barrels.glb",
+   "kind": "prop",
+   "size_m": 1.8,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "Snow-dusted pile of wooden shipping crates and two barrels (barrels on the east side, crates on the west) with a coil of rope and a kerosene lantern on top, ..."
+  },
+  "hay_cart": {
+   "file": "hay_cart.glb",
+   "kind": "prop",
+   "size_m": 3.6,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "W",
+   "note": "Four-wheeled wooden farm wagon with staked plank sides, loaded with hay bales partly covered by a grey tarpaulin, snow-dusted, with a short draw-pole at the ..."
+  },
+  "scarecrow": {
+   "file": "scarecrow.glb",
+   "kind": "prop",
+   "size_m": 2.05,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "Scarecrow on a wooden post and crossbar with a burlap-sack head and stitched smile under a flat cap, straw hair and cuffs, and a ragged dark coat with belt a..."
+  },
+  "wolf_pelt_door": {
+   "file": "wolf_pelt_door.glb",
+   "kind": "prop",
+   "size_m": 2.65,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "Free-standing heavy plank door in a timber frame under a small snow-dusted shingled awning, with a wolf pelt (head uppermost) nailed to the south face, iron ..."
+  },
+  "stalagmite_cluster": {
+   "file": "stalagmite_cluster.glb",
+   "kind": "kit",
+   "size_m": 3.0,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "Diorama-like cave/mine piece on a round rock plinth: a tall ochre stalagmite spire with several smaller ones, a timber gallows bracket with a lit lantern on ..."
+  },
+  "drowned_lantern": {
+   "file": "drowned_lantern.glb",
+   "kind": "prop",
+   "size_m": 3.0,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "A square timber post with a small hipped shingle roof cap (snow on the north and south ends, ridge running north-south) and a large oil lantern hanging from ..."
+  },
+  "wood_stack": {
+   "file": "wood_stack.glb",
+   "kind": "prop",
+   "size_m": 2.2,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "An open-fronted firewood shelter with a plank back, slatted sides and a snow-covered lean-to shingle roof that is high at the back and slopes down over the o..."
+  },
+  "notice_board_2": {
+   "file": "notice_board_2.glb",
+   "kind": "prop",
+   "size_m": 2.6,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "A free-standing timber notice board on two posts under a small snow-covered gable shingle roof with icicles"
+  },
+  "tombstone_tomorrow": {
+   "file": "tombstone_tomorrow.glb",
+   "kind": "prop",
+   "size_m": 1.7,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "A grave plot with a shouldered-arch grey headstone at the north end, a low snow-dusted wooden fence around a mound of dark earth, a red flower bouquet on the..."
+  },
+  "cave_pool_rock": {
+   "file": "cave_pool_rock.glb",
+   "kind": "kit",
+   "size_m": 9.75,
+   "batch": "api-2026-11-11-batch4",
+   "tris": null,
+   "front": "S",
+   "note": "A rock grotto kit piece: snow-capped rock walls on the north and west wrap a dark pool with a low rocky rim on the south and east, with icicles hanging from ..."
+  }
+ }
+}

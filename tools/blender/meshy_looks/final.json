@@ -1,0 +1,36 @@
+{
+  "name": "final",
+  "render": {"shadow_scale": 0.6, "motion_blur": 0.25, "motion_blur_max": 24, "filter_size": 1.8},
+  "sky": {
+    "zenith": [0.007, 0.012, 0.028],
+    "horizon": [0.026, 0.034, 0.058],
+    "glow": [0.42, 0.20, 0.12],
+    "glow_azimuth": 205.0,
+    "glow_width": 70.0,
+    "glow_height": 0.10,
+    "horizon_height": 0.30,
+    "ground": [0.024, 0.030, 0.050],
+    "light": 1.6,
+    "stars": 0.6,
+    "moon_disc": 1.6,
+    "moon_size": 2.4,
+    "moon_halo": 0.035
+  },
+  "moon": {"energy": 1.1, "color": [0.80, 0.88, 1.0], "azimuth": 325.0, "elevation": 19.0, "soft_angle": 2.5, "volume": 1.0},
+  "fog": {"density": 0.006, "height": 6.0, "color": [0.70, 0.78, 0.92], "patchiness": 0.85, "mere_density": 0.11},
+  "lights": {
+    "lantern": {"energy": 220.0, "color": [1.0, 0.56, 0.24], "volume": 0.7, "bulb": 34.0},
+    "lamp": {"energy": 55.0, "color": [1.0, 0.56, 0.24]},
+    "headlamp": {"energy": 450.0, "volume": 0.15},
+    "window": {"energy": 110.0, "color": [1.0, 0.58, 0.26]},
+    "teal": {"energy": 50.0, "color": [0.30, 0.90, 0.74]},
+    "shrine": {"energy": 25.0},
+    "drowned": {"energy": 80.0, "color": [0.22, 0.92, 0.76], "bulb": 16.0, "volume": 0.5}
+  },
+  "emissive": {"strength": 2.0},
+  "snow": {"tint": [0.88, 0.91, 0.96], "shade": [0.60, 0.67, 0.80], "roughness": 0.55, "cobble_roughness": 0.18, "joint_snow": 0.65, "roof": 0.9},
+  "water": {"roughness": 0.16},
+  "snowfall": {"count": 3600, "radius": 0.008, "speed": 0.6, "wind": [0.15, -0.06], "glow": 0.2},
+  "color": {"look": "AgX - Medium High Contrast", "exposure": 1.25},
+  "post": {"bloom": 0.45, "bloom_threshold": 1.0, "bloom_size": 0.45, "saturation": 1.08, "lift": [1.0, 1.002, 1.006]}
+}
