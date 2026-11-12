@@ -1,6 +1,6 @@
 # Story mode part 2: orchestrator handoff
 
-Written 2026-11-10 (updated 2026-11-11 after #498 to #511 and the finisher's report) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
+Written 2026-11-10 (updated 2026-11-12 after #513, #515 and the finisher's third grant) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
 session can resume without the chat. It restates no rule or number: those stay in `docs/GDD.md` and
 `packages/content/data/balance.json`. Decisions the owner makes belong in `docs/DECISIONS.md`.
 
@@ -48,10 +48,13 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
   #502 (R1), #505 (R2), #507 (R3), #508 (R4), #509 (R5), #510 (R7) and #511 (status log). R6 (conversion aura) waits on I9;
   R8 (story section) waits on the map revamp. R fixed three e2e/server races on the way (`skipOpening` helper, `npc.spec`
   NPC-vote assumption, `figuresInView.test.ts`), which bears on open decision 10.
+- #513 (the previous handoff) and S3's #512 are merged into `claude/story-part2`. R's I9 is draft #515 into `claude/story-part2`: the owner
+  chose option (a), keep the listener's once-a-day Faith, and R records it in A606 with the I9b PR; R merges #515 when green.
 - I9 (conversion: Faith, `conversion.faithAt`, sermon hold at the bell) is being built by R on `claude/story-i9-conversion`
   (DECISIONS A606). The owner wants the Vicar to ring the bell every 60 s; the number belongs in `balance.json` and GDD 3.23 only.
-- The finisher holds two owner grants, both for #441 only: the `invariants.test.ts` seed offset and the `npcChores.test.ts`
-  `heldBySnare` edit. S3's work is done; S3 was told to target `claude/story-part2`, not this branch. Nothing is archived unasked.
+- The finisher holds three owner grants, all for #441 only: the `invariants.test.ts` seed offset, the `npcChores.test.ts`
+  `heldBySnare` edit and the `npcChores.test.ts` line 75 `+ 2` to `+ 3` (the `walkCap` source change was refused). It reported
+  `npcChores` 12/12 runs passing; its full server suite was still running, and #441 is not merged. S3's work is done; S3 was told to target `claude/story-part2`, not this branch. Nothing is archived unasked.
 - Nothing from `claude/story-part2` has gone to the production base. Merging it there deploys and needs the owner's say-so.
 - The finisher reports it squash-merged #438 (x16, `act()` tick wait) into the production base as `0c3550b` on
   what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
