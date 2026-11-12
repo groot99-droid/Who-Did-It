@@ -1,5 +1,6 @@
 import mitt from 'mitt';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { isArtStyleLocked, resetArtStyleForTests } from '../view/artStyle';
 import type { NetEvents, NetworkService } from './NetworkService';
 import { installWorldRouter } from './worldRouter';
 
@@ -43,8 +44,10 @@ function setup() {
   const entered = vi.fn();
   bus.on('sceneEnter', entered);
   installWorldRouter(game as never, net, { mock: false });
-  return { active, calls, room, entered, game };
+  return { active, calls, room, entered, game, bus };
 }
+
+afterEach(() => resetArtStyleForTests());
 
 const enter = { sceneId: 'overworld', spawn: 'square_0', facing: 's' };
 const start = { reason: 'body', callerId: 'a', bodyOf: 'b', missing: [] };
@@ -96,5 +99,26 @@ describe('world router', () => {
     room.emit('phaseChange', { phase: 0, endsTick: 0 });
     expect(active.has('GameOver')).toBe(false);
     expect(calls.at(-1)).toBe('start Lobby');
+  });
+
+  // Round 10, S5 (A534): the art style is fixed from Start (the reveal) to game over, the lobby or a lost connection.
+  it('fixes the art style from the reveal to game over, the lobby or a lost connection', () => {
+    const { room, bus } = setup();
+    const reveal = { team: 'town', goal: 'Stay alive.' };
+    expect(isArtStyleLocked()).toBe(false);
+    bus.emit('roleReveal', reveal as never);
+    expect(isArtStyleLocked()).toBe(true);
+    room.emit('sceneEnter', enter);
+    room.emit('meetingStart', start);
+    expect(isArtStyleLocked()).toBe(true);
+    room.emit('gameOver', { winner: 1, roles: {}, summary: '' });
+    expect(isArtStyleLocked()).toBe(false);
+    bus.emit('roleReveal', reveal as never);
+    room.emit('phaseChange', { phase: 0, endsTick: 0 });
+    expect(isArtStyleLocked()).toBe(false);
+    bus.emit('roleReveal', reveal as never);
+    room.emit('sceneEnter', enter);
+    bus.emit('left', undefined as never);
+    expect(isArtStyleLocked()).toBe(false);
   });
 });

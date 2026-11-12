@@ -78,12 +78,16 @@ describe('NPC seats and snares (K6b)', () => {
     expect(heldBySnare(party.room, human)).toBe(true);
     addStack(party.room.state.players.get(npc)!, 'rope', 1);
     placeSeat(party, npc, 'forest', x + 4, y);
+    // The gap is read at the freeing: afterwards the seat goes back to its routine and may walk off.
     let freed = false;
-    advance(party, 60, () => (freed ||= !heldBySnare(party.room, human)));
+    let gap = Infinity;
+    advance(party, 60, () => {
+      if (freed || heldBySnare(party.room, human)) return;
+      freed = true;
+      gap = Math.abs(simOf(party.room).players.get(npc)!.x - simOf(party.room).players.get(human)!.x);
+    });
     expect(freed).toBe(true);
-    expect(
-      Math.abs(simOf(party.room).players.get(npc)!.x - simOf(party.room).players.get(human)!.x),
-    ).toBeLessThan(3 * 32);
+    expect(gap).toBeLessThan(3 * 32);
   });
 
   it('a stall that sells Snares draws an NPC seat that holds none and can pay; it buys one by its roll', async () => {
