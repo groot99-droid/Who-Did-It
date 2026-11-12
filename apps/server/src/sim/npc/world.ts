@@ -9,6 +9,7 @@ import { fleeCreature } from '../mobs/flee';
 import { followPartner, shielded } from '../law/Pairing';
 import { canSee } from '../Sight';
 import { runBodyBands } from './hive/bands';
+import { runNpcSnares } from './snares';
 import { seesPoint } from './hive/senses';
 import { difficultyRow } from './difficulty';
 import { updateNeeds } from './needs';
@@ -303,6 +304,7 @@ export function runWorldNpc(
     return stand(p);
   }
   if (runBodyBands(room, mem, brain, player, p)) return; // round 8, 8R: the body bands (GDD 3.12, granted by 6Z)
+  if (runNpcSnares(room, brain, player, p)) return; // round 10, K6b: a Rope for a held seat; a Snare set outdoors
 
   // Night: keep to lit scenes (GDD 3.12 "Night"). The leave delay is drawn on the first such tick, even while a
   // placement idle still holds the seat.

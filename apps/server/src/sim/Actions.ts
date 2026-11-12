@@ -13,6 +13,7 @@ import { emitSim } from './events/bus';
 import { bellOf, hubOf } from './MapSites';
 import { handleNightPower } from './NightPowers';
 import { type PlayerSim, simOf } from './RoomSim';
+import { handleSnareAbility } from './snares';
 import { handlePlantClue } from './verbs/evidence';
 import { handleKitAbility } from './verbs/hiding';
 import { handleCompare } from './verbs/dust';
@@ -85,6 +86,9 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'eatStew':
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
+    case 'snare': // round 10, K6 (GDD 3.5): `sim/snares.ts`
+    case 'rope':
+      return handleSnareAbility(room, sessionId, payload);
     case 'plantClue':
       return handlePlantClue(room, sessionId, payload, livingActor); // round 10, V1a (GDD 3.2)
     case 'chalk':
