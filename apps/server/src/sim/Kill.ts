@@ -16,6 +16,9 @@ import { emitNoise } from './Noise';
 import { type PlayerSim, simOf } from './RoomSim';
 import { knockBackPair, onBandagedStrike } from './Struck';
 import { isKillPhase, navGrid, reject, sceneKey } from './World';
+import { guardTarget, returnGuard } from './law/Guards';
+import { isPaintTown, onGuardDeath } from './paintTown';
+import { figureOfHandle, killFigure } from './townsfolk/figures';
 import { refusal, type Refusal } from './refusal';
 
 /** Kill cooldown in ticks for this party size (GDD 3.9; the row is cut to 4-10 like the deal). */
@@ -77,6 +80,7 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
   if (bodyBlocksAct(room, sessionId)) return reject(room, sessionId, 'DOWN_OR_STUNNED'); // round 8, 8A
   if (isJailed(room, sessionId))
     return reject(room, sessionId, 'IN_JAIL', { untilDawn: untilDawnS(room, sessionId) }); // B5
+  if (knifeGuard(room, sessionId, player.priv.cooldownEndTick, actor, payload.targetId)) return; // round 10, C5c
   const targetId = resolveHandle(room, sessionId, payload.targetId);
   const target = targetId === null ? undefined : sim.players.get(targetId);
   if (targetId === null || !target || targetId === sessionId) {
@@ -142,6 +146,52 @@ export function handleKill(room: PartyRoom, sessionId: string, payload: Record<s
     scarf: player.traits.scarf,
   });
   emitNoise(room, sceneId, target.x, target.y, balance.noise.killScream, 'scream', sessionId);
+}
+
+/**
+ * The Knife on a guard figure (round 10, C5c; GDD 3.24), in every mode: a guard in reach, standing or knocked out,
+ * dies as a figure dies (its body until the next meeting, no seat's death, no clue of a killer's look), and the
+ * striker is bloody, the Knife rests and the scream carries. In Paint The Town Red it waits for the next morning's
+ * train and its death may complete the pillars (`paintTown.ts`). Returns false when the handle is no guard's.
+ */
+function knifeGuard(
+  room: PartyRoom,
+  sessionId: string,
+  cooldowns: Map<string, number>,
+  actor: PlayerSim,
+  handle: unknown,
+): boolean {
+  const def = abilities.abilities.kill;
+  if (!def) return false;
+  const f = guardTarget(room, sessionId, { actor, def }, handle, (h) => figureOfHandle(room, h), {
+    allowDown: true,
+  });
+  if (f === undefined) return false;
+  if (f === null) return true;
+  const tick = room.state.tick;
+  const why = !isKillPhase(room.state.phase)
+    ? 'PHASE_CLOSED'
+    : actor.dead || !actor.placed
+      ? 'NOT_IN_PLAY'
+      : tick < actor.busyUntilTick
+        ? 'BUSY'
+        : tick < (cooldowns.get('kill') ?? 0)
+          ? 'COOLDOWN'
+          : null;
+  if (why !== null) {
+    reject(room, sessionId, why);
+    return true;
+  }
+  if (endImpersonation(room, sessionId)) sendDisguisePuff(room, actor);
+  const bloodDecay = clues.clues.blood?.decay;
+  actor.bloodyUntilTick = tick + (bloodDecay?.kind === 'seconds' ? bloodDecay.seconds : 0) * TICK_RATE;
+  cooldowns.set('kill', tick + killCooldownTicks(room));
+  const { x, y } = f;
+  killFigure(room, f, 'knife');
+  returnGuard(f); // no foe and no cuff while dead, so the morning train returns it to its post's route afresh
+  emitNoise(room, sceneKey(actor.sceneIdx), x, y, balance.noise.killScream, 'scream', sessionId);
+  if (isPaintTown(room)) onGuardDeath(room, f); // the step's win check reads the pillars at this tick
+  return true;
 }
 
 /**
