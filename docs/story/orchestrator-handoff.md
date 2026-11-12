@@ -50,7 +50,12 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
   NPC-vote assumption, `figuresInView.test.ts`), which bears on open decision 10.
 - #513 and #516 (the previous handoffs) and S3's #512 are merged into `claude/story-part2`. R's I9 is merged there too (#515,
   `9990a4b`, per R's report): the owner chose option (a), keep the listener's once-a-day Faith, recorded in A606. I9b is draft #518.
-  R6 (conversion aura) can start; R asked whether to start now or after #518, and the owner has not answered.
+  R6 started on the owner's word (2026-11-12): draft #521 into `claude/story-part2`, the dealt Vicar's aura (`rite.aura.tiles` 4,
+  `faithPerS` 3, A607). Open for the owner: the rate is about ten times a sermon listener's, so one return day could convert many
+  seats; and a seat next to a returned cover gains no Faith (accepted in R-Q3). Not yet merged; R merges its own PRs when green.
+- The owner granted, after the fact (2026-11-12), R's one existing-test edit in #515: `apps/client/e2e/screens.spec.ts` lock-pick
+  snap wait 5 s to 20 s (assertion unchanged). Any other existing-test edit still needs a grant asked of the orchestrator first.
+- #245 (old round-8 canon PR, no shared history with the base) was closed by the owner's word; its branch still exists.
 - I9 (conversion: Faith, `conversion.faithAt`, sermon hold at the bell) was built by R on `claude/story-i9-conversion`
   (DECISIONS A606), now merged. The owner wants the Vicar to ring the bell every 60 s; the number belongs in `balance.json` and GDD 3.23 only.
 - The finisher holds three owner grants, all for #441 only: the `invariants.test.ts` seed offset, the `npcChores.test.ts`
@@ -70,7 +75,7 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
 |---|---|---|---|
 | Orchestrator | `session_01M5mAcY1JPqjhPmoZ8CZDFp` | running | never archive |
 | P0 design | `session_01M5mAcXYe29zVwSB7eQSKQ5` | #499 and #501 merged; waiting on owner for the open items above | keep until the open items are answered; check live status before archiving (an archive on 2026-11-10 was reversed) |
-| Story R: the Medium's rite and the 10X Vicar | `session_01M5mAcVS17U3fpdfpYurWpn` | spawned by P0; R1 to R5 and R7 built and merged (#502 to #511), nothing open; R6 (conversion aura) unblocked by I9 (#515 merged; owner to say when), R8 (story section) waits on the map revamp | keep until R6 and R8 unblock; never archive unasked |
+| Story R: the Medium's rite and the 10X Vicar | `session_01M5mAcVS17U3fpdfpYurWpn` | spawned by P0; R1 to R5 and R7 built and merged (#502 to #511), I9 merged (#515); R6 is draft #521 and I9b draft #518 (both in CI); R8 (story section) waits on the map revamp | keep until #518, #521 merge and R8 unblocks; never archive unasked |
 | P2 sections engine | `session_01M5mAcVG1b3xhGH76C6nUHz` | review-ready (E14) | keep until merged and summarised |
 | Skipped-PR finisher (#437, #438, #435, #440, #441, K6b) | `session_01M5mAcY9qbhZ1CAniTBr7xH` | everything pushed (2026-11-10). #438 merged into the base (see above). #437 not merged: `e2e` failed twice on `match.spec.ts:169` (hud-clock hidden at startMatch), re-run spent, needs the base's e2e history or the trace (artifact 13597323394, run 42422463137). #435, #440, #441 not merged: each needs a base re-merge, the full server suite, `pnpm auto` at 50 and CI. #440 also has the Handcuffs prices/grant (owner) and an npcStuck failure in match 30 (forest near wall (9,14)) needing a nav fix or routing to 10F/10X. #441 is about 680 lines, over the 400-line rule: owner decides split or accept | keep until these are resolved; never archive unasked |
 | Accounts plan | `session_01M5mAcXu65m2U47WM1R6aso` | draft docs PR #472 | keep while #472 is open; account PR sessions A2+ spawn after Q1 to Q14 |
