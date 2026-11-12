@@ -137,6 +137,8 @@ describe("the Constables' own petitions (GDD 3.31, B3c)", () => {
       (id) => isNpcSeat(party.room, id) && id !== target,
     )!;
     placeSeat(party, other, 'bakery', 3, 4);
+    // The NPC seats stand, so no routine walks the collector off the clue mid-hold (a move cancels it, `runHolds`).
+    npcMemory(party.room).walk = false;
     handleHold(party.room, other, { action: 'collect', targetId: foot, on: true });
     advance(party, S(balance.law.briefingAfterS) + 4);
     expect(party.room.state.scenes.get('bakery')!.clues.get(foot)!.claimed).toBe(true);
