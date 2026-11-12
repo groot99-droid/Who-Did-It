@@ -20,6 +20,7 @@ import { runAction } from './actions';
 import { type Unit, unitsOf } from './units';
 import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
 import { castTable, holderOf, switchRole } from './handover';
+import { takeShade } from './shadeHandover';
 import { type Latches, hear, holds } from './triggers';
 import { releaseStoryHitman, turnForStory } from '../vendettas/arrival';
 import { resetProgress } from '../vendettas/progress';
@@ -365,6 +366,8 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
       new Set(state.units.map((c) => c.roleId)),
       chapter.vendetta,
     );
+    // Arc E15 (R8): a section that plays the shade gives the player the martyr's body, not the card in its own.
+    if (chapter.shade && !replay) takeShade(room, state.humanId);
     seekPhase(room, chapter);
   } else if (chapter.look !== undefined) {
     const player = room.state.players.get(state.humanId);

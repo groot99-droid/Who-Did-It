@@ -70,6 +70,15 @@ export function becomesShade(room: PartyRoom, seat: string, cause: DeathCause): 
   return true;
 }
 
+/** Story R8 (arc.md E15): the martyr's shade moves to the seat that took its body at a story's shade handover. */
+export function moveShade(room: PartyRoom, from: string, to: string): void {
+  const memory = memories.get(room);
+  if (!memory) return;
+  if (memory.martyr === from) memory.martyr = to;
+  if (memory.seat === from) memory.seat = to;
+  simOf(room).viewsDirty = true;
+}
+
 /** Ends the shade's wait without a ghost (R4's return): its seat and death tick, or null when none waits. */
 export function endShade(room: PartyRoom): { seat: string; deathTick: number } | null {
   const memory = memories.get(room);
