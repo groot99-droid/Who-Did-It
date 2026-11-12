@@ -51,7 +51,7 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
 - #513, #516 and #519 (the previous handoffs) and S3's #512 are merged into `claude/story-part2`. R's I9 (#515, `9990a4b`), I9b
   (#518, `8b62147`) and R6 (#521, `535b56f`) are merged there too, per R's reports (R1 to R7, I9 and I9b are all in the story branch;
   R6 started on the owner's word, 2026-11-12). The owner chose option (a), keep the listener's once-a-day Faith (A606). The aura is
-  the dealt Vicar's (`rite.aura.tiles` 4, `faithPerS` 3, A607). Open for the owner: the aura rate is about ten times a sermon
+  the dealt Vicar's (`rite.aura.tiles` 4, `faithPerS` 3, A607). The owner's default (2026-11-12) keeps the aura at these values. The rate is about ten times a sermon
   listener's, so one return day could convert many seats, and it merged at those values (a change is a follow-up PR); a seat next
   to a returned cover gains no Faith (accepted in R-Q3). R's status-log line for #521 is a one-line docs PR, merged by R when green.
 - The owner granted, after the fact (2026-11-12), R's one existing-test edit in #515: `apps/client/e2e/screens.spec.ts` lock-pick
@@ -65,7 +65,10 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
 - Nothing from `claude/story-part2` has gone to the production base. Merging it there deploys and needs the owner's say-so.
 - 25 PRs were open on 2026-11-12 (22 drafts into the production base). Triage (git only, nothing changed): the finisher's #435, #437,
   #440, #441 are current; seven are clean but old (#444, #430, #431, #425, #422, #397, #442); seven conflict (#447, #445, #443, #432,
-  #429, #428, #426); #245 has no shared history with the base; #464 duplicates the story branch. The owner has not yet decided any of them.
+  #429, #428, #426); #245 has no shared history with the base; #464 duplicates the story branch. On 2026-11-12 the owner answered "default on all questions", read as: change nothing. #245 was closed earlier; the other 21
+  stay as they are, and the finisher keeps its four.
+- R's status-log PR #523 for #521 is merged; R has no open PRs and waits only on R8 (the map revamp). "Default on all questions" does
+  not authorise merging `claude/story-part2` into the production base: that still needs the owner's explicit word and green CI.
 - The finisher reports it squash-merged #438 (x16, `act()` tick wait) into the production base as `0c3550b` on
   what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
   instruction. Confirm it was intended.
