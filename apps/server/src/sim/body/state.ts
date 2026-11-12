@@ -87,6 +87,17 @@ export function ensureBody(room: PartyRoom, id: string, figure = false): Body {
 }
 
 /** Drops a body (a death, a figure leaving); the seat's wire row empties. */
+/** Story R8 (arc.md E15): two seats exchange their health records, as they exchange bodies at the shade handover. */
+export function swapBodies(room: PartyRoom, a: string, b: string): void {
+  const map = memoryOf(room).bodies;
+  const ba = map.get(a);
+  const bb = map.get(b);
+  map.delete(a);
+  map.delete(b);
+  if (bb) map.set(a, bb);
+  if (ba) map.set(b, ba);
+}
+
 export function removeBody(room: PartyRoom, id: string): void {
   if (!memoryOf(room).bodies.delete(id)) return;
   const priv = room.state.players.get(id)?.priv;
