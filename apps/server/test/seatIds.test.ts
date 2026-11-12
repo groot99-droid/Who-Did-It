@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vites
 import type { ColyseusTestServer } from '@colyseus/testing';
 import type { Client } from 'colyseus';
 import { C2S, Phase, type PlayerState } from '@wdi/shared';
+import { flowOf } from '../src/sim/Flow';
 import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
 import { clientOf, seatOf } from '../src/sim/seatIds';
@@ -82,9 +83,9 @@ describe('fresh seat ids at Start (row 25)', () => {
     h.room.send(C2S.roleReady, {});
     await sleep(150);
     advance(party, 1);
-    room.broadcastPatch();
-    await sleep(150);
-    expect(stateOf(h).players.get(seat)?.ready).toBe(true);
+    // The card's Ready is private (GDD 3.17): it lands in the flow's set under the fresh seat, not the session id.
+    expect(flowOf(room).cardReady.has(seat)).toBe(true);
+    expect(flowOf(room).cardReady.has(h.id)).toBe(false);
   });
 
   it('records a leave during play on the fresh seat', async () => {
