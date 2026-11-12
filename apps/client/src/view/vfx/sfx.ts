@@ -21,6 +21,7 @@ export const NODE_BREAK: Readonly<Record<string, AudioKey>> = {
   tinOre: 'break_ore',
   resin: 'break_resin',
   herb: 'break_pluck',
+  berries: 'break_pluck',
   mushroom: 'break_pluck',
   coins: 'fx_coins',
 };
