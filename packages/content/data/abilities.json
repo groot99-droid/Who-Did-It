@@ -222,6 +222,8 @@
       "target": "ground",
       "castS": 0,
       "requires": "chalk",
+      "cooldownS": 5,
+      "params": { "symbols": 4 },
       "effect": "Draws a floor mark visible to everyone.",
       "ships": "V1",
       "gddRef": "3.2"
@@ -349,6 +351,22 @@
       "effect": "The ghost picks 1 of 8 phrases.",
       "ships": "V2",
       "gddRef": "3.2"
+    },
+    "derringer": {
+      "id": "derringer",
+      "name": "Derringer",
+      "scope": "item",
+      "kind": "active",
+      "target": "player",
+      "castS": 0,
+      "rangeTiles": 4,
+      "requires": "derringer",
+      "consumes": "derringer",
+      "noise": "shot",
+      "phases": ["day"],
+      "effect": "The Hitman's single shot by day, only at a figure drawn as his mark: a death the Train never returns (GDD 3.33).",
+      "ships": "V1",
+      "gddRef": "3.33"
     },
     "skeletonKey": {
       "id": "skeletonKey",

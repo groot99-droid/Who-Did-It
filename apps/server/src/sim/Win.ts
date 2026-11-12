@@ -13,6 +13,7 @@ import { isNpcSeat, resetNpcsForLobby } from './Npc';
 import { restoreSeats } from './seatIds';
 import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
 import { isOnLine } from './Train';
+import { hitmanGameOver, isDeparted } from './vendettas/arrival';
 import { SCENE_KEYS } from './World';
 
 /**
@@ -24,6 +25,7 @@ export function evaluateWin(room: PartyRoom): Outcome | null {
   const sim = simOf(room);
   const living: ReturnType<typeof factionOf>[] = [];
   room.state.players.forEach((p: PlayerState, id: string) => {
+    if (isDeparted(room, id)) return; // round 10, C4b: a Hitman who boarded the Dusk Train counts for nobody
     if (!sim.players.get(id)?.dead || isOnLine(room, id)) living.push(factionOf(p));
   });
   return checkWin(living, countRow(room.state.players.size).cabalWin);
@@ -41,7 +43,7 @@ const summaryOf = (winner: Outcome, town: string): string =>
       : `The Cabal holds ${town}. The Village is lost.`;
 
 /** Game over: the phase, the winner, the gameOver message and the match-log line (A30). */
-export function endMatch(room: PartyRoom, outcome: Outcome): void {
+export function endMatch(room: PartyRoom, outcome: Outcome, opts: { unseen?: boolean } = {}): void {
   // Round 10, C5: in Paint The Town Red the Killers win only by painting the town; the end trial closing without
   // it (the Final Night's Cabal verdict) is the Village's (GDD 3.8).
   const winner = isPaintTown(room) && outcome === 'cabal' ? 'village' : outcome;
@@ -56,6 +58,8 @@ export function endMatch(room: PartyRoom, outcome: Outcome): void {
     summary: summaryOf(winner, maps[mapIdOfRoom(room)].name),
     ...gameOverExtras(room),
     ...(isPaintTown(room) && { paintTown: paintGameOver(room) }),
+    ...(hitmanGameOver(room) && { hitman: hitmanGameOver(room) }), // round 10, C4b (seams.md 3 row 21)
+    ...(opts.unseen === true && winner === 'cabal' && { unseen: true }), // round 10, B6d (row 35)
   });
 
   const players: Parameters<typeof logMatch>[0]['players'] = [];
@@ -146,6 +150,8 @@ export function resetToLobby(room: PartyRoom): void {
     priv.lensCharges = 0;
     priv.myVote = '';
     priv.paintTown = false; // round 10, C5
+    priv.hitman = false; // round 10, C4
+    priv.departed = false;
   });
   for (const id of gone) state.players.delete(id);
   restoreSeats(room); // round 10, W1a: the human seats back under their session ids

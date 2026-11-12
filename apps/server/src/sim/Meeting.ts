@@ -21,7 +21,7 @@ import { clientOf } from './seatIds';
  * Everyone, living or dead, goes to the map's meeting spawns on the hub (`meetingSpawnsOf`) without a
  * `sceneEnter`; the placements come first.
  */
-function placeAtSquare(room: PartyRoom, announce: boolean): void {
+export function placeAtSquare(room: PartyRoom, announce: boolean): void {
   const sim = simOf(room);
   const spread = meetingSpawnsOf(room);
   room.state.players.forEach((player: PlayerState, id: string) => {

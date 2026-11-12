@@ -34,6 +34,7 @@ import {
   start,
   toWorld,
 } from './npcHelpers';
+import { fitting, tried } from './tribunalHelpers';
 
 /**
  * The county jail's games (round 10, D8; GDD 3.27): the gym (Strength), the yard fight (maximum health or a little
@@ -63,11 +64,12 @@ async function cell(): Promise<{ party: Party; seat: string }> {
   for (const f of figuresOf(party.room).values()) if (f.kind === 'constable') f.dead = true;
   advance(party, 1);
   const [a, b, c, d] = party.humans.map((h) => h.id) as [string, string, string, string];
-  handlePetitionOpen(party.room, a, { accused: d, charge: 'robbery', entries: [] });
+  handlePetitionOpen(party.room, a, { accused: d, charge: 'robbery', entries: fitting(party, a, d) });
   for (const id of [b, c]) handlePetitionSign(party.room, id, { id: party.room.state.petition.id });
   advance(party, 1);
   cuffSeat(party.room, d);
   advance(party, S(balance.jail.walkS) + 1);
+  tried(party, d); // B6a: the cell opened the Tribunal (6Z's grant)
   return { party, seat: d };
 }
 
