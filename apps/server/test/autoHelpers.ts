@@ -60,6 +60,8 @@ export const AUTO_EVENT_KINDS = [
   'phase',
   'start',
   'end',
+  'endTrial.open', // round 10, B6d: the Final Night's end trial (GDD 3.8)
+  'endTrial.verdict',
 ];
 
 /** `finalNight.afterCycle + 1` cycles of the longest discussion, after the role card, grace and the opening. */
