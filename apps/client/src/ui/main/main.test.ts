@@ -165,6 +165,32 @@ describe('the main end panel', () => {
     expect(panel.byTestId('gameover-alsowon')?.content).toBe('B was ejected as the Drifter');
   });
 
+  it("names the Hitman's run and lists a boarded Hitman as one, not as a Drifter (C4b)", () => {
+    const panel = root();
+    const hitman = { seatId: 'a', day: 4, stage: 'boarded' as const };
+    renderMainOver(asEl(panel), over({ alsoWon: ['b', 'a'], hitman }), players(''));
+    expect(panel.byTestId('gameover-hitman')?.content).toBe(
+      'A was turned on day 4, shot the mark and boarded the Dusk Train.',
+    );
+    expect(panel.byTestId('gameover-alsowon')?.content).toBe(
+      'B was ejected as the DrifterA boarded the Dusk Train as the Hitman',
+    );
+  });
+
+  it('draws one Hitman line for each stage short of boarding (C4b)', () => {
+    const lines = (['arrived', 'killed', 'stopped'] as const).map((stage) => {
+      const panel = root();
+      renderMainOver(asEl(panel), over({ hitman: { seatId: 'a', day: 3, stage } }), players(''));
+      expect(panel.byTestId('gameover-alsowon')).toBeUndefined();
+      return panel.byTestId('gameover-hitman')?.content;
+    });
+    expect(lines).toEqual([
+      'A was turned on day 3 and never shot the mark.',
+      'A was turned on day 3 and shot the mark, but never boarded the Dusk Train.',
+      'A was turned on day 3 and died before boarding the Dusk Train.',
+    ]);
+  });
+
   it('draws nothing when the server sent no looks, cards or winners', () => {
     const panel = root();
     renderMainOver(asEl(panel), over({}), players(''));

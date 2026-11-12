@@ -1567,7 +1567,9 @@ the Hitman: the mail turns a townsman into one.
   human may vote and speak at a meeting, whose all-voted early end waits on his vote as on any living seat's. A Hitman who killed but missed that day's Dusk Train does not win. With no
   kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
   frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
-  his death), and a boarded Hitman joins `alsoWon`.
+  his death), and a boarded Hitman joins `alsoWon`. On the client (UI.md 14.51.7) the Derringer takes the next free Q, R
+  or F slot (and a touch disc) while the own pack holds it, a departed seat sees the Departed screen in place of the
+  world, and the end panel draws one line for the Hitman's stage and names a boarded Hitman as one under Also won.
 - Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
   him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
   contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until

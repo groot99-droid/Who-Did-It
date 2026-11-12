@@ -430,6 +430,10 @@ export class MockWorldFeed implements WorldFeed {
     return false; // the mock has no train
   }
 
+  departed(): boolean {
+    return false; // the mock has no Hitman
+  }
+
   kill(targetId: string): void {
     this.ability('kill', targetId);
   }

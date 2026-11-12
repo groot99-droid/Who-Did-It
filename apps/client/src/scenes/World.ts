@@ -8,7 +8,7 @@ import { TICK_RATE, TILE_PX } from '@wdi/shared/constants';
 import { dirFromVector } from '@wdi/shared/direction';
 import { toScreen, toWorld } from '@wdi/shared/iso';
 import { InputController } from '../input/InputController';
-import { SLOT_ACTIONS, cardSlots } from '../input/actions';
+import { SLOT_ACTIONS, cardSlots, withPackAbilities } from '../input/actions';
 import { abilityDiscs, TouchControls } from '../input/TouchControls';
 import {
   REG_INPUT,
@@ -48,6 +48,7 @@ import { type CivicLayer, mountCivicLayer } from '../ui/econ/CivicLayer'; // rou
 import { type SleepLayer, mountSleepLayer } from '../ui/sleep/SleepLayer'; // round 10, A8
 import { mountPurseHud, type PurseHud } from '../view/purse/PurseHud'; // round 8, 8C (locked)
 import { type MugPrompt, mountMugPrompt } from '../ui/mug/MugPrompt';
+import { type DepartedScreen, mountDeparted } from '../ui/Departed'; // round 10, C4b
 import { type LineScreen, bellsNext, lineSecondsLeft, mountOnTheLine } from '../ui/OnTheLine'; // round 10, C1b
 import { EntityView } from '../view/EntityView';
 import { Hud, type HudChip } from '../view/Hud';
@@ -199,6 +200,10 @@ export class World extends Phaser.Scene {
   private wasDead = false;
   /** Round 10, C1b: the On-the-line screen while this seat waits for the morning train. */
   private line: LineScreen | null = null;
+  /** Round 10, C4b: the Departed screen of a Hitman who boarded the Dusk Train. */
+  private departedScreen: DepartedScreen | null = null;
+  /** The ability ids the touch discs were last drawn with (C4b: the pack's Derringer comes and goes). */
+  private discSig: string | null = null;
   /** What the last verb was, so a bare 422 reads as the deck's line for that verb. */
   private lastPhase = -1;
   private stepAt = 0;
@@ -217,6 +222,8 @@ export class World extends Phaser.Scene {
     this.focusEntry = null;
     this.wasDead = false;
     this.line = null;
+    this.departedScreen = null;
+    this.discSig = null;
   }
 
   preload(): void {
@@ -299,7 +306,7 @@ export class World extends Phaser.Scene {
         onAbility: (id) => this.useAbility(id), // round 10, 10Y (A334): one disc per active Q, R or F
         onStrike: () => this.strikeKey(), // round 8, 8A
       });
-      this.touch.setAbilities(abilityDiscs(getNet(this).roleCard));
+      this.refreshDiscs();
       input.attachTouch(this.touch);
     }
 
@@ -398,6 +405,7 @@ export class World extends Phaser.Scene {
       this.purse?.destroy(); // round 8, 8C (locked)
       this.mug?.destroy();
       this.line?.destroy(); // round 10, C1b
+      this.departedScreen?.destroy(); // round 10, C4b
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
@@ -435,6 +443,8 @@ export class World extends Phaser.Scene {
     this.watchPhase(clock.phase);
     if (!this.cutscenes.playing) this.refreshGhost();
     if (!this.cutscenes.playing) this.refreshLine(clock); // round 10, C1b
+    this.refreshDeparted(); // round 10, C4b
+    this.refreshDiscs(); // round 10, C4b
 
     const clues = feed.clues();
     const bodies = feed.bodies();
@@ -504,12 +514,14 @@ export class World extends Phaser.Scene {
     this.inspect?.card.close();
     this.hud.setHidden(true);
     this.touch?.setHidden(true);
+    this.departedScreen?.setHidden(true); // C4b: a meeting still opens for a departed seat
     this.lighting.setHidden(true);
   }
 
   private onWake(): void {
     this.hud.setHidden(false);
     this.touch?.setHidden(false);
+    this.departedScreen?.setHidden(false);
     this.bindKeys();
   }
 
@@ -560,9 +572,24 @@ export class World extends Phaser.Scene {
     this.hud.toast(C['toast.collect.cancel'], 'interact');
   }
 
+  /** The rows the slots and discs read: the card's abilities, then a pack ability whose item is held (C4b). */
+  private slotRows(): { id: string; name: string }[] {
+    return withPackAbilities(getNet(this).roleCard?.abilities, this.feed.inventory());
+  }
+
+  /** The touch discs, redrawn when the rows change: the Derringer comes mid-match and its shot spends it (C4b). */
+  private refreshDiscs(): void {
+    if (!this.touch) return;
+    const discs = abilityDiscs({ abilities: this.slotRows() });
+    const sig = discs.map((d) => d.id).join(',');
+    if (sig === this.discSig) return;
+    this.discSig = sig;
+    this.touch.setAbilities(discs);
+  }
+
   /** Q, R or F: the card's ability in that slot; a passive takes no slot (rolecards.md 3.2). */
   private abilityKey(index: number): void {
-    const slot = cardSlots(getNet(this).roleCard?.abilities)[index];
+    const slot = cardSlots(this.slotRows())[index];
     if (slot) this.useAbility(slot.id);
   }
 
@@ -572,7 +599,7 @@ export class World extends Phaser.Scene {
    */
   private useAbility(id: string): void {
     if (this.feed.dead()) return;
-    const row = getNet(this).roleCard?.abilities.find((a) => a.id === id);
+    const row = this.slotRows().find((a) => a.id === id);
     const def = row ? ABILITY_DEFS[row.id] : undefined;
     if (!row || !def || def.kind !== 'active') return;
     if (def.target === 'seat') return this.pickSeat(row.id, row.name);
@@ -797,6 +824,18 @@ export class World extends Phaser.Scene {
     if (!memory.on) return;
     memory.on = false; // the scene restarts on the platform, so the memory outlives this run
     this.hud.toast(C['line.back'], 'warm', undefined, 3000);
+  }
+
+  /** Round 10, C4b (GDD 3.33, UI.md 14.51.7): a boarded Hitman has left play; his screen stands in for the world. */
+  private refreshDeparted(): void {
+    if (!this.feed.departed()) {
+      this.departedScreen?.destroy();
+      this.departedScreen = null;
+      return;
+    }
+    if (this.departedScreen) return;
+    this.endUse();
+    this.departedScreen = mountDeparted(overlayRoot());
   }
 
   /** Ghost mode: your sprite translucent, "You are a ghost", the verbs off. The flag lives in the feed. */
