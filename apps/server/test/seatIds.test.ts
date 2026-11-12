@@ -23,7 +23,7 @@ vi.setConfig({ testTimeout: 60_000 });
 async function started(humans: number): Promise<{ party: Party; sessions: string[] }> {
   const party = await lobbyOf(colyseus, humans);
   pauseClock(party.room);
-  const sessions = party.humans.map((h) => h.id);
+  const sessions = party.humans.map((h) => h.room.sessionId);
   for (const h of party.humans) h.log.length = 0;
   party.room.lobbyCommands.push({ sessionId: sessions[0] } as Client, C2S.lobbyStart, {});
   advance(party, 1);
@@ -44,7 +44,7 @@ describe('fresh seat ids at Start (row 25)', () => {
     for (const s of sessions) expect(ids).not.toContain(s);
     expect(ids).toEqual([...ids].sort());
     // Each client's session maps to one seat, no two alike, and back again; NPC seats have no client.
-    const mine = party.humans.map((h) => seatOf(room, { sessionId: h.id }));
+    const mine = party.humans.map((h) => seatOf(room, { sessionId: h.room.sessionId }));
     expect(new Set(mine).size).toBe(3);
     for (const [i, seat] of mine.entries()) {
       expect(ids).toContain(seat);
@@ -62,7 +62,7 @@ describe('fresh seat ids at Start (row 25)', () => {
     const { party, sessions } = await started(4);
     const room = party.room;
     for (const h of party.humans) {
-      const seat = seatOf(room, { sessionId: h.id });
+      const seat = seatOf(room, { sessionId: h.room.sessionId });
       const state = stateOf(h);
       const own = [...state.players.values()].filter((p: PlayerState) => p.priv?.seatId);
       expect(own.map((p: PlayerState) => p.priv.seatId)).toEqual([seat]);
@@ -79,20 +79,20 @@ describe('fresh seat ids at Start (row 25)', () => {
     const { party } = await started(3);
     const room = party.room;
     const h = party.humans[1]!;
-    const seat = seatOf(room, { sessionId: h.id });
+    const seat = seatOf(room, { sessionId: h.room.sessionId });
     h.room.send(C2S.roleReady, {});
     await sleep(150);
     advance(party, 1);
     // The card's Ready is private (GDD 3.17): it lands in the flow's set under the fresh seat, not the session id.
     expect(flowOf(room).cardReady.has(seat)).toBe(true);
-    expect(flowOf(room).cardReady.has(h.id)).toBe(false);
+    expect(flowOf(room).cardReady.has(h.room.sessionId)).toBe(false);
   });
 
   it('records a leave during play on the fresh seat', async () => {
     const { party } = await started(3);
     const room = party.room;
     const h = party.humans[2]!;
-    const seat = seatOf(room, { sessionId: h.id });
+    const seat = seatOf(room, { sessionId: h.room.sessionId });
     await h.room.leave();
     await sleep(200);
     expect(room.state.players.get(seat)?.connected).toBe(false);
@@ -104,7 +104,7 @@ describe('fresh seat ids at Start (row 25)', () => {
       const { party, sessions } = await started(n);
       const ids = seatsOf(party);
       for (const s of sessions) expect(ids).toContain(s);
-      for (const h of party.humans) expect(stateOf(h).players.get(h.id)?.priv.seatId).toBe('');
+      for (const h of party.humans) expect(stateOf(h).players.get(h.room.sessionId)?.priv.seatId).toBe('');
       await colyseus.cleanup();
     }
   });
@@ -122,8 +122,10 @@ describe('fresh seat ids at Start (row 25)', () => {
     expect(leader).not.toBe(room.state.leaderId);
     for (const id of ids) expect(room.state.players.get(id)?.priv.seatId).toBe('');
     for (const h of party.humans) {
-      expect(seatOf(room, { sessionId: h.id })).toBe(h.id);
-      expect(stateOf(h).players.get(h.id)?.name).toBe(room.state.players.get(h.id)?.name);
+      expect(seatOf(room, { sessionId: h.room.sessionId })).toBe(h.room.sessionId);
+      expect(stateOf(h).players.get(h.room.sessionId)?.name).toBe(
+        room.state.players.get(h.room.sessionId)?.name,
+      );
     }
   });
 });
