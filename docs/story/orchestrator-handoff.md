@@ -86,6 +86,11 @@ ownerless #443), 10Y `session_01M5mAcWwzvbuS9YxojFNVor` (#428). Left archived: 1
 #441, #435, #437). The orchestrator owns #471 itself. The delegation covers the lanes' questions; merging into the production
 base still deploys and still needs the owner's explicit word.
 
+The map revamp (owner, 2026-11-12) is the Blender work from the owner's local "Blender tools setup" session: the 3D
+HollowMere built from the owner's Meshy models on `overworld.json` (`tools/blender/`, first commit `753b563d`), and next the
+forest, Fenwood, Tin Gallery and Flooded Gallery from the scene JSONs. Anything that "waits on the map revamp" (R8, P5, P6)
+waits on that work.
+
 Grants and calls the orchestrator made under that delegation:
 - 2026-11-12, 10S #447: a test-helper grant. `npcHelpers.ts` `Human.id` resolves through `seatOf` (seat ids are fresh at Start), and
   `flow.test.ts` lines 121 and 140 map session ids to seat ids. No assertion, value or timeout changes.
