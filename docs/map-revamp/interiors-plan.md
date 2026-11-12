@@ -19,7 +19,12 @@ the local session. Where this plan lists a candidate use, it is a prompt for tha
   - No interior exists in 3D.
   - The woods and the mine (Gallows Wood, the Fenwood, the Tin Gallery mouth, the Flooded Gallery and the sea door, which
     opens on the frozen lake) are in progress on `claude/blender-hollowmere-3d`.
-  - BlackPine has no 3D yet.
+  - The village outskirts beyond the playable map are being built as a draft for the owner's review (section 3).
+
+**Owner decisions of 2026-11-12, relayed by the local session:**
+- All 75 Meshy models are HollowMere's, and BlackPine has none, even where a model's name or lettering says BlackPine.
+  Lettering stays as modelled (BLACKPINE MINING CO., VANE SAWMILL, TYCOON'S MANOR).
+- Only the sea door's lake is frozen. The village mere stays open water.
 
 ## 2. The interiors that already exist as scenes
 
@@ -37,36 +42,42 @@ material letters. A 3D interior is built from that file. Its ids are frozen; its
 | `Hale_Barn` | `barn` 20x12 | HollowMere | Medium |
 | `Vicars_Chapel` | `chapel` 18x12, `cellar` 28x16 (dark; also reached by the well and the tavern trap) | HollowMere | Large |
 | `Frostbitten_Fisherman_s_Wharf` (`netloft`) | **none**: the net loft has no door portal and no scene | HollowMere | n/a |
-| `Blackpine_Bunkhouse` | `bp_lodge` 24x12 | BlackPine | Small |
-| `Frostwood_Sawmill` | `bp_mill` 24x14 | BlackPine | Small |
-| `Blackpine_Mining_Office_Bank` | `bp_office` 18x11 | BlackPine | Medium |
-| `The_Winter_Forge` | `bp_smithy` 16x11 | BlackPine | Medium |
-| `Frostbound_County_Jail` | `cj_cell` 12x8 (in no map; no portals) | none | n/a |
+| `Frostbound_County_Jail` (the Constable's lock-up, draft) | `cj_cell` 12x8 (in no map; no portals) | none | n/a |
 
-That makes 21 interior scenes, or 22 counting the jail cell.
+That makes 16 HollowMere interior scenes, plus the jail cell. BlackPine's interiors (`bp_lodge`, `bp_mill`, `bp_office`,
+`bp_smithy`, and its woods and caves) have no Meshy model by the owner's decision. Their 3D look is not part of this plan.
 
 ## 3. The buildings with no place on the map yet
 
-These catalog buildings have no scene and no footprint on any map. The owner and the local session decide what each one
-is, which map it stands on, and whether it gets an interior at all.
+These catalog buildings have no scene and no footprint in the game data. All are HollowMere's. The placement below is the
+local session's **working draft** (2026-11-12), being built for the owner to review in stills. Nothing is final until the
+owner says so. The last column is what the data side still needs.
 
-| Model | What the model shows (catalog note, shortened) | Questions to settle |
+| Model | Draft place and use (local session) | Still to settle |
 |---|---|---|
-| `Frontier_Detective_Bureau` | two-storey timber courthouse, blue trim, false front | which role's building; interior rooms |
-| `Frontier_Post_Office` | plank post office, red trim, porch of parcels | which role's building; sorting room, telegraph |
-| `Frostbound_Union_Hall` | large two-storey L-shaped log hall, slate roofs | which map; what meets there |
-| `Frosted_Hearth_Cabin` | plank cabin, big stone chimney, porch of tools | whose cabin |
-| `Frostbound_Witch_Hut` | open-fronted hut or stall, horned finials | stall (no interior) or hut |
-| `Frostwood_Witch_Hut` | crooked fairy-tale log cottage, dead tree | whose; woods or village |
-| `mother_moll_hut` | one-room sod-roof log cabin | the Fenwood names Mother Moll's hut: does it get an interior? |
-| `Frostgrave_Chapel` | gothic chapel, red lancet windows, bell-cote | a second chapel: whose, where |
-| `Frozen_Crypt_of_Bones` | crypt door in a rocky hillside | crypt interior, or a way into the Undercroft |
-| `Frostbound_Outpost` | palisaded lookout on a rock outcrop, watchtower | where; interior or landmark |
-| `Frostbound_Waystation` | raised platform with a log cabin | a second stop on the line? |
-| `Frostbound_Freight_Dock` | raised loading platform, crates | landmark only |
-| `Abandoned_Tin_Mine` | rock outcrop with the TIN GALLERY adit | likely the Gallows Wood face of `cave_entry` |
-| `mine_adit` | timber mine portal in rock | likely BlackPine's `bp_mine` adit |
-| `charcoal_kiln`, `log_chute`, `log_pond_landing` | BlackPine and Fenwood workings | exterior landmarks; `log_pond_landing` has a cabin |
+| `Frostwood_Sawmill` (VANE SAWMILL), `log_pond_landing`, `log_chute` | outskirts: on a beck into the mere | interior? |
+| `Frostbound_Freight_Dock`, `powder_kegs` | outskirts railyard, on a `Frostbound_Rails` siding | landmark |
+| `The_Winter_Forge` | outskirts railyard | interior? |
+| `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior? |
+| `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior? |
+| `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior? |
+| `Frontier_Post_Office` | outskirts: Station Street | interior; which role's building |
+| `Frostbound_County_Jail` | Station Street: the Constable's lock-up | is `cj_cell` its interior? |
+| `Frontier_Detective_Bureau` | Station Street: a courthouse | interior; which role's building |
+| `Frostbound_Outpost` | hills: the Bandit's hideout (the owner's word) | interior |
+| `Frostbound_Waystation` | hills: up the line | interior? |
+| `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior? |
+| `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior? |
+| `Frostgrave_Chapel` | the western woods: the Dark Mass chapel | interior; the rite site? |
+| `Frozen_Crypt_of_Bones` | beyond the chapel yard | interior? |
+| `broken_trestle`, `cliff_section` | hills | landmarks |
+| `Abandoned_Tin_Mine` | Gallows Wood (the Tin Gallery's face) | none: `cave_entry` exists |
+| `Frostbound_Witch_Hut` | Gallows Wood: the gamekeeper's stall | open-fronted: no interior |
+| `mother_moll_hut`, `charcoal_kiln`, `hanging_oak`, `mine_adit` | the Fenwood | interior for the hut? |
+
+**Draft caveat: the outskirts.** The outskirts lie **outside the playable map**. A building there needs a door portal
+and a scene before a player can enter it. Section 5 covers that: a new scene id, and either a bigger overworld or a new
+exterior scene of its own.
 
 **Interiors the GDD already plans but no scene has.** A new building here may be the place for one of these. That is the
 owner's call:
@@ -121,9 +132,7 @@ its GDD text in the same PR (CLAUDE.md):
    rooms, and `widow_parlour` and `widow_bedroom`.
 4. **HollowMere, Medium and Large:** `manor_hall` and `manor_upper`, `barn`, `chapel` and `cellar`.
 5. **New buildings:** in the order the owner settles section 3. Each one is a data PR plus a 3D pass.
-6. **BlackPine:** its exterior from `bp_camp.json`, then `bp_lodge`, `bp_mill`, `bp_office`, `bp_smithy`, and the caves and
-   woods after HollowMere's.
-7. **The jail cell** `cj_cell`, whenever it suits. It stands alone and has no exterior on any map.
+6. **The jail cell** `cj_cell`, whenever it suits. It stands alone and has no exterior on any map.
 
 ## 7. Who does what
 
