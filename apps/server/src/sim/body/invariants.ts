@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { registerInvariant } from '../auto/invariants';
 import { simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
+import { maxHpBonusOf } from './effects';
 import { bodies, ownsWireEffect } from './state';
 
 /**
@@ -48,7 +49,7 @@ function bodyBounds(room: PartyRoom): InvariantFailure | null {
     if (body.figure) continue;
     // Round 10, D8: a lost yard fight lowers a seat's maximum health, never under the floor.
     if (
-      body.maxHp > b.maxHp ||
+      body.maxHp > b.maxHp + maxHpBonusOf(body) ||
       body.maxHp < Math.min(b.maxHp, balance.jail.yard.maxHpFloor) ||
       body.maxStamina !== b.maxStamina
     )
