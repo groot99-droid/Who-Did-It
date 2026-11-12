@@ -61,10 +61,10 @@ owner says so. The last column is what the data side still needs.
 | `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior? |
 | `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior? |
 | `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior? |
-| `Frontier_Post_Office` | outskirts: Station Street | interior; which role's building |
+| `Frontier_Post_Office` | outskirts: Station Street; **the Postmaster's post office (owner, 2026-11-12)** | interior? |
 | `Frostbound_County_Jail` | Station Street: the Constable's lock-up | is `cj_cell` its interior? |
 | `Frontier_Detective_Bureau` | Station Street: a courthouse | interior; which role's building |
-| `Frostbound_Outpost` | hills: the Bandit's hideout (the owner's word) | interior |
+| `Frostbound_Outpost` (palisaded fort on a rock) | hills; **the Bandit's hideout (owner, 2026-11-12)** | interior? |
 | `Frostbound_Waystation` | hills: up the line | interior? |
 | `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior? |
 | `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior? |
@@ -153,7 +153,9 @@ its GDD text in the same PR (CLAUDE.md):
 
 1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today. A 3D interior is built from
    its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
-2. For each building in section 3: what it is, which map it stands on, and whether it has an interior.
+2. For each building in section 3: what it is, which map it stands on, and whether it has an interior. PARTLY ANSWERED
+   (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
+   an interior, and the rest of section 3, are open.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
 4. ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
    renders must therefore line up with the game's isometric camera and each scene's tile grid, and be loadable by the
