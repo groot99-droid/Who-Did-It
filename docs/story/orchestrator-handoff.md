@@ -73,6 +73,19 @@ Against the Zealot first. The GDD change ships in the same PR as the behaviour.
   what it describes as the owner's direct "merge" instruction; the orchestrator did not do or see that
   instruction. Confirm it was intended.
 
+## Round-10 lanes the orchestrator owns (2026-11-12)
+
+The owner asked the orchestrator to find archived sessions with unmerged PRs, bring them back until the map revamp, and
+"become the owner" of them, answering their questions with its own decisions. Unarchived and briefed (bring the PR up to
+the base, CI green, list owner sign-offs in the PR description, merge nothing into the base, no existing-test edits without a
+grant asked of the orchestrator, report by message): 10S `session_01M5mAcWM6iFP4icHHeKca4Z` (#447), 10T
+`session_01M5mAcUmmE2mPSi934vv6Gw` (#445), 10F `session_01M5mAcUJforvFMyeRQoDBwy` (#429, plus GDD 3.14 and A286), 10H
+`session_01M5mAcVEtsFr2jS1mBpRknV` (#444, #430), 10D `session_01M5mAcXTCbXtKaAJRgkS8ow` (#422), 10C
+`session_01M5mAcVzBNTaHxVatNhaVLo` (#426, #432), 10X `session_01M5mAcXMS5b7bZYzzwMzzpW` (#425, #431, #442, #397, and the
+ownerless #443), 10Y `session_01M5mAcWwzvbuS9YxojFNVor` (#428). Left archived: 10K, 10N and 10M (the finisher holds #440,
+#441, #435, #437). The orchestrator owns #471 itself. The delegation covers the lanes' questions; merging into the production
+base still deploys and still needs the owner's explicit word.
+
 ## Sessions
 
 | Session | Id | State | Rule |
