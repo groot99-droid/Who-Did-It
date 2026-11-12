@@ -3,7 +3,7 @@
   "sky": {
     "zenith": [0.012, 0.017, 0.029],
     "horizon": [0.024, 0.031, 0.046],
-    "glow": [0.058, 0.070, 0.092],
+    "glow": [0.058, 0.07, 0.092],
     "glow_azimuth": 322.0,
     "glow_width": 45.0,
     "glow_height": 0.9,
@@ -20,7 +20,7 @@
     "volume": 0.8
   },
   "fog": {
-    "density": 0.050,
+    "density": 0.05,
     "height": 9.0,
     "color": [0.82, 0.87, 0.95],
     "anisotropy": 0.5,
@@ -28,15 +28,15 @@
     "patchiness": 0.4
   },
   "lights": {
-    "lantern": {"energy": 250.0, "volume": 0.4, "bulb": 110.0},
-    "lamp": {"energy": 75.0, "volume": 0.5},
-    "headlamp": {"volume": 0.2},
-    "window": {"energy": 110.0, "volume": 0.11},
-    "drowned": {"volume": 0.35}
+    "lantern": { "energy": 250.0, "volume": 0.4, "bulb": 110.0 },
+    "lamp": { "energy": 75.0, "volume": 0.5 },
+    "headlamp": { "volume": 0.2 },
+    "window": { "energy": 110.0, "volume": 0.11 },
+    "drowned": { "volume": 0.35 }
   },
-  "snow": {"joint_snow": 0.85, "roof": 0.95},
-  "snowfall": {"count": 9000, "radius": 0.012, "speed": 1.5, "wind": [1.2, -0.5]},
-  "color": {"look": "AgX - Medium High Contrast", "exposure": 1.6},
+  "snow": { "joint_snow": 0.85, "roof": 0.95 },
+  "snowfall": { "count": 9000, "radius": 0.012, "speed": 1.5, "wind": [1.2, -0.5] },
+  "color": { "look": "AgX - Medium High Contrast", "exposure": 1.6 },
   "post": {
     "bloom": 0.75,
     "bloom_threshold": 0.7,
