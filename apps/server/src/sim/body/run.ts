@@ -13,6 +13,8 @@ import {
   blocksRegen,
   blocksRun,
   deriveEffects,
+  effectDef,
+  effectsOn,
   factorOf,
   speedFactorOf,
   statusBitsOf,
@@ -66,8 +68,11 @@ function tickBody(room: PartyRoom, id: string, body: Body, p: PlayerSim | undefi
       (p.vx !== 0 || p.vy !== 0) &&
       !blocksRun(body) &&
       body.stamina > 0;
-    if (running) body.stamina = Math.max(0, body.stamina - b.runCostPerS * dt);
-    else {
+    if (running) {
+      // The Miner's Pasty's Tireless: running costs nothing while it lasts (round 10, D4b).
+      if (!effectsOn(body).some((e) => effectDef(e).staminaFree))
+        body.stamina = Math.max(0, body.stamina - b.runCostPerS * dt);
+    } else {
       const regen =
         b.staminaRegenPerS * factorOf(body, (d) => d.staminaRegenFactor) * armourOf(room, id).regen * dt;
       body.stamina = Math.min(body.maxStamina, body.stamina + regen);

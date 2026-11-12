@@ -144,6 +144,10 @@ export const EffectId = {
   exhausted: 13,
   /** Round 10, D4a (GDD 3.14): a dish's poison resistance until it wears off; private, no status bit. */
   resistant: 14,
+  /** Round 10, D4b (GDD 3.14): the Berry Tart's extra maximum health until the next dawn; private, no status bit. */
+  heartened: 15,
+  /** Round 10, D4b (GDD 3.14): the Miner's Pasty's running without stamina cost for a while; private, no status bit. */
+  tireless: 16,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

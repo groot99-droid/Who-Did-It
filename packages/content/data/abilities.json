@@ -629,6 +629,30 @@
       "ships": "V1",
       "gddRef": "3.22"
     },
+    "eatBerryTart": {
+      "id": "eatBerryTart",
+      "name": "Eat Berry Tart",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "berryTart",
+      "effect": "Eats the Berry Tart: cures Famished and Weakened, and raises maximum health until the next dawn.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
+    "eatMinersPasty": {
+      "id": "eatMinersPasty",
+      "name": "Eat Miner's Pasty",
+      "scope": "item",
+      "kind": "active",
+      "target": "self",
+      "castS": 0,
+      "consumes": "minersPasty",
+      "effect": "Eats the Miner's Pasty: cures Famished and Weakened, and running costs no stamina for a while.",
+      "ships": "V1",
+      "gddRef": "3.14"
+    },
     "eatStew": {
       "id": "eatStew",
       "name": "Eat Stew",
