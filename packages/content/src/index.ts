@@ -33,6 +33,7 @@ import eventsJson from '../data/events.json' with { type: 'json' };
 import economyJson from '../data/economy.json' with { type: 'json' };
 // Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines.
 import talkJson from '../data/talk.json' with { type: 'json' };
+import storyJson from '../data/story.json' with { type: 'json' };
 // Round 10 (A9; GDD 3.14): the logic table.
 import interactionsJson from '../data/interactions.json' with { type: 'json' };
 import overworldJson from '../data/scenes/overworld.json' with { type: 'json' };
@@ -65,6 +66,8 @@ import crumbMixingJson from '../data/scenes/crumb_mixing.json' with { type: 'jso
 import crumbOvenJson from '../data/scenes/crumb_oven.json' with { type: 'json' };
 import crumbProofingJson from '../data/scenes/crumb_proofing.json' with { type: 'json' };
 import cjCellJson from '../data/scenes/cj_cell.json' with { type: 'json' };
+import cottageFisherJson from '../data/scenes/cottage_fisher.json' with { type: 'json' };
+import seaExitJson from '../data/scenes/sea_exit.json' with { type: 'json' };
 import hollowmereJson from '../data/maps/hollowmere.json' with { type: 'json' };
 import blackpineJson from '../data/maps/blackpine.json' with { type: 'json' };
 
@@ -87,6 +90,7 @@ import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
 import { LoreFile } from './schemas/lore.js';
 import { TalkFile } from './schemas/talk.js';
+import { StoryFile } from './schemas/story.js';
 import { InteractionsFile } from './schemas/interactions.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
@@ -120,6 +124,7 @@ export * from './schemas/economy.js';
 export * from './schemas/relations.js';
 export * from './schemas/lore.js';
 export * from './schemas/talk.js';
+export * from './schemas/story.js';
 export * from './schemas/interactions.js';
 export { checkGrid, validateContent, type Content } from './validate.js';
 export { checkSceneWorld } from './validateWorld.js';
@@ -156,6 +161,8 @@ const sceneJson: Record<SceneId, unknown> = {
   crumb_oven: crumbOvenJson,
   crumb_proofing: crumbProofingJson,
   cj_cell: cjCellJson,
+  cottage_fisher: cottageFisherJson,
+  sea_exit: seaExitJson,
 };
 
 const mapJson: Record<MapId, unknown> = {
@@ -205,6 +212,7 @@ export function parseContent(raw: {
   relations: unknown;
   lore: unknown;
   talk: unknown;
+  story: unknown;
   interactions: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   const parsed = {
@@ -236,6 +244,7 @@ export function parseContent(raw: {
     relations: RelationsFile.parse(raw.relations),
     lore: LoreFile.parse(raw.lore),
     talk: TalkFile.parse(raw.talk),
+    story: StoryFile.parse(raw.story),
     interactions: InteractionsFile.parse(raw.interactions),
   };
   // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
@@ -272,6 +281,7 @@ export const content: Content = {
     relations: relationsJson,
     lore: loreJson,
     talk: talkJson,
+    story: storyJson,
     interactions: interactionsJson,
   }),
   scenes: parseScenes(),
@@ -310,6 +320,7 @@ export const {
   relations,
   lore,
   talk,
+  story,
   interactions,
 } = content;
 

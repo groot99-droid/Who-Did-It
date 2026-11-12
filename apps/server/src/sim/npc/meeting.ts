@@ -54,9 +54,15 @@ const pickOf = <T>(items: readonly T[], u: number): T | null =>
  * confessed seat while it lives); a Killer NPC the plurality of the votes already cast; with `suspectVoteChance`
  * the suspect of its suspicion memory; a random living other seat when Skip is disabled; else null. 5G's NPC Last
  * Shot aims here, holding its fire on null. The uniforms are the ones drawn at the vote tick (`brain.voteRolls`;
- * before that the seat's night-power pick, which every NPC draws), so no call draws from a stream.
+ * before that the seat's night-power pick, which every NPC draws), so no call draws from a stream. `mustPick` is the
+ * end trial's filing (B6d2): there is no Skip, so the Skip answer becomes the random living other seat.
  */
-export function npcVoteTarget(room: PartyRoom, id: string, tieRoll?: number): string | null {
+export function npcVoteTarget(
+  room: PartyRoom,
+  id: string,
+  tieRoll?: number,
+  mustPick = false,
+): string | null {
   const player = room.state.players.get(id);
   if (!player) return null;
   const mem = npcMemory(room);
@@ -81,7 +87,7 @@ export function npcVoteTarget(room: PartyRoom, id: string, tieRoll?: number): st
     }
     const top = pluralityOf(cast, () => tieRoll ?? uTie);
     if (top !== null && top !== id) return top;
-    return skipDisabled(room) ? pickOf(others, uFallback) : null;
+    return mustPick || skipDisabled(room) ? pickOf(others, uFallback) : null;
   }
 
   const suspect =
@@ -89,7 +95,7 @@ export function npcVoteTarget(room: PartyRoom, id: string, tieRoll?: number): st
       ? pickSuspect(brain.suspicion, others, () => uTie)
       : null;
   if (suspect !== null) return suspect;
-  return skipDisabled(room) ? pickOf(others, uFallback) : null;
+  return mustPick || skipDisabled(room) ? pickOf(others, uFallback) : null;
 }
 
 /**
