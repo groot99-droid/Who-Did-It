@@ -1583,13 +1583,33 @@ the Hitman: the mail turns a townsman into one.
   kill by the Dusk Train of the `hitman.contractDays`th day from the turning (2), the contract lapses. The game-over
   frame names him (`gameOver.hitman`: the seat, the day and how far he got: arrived, killed, boarded, or stopped by
   his death), and a boarded Hitman joins `alsoWon`.
-- Not built yet: the dormant role (C4c, with the hardships that show the same sign, so a thin, dear stall never names
-  him: its look runs thin and dear as a seat Owing the line, 3.23); an NPC Hitman hunting and shooting (it holds the
-  contract and the Derringer, never shoots, and its contract lapses); the report to a Constable from the kill until
-  the Dusk Train, which convenes a manhunt at the station (10B); the hardships, the Clerk's ledger and the cold station (C4c); the dark window (a home's
-  window state); the turned seat's true look (`Private.trueLook`, world-mode 4.4, with no `hitman` atlas yet), the
-  black-wax mailbag and the crow on the station roof; a turned NPC seat
-  stopping its routine.
+- **The dormant role** (C4c). From the turning, the turned seat's look runs thin and dear (3.23 "What breaks when I'm
+  gone"): its stall stocks `hitman.dormantOutput` (half, equal to `respawn.stockMult`) of a day's stock at
+  `respawn.priceMult` of the price, exactly a seat Owing the line, with no field of its own.
+- **Hardships** (C4c; F4 b2 to b5). At every morning delivery, the same tick as the turning, the secret stream
+  `hardship` strikes `hardship.atOnce` (1 or 2) seats, each with a kind (robbed, a failed harvest, fined, rent, illness,
+  a lost shipment), and each runs thin and dear exactly as the dormant role for `hardship.recoverS` (one day). The pool
+  reads only public facts: a seat shown alive on the roster whose look owns a stall and that has no hardship running,
+  human or NPC, whatever its card; it never reads the card, the NPC flag, a death the meeting has not shown, the line,
+  the jail or the turning. So on the turning delivery the Hitman's thin stall is one of that delivery's fresh thin
+  stalls, and a thin, dear stall alone never names him. A hardship is the sign only: no purse, card or play changes,
+  and nothing is sent. A rent hardship is kept, by look, for the Clerk's ledger; it boards no house (a boarding would
+  tell it from the Hitman's look without the ledger), so a struck human keeps their bed.
+- **The Clerk's rent ledger** (C4d; F4 b5 and 2.7). Reading the Clerk's books on HollowMere (`bk.ledger`, in reach,
+  in a world phase, alive and out of jail) shows the reader alone every rent hardship of the match so far, oldest
+  first: the day it struck and the look the struck seat wore then. It never shows a seat, a name, a card, a cover, a
+  hardship of another kind or a real boarding (3.23's, the seat's own economy), and every reader at a moment sees the
+  same rows. Reading it takes the trip; nothing public carries it, the read has no hold, clip or noise, and the server
+  keeps nothing of who read. The rows are the town's lead: a dark, dear look that isn't in the ledger went dark for a
+  reason other than rent. NPC seats read it too, as a person would: at each trip they pick, a draw on their own
+  stream sends one to stand at the books for the errand's length, holding nothing, with the chance
+  `hardship.readLedger.before` until the Hitman's line has gone out and `after` it (P 0 and 0.1), so a stop at the
+  Clerk's books marks no one.
+- Not built yet: an NPC Hitman hunting and shooting (it holds the contract and the Derringer, never shoots, and its
+  contract lapses); the report to a Constable from the kill until the Dusk Train, which convenes a manhunt at the
+  station (10B); Blackpine's ledger (it has no `ledger` prop); the cold station and the dark window (a home's window
+  state), for the dormant role and the hardships alike; the turned seat's true look (`Private.trueLook`, world-mode
+  4.4, with no `hitman` atlas yet), the black-wax mailbag and the crow on the station roof; a turned NPC seat stopping its routine.
 
 ### 3.34 Story mode
 
