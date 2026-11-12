@@ -316,9 +316,15 @@ export class MockWorldFeed implements WorldFeed {
 
   snapshot(): PlayerSnap[] {
     if (this.killPending) {
+      // The first read comes from inside the World's `create` (the Notebook sheet reads the roster as it is built,
+      // round 7, #125), before `create` listens for `killed`: a server's kill only ever reaches a World that
+      // listens, so the mock's lands on the next macrotask, once `create` has returned (round 10, 10Y, A494).
       this.killPending = false;
-      this.ghost = true;
-      this.emitKilled();
+      window.setTimeout(() => {
+        if (this.timer === null) return; // disposed before the kill landed
+        this.ghost = true;
+        this.emitKilled();
+      }, 0);
     }
     const me = this.actors.get(this.selfId);
     const out: PlayerSnap[] = [];
