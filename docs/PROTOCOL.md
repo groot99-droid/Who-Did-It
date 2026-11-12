@@ -92,6 +92,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
 | `achv` | `{ id: string; step: number; steps: number; done: boolean }` | Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only. |
 | `rite` | `{ stage: 'open' \| 'begun' \| 'done' \| 'returned'; medium?: string; endsTick?: number }` | Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick` is the tick it is done on; it cannot be interrupted), `done` when it is, and (R4) `returned` when the seat lives again at the next day. |
+| `conversion` | `{ kind: 'converted' \| 'sermon' \| 'peaceful'; heard?: number }` | Story I9 (GDD 3.23, A606), private to one seat's own client and never in public state: `converted` to a seat whose Faith reached `conversion.faithAt` (once a match), `sermon` to the preacher when its sermon ends (`heard` is how many seats it reached, never who), `peaceful` to the dealt Vicar when every other living seat is converted. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
 
@@ -232,7 +233,9 @@ export type HoldAction =
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
   | 'dust'
   // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
-  | 'rite';
+  | 'rite'
+  // Story I9 (GDD 3.23): the Vicar preaches at the hub's bell (`targetId` is 'bell').
+  | 'sermon';
 ```
 
 ```ts

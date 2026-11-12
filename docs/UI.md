@@ -2189,7 +2189,7 @@ save's `summaries` are read defensively as `{ chapterId, failed?, counters? }` (
 Screens `story-menu`, `story-title`, `story-section`, `story-line`, `story-resume`, `story-finale`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
 fixture story). `e2e/screens-story-live.spec.ts` plays the same entry against the real server: Story, Begin, the title and
-opening beat cards, the map's cutscene, then the HUD with the goals strip pinned top-left. Screenshots land in the specs'
+opening beat cards, the map's cutscene, then the HUD with the goals strip pinned top-left. `e2e/story-replay-live.spec.ts` seeds a save with two finished chapters and checks that Replay on the second starts the second: the menu sends the device's save with `story.start { chapterId, resume }`, because for a guest the server replays only a chapter its save finished. Screenshots land in the specs'
 output like `screens.spec.ts`'s.
 
 ### 14.54 The evidence verbs (10V, round 10)

@@ -530,6 +530,19 @@ export const BalanceFile = z.strictObject({
     buff: z.strictObject({ speedFactor: z.number().min(1), maxHpFactor: z.number().min(1) }),
   }),
   /**
+   * Story I9 (GDD 3.23, DECISIONS A606; round 10 scope I9): conversion. A seat is converted once its private Faith
+   * reaches `faithAt`. The Vicar's sermon is a hold of `sermonS` at the hub's bell, again `sermonCooldownS` after one ends; every other seat that
+   * stands within `sermonTiles` of the bell for at least `listenS` of it gains `sermonFaith`, once a day.
+   */
+  conversion: Section({
+    faithAt: z.number().int().positive(),
+    sermonS: Seconds,
+    sermonCooldownS: Seconds,
+    sermonTiles: Tiles,
+    listenS: Seconds,
+    sermonFaith: z.number().int().positive(),
+  }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the

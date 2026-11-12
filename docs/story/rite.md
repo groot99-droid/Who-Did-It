@@ -28,7 +28,7 @@ brief for a new session, called **R** below. It restates no number: every number
 | The next-match candidate | `sim/Flow.ts` `ascendedVicarCandidate` | Written, never read |
 | Ghosts | GDD 3.8 "Death and ghosts", `sim/Movement.ts`, `sim/Portals.ts`, `sim/Visibility.ts` | Built. A ghost sees every role and reads the Cabal channel |
 | A comeback | GDD 3.22 "On the line" (C1), `sim/Train.ts`, `sim/Death.ts` | Built. A day death by bite or shot comes back at the next Train with `respawn.hp`; the seat gets no ghost view while it waits |
-| Conversion (Faith, the sermon, the Peaceful win) | `docs/round10/scope.md` I9 | **Not built.** Only Hear Confession exists (`confession`) |
+| Conversion (Faith, the sermon, the Peaceful win) | `docs/round10/scope.md` I9 | Built server side by story I9 (A606): `isConverted`, `addFaith` for R6 |
 | The Medium card | `roles.json` `medium` (V2, `seance`, `seanceChalk`), GDD 3.2 row | In data, in no deck |
 | The hideout | `arc.md` 8.2 | No scene. `forest_deep` ("The Fenwood") exists |
 | Story revive | `sim/story/handover.ts` `reviveHuman` | Built, story rooms only |
