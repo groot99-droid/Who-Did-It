@@ -4,6 +4,7 @@ import type { PartyRoom } from '../rooms/PartyRoom';
 import { flowOf } from './Flow';
 import { initBodies } from './body/state';
 import { beginPaintTown, humansOf, paintDeal, paintsTown } from './paintTown';
+import { drawArrival, hitmanGameOver } from './vendettas/arrival';
 import { drawVendettas } from './vendettas/state';
 
 // The main-mode deal from the deck (GDD 3.1, round-5 `deck/wire.md` 4.4 and 5). Round 10, 10C owns this file; the hook
@@ -62,6 +63,7 @@ export function dealMainDeck(room: PartyRoom, ids: readonly string[]): Map<strin
   flow.deck = cards;
   flow.undealt = deal.undealt;
   drawVendettas(room, dealt); // round 7, 7H: one vendetta per Killer seat, on its own stream (GDD 3.20)
+  drawArrival(room, ids); // round 10, C4: the Hitman's arrival, on the secret `hitman` stream (GDD 3.33)
   initBodies(room); // round 8, 8A: every seat whole at the deal (GDD 3.22, locked call site)
   return dealt;
 }
@@ -90,12 +92,15 @@ const EJECTION_WINNER = 'drifter';
 
 /**
  * Main mode's end-screen facts beside the winner (GDD 3.1, 3.8; `gameOver.undealt`, `.alsoWon`): the cards nobody
- * held, and every seat the vote ejected as the Drifter, who wins whichever faction ends the match.
+ * held, and every seat the vote ejected as the Drifter, who wins whichever faction ends the match, and the Hitman
+ * who boarded the Dusk Train (round 10, C4b: the Contract victory, GDD 3.33).
  */
 export function gameOverExtras(room: PartyRoom): { undealt: string[]; alsoWon?: string[] } {
   const flow = flowOf(room);
   const alsoWon = flow.meetings
     .filter((m) => m.ejectedRole === EJECTION_WINNER)
     .flatMap((m) => (m.ejectedId === undefined ? [] : [m.ejectedId]));
+  const hitman = hitmanGameOver(room);
+  if (hitman?.stage === 'boarded') alsoWon.push(hitman.seatId);
   return { undealt: [...flow.undealt], ...(alsoWon.length > 0 && { alsoWon }) };
 }
