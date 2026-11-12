@@ -122,6 +122,24 @@
       "dish": true,
       "cures": [],
       "gddRef": "3.14"
+    },
+    "heartened": {
+      "id": "heartened",
+      "name": "Heartened",
+      "durationS": 0,
+      "maxHpBonus": 10,
+      "dish": true,
+      "cures": [],
+      "gddRef": "3.14"
+    },
+    "tireless": {
+      "id": "tireless",
+      "name": "Tireless",
+      "durationS": 120,
+      "staminaFree": true,
+      "dish": true,
+      "cures": [],
+      "gddRef": "3.14"
     }
   }
 }
