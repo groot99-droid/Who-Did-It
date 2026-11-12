@@ -98,7 +98,7 @@ Grants and calls the orchestrator made under that delegation:
   and the orchestrator owns story mode. Carry the same two lines into `claude/story-part2` when it next takes the base.
 - 2026-11-12, Blender tools session (`session_01M5mAcVgjse9A6XHwQQXcDr`, runs on the owner's laptop): the orchestrator sent it
   canon answers, and the owner OVERRULED all of them and withdrew them. The owner works with that session directly. The orchestrator
-  makes no canon calls for the map revamp. The "sea" is a frozen lake. That session builds the woods and the rest of the map, and
+  makes no canon calls for the map revamp. The sea door opens on a frozen lake; the village mere stays open water. Every Meshy model is HollowMere's (none BlackPine's); the interiors plan is #531. That session builds the woods and the rest of the map, and
   uses the Meshy models by what they are (several are mislabelled, such as the "Tycoon's Manor").
   Its commit `753b563d` (tools/blender only) was pushed straight to the production base; the owner was told and has not asked for a
   revert. Its later builders go on their own branch with a PR.
