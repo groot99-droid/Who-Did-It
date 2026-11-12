@@ -297,6 +297,28 @@ export function drawNode(g: SKRSContext2D, id: string, state: 'ready' | 'spent',
             [sx - 2, sy - 5],
           ]);
       return;
+    case 'berries':
+      if (ready) {
+        for (const [lx, ly, r] of [
+          [x - 12, y - 8, 12],
+          [x + 12, y - 8, 12],
+          [x, y - 18, 13],
+        ] as const)
+          leaf(g, lx, ly, r, 2);
+        for (const [fx, fy] of [
+          [x - 12, y - 10],
+          [x - 4, y - 20],
+          [x + 6, y - 12],
+          [x + 14, y - 6],
+          [x - 4, y - 4],
+        ] as const)
+          ell(g, c('brick', 3), fx, fy, 3.5, 3.5, 1);
+      } else {
+        for (const sx of [-8, -1, 6, 11]) seg(g, c('moss', 2), [x + sx, y], [x + sx + 1, y - 8], 3);
+        leaf(g, x - 10, y - 2, 4, 1);
+        leaf(g, x + 9, y - 1, 4, 1);
+      }
+      return;
     case 'coins':
       // A scattered heap where a purse spilled; once swept up only a scuff in the dirt is left.
       if (ready) for (const [dx, dy, edge] of HEAP) coin(g, x + dx, y + dy, 7, edge);
@@ -471,6 +493,7 @@ export function drawNodeBreak(g: SKRSContext2D, id: string, n: number, o: Pt): v
       return;
     }
     case 'herb':
+    case 'berries':
     case 'mushroom': {
       // Plucked: the crop lifts away and shrinks, then a few petals or crumbs fall and the stalks wilt.
       fading(g, id, o, 1 - k * 1.25, 1 - k * 0.5, 1 - k * 0.3, k * 22);

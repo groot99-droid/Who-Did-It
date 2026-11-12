@@ -81,6 +81,7 @@ function handleAbility(room: PartyRoom, sessionId: string, payload: Record<strin
     case 'antidote':
     case 'eat':
     case 'eatHerbBread':
+    case 'eatStew':
     case 'skin':
       return handleBodyAbility(room, sessionId, payload);
     case 'snare': // round 10, K6 (GDD 3.5): `sim/snares.ts`

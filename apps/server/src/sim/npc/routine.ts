@@ -20,6 +20,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { navGrid, profileOpen, sceneIndex, sceneKey, tileCentre } from '../World';
 import { holdAt, holdOf, otherAt, sellAt, workable } from './chores';
 import { type Act, type Brain, type NpcMemory, playRng } from './memory';
+import { moodPool } from './moodHooks';
 import { moodWeights } from './needs';
 import { GOAL_SLACK, drive, firstPortalToward, stand, walkThrough, walkTo, wander } from './walk';
 import { vendettaGoalFor } from '../vendettas/goal';
@@ -404,7 +405,8 @@ function pickStation(
   const own = base.filter((st) => st.scene === here);
   const other = base.filter((st) => st.scene !== here && adjacent.has(st.scene));
   const dwellRun = tick >= brain.sceneDwellUntilTick;
-  let pool = dwellRun ? (other.length > 0 ? other : own) : own;
+  let pool: readonly Station[] = dwellRun ? (other.length > 0 ? other : own) : own;
+  pool = moodPool(room, brain, player.id, brain.persona?.home ?? null, p, pool, rng); // round 10, T6b: the mood hooks
   // GDD 3.20 "NPC Killers": a vendetta's scene is one more place to work, drawn under the same weights (7H's
   // `vendettaGoalFor`, no draw). It keeps the dwell and the one-hop rule, so it reads like any routine trip: in the
   // goal scene the seat works there; elsewhere, once the dwell has run, its next trip is to the next scene on the way.
@@ -593,6 +595,7 @@ function endAct(brain: Brain): void {
   const act = brain.act;
   if (act && (act.kind === 'travel' || act.kind === 'work')) brain.lastStationId = act.stationId;
   brain.act = null;
+  brain.holdTries = 0; // the tries count one visit's holds: none outlives it
 }
 
 /** Drops the claims of seat `id` (all of them, or all but `keep`). */
@@ -817,6 +820,8 @@ function runWork(
       act.traded = true;
       const pause = spanTicks(playRng(room, id), balance.npc.routine.workPauseS); // always drawn: the count is fixed
       act.untilTick = Math.min(act.untilTick, sold ? tick + pause : tick); // round 10, K6b: no pause for a look at Snares
+      // The pause at the counter holds nothing, so it is the stand between actions (D1): no idle follows it.
+      if (sold) brain.rested = true;
     }
     return stand(p);
   }

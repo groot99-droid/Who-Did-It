@@ -472,13 +472,21 @@ Round 6 (ROADMAP M5b). The rows are `resources.json`, `recipes.json` and the `ma
 numbers below are theirs and `balance.resources`'s. Sentences marked (6F) are the server's behaviour and may be
 corrected by Session 6F when it lands.
 
-**Resources.** Six resources grow at the **nodes** of the forests, caves and the BlackPine camp (`nodes` in the scene
+**Resources.** Six resources (and Berries, below) grow at the **nodes** of the forests, caves and the BlackPine camp (`nodes` in the scene
 files): Timber, Stone, Pine Resin, Herbs, Mushrooms and Tin Ore. Every map has all six at every party size: HollowMere's
 Small profile finds them in Gallows Wood and the Tin Gallery mouth, BlackPine's in the woods, the camp and the
 Workings. Nodes that share a `pool` are one pool: at Start the server activates half of each pool's spots, rounded
 up (`poolActiveFrac` 0.5, so a pool of two keeps one), drawn from the `nodes` stream, so a forest is never stripped the same
 way twice; a spot not drawn has no node that match and is not sent to anyone, and a node outside any pool is always
 active. (6F)
+
+**Berries, Game and Stew** (round 10, S2; `logic-table.md` 9.6). A seventh resource, **Berries** (2 s, yield 2, respawn
+75 s), grows in the woods: two spots in each of `forest`, `forest_deep` and `bp_woods`, one pool per scene (so one of the two
+is up). Picking them takes bare hands, like Herbs and Mushrooms; no tool is faster. The market buys Berries (1 Scrip,
+`economy.json`), below the Wake Loaf's ask. **Game** (3.22) has its first use: a **Stew** is made of 1 Game, 1 Herbs and 1
+Mushrooms at an `oven` (the bakery's plain oven on Hollowmere, the lodge stove in BlackPine; the brick oven is another
+station), 4 s, and eating it (`eatStew`, a `consumes` verb like `eat`) cures what any food cures
+(Famished and Weakened). It is not role-bound and carries no buff yet.
 
 | Resource | Gather hold | Yield | Respawn | Needs |
 |---|---|---|---|---|
@@ -559,12 +567,30 @@ none is role-bound, and the content check refuses a wall that no neutral tool ca
 | Ore pile | Pickaxe | 4 s | 2 Tin Ore | 1 | 600 s |
 | Nailed crate | Crowbar or Hammer | 3 s | 1 Timber, 60% | 1 | stays open |
 
+**Containers and loot** (round 10, S1, A286; logic-table 6). The barrels, crates, sacks, shelves and chests of the
+world are containers. An open one (any dressing or decor prop the census calls a container and no other class names) is
+searched bare-handed in 2 s; a locked one (footlocker, blanket chest, safe, tin cabinet) is picked with the lock-pick
+(3.29) or forced with a `pry` tool in 4 s, which rings `crowbar`; a nailed crate stays the tool wall above.
+Each match will deal a share of each scene's containers (`activeFrac`), kept off doors, spawns and hiding spots
+(`keepClearTiles`), with a cap and a spacing on chests, and roll each from its scene's or its stem's loot table
+(`interactions.json` `lootTables` and `containers`) at a tier set by its distance from the hub in portal hops
+(`tierHops`; a dark cave is the top tier, a chest at least `chestMinTier`). What a container holds goes to its opener
+alone; the scene sees only that it was searched, opened or broken. Six new containers stand in the woods and the caves.
+The three verbs answer `NFY` until the deal lands (S1b).
+
 **The forge chain** (round 10, S3; `logic-table.md` 7.1, 8.1 and 8.2, owner answer LT9: BlackPine first). A **kiln** (the two charcoal kilns of `bp_woods`) smelts 1 Tin Ore and 1 Stone into a **Tin Ingot** (5 s; kind `deliverable`, an intermediate like Planks). At the **forge** of `bp_smithy`, 3 Ingots and 1 Timber make an **Iron axe** (`cut` 2, 40 uses; 6 s) or an **Iron pickaxe** (`break` 2, `dig` 1, 40 uses; 6 s), and 1 Ingot and 1 Tin Ore a **Fine pick** (`pick` 2; 5 s); at the **anvil** 6 Ingots make **Tin mail** (8 s) and 3 a **Tin helm** (6 s). The kiln, forge and anvil are stations (prop kinds `kiln`, `forge`, `anvil`, formerly `decor`); every one of these recipes is made on BlackPine only (`maps`), and, because the smithy opens with the medium party profile, from that profile (`profile`: a small party is not asked to forge). Hollowmere reaches tier 2 by carrying ingots or tools across. The first **tier-2 wall**: the fallen logs of the forests (stem `fallen_log`, class `thickLog`) are felled only with a `cut` 2 tool (`fellThickLog`: 5 s, 3 to 4 Logs, wears the tool by 2, back in 300 s); a plain axe is refused `NEED_TOOL` naming the Iron axe. The grindstone, the Miner's cap lamp and Warmth are not part of this step. No item here is role-bound; the Fine pick opens what a plain lock pick opens, and tier-3 locks are for later.
 
 **Logs** are the raw wood of a pile; they stack as a material and become Timber only at a saw (round 10, D3): the mill's
 head saw (BlackPine, `bp_mill`) turns one Log into 2 Timber in 4 s, a saw horse (the mill and the lumber camp) one into 1
 Timber in 8 s, bare-handed, by day, with no tool wear and no noise yet. A seat with no Log is refused `NEED_ITEM`. The Timber nodes
 still give Timber directly (they are the camp's cut stacks). A worn tool breaks when its uses run out (one is taken); the wear is server memory per seat and tool.
+**The grindstone** (round 10, x9; A313). A hold of 6 s at a grindstone (`bc.grindstone` in the lumber camp and `bf.grindstone`
+in the smithy, so BlackPine only: HollowMere has no grindstone, and a tool worn out there is gone), bare-handed, by day or by
+night and silent, forgets every use worn off the tools the seat carries, so each is whole again. A tool that broke is gone, and
+the Lockpicks' charges are not wear and stay as they are. A seat whose tools are whole, or that carries none, is refused
+`ALREADY_DONE` ("Nothing you carry wants the stone."). The 6 s is a proposal for the balance lab. An NPC seat works the
+stone as a chore (3.12 Chores: the `gather` activity, by day, hold `interact`): the station qualifies only while a tool it
+carries is worn, so a seat with whole tools never walks to it, and a figure at the wheel marks no human.
 **The bakery's parts and the Herb Bread** (round 10, D4a; owner answer LT1). Dishes are made in parts at the stations of Crumb's Ovens, on Hollowmere only (a recipe's optional `maps` lists where its stations stand). Flour (bought at the bakery's counter) is mixed into Dough at the dough mixer (2 Flour, 4 s), proofed at the proofing cabinet (8 s), and Herbs are chopped into Herb filling at the cold shelves (2 Herbs, 3 s). The brick oven then bakes a Wake Loaf from Proofed dough (5 s) or Herb Bread from Proofed dough and Herb filling (6 s). Anyone may make any step; no step marks the Baker. Eating the Herb Bread (the `eatHerbBread` ability, a `consumes` verb like `eat`) cures what any food cures and gives the private **Resistant** effect (`effects.json`, `dish`, no status bit): a Poisoned that starts while it lasts runs half as long (`poisonFactor`). It lasts until the next dawn, not a clock (owner ruling, round 10, x11): the night turning to day, the dawn that wakes the sleepers (3.32) and resolves the poison, takes it off, so a loaf eaten at night ends at that dawn and a loaf eaten by day lasts through that night; a meeting's new day is not a dawn. Eating another dish replaces a running dish buff, so one runs at a time. Nightshade's poison (3.2) is a different mechanism and ignores it. The proofing time is a short hold, not a tenth of a day, and the water is not modelled: there is no filled bucket. The rest of the dishes wait for their fillings (D4b).
 
 **Nodes keep bare hands** (owner answer LT1): a Timber node holds 3 s by hand and 1.5 s with an Axe in the inventory, a
@@ -759,6 +785,8 @@ Round 6 (ROADMAP M5d). An owner-only room runs a match in which every seat is an
 **The all-NPC match.** The owner chooses the map, the seat count (every seat an NPC, up to `players.max`), the NPC difficulty and optionally the seed words. Start needs no leader and no human; the match deals, plays and ends exactly as a normal one, and below `players.min` seats the usual NPC fill applies. Each NPC brain plays as in 3.12, with one difference: an NPC Killer may take another NPC as prey, so the brains play each other. Reset returns the room to the lobby with the same seats under the same ids, the same options and the speed paused.
 
 **Replay.** An auto match fixes the seed words of every random stream and the seat ids before Start, so the same words and ids replay the same match tick for tick. The headless runner (`pnpm auto`) plays such matches with no network and no client and prints one line per match (winner, ticks, rounds, invariant failures); a failure is printed with the seed words of every stream and the seat ids, which the admin page can set to watch it again. The runner's `--seed` decides every match's words, so a run with the same flags plays the same matches.
+
+**Decoded views (round 10, x14, A453).** With `--views`, the runner gives every seat of a match a shadow view, reconciled by the same rule as a client's view and fed through the room's own encoder and a decoder, so the seat's decoded state is what a client at that seat would hold. The check runs with the other invariants, both ways: every avatar a seat's decoded state holds exists on the server at the same position and its view still shows it, and every avatar its view shows has been decoded, compared at the tick the frame was encoded. On a living seat's decoded state the rule of 3.17 holds too: no other seat's private view or presence, no avatar's seat, no Blood out of its range (3.4) and no secret field outside the seat's own entry. The flag is off by default, the default run's speed does not change, and the shadows read the state and touch neither the sim nor any random stream.
 
 **The Studio.** Round 9. Beside the auto room, behind the same sign-in, the owner has a Studio (`#/studio`): a creative mode that walks one scene at a time with one admin figure (noclip, teleport, time of day, pause, steps and the speeds above, stand-in mobs and townsfolk that run their own brains, any item in hand), a room editor that walks an unsaved edit in the Studio and saves a scene as a draft pull request, and reports (a screenshot and a note) filed as issues. It is tooling: it is never a `party` room, deals no cards, runs no match and changes no rule or number of this document. The contract is `docs/round9/admin-studio.md`.
 
@@ -1001,7 +1029,7 @@ or figure of a later round and never holds.
 
 **Armour** (round 10, D6a; owner answer LW8). An item with an `armor` block (`items.json`; kind `armour`) worn in the body or head slot (3.30) is armour. Its `tier` picks a factor from `balance.json` `armor.tierMult` (body 0.80, 0.65, 0.50; head 0.90, 0.80); the factors of the worn items multiply, and for a creature's bite so does the Lodge's `creatureDmg` perk (3.23), and the damage never falls below `armor.cap` (0.5) of what the row would have dealt. It applies to every attack that goes through the damage table (the fists, a mugging, the slingshot, a guard's blow, a creature); only a creature's bite is also cut by the Lodge perk; the Knife never reads it (A89), nor do Nightshade and the Last Shot, so armour never makes a seat unkillable by the Killer. The Leather jerkin (tier 2) also halves how fast a Bleeding drains health (a Bleeding has no timer, so "stops sooner" is a slower drain) and costs stamina regeneration (x0.9); an item may also carry `speedMult`. Armour is private: nothing on the wire shows it, there is no inspect line and the figure is not drawn with it; it is not role-bound and drops on death. The Quilted coat is sold at the general stores; the jerkin waits for hide (skinning, D6b). **Tin mail** (body, tier 3) halves Bleeding and Poisoned drains, costs stamina regeneration (x0.8) and walking speed (x0.95); the **Tin helm** (head, tier 2) halves how long a Dazed lasts (a `dazed` resist is a factor on the duration, taken when the effect starts) and costs a little regeneration (x0.95). Both are forged (3.14). Not built yet: Warmth at night, a Miner's cap with a lamp, louder footsteps (the mail's extra footstep tile).
 
-**Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game has no use yet (the stew and the pie, D4b). The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
+**Skinning** (round 10, D6b; owner answer LW13). A Skinning knife (`skinningKnife`: tool tag `skin`, 20 uses, not role-bound, sold at the gamekeeper's stalls and the general stores) skins a fallen creature: `act.ability {abilityId: 'skin'}` takes the hide and game of the creature's `mobs.json` `skin` row (wolf hide 2, game 1; boar hide 2, game 2; bat and rat none) off the nearest corpse in reach (1.5 tiles) that has not been skinned, once, within the `body.creatureCorpseS` the corpse lies, and wears the knife one use. The Killer's Knife and the Replica Knife have no part in it, so every seat can hold hide. Three Hide stitch a Leather jerkin anywhere (no station; 6 s). Nothing is announced: no noise, no clue, nothing new on the wire. Game is a Stew's meat (3.14); it is no meal as it is. The `toolshed` and `forager` loot of the logic table has no loot tables to join, so the shops are the knife's only source.
 
 ### 3.23 The economy
 
@@ -1169,9 +1197,14 @@ with `desperateNeeds` or more needs over the threshold it is Desperate; with non
 `moodHoldS` before it changes, so a seat does not flicker. A mood shows in two ways only:
 
 - **The routine draw.** The class's work, stroll and idle weights (3.12) are scaled by `moods.weights[mood]` and
-  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more. The
-  richer habits of `townsfolk.md` 1 (home earlier, the bakery, the quiet places, lingering near the one it is angry
-  at) wait on routine hooks that do not exist yet (A140, open).
+  renormalised: a Hungry seat works more, a Scared one idles more, an Angry or Desperate one strolls more.
+- **The mood hooks (round 10, T6b, A262).** When a seat's or a villager's mood is not Calm, its next work trip draws
+  from a narrowed pool with chance `moodHooks.chance` (one draw on its own routine stream, none when Calm). Scared:
+  stations in its home scene or a scene lit at night. Hungry: the bakery's. Desperate: scenes nobody stands in. Angry:
+  its own scene, while a figure drawn with the face that struck or robbed it stands in sight there (the hook keeps the
+  drawn look at the event, never the seat behind it, so an impersonation shows nothing; never near a seat that is
+  dead, jailed or on the line, and never a walk to another scene). A narrowing that finds no station leaves the
+  pool whole. The hooks read needs, the home and public scene state only, and show nothing but where a trip goes.
 - **The idle.** While it stands still a Scared seat cowers, a Hungry or Desperate one fidgets, an Angry one stomps
   (the `cower`, `fidget` and `stomp` clips of 3.22); a Calm seat shows the plain idle. A client receives the clip id
   and nothing else, so a mood is a thing to notice, never a word.
