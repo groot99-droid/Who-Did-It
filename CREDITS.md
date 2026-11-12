@@ -75,6 +75,8 @@ The roles of `tools/blender/materials/roles.py` draw on these CC0 textures, pinn
 `tools/blender/materials/polyhaven.lock.json` and fetched at build time into the git-ignored cache by `fetch.py`
 (`docs/round8/art.md` 5, `docs/DECISIONS.md` A144, A155). The sources are never committed; the renders that use
 them are credited in the tables below by key. Licence text: `LICENSES/vendors/polyhaven-materials-license-2026-10-23.txt`.
+The textures added since are listed in `polyhaven-materials-license-2026-11-12.txt` (the snow) and
+`polyhaven-assets-license-2026-11-12.txt` (the wild places).
 
 | Slug                     | Title                  | Authors                           | URL                                            | Licence | Roles                |
 | ------------------------ | ---------------------- | --------------------------------- | ---------------------------------------------- | ------- | -------------------- |
@@ -91,6 +93,7 @@ them are credited in the tables below by key. Licence text: `LICENSES/vendors/po
 | `forest_ground_05`       | Forest Ground 05       | Charlotte Baglioni                | https://polyhaven.com/a/forest_ground_05       | CC0-1.0 | `forest_ground_dark` |
 | `forest_leaves_02`       | Forest Leaves 02       | Rob Tuytel                        | https://polyhaven.com/a/forest_leaves_02       | CC0-1.0 | `leaf_litter`        |
 | `forrest_ground_01`      | Forest Ground 01       | Rob Tuytel                        | https://polyhaven.com/a/forrest_ground_01      | CC0-1.0 | `needles`            |
+| `forrest_ground_03`      | Forest Ground 03       | Rob Tuytel                        | https://polyhaven.com/a/forrest_ground_03      | CC0-1.0 | `pine_needles`       |
 | `gravel`                 | Gravel                 | Dimitrios Savva                   | https://polyhaven.com/a/gravel                 | CC0-1.0 | `gravel`             |
 | `gravel_floor`           | Gravel Floor           | Jenelle van Heerden, Matterfield  | https://polyhaven.com/a/gravel_floor           | CC0-1.0 | `gravel_floor`       |
 | `gravel_stones`          | Gravel Stones          | Amal Kumar                        | https://polyhaven.com/a/gravel_stones          | CC0-1.0 | `gravel_stones`      |
@@ -107,17 +110,24 @@ them are credited in the tables below by key. Licence text: `LICENSES/vendors/po
 | `old_wood_floor`         | Old Wood Floor         | Guillaume Monsergent              | https://polyhaven.com/a/old_wood_floor         | CC0-1.0 | `wood_floor`         |
 | `pine_bark`              | Pine Bark              | Dimitrios Savva                   | https://polyhaven.com/a/pine_bark              | CC0-1.0 | `pine_bark`          |
 | `poly_wool_herringbone`  | Poly Wool Herringbone  | Rico Cilliers, colormass          | https://polyhaven.com/a/poly_wool_herringbone  | CC0-1.0 | `wool`               |
+| `quarry_wall_02`         | Quarry Wall 02         | Dimitrios Savva                   | https://polyhaven.com/a/quarry_wall_02         | CC0-1.0 | `mine_wall`          |
+| `raw_wooden_floor_01`    | Raw Wooden Floor 01    | Charlotte Baglioni                | https://polyhaven.com/a/raw_wooden_floor_01    | CC0-1.0 | `timber_rough`       |
 | `red_brick_03`           | Red Brick 03           | Rob Tuytel                        | https://polyhaven.com/a/red_brick_03           | CC0-1.0 | `brick`              |
 | `river_small_rocks`      | River Small Rocks      | Rico Cilliers, Rob Tuytel         | https://polyhaven.com/a/river_small_rocks      | CC0-1.0 | `river_rocks`        |
 | `rock_face`              | Rock Face              | Dario Barresi, Greg Zaal          | https://polyhaven.com/a/rock_face              | CC0-1.0 | `rock_face`          |
 | `rock_ground`            | Rock Ground            | Rob Tuytel                        | https://polyhaven.com/a/rock_ground            | CC0-1.0 | `rock_ground`        |
 | `rock_wall_08`           | Rock Wall 08           | Amal Kumar                        | https://polyhaven.com/a/rock_wall_08           | CC0-1.0 | `stone_wall`         |
+| `rocks_ground_08`        | Rocks Ground 08        | Rob Tuytel                        | https://polyhaven.com/a/rocks_ground_08        | CC0-1.0 | `mine_floor`         |
 | `rocky_gravel`           | Rocky Gravel           | Dario Barresi, Dimitrios Savva    | https://polyhaven.com/a/rocky_gravel           | CC0-1.0 | `rocky_gravel`       |
 | `rocky_trail`            | Rocky Trail            | Amal Kumar                        | https://polyhaven.com/a/rocky_trail            | CC0-1.0 | `rocky_trail`        |
 | `roof_slates_02`         | Roof Slates 02         | Rob Tuytel                        | https://polyhaven.com/a/roof_slates_02         | CC0-1.0 | `slate_roof`         |
 | `rough_linen`            | Rough Linen            | Rico Cilliers, colormass          | https://polyhaven.com/a/rough_linen            | CC0-1.0 | `linen`              |
 | `rust_coarse_01`         | Rust Coarse 01         | Dimitrios Savva, Rico Cilliers    | https://polyhaven.com/a/rust_coarse_01         | CC0-1.0 | `rust`               |
+| `seaside_rock`           | Seaside Rock           | Dimitrios Savva                   | https://polyhaven.com/a/seaside_rock           | CC0-1.0 | `wet_rock`           |
 | `slate_floor_02`         | Slate Floor 02         | Dimitrios Savva                   | https://polyhaven.com/a/slate_floor_02         | CC0-1.0 | `slate_floor`        |
+| `snow_02`                | Snow 02                | Rob Tuytel                        | https://polyhaven.com/a/snow_02                | CC0-1.0 | `snow`               |
+| `snow_03`                | Snow 03                | Rob Tuytel                        | https://polyhaven.com/a/snow_03                | CC0-1.0 | `snow_trodden`       |
+| `snow_field_aerial`      | Snow Field Aerial      | Rob Tuytel                        | https://polyhaven.com/a/snow_field_aerial      | CC0-1.0 | `snow_field`         |
 | `stone_floor`            | Stone Floor            | Dimitrios Savva                   | https://polyhaven.com/a/stone_floor            | CC0-1.0 | `flagstone`          |
 | `thatch_roof_angled`     | Thatch Roof Angled     | Dimitrios Savva, Rob Tuytel       | https://polyhaven.com/a/thatch_roof_angled     | CC0-1.0 | `thatch`             |
 | `weathered_plank_siding` | Weathered Plank Siding | Dimitrios Savva                   | https://polyhaven.com/a/weathered_plank_siding | CC0-1.0 | `wood_boards`        |
@@ -131,6 +141,29 @@ The sky the PBR finish of the HD style fills the world with (`tools/blender/mate
 | Slug                                   | Title                                   | Authors                | URL                                                          | Licence | Use                                                   |
 | -------------------------------------- | --------------------------------------- | ---------------------- | ------------------------------------------------------------ | ------- | ----------------------------------------------------- |
 | `kloofendal_48d_partly_cloudy_puresky` | Kloofendal 48d Partly Cloudy (Pure Sky) | Greg Zaal, Jarod Guest | https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky | CC0-1.0 | the world fill of the PBR finish (`materials/pbr.py`) |
+
+The rocks, plants and props of the 3D wild scenes (Gallows Wood, The Fenwood, the Tin Gallery mouth and its sea
+door, the Flooded Gallery) are Poly Haven CC0 models, pinned by md5 in `tools/blender/materials/polyhaven_models.lock.json`
+and fetched at build time, each with the files it includes, into the git-ignored `tools/blender/.cache/polyhaven_models/`
+by `fetch_models.py`. They keep their scanned textures. The sources are never committed. Licence text:
+`LICENSES/vendors/polyhaven-assets-license-2026-11-12.txt`.
+
+| Slug                     | Title                  | Authors                      | URL                                            | Licence | File      | Use                                                                     |
+| ------------------------ | ---------------------- | ---------------------------- | ---------------------------------------------- | ------- | --------- | ----------------------------------------------------------------------- |
+| `dry_branches_medium_01` | Dry Branches Medium 01 | Rico Cilliers                | https://polyhaven.com/a/dry_branches_medium_01 | CC0-1.0 | 1k glTF   | windfall brush and deadfall on the trails                               |
+| `fern_02`                | Fern 02                | Rico Cilliers, Rob Tuytel    | https://polyhaven.com/a/fern_02                | CC0-1.0 | 1k .blend | frost-killed bracken, tinted brown; the .blend keeps the alpha cut-outs |
+| `grass_medium_02`        | Grass Medium 02        | Rico Cilliers                | https://polyhaven.com/a/grass_medium_02        | CC0-1.0 | 1k .blend | fen-margin grass; the .blend keeps the alpha and the dead-grass map     |
+| `picke_dirty_01`         | Picke Dirty 01         | Dennis Halbeck               | https://polyhaven.com/a/picke_dirty_01         | CC0-1.0 | 1k glTF   | the pick beside the dropped lamp                                        |
+| `rock_07`                | Rock 07                | Jenelle van Heerden          | https://polyhaven.com/a/rock_07                | CC0-1.0 | 1k glTF   | mine rubble: fallen roof stone, the ore heap                            |
+| `rock_face_01`           | Rock Face 01           | Dario Barresi                | https://polyhaven.com/a/rock_face_01           | CC0-1.0 | 1k glTF   | rock faces: the woods' ridges, the rock round the Tin Gallery mouth     |
+| `rock_face_02`           | Rock Face 02           | Dario Barresi, Rico Cilliers | https://polyhaven.com/a/rock_face_02           | CC0-1.0 | 1k glTF   | smaller rock faces: outcrops, the sea-door cliff                        |
+| `rock_moss_set_01`       | Rock Moss Set 01       | Kless Gyzen                  | https://polyhaven.com/a/rock_moss_set_01       | CC0-1.0 | 1k glTF   | forest outcrops (six mossy boulders up to 2.7 m)                        |
+| `rock_moss_set_02`       | Rock Moss Set 02       | Kless Gyzen                  | https://polyhaven.com/a/rock_moss_set_02       | CC0-1.0 | 1k glTF   | forest boulders (seven smaller mossy rocks)                             |
+| `rusted_spade_01`        | Rusted Spade 01        | Blemonade                    | https://polyhaven.com/a/rusted_spade_01        | CC0-1.0 | 1k glTF   | the shovel in the broken-ore heap                                       |
+| `shrub_02`               | Shrub 02               | Rico Cilliers                | https://polyhaven.com/a/shrub_02               | CC0-1.0 | 1k .blend | undergrowth, sparingly; the .blend keeps the alpha cut-outs             |
+| `single_root`            | Single Root            | Jenelle van Heerden          | https://polyhaven.com/a/single_root            | CC0-1.0 | 1k glTF   | surface roots                                                           |
+| `tree_stump_01`          | Tree Stump 01          | Rob Tuytel                   | https://polyhaven.com/a/tree_stump_01          | CC0-1.0 | 1k glTF   | stumps on the trails and in the clearings                               |
+| `wooden_lantern_01`      | Wooden Lantern 01      | James Ray Cock               | https://polyhaven.com/a/wooden_lantern_01      | CC0-1.0 | 1k .blend | the dropped miner's lamp; the .blend keeps the glass opacity            |
 
 ## Generated assets
 
