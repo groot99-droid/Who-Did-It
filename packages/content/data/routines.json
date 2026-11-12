@@ -16,12 +16,15 @@
         "coldShelves",
         "doughMixer",
         "brickOven",
+        "kiln",
+        "forge",
+        "anvil",
         "proofingCabinet"
       ]
     },
     "gather": {
       "phases": ["day"],
-      "kinds": ["lumber", "stump", "timberSet", "boulder", "rockPile", "orePile"]
+      "kinds": ["lumber", "stump", "timberSet", "boulder", "rockPile", "orePile", "grindstone"]
     },
     "trade": { "phases": ["day"], "kinds": ["counter", "ledger"] },
     "social": {
@@ -37,6 +40,7 @@
     "boulder": "interact",
     "rockPile": "interact",
     "orePile": "interact",
+    "grindstone": "interact",
     "counter": "shop",
     "ledger": "errand"
   },

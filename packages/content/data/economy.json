@@ -47,7 +47,7 @@
     "market": {
       "prop": "ov.shop_market",
       "sells": [],
-      "buys": ["timber", "stone", "resin", "herb", "mushroom", "tinOre"]
+      "buys": ["timber", "stone", "resin", "herb", "mushroom", "berries", "tinOre"]
     },
     "gamekeeper": {
       "prop": "fo.shop_stall",
@@ -79,7 +79,7 @@
     "bpMarket": {
       "prop": "bc.shop_market",
       "sells": [],
-      "buys": ["timber", "stone", "resin", "herb", "mushroom", "tinOre"]
+      "buys": ["timber", "stone", "resin", "herb", "mushroom", "berries", "tinOre"]
     }
   },
   "prices": {
@@ -103,6 +103,7 @@
     "resin": { "pay": 2 },
     "herb": { "pay": 2 },
     "mushroom": { "pay": 2 },
+    "berries": { "pay": 1 },
     "tinOre": { "pay": 3 }
   },
   "rent": { "maps": ["hollowmere"], "amount": 6, "dueAtDayFrac": 0.5 },
