@@ -86,6 +86,17 @@ ownerless #443), 10Y `session_01M5mAcWwzvbuS9YxojFNVor` (#428). Left archived: 1
 #441, #435, #437). The orchestrator owns #471 itself. The delegation covers the lanes' questions; merging into the production
 base still deploys and still needs the owner's explicit word.
 
+Grants and calls the orchestrator made under that delegation:
+- 2026-11-12, 10S #447: a test-helper grant. `npcHelpers.ts` `Human.id` resolves through `seatOf` (seat ids are fresh at Start), and
+  `flow.test.ts` lines 121 and 140 map session ids to seat ids. No assertion, value or timeout changes.
+- 2026-11-12, 10C #432: append `hardship` to `STORY_STREAMS` and fixed seed words to `hollowmere_winter.seedWords`. This is data,
+  and the orchestrator owns story mode. Carry the same two lines into `claude/story-part2` when it next takes the base.
+- 2026-11-12, Blender tools session (`session_01M5mAcVgjse9A6XHwQQXcDr`, runs on the owner's laptop): canon answers.
+  Vane Manor sign, black crepe, no sea, blank crate lettering, one torch pair at the adit, cart upright, the Hanging Oak is the
+  gallows, Fenwood lantern teal. Data follow-ups: the `sea_exit` notes text, the adit torch light, the `fd.lt_drowned` kind.
+  Its commit `753b563d` (tools/blender only) was pushed straight to the production base; the owner was told and has not asked for a
+  revert. Its later builders go on their own branch with a PR.
+
 ## Sessions
 
 | Session | Id | State | Rule |
