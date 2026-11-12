@@ -11,7 +11,7 @@ import { onSim } from '../events/bus';
  * and its maximum health `rite.buff.maxHpFactor` times the body's, and it comes back at that maximum. At dusk the
  * effect comes off and the extra maximum goes with it (health over the new maximum is lost). A return at the Final
  * Night has no dusk ahead, so the buff lasts to the match's end. It follows the look, as the return does: the effect
- * shows no sign, and its speed is all anyone else can see. The conversion aura waits on I9 (R6).
+ * shows no sign, and its speed is all anyone else can see. The dealt Vicar's conversion aura while it lasts is `aura.ts` (R6).
  */
 export const BUFF_EFFECT = 'ascended';
 
