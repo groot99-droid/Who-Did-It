@@ -1,7 +1,6 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import { WORLD_COPY as C } from '../ui/copy';
 import { h } from '../ui/dom';
-import { mountArtStyleSwitch, type ArtStyleSwitch } from '../ui/artStyle/ArtStyleSwitch';
 import { mountDeckChip, type DeckChip } from '../ui/main/deckChip';
 import { mountSettingsPanel } from '../ui/SettingsPanel';
 import '../ui/theme/tokens.css';
@@ -81,7 +80,6 @@ export class Hud {
   private readonly clockPhase: HTMLElement;
   private readonly log: HTMLElement;
   private readonly toasts: HTMLElement;
-  private readonly artSwitch: ArtStyleSwitch;
   private readonly settings: { destroy(): void };
   private readonly promptEl: HTMLElement;
   private readonly promptText: HTMLElement;
@@ -142,12 +140,11 @@ export class Hud {
       this.toasts,
     );
     parent.append(this.root);
-    // The art-style switch (A79): the in-match button, over the log's corner.
-    this.artSwitch = mountArtStyleSwitch(this.root.querySelector('.wdi-hud__tr') as HTMLElement, {
-      compact: true,
+    // Round 6, 6L (locked slot): the settings gear in the corner. Round 10, S5 (A534): the art style is picked in the
+    // lobby only, so the switch that stood beside the gear is gone and the panel names the pick read only.
+    this.settings = mountSettingsPanel(this.root.querySelector('.wdi-hud__tr') as HTMLElement, {
+      inMatch: true,
     });
-    // Round 6, 6L (locked slot): the settings gear beside the art switch.
-    this.settings = mountSettingsPanel(this.root.querySelector('.wdi-hud__tr') as HTMLElement);
   }
 
   setChip(chip: HudChip | null): void {
@@ -229,7 +226,6 @@ export class Hud {
   }
 
   destroy(): void {
-    this.artSwitch.destroy();
     this.settings.destroy();
     this.deckChip?.destroy();
     this.deckChip = null;
