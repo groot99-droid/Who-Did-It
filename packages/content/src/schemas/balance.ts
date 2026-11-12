@@ -525,6 +525,12 @@ export const BalanceFile = z.strictObject({
    */
   paintTown: Section({ winUnique: Frac }),
   /**
+   * Round 10 (GDD 3.24, T6): the mood hooks. A seat or figure whose mood is not Calm narrows its next work trip with
+   * this chance (`moodPool`): Scared to its home or a lit scene, Hungry to the bakery, Angry to the scene of the seat it
+   * is angry at, Desperate to a scene nobody stands in.
+   */
+  moodHooks: Section({ chance: Chance }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the

@@ -2259,3 +2259,12 @@ the table as it places them (A414's deck test):
 Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
 `TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
 read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
+
+### 14.56 Containers (10F, round 10, S1)
+
+The words of containers (GDD 3.14, `docs/round9/logic-table.md` 6), all in `interactions.json`: the prompts are the
+interactions' labels, "Search" (`searchContainer`), "Pick the lock" (`pickContainer`) and "Force the lid"
+(`pryContainer`). A searched container answers `NOTHING_THERE` with "Somebody has been through it already."; a locked
+one answers `NEED_TOOL` with "It is locked. A pick or a bar would open it." and, once open, "It stands open, and empty."
+An empty search is not a refusal: the searcher alone reads the system line "Only dregs and cobwebs."
+(`containers.empty`). What a container held shows only in the opener's inventory; no line names it.
