@@ -41,7 +41,7 @@ material letters. A 3D interior is built from that file. Its ids are frozen; its
 | `Tycoon_s_Manor` | `manor_hall` 28x16, `manor_upper` 24x12 | HollowMere | Medium |
 | `Hale_Barn` | `barn` 20x12 | HollowMere | Medium |
 | `Vicars_Chapel` | `chapel` 18x12, `cellar` 28x16 (dark; also reached by the well and the tavern trap) | HollowMere | Large |
-| `Frostbitten_Fisherman_s_Wharf` (`netloft`) | **none**: the net loft has no door portal and no scene | HollowMere | n/a |
+| `Frostbitten_Fisherman_s_Wharf` (`netloft`) | **none, by the owner's decision (2026-11-12)**: exterior only, with no door portal and no scene | HollowMere | n/a |
 | `Frostbound_County_Jail` (the Constable's lock-up, draft) | `cj_cell` 12x8 (in no map; no portals) | none | n/a |
 
 That makes 16 HollowMere interior scenes, plus the jail cell. BlackPine's interiors (`bp_lodge`, `bp_mill`, `bp_office`,
@@ -151,6 +151,6 @@ its GDD text in the same PR (CLAUDE.md):
 1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today. A 3D interior is built from
    its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior.
-3. Does the net loft (`netloft`) get an interior?
+3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
 4. Should the 3D interiors replace the game's 2.5D interior art (sprites rendered from them), or are they for film and
    look development only, as the village is today?
