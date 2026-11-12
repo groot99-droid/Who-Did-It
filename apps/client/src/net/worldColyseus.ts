@@ -54,6 +54,7 @@ interface PlayerState {
     inBed?: number;
     inBedOf?: number;
     onLine?: boolean; // round 10, C1
+    departed?: boolean; // round 10, C4b (seams.md 3 row 21)
     fare?: number; // round 10, C2
     paintTown?: boolean; // round 10, C5
     hitman?: boolean; // round 10, C4 (seams.md 3 row 20): the Hitman turned this seat
@@ -273,6 +274,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   onLine(): boolean {
     return this.state.players.get(this.selfId)?.priv?.onLine === true;
+  }
+
+  departed(): boolean {
+    return this.state.players.get(this.selfId)?.priv?.departed === true;
   }
 
   clock() {

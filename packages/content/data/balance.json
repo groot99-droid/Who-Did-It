@@ -509,5 +509,10 @@
     "trespassFine": 4,
     "rumourFine": 3,
     "gddRef": "3.8"
+  },
+  "snare": {
+    "seeTiles": 1,
+    "npc": { "setChancePer10s": 0.2, "buyChance": 0.3, "ropeChance": 0.7 },
+    "gddRef": "3.5"
   }
 }

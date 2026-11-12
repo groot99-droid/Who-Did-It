@@ -44,7 +44,7 @@ async function quietRoom(): Promise<PartyRoom> {
 }
 
 const words = (n: number) => [n, n + 1, n + 2, n + 3] as [number, number, number, number];
-const fixedSeeds = Object.fromEntries(AUTO_STREAMS.map((s, i) => [s, words(i * 4 + 1)]));
+const fixedSeeds = Object.fromEntries(AUTO_STREAMS.map((s, i) => [s, words(i * 4 + 2)]));
 const fixedIds = Array.from({ length: 6 }, (_, i) => `bus${i}`);
 const hashOf = (events: SimEventWire[]) => events.map(logLine).join('\n');
 

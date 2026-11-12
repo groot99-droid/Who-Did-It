@@ -96,6 +96,35 @@ export function checkInteractions(
     for (const e of table.entries)
       if (e.item !== null && !isItem(e.item)) err(`${file} loot ${id}: unknown item ${e.item}`);
 
+  // Round 10 (S1; logic-table.md 6): the container rules name real classes, tables, scenes and stems, and every
+  // scene with a dealable container has a table to draw from.
+  const box = t.containers;
+  for (const cls of [...box.classes, ...box.stocked, ...box.chestGrade])
+    if (!Object.hasOwn(t.classes, cls)) err(`${file} containers: unknown class ${cls}`);
+  const themed = new Map<string, string>();
+  for (const [lists, kind] of [
+    [box.themes, 'theme'],
+    [box.stems, 'stem'],
+  ] as const)
+    for (const [table, names] of Object.entries(lists)) {
+      if (!Object.hasOwn(t.lootTables, table)) err(`${file} containers ${kind}: unknown loot table ${table}`);
+      for (const name of names.split(' ')) {
+        if (kind === 'theme' && !Object.hasOwn(c.scenes, name))
+          err(`${file} containers: unknown scene ${name}`);
+        if (kind === 'stem' && !placedStems.has(name))
+          err(`${file} containers: stem ${name} is placed nowhere`);
+        if (themed.has(`${kind}:${name}`)) err(`${file} containers: ${name} has two tables`);
+        themed.set(`${kind}:${name}`, table);
+      }
+    }
+  for (const scene of Object.values(c.scenes))
+    for (const prop of scene.props) {
+      const cls = classesOfProp(t, prop)[0];
+      if (cls === undefined || ![...box.classes, ...box.stocked].includes(cls)) continue;
+      if (!themed.has(`theme:${scene.id}`) && !themed.has(`stem:${propStem(prop.id)}`))
+        err(`${file} containers: scene ${scene.id} has container ${prop.id} and no loot table`);
+    }
+
   for (const [id, it] of Object.entries(t.interactions)) {
     const where = `${file} ${id}`;
     const cls = t.classes[it.target];

@@ -305,6 +305,11 @@ export interface WorldFeed {
    * ghost then: `dead()` is false, and the On-the-line screen stands in for the world until the train.
    */
   onLine(): boolean;
+  /**
+   * Round 10 (C4b, GDD 3.33): this seat is the Hitman who boarded the Dusk Train and left play (`Private.departed`).
+   * The server sends it no scene; the Departed screen stands in for the world until the match ends.
+   */
+  departed(): boolean;
   sendMove(cmd: MoveCmd): void;
   enterPortal(portalId: string): void;
   /** `targetId` is an avatar handle (GDD 3.17); the server resolves it to a seat. */

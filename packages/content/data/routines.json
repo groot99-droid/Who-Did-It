@@ -13,14 +13,14 @@
         "goat",
         "fence",
         "window",
-        "coldShelves",
-        "doughMixer",
-        "brickOven",
         "kiln",
         "forge",
-        "anvil",
-        "proofingCabinet"
+        "anvil"
       ]
+    },
+    "bake": {
+      "phases": ["day", "night"],
+      "kinds": ["coldShelves", "doughMixer", "brickOven", "proofingCabinet"]
     },
     "gather": {
       "phases": ["day"],
