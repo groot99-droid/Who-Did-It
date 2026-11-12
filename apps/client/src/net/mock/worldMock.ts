@@ -187,6 +187,8 @@ export class MockWorldFeed implements WorldFeed {
   /** Story R7: ?ghost=shade dies as the martyr's shade, with a Medium figure beside it (stays put at the death). */
   private shade = false;
   private medium: { x: number; y: number } | null = null;
+  /** Story I9b: the Vicar's converted count after the mock sermon. */
+  private convertedCount = 0;
   /** `?cutscene=1`: the mock Start sends the HollowMere opening and a ghost's kill names its cutscene, like the server (round 6, 6J). */
   private opening = false;
   private killPending = false;
@@ -250,6 +252,12 @@ export class MockWorldFeed implements WorldFeed {
     if (shotScene && shotSpawn && self) {
       this.place(self, shotScene, shotSpawn);
       this.startAt = { sceneId: shotScene, spawn: shotSpawn.id, facing: shotSpawn.facing };
+    }
+    // Story I9b: `?vicar=bell` plays the Vicar's look one tile below the overworld's bell, for the sermon.
+    const bellProp = this.content.scenes.overworld?.props?.find((p) => p.id === 'ov.bell');
+    if (q.get('vicar') === 'bell' && self && bellProp) {
+      self.look = 'vicar';
+      this.place(self, 'overworld', { x: bellProp.x, y: bellProp.y + 1, facing: 'n' });
     }
     // Round 6 (6I): `?m5b=1` stands the own seat beside the overworld's quest giver with a spade and a kit of nodes.
     let kit: { scene: string; x: number; y: number; bare?: boolean } | null = null;
@@ -523,6 +531,14 @@ export class MockWorldFeed implements WorldFeed {
   }
 
   hold(action: HoldAction, targetId: string, on: boolean): void {
+    if (action === 'sermon' && on) {
+      // Story I9b: the sermon runs `conversion.sermonS`; two mock listeners hear it and both are converted.
+      window.setTimeout(() => {
+        this.convertedCount = 2;
+        this.bus.emit('conversion', { kind: 'sermon', heard: 2 });
+      }, balanceJson.conversion.sermonS * 1000);
+      return;
+    }
     if (action === 'rite' && on && this.shade && targetId === MOCK_MEDIUM) {
       // Story R7: the rite runs `rite.holdS`, then the seat returns two seconds later (the server's next day).
       this.bus.emit('rite', {
@@ -673,6 +689,10 @@ export class MockWorldFeed implements WorldFeed {
   // Round 8, 8D: the mock town has no altar, station or bank, so no Faith and nothing built.
   faith(): number {
     return 0;
+  }
+
+  converted(): number {
+    return this.convertedCount;
   }
 
   hqTiers(): Record<string, number> {
