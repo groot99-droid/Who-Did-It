@@ -40,6 +40,10 @@ export const ClueKind = {
   scuffle: 10,
   /** Round 10 (D5c, seams.md 3 row 12, GDD 3.29): scratches round a lock a pick opened; `value` and `dir` are 0 for everyone. */
   scratch: 11,
+  /** Round 10 (V3, seams.md 3 row 39, GDD 3.2): a Chalk mark on the floor; `value` the symbol, `dir` 0. */
+  chalk: 13,
+  /** Round 10 (V1b, seams.md 3 row 24, GDD 3.2): a Doctor's Autopsy reading; `value` an `AutopsyCause`, the entry's `tick` the estimate. */
+  timeOfDeath: 12,
 } as const;
 export type ClueKindId = (typeof ClueKind)[keyof typeof ClueKind];
 
@@ -51,6 +55,23 @@ export const PairPhase = { none: 0, asking: 1, asked: 2, paired: 3, declined: 4 
 
 /** `GameState.manhunt.state` (round 10, B4; GDD 3.31, seams.md 3 row 14). */
 export const ManhuntState = { none: 0, hunting: 1, cuffed: 2 } as const;
+
+/** `GameState.tribunal` (round 10, B6a; GDD 3.8, seams.md 3 row 22). */
+export const TribunalStep = {
+  none: 0,
+  charge: 1,
+  case: 2,
+  defence: 3,
+  verdict: 4,
+  return: 5,
+  /** B6d (row 35): the Final Night's end trial gathers, then takes filings, then reads each case as a verdict. */
+  gathering: 6,
+  filing: 7,
+} as const;
+export const TribunalFinding = { none: 0, dismissed: 1, proven: 2, murder: 3 } as const;
+export const TribunalSentence = { none: 0, release: 1, fine: 2, jail: 3, death: 4, fineJail: 5 } as const;
+/** `TribunalEntry.weight`: how an entry on the scales counts against the accused's public traits. */
+export const EntryWeight = { none: 0, match: 1, exclusion: 2 } as const;
 
 /** `NotebookEntry.status` values (GDD 3.4; `teaching` is the grace-phase clue of GDD 2 step 5). */
 export const NotebookStatus = {
@@ -77,7 +98,17 @@ export const NoteKind = {
   contract: 9,
   /** Round 8 (GDD 3.23): a Blackmail Notice from the mailbag; `of` is the look it names, `sceneId` and `value` (a phase) where and when. */
   notice: 10,
+  /** Round 10 (V3, seams.md 3 row 39, GDD 3.7): a hider's own entry that a Check opened its spot; `of` is the face the checker showed. */
+  checked: 14,
+  /** Round 10 (V1b, row 24, GDD 3.2): a Dust lift, the seat's own reading; `of` is the body's victim, '' for a door. */
+  lift: 11,
+  /** Round 10 (V1b): a Compare of two lifts; `value` 1 match, 0 no match; `of` lists the two entry ids, comma-joined. */
+  comparison: 12,
+  /** Round 10 (V1b): an Autopsy; `of` is the victim, `value` the `AutopsyCause`, `tick` the estimated death. */
+  autopsy: 13,
 } as const;
+/** `NotebookEntry.value` of an autopsy (round 10, V1b): the cause as the Doctor reads it. */
+export const AutopsyCause = { knife: 0, creature: 1, poison: 2, shot: 3, other: 4 } as const;
 export type NoteKindId = (typeof NoteKind)[keyof typeof NoteKind];
 
 /** Sent in `Private.cooldownEndTick[abilityId]` while a night power is spent for the current night (GDD 3.2). */

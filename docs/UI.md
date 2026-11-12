@@ -37,8 +37,8 @@ Session I, 2026-10-10. Owner review pending on the role card and the meeting scr
 
 ## 2. Palette
 
-The ten tokens of `packages/content/data/palette.json` (docs/ASSETS.md 6.1) and its five-colour
-`night` set (round 7, below) are the only colours. CSS exposes each as `--wdi-<name>` and as `--wdi-<name>-rgb` so an alpha variant is
+The ten tokens of `packages/content/data/palette.json` (docs/ASSETS.md 6.1), its five-colour
+`night` set (round 7, below) and its sixteen-colour `dossier` set (round 10, below) are the only colours. CSS exposes each as `--wdi-<name>` and as `--wdi-<name>-rgb` so an alpha variant is
 written `rgb(var(--wdi-bone-rgb) / 0.72)` and no new hex is ever born. The night roles:
 
 | Role token | Palette | Used for |
@@ -95,6 +95,19 @@ The veil and the glass alphas are the ones 10 measures, over the darkest frame t
 (`night`) and the brightest (`snow`): text on glass passes whatever the video shows. Bare text on
 the backdrop is display size (24 px and up) or sits in the vignette.
 
+**The dossier set (round 10, 10R, DECISIONS A257).** The role card and the Satchel are paper, what you hold
+(owner, Q-E1: "only card and Satchel"); the HUD and the world's panels stay on the night glass. `palette.json`
+`dossier` holds the paper in two papers, light then dark: DOM UI only, like `night`, never art or a tint.
+`ui/theme/dossier.css` maps them onto private roles under a `.wdi-dossier` root, which follows
+`prefers-color-scheme` unless `data-paper="light"` or `"dark"` says otherwise (`docs/round10/rolecards.md` 6).
+
+The roles, light / dark: page `vellum` / `carbon`; sheet (cards, chips) `sheet` / `graphite`; well (the Proposed
+box) `well` / `cellar`; rule (1 px edges) `rule` / `seam`; ink `ink` / `bone`; soft (hints, never in a dark well)
+`pencil` / `ash`; number (eyebrows, numbers, the well's rule) `ochre` / `mustard`; done `moss` / `sage`; forged
+`brick` / `blush` (never a faction, never in a dark well); focus `focus` / `moon`, since the double ring of 10 fails
+on light paper. The set takes no alpha, so it has no `-rgb` triplets. The primary button is ink on mustard on both papers. The faction colours stay on the card's stripe and frame
+(7), with their own pairs; on light paper the frame's corner motif is drawn in ink.
+
 ## 3. Type
 
 Oswald for display (titles, buttons, names, codes, chips: uppercase, tracked) and Inter for
@@ -105,7 +118,7 @@ text (body, hints, inputs, chat). Both are self-hosted variable fonts under the 
 (`--wdi-font-pixel-display`, one weight) and Pixelify Sans (`--wdi-font-pixel-text`, variable 400 to
 700), both OFL, self-hosted from Fontsource 5.3.0 as Latin woff2 (12.2 and 11.7 KiB, about 24 KiB
 together, bundled with the stylesheet and fetched only by a screen that uses them). `style.json`
-`ui.fonts` names all four and `theme.test.ts` refuses any other family in any stylesheet under
+`ui.fonts` names them (seven since round 10, below) and `theme.test.ts` refuses any other family in any stylesheet under
 `apps/client/src` (generic families such as `monospace` aside). The sizes are the scale below;
 which face each size takes on a night surface:
 
@@ -119,6 +132,13 @@ which face each size takes on a night surface:
 
 Never below 12 px, never synthesised bold (Press Start 2P has one weight: `font-synthesis: none`),
 and the pixel faces take no tracking beyond 0.04 em.
+
+**The dossier faces (round 10, 10R, DECISIONS A257).** The role card and the Satchel set Alegreya SC 700
+(`--wdi-font-dossier-display`: section heads, the role name), Alegreya Sans 400, 500 and 700
+(`--wdi-font-dossier-text`: running text, buttons, pills) and IBM Plex Mono 400 and 500
+(`--wdi-font-dossier-mono`: eyebrows, keys, numbers, chips), all OFL, self-hosted Latin woff2 from Fontsource 5.2.5
+(about 127 KiB for the six; the browser fetches a face only when a dossier screen first draws it). `style.json`
+`ui.fonts` names all seven families; the sizes are the scale below.
 
 | Token | Size | Face | Where |
 |---|---|---|---|
@@ -432,6 +452,45 @@ composited over the background first. Floors: 4.5 for text, 3 for large text (24
 | `mustard` | `ink` | 9.88 | 3 | AAA | focus ring on the page (non-text, 3:1) |
 | `fog` | `ink` | 4.23 | 3 | AA large / UI | display text 24 px and up only (large text, 3:1) |
 
+The dossier (round 10, 2), light paper:
+
+| Foreground | Background | Ratio | Floor | Grade | Use |
+|---|---|---|---|---|---|
+| `ink` | `sheet` | 17.77 | 4.5 | AAA | text on a card |
+| `ink` | `vellum` | 15.82 | 4.5 | AAA | text on the page |
+| `ink` | `well` | 15.46 | 4.5 | AAA | text in a well |
+| `pencil` | `sheet` | 6.10 | 4.5 | AA | hints on a card |
+| `pencil` | `vellum` | 5.43 | 4.5 | AA | hints on the page |
+| `pencil` | `well` | 5.30 | 4.5 | AA | hints in a well |
+| `ochre` | `sheet` | 5.35 | 4.5 | AA | eyebrows and numbers on a card |
+| `ochre` | `vellum` | 4.77 | 4.5 | AA | eyebrows on the page |
+| `ochre` | `well` | 4.66 | 4.5 | AA | numbers in a well, the well's rule |
+| `moss` | `sheet` | 6.14 | 4.5 | AA | done |
+| `brick` | `sheet` | 6.52 | 4.5 | AA | forged |
+| `brick` | `well` | 5.68 | 4.5 | AA | forged in a well |
+| `focus` | `vellum` | 5.46 | 3 | AA | the focus ring on the page (non-text, 3:1) |
+| `focus` | `sheet` | 6.13 | 3 | AA | the focus ring on a card (non-text, 3:1) |
+
+Dark paper:
+
+| Foreground | Background | Ratio | Floor | Grade | Use |
+|---|---|---|---|---|---|
+| `bone` | `graphite` | 7.46 | 4.5 | AAA | text on a card |
+| `bone` | `carbon` | 8.78 | 4.5 | AAA | text on the page |
+| `bone` | `cellar` | 6.57 | 4.5 | AA | text in a well |
+| `ash` | `graphite` | 5.10 | 4.5 | AA | hints on a card |
+| `ash` | `carbon` | 6.01 | 4.5 | AA | hints on the page |
+| `mustard` | `graphite` | 6.04 | 4.5 | AA | eyebrows and numbers on a card |
+| `mustard` | `carbon` | 7.11 | 4.5 | AAA | eyebrows on the page |
+| `mustard` | `cellar` | 5.32 | 4.5 | AA | numbers in a well, the well's rule |
+| `sage` | `graphite` | 6.00 | 4.5 | AA | done |
+| `blush` | `graphite` | 4.76 | 4.5 | AA | forged (never in a well) |
+| `moon` | `carbon` | 5.63 | 3 | AA | the focus ring on the page (non-text, 3:1) |
+| `moon` | `graphite` | 4.78 | 3 | AA | the focus ring on a card (non-text, 3:1) |
+
+The dossier avoids `ash` on `cellar` (4.50, at the floor), `blush` on `cellar` (4.19), and `moon` (2.27) and
+`mustard` (1.80) on `sheet`, which is why its frame motif is ink on light paper.
+
 The night theme (round 7). A stack such as `snow@0.04 over indigo@0.66 over night@0.6 over snow` is
 composited bottom up: the brightest frame the loop could show (`snow`), the veil, the glass fill, then
 a cell of the glass's checker sheen (the worst place a letter can sit). The
@@ -585,7 +644,7 @@ disc carries the key instead.
 | `prompt.ability` | Q / R / F | {ability} {target} | an ability row of the card with a living player in reach; `{ability}` is the card row's `name` ("Kill", "Bandage") |
 | `prompt.ability.cooldown` | – | {ability} in {s} s | the same row while its cooldown runs; `{s}` is the remaining seconds |
 
-Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.run` Run, `touch.sneak` Sneak; the Strike disc's label
+Touch labels (`.wdi-touch-btn`): `touch.use` Use, `touch.sneak` Sneak (a toggle since round 10, R1; 14.53), and `touch.run` names the stick; the Strike disc's label
 is 8A's `body.strike` (14.32); an ability disc's label is its card row's `name` (14.51.1, round 10, 10Y; `touch.act`
 Act went with the Act disc).
 
@@ -2068,3 +2127,114 @@ line, the book and the bells at 390 x 844 and 1280 x 720 (`docs/ui/line-*.png`),
 |---|---|---|
 | the time to the bells (`line.bells`) | The bells in {time} | On the line, top band, as m:ss, in place of `line.train` when the next day is the Final Night |
 | no work held (`line.quests.none`) | You hold no work. | On the line, the quest list, when the seat holds no quest |
+
+### 14.53 The role cards and the Satchel (10R, round 10)
+
+`docs/round10/rolecards.md`. The keys and touch controls come from one table, `apps/client/src/input/actions.ts` (R1):
+the input code, the touch HUD and the card's "What you can do" panel all read its rows, so a key changes in one place.
+
+#### 14.53.1 The action table and the phone's run and sneak (R1)
+
+| Key | Line | Where |
+| --- | --- | --- |
+| `touch.run` | Move. Push to the rim to run. | the stick's accessible name and title: running is the stick pushed to its rim (Q-C3) |
+| `touch.sneak` | Sneak | the Sneak disc, now a toggle (`aria-pressed`, `touch-sneak`); it stays on until tapped again |
+
+The Run disc is gone. A card's ability takes the slot keys Q, R and F in card order only when it is not passive
+(`cardSlots`), so the Gamekeeper's Last Shot, the Accomplice's Inherit and the professions' Tasks no longer hold a key,
+and the phone's ability discs read the same slots (14.51.1).
+
+### 14.54 Story cards and the goals strip (S3, story mode)
+
+`apps/client/src/ui/story/`; `docs/story/README.md` 3; `docs/round9/phases.md` 8. Story mode draws three full-screen
+cards over the world, one at a time, from the private `story.card` message, and a goals strip from `story.goals`. Both
+reach the player's own client only (`PROTOCOL.md`); every title, line, goal and summary key is copy the server took from
+`story.json`. The client types only the chrome below (`ui/story/copy.ts`).
+
+| Card (`kind`) | Shows | Button (`story.continue`) |
+|---|---|---|
+| `title` | The chapter's name, its set-up lines | `story.card.begin` |
+| `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
+
+A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
+the player). The panel is at most 36 rem wide, scrolls on a short phone and keeps a 44 px button. The title card is
+opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD band, at most 18 rem
+wide, ticks a goal off (struck through, a "done" label for a screen reader) and is hidden while a card is up and when a
+chapter has no goals; an end card clears it.
+
+The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
+opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+`localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
+(Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
+server deals the first card and scene.
+
+Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
+`e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
+fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
+
+### 14.54 The evidence verbs (10V, round 10)
+
+The copy proposed for V1a's Inspect and Plant Clue (GDD 3.4). The server sends only the refusal reasons of 14.43 and
+`clueFound`. 10Y adds the keys and writes these lines into a table here as it places them, since a table row names a
+key the client holds (A414's deck test):
+
+- `verb.inspect`: "Inspect"; `verb.inspect.prompt`: "Inspect with a Lens ({n} left)".
+- `verb.inspect.done.verified`: "Verified: this clue is true."
+- `verb.inspect.done.forged`: "Forged: someone planted this. An Accomplice is in play."
+- `verb.plant`: "Plant Clue"; `verb.plant.pick`: "Plant what?"
+- `verb.plant.footprints`: "Footprints: {height} stride"; `verb.plant.thread`: "Thread: {scarf} wool" (a thread is
+  laid only beside a door).
+- `verb.plant.done`: "Planted. It looks like any other clue."
+- `card.lens`: "Lenses: {n} of {max}. One comes back each day."
+
+A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`, no Lens `NEED_ITEM {need: 'lens'}`,
+a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
+away from a door `TOO_FAR {of: 'door'}`.
+
+#### The hiding spots and the kit verbs (V3)
+
+Proposed for 10Y, who adds the keys and writes the lines into a table as it places them (A414's deck test). The
+server sends `Private.hiding` (the spot id, '' when none), the hider's `NoteKind.checked` Notebook entry and Chalk
+marks as clues:
+
+- `verb.hide`: "Hide"; `verb.hide.prompt`: "Hide in the {spot}"; `verb.hide.slit`: "You are hiding. Burst Out [E]".
+- `verb.check`: "Check"; `verb.check.prompt`: "Look inside the {spot}"; `verb.check.empty`: "Nobody there."
+- `verb.burst`: "Burst Out".
+- `note.checked`: "{who} opened my {spot} at {time}." (`of` is the face shown; the spot is the hider's own scene).
+- `verb.chalk`: "Chalk"; `verb.chalk.pick`: "Draw which mark?"; `clue.chalk`: "A chalk mark. Someone drew it here."
+- `verb.shifty`: "Act Shifty"; `verb.fakeBlood`: "Fake Blood"; `verb.fakeBlood.spent`: "You have used your Fake Blood."
+
+A refusal reads its 14.43 line: a taken spot is `BUSY`, a spot out of reach `TOO_FAR {of: 'door'}`, an adult at a
+crawlspace `NOTHING_THERE`, a cooling Chalk or Act Shifty `COOLDOWN`, a second Fake Blood `SPENT {what: 'match'}`.
+#### V2, the cover-up verbs
+
+The copy proposed for Drag body, Clean, Wash and the two door verbs (GDD 3.4). The server sends only the refusal reasons of
+14.43 and the noise kinds `rag`, `skeletonKey` and `crowbar`. 10Y adds the keys and writes these lines into a table here as
+it places them:
+
+- `verb.drag`: "Drag body"; `verb.drag.drop`: "Let go"; `verb.drag.hide`: "Hide the body here".
+- `verb.clean`: "Clean"; `verb.clean.prompt`: "Wipe this clue away ({n} left)".
+- `verb.wash`: "Wash"; `verb.wash.prompt`: "Wash the Blood off".
+- `verb.unlock`: "Skeleton Key"; `verb.unlock.prompt`: "Unlock this door"; `verb.crowbar`: "Crowbar"; `verb.crowbar.prompt`: "Break this door".
+
+A refusal reads its 14.43 line: no Rag or Bucket is `NEED_ITEM {need: 'bloodyRag' | 'bucket'}`, no Skeleton Key
+`NEED_KEY {need: 'skeletonKey'}`, no Crowbar `NEED_TOOL {need: 'crowbar'}`, a card without Drag `NOT_YOUR_POWER`, a door already
+opened `ALREADY_DONE`, a body, clue or door out of reach `TOO_FAR {of: 'body' | 'clue' | 'door'}`.
+
+### 14.55 Dust, Compare and Autopsy (10V, round 10, V1b)
+
+Copy proposed for 10Y (GDD 3.4); the server sends only the 14.43 refusal reasons and `clueFound`. The Notebook shows each
+reading by its `note` (`lift`, `comparison`, `autopsy`) and never offers it for a petition. 10Y adds the keys and writes
+the table as it places them (A414's deck test):
+
+- `verb.dust`: "Dust for prints"; `verb.dust.prompt`: "Dust ({n} left)".
+- `note.lift`: "A print lifted from {where}"; `note.lift.body`: "from the body of {name}"; `note.lift.door`: "from a door".
+- `verb.compare`: "Compare prints"; `verb.compare.pick`: "Compare which two?"
+- `note.comparison.match`: "The prints match."; `note.comparison.nomatch`: "The prints do not match." (no name, ever).
+- `verb.autopsy`: "Examine the body"; `note.autopsy`: "{name}: {cause}, about {time}" with causes "a knife", "a creature",
+  "poison", "a shot", "something else", and the time shown as an estimate.
+
+Refusals read their 14.43 lines: a door only the duster crossed or a body out of reach is `NOTHING_THERE` or
+`TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
+read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.

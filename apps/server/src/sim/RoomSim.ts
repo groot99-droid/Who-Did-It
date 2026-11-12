@@ -144,6 +144,15 @@ export interface ClueMeta {
   collectors: Set<string>;
 }
 
+/** A body a dragger put in a body spot: out of the scene's state, in room memory only (round 10, V2). */
+export interface HiddenBody {
+  sceneId: string;
+  spotId: string;
+  of: string;
+  x: number;
+  y: number;
+}
+
 export class RoomSim {
   readonly players = new Map<string, PlayerSim>();
   readonly views = new Map<string, ViewState>();
@@ -161,6 +170,12 @@ export class RoomSim {
   readonly clueMeta = new Map<string, ClueMeta>();
   /** Body ids already reported; a body starts one meeting only (A30). */
   readonly reportedBodies = new Set<string>();
+  /** Round 10, V2: keyed doors a verb opened or broke, `<sceneId>/<portalId>` to a `DoorState`. */
+  readonly openedDoors = new Map<string, number>();
+  /** Round 10, V2: the last three seats to touch a door with a Skeleton Key, newest last (read by Dust, V1b). */
+  readonly doorTouches = new Map<string, string[]>();
+  /** Round 10, V2: bodies hidden in a body spot, by body id (restored by Check, V3). */
+  readonly hiddenBodies = new Map<string, HiddenBody>();
   /** The grace teaching clue is spawned once per match, at the first placement. */
   teachingSpawned = false;
   /** Raised by the WDI_DEBUG `debug.play` message, consumed by the step. */
@@ -186,6 +201,9 @@ export class RoomSim {
     this.clueSeq.clear();
     this.clueMeta.clear();
     this.reportedBodies.clear();
+    this.openedDoors.clear();
+    this.doorTouches.clear();
+    this.hiddenBodies.clear();
     this.teachingSpawned = false;
   }
 

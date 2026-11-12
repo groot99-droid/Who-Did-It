@@ -288,6 +288,20 @@
       "description": "Bright scratches round a lock a pick opened. They say a lock was picked, never by whom.",
       "ships": "V1",
       "gddRef": "3.29"
+    },
+    "chalk": {
+      "id": "chalk",
+      "name": "Chalk mark",
+      "reveals": "marked",
+      "inWorld": true,
+      "collectible": false,
+      "decay": { "kind": "cycles", "cycles": 1 },
+      "reader": "anyone",
+      "plantable": false,
+      "source": "ability",
+      "description": "A mark drawn on the floor in chalk. It says someone stood here and drew it, never who.",
+      "ships": "V1",
+      "gddRef": "3.2"
     }
   }
 }

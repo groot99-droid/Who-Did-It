@@ -1,5 +1,6 @@
 import { TICK_RATE } from '@wdi/shared/constants';
 import type { MoveCmd } from '../net/world';
+import { type ActionId, codesOf } from './actions';
 import { keyVector, worldMove } from './vectors';
 
 // Sends `input.move` at 20 Hz from a timer, not from the render loop, so a slow frame or a background tab
@@ -15,6 +16,9 @@ export interface InputSource {
 export interface MoveSink {
   sendMove(cmd: MoveCmd): void;
 }
+
+/** The keys the move command reads, held while down (the `move`, `run` and `sneak` rows). */
+const MOVE_CODES = new Set<string>([...codesOf('move'), ...codesOf('run'), ...codesOf('sneak')]);
 
 const isTyping = (t: EventTarget | null) => t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement;
 
@@ -41,9 +45,12 @@ export class InputController {
     this.touch = source;
   }
 
-  /** Calls `handler(true)` on keydown (never on auto-repeat) and `handler(false)` on keyup or blur. */
-  bind(code: string, handler: (down: boolean) => void): void {
-    this.bindings.set(code, handler);
+  /**
+   * Binds an action of the table (`actions.ts`, rolecards.md 3) on every key it lists: `handler(true)` on keydown (never
+   * on auto-repeat) and `handler(false)` on keyup or blur. A key is bound only through its row.
+   */
+  bindAction(id: ActionId, handler: (down: boolean) => void): void {
+    for (const code of codesOf(id)) this.bindings.set(code, handler);
   }
 
   /** Drops every binding (a held key is released first); the World scene rebinds on each start. */
@@ -78,10 +85,13 @@ export class InputController {
     return {
       dx,
       dy,
-      sprint: this.pressed.has('Space') || (this.touch?.sprint() ?? false),
-      sneak:
-        this.pressed.has('ShiftLeft') || this.pressed.has('ShiftRight') || (this.touch?.sneak() ?? false),
+      sprint: this.held('run') || (this.touch?.sprint() ?? false),
+      sneak: this.held('sneak') || (this.touch?.sneak() ?? false),
     };
+  }
+
+  private held(id: ActionId): boolean {
+    return codesOf(id).some((code) => this.pressed.has(code));
   }
 
   private readonly tick = (): void => {
@@ -104,7 +114,7 @@ export class InputController {
       this.down.add(e.code);
       bound(true);
     }
-    if (/^(Key[WASD]|Arrow(Up|Down|Left|Right)|Space|Shift(Left|Right))$/.test(e.code)) {
+    if (MOVE_CODES.has(e.code)) {
       this.pressed.add(e.code);
       e.preventDefault();
     }

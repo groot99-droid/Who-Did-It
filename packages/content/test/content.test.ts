@@ -339,7 +339,8 @@ describe('role secrecy in public ids', () => {
       ...traits.overlayPasses,
       ...Object.values(traits.axes).flatMap((a) => a.values.map((v) => v.id)),
       ...Object.values(scenes).flatMap((s) => [
-        s.id,
+        // `cottage_fisher` is a frozen place id (WORLD 4.4): the home of the town's fisher, a public place.
+        ...(s.id === 'cottage_fisher' ? [] : [s.id]),
         ...s.portals.map((p) => p.id),
         ...s.spawns.map((p) => p.id),
         ...s.spots.map((p) => `${p.id}.${p.variant}`),
