@@ -1,0 +1,15 @@
+https://polyhaven.com/license (read 2026-11-12)
+
+Poly Haven assets licence
+
+All assets on Poly Haven are licensed as CC0 1.0 Universal (public domain dedication):
+https://creativecommons.org/publicdomain/zero/1.0/
+
+The licence and the public API terms are unchanged from the copy saved on 2026-10-23
+(polyhaven-materials-license-2026-10-23.txt).
+
+Assets added to the material library lock on 2026-11-12 (diffuse, normal and roughness maps, 1k and 2k jpg,
+via https://api.polyhaven.com/files/<id>, pinned by md5 in tools/blender/materials/polyhaven.lock.json),
+for the snow of the 3D HollowMere scene (tools/blender/meshy_village_build.py):
+- snow_02: Snow 02 (Rob Tuytel)
+- snow_field_aerial: Snow Field Aerial (Rob Tuytel)
