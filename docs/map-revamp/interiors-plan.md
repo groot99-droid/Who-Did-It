@@ -101,6 +101,9 @@ One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_
 6. **Look:** a `meshy_looks/interior_*.json`, one per mood (warm house, dark house, cave), with the same keys as the
    village look.
 7. **Outputs:** `build/<sceneId>.blend` (git-ignored), plus `--preview` stills, the same as the village.
+8. **Game renders (Q4: the 3D interiors replace the old interior art):** an orthographic camera at the game's isometric
+   angle, framed on the scene's tile grid, so each tile lands where the client draws it. The output format and the
+   client manifest are settled in the data/client PR (section 7).
 
 **Decision to make first: the scale.** An interior grid is bigger than its shell. `tavern_bar` is 20x12 tiles, 30x18 m at
 1.5 m per tile, while `The_Drowned_Lantern` is about 11 m long. Choose one:
@@ -152,5 +155,8 @@ its GDD text in the same PR (CLAUDE.md):
    its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
-4. Should the 3D interiors replace the game's 2.5D interior art (sprites rendered from them), or are they for film and
-   look development only, as the village is today?
+4. ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
+   renders must therefore line up with the game's isometric camera and each scene's tile grid, and be loadable by the
+   client; stills and film alone are not enough. How the client takes them in (asset format, manifest, and whether the
+   exterior moves to 3D art too) is a later data/client PR by Story mode, opened once the pipeline (section 6, step 2)
+   produces its first room.
