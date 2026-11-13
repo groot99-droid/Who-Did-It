@@ -11,6 +11,7 @@ import { npcMemory } from './npc/memory';
 import { type PlayerSim, simOf } from './RoomSim';
 import { isAsleep } from './Sleep';
 import { figuresOf } from './townsfolk/figures';
+import { seatOf } from './seatIds';
 import { isOnLine } from './Train';
 import { isWorldPhase, reject, sceneIndex } from './World';
 
@@ -104,7 +105,7 @@ function emitBark(room: PartyRoom, speaker: Actor, handle: string, phraseId: str
   const sim = simOf(room);
   const reach = balance.chat.quickChatRadiusTiles * TILE_PX;
   for (const client of room.clients) {
-    const seat = client.sessionId;
+    const seat = seatOf(room, client); // round 10, W1a: the client's seat, re-keyed at Start
     const viewer = sim.players.get(seat);
     if (!viewer?.placed || isOnLine(room, seat)) continue;
     if (seat !== speaker.id) {
