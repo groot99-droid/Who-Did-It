@@ -7,6 +7,7 @@ import { settle } from './Inventory';
 import { nightOf } from './nightMemory';
 import { simOf } from './RoomSim';
 import { isOnLine } from './Train';
+import { clientOf } from './seatIds';
 
 // Inherit (GDD 3.2, 3.3; round-5 `deck/wire.md` 5). Session 5G owns this file. When a death or an ejection leaves no
 // living Killer and a living Accomplice, the Accomplice takes the Knife: it turns into the `heir` card (the Accomplice's
@@ -48,6 +49,6 @@ export function runInherit(room: PartyRoom): void {
   const cooldownS = countRow(room.state.players.size).killCooldownS + bonusS;
   player.priv.cooldownEndTick.set('kill', tick + Math.round(cooldownS * TICK_RATE));
   mem.lastStrikeRound.set(accomplice, room.state.round); // it counts as having struck in this round (Hunger)
-  room.clients.getById(accomplice)?.send(S2C.inherit, {});
+  clientOf(room, accomplice)?.send(S2C.inherit, {});
   emitSim(room, { tick, kind: 'inherit', seat: accomplice }); // story mode's heir section waits for it (arc E6)
 }

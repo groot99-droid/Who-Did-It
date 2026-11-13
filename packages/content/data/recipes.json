@@ -119,6 +119,81 @@
       "craftS": 6,
       "maps": ["hollowmere"]
     },
+    "shapedPastry": {
+      "id": "shapedPastry",
+      "out": "shapedPastry",
+      "qty": 1,
+      "in": [{ "item": "proofedDough", "qty": 1 }],
+      "station": "doughMixer",
+      "craftS": 4,
+      "maps": ["hollowmere"]
+    },
+    "berryFilling": {
+      "id": "berryFilling",
+      "out": "berryFilling",
+      "qty": 1,
+      "in": [{ "item": "berries", "qty": 2 }],
+      "station": "coldShelves",
+      "craftS": 3,
+      "maps": ["hollowmere"]
+    },
+    "gameFilling": {
+      "id": "gameFilling",
+      "out": "gameFilling",
+      "qty": 1,
+      "in": [{ "item": "game", "qty": 1 }],
+      "station": "coldShelves",
+      "craftS": 3,
+      "maps": ["hollowmere"]
+    },
+    "mushroomGameFilling": {
+      "id": "mushroomGameFilling",
+      "out": "mushroomGameFilling",
+      "qty": 1,
+      "in": [{ "item": "mushroom", "qty": 1 }, { "item": "game", "qty": 1 }],
+      "station": "coldShelves",
+      "craftS": 3,
+      "maps": ["hollowmere"]
+    },
+    "gamePie": {
+      "id": "gamePie",
+      "out": "gamePie",
+      "qty": 1,
+      "in": [{ "item": "shapedPastry", "qty": 1 }, { "item": "gameFilling", "qty": 1 }],
+      "station": "brickOven",
+      "craftS": 6,
+      "maps": ["hollowmere"]
+    },
+    "berryTart": {
+      "id": "berryTart",
+      "out": "berryTart",
+      "qty": 1,
+      "in": [{ "item": "shapedPastry", "qty": 1 }, { "item": "berryFilling", "qty": 1 }],
+      "station": "brickOven",
+      "craftS": 6,
+      "maps": ["hollowmere"]
+    },
+    "minersPasty": {
+      "id": "minersPasty",
+      "out": "minersPasty",
+      "qty": 1,
+      "in": [{ "item": "shapedPastry", "qty": 1 }, { "item": "mushroomGameFilling", "qty": 1 }],
+      "station": "brickOven",
+      "craftS": 6,
+      "maps": ["hollowmere"]
+    },
+    "stew": {
+      "id": "stew",
+      "out": "stew",
+      "qty": 1,
+      "in": [
+        { "item": "game", "qty": 1 },
+        { "item": "herb", "qty": 1 },
+        { "item": "mushroom", "qty": 1 }
+      ],
+      "station": "oven",
+      "craftS": 4
+    },
     "tinIngot": {
       "id": "tinIngot",
       "out": "tinIngot",

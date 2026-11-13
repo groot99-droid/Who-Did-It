@@ -21,6 +21,8 @@ export const EFFECT_IDS = [
   'charm',
   'exhausted',
   'resistant',
+  'heartened',
+  'tireless',
   'ascended',
 ] as const;
 export const EffectKey = z.enum(EFFECT_IDS);
@@ -55,6 +57,10 @@ export const Effect = z.strictObject({
   maxStaminaFactor: Factor.optional(),
   /** Factor on the length of a Poisoned this body takes on (round 10, D4a: a dish's resistance; Nightshade is untouched). */
   poisonFactor: Factor.optional(),
+  /** Maximum health a dish adds while it lasts (round 10, D4b: the Berry Tart); taken off again when it ends. */
+  maxHpBonus: z.number().int().positive().optional(),
+  /** Running costs no stamina while on (round 10, D4b: the Miner's Pasty). */
+  staminaFree: z.boolean().optional(),
   /** A dish's buff: eating another dish replaces it, so one runs at a time (round 10, D4a). */
   dish: z.boolean().optional(),
   /** Health does not regenerate while on. */

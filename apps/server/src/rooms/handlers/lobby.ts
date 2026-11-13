@@ -4,17 +4,11 @@ import {
   ABILITY_KEYS,
   C2S,
   type ErrorCode,
-  Inventory,
   ItemStack,
   NpcLevel,
   Phase,
-  Player,
   type PlayerState,
-  Presence,
-  Private,
   REASON_CODE,
-  Role,
-  Traits,
   S2C,
   Team,
   TRAIT_IDS,
@@ -46,6 +40,8 @@ import { simOf } from '../../sim/RoomSim';
 import { mapIdOfRoom } from '../../sim/MapSites';
 import { dealPurses } from '../../sim/economy/purse';
 import { settle } from '../../sim/Inventory';
+import { clientOf } from '../../sim/seatIds';
+import { rekeySeats } from '../../sim/seatRekey';
 
 /**
  * Flow messages: the lobby and role-card flow plus the meeting vote and chat (consumed by the phase
@@ -180,20 +176,8 @@ export function runLobbyCommands(room: PartyRoom): void {
   }
 }
 
-/** The seat constructor shared by `PartyRoom.onJoin` and the NPC seats: a connected, empty lobby seat. */
-export function newSeat(room: PartyRoom, id: string, name: string): PlayerState {
-  const player = new Player();
-  player.id = id;
-  player.name = name;
-  player.connected = true;
-  player.traits = new Traits();
-  player.presence = new Presence();
-  player.priv = new Private();
-  player.priv.role = new Role();
-  player.priv.inventory = new Inventory();
-  room.state.players.set(id, player);
-  return player;
-}
+/** The seat constructor (`sim/newSeat.ts`), re-exported for its callers here. */
+export { newSeat } from '../../sim/newSeat';
 
 /** Drops the most recently added NPC seat; false when there is none. */
 export function removeNewestNpcSeat(room: PartyRoom): boolean {
@@ -260,6 +244,7 @@ export function startMatch(room: PartyRoom): void {
   room.matchSeed = randomInt(2 ** 32);
   // The party fills to `players.min` with NPC seats, named from a stream apart from the deal's (GDD 3.12).
   fillNpcSeats(room, room.seeds.get('npcNames'));
+  rekeySeats(room); // round 10, W1a: a world match's seats under fresh ids, before anything is dealt (row 25)
   const ids = [...room.state.players.keys()];
   // The deal from the public deck (GDD 3.1).
   const dealt = dealMainDeck(room, ids);
@@ -312,7 +297,7 @@ export function startMatch(room: PartyRoom): void {
     }));
     const look = looks.get(id) as { height: number; scarf: number; hat: number };
     // Round 5, 5F: the main-mode card fields (deck, look, portrait, cover hints) beside the card.
-    room.clients.getById(id)?.send(S2C.roleReveal, {
+    clientOf(room, id)?.send(S2C.roleReveal, {
       ...buildRoleReveal(dealt.get(id) as string, look, ids.length, mates),
       ...mainRevealFields(room, id),
     });

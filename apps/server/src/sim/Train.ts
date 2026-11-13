@@ -11,7 +11,8 @@ import { secondsToTicks } from './Flow';
 import { mapIdOfRoom, stationOf } from './MapSites';
 import { emitNoise } from './Noise';
 import { isNpcSeat } from './Npc';
-import { isPaintTown } from './paintTown';
+import { isPaintTown, returnGuards } from './paintTown';
+import { onDeliveryHardship } from './economy/hardship';
 import { onDeliveryArrival, onDuskArrival } from './vendettas/arrival';
 import { enterScene } from './Portals';
 import { simOf } from './RoomSim';
@@ -176,12 +177,14 @@ export function runTrain(room: PartyRoom): void {
       client.send(S2C.chatMsg, { from: '', text: TRAIN_ARRIVE_LINE, channel: 'system' });
     }
     returnLine(room, train.round);
+    returnGuards(room, train.round); // Paint The Town Red: the guards come back too (round 10, C5c)
   }
   // The delivery follows an arrival whatever the phase, so a meeting never swallows the strongbox.
   if (train.arrived && !train.delivered && state.tick >= train.deliveryTick) {
     train.delivered = true;
     announce(room, 'train.delivery', 'train_brake', train.round);
     onDeliveryArrival(room, train.round); // round 10, C4: the Hitman's letter (GDD 3.33)
+    onDeliveryHardship(room, train.round); // round 10, C4c: the same delivery strikes its hardships
   }
 }
 

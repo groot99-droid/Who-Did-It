@@ -1,3 +1,4 @@
+import type { Client } from '@colyseus/core';
 import { StateView } from '@colyseus/schema';
 import { clues } from '@wdi/content';
 import { TILE_PX, VIEW_TAG } from '@wdi/shared';
@@ -14,6 +15,7 @@ import { isShade } from './rite/shade';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
 import { SCENE_KEYS, isWorldPhase, sceneKey } from './World';
+import { seatOf } from './seatIds';
 
 export { SCENE_KEYS, sceneKey };
 
@@ -34,6 +36,31 @@ function heldOf(room: PartyRoom, sessionId: string): HeldAvatars {
   if (!held) all.set(sessionId, (held = { plain: new Set(), ghost: new Set(), near: new Set() }));
   return held;
 }
+
+/**
+ * Round 10, x14 (A453): the shadow viewers of an auto match run with `pnpm auto -- --views`, one per seat, reconciled
+ * below exactly as a client's view is (`sim/auto/shadowViews.ts` encodes and decodes them). Empty in every real room:
+ * a shadow is never a client, is never the admin, and nothing it holds reaches the wire.
+ */
+export interface ShadowViewer {
+  sessionId: string;
+  view: StateView;
+}
+const shadowViewers = new WeakMap<PartyRoom, ShadowViewer[]>();
+const NO_SHADOWS: readonly ShadowViewer[] = [];
+export function addShadowViewer(room: PartyRoom, viewer: ShadowViewer): void {
+  let all = shadowViewers.get(room);
+  if (!all) shadowViewers.set(room, (all = []));
+  all.push(viewer);
+}
+export function clearShadowViewers(room: PartyRoom): void {
+  shadowViewers.delete(room);
+}
+/** The clients, then the shadow viewers (x14): every view the room reconciles. */
+const viewersOf = (room: PartyRoom): readonly (Client | ShadowViewer)[] => [
+  ...room.clients,
+  ...(shadowViewers.get(room) ?? NO_SHADOWS),
+];
 
 /**
  * `Player.presence` and `Player.priv` carry their own view tags so each can be granted alone: adding a
@@ -71,25 +98,26 @@ export function createPlayerView(room: PartyRoom, sessionId: string): StateView 
 export function reconcileViews(room: PartyRoom): void {
   const sim = simOf(room);
   const world = isWorldPhase(room.state.phase);
-  for (const client of room.clients) {
+  for (const client of viewersOf(room)) {
     // Round 6, 6C (locked): the admin room's seatless client takes the god view and nothing below.
     if (isAdminClient(room, client.sessionId)) {
-      reconcileAdminView(room, client);
+      reconcileAdminView(room, client as Client); // never a shadow (x14): the admin's id is no seat
       continue;
     }
+    const seat = seatOf(room, client);
     const view = client.view;
-    const viewer = room.state.players.get(client.sessionId);
-    const viewerSim = sim.players.get(client.sessionId);
+    const viewer = room.state.players.get(seat);
+    const viewerSim = sim.players.get(seat);
     if (!view || !viewer || !viewerSim) continue;
-    let held = sim.views.get(client.sessionId);
+    let held = sim.views.get(seat);
     if (!held) {
       held = { scene: null };
-      sim.views.set(client.sessionId, held);
+      sim.views.set(seat, held);
     }
 
     // Round 10 (C1): a seat on the line holds no avatar and no scene until the Train brings it back; a Hitman who
     // boarded the Dusk Train (C4b) holds none again.
-    const onLine = isOnLine(room, client.sessionId) || isDeparted(room, client.sessionId); // C4b: the Dusk Train
+    const onLine = isOnLine(room, seat) || isDeparted(room, seat); // C4b: the Dusk Train
     const want = onLine ? null : sceneKey(viewerSim.sceneIdx);
     if (held.scene !== want) {
       const old = held.scene === null ? undefined : room.state.scenes.get(held.scene);
@@ -99,13 +127,13 @@ export function reconcileViews(room: PartyRoom): void {
         view.add(next);
         // Round 6, 6G (contract item): `view.add` carries the scene's current avatars in with it; count them as held
         // so `reconcileAvatars` takes back, in this same pass, every one the viewer may not see (a ghost, the dark).
-        const avatars = heldOf(room, client.sessionId).plain;
+        const avatars = heldOf(room, seat).plain;
         next.avatars.forEach((_avatar, handle) => avatars.add(handle));
       }
       held.scene = want;
     }
 
-    reconcileAvatars(room, client.sessionId, view, viewerSim, world && !onLine);
+    reconcileAvatars(room, seat, view, viewerSim, world && !onLine);
   }
 }
 
@@ -202,7 +230,7 @@ function reconcileAvatars(
 }
 
 /** `clues.blood.params.visibleTiles` in px: the range Blood is seen from (GDD 3.4; the client's guard reads it too). */
-const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
+export const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
 
 /**
  * Round 8 (8L, docs/round8/teardown.md 1): every tick, after the avatars are written (`publishAvatars`), each view
@@ -211,11 +239,12 @@ const NEAR_PX = (clues.clues.blood?.params?.visibleTiles ?? 0) * TILE_PX;
  */
 export function reconcileNear(room: PartyRoom): void {
   const sim = simOf(room);
-  for (const client of room.clients) {
-    const viewerSim = sim.players.get(client.sessionId);
+  for (const client of viewersOf(room)) {
+    const seat = seatOf(room, client);
+    const viewerSim = sim.players.get(seat);
     if (!client.view || !viewerSim || isAdminClient(room, client.sessionId)) continue;
-    const ghostViewer = viewerSim.dead && !isShade(room, client.sessionId);
-    syncNear(room, heldOf(room, client.sessionId), client.view, viewerSim, ghostViewer);
+    const ghostViewer = viewerSim.dead && !isShade(room, seat);
+    syncNear(room, heldOf(room, seat), client.view, viewerSim, ghostViewer);
   }
 }
 

@@ -83,7 +83,7 @@ interface PlayerLike {
   hasVoted: boolean;
   sceneId: number;
   presence?: { x: number; y: number; statusBits: number };
-  priv?: { cooldownEndTick: { get(key: string): number | undefined } };
+  priv?: { cooldownEndTick: { get(key: string): number | undefined }; seatId?: string };
 }
 interface StateLike {
   phase: number;
@@ -210,7 +210,14 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
 
   const timer = setInterval(() => {
     const state = room.state as unknown as StateLike | undefined;
-    const me = state?.players.get(room.sessionId);
+    // Round 10, W1a (seams.md 3 row 25): in a world match the seat ids are fresh at Start; the own seat's id is the
+    // one `priv.seatId` this client's view holds, and the session id only in the lobby.
+    let selfId = '';
+    state?.players.forEach((p) => {
+      if (selfId === '' && p.priv?.seatId) selfId = p.priv.seatId;
+    });
+    selfId ||= room.sessionId;
+    const me = state?.players.get(selfId);
     if (!state || !me) return;
     const now = Date.now();
 
@@ -225,7 +232,7 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
         lastVoteAt = now;
         const roster: Array<{ id: string; name: string; alive: boolean }> = [];
         state.players.forEach((p) => roster.push({ id: p.id, name: p.name, alive: p.alive }));
-        const targetId = pickVote(behavior.vote ?? 'skip', room.sessionId, state.leaderId, roster, rng);
+        const targetId = pickVote(behavior.vote ?? 'skip', selfId, state.leaderId, roster, rng);
         // Refused too often: give the vote up.
         if (voteRefusals < MAX_VOTE_REFUSALS) {
           room.send('meeting.vote', { targetId });
@@ -284,7 +291,7 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
       let preyD = Infinity;
       // Round 5 (A50): the figures in my scene are avatars under opaque handles; `lookOf` names the seat drawn.
       state.scenes?.get(sceneKey)?.avatars.forEach((a, handle) => {
-        if (a.lookOf === room.sessionId || mates.has(a.lookOf) || (a.statusBits & 1) !== 0) return;
+        if (a.lookOf === selfId || mates.has(a.lookOf) || (a.statusBits & 1) !== 0) return;
         const d = Math.hypot(a.x - x, a.y - y);
         if (d < preyD) {
           prey = { handle, x: a.x, y: a.y };
@@ -345,12 +352,7 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
     // sees through its own scene's view, so it does not check.
     if (!dead)
       state.players.forEach((p, id) => {
-        if (
-          id !== room.sessionId &&
-          p.presence &&
-          p.sceneId !== me.sceneId &&
-          (p.presence.statusBits & 1) === 0
-        )
+        if (id !== selfId && p.presence && p.sceneId !== me.sceneId && (p.presence.statusBits & 1) === 0)
           stats.leaks++;
       });
   }, 1000 / TICK_RATE);

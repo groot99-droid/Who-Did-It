@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { balance } from '@wdi/content';
 import { createParty } from './fixtures/party';
 
-// Story I9b (GDD 3.23; UI.md 14.57): the Vicar's sermon at the bell, on the mock (`?vicar=bell` plays the Vicar's look
+// Story I9b (GDD 3.23; UI.md 14.63): the Vicar's sermon at the bell, on the mock (`?vicar=bell` plays the Vicar's look
 // one tile below the bell by day; the sermon runs `conversion.sermonS`, two listeners hear it and are converted).
 
 async function toBell(page: import('@playwright/test').Page) {

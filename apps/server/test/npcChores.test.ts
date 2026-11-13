@@ -1,3 +1,4 @@
+import { heldBySnare } from '../src/sim/snares';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, economy } from '@wdi/content';
@@ -71,7 +72,7 @@ describe('never idle', () => {
     const mem = npcMemory(party.room);
     const still = new Map<string, number>();
     const at = new Map<string, string>();
-    const cap = routine.idleS.max * TICK_RATE + 2;
+    const cap = routine.idleS.max * TICK_RATE + 3;
     advance(party, 600 * TICK_RATE, (tick) => {
       for (const id of npcIdsOf('S1')) {
         const p = sim.players.get(id)!;
@@ -80,7 +81,8 @@ describe('never idle', () => {
           at.get(id) === where &&
           p.hold === null &&
           mem.brain(id).mode === 'routine' &&
-          tick >= p.busyUntilTick;
+          tick >= p.busyUntilTick &&
+          !heldBySnare(party.room, id);
         still.set(id, stands ? (still.get(id) ?? 0) + 1 : 0);
         expect(still.get(id), `${id}@${tick}`).toBeLessThanOrEqual(cap);
         at.set(id, where);

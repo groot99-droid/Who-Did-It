@@ -14,7 +14,7 @@ export interface SermonLayer {
 type Toast = (text: string, kind: 'interact' | 'hazard' | 'warm', ms: number) => void;
 
 /**
- * Conversion on the seat's own screen (story I9b, GDD 3.23; UI.md 14.57). A seat in the Vicar's look standing by the
+ * Conversion on the seat's own screen (story I9b, GDD 3.23; UI.md 14.63). A seat in the Vicar's look standing by the
  * bell by day sees "Hold E: preach a sermon": a tap of E still rings the bell, E held `PREACH_HOLD_MS` (or a tap on
  * the prompt) sends `act.hold sermon`, and a banner counts the sermon down. The private `conversion` messages give
  * the toasts (the preacher's count, the seat's own conversion, the Peaceful route), and the dealt Vicar's view shows

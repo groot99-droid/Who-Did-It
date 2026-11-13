@@ -2,6 +2,7 @@ import { generateId } from '@colyseus/core';
 import { type ArcStory as Story, balance, storyArc } from '@wdi/content';
 import { ItemStack, Phase, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf } from '../seatIds';
 import { newSeat } from '../../rooms/handlers/lobby';
 import { applyClock, autoOf, enableAuto, queueAutoStart } from '../auto/Auto';
 import { markCardReady } from '../Covers';
@@ -275,7 +276,7 @@ export function handleStoryStart(room: PartyRoom, seat: string, payload: Record<
     // `resume` is the save the client was last given by `story.saved`; the device store re-validates it (plan 5).
     const ctx: SaveCtx = {
       seat,
-      send: (t, p) => room.clients.getById(seat)?.send(t, p),
+      send: (t, p) => clientOf(room, seat)?.send(t, p),
       resume: payload.resume,
     };
     const kept = saveStoreFor(ctx).get(ctx, storyId);
@@ -293,7 +294,7 @@ export const storyQueued = (room: PartyRoom): number => storyOf(room)?.queue.len
 // --- cards ---------------------------------------------------------------------------------------------------------
 
 const send = (room: PartyRoom, state: StoryState, type: string, payload: unknown): void =>
-  room.clients.getById(state.humanId)?.send(type, payload);
+  clientOf(room, state.humanId)?.send(type, payload);
 
 function showCard(room: PartyRoom, state: StoryState, card: StoryCard): void {
   state.cardUp = true;

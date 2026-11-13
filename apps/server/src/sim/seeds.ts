@@ -27,6 +27,8 @@ import { type Rng, sfc32 } from '@wdi/shared';
  * - `trialTick`, `trialChance`: an NPC seat's tick and its chance to present at a Tribunal or file at the end trial,
  *   keyed by seat id, drawn card-blind by every NPC (round 10, B6d2, GDD 3.12); never shared with a public draw;
  * - `locks`: each lock's pin set points (round 10, D5, GDD 3.29), keyed by prop id; the picker's client is sent them.
+ * - `barks`: an NPC seat's or a figure's idle gaps, reaction rolls and lines (round 10, M1, GDD 3.5), keyed by the
+ *   actor's id, a seat's or a figure's alike; public-safe, and no secret draw shares it.
  */
 export type StreamName =
   | 'deal'
@@ -53,7 +55,9 @@ export type StreamName =
   | 'autopsy' // round 10, V1b: an Autopsy's time-of-death offset, keyed by seat (secret, seams.md 1)
   | 'hitman' // round 10, C4: whether the Hitman comes, the day, human or NPC, and the turned seat (secret)
   | 'trialTick' // round 10, B6d2: the tick an NPC presents or files on, keyed by seat id (card-blind)
-  | 'trialChance'; // round 10, B6d2: whether it does, keyed by seat id (card-blind);
+  | 'trialChance' // round 10, B6d2: whether it does, keyed by seat id (card-blind)
+  | 'barks' // round 10, M1: a bark's idle gap, reaction roll and line, keyed by actor id (public, seams.md 3 row 36)
+  | 'hardship'; // round 10, C4c: how many seats a delivery strikes, which, and the kind (secret)
 
 /** Four 32-bit seed words of one sfc32 stream. */
 export type SeedWords = readonly [number, number, number, number];

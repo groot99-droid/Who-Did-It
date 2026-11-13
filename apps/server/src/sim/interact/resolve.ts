@@ -28,6 +28,7 @@ import { emitNoise } from '../Noise';
 import { type PlayerSim, simOf } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
 import { isVerbPhase, sceneKey, tileCentre } from '../World';
+import { clientOf } from '../seatIds';
 
 /**
  * The logic table's resolver (round 10, A10; docs/round9/logic-table.md 4, GDD 3.14): `act.hold {action: 'interact',
@@ -144,6 +145,7 @@ export function interactReady(
       it.target === t.classId &&
       it.status === 'live' &&
       it.phases.includes(cls) &&
+      (it.handler !== 'sharpen' || hasWorn(room, player)) && // the stone has work only for a worn tool (x9)
       it.modes.some(
         (m) => m.minigame === undefined && toolHeld(player, m, t) !== undefined && !missingInput(player, m),
       ),
@@ -184,6 +186,7 @@ function problemOf(
   if (lacking !== undefined) return { problem: { reason: 'NEED_ITEM', args: { need: lacking } }, t };
   if ((mode.drops ?? []).some((d) => !canAdd(player, d.item, d.qty[1])))
     return { problem: { reason: 'PACK_FULL' }, t };
+  if (it.handler === 'sharpen' && !hasWorn(room, player)) return { problem: { reason: 'ALREADY_DONE' }, t };
   return { problem: null, t, modeIdx };
 }
 
@@ -195,9 +198,7 @@ function refuse(
 ): void {
   const line = interactionId ? interactions.interactions[interactionId]?.fail[problem.reason] : undefined;
   const extra = { ...(line ? { msg: line } : {}), ...(interactionId ? { interaction: interactionId } : {}) };
-  room.clients
-    .getById(sessionId)
-    ?.send(S2C.error, refusalFrame(problem.reason, problem.args as never, extra));
+  clientOf(room, sessionId)?.send(S2C.error, refusalFrame(problem.reason, problem.args as never, extra));
 }
 
 /** `act.hold {action: 'interact', targetId, via?}` (`sim/Hold.ts`): starts the hold if it can run. */
@@ -230,7 +231,8 @@ export function handleInteract(room: PartyRoom, sessionId: string, targetId: str
 /**
  * One tick of an interact hold (`runHolds`): moving, a phase change, a prop another seat changed, a lost tool or a
  * full pack cancel it with nothing done; at the end of `holdS` the drops land, the tool wears, the prop changes state
- * and the noise sounds.
+ * and the noise sounds. A `sharpen` hold (the grindstone, round 10, x9) instead forgets every use worn off the seat's
+ * tools, so each is whole again; a tool that broke is gone for good.
  */
 export function tickInteract(room: PartyRoom, sessionId: string, p: PlayerSim): void {
   const hold = p.hold;
@@ -251,6 +253,7 @@ export function tickInteract(room: PartyRoom, sessionId: string, p: PlayerSim): 
   for (const c of mode.consumes ?? []) take(player, c.item, c.qty);
   const tool = toolHeld(player, mode, t);
   if (tool) wear(room, sessionId, player, tool, mode.wear);
+  if (it.handler === 'sharpen') WORN.get(room)?.delete(sessionId);
   if (it.after) {
     const state = new PropState();
     state.id = t.id;
@@ -275,6 +278,13 @@ export function wear(room: PartyRoom, sessionId: string, player: PlayerState, to
   if (total < uses) return void worn.set(tool, total);
   take(player, tool, 1);
   worn.set(tool, 0);
+}
+
+/** Whether a tool the seat still carries has uses worn off it (round 10, x9: the grindstone has work only then). */
+function hasWorn(room: PartyRoom, player: PlayerState): boolean {
+  for (const [tool, n] of WORN.get(room)?.get(player.id) ?? [])
+    if (n > 0 && count(player, tool) > 0) return true;
+  return false;
 }
 
 /** Step stage after `runResources`: a new match clears the prop states and the wear; a respawned prop is whole again. */

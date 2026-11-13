@@ -27,6 +27,7 @@ import { runTrain } from './Train';
 import { runCommands } from './Commands';
 import { runHunger } from './Hunger';
 import { runImpersonation } from './Impersonate';
+import { runBarks } from './Barks';
 import { runNpcs } from './Npc';
 import { applyInputs, moveAndCollide } from './Movement';
 import { runNightPowers } from './NightPowers';
@@ -34,6 +35,7 @@ import { runPhases } from './Phases';
 import { placeNewPlayers, runPortals } from './Portals';
 import { simOf } from './RoomSim';
 import { reconcileViews } from './Visibility';
+import { runSnares } from './snares';
 
 // Fixed order inside setFixedTimestep (ARCHITECTURE 5.6). Stages without a milestone yet are empty.
 // Round 6 (docs/round6/seams.md 1.3, locked call sites): `runAuto` before the brains; `runResources`, `runMobs` and
@@ -60,6 +62,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
   runAuto(room); // round 6, 6A: the auto commands, Start inside the step (locked call site)
   runNpcs(room); // M3c: NPC brains write their inputs and verbs (round 4, S)
   runTownsfolk(room); // round 8, 8E: ambient figures' brains write their inputs (locked call site)
+  runBarks(room); // round 10, M1: NPC seats and figures bark a pool line (seams.md 3 row 36)
   applyInputs(room);
   moveAndCollide(room);
   publishAvatars(room); // round 5, 5F: presence onto avatars (locked call site)
@@ -81,6 +84,7 @@ export function step(room: PartyRoom, _ctx: StepContext): void {
     sim.viewsDirty = false;
     reconcileViews(room);
   }
+  runSnares(room); // round 10, K6: snares spring, and each view holds the ones row 31 sends it (after the views)
   runPhases(room);
   runEvents(room); // round 6, 6B: deliver the tick's sim events (locked call site)
   runStory(room); // story mode: the beat runner and the player's queued commands, after the bus delivers (locked call site)

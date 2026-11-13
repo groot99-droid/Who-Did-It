@@ -7,6 +7,7 @@ import { simOf } from './RoomSim';
 import { bodyBlocksAct } from './body/run';
 import { isShade } from './rite/shade';
 import { isOnLine } from './Train';
+import { seatOf } from './seatIds';
 
 const SPEAKING_PHASES: readonly number[] = [Phase.meetingDiscussion, Phase.meetingVote, Phase.reveal];
 
@@ -35,9 +36,9 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
   if (channel === 'meeting') heard(room, room.state.players.get(sessionId)?.name ?? '', text); // round 8, 8T: the meeting so far, for NPC talk
   for (const client of room.clients) {
     // Round 10, C1: a seat on the line hears neither the ghosts nor the meeting (phases.md 4: it does not attend).
-    if (isOnLine(room, client.sessionId)) continue;
-    if (channel === 'ghost' && (!sim.players.get(client.sessionId)?.dead || isShade(room, client.sessionId)))
-      continue;
+    const seat = seatOf(room, client);
+    if (isOnLine(room, seat)) continue;
+    if (channel === 'ghost' && (!sim.players.get(seat)?.dead || isShade(room, seat))) continue;
     client.send(S2C.chatMsg, { from: sessionId, text, channel });
   }
 }

@@ -4,6 +4,7 @@ import type { PartyRoom } from '../../rooms/PartyRoom';
 import { onSim } from '../events/bus';
 import { rolesOf } from '../Flow';
 import { simOf } from '../RoomSim';
+import { clientOf } from '../seatIds';
 import { sceneKey } from '../World';
 
 /**
@@ -99,7 +100,9 @@ export function expireShade(room: PartyRoom): void {
 export function ghostView(room: PartyRoom, seat: string): void {
   const p = simOf(room).players.get(seat);
   if (!p) return;
-  room.clients
-    .getById(seat)
-    ?.send(S2C.killed, { sceneId: sceneKey(p.sceneIdx), cause: 'knife', roles: rolesOf(room) });
+  clientOf(room, seat)?.send(S2C.killed, {
+    sceneId: sceneKey(p.sceneIdx),
+    cause: 'knife',
+    roles: rolesOf(room),
+  });
 }

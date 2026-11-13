@@ -7,6 +7,7 @@ import { simOf } from '../RoomSim';
 import { isWorldPhase } from '../World';
 import { isAdminClient } from './AdminView';
 import { matchEvents } from './log';
+import { seatOf } from '../seatIds';
 
 /**
  * The invariant registry (round 6, docs/round6/auto-admin.md 5): checks the harness, `pnpm auto` and the admin room
@@ -60,14 +61,14 @@ const fail = (room: PartyRoom, detail: string): InvariantFailure => ({
 // 1. No seat's `priv` (nor its `presence`) in another seat's view (visibility.test.ts's rule).
 registerInvariant('privLeak', (room) => {
   for (const client of room.clients) {
+    const seat = seatOf(room, client);
     const view = client.view;
-    if (!view || isAdminClient(room, client.sessionId) || !room.state.players.has(client.sessionId)) continue;
+    if (!view || isAdminClient(room, client.sessionId) || !room.state.players.has(seat)) continue;
     for (const [id, player] of room.state.players) {
-      if (id === client.sessionId) continue;
-      if (view.hasTag(player, VIEW_TAG.priv))
-        return fail(room, `seat ${client.sessionId} holds the priv of ${id}`);
+      if (id === seat) continue;
+      if (view.hasTag(player, VIEW_TAG.priv)) return fail(room, `seat ${seat} holds the priv of ${id}`);
       if (view.hasTag(player, VIEW_TAG.presence))
-        return fail(room, `seat ${client.sessionId} holds the presence of ${id}`);
+        return fail(room, `seat ${seat} holds the presence of ${id}`);
     }
   }
   return null;
@@ -77,16 +78,14 @@ registerInvariant('privLeak', (room) => {
 registerInvariant('seatLeak', (room) => {
   const sim = simOf(room);
   for (const client of room.clients) {
+    const seat = seatOf(room, client);
     const view = client.view;
-    const viewer = sim.players.get(client.sessionId);
+    const viewer = sim.players.get(seat);
     if (!view || !viewer || viewer.dead || isAdminClient(room, client.sessionId)) continue;
     for (const [sceneId, scene] of room.state.scenes) {
       for (const [handle, avatar] of scene.avatars) {
         if (view.hasTag(avatar, VIEW_TAG.ghost))
-          return fail(
-            room,
-            `living seat ${client.sessionId} holds the seat of avatar ${handle} in ${sceneId}`,
-          );
+          return fail(room, `living seat ${seat} holds the seat of avatar ${handle} in ${sceneId}`);
       }
     }
   }

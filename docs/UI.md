@@ -2150,6 +2150,30 @@ never sent (A79). `e2e/artStyle.spec.ts` picks in the lobby, starts the match an
 
 Frozen test id: `settings-art-style` (the row).
 
+#### 14.51.7 The Hitman's Derringer, Departed and the end panel (10Y, C4b)
+
+C4b's client half (GDD 3.33; DECISIONS A574), client only: it reads `Private.departed` and `gameOver.hitman` as seams.md
+3 rows 20 and 21 put them on the wire. **The Derringer** is an item ability that reaches the pack mid-match, so it
+takes the slot after the card's own (`input/actions.ts` `withPackAbilities`; Q, R or F, and a touch disc labelled
+Derringer) while the own pack holds one, and fires as any player-target ability at the nearest figure in reach. The
+spent shot leaves the pack, and the slot and disc go with it. **Departed** (`ui/Departed.ts`) stands in for the world
+of a Hitman who boarded the Dusk Train, in the On-the-line screen's night colours, with no button; it hides while a
+meeting is open, since he may still speak and vote there. **The end panel** (`ui/main/overMain.ts`) draws one line for
+the Hitman's stage under its own heading, and a boarded Hitman under Also won reads `over.alsoWon.hitman`.
+`input/actions.test.ts`, `ui/Departed.test.ts` and `ui/main/main.test.ts` cover the three.
+
+| Line | Text | Where |
+|---|---|---|
+| the departed title (`departed.title`) | Departed | Departed, top band and the screen's label |
+| the departed line (`departed.body`) | The Dusk Train carries you out of the valley. The Contract is done; you have won. | Departed, centre |
+| the meeting note (`departed.meeting`) | You take no more part in the town, but a meeting still calls you to speak and vote. | Departed, under the centre line |
+| the Hitman heading (`over.hitman`) | The Hitman | End panel, over the Hitman's line |
+| arrived (`over.hitman.arrived`) | {name} was turned on day {day} and never shot the mark. | End panel, a living Hitman who never shot his mark |
+| killed (`over.hitman.killed`) | {name} was turned on day {day} and shot the mark, but never boarded the Dusk Train. | End panel |
+| boarded (`over.hitman.boarded`) | {name} was turned on day {day}, shot the mark and boarded the Dusk Train. | End panel |
+| stopped (`over.hitman.stopped`) | {name} was turned on day {day} and died before boarding the Dusk Train. | End panel |
+| a boarded Hitman also won (`over.alsoWon.hitman`) | {name} boarded the Dusk Train as the Hitman | End panel, Also won, in place of `over.alsoWon.row` |
+
 ### 14.53 The role cards and the Satchel (10R, round 10)
 
 `docs/round10/rolecards.md`. The keys and touch controls come from one table, `apps/client/src/input/actions.ts` (R1):
@@ -2166,7 +2190,7 @@ The Run disc is gone. A card's ability takes the slot keys Q, R and F in card or
 (`cardSlots`), so the Gamekeeper's Last Shot, the Accomplice's Inherit and the professions' Tasks no longer hold a key,
 and the phone's ability discs read the same slots (14.51.1).
 
-### 14.54 Story cards and the goals strip (S3, story mode)
+### 14.61 Story cards and the goals strip (S3, story mode)
 
 `apps/client/src/ui/story/`; `docs/story/README.md` 3; `docs/round9/phases.md` 8. Story mode draws three full-screen
 cards over the world, one at a time, from the private `story.card` message, and a goals strip from `story.goals`. Both
@@ -2234,6 +2258,20 @@ A refusal reads its 14.43 line: no Magnifier is `NEED_TOOL {need: 'magnifier'}`,
 a clue the Notebook already read `ALREADY_DONE {what: 'notebook'}`, an empty Plant Kit `SPENT {what: 'stock'}`, a thread
 away from a door `TOO_FAR {of: 'door'}`.
 
+### 14.60 Barks and talk (10M, round 10)
+
+The quick-chat wheel's lines are a content field: the sixteen phrases of `balance.json` `chat.quickChat`, in order, eight
+from round 3 and eight world lines from round 10 (Anyone seen the baker? / Got any food to spare? / Mind the wolves / I
+owe the clerk / Was that the bell? / Wolf! / Keep to the light / Getting dark). The wheel and its bubble are built in M1b;
+this section holds their copy.
+
+#### 14.60.1 Refusing a bark
+
+A bark that the wheel could not have sent (an id outside the pool) is dropped and shows nothing: the refusal for it,
+`UNKNOWN_PHRASE` in `apps/client/src/ui/copy/refusals.ts`, is an empty line like `SAY_SOMETHING`. A second bark inside
+`chat.quickGapS` is `CHAT_RATE` ("Slow down."), and a bark in a meeting, asleep, downed or as a ghost shows the ordinary
+line of its reason.
+
 #### The hiding spots and the kit verbs (V3)
 
 Proposed for 10Y, who adds the keys and writes the lines into a table as it places them (A414's deck test). The
@@ -2281,7 +2319,16 @@ Refusals read their 14.43 lines: a door only the duster crossed or a body out of
 `TOO_FAR {of: 'clue'}`, no kit `NEED_TOOL {need: 'fingerprintKit'}`, the lifts spent `SPENT {what: 'match'}`, a body
 read twice `ALREADY_DONE {what: 'notebook'}`, another card `NOT_YOUR_POWER`.
 
-### 14.56 The Medium's rite (story R7)
+### 14.56 Containers (10F, round 10, S1)
+
+The words of containers (GDD 3.14, `docs/round9/logic-table.md` 6), all in `interactions.json`: the prompts are the
+interactions' labels, "Search" (`searchContainer`), "Pick the lock" (`pickContainer`) and "Force the lid"
+(`pryContainer`). A searched container answers `NOTHING_THERE` with "Somebody has been through it already."; a locked
+one answers `NEED_TOOL` with "It is locked. A pick or a bar would open it." and, once open, "It stands open, and empty."
+An empty search is not a refusal: the searcher alone reads the system line "Only dregs and cobwebs."
+(`containers.empty`). What a container held shows only in the opener's inventory; no line names it.
+
+### 14.62 The Medium's rite (story R7)
 
 Story R7 (GDD 3.20, DECISIONS A605; `docs/story/rite.md`). Only the martyr's shade sees any of it, and every line follows
 the private `rite` messages (`ui/rite/RiteLayer.ts`, its lines in `ui/copy/rite.ts`). The Medium is drawn like any
@@ -2301,7 +2348,7 @@ down. A toast marks the end of the rite and another the return. The buff shows o
 | done (`done`) | The rite is done. You return at daybreak. | toast, 6 s |
 | back (`returned`) | You are back, stronger until dusk. | toast, 6 s, at the return |
 
-### 14.57 Conversion and the sermon (story I9b)
+### 14.63 Conversion and the sermon (story I9b)
 
 Story I9b (GDD 3.23, DECISIONS A606). Every line follows the seat's own private view (`ui/conversion/SermonLayer.ts`,
 its lines in `ui/copy/conversion.ts`); no line names a seat. A seat in the Vicar's look standing within the bell's

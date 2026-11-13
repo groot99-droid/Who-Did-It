@@ -1,6 +1,6 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { balance, clues, scenes } from '@wdi/content';
-import { Phase, TILE_PX } from '@wdi/shared';
+import { C2S, Phase, TILE_PX } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { avatarMemory } from '../src/sim/Avatars';
 import { clockOf } from '../src/sim/auto/clock';
@@ -10,6 +10,9 @@ import { markDead } from '../src/sim/Death';
 import { mediumHandle } from '../src/sim/rite/rite';
 import { isShade } from '../src/sim/rite/shade';
 import { canSee } from '../src/sim/Sight';
+import { forceHardship } from '../src/sim/economy/hardship';
+import { mapScenesOf } from '../src/sim/MapSites';
+import { stationsOf } from '../src/sim/npc/routine';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
 import { avatarsHeld } from './avatarHelpers';
 import { emitSim } from '../src/sim/events/bus';
@@ -250,6 +253,24 @@ describe('the leak audit (8L)', () => {
     const checked = a.checked;
     expect(await until(() => a.checked > checked + 10, 10_000)).toBe(true);
     for (const bot of m.bots) if (bot !== shade) expect(events(bot, 'rite')).toEqual([]);
+    expect(a.leaks).toEqual([]);
+  });
+
+  it('the Clerk’s rent ledger (C4d, seams.md 3 row 37): one reader is sent looks only, and no one else anything', async () => {
+    const m = await startParty(colyseus, 6);
+    setPhase(m, Phase.day);
+    const [reader, struck] = m.bots as [Bot, Bot];
+    forceHardship(m.room, struck.id, 'rent');
+    const st = stationsOf(mapScenesOf(m.room), simOf(m.room).profile).find((s) => s.propId === 'bk.ledger')!;
+    teleport(m, reader, st.scene, st.stands[0]!.x, st.stands[0]!.y);
+    const a = audit(m);
+    moved(m, a);
+    const sent: string[] = [];
+    for (const bot of m.bots) bot.room.onMessage('ledger', () => sent.push(bot.id));
+    reader.room.send(C2S.ledgerRead, { propId: 'bk.ledger' });
+    expect(await until(() => sent.length > 0, 10_000)).toBe(true);
+    await sleep(200);
+    expect(sent).toEqual([reader.id]);
     expect(a.leaks).toEqual([]);
   });
 

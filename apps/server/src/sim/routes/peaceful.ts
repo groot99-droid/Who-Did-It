@@ -1,5 +1,6 @@
 import { Phase, S2C } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf } from '../seatIds';
 import { simOf } from '../RoomSim';
 
 /**
@@ -43,5 +44,5 @@ export function checkPeaceful(room: PartyRoom, vicar: string, converted: Readonl
   }
   if (others === 0) return;
   memory.met = { seat: vicar, tick: room.state.tick };
-  room.clients.getById(vicar)?.send(S2C.conversion, { kind: 'peaceful' });
+  clientOf(room, vicar)?.send(S2C.conversion, { kind: 'peaceful' });
 }

@@ -5,10 +5,12 @@ import { handleHold } from '../Hold';
 import { count } from '../Inventory';
 import { simOf } from '../RoomSim';
 import { owesFare } from '../economy/fare';
+import { goesToReadLedger } from '../economy/ledger';
 import { handleSell } from '../economy/shops';
 import { interactReady } from '../interact/resolve';
 import { sceneIndex } from '../World';
 import type { Station } from './routine';
+import { maybeBuySnare, snareShopAt } from './snares';
 
 // The chores of an NPC seat (round 10, D1; GDD 3.12 "Chores", LW 1.8): the stations it can work for real, what it
 // sells at a counter, and the rule that nothing waits on it. Every action goes through the verb a human uses.
@@ -16,6 +18,12 @@ import type { Station } from './routine';
 /** The hold of a station: its class's row first, then its kind's (`routines.json` `holds`). */
 export const holdOf = (st: Station): RoutineHold | undefined =>
   (st.cls !== undefined ? routines.holds[st.cls] : undefined) ?? routines.holds[st.kind];
+
+/** The hold the seat runs at a station: none at the Clerk's books unless it owes (C4d: a reader holds nothing). */
+export const holdAt = (room: PartyRoom, seat: string, st: Station): RoutineHold | undefined => {
+  const hold = holdOf(st);
+  return hold === 'errand' && !owesFare(room, seat) ? undefined : hold;
+};
 
 const shopAt = (propId: string): string | undefined =>
   Object.keys(economy.shops).find((id) => economy.shops[id]!.prop === propId);
@@ -41,16 +49,24 @@ export function workable(room: PartyRoom, player: PlayerState, st: Station): boo
   if (otherAt(room, player.id, st.propId)) return false;
   const hold = holdOf(st);
   if (hold === 'interact') return interactReady(room, player, st.scene, st.propId);
-  if (hold === 'shop') return sellables(player, st.propId).length > 0;
-  if (hold === 'errand') return owesFare(room, player.id); // round 10, C2b: the Clerk's books, only while owing
+  if (hold === 'shop')
+    return sellables(player, st.propId).length > 0 || snareShopAt(room, player, st.propId) !== undefined; // K6b
+  // Round 10, C2b: the Clerk's books, while owing; C4d: or to read the rent ledger there (`economy/ledger.ts`).
+  if (hold === 'errand') return owesFare(room, player.id) || goesToReadLedger(room, player.id);
   return true;
 }
 
-/** At a counter: opens the shop with the human verb, then sells all it holds that the shop buys. */
-export function sellAt(room: PartyRoom, id: string, player: PlayerState, st: Station): void {
+/**
+ * At a counter: opens the shop with the human verb, sells all it holds that the shop buys, and may buy a Snare. Returns
+ * whether the visit earns the pause before the next action: a sale (or a counter it could not reach) does, a visit that
+ * only looked at the Snares does not, so that it never stands at the counter longer than a seat that sold something.
+ */
+export function sellAt(room: PartyRoom, id: string, player: PlayerState, st: Station): boolean {
   const shopId = shopAt(st.propId);
-  if (shopId === undefined || simOf(room).players.get(id)?.sceneIdx !== sceneIndex(st.scene)) return;
+  if (shopId === undefined || simOf(room).players.get(id)?.sceneIdx !== sceneIndex(st.scene)) return true;
   handleHold(room, id, { action: 'shop', targetId: st.propId, on: true });
-  for (const itemId of sellables(player, st.propId))
-    handleSell(room, id, { shopId, itemId, qty: count(player, itemId) });
+  const goods = sellables(player, st.propId);
+  for (const itemId of goods) handleSell(room, id, { shopId, itemId, qty: count(player, itemId) });
+  maybeBuySnare(room, id, player, st.propId); // round 10, K6b: a Snare, as a human buys one
+  return goods.length > 0;
 }

@@ -557,6 +557,12 @@ export const BalanceFile = z.strictObject({
     sermonFaith: z.number().int().positive(),
   }),
   /**
+   * Round 10 (GDD 3.24, T6): the mood hooks. A seat or figure whose mood is not Calm narrows its next work trip with
+   * this chance (`moodPool`): Scared to its home or a lit scene, Hungry to the bakery, Angry to the scene of the seat it
+   * is angry at, Desperate to a scene nobody stands in.
+   */
+  moodHooks: Section({ chance: Chance }),
+  /**
    * Round 10, C4 (GDD 3.33): the Hitman's arrival. By the human seats at the deal (3 to 10; fewer never draws him),
    * the chance he `comes` and, if he does, the chance the turned seat is `human`; he comes on a day in `days`
    * (inclusive, uniform), at that day's `train.delivery`. His contract stays open for `contractDays` days from the
@@ -569,6 +575,22 @@ export const BalanceFile = z.strictObject({
     ),
     days: z.tuple([z.number().int().positive(), z.number().int().positive()]),
     contractDays: z.number().int().positive(),
+    /** The turned seat's stall stocks this of a day's stock; it equals `respawn.stockMult` (F4 b1, C4c). */
+    dormantOutput: Frac,
+  }),
+  /**
+   * Round 10, C4c (GDD 3.33, F4 b2 to b5): at every morning delivery, `atOnce` (inclusive) seats wearing a stall's look
+   * are struck by a hardship, each of a `kinds` row, and run thin and dear for `recoverS`, as the Hitman's turned seat.
+   */
+  hardship: Section({
+    atOnce: z.tuple([z.number().int().nonnegative(), z.number().int().positive()]),
+    recoverS: Seconds,
+    kinds: z.array(z.enum(['robbed', 'harvest', 'fined', 'rent', 'illness', 'shipment'])).min(1),
+    /**
+     * C4d (seams.md 3 row 37): at each trip an NPC seat picks, the chance it goes to read the Clerk's rent ledger, on its
+     * own stream: `before` the Hitman's arrival line has gone out, `after` it (a public trigger).
+     */
+    readLedger: z.strictObject({ before: Chance, after: Chance }),
   }),
   /** Round 6 (GDD 3.13, 3.18): the client's scene transitions, in seconds, the whole cover-and-lift (GDD 3.13). */
   ui: Section({
@@ -607,7 +629,26 @@ export const BalanceFile = z.strictObject({
     /** A `chat.say` line is cut to this many characters (GDD 3.5). */
     maxChars: z.number().int().positive(),
     quickChatRadiusTiles: Tiles,
-    quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).length(8),
+    quickChat: z.array(z.strictObject({ id: Id, text: z.string().min(1) })).min(8),
+    /** A seat or figure barks at most once in this many seconds (round 10, M1; GDD 3.5), human or NPC alike. */
+    quickGapS: Seconds,
+  }),
+  /** Round 10, M1 (GDD 3.5 "Barks"): when NPC seats and figures bark a pool line, and at what. */
+  bark: Section({
+    /** The gap to an idle bark, drawn per actor; its minimum is `chat.quickGapS`, so it reaches the human's rate. */
+    idleGapS: z.strictObject({ min: Seconds, max: Seconds }),
+    /** The chance an actor that sees a shared moment barks at it. */
+    reactChance: z.number().min(0).max(1),
+    /** The delay from the moment to the bark, drawn per actor. */
+    reactDelayS: z.strictObject({ min: Seconds, max: Seconds }),
+    /** A wolf within this many tiles of an actor is a moment. */
+    wolfTiles: Tiles,
+    /** Per moment, the pool ids its barks draw from. */
+    moments: z.strictObject({
+      bell: z.array(Id).min(1),
+      wolf: z.array(Id).min(1),
+      lantern: z.array(Id).min(1),
+    }),
   }),
   /** Round 8 (GDD 3.8 "Meeting notes", 3.25), 8T's keys. */
   talk: Section({
@@ -718,6 +759,12 @@ export const BalanceFile = z.strictObject({
    */
   guard: Section({ leashTiles: Tiles, angerS: Seconds }),
   /**
+   * Round 10, K3 (GDD 3.5, I28, I29): Handcuffs cut a cuff hold to `handcuffsHoldMult` of `law.cuffHoldS`; an NPC seat
+   * lights a light it holds a delay within `npcLightDelayS` after the rule a human would follow says to (dusk, night,
+   * a dark scene), drawn on `npcTiming`.
+   */
+  kit: Section({ handcuffsHoldMult: Chance, npcLightDelayS: Span }),
+  /**
    * Round 10, B2 (GDD 3.31): the law. The Constables verify a clue `speedMult` times a Detective's rate (its
    * `clues.collectHoldS`) and post a briefing `briefingAfterS` after it appears. A cuff is a hold of `cuffHoldS`
    * (B4); a Constable's takes `cuffHoldS / speedMult`. The Constables file their own petition on the briefings of the
@@ -747,6 +794,18 @@ export const BalanceFile = z.strictObject({
     cotFaith: z.number().int().nonnegative(),
     /** The last active player awake, alone this long while the rest sleep, is Exhausted the next day. */
     holdoutGraceS: Seconds,
+  }),
+  /**
+   * Round 10, K6 (GDD 3.5, seams.md 3 row 31): a set snare is sent to its layer and to seats within `seeTiles` of it.
+   * The hold is `abilities.json` `snare.params.holdS`, then Slowed.
+   */
+  snare: Section({
+    seeTiles: Tiles,
+    /**
+     * K6b (GDD 3.12): an NPC seat outdoors sets the Snare it holds by `setChancePer10s`; at a stall that sells one it
+     * buys a Snare by `buyChance`; it frees a held seat it sees with its Rope by `ropeChance`, one roll per held seat.
+     */
+    npc: z.strictObject({ setChancePer10s: z.number().min(0), buyChance: Frac, ropeChance: Frac }),
   }),
 });
 export type BalanceFile = z.infer<typeof BalanceFile>;

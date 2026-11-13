@@ -2,6 +2,7 @@ import { NotebookEntry, NotebookStatus, S2C, type DeathCause } from '@wdi/shared
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import type { PlayerSim } from '../RoomSim';
 import type { MatchSeeds } from '../seeds';
+import { clientOf } from '../seatIds';
 
 // Round 10, V1b (10V; GDD 3.2, seams.md 3 row 24): what Dust, Compare and Autopsy remember, in room memory keyed by the
 // match's seeds (a new match, a new memory), and the writer of a reading into the reader's own Notebook. No field here
@@ -64,6 +65,6 @@ export function writeReading(
   entry.note = fields.note;
   entry.of = fields.of;
   player.priv.notebook.push(entry);
-  room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
+  clientOf(room, sessionId)?.send(S2C.clueFound, { entryId: entry.id });
   return entry;
 }

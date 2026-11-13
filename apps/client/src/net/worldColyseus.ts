@@ -1,5 +1,6 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import { selfSeatId } from './selfSeat';
 import balance from '@wdi/content/data/balance.json';
 import type { HoldAction } from '@wdi/shared/protocol';
 import { paintTarget } from '@wdi/shared/rules';
@@ -54,6 +55,7 @@ interface PlayerState {
     inBed?: number;
     inBedOf?: number;
     onLine?: boolean; // round 10, C1
+    departed?: boolean; // round 10, C4b (seams.md 3 row 21)
     fare?: number; // round 10, C2
     paintTown?: boolean; // round 10, C5
     hitman?: boolean; // round 10, C4 (seams.md 3 row 20): the Hitman turned this seat
@@ -152,7 +154,7 @@ export class ColyseusWorldFeed implements WorldFeed {
   }
 
   get selfId(): string {
-    return this.room.sessionId;
+    return selfSeatId(this.room); // round 10, W1a: the fresh seat id in a world match
   }
 
   private get state(): GameStateLike {
@@ -280,6 +282,10 @@ export class ColyseusWorldFeed implements WorldFeed {
 
   onLine(): boolean {
     return this.state.players.get(this.selfId)?.priv?.onLine === true;
+  }
+
+  departed(): boolean {
+    return this.state.players.get(this.selfId)?.priv?.departed === true;
   }
 
   clock() {

@@ -16,7 +16,7 @@ export interface RiteLayer {
 type Toast = (text: string, kind: 'interact' | 'hazard' | 'warm', ms: number) => void;
 
 /**
- * The Medium's rite on the shade's screen (story R7, GDD 3.20; UI.md 14.56): a banner while the rite is open, the
+ * The Medium's rite on the shade's screen (story R7, GDD 3.20; UI.md 14.62): a banner while the rite is open, the
  * prompt within `rite.reachTiles` of the Medium, the seconds left while it runs, and a toast when it is done and when
  * the seat returns. Everything follows the private `rite` messages, which reach the shade alone; the Medium itself is
  * drawn like any figure. The server decides every act.

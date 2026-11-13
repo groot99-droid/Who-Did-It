@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createParty } from './fixtures/party';
 
-// Story R7 (GDD 3.20; UI.md 14.56): the martyr's shade and the Medium's rite, on the mock (`?ghost=shade` dies as
+// Story R7 (GDD 3.20; UI.md 14.62): the martyr's shade and the Medium's rite, on the mock (`?ghost=shade` dies as
 // the shade with the Medium one tile away; the rite runs `rite.holdS` and the seat returns two seconds later).
 
 async function toShade(page: import('@playwright/test').Page) {

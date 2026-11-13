@@ -1,5 +1,6 @@
 import mitt, { type Emitter } from 'mitt';
 import type { Room } from '@colyseus/sdk';
+import { selfSeatId } from './selfSeat';
 import balance from '@wdi/content/data/balance.json';
 import { TICK_RATE } from '@wdi/shared/constants';
 import type {
@@ -82,7 +83,7 @@ export class ColyseusMeetingFeed implements MeetingFeed {
   }
 
   get selfId(): string {
-    return this.room.sessionId;
+    return selfSeatId(this.room); // round 10, W1a: the fresh seat id in a world match
   }
 
   private get state(): GameStateLike {

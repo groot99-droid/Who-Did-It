@@ -1,6 +1,7 @@
 import { abilities, balance, economy, roles } from '@wdi/content';
 import { Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf } from '../seatIds';
 import { emitSim, onSim } from '../events/bus';
 import { bellOf, hubOf } from '../MapSites';
 import { type PlayerSim, simOf } from '../RoomSim';
@@ -95,7 +96,7 @@ export function runConversion(room: PartyRoom): void {
     if (!priv || memory.converted.has(id) || id === vicar || priv.faith < balance.conversion.faithAt)
       continue;
     memory.converted.add(id);
-    room.clients.getById(id)?.send(S2C.conversion, { kind: 'converted' });
+    clientOf(room, id)?.send(S2C.conversion, { kind: 'converted' });
   }
   const vicarPriv = vicar === null ? undefined : room.state.players.get(vicar)?.priv;
   if (vicarPriv && vicarPriv.converted !== Math.min(255, memory.converted.size))
@@ -176,5 +177,5 @@ function runSermon(room: PartyRoom, memory: ConversionMemory): void {
     heard++;
   }
   memory.listening.clear();
-  room.clients.getById(seat)?.send(S2C.conversion, { kind: 'sermon', heard });
+  clientOf(room, seat)?.send(S2C.conversion, { kind: 'sermon', heard });
 }

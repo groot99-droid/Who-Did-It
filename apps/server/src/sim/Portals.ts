@@ -33,6 +33,7 @@ import { recordCrossings } from './verbs/dust';
 import { reconcileViews } from './Visibility';
 import { isOnLine } from './Train';
 import { isDeparted } from './vendettas/arrival';
+import { clientOf } from './seatIds';
 
 const ticks = (seconds: number): number => Math.round(seconds * TICK_RATE);
 
@@ -108,7 +109,7 @@ export function enterScene(
   }
   rehandle(room, player.id, transit); // round 5, 5F: a new avatar handle on every scene entry (locked call site)
   if (announce) {
-    room.clients.getById(player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
+    clientOf(room, player.id)?.send(S2C.sceneEnter, { sceneId, spawn: spawn.id, facing: spawn.facing });
   }
   return true;
 }

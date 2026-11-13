@@ -3,8 +3,10 @@ import { C2S } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
 import { runAction } from './Actions';
 import { handleBank } from './economy/bank';
+import { handleLedgerRead } from './economy/ledger';
 import { handleBuy, handleSell } from './economy/shops';
 import { handleMinigameResult } from './Minigames';
+import { handleQuick } from './Barks';
 import { handleLight } from './mobs/light';
 import { handleTalk } from './townsfolk/talk';
 import { handleQuestAccept, handleQuestTurnIn } from './Quests';
@@ -28,6 +30,7 @@ import { handleStoryStart, queueStoryContinue } from './story/Story';
 
 /** A client message waiting for the next step(). Message callbacks only ever push here. */
 export interface QueuedCommand {
+  /** The sender's seat id: its session id in the lobby, its fresh seat id in a world match (`seatIds.ts`). */
   sessionId: string;
   type: string;
   payload: unknown;
@@ -38,7 +41,7 @@ export class CommandQueue {
   /** `input.move` keeps only the newest per client: one is applied per tick, newest wins (5.6). */
   private moves = new Map<string, unknown>();
 
-  push(client: Client, type: string, payload: unknown): void {
+  push(client: Pick<Client, 'sessionId'>, type: string, payload: unknown): void {
     if (type === C2S.move) this.moves.set(client.sessionId, payload);
     else this.items.push({ sessionId: client.sessionId, type, payload });
   }
@@ -96,6 +99,9 @@ export function runCommands(room: PartyRoom): void {
       case C2S.talkAsk: // round 10, D9c (GDD 3.24, seams.md 3 row 16)
         handleTalk(room, cmd.sessionId, payload);
         break;
+      case C2S.ledgerRead: // round 10, C4d (GDD 3.33, seams.md 3 row 37)
+        handleLedgerRead(room, cmd.sessionId, payload);
+        break;
       case C2S.questAccept:
         handleQuestAccept(room, cmd.sessionId, payload);
         break;
@@ -104,6 +110,9 @@ export function runCommands(room: PartyRoom): void {
         break;
       case C2S.minigameResult:
         handleMinigameResult(room, cmd.sessionId, payload);
+        break;
+      case C2S.quick: // round 10, M1 (seams.md 3 row 36)
+        handleQuick(room, cmd.sessionId, payload);
         break;
       case C2S.light:
         handleLight(room, cmd.sessionId, payload);

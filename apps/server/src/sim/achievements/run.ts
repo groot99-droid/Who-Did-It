@@ -1,5 +1,6 @@
 import { achievements, type Achievement } from '@wdi/content';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf, seatOf } from '../seatIds';
 import { ANY_SIM, onSim, type SimEvent } from '../events/bus';
 
 /**
@@ -42,7 +43,7 @@ for (const a of list)
 function seatsOf(room: PartyRoom, who: string, ev: SimEvent): string[] {
   if (who === 'seat') return ev.seat === undefined ? [] : [ev.seat];
   if (who === 'humans')
-    return room.clients.map((c) => c.sessionId).filter((id) => room.state.players.has(id));
+    return room.clients.map((c) => seatOf(room, c)).filter((id) => room.state.players.has(id));
   const named = ev.data?.[who.slice('data.'.length)];
   return typeof named === 'string' ? [named] : [];
 }
@@ -57,7 +58,7 @@ function hear(room: PartyRoom, memory: Memory, ev: SimEvent): void {
     // The current step of each seat differs, so find the seats from every step that names this kind.
     const seats = new Set(a.steps.filter((s) => s.on === ev.kind).flatMap((s) => seatsOf(room, s.who, ev)));
     for (const seat of seats) {
-      const client = room.clients.getById(seat);
+      const client = clientOf(room, seat);
       if (client === undefined) continue;
       const mine = memory.progress.get(seat) ?? new Map<string, Progress>();
       memory.progress.set(seat, mine);

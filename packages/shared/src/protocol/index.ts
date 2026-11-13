@@ -19,6 +19,8 @@ export const C2S = {
   mug: 'act.mug',
   /** Round 10, D9c (GDD 3.24, seams.md 3 row 16): ask a figure about the town or the time; `sim/townsfolk/talk.ts`. */
   talkAsk: 'talk.ask',
+  /** Round 10, C4d (GDD 3.33, seams.md 3 row 37): read the Clerk's rent ledger; `sim/economy/ledger.ts`. */
+  ledgerRead: 'ledger.read',
   /** Round 10, A12 (GDD 3.30): move a stack between two slots of the own inventory; `sim/InventoryMoves.ts`. */
   invMove: 'inv.move',
   /** Round 10, A12 (GDD 3.30): pick the held hotbar slot. */
@@ -127,6 +129,10 @@ export const S2C = {
   rite: 'rite',
   /** Story I9 (GDD 3.23), private to one seat's own client: it is converted, or (to the Vicar) the parish is. */
   conversion: 'conversion',
+  /** Round 10, M1 (seams.md 3 row 36): a quick-chat line over one figure's head, the same from a seat or a figure. */
+  bark: 'bark',
+  /** Round 10, C4d (GDD 3.33, seams.md 3 row 37), private to the reader: the Clerk's rent ledger. */
+  ledger: 'ledger',
 } as const;
 
 /**
@@ -393,6 +399,11 @@ export interface C2SPayloads {
   /** Story mode: closes the card that is up. Refused 422 with no card up. */
   'story.continue': Record<string, never>;
   /**
+   * Round 10, C4d (GDD 3.33, seams.md 3 row 37): `propId` is a `ledger` prop in the reader's reach (HollowMere's
+   * `bk.ledger`). Answered with `ledger`. Refused `TOO_FAR`, `PHASE_CLOSED`, `NOT_IN_PLAY`, `IN_JAIL`.
+   */
+  'ledger.read': { propId: string };
+  /**
    * Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`):
    * into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to`
    * does not take the item (the belt takes tools, gear its own slot) or `from` is empty.
@@ -460,6 +471,8 @@ export interface S2CPayloads {
     unseen?: boolean;
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
+  /** A quick-chat bubble over the avatar `handle`; names no seat, card, side or channel. */
+  bark: { handle: string; phraseId: string };
   /** Where the shout rang; names no seat, no card and no body. */
   shout: { sceneId: string; x: number; y: number };
   /**
@@ -577,6 +590,12 @@ export interface S2CPayloads {
    * many seats it reached, never who), `peaceful` to the dealt Vicar when every other living seat is converted.
    */
   conversion: { kind: 'converted' | 'sermon' | 'peaceful'; heard?: number };
+  /**
+   * Private to the reader, round 10, C4d (GDD 3.33, seams.md 3 row 37): every rent hardship of the match so far, oldest
+   * first, by the day it struck and the struck seat's `Player.look` then (a `looks.json` id). No seat, handle, name,
+   * card, cover or other hardship; every reader at a tick gets the same rows.
+   */
+  ledger: { propId: string; rows: Array<{ day: number; lookId: string }> };
 }
 
 export type ErrorPayload = S2CPayloads['error'];
@@ -620,6 +639,7 @@ export const RATE_LIMITS: Partial<Record<C2SType, number>> = {
   'act.payRent': 5,
   'act.mug': 5,
   'talk.ask': 5,
+  'ledger.read': 2,
   'inv.move': 10,
   'inv.select': 10,
   'craft.grid': 5,

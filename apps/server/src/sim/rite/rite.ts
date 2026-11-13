@@ -1,6 +1,7 @@
 import { balance, scenes } from '@wdi/content';
 import { Avatar, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf } from '../seatIds';
 import { avatarMemory, avatarOf, newHandle } from '../Avatars';
 import { AnimId } from '../constants';
 import { emitSim, onSim } from '../events/bus';
@@ -121,14 +122,14 @@ export function runRite(room: PartyRoom): void {
   const shade = shadeOf(room);
   if (shade !== null && memory.told !== shade && memory.handle !== null) {
     memory.told = shade;
-    room.clients.getById(shade)?.send(S2C.rite, { stage: 'open', medium: memory.handle });
+    clientOf(room, shade)?.send(S2C.rite, { stage: 'open', medium: memory.handle });
     riteEvent(room, 'open', shade);
   }
   const running = memory.running;
   if (running && room.state.tick >= running.endTick) {
     memory.running = null;
     memory.done = running.seat;
-    room.clients.getById(running.seat)?.send(S2C.rite, { stage: 'done' });
+    clientOf(room, running.seat)?.send(S2C.rite, { stage: 'done' });
     riteEvent(room, 'done', running.seat);
   }
 }
@@ -157,7 +158,7 @@ export function handleRiteHold(room: PartyRoom, seat: string, handle: string): v
   p.busyUntilTick = Math.max(p.busyUntilTick, endTick); // it stands still until the rite is done
   p.input = null;
   p.hold = null;
-  room.clients.getById(seat)?.send(S2C.rite, { stage: 'begun', endsTick: endTick });
+  clientOf(room, seat)?.send(S2C.rite, { stage: 'begun', endsTick: endTick });
   riteEvent(room, 'begun', seat);
 }
 

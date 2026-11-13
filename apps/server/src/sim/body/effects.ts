@@ -12,6 +12,10 @@ import { type Body, bodyOf, bodyRng } from './state';
  */
 export const effectDef = (id: EffectKey): Effect => effects.effects[id];
 
+/** The maximum health the dishes on a body add (the bound of `invariants.ts`). */
+export const maxHpBonusOf = (body: Body): number =>
+  effectsOn(body).reduce((sum, id) => sum + (effectDef(id).maxHpBonus ?? 0), 0);
+
 export const hasEffect = (body: Body, id: EffectKey): boolean => body.effects.has(id);
 
 /** The effects on a body, in application order. */
@@ -45,12 +49,24 @@ export function applyEffect(
     return;
   }
   body.effects.set(id, { untilTick, stacks: 1 });
+  // A dish's extra health comes on with it, and goes with it (`cureEffect`); round 10, D4b.
+  const bonus = effectDef(id).maxHpBonus ?? 0;
+  if (bonus > 0) {
+    body.maxHp += bonus;
+    body.hp += bonus;
+  }
   emitSim(room, { tick, kind: 'body.effect', seat: target, data: { target, effect: id, on: true } });
 }
 
 /** Takes an effect off; returns whether it was on. */
 export function cureEffect(room: PartyRoom, target: string, body: Body, id: EffectKey): boolean {
   if (!body.effects.delete(id)) return false;
+  const bonus = effectDef(id).maxHpBonus ?? 0;
+  if (bonus > 0) {
+    // Never under the floor a lost yard fight leaves (`invariants.ts`), whatever the dish added.
+    body.maxHp = Math.max(Math.min(balance.body.maxHp, balance.jail.yard.maxHpFloor), body.maxHp - bonus);
+    body.hp = Math.min(body.hp, body.maxHp);
+  }
   emitSim(room, {
     tick: room.state.tick,
     kind: 'body.effect',

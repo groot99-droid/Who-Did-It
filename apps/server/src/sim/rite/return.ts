@@ -1,6 +1,7 @@
 import { type SceneId, balance } from '@wdi/content';
 import { S2C } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
+import { clientOf } from '../seatIds';
 import { ensureBody, removeBody } from '../body/state';
 import { emitSim } from '../events/bus';
 import { startMartyrWindow } from '../Memorial';
@@ -36,7 +37,7 @@ export function returnMartyr(room: PartyRoom, seat: string, deathTick: number): 
   for (const [key, end] of cooldowns) if (end > deathTick) cooldowns.set(key, end + (tick - deathTick));
   sim.viewsDirty = true;
   startMartyrWindow(room, seat);
-  room.clients.getById(seat)?.send(S2C.rite, { stage: 'returned' });
+  clientOf(room, seat)?.send(S2C.rite, { stage: 'returned' });
   emitSim(room, { tick, kind: 'rite.returned', seat }); // story R8 (arc.md E17), as `riteEvent` in rite.ts
   return true;
 }
