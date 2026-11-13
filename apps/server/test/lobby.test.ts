@@ -265,9 +265,11 @@ describe('privacy after Start', () => {
     for (let game = 0; game < 12; game++) {
       const { bots, room } = await party(6);
       const observer = bots[1] as Bot;
+      // Round 10, W1a (owner test-body grant, 2026-11-13, #447): every seat takes a fresh id at Start in a world match
+      // (seams.md 3 row 25), so the two snapshots pair each seat with itself by its name, which the re-keying keeps.
       const snapshot = () =>
         new Map<string, ReturnType<typeof publicOf>>(
-          [...stateOf(observer).players.entries()].map(([id, p]) => [id, publicOf(p)]),
+          [...stateOf(observer).players.values()].map((p) => [p.name, publicOf(p)]),
         );
       const before = snapshot();
       bots[0]?.room.send(C2S.lobbyStart, {});
@@ -275,11 +277,11 @@ describe('privacy after Start', () => {
       const after = snapshot();
       const killer = [...room.state.players.entries()].find(([, p]) => p.priv?.role.roleId === 'killer');
       expect(killer).toBeDefined();
-      for (const [id, now] of after) {
-        const was = before.get(id) as ReturnType<typeof publicOf>;
+      for (const [name, now] of after) {
+        const was = before.get(name) as ReturnType<typeof publicOf>;
         const changed = (Object.keys(now) as (keyof typeof now)[]).filter((k) => now[k] !== was[k]);
         signatures.add(changed.join(','));
-        expect(changed.join(','), id === killer?.[0] ? 'killer' : 'other').toBe('alive');
+        expect(changed.join(','), name === killer?.[1].name ? 'killer' : 'other').toBe('alive');
       }
       await colyseus.cleanup();
     }
