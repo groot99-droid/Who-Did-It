@@ -1,7 +1,10 @@
 """HollowMere in 3D: the game's own overworld map built from the owner's Meshy models (original textures).
 
     blender -b --factory-startup -P tools/blender/meshy_village_build.py -- --save tools/blender/build/hollowmere_base.blend
-        [--preview tools/blender/build/hm_preview] [--no-models] [--no-forest]
+        [--preview tools/blender/build/hm_preview] [--no-models] [--no-forest] [--no-outskirts]
+
+The outskirts round the map (the mill, the railyard, the hideout and the woods: `meshy_village_outskirts.py`) are
+built by default; `--no-outskirts` leaves the village exactly as it was without them.
 
 Reads `packages/content/data/scenes/overworld.json` (64 x 48 tiles, y grows south) and lays out, at 1.5 m per
 tile (`meshy_village_look.TILE_M`: the game's arrangement, enlarged so that human-scale buildings and a full-size
@@ -77,12 +80,16 @@ def _fbm(x: float, y: float, s: float, octaves: int = 4) -> float:
 
 
 class Map:
-    def __init__(self, path: str = SCENE_JSON):
+    def __init__(self, path: str = SCENE_JSON, edits: list | None = None):
         with open(path) as fh:
             self.d = json.load(fh)
         self.grid, self.mat = self.d["grid"], self.d["material"]
         self.ground = [[self._ground(x, y) for x in range(W)] for y in range(H)]
         self.rail_x = wx(next(tx for row in self.mat for tx, c in enumerate(row) if c == "=") + 0.5)
+        # hook (outskirts): terrain edits f(x, y, h, wts) -> (h, wts), applied in order by sample() outside the map only
+        self.edits: list = list(edits or [])
+        # hook (outskirts): f(x, y) -> tile rows the shore of the mere moves by, beyond the map's east and west edges only
+        self.shore = None
 
     def tread(self, tx: int, ty0: int, ty1: int, letter: str = "p") -> None:
         """Turn a column of tiles into trodden path (ground the map leaves as grass)."""
@@ -138,6 +145,8 @@ class Map:
             west = 1.0 - min(1.0, max(0.0, (fx - 40.0) / 3.0))
             east = min(1.0, max(0.0, (fx - 64.0) / 3.0))
             fy += 0.9 * _fbm(x, 0.0, 0.035, 3) * max(west, east) * min(1.0, (fy - 36.0) / 1.5)
+            if self.shore is not None and abs(x) > W * S / 2:  # hook (outskirts): never inside the map
+                fy += self.shore(x, y) * min(1.0, (fy - 36.0) / 1.5)
         x0, y0 = math.floor(fx), math.floor(fy)
         ax, ay = fx - x0, fy - y0
         h, wts = 0.0, {}
@@ -157,6 +166,9 @@ class Map:
             cut = min(1.0, max(0.0, (abs(x - self.rail_x) - 6.0) / 24.0))  # the railway leaves in a level cutting
             hill *= cut * cut * (3 - 2 * cut)
             h += hill * (1.0 - fade)
+        if self.edits and not (abs(x) <= W * S / 2 and abs(y) <= H * S / 2):  # hook (outskirts): never inside the map
+            for edit in self.edits:
+                h, wts = edit(x, y, h, wts)
         return h, wts
 
     def height(self, x: float, y: float) -> float:
@@ -365,8 +377,11 @@ def _principled(mat):
 # ---------------------------------------------------------------- terrain
 
 
-def terrain_material() -> bpy.types.Material:
-    """Snow over the game's own Poly Haven ground: each map letter's texture shows where the snow is trodden away."""
+def terrain_material(layer=None) -> bpy.types.Material:
+    """Snow over the game's own Poly Haven ground: each map letter's texture shows where the snow is trodden away.
+
+    hook (outskirts): `layer(module, G, colour, roughness, normal) -> (colour, roughness, normal)` lays more ground over
+    this one (the outskirts' bare earth and rock, weighted 0 inside the map); without it the material is as before."""
     m = bpy.data.materials.new("HM_Ground")
     bsdf = _principled(m)
     g = G(m.node_tree)
@@ -429,8 +444,9 @@ def terrain_material() -> bpy.types.Material:
         nor = g.mix(bare, nor, c_nor)
         rough = g.mixf(bare, rough, c_rough)
         bare_all = g.math("MAXIMUM", bare_all, bare)
-    g.link(col, bsdf.inputs["Base Color"])
-    g.link(rough, bsdf.inputs["Roughness"])
+    if layer is None:
+        g.link(col, bsdf.inputs["Base Color"])
+        g.link(rough, bsdf.inputs["Roughness"])
     nmap = _new(g.n, "ShaderNodeNormalMap", space="TANGENT", uv_map="UVMap")
     # full grain underfoot, flattened with distance: far ground then neither shows the repeat nor shimmers in motion
     far = g.smooth(_new(g.n, "ShaderNodeCameraData").outputs["View Z Depth"], 14.0, 80.0)
@@ -443,11 +459,86 @@ def terrain_material() -> bpy.types.Material:
     bump.inputs["Distance"].default_value = 1.0
     g.link(hgt, bump.inputs["Height"])
     g.link(nmap.outputs["Normal"], bump.inputs["Normal"])
-    g.link(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    if layer is None:
+        g.link(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    else:  # hook (outskirts)
+        col, rough, nrm = layer(sys.modules[__name__], g, col, rough, bump.outputs["Normal"])
+        g.link(col, bsdf.inputs["Base Color"])
+        g.link(rough, bsdf.inputs["Roughness"])
+        g.link(nrm, bsdf.inputs["Normal"])
     return m
 
 
-def build_terrain(mp: Map) -> bpy.types.Object:
+def fine_grid(xs: list[float], ys: list[float], zones) -> tuple[list[tuple[float, float]], list[tuple[int, ...]]]:
+    """hook (outskirts): the xs x ys grid with every cell that overlaps a zone (x0, x1, y0, y1, step) cut into cells of
+    about `step` metres. Each edge two cells share carries the points of both sides' cuts, and a cell whose outline
+    gains points from a finer neighbour is fanned from its centre, so the surface has no cracks. Returns the (x, y)
+    points and the faces (quads, and triangles where fanned), counter-clockwise from above."""
+    nx, ny = len(xs) - 1, len(ys) - 1
+    sub = [[(1, 1)] * nx for _ in range(ny)]  # (cuts across, cuts along) per cell
+    for j in range(ny):
+        y0, y1 = ys[j], ys[j + 1]
+        row = [z for z in zones if y0 < z[3] and y1 > z[2]]
+        if not row:
+            continue
+        for i in range(nx):
+            x0, x1 = xs[i], xs[i + 1]
+            step = min((z[4] for z in row if x0 < z[1] and x1 > z[0]), default=None)
+            if step:
+                sub[j][i] = (max(1, round((x1 - x0) / step)), max(1, round((y1 - y0) / step)))
+    index: dict[tuple[int, int], int] = {}
+    pts: list[tuple[float, float]] = []
+    faces: list[tuple[int, ...]] = []
+
+    def vid(x: float, y: float) -> int:
+        key = (round(x * 1000.0), round(y * 1000.0))
+        k = index.get(key)
+        if k is None:
+            k = index[key] = len(pts)
+            pts.append((x, y))
+        return k
+
+    def cuts(a: float, b: float, n: int, m: int) -> list[float]:
+        return sorted({round(a + (b - a) * k / n, 6) for k in range(n + 1)} | {round(a + (b - a) * k / m, 6) for k in range(m + 1)})
+
+    def between(vals, lo, hi):
+        return [v for v in vals if lo + 1e-6 < v < hi - 1e-6]
+
+    for j in range(ny):
+        for i in range(nx):
+            x0, x1, y0, y1 = xs[i], xs[i + 1], ys[j], ys[j + 1]
+            n, m = sub[j][i]
+            south = cuts(x0, x1, n, sub[j - 1][i][0] if j > 0 else n)
+            north = cuts(x0, x1, n, sub[j + 1][i][0] if j < ny - 1 else n)
+            west = cuts(y0, y1, m, sub[j][i - 1][1] if i > 0 else m)
+            east = cuts(y0, y1, m, sub[j][i + 1][1] if i < nx - 1 else m)
+            gx = [x0 + (x1 - x0) * k / n for k in range(n + 1)]
+            gy = [y0 + (y1 - y0) * k / m for k in range(m + 1)]
+            for b in range(m):
+                for a in range(n):
+                    xa, xb, ya, yb = gx[a], gx[a + 1], gy[b], gy[b + 1]
+                    ring = [(xa, ya)]
+                    if b == 0:
+                        ring += [(x, ya) for x in between(south, xa, xb)]
+                    ring.append((xb, ya))
+                    if a == n - 1:
+                        ring += [(xb, y) for y in between(east, ya, yb)]
+                    ring.append((xb, yb))
+                    if b == m - 1:
+                        ring += [(x, yb) for x in reversed(between(north, xa, xb))]
+                    ring.append((xa, yb))
+                    if a == 0:
+                        ring += [(xa, y) for y in reversed(between(west, ya, yb))]
+                    ids = [vid(x, y) for x, y in ring]
+                    if len(ids) == 4:
+                        faces.append(tuple(ids))
+                    else:
+                        c = vid((xa + xb) / 2.0, (ya + yb) / 2.0)
+                        faces.extend((c, ids[k], ids[(k + 1) % len(ids)]) for k in range(len(ids)))
+    return pts, faces
+
+
+def build_terrain(mp: Map, fine_zones: list | None = None, layer=None) -> bpy.types.Object:
     def axis(lo, fine_lo, fine_hi, hi, fine=0.5, coarse=4.0):
         vals, v = [], lo
         while v < fine_lo - 1e-6:
@@ -465,17 +556,20 @@ def build_terrain(mp: Map) -> bpy.types.Object:
 
     xs = axis(-242.0, -58.0, 58.0, 242.0)
     ys = axis(-304.0, -48.0, 46.0, 242.0)
+    if fine_zones:  # hook (outskirts): finer cells over the given zones; without zones the grid is exactly as before
+        pts, faces = fine_grid(xs, ys, fine_zones)
+    else:
+        pts = [(x, y) for y in ys for x in xs]
+        nx, ny = len(xs), len(ys)
+        faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i)
+                 for j in range(ny - 1) for i in range(nx - 1)]
     verts, col_a, col_b = [], [], []
-    for y in ys:
-        for x in xs:
-            h, w = mp.sample(x, y)
-            snow = w.get("g", 0.0) + w.get("T", 0.0)
-            verts.append((x, y, h + 0.05 * snow * _fbm(x, y, 0.45, 3)))
-            col_a.extend((w.get("c", 0.0), w.get("p", 0.0), w.get("d", 0.0), 1.0))
-            col_b.extend((w.get("s", 0.0) + w.get("X", 0.0) + w.get("w", 0.0), w.get("T", 0.0), w.get("=", 0.0), 1.0))
-    nx, ny = len(xs), len(ys)
-    faces = [(j * nx + i, j * nx + i + 1, (j + 1) * nx + i + 1, (j + 1) * nx + i)
-             for j in range(ny - 1) for i in range(nx - 1)]
+    for x, y in pts:
+        h, w = mp.sample(x, y)
+        snow = w.get("g", 0.0) + w.get("T", 0.0)
+        verts.append((x, y, h + 0.05 * snow * _fbm(x, y, 0.45, 3)))
+        col_a.extend((w.get("c", 0.0), w.get("p", 0.0), w.get("d", 0.0), 1.0))
+        col_b.extend((w.get("s", 0.0) + w.get("X", 0.0) + w.get("w", 0.0), w.get("T", 0.0), w.get("=", 0.0), 1.0))
     me = bpy.data.meshes.new("HM_Ground")
     me.from_pydata(verts, [], faces)
     me.update()
@@ -484,7 +578,7 @@ def build_terrain(mp: Map) -> bpy.types.Object:
         attr.data.foreach_set("color", data)
     me.polygons.foreach_set("use_smooth", [True] * len(me.polygons))
     uv_world(me)
-    me.materials.append(terrain_material())
+    me.materials.append(terrain_material(layer))  # hook (outskirts): `layer`, see terrain_material
     ob = bpy.data.objects.new("HM_Ground", me)
     COL["world"].objects.link(ob)
     return ob
@@ -1119,6 +1213,7 @@ def main() -> None:
     p.add_argument("--preview")
     p.add_argument("--no-models", action="store_true")
     p.add_argument("--no-forest", action="store_true")
+    p.add_argument("--no-outskirts", action="store_true", help="the village alone, as before the outskirts")  # hook (outskirts)
     a = p.parse_args(argv)
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
@@ -1129,7 +1224,13 @@ def main() -> None:
     CAT.update(mi.catalog())
     mp = Map()
     mp.tread(60, 31, 35)  # a trodden way from the platform steps to the lane
-    build_terrain(mp)
+    ok = None
+    if not a.no_outskirts:  # hook (outskirts): its earthworks go into Map.sample before anything stands on the ground
+        import meshy_village_outskirts as ok
+        mp.edits.extend(ok.terrain_edits())
+        mp.shore = ok.shore_wander
+    # hook (outskirts): finer ground under the districts, and bare earth and rock on its steep faces outside the map
+    build_terrain(mp, fine_zones=ok.FINE_ZONES if ok else None, layer=ok.ground_layer if ok else None)
     build_water()
     build_dock(mp)
     rail_x, _, _ = build_rails(mp)
@@ -1137,6 +1238,8 @@ def main() -> None:
         build_village(mp)
         if not a.no_forest:
             build_forest(mp, rail_x)
+    if ok:  # hook (outskirts): after the forest, so its random sequence is the village's own
+        ok.build_outskirts(mp, sys.modules[__name__], models=not a.no_models, forest=not (a.no_models or a.no_forest))
     COL["src"].hide_viewport = True  # the masters stand at the origin: keep them out of ray casts and the viewport
     tris = sum(len(o.data.polygons) for o in scene.objects if o.type == "MESH" and not o.hide_render)
     print(f"BUILT objects {len(scene.objects)} faces {tris}", flush=True)

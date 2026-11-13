@@ -1,0 +1,18 @@
+{
+  "_about": "Still cameras of HollowMere's outskirts, for meshy_village_look.py --views-file (render with --look tools/blender/meshy_looks/final.json): name -> [[eye x, eye y, eye height], [target x, target y, target z], lens mm, options]. x and y are corner tile units of the village map (the look's tile_xy: world x = (tx - 32) * 1.5, world y = (24 - ty) * 1.5); the eye height is above HM_Ground when the option ground is true (the look's default: eye height under 25 and ty under 37), else absolute world z; the target z is world z. The village build (meshy_village_outskirts.view_trees) reads this file: it clears the forest trees on these sightlines and near these lenses and gives the near ones smooth near masters, so a change here wants a rebuild.",
+  "mill_front": [[98.666667, 51.333333, 1.0], [97.133333, 41.0, 2.6], 30.0],
+  "mill_wide": [[84.0, 56.0, 14.0], [101.333333, 33.333333, 0.0], 26.0, { "ground": true }],
+  "hideout_close": [[125.333333, 7.333333, 1.8], [142.666667, 2.666667, 21.0], 32.0],
+  "hideout_far": [[105.333333, 20.666667, 8.0], [142.666667, 2.666667, 20.0], 55.0],
+  "station_street": [[64.666667, 35.333333, 1.8], [71.0, 18.666667, 3.5], 28.0],
+  "railyard": [[63.333333, -1.333333, 3.5], [68.666667, -17.333333, 2.0], 26.0],
+  "union_hall": [[74.0, -6.0, 3.3], [84.666667, 5.0, 5.5], 26.0],
+  "waystation": [[66.666667, -45.333333, 2.0], [58.0, -49.333333, 3.0], 30.0],
+  "trestle": [[140.933333, 23.4, 3.9], [157.333333, 24.333333, 15.3], 20.5, { "exposure": 0.4 }],
+  "crypt": [[-6.133333, 21.0, 2.4], [-7.2, 32.0, 3.2], 35.0],
+  "trapper": [[-15.333333, 38.0, 1.8], [-25.0, 35.333333, 3.0], 30.0, { "ground": true }],
+  "hermit": [[-22.0, -6.666667, 1.8], [-24.0, -16.0, 3.5], 30.0],
+  "dark_mass_chapel": [[-23.6, 7.266667, 1.8], [-34.666667, 2.666667, 5.0], 28.0],
+  "aerial_east": [[118.666667, 64.0, 55.0], [96.303333, 23.722, 0.0], 24.0],
+  "aerial_west": [[5.333333, 70.666667, 50.0], [-18.0, 4.0, 0.0], 24.0]
+}
