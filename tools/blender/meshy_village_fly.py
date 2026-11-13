@@ -98,9 +98,9 @@ def at_time(samples, t: float):
     return es[i].lerp(es[i + 1], f), ls[i].lerp(ls[i + 1], f), zs[i] + (zs[i + 1] - zs[i]) * f
 
 
-def build_camera(scene, hold: float = 1.5) -> int:
-    """Key the fly camera on every frame; returns the frame count."""
-    samples = sample_path()
+def build_camera(scene, hold: float = 1.5, path=None) -> int:
+    """Key the fly camera on every frame; returns the frame count. `path` (added) replaces PATH."""
+    samples = sample_path(path or PATH)  # added: the path is passed through (sample_path's default is bound to PATH)
     total = samples[0][-1]
     frames = int(math.ceil((total + hold) * FPS))
     cam = bpy.data.objects.get("HM_FlyCam")
@@ -163,8 +163,9 @@ def check(scene, frames: int, clearance: float = 1.0) -> list[dict]:
             if hit:
                 through = ob.name
         if worst < clearance or through:
+            mw, mh = lk.map_size()  # added: the open scene's map size (was the village's 64 x 48)
             out.append(dict(frame=f, time=round((f - 1) / FPS, 2), near=round(worst, 2) if worst < 1e8 else None, object=what, through=through,
-                            tile=(round(p.x / lk.TILE_M + 32, 1), round(24 - p.y / lk.TILE_M, 1), round(p.z, 1))))
+                            tile=(round(p.x / lk.TILE_M + mw / 2, 1), round(mh / 2 - p.y / lk.TILE_M, 1), round(p.z, 1))))
         last = p
     for ob in hidden:
         ob.hide_viewport = False
@@ -218,6 +219,8 @@ def main() -> None:
     p = argparse.ArgumentParser(prog="meshy_village_fly.py")
     p.add_argument("--blend")
     p.add_argument("--look")
+    p.add_argument("--path", help="added: a JSON list of waypoints like PATH ({eye, look, speed, lens}, tile units of the "
+                                  "open scene) that replaces PATH")
     p.add_argument("--out", default="tools/blender/build/fly")
     p.add_argument("--check", action="store_true")
     p.add_argument("--storyboard", type=int, default=0)
@@ -240,7 +243,11 @@ def main() -> None:
     if a.samples:
         look.setdefault("render", {})["samples"] = a.samples
     lk.apply_look(scene, look)
-    frames = build_camera(scene)
+    path = None
+    if a.path:  # added: another scene's camera path
+        with open(a.path, encoding="utf-8") as fh:
+            path = json.load(fh)
+    frames = build_camera(scene, path=path)
     print(f"PATH frames {frames} seconds {frames / FPS:.1f}", flush=True)
     os.makedirs(out, exist_ok=True)
     if a.check or a.storyboard:

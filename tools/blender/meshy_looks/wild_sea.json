@@ -1,0 +1,109 @@
+{
+  "name": "wild_sea",
+  "render": {
+    "shadow_scale": 0.8,
+    "motion_blur": 0.0,
+    "motion_blur_max": 24,
+    "filter_size": 1.5,
+    "samples": 64,
+    "fog_end": 80.0,
+    "fog_samples": 96
+  },
+  "sky": {
+    "zenith": [0.007, 0.012, 0.028],
+    "horizon": [0.026, 0.034, 0.058],
+    "glow": [0.42, 0.2, 0.12],
+    "glow_azimuth": 205.0,
+    "glow_width": 70.0,
+    "glow_height": 0.1,
+    "horizon_height": 0.3,
+    "ground": [0.024, 0.03, 0.05],
+    "light": 1.6,
+    "stars": 0.6,
+    "moon_disc": 1.6,
+    "moon_size": 2.4,
+    "moon_halo": 0.035,
+    "on": false,
+    "ink": [0.0006, 0.0007, 0.0012],
+    "ambient": 15.0
+  },
+  "moon": {
+    "energy": 1.1,
+    "color": [0.8, 0.88, 1.0],
+    "azimuth": 325.0,
+    "elevation": 19.0,
+    "soft_angle": 2.5,
+    "volume": 1.0,
+    "on": true
+  },
+  "fog": {
+    "density": 0.006,
+    "height": 3.0,
+    "color": [0.62, 0.68, 0.78],
+    "patchiness": 0.5,
+    "mere_density": 0.0,
+    "anisotropy": 0.25,
+    "box": [120.0, -8.0, 30.0]
+  },
+  "lights": {
+    "lantern": { "energy": 220.0, "color": [1.0, 0.56, 0.24], "volume": 0.7, "bulb": 34.0 },
+    "lamp": { "energy": 110.0, "color": [1.0, 0.56, 0.24], "radius": 0.04, "volume": 0.6, "shadow": true },
+    "headlamp": { "energy": 450.0, "volume": 0.15 },
+    "window": { "energy": 110.0, "color": [1.0, 0.58, 0.26] },
+    "teal": { "energy": 50.0, "color": [0.3, 0.9, 0.74] },
+    "shrine": { "energy": 25.0 },
+    "drowned": { "energy": 80.0, "color": [0.22, 0.92, 0.76], "bulb": 16.0, "volume": 0.5 },
+    "moss": { "energy": 28.0, "color": [0.3, 0.9, 0.74], "radius": 0.3, "volume": 0.06, "shadow": "keep" },
+    "moss_glow": {
+      "energy": 30.0,
+      "color": [0.3, 0.9, 0.74],
+      "radius": 0.1,
+      "volume": 0.05,
+      "shadow": "keep"
+    },
+    "shaft": { "energy": 30.0, "color": [0.55, 0.7, 1.0], "radius": 1.3, "volume": 0.4, "shadow": "keep" },
+    "moon_pool": {
+      "energy": 40.0,
+      "color": [0.55, 0.7, 1.0],
+      "radius": 1.5,
+      "volume": 0.5,
+      "shadow": "keep"
+    },
+    "sinkhole": {
+      "energy": 2400.0,
+      "color": [0.62, 0.76, 1.0],
+      "radius": 0.8,
+      "volume": 1.8,
+      "shadow": "keep"
+    },
+    "rot": { "energy": 32.0, "color": [0.22, 0.92, 0.76], "radius": 0.1, "volume": 0.03, "shadow": "keep" },
+    "bounce": { "energy": 80.0, "color": [0.62, 0.76, 1.0], "radius": 0.1, "volume": 0.0, "shadow": "keep" }
+  },
+  "emissive": { "strength": 0.0 },
+  "snow": {
+    "tint": [0.88, 0.91, 0.96],
+    "shade": [0.6, 0.67, 0.8],
+    "roughness": 0.55,
+    "cobble_roughness": 0.18,
+    "joint_snow": 0.65,
+    "roof": 0.0
+  },
+  "water": { "roughness": 0.08 },
+  "snowfall": {
+    "count": 3600,
+    "radius": 0.008,
+    "speed": 0.6,
+    "wind": [0.15, -0.06],
+    "glow": 0.2,
+    "on": false
+  },
+  "color": { "look": "AgX - Medium High Contrast", "exposure": 1.5 },
+  "post": {
+    "bloom": 0.45,
+    "bloom_threshold": 0.9,
+    "bloom_size": 0.5,
+    "saturation": 1.05,
+    "lift": [1.0, 1.0, 1.0],
+    "ink": [0.00575, 0.00589, 0.00889]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "_about": "Still cameras for meshy_village_look.py --views-file: name -> [[eye x, eye y, eye height], [target x, target y, target z], lens mm, options]. x and y are corner tile units (the look's tile_xy: a tile's centre is +0.5), the eye height is above HM_Ground (absolute world z from 25 m up), the target z is world z. Options: cut_z cuts the cave rock away above that height (P_cut_z), hide hides the named objects from the camera for that view (their shadows stay; a fog or haze volume is left out of the render); show lists objects (or collections) the build leaves out of the render, shown for that still only (the cutaway's fill light; HM_Cutaway, the cutaway's hill, land, dressing and moon); exposure adds stops for that still (the look's ink floor is scaled so black stays ink).",
+  "ce_overview": [
+    [24.9, 22.9, 28],
+    [10.5, 7.8, 0.0],
+    30,
+    {
+      "cut_z": 3.0,
+      "hide": ["WP_stalactites", "WP_bat_streaks", "WP_icicles", "WP_hanging_root_0", "WP_hanging_root_1"],
+      "show": ["L_cut_fill", "HM_Cutaway"]
+    }
+  ],
+  "ce_arrival": [[8.0, 11.2, 1.7], [6.3, 3.4, 1.05], 24, { "exposure": 1.25 }],
+  "ce_looking_out": [
+    [10.5, 2.1, 1.7],
+    [10.7, 13.9, 1.3],
+    30,
+    { "exposure": 0.5, "hide": ["WP_bat_streaks"] }
+  ],
+  "ce_pool_niche": [[6.8, 8.6, 2.45], [1.6, 10.0, 0.2], 30, { "exposure": 0.75 }],
+  "ce_sea_door": [[15.1, 6.4, 1.7], [19.5, 4.5, 1.2], 30, { "exposure": 0.75 }]
+}

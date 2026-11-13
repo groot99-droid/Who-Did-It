@@ -1,0 +1,91 @@
+{
+  "name": "wild_fen",
+  "render": {
+    "shadow_scale": 0.6,
+    "motion_blur": 0.25,
+    "motion_blur_max": 24,
+    "filter_size": 1.8,
+    "fog_tile": "4"
+  },
+  "sky": {
+    "zenith": [0.007, 0.012, 0.028],
+    "horizon": [0.026, 0.034, 0.058],
+    "glow": [0.32, 0.22, 0.04],
+    "glow_azimuth": 205.0,
+    "glow_width": 70.0,
+    "glow_height": 0.08,
+    "horizon_height": 0.3,
+    "ground": [0.024, 0.03, 0.05],
+    "light": 1.6,
+    "stars": 0.6,
+    "moon_disc": 1.6,
+    "moon_size": 2.4,
+    "moon_halo": 0.035
+  },
+  "moon": {
+    "energy": 1.1,
+    "color": [0.8, 0.88, 1.0],
+    "azimuth": 325.0,
+    "elevation": 19.0,
+    "soft_angle": 2.5,
+    "volume": 1.0
+  },
+  "fog": {
+    "density": 0.0095,
+    "height": 5.0,
+    "color": [0.7, 0.78, 0.92],
+    "patchiness": 0.85,
+    "mere_density": 0.15,
+    "anisotropy": 0.3,
+    "mere_top": 0.5,
+    "bank_box": [
+      [-200.0, -200.0, 1.5, -7.5],
+      [-200.0, -200.0, 15.0, -26.5]
+    ],
+    "bank_soft": 3.5
+  },
+  "lights": {
+    "lantern": { "energy": 220.0, "color": [1.0, 0.56, 0.24], "volume": 0.7, "bulb": 34.0 },
+    "lamp": { "energy": 55.0, "color": [1.0, 0.5, 0.18], "radius": 0.5, "volume": 0.8, "shadow": false },
+    "headlamp": { "energy": 450.0, "volume": 0.15 },
+    "window": { "energy": 110.0, "color": [1.0, 0.58, 0.26] },
+    "teal": { "energy": 50.0, "color": [0.3, 0.9, 0.74] },
+    "shrine": { "energy": 25.0 },
+    "drowned": { "energy": 80.0, "color": [0.22, 0.92, 0.76], "bulb": 16.0, "volume": 0.5, "shadow": true },
+    "moon_pool": {
+      "energy": 4300.0,
+      "color": [0.74, 0.85, 1.0],
+      "radius": 0.6,
+      "volume": 0.3,
+      "shadow": true
+    },
+    "fire": { "energy": 300.0, "color": [1.0, 0.47, 0.16], "radius": 0.45, "volume": 0.9, "shadow": true },
+    "moss": { "energy": 30.0, "color": [0.12, 0.86, 0.74], "radius": 0.8, "volume": 0.8, "shadow": false }
+  },
+  "emissive": { "strength": 2.0, "models": ["drowned_lantern", "charcoal_kiln", "mother_moll_hut"] },
+  "snow": {
+    "tint": [0.88, 0.91, 0.96],
+    "shade": [0.6, 0.67, 0.8],
+    "roughness": 0.55,
+    "cobble_roughness": 0.18,
+    "joint_snow": 0.65,
+    "roof": 0.6
+  },
+  "water": { "roughness": 0.1 },
+  "snowfall": {
+    "count": 1400,
+    "radius": 0.007,
+    "speed": 0.5,
+    "wind": [0.1, -0.04],
+    "glow": 0.06,
+    "on": true
+  },
+  "color": { "look": "AgX - Medium High Contrast", "exposure": 1.3 },
+  "post": {
+    "bloom": 0.45,
+    "bloom_threshold": 1.0,
+    "bloom_size": 0.45,
+    "saturation": 1.08,
+    "lift": [1.0066, 1.0068, 1.0102]
+  }
+}

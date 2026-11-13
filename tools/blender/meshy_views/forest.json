@@ -1,0 +1,33 @@
+{
+  "_about": "Still cameras for meshy_village_look.py --views-file: name -> [[eye x, eye y, eye height], [target x, target y, target z], lens mm, options]. x and y are corner tile units (the look's tile_xy: a tile's centre is +0.5), the eye height is above HM_Ground (absolute world z from 25 m up), the target z is world z. Options: cut_z cuts the cave rock away above that height (P_cut_z), hide hides the named objects from the camera for that view (their shadows stay; a fog or haze volume is left out of the render). Read by meshy_wild_build.sharpen_near_views (the look ignores them): clear [[tile x, tile y, r], ...] removes the trees within r metres of those points from the scene, cone (metres, default 4.5) removes every tree that near the eye inside the frame's width, lod_r (a high view) gives the trees within that many metres of its eye at least the 0.6 master, full_r gives the trees in a low view's frame within that many metres the full near master, veil [[tile x, tile y, r], ...] names the trees within r metres of those points HM_veil_<view>_<k> (for that view's hide: gone from that still only, their shadows stay), cone_lens works the cone out at that lens (when a still's lens changes but the trees it removes should stay the same).",
+  "gate_clearing": [[19.1, 28.33, 1.7], [20.26, 21.77, 2.0], 21],
+  "last_lantern": [[20.0, 14.8, 1.75], [21.17, 22.5, 1.25], 28],
+  "cross_trail_fork": [[15.0, 13.7, 1.6], [21.5, 12.5, 0.95], 28, { "clear": [[19.5, 10.55, 3.2]] }],
+  "tin_gallery_mouth": [
+    [7.0, 5.7, 1.7],
+    [6.89, 0.1, 1.7],
+    28,
+    {
+      "clear": [
+        [4.77, 4.32, 1.0],
+        [9.85, 0.69, 0.8]
+      ]
+    }
+  ],
+  "fenwood_gate": [
+    [3.9, 16.5, 1.7],
+    [0.65, 16.5, 1.05],
+    26,
+    {
+      "clear": [
+        [0.37, 18.25, 0.8],
+        [0.77, 14.59, 0.8]
+      ],
+      "cone_lens": 24,
+      "veil": [[0.33, 13.56, 0.6]],
+      "hide": ["HM_veil_fenwood_gate_0"]
+    }
+  ],
+  "overview": [[7.83, 43.2, 34], [22.5, 8.5, 0.0], 21, { "hide": ["HM_Snowfall"], "lod_r": 50 }],
+  "overview_map": [[20.5, 36.33, 55], [20.5, 14.0, 0.0], 24, { "hide": ["HM_Snowfall"] }]
+}
