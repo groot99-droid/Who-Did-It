@@ -10,6 +10,7 @@ import { type Verb, seatInReach } from './body/verbs';
 import { livingActor } from './Actions';
 import { count, take } from './Inventory';
 import { simOf } from './RoomSim';
+import { seatOf } from './seatIds';
 import { townsfolkMemory } from './townsfolk/figures';
 import { isOnLine } from './Train';
 import { isWorldPhase, reject, sceneIndex, sceneKey, tileCentre } from './World';
@@ -193,12 +194,13 @@ export function runSnares(room: PartyRoom): void {
     }
   }
   for (const client of room.clients)
-    if (client.view) reconcileSnareView(room, mem, client.sessionId, client.view);
+    if (client.view) reconcileSnareView(room, mem, seatOf(room, client), client.view); // round 10, W1a: the seat id
 }
 
 const seePx = (): number => balance.snare.seeTiles * TILE_PX;
 
 function reconcileSnareView(room: PartyRoom, mem: SnareMemory, sessionId: string, view: StateView): void {
+  // `sessionId` is the viewer's seat id (round 10, W1a), the key of `sim.views`.
   const sim = simOf(room);
   const scene = sim.views.get(sessionId)?.scene ?? null;
   let held = mem.views.get(sessionId);

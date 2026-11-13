@@ -27,6 +27,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { flowOf } from '../src/sim/Flow';
 import { endTrialOpen, handleFile } from '../src/sim/law/EndTrial';
 import { simOf } from '../src/sim/RoomSim';
+import { seatOf } from '../src/sim/seatIds';
 import { opts, sleep } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -132,7 +133,7 @@ describe('debug.clock and debug.deal (WDI_DEBUG only)', () => {
     await sleep(150);
     leader.send(C2S.lobbyStart, {});
     await until(() => room.state.phase === Phase.roleReveal);
-    const dealt = ids.map((id) => room.state.players.get(id)!.priv!.role.roleId);
+    const dealt = ids.map((id) => room.state.players.get(seatOf(room, { sessionId: id }))!.priv!.role.roleId);
     expect(dealt[3]).toBe('killer');
     expect(dealt[4]).toBe('doctor');
     const flow = flowOf(room);

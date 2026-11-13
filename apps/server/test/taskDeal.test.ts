@@ -81,7 +81,10 @@ describe('the deal at Start', () => {
       const party = await lobbyOf(colyseus, 4);
       fixSeeds(party.room, { tasks: WORDS });
       await start(party);
-      lists.push(party.humans.map((h) => listOf(party.room.state.players.get(h.id)!).map((t) => t.id)));
+      // Round 10, W1a (owner test-body grant, 2026-11-12, #447): a world match re-keys its seats at Start in a random
+      // order, so the same words deal the same lists in a different seat order: they are compared as a set.
+      const dealt = party.humans.map((h) => listOf(party.room.state.players.get(h.id)!).map((t) => t.id));
+      lists.push(dealt.sort((a, b) => a.join().localeCompare(b.join())));
       await colyseus.cleanup();
     }
     expect(lists[0]).toEqual(lists[1]);

@@ -14,6 +14,7 @@ import { GOAL_SLACK, firstPortalToward, stand, walkThrough, walkTo } from '../wa
 import { type Fact, hiveOf } from './board';
 import { heardBy, seesFact } from './senses';
 import { dueReaction, heldReaction, registerTrigger } from './triggers';
+import { clientOf } from '../../seatIds';
 
 /**
  * The body bands (round 8, 8R, A174, A176; GDD 3.12): what an NPC does about a body, a shout and a scream.
@@ -141,7 +142,7 @@ function shout(room: PartyRoom, mem: NpcMemory, seat: string, p: PlayerSim, body
     const holder = nearestHolder(room, roleId, seat, p);
     if (holder === null) continue;
     if (mem.ids.has(holder)) bands.calls.set(holder, fact);
-    else room.clients.getById(holder)?.send(S2C.shout, { sceneId, x, y });
+    else clientOf(room, holder)?.send(S2C.shout, { sceneId, x, y });
   }
 }
 

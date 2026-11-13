@@ -16,6 +16,7 @@ import { refusal, type Refusal } from '../refusal';
 import { type PlayerSim, type RoomSim, simOf } from '../RoomSim';
 import { isVerbPhase, navGrid, reject, sceneKey } from '../World';
 import { entryFor, isPlanted, markPlanted, writeClueEntry } from './notebook';
+import { clientOf } from '../seatIds';
 
 // Round 10, V1a (10V; GDD 3.2 and 3.4): the Lens Inspect and Plant Clue. A plant is a clue like any other on the
 // wire; only the planted mark in room memory (`notebook.ts`) tells it apart, and only a Lens reads that mark, into
@@ -90,7 +91,7 @@ export function tickInspect(room: PartyRoom, sessionId: string, p: PlayerSim): v
   const entry = entryFor(player, sessionId, meta);
   if (entry) {
     entry.status = status;
-    room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
+    clientOf(room, sessionId)?.send(S2C.clueFound, { entryId: entry.id });
   } else {
     meta.collectors.add(sessionId);
     clue.claimed = true;

@@ -1,4 +1,4 @@
-import type { Client, StepContext } from '@colyseus/core';
+import { type Client, type StepContext, matchMaker } from '@colyseus/core';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { boot } from '@colyseus/testing';
 import { type SceneId, roles } from '@wdi/content';
@@ -18,6 +18,7 @@ import { createServer } from '../src/server';
 import { isNpcSeat } from '../src/sim/Npc';
 import { addNpcSeat } from '../src/sim/npc/seats';
 import { simOf } from '../src/sim/RoomSim';
+import { seatOf } from '../src/sim/seatIds';
 import { step } from '../src/sim/Step';
 import { sceneIndex } from '../src/sim/World';
 import { until } from './flowHelpers';
@@ -75,7 +76,15 @@ async function connect(join: () => Promise<Room>): Promise<Human> {
     await sleep(100);
     room = await join();
   }
-  const human: Human = { room, id: room.sessionId, log: [] };
+  // Round 10, W1a (test-helper grant from the orchestrator, 2026-11-12): the seat id, which a world match re-keys at Start.
+  const server = () => matchMaker.getLocalRoomById(room.roomId) as unknown as PartyRoom;
+  const human: Human = {
+    room,
+    get id() {
+      return seatOf(server(), { sessionId: room.sessionId });
+    },
+    log: [],
+  };
   room.onMessage('*', (type: string | number, payload: unknown) =>
     human.log.push({ type: String(type), payload }),
   );

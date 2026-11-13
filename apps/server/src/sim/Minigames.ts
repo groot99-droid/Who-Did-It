@@ -38,6 +38,7 @@ import { movePurse, TOWN } from './economy/purse';
 import { emitNoise } from './Noise';
 import { isVerbPhase, reject, sceneIndex, tileCentre } from './World';
 import { refusal, sendRefusal, type Refusal } from './refusal';
+import { clientOf } from './seatIds';
 
 /**
  * Main-mode mini-games (round 6, M5b, GDD 3.16; docs/round6/m5b-data.md 2.3): a station task's `task` hold sends
@@ -141,9 +142,7 @@ export function startLockpick(
   });
   const at = lockCenter(lock.sceneId, lock.propId);
   if (at && noise) emitNoise(room, lock.sceneId, at.x, at.y, balance.noise[noise], noise, sessionId);
-  room.clients
-    .getById(sessionId)
-    ?.send(S2C.minigameStart, { taskId: lock.propId, kind: 'lockpick', public: pub });
+  clientOf(room, sessionId)?.send(S2C.minigameStart, { taskId: lock.propId, kind: 'lockpick', public: pub });
 }
 
 /** The answer to an open lock: opens it, snaps the pick, or asks again. */
@@ -230,7 +229,7 @@ export function startJailGame(
   const kind = game === 'gym' ? 'tap' : game === 'yard' ? 'crates' : 'pour';
   const puzzle = generateMinigame(kind, b.difficulty, rng, balance.minigames);
   openOf(room).set(sessionId, { taskId: t.id, puzzle, startTick: room.state.tick, jail });
-  room.clients.getById(sessionId)?.send(S2C.minigameStart, { taskId: t.id, kind, public: puzzle.public });
+  clientOf(room, sessionId)?.send(S2C.minigameStart, { taskId: t.id, kind, public: puzzle.public });
   return true;
 }
 
@@ -362,9 +361,7 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
   const rng = room.seeds.get('minigame', sessionId);
   const puzzle = generateMinigame(def.kind, def.difficulty, rng, balance.minigames);
   openOf(room).set(sessionId, { taskId, puzzle, startTick: room.state.tick });
-  room.clients
-    .getById(sessionId)
-    ?.send(S2C.minigameStart, { taskId, kind: puzzle.kind, public: puzzle.public });
+  clientOf(room, sessionId)?.send(S2C.minigameStart, { taskId, kind: puzzle.kind, public: puzzle.public });
 }
 
 /**

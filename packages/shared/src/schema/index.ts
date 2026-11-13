@@ -18,7 +18,7 @@ import { schema, t } from '@colyseus/schema';
 // A7 adds `Private.home`, `asleep`, `inBed` and `inBedOf` (seams.md 3, row 5), C1 `Private.onLine` (row 6), B8
 // `Private.pair` (row 10), C2 `Private.fare` (row 11), B3 `GameState.petition` and `Private.petitionSigned`
 // (row 13), B4 `GameState.manhunt` and `Private.huntScene` (row 14), C5 `Private.paintTown` (row 18), B5
-// `Private.jailUntilTick` (row 19), and C4 `Private.hitman` (row 20) and `Private.departed` (row 21) to version 7.
+// `Private.jailUntilTick` (row 19), and C4 `Private.hitman` (row 20) and `Private.departed` (row 21) to version 7, and W1a `Private.seatId` (row 25).
 // B6a adds `GameState.tribunal` (row 22) and B6d `GameState.endTrial` (row 35) to version 7. K6 adds
 // `SceneState.snares` (row 31) to version 7.
 
@@ -297,6 +297,11 @@ export const Private = schema(
     hitman: bool(),
     /** Round 10, C4b (seams.md 3 row 21): the Hitman boarded the Dusk Train and left play. Own view only. */
     departed: bool(),
+    /**
+     * Round 10, W1a (seams.md 3 row 25): this seat's own id. In a world match it is a fresh id drawn at Start that no
+     * client can link to its session id; '' in the lobby, where a client's seat id is its session id.
+     */
+    seatId: str(),
   },
   'Private',
 );

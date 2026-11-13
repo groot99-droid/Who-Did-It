@@ -19,6 +19,7 @@ import { type PlayerSim, simOf } from '../RoomSim';
 import { isWorldPhase, reject, sceneKey } from '../World';
 import { type Figure, figureRng, figuresOf } from './figures';
 import { walkFigure } from './walk';
+import { clientOf } from '../seatIds';
 
 /**
  * The mugging (round 8, GDD 3.24, docs/round8/townsfolk.md 3; Session 8E). A Hungry, Angry or Desperate ambient
@@ -326,7 +327,7 @@ function prompt(room: PartyRoom, mg: Mugging): void {
   const muggerId = mg.figure
     ? (mg.figure.handle ?? '')
     : (room.state.players.get(mg.mugger)?.priv.avatar ?? '');
-  room.clients.getById(mg.target)?.send(S2C.mugPrompt, { muggerId, endsTick: mg.untilTick });
+  clientOf(room, mg.target)?.send(S2C.mugPrompt, { muggerId, endsTick: mg.untilTick });
 }
 
 /**

@@ -3,6 +3,7 @@ import { S2C } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { isJailed, untilDawnS } from '../law/Jail';
 import { simOf } from '../RoomSim';
+import { clientOf } from '../seatIds';
 import { arrivalLineSent } from '../vendettas/arrival';
 import { isVerbPhase, reject, sceneKey } from '../World';
 import { owesFare } from './fare';
@@ -39,7 +40,7 @@ export function handleLedgerRead(room: PartyRoom, sessionId: string, payload: Re
     return reject(room, sessionId, 'IN_JAIL', { untilDawn: untilDawnS(room, sessionId) });
   if (!ledgerHere(p.sceneIdx, propId) || !nearProp(room, sessionId, [propId]))
     return reject(room, sessionId, 'TOO_FAR');
-  room.clients.getById(sessionId)?.send(S2C.ledger, { propId, rows: ledgerRows(room) });
+  clientOf(room, sessionId)?.send(S2C.ledger, { propId, rows: ledgerRows(room) }); // round 10, W1a: the seat's client
 }
 
 /** The NPC seats on their way to read the ledger (`npc/routine.ts`). Server memory only. */

@@ -1,6 +1,7 @@
 import { NotebookEntry, S2C, type PlayerState } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import type { ClueMeta, PlayerSim } from '../RoomSim';
+import { clientOf } from '../seatIds';
 
 // Round 10, V1 (10V): what the evidence verbs keep about a clue, in room memory only. Keyed by the clue's `ClueMeta`,
 // which every spawn makes new, so nothing outlives its clue or its match. No field here reaches any client.
@@ -45,5 +46,5 @@ export function writeClueEntry(
   const bySeat = entries.get(meta) ?? new Map<string, string>();
   bySeat.set(sessionId, entry.id);
   entries.set(meta, bySeat);
-  room.clients.getById(sessionId)?.send(S2C.clueFound, { entryId: entry.id });
+  clientOf(room, sessionId)?.send(S2C.clueFound, { entryId: entry.id });
 }

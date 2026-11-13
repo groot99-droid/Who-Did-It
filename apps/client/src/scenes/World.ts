@@ -77,6 +77,8 @@ const A = abilitiesJson.abilities;
 const REPORT_REACH_PX = A.report.rangeTiles * TILE_PX;
 const BELL_REACH_PX = A.bell.rangeTiles * TILE_PX;
 const COLLECT_REACH_PX = PORTAL_REACH_TILES * TILE_PX;
+/** Standing on a clue (GDD 3.4, A579): within a third of a tile, a clue keeps the prompt over a body in reach. */
+const ON_CLUE_PX = TILE_PX / 3;
 const COLLECT_MS = A.collect.castS * 1000;
 /** A target player may have moved since the last patch; the server adds the same slack from its ring. */
 const TARGET_SLACK_TILES = 1;
@@ -672,7 +674,11 @@ export class World extends Phaser.Scene {
 
   // ---- targets and the prompt ---------------------------------------------------------------------
 
-  /** The nearest thing in reach: a body (Report), a clue (Hold E), the bell or a door. Ghosts get doors only. */
+  /**
+   * The nearest thing in reach: a body (Report), a clue (Hold E), the bell or a door. Ghosts get doors only. A body in
+   * reach wins over everything else, however near, except a clue the player stands on (owner, 2026-11-12, DECISIONS
+   * A579; GDD 3.4).
+   */
   private updateTarget(
     self: Phaser.GameObjects.Container | null,
     clues: ClueSnap[],
@@ -691,17 +697,25 @@ export class World extends Phaser.Scene {
         this.target = t;
       }
     };
+    let bodyInReach = false;
     if (!ghost) {
       for (const b of bodies)
         if (!b.hidden) consider({ kind: 'body', id: b.id, x: b.x, y: b.y }, REPORT_REACH_PX);
+      bodyInReach = best !== Infinity;
+    }
+    if (!ghost) {
       const collected = collectedBy.get(this.feed);
+      // A body in reach keeps the prompt unless the player stands on a clue: then the clue it stands on wins.
+      if (bodyInReach) best = ON_CLUE_PX + 1;
+      const clueReach = bodyInReach ? ON_CLUE_PX : COLLECT_REACH_PX;
       for (const c of clues) {
-        if (!collected?.has(c.id)) consider({ kind: 'clue', id: c.id, x: c.x, y: c.y }, COLLECT_REACH_PX);
+        if (!collected?.has(c.id)) consider({ kind: 'clue', id: c.id, x: c.x, y: c.y }, clueReach);
       }
-      if (this.bell) consider({ kind: 'bell', x: this.bell.x, y: this.bell.y }, BELL_REACH_PX);
+      if (this.bell && !bodyInReach)
+        consider({ kind: 'bell', x: this.bell.x, y: this.bell.y }, BELL_REACH_PX);
     }
     const doors = this.feed.doors();
-    for (const p of this.portals) {
+    for (const p of bodyInReach ? [] : this.portals) {
       const boarded = doors.find((d) => d.id === p.id)?.state === 1;
       consider({ kind: 'door', id: p.id, x: p.x, y: p.y, boarded }, PORTAL_REACH_TILES * TILE_PX);
     }

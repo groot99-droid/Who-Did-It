@@ -9,6 +9,7 @@ import { simOf } from './RoomSim';
 import { recordDeath } from './verbs/readings';
 import { boardLine, returnsOnTrain } from './Train';
 import { sceneKey } from './World';
+import { clientOf } from './seatIds';
 
 /**
  * Turns a player into a ghost (A30): `PlayerSim.dead` in room memory (the public `alive` stays true
@@ -42,7 +43,7 @@ export function markDead(room: PartyRoom, victimId: string, cause: DeathCause, k
   if (!onLine) for (const [id, player] of room.state.players) roles[id] = player.priv.role.roleId;
   // Round 6, 6J (locked call site): the death's cutscene id, from the pure rule over the cutscene index.
   const cutsceneId = deathCutsceneFor(cutscenes, cause);
-  room.clients.getById(victimId)?.send(S2C.killed, {
+  clientOf(room, victimId)?.send(S2C.killed, {
     sceneId: sceneKey(p.sceneIdx),
     cause,
     roles,
