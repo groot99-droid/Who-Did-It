@@ -12,6 +12,7 @@ packages/content/data
 apps/client/public/assets
 docs/PROTOCOL.md
 apps/client/test-results
+apps/walk/test-results
 # The material library lock is written by tools/blender/materials/fetch.py in its own one-line-per-file layout
 tools/blender/materials/polyhaven.lock.json
 # Its model lock, written the same way by tools/blender/materials/fetch_models.py (`fetch.dump_lock`)
