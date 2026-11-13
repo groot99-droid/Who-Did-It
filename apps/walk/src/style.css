@@ -1,0 +1,167 @@
+:root {
+  --ink: #f2ede4;
+  --muted: #b9b2a6;
+  --panel: rgb(18 20 26 / 0.82);
+  --accent: #e3a857;
+  --danger: #ef8a7a;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color: var(--ink);
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: #11131a;
+}
+
+#view {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+  touch-action: none;
+}
+
+#hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.panel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(28rem, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: 20px 22px;
+  border-radius: 12px;
+  background: var(--panel);
+}
+
+.panel h1 {
+  margin: 0 0 8px;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.panel .status {
+  margin: 0 0 12px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.panel.error .status {
+  color: var(--danger);
+}
+
+.bar {
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / 0.12);
+  overflow: hidden;
+}
+
+.bar .fill {
+  height: 100%;
+  width: 0;
+  background: var(--accent);
+  transition: width 0.2s;
+}
+
+.bar.busy .fill {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.hint {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 0.85rem;
+  text-align: center;
+  transition: opacity 0.4s;
+}
+
+.hint.dim {
+  opacity: 0.35;
+}
+
+.picker {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  font-size: 0.85rem;
+  pointer-events: auto;
+}
+
+.picker select {
+  font: inherit;
+}
+
+.debug {
+  position: absolute;
+  top: 12px;
+  left: 16px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--panel);
+  font:
+    0.75rem/1.4 ui-monospace,
+    monospace;
+  white-space: pre;
+}
+
+.stick {
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  margin: -60px 0 0 -60px;
+  border-radius: 50%;
+  border: 2px solid rgb(255 255 255 / 0.35);
+  background: rgb(0 0 0 / 0.15);
+}
+
+.stick .knob {
+  position: absolute;
+  left: 36px;
+  top: 36px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.5);
+}
+
+.drop {
+  position: absolute;
+  inset: 12px;
+  display: grid;
+  place-items: center;
+  border: 3px dashed var(--accent);
+  border-radius: 16px;
+  background: rgb(0 0 0 / 0.45);
+  font-size: 1.4rem;
+}
+
+[hidden] {
+  display: none !important;
+}

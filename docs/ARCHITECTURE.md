@@ -20,6 +20,7 @@
 | Type stubs | `@types/node ^22`, `@types/express ^5` | Added 2026-10-10 |
 | Python | 3.12+ for `tools/blender` tests (`python3 -m unittest`); the `bpy 5.2.0` wheel only for rendering | CI runs the tests without Blender |
 | Blender / Tiled / Audacity | 5.2 LTS / 1.11 / 4.0.1 | Tiled only from M6 |
+| Three.js (V2 walk) | `three 0.186.1`, `three-mesh-bvh 0.9.16`, `@types/three 0.186.0` (exact pins) | `apps/walk` only, the single-player first-person walk-through (W3D, 2026-11-13, DECISIONS A610); the Draco and Basis decoders ship inside `three` |
 
 ### 5.2 Monorepo
 
@@ -29,6 +30,7 @@ Who-Did-It/
 ├─ .github/workflows/ci.yml  pages.yml          # only two workflows
 ├─ LICENSE (MIT, code)  LICENSE-ASSETS  CREDITS.md  LICENSES/
 ├─ apps/client/      # Phaser + Vite; base '/Who-Did-It/'; src/{main,net,scenes,view,ui,flags}
+├─ apps/walk/        # V2 first step (A610): Vite + Three.js single-player walk-through of the 3D HollowMere GLB; base '/Who-Did-It/walk/'
 ├─ apps/server/      # Colyseus; src/{index,rooms/PartyRoom,rooms/handlers,sim/{Step,Commands,Collision,Visibility,Portals},services}
 ├─ packages/shared/  # @wdi/shared: schema/, protocol/, rules/, constants.ts, metrics.ts, version.ts
 ├─ packages/content/ # @wdi/content: data/{roles,traits,items,abilities,clues,tasks,balance,metrics}.json, scenes/*.json, zod validators
