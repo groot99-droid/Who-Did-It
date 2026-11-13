@@ -299,6 +299,7 @@
     },
     "medium": {
       "id": "medium",
+      "retired": "A600",
       "name": "Medium",
       "faction": "village",
       "cover": false,

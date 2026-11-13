@@ -6,14 +6,18 @@ import { messageLine, nameField, validateName } from '../menu/form';
 import { openDialog, type MenuDialog } from '../menu/dialog';
 import { STORY_COPY as C } from './copy';
 import { chapterRows, readFinished, type StoryCatalogEntry } from './model';
+import { deviceSaveStore, type StorySaveStore } from './save';
+import type { StorySaveWire } from '@wdi/shared/protocol';
 
 export interface StoryMenuOptions {
   root: HTMLElement;
   stories: readonly StoryCatalogEntry[];
   /** The remembered profile name. */
   name: string;
-  /** Creates the story room and sends `story.start`; `chapterId` replays a finished chapter. */
-  onStart(name: string, storyId: string, chapterId?: string): Promise<void>;
+  /** Creates the story room and sends `story.start`; `chapterId` replays a finished chapter, `resume` continues a save. */
+  onStart(name: string, storyId: string, chapterId?: string, resume?: StorySaveWire): Promise<void>;
+  /** Where saves live: this device by default; an account replaces it (docs/accounts/plan.md 5). */
+  saves?: StorySaveStore;
   explainFailure?(): Promise<string | null>;
   onClose?(): void;
 }
@@ -33,7 +37,8 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
   const msg = messageLine();
   const buttons: HTMLButtonElement[] = [];
 
-  const submit = async (storyId: string, chapterId?: string) => {
+  const saves = opts.saves ?? deviceSaveStore();
+  const submit = async (storyId: string, chapterId?: string, resume?: StorySaveWire) => {
     const trimmed = name.input.value.trim();
     const problem = validateName(trimmed);
     if (problem !== null) {
@@ -44,7 +49,7 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
     for (const b of [name.input, ...buttons]) b.toggleAttribute('disabled', true);
     msg.say(MENU_COPY['menu.connecting'], false);
     try {
-      await opts.onStart(trimmed, storyId, chapterId);
+      await opts.onStart(trimmed, storyId, chapterId, resume);
     } catch {
       msg.say(JOIN_FAILED_MESSAGE);
       for (const b of [name.input, ...buttons]) b.toggleAttribute('disabled', false);
@@ -68,6 +73,29 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
     );
     begin.addEventListener('click', () => void submit(story.id));
     buttons.push(begin);
+    // A Continue row only for a save whose next chapter this build knows; the server still decides on resume.
+    const save = saves.read(story.id);
+    const next = save?.nextChapterId ? story.chapters.find((c) => c.id === save.nextChapterId) : undefined;
+    const resume =
+      save && next
+        ? h(
+            'button',
+            {
+              type: 'button',
+              class: 'wdi-btn wdi-btn--primary',
+              'data-testid': 'story-resume',
+              'data-story': story.id,
+              'data-chapter': next.id,
+            },
+            fill(C['story.menu.continueAt'], {
+              chapter: fill(C['story.menu.chapter'], { n: story.chapters.indexOf(next) + 1 }),
+            }),
+          )
+        : null;
+    if (resume && save) {
+      resume.addEventListener('click', () => void submit(story.id, undefined, save));
+      buttons.push(resume);
+    }
     const rows = chapterRows(story, finished).map((row) => {
       const replay =
         row.state === 'done'
@@ -83,7 +111,11 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
             )
           : null;
       if (replay) {
-        replay.addEventListener('click', () => void submit(story.id, row.id));
+        // A guest's save lives on this device, so a replay sends it along: the server replays only a chapter its save finished.
+        replay.addEventListener(
+          'click',
+          () => void submit(story.id, row.id, saves.read(story.id) ?? undefined),
+        );
         buttons.push(replay);
       }
       return h(
@@ -109,6 +141,7 @@ export function openStoryMenu(opts: StoryMenuOptions): MenuDialog {
       h('h3', {}, story.title),
       h('p', { class: 'wdi-field__msg' }, story.blurb),
       h('ul', { class: 'wdi-story-chapters' }, ...rows),
+      resume,
       begin,
     );
   });

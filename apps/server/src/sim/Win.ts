@@ -14,6 +14,7 @@ import { restoreSeats } from './seatRekey';
 import { isPaintTown, paintGameOver, paintWinner } from './paintTown';
 import { isOnLine } from './Train';
 import { hitmanGameOver, isDeparted } from './vendettas/arrival';
+import { holdMatch } from './story/Story';
 import { SCENE_KEYS } from './World';
 
 /**
@@ -44,6 +45,7 @@ const summaryOf = (winner: Outcome, town: string): string =>
 
 /** Game over: the phase, the winner, the gameOver message and the match-log line (A30). */
 export function endMatch(room: PartyRoom, outcome: Outcome, opts: { unseen?: boolean } = {}): void {
+  if (holdMatch(room, outcome)) return; // story mode, E3: no match ends before the story's last section
   // Round 10, C5: in Paint The Town Red the Killers win only by painting the town; the end trial closing without
   // it (the Final Night's Cabal verdict) is the Village's (GDD 3.8).
   const winner = isPaintTown(room) && outcome === 'cabal' ? 'village' : outcome;

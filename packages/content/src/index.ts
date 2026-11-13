@@ -90,7 +90,10 @@ import { EconomyFile } from './schemas/economy.js';
 import { RelationsFile } from './schemas/relations.js';
 import { LoreFile } from './schemas/lore.js';
 import { TalkFile } from './schemas/talk.js';
-import { StoryFile } from './schemas/story.js';
+import { StoryArcFile } from './schemas/story.js';
+import { storyPlays } from './storyPlays.js';
+import { AchievementsFile } from './schemas/achievements.js';
+import achievementsJson from '../data/achievements.json' with { type: 'json' };
 import { InteractionsFile } from './schemas/interactions.js';
 import { SCENE_IDS, Scene, type SceneId } from './schemas/scene.js';
 import { StyleFile } from './schemas/style.js';
@@ -125,6 +128,8 @@ export * from './schemas/relations.js';
 export * from './schemas/lore.js';
 export * from './schemas/talk.js';
 export * from './schemas/story.js';
+export * from './storyPlays.js';
+export * from './schemas/achievements.js';
 export * from './schemas/interactions.js';
 export { checkGrid, validateContent, type Content } from './validate.js';
 export { checkSceneWorld } from './validateWorld.js';
@@ -213,6 +218,7 @@ export function parseContent(raw: {
   lore: unknown;
   talk: unknown;
   story: unknown;
+  achievements: unknown;
   interactions: unknown;
 }): Omit<Content, 'scenes' | 'maps'> {
   const parsed = {
@@ -244,11 +250,14 @@ export function parseContent(raw: {
     relations: RelationsFile.parse(raw.relations),
     lore: LoreFile.parse(raw.lore),
     talk: TalkFile.parse(raw.talk),
-    story: StoryFile.parse(raw.story),
+    storyArc: StoryArcFile.parse(raw.story),
+    achievements: AchievementsFile.parse(raw.achievements),
     interactions: InteractionsFile.parse(raw.interactions),
   };
   // Round 8 (A171): the role text's number tokens are filled from the data here, before anything reads a role.
-  return { ...parsed, roles: fillRoles(parsed.roles, parsed) };
+  // Story mode (docs/story/arc.md 5): `story` is the part-1 view of the arc, one play per section.
+  const roles = fillRoles(parsed.roles, parsed);
+  return { ...parsed, roles, story: storyPlays(parsed.storyArc, roles) };
 }
 
 export const content: Content = {
@@ -282,6 +291,7 @@ export const content: Content = {
     lore: loreJson,
     talk: talkJson,
     story: storyJson,
+    achievements: achievementsJson,
     interactions: interactionsJson,
   }),
   scenes: parseScenes(),
@@ -321,6 +331,8 @@ export const {
   lore,
   talk,
   story,
+  storyArc,
+  achievements,
   interactions,
 } = content;
 

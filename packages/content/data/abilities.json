@@ -342,6 +342,7 @@
     },
     "seance": {
       "id": "seance",
+      "retired": "A600",
       "name": "Seance",
       "scope": "role",
       "kind": "hold",

@@ -35,7 +35,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 
 **Traits.** Each player is dealt a unique triple from 27 combinations, from a random stream of its own (never the deal's): **Height** S/M/T (sprite scale 0.9/1.0/1.1, feet-anchored, on top of the drawn figure scale of `metrics.json` `iso.figureScale`, round 8), **Scarf** red/green/blue (every character wears a storm scarf, a tinted overlay in the palette tokens blood/teal/moon; the nameplate repeats it as a shape: diamond/circle/square), **Hat** cap/bowler/bare. The boot trait from the earlier draft is dropped because a boot is 6 px at shipping scale. (M5a) Height and scarf are drawn on the character in the world; the hat is not, since every character keeps its own headgear, and it shows as a glyph on the nameplate, on the role card and in the meeting roster. Traits are dealt apart from the cards, so they still say nothing about a role, and a kill leaves the killer's own traits whatever look they wear (3.4, 3.17). Traits appear on the role card, the HUD chip tooltip and the meeting roster.
 
-**The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5), the Thief (V1.5) and the Medium (V2) join when they ship. Lobby toggles (Thief, Medium, faction-only reveal) are V1.5.
+**The deck.** A match deals from a public deck of player count + 2 character cards (table in 3.9). Every card is a different character, so two seats share a look only when a cover role chooses to (3.17); the one repeated card is the second Killer of the 10-seat deck, which never walks as itself (Killers always wear a cover). Every Killer card is always dealt; the other cards are shuffled, and two of them stay **undealt**. Which two is secret; the deck list itself is public, in the lobby (for the current party size), on the role card and in the HUD. Townsfolk are dealt as **professions** (Lamplighter, Baker, Fisher, Tinner): each is one card, the Townsfolk card with a character of its own. The deck rows are `roles.json` `decks["4".."10"]`; the rules engine reads them, and no document restates them. The Butler and the Child stay out of the decks until their abilities ship (M4); the Ranger (V1.5) and the Thief (V1.5) join when they ship. The Medium card is retired (DECISIONS A600): the Medium is an NPC at the rite site, not a card (3.20), so no deck deals it and its id stays in `roles.json` unused. Lobby toggles (Thief, faction-only reveal) are V1.5.
 
 ### 3.2 Role cards
 
@@ -58,7 +58,7 @@ Factions: **Village** (blue, shield), **Cabal** (red, dagger; Killer and Accompl
 | **Drifter** (Neutral) | Yes | Get ejected (solo win; the match continues and the end screen lists you among the winners). | Replica Knife, Bloody Rag x1 | **Act Shifty**: fake noise rings (60 s CD). **Fake Blood**: 30 s (1 use, world only; meetings show portraits). | You want to hang. Be suspicious enough to be voted out, not so obvious they ignore you. | A calm village; dying to the Killer is a loss; counts as nobody for parity; you wear a cover like the Cabal, but alone. |
 | **Ranger** (Village, V1.5) | No | Village | Crossbow + 2 Bolts, Snare x2, Torch | **Shoot** a wolf: it dies. **Arrest** (1 bolt on a player): the target is cuffed and dragged to the square; the next meeting opens with them as a Case Closed suspect. **Snare**: holds 4 s and logs the name. | You hunt wolves. One arrest per match: be right. | Bolts are loud (noise 10). |
 | **Thief** (Neutral, V1.5) | Decided when it ships | Escape by the sea door at the back of the cave holding 3 Heirlooms | Lockpicks x5, Sack, Smoke Bomb | Pickpocket (40 s CD), Lockpick (2 s, noise 5), Smoke (4 s). | Nobody's hero. | Thefts look like Killer activity; counts as Village for parity. |
-| **Medium** (Village, V2) | No | Village | Seance Chalk, Candle x3 | Seance at a body (8 s): the ghost picks 1 of 8 phrases. | You hear the dead. | Cabal ghosts may lie. |
+| **Medium** (retired, A600) | — | — | — | Retired with Seance and Seance Chalk: the Medium is the NPC of the rite (3.20), not a card. The ids stay in the data so none is reused. | — | — |
 
 The Accomplice's Forged Alibi is a V1.5 kit item (3.5) and is not in the V1 start kit. Values the table leaves open (decided 2026-10-10, Session C): Kill, Bandage, Salts, Medkit and Rope reach 1.5 tiles; Bandage is instant and knocks both players back 1 tile; Plant Clue takes 2 s; Dust takes 2 s; the Slingshot reaches 5 tiles; Act Shifty's fake rings use the run radius. Universal verbs: Report and the Bell reach 2 tiles; Collect is a 2 s hold. `abilities.json` holds every verb with a number; an item's `use` points at its verb.
 
@@ -193,7 +193,7 @@ Vision 7 tiles by day, 3.5 at night, Child -1; walking moves 3 tiles/s, running 
 
 **Doors** have four server states: open, closed, locked, broken. Any door unlocks from the inside for anyone. Killer locks expire after 45 s. From outside you see the door swing for 3 s; the entering player is in a 0.6 s `transit` state, encoded to both scenes at the door with the nameplate hidden.
 
-**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen.
+**Death and ghosts.** A kill is private until the next meeting: the roster still shows the victim alive, the victim's client learns at once, and the body in the scene is the only sign; a meeting reveals every death so far. Dead and ejected players become ghosts: walk through walls and portals (no lock, phase or alive checks, no noise), see all roles, read the Cabal and ghost channels, finish their own tasks, and once per cycle use a Wisp (flicker a lantern, rattle a door for noise 2, or nudge a clue 1 tile; V1.5). Ghosts are drawn only for other ghosts. Ghosts cast a non-binding ghost vote shown on the end screen. (M3) A living client never receives a ghost's position; a ghost sees every player in its own scene; nobody's position is sent during a meeting, the reveal or the end screen. **The martyr's shade** (story R2, DECISIONS A600): the martyr (3.20) is no ghost from its death but a shade. It walks as a ghost does (through walls and portals, unseen by the living, finishing its own tasks) with a living seat's view: its death names no role, it sees no ghost and only what its sight reaches, the ghost channel neither reaches it nor takes its lines, and it cannot speak in a meeting. A shade still waiting when the next day begins (or the Final Night) becomes an ordinary ghost and is shown every role then.
 
 ### 3.8 Meetings, voting and win conditions
 
@@ -319,7 +319,7 @@ The Knife works only after dark (3.3), about 330 s of each 810 s cycle (round 10
 
 **V1.5**: Ranger (Arrest), Thief, Heirlooms, the cave's sea door, Handcuffs, Forged Alibi, the Killer's Lock door, Candles for all, Wisp, Butler Bell, lit-window silhouettes, proximity chat toggle, faction-only reveal, fisher cottage, lighthouse, lobby role toggles, radius + occluder visibility (dark scenes first, M5b; 3.13), Lottie reveal, Light2D experiment, spectator mode.
 
-**V2**: Medium, the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
+**V2**: the Beast and Cave Gate, bats, bog lurker, crows, poison, voice chat, cosmetics; first-person renderer.
 
 ### 3.11 The quick mode (removed)
 
@@ -826,7 +826,7 @@ server, and one consequence that fires at most once per match; the bus carries i
 events that name no seat (`vendettas.json` `emits`, `fires`).
 
 - **Conversion: the Zealot against the Vicar (7H).** The Zealot's goal is the Vicar's flock: world-phase time in
-  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **45 s**
+  the same scene as the seat dealt the Vicar, both alive and placed, counted across scenes and phases. At **160 s**
   (`vendettas.conversion.shareS`) the doubt is sown (`vendetta.conversion.sown`). At the next meeting the
   Vicar's vote counts for nothing (`vendetta.conversion.doubt`, the consequence). To every other seat it is an
   ordinary abstention: the Vicar's voted mark stays down and the tally leaves it out, while the meeting still ends
@@ -875,20 +875,47 @@ plays a memorial to every seat: the Vicar's film (`memorial_vicar`) under one ti
 cutscene (3.18). It plays once per match, so a later reveal stays plain, and the meeting, not the night, carries
 it. No other death plays it: a seat in the Vicar's look poisoned, shot, ejected or taken by a wolf, or a seat in
 another look struck by the Knife, even one dealt the Vicar. It names no seat on screen and changes nothing public
-beyond the film. The Ascended Vicar candidacy follows the dealt card instead and stays private: the seat dealt the
-Vicar that dies by the Knife becomes `flow.ascendedVicarCandidate` at that reveal (room memory only, kept into the
-room's next match until another replaces it), which round 8's evolutions read.
+beyond the film. (The next-match Ascended Vicar candidacy, `flow.ascendedVicarCandidate`, is gone: the martyr returns
+the next day of the same match, below; DECISIONS A600 R-Q8, A603.)
 
 **The martyr's due (owner's rule, 7I).** The Vicar must die a martyr: struck by a Killer's Knife, the only source of
 a Knife death. A Vicar taken by a wolf, poisoned, shot or ejected is no martyr. The martyr is the seat the memorial
 mourns, so it follows the public look like the film: a cover in the Vicar's look is the martyr, and a seat dealt the
-Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. From that
-reveal and for **10 minutes** (`tasks.martyrS`, the owner's limit), each real task the martyr's ghost finishes
-counts **10** times on the task bar (`tasks.martyrWeight`), outside the ghost cap (3.5); the tasks it finished
-before that reveal or after the ten minutes count as any ghost's. The boost ends with the match and never carries
-into the room's next one. A full bar in play wins
+Vicar under another look is not, since the bar is public and Killers pick victims by the look they see. The due is
+gated behind the Medium's rite (below; A600 R-Q6): only a martyr the rite brought back has it. From its return and for
+**10 minutes** (`tasks.martyrS`, the owner's limit), each real task it finishes counts **10** times on the task bar
+(`tasks.martyrWeight`), outside the ghost cap (3.5); its tasks before the return count as any ghost's, and those after
+the ten minutes as its own. Without the rite its ghost's tasks count as any ghost's. The boost ends with the match and
+never carries into the room's next one. A full bar in play wins
 for the Village, so a Killer that strikes the Vicar hands the village a fast clock: the Zealot, whose goal is the
-Vicar's flock, is the one Killer with a reason to take that risk. The private candidacy above stays on the card.
+Vicar's flock, is the one Killer with a reason to take that risk.
+
+**The Medium's rite** (DECISIONS A517 addendum, A600, A602; `docs/story/rite.md`) gates the martyr's return as the 10X
+Vicar and the martyr's task weight. **The Medium** is an NPC, not a card: one figure standing at the rite site
+(`balance.json` `rite.site`, a scene and a spawn; a test site, the Fenwood's `wood_side`, until the map revamp names the
+Zealot's hideout in the deep woods) on a map that holds that scene. It has no seat, no deal and no random stream; the
+Knife cannot name it and nothing can kill it. It looks like any townsfolk figure and is seen by the same dark rule.
+**The rite** is a hold at the Medium: the martyr's shade within `rite.reachTiles` (1.5 tiles) of it begins the rite,
+which takes `rite.holdS` (8 s), costs nothing and cannot be interrupted (the shade stands still until it is done; a
+release changes nothing). Once a match. Only the shade is told: that the rite is open, begun and done. **The return**
+(R4, A603): at the start of the next day (or the Final Night) a shade whose rite is done lives again at the rite site,
+on the Train's respawn path (3.22 "On the line"): its public `alive` true, its body gone from the scene, full health
+and stamina and no effects, its card, kit, notebook and quests kept and its cooldowns resumed where they stood. The
+return follows the look, as the martyr does, so it says nothing of a cover; only the seat is told. A shade with no
+rite done by then becomes an ordinary ghost and never returns; the rite is then refused. **The 10X buff** (R5, A604;
+R-Q1): the returned martyr wears the private effect **Ascended** (3.22) until that day's dusk: `rite.buff.speedFactor`
+(1.3x) speed and `rite.buff.maxHpFactor` (2x) maximum health, and it comes back at that maximum. At dusk the effect
+comes off and the maximum falls back, taking any health above it. A return at the Final Night has no dusk ahead, so the
+buff lasts to the match's end. The buff follows the look like the return: it shows no sign, and only its speed is seen.
+**The conversion aura** (R6, A607; R-Q1, R-Q3): while the **dealt** Vicar wears Ascended, every other living, placed
+seat in its scene within `rite.aura.tiles` (4 tiles) of it gains `rite.aura.faithPerS` (3) Faith a second, to the Faith
+cap, and is converted at `conversion.faithAt` (3.23). The aura follows the dealt card, not the look: a cover in the
+Vicar's look comes back with the buff and no aura. It draws nothing and tells no one; each seat sees only its own Faith.
+The martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
+the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
+**The rite on the bus** (story R8, `docs/story/arc.md` E17, A608): each stage is also a sim event naming the shade's
+seat, `rite.open`, `rite.begun`, `rite.done`, `rite.returned`, and `rite.lapsed` when the wait ends with no rite done.
+The bus reaches the match log and the server's subscribers (a story's triggers), never a client.
 
 ### 3.21 Parties, profiles and friends
 
@@ -993,6 +1020,7 @@ figure (its `StatusBit`, seams.md 2); an effect without one shows only to Inspec
 | Knocked out | see above | `body.koS` | fists, a mugging, the slingshot | time, a meeting | down |
 | Indebted | an economy status (3.23, 8D) | until paid | unpaid rent | paying | none |
 | Charmed | one silent charge: the first killing Knife strike spends it and leaves the seat Wounded at 1 health | until spent | the well (7M, stations.md 4) | being spent | none |
+| Ascended | `rite.buff.speedFactor` (1.3x) speed and `rite.buff.maxHpFactor` (2x) maximum health | until the next dusk | the martyr's return (3.20, R5) | dusk | none |
 
 Rows that another system writes onto the body's effect list (Indebted, 3.23) are left as the body's clock finds
 them: it never decays, clears or resets them, on a wake, a knockout or a death. The Charmed row is set by the
@@ -1149,6 +1177,18 @@ Sessions 8C (Scrip) and 8D (the rest) write this section. The numbers are `econo
     under your public name ("the charge is a matter for the Church"), clears every vote cast so far, and for
     `faith.sealShieldS` refuses any vote naming you. The shield ends with the meeting. The full heresy trial waits for
     R9's Tribunal.
+- **Conversion** (story I9, A606; round 10 scope I9). A seat is converted once its Faith reaches
+  `conversion.faithAt`, and stays converted for the match whatever it spends later. It alone is told; nobody learns
+  another seat's Faith or conversion. The dealt Vicar's own view counts the other seats converted
+  (`Private.converted`), never naming one. **The sermon**: by day, a seat in the Vicar's look on the hub within the
+  bell's reach holds `act.hold {action: 'sermon'}` for `conversion.sermonS`, standing still, and may preach again
+  `conversion.sermonCooldownS` after a sermon ends (owner, 2026-11-11); it calls no meeting and spends no bell pull. Leaving the bell, the day or its life ends it with nothing. Every other living seat
+  within `conversion.sermonTiles` of the bell for at least `conversion.listenS` of it gains `conversion.sermonFaith`
+  Faith, once a day; the preacher is told how many heard, never who. The sermon follows the look, like the martyr
+  (3.20): a cover in the Vicar's look preaches to the same effect, so no listener's Faith tells a cover. **Peaceful**:
+  the dealt Vicar's route is met the first time every other living, placed seat (NPC seats too) is converted, with at
+  least one, before the Final Night. The dealt Vicar alone is told; the route is recorded for the ledger and never ends
+  the match. NPC seats do not seek out a sermon yet.
 
 - **Rumours** (8D). The server keeps a rumour ledger: every `notices.sampleS` it writes down each drawn look that
   stands in a scene with at least one other figure, so a line is only ever what an observer could have seen, and it
@@ -1288,19 +1328,19 @@ holds its mood idle until 8A's one-shot slot lands), then the target has `answer
   figure's takings sit in its `@figure:<id>` account. Banked Scrip is safe.
 - **Silence**: the share is taken when the answer runs out (the strike, once the fists land).
 - **A door**: a target that leaves the scene while its answer is due escapes, with nothing taken.
-- **Flee** (round 10, S4): a chase of `chaseS` (_proposed_ 5 s). The mugger runs after the target at its own walking
+- **Flee** (round 10, S4): a chase of `chaseS` (5 s). The mugger runs after the target at its own walking
   pace (a figure `townsfolk.walkTilesPerS`, an NPC seat its usual walk) and takes the share only if it comes within
   `reachTiles`; a target that outpaces it, or leaves the scene, keeps its purse. A scuffle is left either way.
-- **Fight** (round 10, S4): for `fightS` (_proposed_ 9 s) the two stand in reach and trade a blow every `fightHitS`
-  (_proposed_ 1.5 s) on 8A's fists (3.22): the target's `strike` row on the mugger, the mugger's `mugging` row on the
+- **Fight** (round 10, S4): for `fightS` (9 s) the two stand in reach and trade a blow every `fightHitS`
+  (1.5 s) on 8A's fists (3.22): the target's `strike` row on the mugger, the mugger's `mugging` row on the
   target, each cut by the striker's Weakened and the other's armour, with no stamina cost. A target the blows knock
   out is taken for the share; a mugger whose next blow would knock it out is beaten off and goes (a figure is never
   knocked out); one still standing at `fightS` gives up. A target that steps out of reach turns the fight into a
   chase. The target's blows are the exchange itself, not a strike it aims.
 
 A mugged NPC seat draws, when the threat ends, once, from its own choices stream and blind to its card and mood, both
-what it answers and when: Pay _proposed_ 40 %, Flee 20 %, Fight 20 %, or silence 20 % (`moods.mug.npcAnswer`), the
-answer landing at a tick uniform between `npcAnswerMinS` (_proposed_ 1.5 s) and `answerS`, never on the prompt's first
+what it answers and when: Pay 40 %, Flee 20 %, Fight 20 %, or silence 20 % (`moods.mug.npcAnswer`), the
+answer landing at a tick uniform between `npcAnswerMinS` (1.5 s) and `answerS`, never on the prompt's first
 tick; a silent seat lets the window run out and is taken for the share, as a human who does not answer. If the target
 leaves the scene or the mugging ends first, nothing lands. Its Flee runs to the nearest open portal of the
 scene, else straight away from the mugger, and its Fight stands and trades blows, both on the human's paths above.
@@ -1376,7 +1416,40 @@ fist, a smaller health bar and the purse.
 
 ### 3.28 Accounts and achievements
 
-Round 10, E1 (`docs/round9/gdd-map.md` 2.2). Not built yet: the step that builds it writes this section.
+Round 10, E1 (`docs/round9/gdd-map.md` 2.2; the owner: "step by step achievements that branch out in different
+directions", "skill trees plus trophies", stored on the device until accounts exist). The accounts are not built; this
+section is the achievements on the device. The tree and its steps are `achievements.json` (zod schema and validator in
+`@wdi/content`).
+
+**Trees and steps.** An achievement belongs to a tree and has a title, a line and an ordered list of steps. A step is a
+pattern on one sim bus kind (`sim/events/bus.ts`): the kind, whose step it is (the event's own seat, the seat a data
+key names, or every human at the table, which is how the story runner's events, naming no seat, reach the one human of
+a story room), exact matches on the event's data, and how many matching events complete it. Steps are done in order;
+an event counts for a step only once the step before it is done. `after` links an achievement to the ones it grows
+from: a node with two children is a branch and a node with two parents a join. The tree is how the device lays the
+achievements out and what a locked one shows; it gates nothing on the server, which knows no device. Story mode has its
+own tree (a chapter ended well, a goal met, the story finished), and the main game's trees read only events that exist:
+tasks, rent, quota, the fare, meals, rest, inspecting, pairing, a purse taken, a knock-out, a notice, a kill, a death.
+Steps on the trial wait on the Tribunal (B6b to B6d) and are not in the file.
+
+**Evaluation.** The server evaluates every event of a tick in `step()`, as a bus subscriber after the tick's events are
+delivered; a message callback never touches it. Progress is the room's memory for the match, per seat and per
+achievement, and starts again with the next match. It draws no random number, so no stream is shared with anything
+public. A step needs a connected client to hear of it; an NPC seat earns nothing.
+
+**What is told, and to whom.** The `achv` message goes to the earning seat's own client only, when a step is done and
+when the achievement is done, with the achievement id, the steps done and the steps in all. It is never a public field,
+never in the state root, and never sent to another seat, a spectator or the admin room. It names only the achievement,
+so a title that mentions a deed (a kill, a robbery) is shown to the one who did it and to no one else. Two seats
+earning at once get two messages, each to its own client.
+
+**On the device.** The client keeps the earned set under one `localStorage` key beside its other settings, with the
+day each was earned, and reads and writes it inside a guard: a blocked or empty store shows nothing earned and loses
+nothing else. The client shows a toast for each `achv` and a view of the trees; an achievement earned twice on the
+device is kept once. Story mode's end screen reads the same record.
+
+**No reward.** An achievement changes no rule, number, item, card, look or power. It is a title.
+
 
 ### 3.29 The lock-pick mini-game
 
@@ -1679,10 +1752,13 @@ No number is stated here: the roster, the seed words and the chapters are in `st
 - **The room.** A story room is a `party` room the story engine (`sim/story`) turns into an auto room with one human.
   The human is the leader; the NPC seats keep fixed ids; the clock runs at 1x and is never sped up. Nothing a client
   sends changes the speed.
-- **Chapters.** A story is a list of chapters played in order. Each names the card the player holds for it. Chapter
-  one's card is dealt to the player at the deal (the deck's own fixed-deal request); a later chapter moves the
-  player's seat to its card at the break (the handover below). A chapter ends when its end trigger fires, or at once
-  when the player's seat dies, and either way the next chapter starts, so a story is always finishable.
+- **Chapters and sections.** A story is a list of chapters played in order; a chapter is a list of sections, and the
+  section is the unit that runs. Each section names the card the player holds for it. The first section's card is
+  dealt to the player at the deal (the deck's own fixed-deal request); a later section moves the player's seat to its
+  card at the break (the handover below). A section ends when its end trigger fires, or at once when the player's
+  seat dies, and either way the next section starts, so a story is always finishable. A chapter's first section opens
+  with the chapter's card, every later section with its own; a break between two sections of a chapter shows no end
+  card unless the section names one, and a chapter's last section ends with the chapter's end card.
 - **Cards and the pause.** A chapter's title card, a beat's card and a chapter's end card are shown to the player
   alone and pause the clock until the player's continue. This is the only pause in any mode other than the admin
   room (3.19): the world waits only because no second human is wronged by it. A role card is dismissed by the
@@ -1691,18 +1767,80 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   client alone; no public field, no other seat's view and no bus event names a chapter, a goal or the player's card
   with its holder.
 - **Beats.** A chapter's beats are each a trigger on the sim event bus (or on the chapter's own clock) and an action:
-  a card, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. Each fires once, and a goal is
+  a card, a spoken line, an order to the NPC that holds a card, a clue left at a spawn, a cutscene. A spoken line is
+  said by the seat that holds a named card, under that seat's public name and look as the table sees them (a cover
+  speaks as its cover), or by a named figure with no seat. Each fires once, and a goal is
   done when its beat fires. The player's own scene changes and pickups reach the bus as `story.enter` and
   `story.pickup`. The chapter's tick count stops while a card holds the clock.
 - **The break.** When a chapter ends the end card shows what the player did; the next chapter's card goes to the
   player's seat, the card it held goes to the seat that held the new one, and the player's private view starts empty
   except for what the chapter hands on. The clock moves on to the chapter's start phase, never backwards.
+- **The cast.** A chapter may name the cards at the table. After the player's own card has moved at the chapter's
+  first section, every card the cast names that nobody holds is dealt to an NPC seat whose card the cast does not name
+  (dead seats first, then in seat order), as a newcomer off the morning train: the seat's kit and view are the card's
+  own, its routine starts over, and a dead seat is made whole. A Knife holder never gives up its seat. A cover card
+  walks as another card of the cast. A replay of a section changes no card.
+- **The NPC Killer's vendetta.** A section may name `npcVendetta`: while it runs, the NPC seat that holds the Killer card
+  holds that vendetta, with its progress started over (not on a replay). A section whose player holds the Killer card
+  sets nothing. When the player takes the card at the next break the vendetta travels with it, progress started over.
+- **No early win.** A match win before the story's last section (the task bar full, parity, a Thief's escape, a Hitman
+  boarding the Dusk Train, the Final Night's verdict) does not end the room. It ends the running section as done, with
+  the section's own break, and the story moves on; the sim emits `story.win` once for it. Only a win in the last section
+  ends the match. A win that is still true (parity) is held again at the next check, so it can end the next section too.
+- **A fixed Hitman.** A section that names `hitman: {mark}` turns the player's seat when it starts, whatever the arrival
+  draw said (a story room has one human, below the floor of 3.33): the seat keeps its card and look, holds the `hitman`
+  vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
+  sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
+  section lets the seat go, its contract and its flag with it.
+- **The martyr's shade** (story R8, `docs/story/arc.md` 3.4 and E16, A608). A section that names `shade: true` plays
+  the match's martyr (3.20) as its shade: the player's death there is no failure while the seat is the martyr and has
+  not come back (a waiting shade, or a ghost whose wait lapsed with no rite). The section ends on its own trigger,
+  which may be a rite stage (3.20, "The rite on the bus"). Once the rite has brought the seat back, a death fails the
+  section as in any other.
+- **The shade handover** (story R8, `arc.md` E15, A608). When a section that plays the shade starts while the match's
+  martyr is an NPC seat waiting as a shade, the card handover runs as at any break (the card, kit, look, traits and
+  name move), and then the two seats exchange bodies: where each stands, whether it lives, its health, its corpse and
+  its figure. The player is then the shade where the martyr fell, with the Vicar's card; the seat it left goes on
+  alive where the player stood, as the NPC holding the player's old card. Every other per-seat memory stays with its
+  seat. With no waiting shade the section starts as any other, unless it names `onlyIf: 'shade'` (`arc.md` E17): then
+  it is skipped, with no handover and no card of its own, and ends at once, not failed (the sim event `story.skip`
+  names it); as its chapter's last section, the chapter's end card and save follow as at any end.
+- **Night-power events.** A night power that lands (Hear Confession, Keep Watch, Remedy, Nightshade), by a human or
+  an NPC, emits the sim event `nightPower` with the user's `seat` and `data: { ability, target }`, so a section or a
+  goal can end on it (`{ event: 'nightPower', seat: 'player', data: { ability: 'confession' } }`). It is server-side only:
+  no client message and no admin feed carries it.
+- **The heir section.** A section may name `startWhen`. When the section before it ends, the story does not start it at
+  once: it waits, the player keeping the card they hold and the town running, until the trigger holds. The Knife's
+  inheritance (3.2) emits the sim event `inherit` (the seat is its `seat`) for it; a story gives the trigger a tick
+  fallback so it always moves on. When it holds, the section starts as any other, the player taking the card.
+- **Pick events.** A lock the player opens with the lock-pick (3.29) emits the sim event `story.picked` with the
+  picker's `seat` and `data: { lock }` (the prop id), so a goal or a section end can be "open the hall door". The
+  story runner hears it like `story.enter` and `story.pickup`. The reader (3.26) has no server path (the server keeps
+  nothing of what a seat read), so there is no `story.read` yet.
+- **Company.** The sim event `story.company` with `data: { with: <role id> }` and the player's `seat` is heard once
+  the player has shared a scene, in a world phase and with both seats alive and placed, with the seat holding that card
+  for `story.companyS` seconds (`balance.json`) of that section; once per card per section, and the count starts over at
+  every section. A trigger writes it as `{ event: 'story.company', seat: 'player', data: { with: 'vicar' } }`. It is the
+  shape of the conversion's shared time (3.20) without its vendetta.
+- **Cutscene and bell.** A beat's `cutscene` action plays the cutscene for the table (`cutscene { id, scope: 'all' }`, once, and the server never waits for a client) and still emits `story.cutscene`. A `meeting: true` action rings the bell for the player's seat: a meeting opens at the next world-phase step, and its reveal is where the memorial (3.20) plays when a seat under the Vicar's look has died by the Knife. A story that wants the memorial rings a meeting if no NPC does.
+- **Staging.** A break swaps cards between two bodies where they stand, so the card a section needs is where the last section left it. A section stages its own opening: a beat at `tick: 0` with `npcOrder goTo` sends the seat holding a card to a scene (`args.scene`), to a named spawn of it with `args.spawn`, on foot as a hunt travels. `goTo` is the only order; the validator refuses any other order, a missing or unknown scene and an unknown spawn.
+- **Saves.** The server saves at the end of each chapter, from what it ran: the chapters finished, what each of them
+  counted (for the end screen), the sections whose single replay is spent, and the chapter a Continue starts. A save
+  holds break state only, no world snapshot and no secret of a live match, so a resume starts the next chapter from its
+  break with what the finished chapter hands on. A guest's save is kept on their own device: the server sends it to
+  that client alone and, when the story is started again with a save, checks its shape, its sizes and that it fits the
+  story's chapters in order, and starts from the beginning when it does not. A start that names a chapter the save has finished replays from that chapter on. An account store replaces the device's
+  behind the same interface.
 - **Killer chapters.** A chapter on the Killer card may name a vendetta (`vendettas.json`; the card must be that
   vendetta's). The vendetta travels with the card: the seat that takes the Killer card takes the NPC Killer's, or the
   chapter's named one, with its progress started over, and the NPC seat that takes the old card holds none. A chapter
   on the card the player already holds changes no card; it starts the view over and sets its vendetta. The vendetta
   then runs as in 3.20 (the Bandit's heist, the Activist's sabotage).
-- **A dead player.** The chapter ends as failed, its end card says so, and the next chapter still starts.
+- **A dead player.** The section ends as failed and its end card says so. A failed section replays once (the owner's
+  A515): the player's seat is made whole where it stands, the section's goals, beats and counters start over, and the
+  card, its view and its hand-over items are dealt again; the world is not rewound. A second failure of the same
+  section ends it for good and the next section starts, so a story is always finishable. A match that has ended
+  allows no replay.
 - **Invariants.** A story room runs the harness's invariants unchanged, plus one: the room holds exactly one human
   seat, and it is the story's own.
 

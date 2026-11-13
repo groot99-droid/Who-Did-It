@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GddRef, Id, Seconds, Ships, Tiles } from './common.js';
+import { GddRef, Id, Seconds, Retired, Ships, Tiles } from './common.js';
 import { NoiseKey } from './balance.js';
 
 /** Phase names an ability can be limited to (GDD 3.3). */
@@ -47,6 +47,8 @@ export const Ability = z.strictObject({
   /** A `seat` target may be the actor. */
   allowSelf: z.boolean().optional(),
   effect: z.string().min(1),
+  /** Retired (common.ts `Retired`): kept so its id is never reused; nothing deals, grants or plays it. */
+  retired: Retired.optional(),
   ships: Ships,
   gddRef: GddRef,
 });

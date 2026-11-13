@@ -140,6 +140,13 @@
       "dish": true,
       "cures": [],
       "gddRef": "3.14"
+    },
+    "ascended": {
+      "id": "ascended",
+      "name": "Ascended",
+      "durationS": 0,
+      "cures": [],
+      "gddRef": "3.20"
     }
   }
 }

@@ -141,9 +141,10 @@ for (const [name, width, height, query] of [
       await page.waitForTimeout(500);
       await page.keyboard.up('Space');
       await expect(status).toHaveText(/^(It slips back\.|1 of 3 pins set)$/);
-      // Held past the snap line, the pick snaps without a release.
+      // Held past the snap line, the pick snaps without a release. The tension climbs per frame (at most 0.1 s of game
+      // time a frame, `draw.ts` `loop`), so a starved CI renderer needs longer than 5 s of wall clock to reach it.
       await page.keyboard.down('Space');
-      await expect(status).toHaveText('The pick snaps.', { timeout: 5000 });
+      await expect(status).toHaveText('The pick snaps.', { timeout: 20_000 });
       await page.keyboard.up('Space');
     });
 

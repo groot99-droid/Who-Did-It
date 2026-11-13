@@ -85,6 +85,7 @@ export type StoryAction =
       goal?: string | undefined;
     }
   | { cutscene: string }
+  | { meeting: true }
   | { questStep: { quest: string; step: string } }
   | { npcOrder: { npcId: string; order: string; args?: Record<string, unknown> | undefined } }
   | { spawn: { kind: string; at: string } }
@@ -103,6 +104,8 @@ export const StoryAction: z.ZodType<StoryAction> = z.lazy(() =>
       goal: Id.optional(),
     }),
     z.strictObject({ cutscene: Id }),
+    /** Rings the bell: a meeting opens at the next world-phase step (a reveal follows, so the memorial can play). */
+    z.strictObject({ meeting: z.literal(true) }),
     z.strictObject({ questStep: z.strictObject({ quest: Id, step: Id }) }),
     z.strictObject({
       npcOrder: z.strictObject({
@@ -189,3 +192,132 @@ export const StoryFile = z.strictObject({
   stories: z.record(WorldId, Story),
 });
 export type StoryFile = z.infer<typeof StoryFile>;
+
+// --- Part 2: chapters of sections (docs/story/arc.md 5, P1) -------------------------------------------------------
+//
+// `story.json` holds the arc: a story is chapters, a chapter is sections, and each section has its own card. Until the
+// engine (P2) reads sections, `@wdi/content` also exports the part-1 shape above as a flat list of *plays*, one per
+// section (`storyPlays` in `storyPlays.ts`): every consumer of `story` keeps working, and P2 retires that view.
+
+/** A spoken line, `say` (arc E7; `line` is taken by the narration card): by the seat that holds the card `by`, or by a figure with no seat (`speaker`). */
+export interface ArcLine {
+  say: {
+    text: string;
+    by?: string | undefined;
+    speaker?: string | undefined;
+    portrait?: string | undefined;
+    goal?: string | undefined;
+  };
+}
+
+export type ArcAction = Exclude<StoryAction, { seq: StoryAction[] }> | ArcLine | { seq: ArcAction[] };
+
+export const ArcAction: z.ZodType<ArcAction> = z.lazy(() =>
+  z.union([
+    z.strictObject({
+      say: z
+        .strictObject({
+          text: Line,
+          /** A role id: the NPC seat that holds that card speaks, under its name and look. */
+          by: Id.optional(),
+          /** A figure with no seat (the Company Clerk, Widow Vane, Mother Moll). */
+          speaker: Short.optional(),
+          /** A look id of looks.json (or `villager`); default: the speaking seat's look. */
+          portrait: LookId.optional(),
+          goal: Id.optional(),
+        })
+        .refine((l) => l.by !== undefined || l.speaker !== undefined, 'a `say` names `by` or `speaker`'),
+    }),
+    z.strictObject({ seq: z.array(ArcAction).min(1) }),
+    StoryAction as z.ZodType<Exclude<StoryAction, { seq: StoryAction[] }>>,
+  ]),
+);
+
+export const ArcBeat = z.strictObject({
+  id: Id,
+  trigger: Trigger,
+  action: ArcAction,
+  oncePerChapter: z.literal(true),
+});
+export type ArcBeat = z.infer<typeof ArcBeat>;
+
+const Phase = z.strictObject({ cycle: z.number().int().positive(), part: z.enum(['day', 'night']) });
+
+/** An end card: what the player did. A section's is shown at its break; the chapter's when the chapter ends. */
+export const EndCard = z.strictObject({
+  /** Counters the card shows (`story.chapterEnd` carries them). */
+  summaryKeys: z.array(Counter).min(1),
+  lines: z.array(Line).min(1).max(4),
+  /** Shown when the player's seat dies in it: the chapter fails and replays once (part2.md). */
+  failedLine: Line,
+});
+export type EndCard = z.infer<typeof EndCard>;
+
+export const Section = z.strictObject({
+  /** Unique across the story; the four part-1 chapter ids are kept as section ids (arc Q-A7). */
+  id: WorldId,
+  title: Short,
+  setup: Line,
+  roleId: Id,
+  /** Only for a card with no world look (the Thief); a Killer section wears the Killer card's own look (A4). */
+  look: LookId.optional(),
+  /** The player's vendetta: a Killer section's, or `hitman` on the card the mail turns (GDD 3.33). */
+  vendetta: Id.optional(),
+  /** The vendetta the NPC Killer holds while this section runs (arc E4). */
+  npcVendetta: Id.optional(),
+  /** Default: the chapter's `startPhase` for the first section, the clock as it stands for the others. */
+  startPhase: Phase.optional(),
+  /** Absent: the section starts when the previous one ends. Present: it waits for this too (arc E6, the heir). */
+  startWhen: Trigger.optional(),
+  /** Arc E5: the mail turns the player in this section, and the contract's mark is the seat holding this card. */
+  hitman: z.strictObject({ mark: Id }).optional(),
+  /**
+   * Arc E16 (R8, arc.md 3.4): the player plays the match's martyr as its shade (GDD 3.20). Its death before the
+   * return is not a failure; a death after the return is, as in any section (Q-A9).
+   */
+  shade: z.literal(true).optional(),
+  /** Arc E17 (R8, arc.md 3.4): the section is skipped, ended at once and not failed, unless a shade waits as it starts. */
+  onlyIf: z.literal('shade').optional(),
+  goals: z.array(ChapterGoal).min(1),
+  beats: z.array(ArcBeat).min(1),
+  /** Ends the section (with a tick fallback inside an `any`, so a story always moves on). */
+  end: Trigger,
+  /** The card at this section's break. Not on a chapter's last section: the chapter's own end card is shown there. */
+  endCard: EndCard.optional(),
+  /** What crosses this section's break: a letter, a lead, an item. */
+  handOn: z.array(HandOn).optional(),
+});
+export type Section = z.infer<typeof Section>;
+
+export const ArcChapter = z.strictObject({
+  id: WorldId,
+  title: Short,
+  setup: Line,
+  /** One line for the story's end screen (part2.md). */
+  summary: Line,
+  startPhase: Phase,
+  /** The cards at the table this chapter (arc E2). Absent: the deck of the roster's size, as part 1. */
+  cast: z.array(Id).min(1).optional(),
+  sections: z.array(Section).min(1),
+  end: EndCard,
+});
+export type ArcChapter = z.infer<typeof ArcChapter>;
+
+export const ArcStory = z.strictObject({
+  id: WorldId,
+  title: Short,
+  blurb: Line,
+  mapId: WorldId,
+  roster: z.strictObject({ humanSeat: z.literal(0), npcCount: z.number().int().min(3).max(9) }),
+  seedWords: z.record(z.string(), StorySeedWords),
+  /** Every card of roles.json is a section's card or a line's `by` (part2.md Q-P2). Set once the story is whole. */
+  full: z.literal(true).optional(),
+  chapters: z.array(ArcChapter).min(1),
+});
+export type ArcStory = z.infer<typeof ArcStory>;
+
+export const StoryArcFile = z.strictObject({
+  gddRef: GddRef,
+  stories: z.record(WorldId, ArcStory),
+});
+export type StoryArcFile = z.infer<typeof StoryArcFile>;

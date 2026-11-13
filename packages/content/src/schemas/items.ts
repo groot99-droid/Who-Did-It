@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GddRef, Id, Ships, Tiles } from './common.js';
+import { GddRef, Id, Retired, Ships, Tiles } from './common.js';
 import { ToolTag } from './interactions.js';
 
 export const Item = z.strictObject({
@@ -47,6 +47,8 @@ export const Item = z.strictObject({
   /** Round 10 (A10): uses before the tool breaks, each worn by an interaction's `wear`; absent = it lasts. */
   uses: z.number().int().positive().optional(),
   tooltip: z.string().min(1),
+  /** Retired (common.ts `Retired`): kept so its id is never reused; nothing deals, grants or plays it. */
+  retired: Retired.optional(),
   ships: Ships,
   gddRef: GddRef,
 });

@@ -121,11 +121,36 @@ export const S2C = {
   storyCard: 'story.card',
   /** Story mode, private to the player's own client: the chapter's goals and which are done. */
   storyGoals: 'story.goals',
+  /** Story mode, part 2 (docs/accounts/plan.md 5), private to the player's own client: the save at a chapter break. */
+  storySaved: 'story.saved',
+  /** Round 10, E1 (GDD 3.28), private to the earning seat's own client: a step or an achievement is done. */
+  achv: 'achv',
+  /** Story R3 (GDD 3.20), private to the martyr's shade: the Medium's rite is open, begun or done. */
+  rite: 'rite',
+  /** Story I9 (GDD 3.23), private to one seat's own client: it is converted, or (to the Vicar) the parish is. */
+  conversion: 'conversion',
   /** Round 10, M1 (seams.md 3 row 36): a quick-chat line over one figure's head, the same from a seat or a figure. */
   bark: 'bark',
   /** Round 10, C4d (GDD 3.33, seams.md 3 row 37), private to the reader: the Clerk's rent ledger. */
   ledger: 'ledger',
 } as const;
+
+/**
+ * A story save as it crosses the wire (docs/accounts/plan.md 5). The accounts session owns the validating schema
+ * (`StorySave`); the client reads only the fields named here and passes the whole object back unchanged.
+ */
+export interface StorySaveWire {
+  v: number;
+  storyId: string;
+  /** The chapter a Continue starts; `null` when the story is finished. */
+  nextChapterId: string | null;
+  finished: string[];
+  handOn: unknown[];
+  replayUsed: string[];
+  summaries: unknown[];
+  rev: number;
+  savedAt: number;
+}
 
 export type C2SType = (typeof C2S)[keyof typeof C2S];
 export type S2CType = (typeof S2C)[keyof typeof S2C];
@@ -160,7 +185,11 @@ export type HoldAction =
   | 'unlock'
   | 'crowbar'
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
-  | 'dust';
+  | 'dust'
+  // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
+  | 'rite'
+  // Story I9 (GDD 3.23): the Vicar preaches at the hub's bell (`targetId` is 'bell').
+  | 'sermon';
 /** The main-mode mini-game kinds (GDD 3.16), played at task stations. */
 export type MinigameKind = 'crates' | 'pour' | 'slide' | 'stoke' | 'tap' | 'lockpick';
 /**
@@ -362,9 +391,11 @@ export interface C2SPayloads {
   'talk.ask': { targetId: string; ask: 'town' | 'time' };
   /**
    * Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId`
-   * replays a finished chapter (Q-S4) and defaults to the story's first.
+   * replays a finished chapter (Q-S4) and defaults to the story's first. `resume` (part 2) is the save the client was
+   * last given by `story.saved`, sent back untouched: the device store has no other copy (docs/accounts/plan.md 5). The
+   * server re-validates it and decides; the client never composes one.
    */
-  'story.start': { storyId: string; chapterId?: string };
+  'story.start': { storyId: string; chapterId?: string; resume?: StorySaveWire };
   /** Story mode: closes the card that is up. Refused 422 with no card up. */
   'story.continue': Record<string, never>;
   /**
@@ -403,8 +434,18 @@ export interface S2CPayloads {
   sceneEnter: { sceneId: string; spawn: string; facing: string };
   /** Private. */
   clueFound: { entryId: string };
-  /** Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). */
-  killed: { sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string };
+  /**
+   * Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). Empty for a
+   * seat on the line (C1) and for the martyr's shade (story R2, GDD 3.8), which says `shade`; a shade that becomes a
+   * ghost at the next day is sent a second `killed`, with the roles and no cutscene.
+   */
+  killed: {
+    sceneId: string;
+    cause: DeathCause;
+    roles: Record<string, string>;
+    cutsceneId?: string;
+    shade?: boolean;
+  };
   /** Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). */
   'chat.msg': { from: string; text: string; channel: ChatChannel };
   phaseChange: { phase: number; endsTick: number };
@@ -505,13 +546,17 @@ export interface S2CPayloads {
   tribunalVerdict: { roleId: string };
   /**
    * Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen
-   * chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content
-   * file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards)
-   * is the next chapter's title.
+   * chapter card. `kind` is the chapter's title card, a section card (replaces the title card after a chapter's first
+   * section, docs/story/part2.md), a beat's narration, a scripted NPC line (`line`, part 2) or the chapter's end. Every
+   * string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to
+   * their values; `next` (end cards) is the next chapter's title. `sectionId` (section and line cards) names the section;
+   * `speaker` (line cards) is the speaker's display name, `portrait` its figure; a line card holds several lines.
    */
   'story.card': {
-    kind: 'title' | 'beat' | 'end';
+    kind: 'title' | 'section' | 'beat' | 'line' | 'end';
     chapterId: string;
+    sectionId?: string;
+    speaker?: string;
     title?: string;
     lines: string[];
     portrait?: string;
@@ -519,8 +564,32 @@ export interface S2CPayloads {
     summary?: Record<string, number>;
     next?: string;
   };
+  /**
+   * Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break
+   * (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it
+   * back as `story.start.resume`. It holds break state only, no secret of a live match.
+   */
+  'story.saved': { save: StorySaveWire };
   /** Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. */
   'story.goals': { chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> };
+  /**
+   * Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step
+   * (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only.
+   */
+  achv: { id: string; step: number; steps: number; done: boolean };
+  /**
+   * Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade
+   * (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick`
+   * is the tick it is done on; it cannot be interrupted), `done` when it is, and (R4) `returned` when the seat lives
+   * again at the next day.
+   */
+  rite: { stage: 'open' | 'begun' | 'done' | 'returned'; medium?: string; endsTick?: number };
+  /**
+   * Story I9 (GDD 3.23, A606), private to one seat's own client and never in public state: `converted` to a seat whose
+   * Faith reached `conversion.faithAt` (once a match), `sermon` to the preacher when its sermon ends (`heard` is how
+   * many seats it reached, never who), `peaceful` to the dealt Vicar when every other living seat is converted.
+   */
+  conversion: { kind: 'converted' | 'sermon' | 'peaceful'; heard?: number };
   /**
    * Private to the reader, round 10, C4d (GDD 3.33, seams.md 3 row 37): every rent hardship of the match so far, oldest
    * first, by the day it struck and the struck seat's `Player.look` then (a `looks.json` id). No seat, handle, name,

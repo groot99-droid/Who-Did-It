@@ -46,8 +46,10 @@ describeChapters('a scripted player finishes the story (README DoD 1 and 4)', ()
       expect(rolesAtStart).toEqual(def.chapters.map((c) => c.roleId));
 
       for (const ch of def.chapters) {
-        const kinds = sr.cards.filter((c) => c.card.chapterId === ch.id).map((c) => c.card.kind);
-        expect(kinds[0], `${ch.id} opens with a title card`).toBe('title');
+        const kinds = sr.cards.filter((c) => c.card.sectionId === ch.id).map((c) => c.card.kind);
+        // A chapter's first section opens with the chapter's title card, a later one with its own section card.
+        const opening = def.chapters.find((c) => c.id === ch.id) as { first?: boolean } | undefined;
+        expect(kinds[0], `${ch.id} opens with its card`).toBe(opening?.first ? 'title' : 'section');
         expect(kinds.at(-1), `${ch.id} closes with an end card`).toBe('end');
         // Every beat card is for a beat of this chapter's file, and a beat fires once.
         const beats = sr.events.filter(

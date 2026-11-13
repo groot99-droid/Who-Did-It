@@ -45,7 +45,7 @@
 | `act.bank` | `{ op: 'deposit' \| 'withdraw'; amount: number }` | 5/s | Round 8 (GDD 3.23, 8C): moves `amount` Scrip between the purse and the bank, at the bank counter a `bank` hold opened and that stays in reach. Refused 422 when the side it draws on holds less. |
 | `act.mug` | `{ choice: 'pay' \| 'fight' \| 'flee' }` | 5/s | Round 8 (GDD 3.24): the target's answer to its open `mugPrompt`. Refused 422 with no prompt open; `flee` and `fight` are refused until the fists land (DECISIONS A180). |
 | `talk.ask` | `{ targetId: string; ask: 'town' \| 'time' }` | 5/s | Round 10, D9c (GDD 3.24, seams.md 3 row 16): `targetId` is a figure's avatar handle in reach; `ask` is `town` (a tip off the rumour ledger) or `time`. The answer is one system chat line to the asker alone, after a fixed delay. Refused `NO_TARGET` for a seat's handle or an unknown one, `TOO_FAR`, `COOLDOWN` (per figure), `NOT_IN_PLAY` for a ghost, `PHASE_CLOSED`, `BAD_REQUEST` for another `ask`. |
-| `story.start` | `{ storyId: string; chapterId?: string }` | 2/s | Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId` replays a finished chapter (Q-S4) and defaults to the story's first. |
+| `story.start` | `{ storyId: string; chapterId?: string; resume?: StorySaveWire }` | 2/s | Story mode: a `stories` key of `story.json`, from the title screen; refused 422 for an unknown id. `chapterId` replays a finished chapter (Q-S4) and defaults to the story's first. `resume` (part 2) is the save the client was last given by `story.saved`, sent back untouched: the device store has no other copy (docs/accounts/plan.md 5). The server re-validates it and decides; the client never composes one. |
 | `story.continue` | `Record<string, never>` | 5/s | Story mode: closes the card that is up. Refused 422 with no card up. |
 | `ledger.read` | `{ propId: string }` | 2/s | Round 10, C4d (GDD 3.33, seams.md 3 row 37): `propId` is a `ledger` prop in the reader's reach (HollowMere's `bk.ledger`). Answered with `ledger`. Refused `TOO_FAR`, `PHASE_CLOSED`, `NOT_IN_PLAY`, `IN_JAIL`. |
 | `inv.move` | `{ from: number; to: number }` | 10/s | Round 10, A12 (GDD 3.30): the stack in slot `from` goes to slot `to` (slot numbers of `rules/inventory.ts`): into an empty slot, onto a stack of its item as far as it fits, or swapped. Refused `BAD_REQUEST` when `to` does not take the item (the belt takes tools, gear its own slot) or `from` is empty. |
@@ -66,7 +66,7 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `roleReveal` | `RoleRevealPayload` | Private. |
 | `sceneEnter` | `{ sceneId: string; spawn: string; facing: string }` | Private. |
 | `clueFound` | `{ entryId: string }` | Private. |
-| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). |
+| `killed` | `{ sceneId: string; cause: DeathCause; roles: Record<string, string>; cutsceneId?: string; shade?: boolean; }` | Private: the player is now a ghost; `roles` lists every seat's role id (ghosts see all roles, GDD 3.7). Empty for a seat on the line (C1) and for the martyr's shade (story R2, GDD 3.8), which says `shade`; a shade that becomes a ghost at the next day is sent a second `killed`, with the roles and no cutscene. |
 | `chat.msg` | `{ from: string; text: string; channel: ChatChannel }` | Private: routed per recipient; `from` is a player id, `''` on `system` and `notes` (no speaker). |
 | `phaseChange` | `{ phase: number; endsTick: number }` | - |
 | `meetingStart` | `{ reason: MeetingReason; callerId: string; bodyOf?: string; missing: string[] }` | - |
@@ -89,8 +89,12 @@ Every C->S message is queued and consumed inside the server step; nothing mutate
 | `coopHold` | `{ taskId: string; holders: number; progress: number }` | Private, round 7 (7M, GDD 3.5): the co-op hold's shared progress, 0..1, and how many hands hold, on change. |
 | `mugPrompt` | `{ muggerId: string; endsTick: number }` | Private, round 8 (GDD 3.24): a mugger demands the purse; `muggerId` is its avatar handle in the target's scene (never a seat or a figure id), the answer is due by `endsTick` (`act.mug`). |
 | `tribunalVerdict` | `{ roleId: string }` | Public, round 10 (B6a, seams.md 3 row 22): sent at the Tribunal's verdict only for a death sentence, the true role of the seat held (the one card that goes out before game over, as an ejection's does). |
-| `story.card` | `{ kind: 'title' \| 'beat' \| 'end'; chapterId: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the title card, a beat's line or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. |
+| `story.card` | `{ kind: 'title' \| 'section' \| 'beat' \| 'line' \| 'end'; chapterId: string; sectionId?: string; speaker?: string; title?: string; lines: string[]; portrait?: string; goal?: string; summary?: Record<string, number>; next?: string; }` | Story mode (docs/story/README.md 3), private to the player's own client and never in public state: a full-screen chapter card. `kind` is the chapter's title card, a section card (replaces the title card after a chapter's first section, docs/story/part2.md), a beat's narration, a scripted NPC line (`line`, part 2) or the chapter's end. Every string is copy from the content file; the client adds none. `summary` (end cards) maps `summaryKeys` counters to their values; `next` (end cards) is the next chapter's title. `sectionId` (section and line cards) names the section; `speaker` (line cards) is the speaker's display name, `portrait` its figure; a line card holds several lines. |
+| `story.saved` | `{ save: StorySaveWire }` | Story mode, part 2, private to the player's own client and never in public state: the save at a chapter break (docs/accounts/plan.md 5, A1). The device store has the client keep it (`localStorage['wdi:story:save']`) and send it back as `story.start.resume`. It holds break state only, no secret of a live match. |
 | `story.goals` | `{ chapterId: string; goals: Array<{ id: string; text: string; done: boolean }> }` | Story mode, private to the player's own client: the chapter's goals, resent whenever one is done. |
+| `achv` | `{ id: string; step: number; steps: number; done: boolean }` | Round 10, E1 (GDD 3.28), private to the earning seat's own client and never in public state: an achievement's step (or the achievement) is done. `step` is steps done, `steps` the steps in all. It names the achievement only. |
+| `rite` | `{ stage: 'open' \| 'begun' \| 'done' \| 'returned'; medium?: string; endsTick?: number }` | Story R3 (GDD 3.20, A602), private to the martyr's shade and never in public state: `open` once it is a shade (`medium` is the Medium's avatar handle, the hold's `targetId`), `begun` when its hold starts the rite (`endsTick` is the tick it is done on; it cannot be interrupted), `done` when it is, and (R4) `returned` when the seat lives again at the next day. |
+| `conversion` | `{ kind: 'converted' \| 'sermon' \| 'peaceful'; heard?: number }` | Story I9 (GDD 3.23, A606), private to one seat's own client and never in public state: `converted` to a seat whose Faith reached `conversion.faithAt` (once a match), `sermon` to the preacher when its sermon ends (`heard` is how many seats it reached, never who), `peaceful` to the dealt Vicar when every other living seat is converted. |
 | `ledger` | `{ propId: string; rows: Array<{ day: number; lookId: string }> }` | Private to the reader, round 10, C4d (GDD 3.33, seams.md 3 row 37): every rent hardship of the match so far, oldest first, by the day it struck and the struck seat's `Player.look` then (a `looks.json` id). No seat, handle, name, card, cover or other hardship; every reader at a tick gets the same rows. |
 
 "Private" messages are sent to their owner only; no private payload is broadcast.
@@ -230,7 +234,11 @@ export type HoldAction =
   | 'unlock'
   | 'crowbar'
   // Round 10 (V1b, GDD 3.2): lift a print from a body or a door in reach.
-  | 'dust';
+  | 'dust'
+  // Story R3 (GDD 3.20): the martyr's shade takes the rite at the Medium (`targetId` is the Medium's avatar handle).
+  | 'rite'
+  // Story I9 (GDD 3.23): the Vicar preaches at the hub's bell (`targetId` is 'bell').
+  | 'sermon';
 ```
 
 ```ts

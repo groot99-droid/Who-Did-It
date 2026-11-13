@@ -1,6 +1,7 @@
 import { abilities, roles } from '@wdi/content';
 import { ItemStack, S2C, TICK_RATE } from '@wdi/shared';
 import type { PartyRoom } from '../rooms/PartyRoom';
+import { emitSim } from './events/bus';
 import { countRow } from './Flow';
 import { settle } from './Inventory';
 import { nightOf } from './nightMemory';
@@ -49,4 +50,5 @@ export function runInherit(room: PartyRoom): void {
   player.priv.cooldownEndTick.set('kill', tick + Math.round(cooldownS * TICK_RATE));
   mem.lastStrikeRound.set(accomplice, room.state.round); // it counts as having struck in this round (Hunger)
   clientOf(room, accomplice)?.send(S2C.inherit, {});
+  emitSim(room, { tick, kind: 'inherit', seat: accomplice }); // story mode's heir section waits for it (arc E6)
 }

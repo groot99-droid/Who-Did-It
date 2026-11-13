@@ -30,8 +30,10 @@ import type { LoreFile } from './schemas/lore.js';
 import { checkLore } from './validateLore.js';
 import type { TalkFile } from './schemas/talk.js';
 import { checkTalk } from './validateTalk.js';
-import type { StoryFile } from './schemas/story.js';
+import type { StoryArcFile, StoryFile } from './schemas/story.js';
 import { checkStory } from './validateStory.js';
+import type { AchievementsFile } from './schemas/achievements.js';
+import { checkAchievements } from './validateAchievements.js';
 import { classesOfProp, type InteractionsFile } from './schemas/interactions.js';
 import { checkInteractions } from './validateInteractions.js';
 
@@ -72,8 +74,12 @@ export interface Content {
   lore: LoreFile;
   /** Round 9 (GDD 3.25, N2): the NPC seats' meeting-note lines. */
   talk: TalkFile;
-  /** Story mode (docs/story/README.md): the fixed stories. */
+  /** Story mode (docs/story/arc.md 5): the stories as written, chapters of sections. */
+  storyArc: StoryArcFile;
+  /** Story mode, the part-1 view of `storyArc`: one play per section (`storyPlays`), until the engine reads sections. */
   story: StoryFile;
+  /** Round 10, E1 (GDD 3.28): the achievements' trees and steps. */
+  achievements: AchievementsFile;
   /** Round 10 (A9; GDD 3.14): the logic table. */
   interactions: InteractionsFile;
 }
@@ -105,16 +111,27 @@ export function validateContent(c: Content): string[] {
   // Roles: kits and abilities.
   const cardAbilities = new Set<string>();
   for (const role of Object.values(roles.roles)) {
-    for (const k of role.startKit) if (!isItem(k.item)) err(`role ${role.id}: unknown item ${k.item}`);
+    for (const k of role.startKit) {
+      if (!isItem(k.item)) err(`role ${role.id}: unknown item ${k.item}`);
+      else if (role.retired === undefined && items.items[k.item]!.retired !== undefined)
+        err(`role ${role.id}: kit holds retired item ${k.item}`);
+    }
     for (const a of role.abilities) {
       cardAbilities.add(a);
       if (!isAbility(a)) err(`role ${role.id}: unknown ability ${a}`);
+      else if (role.retired === undefined && abilities.abilities[a]!.retired !== undefined)
+        err(`role ${role.id}: holds retired ability ${a}`);
       else if (abilities.abilities[a]?.scope !== 'role') err(`role ${role.id}: ${a} is not a role ability`);
     }
     if ((role.faction === 'cabal') !== (role.winsWith === 'cabal')) err(`role ${role.id}: faction/winsWith`);
   }
   // The main deck, covers, professions and looks (GDD 3.1, 3.9, 3.17).
   checkDecksAndLooks(c, err);
+  // Story R3 (GDD 3.20, A602): the Medium's rite site is a scene and one of its spawns.
+  const site = balance.rite.site;
+  if (!scenes[site.scene]) err(`balance.json rite.site: unknown scene ${site.scene}`);
+  else if (!scenes[site.scene]!.spawns.some((sp) => sp.id === site.spawn))
+    err(`balance.json rite.site: unknown spawn ${site.scene}.${site.spawn}`);
 
   // Abilities and items refer to each other.
   for (const ab of Object.values(abilities.abilities)) {
@@ -280,6 +297,7 @@ export function validateContent(c: Content): string[] {
   checkLore(c, err);
   checkTalk(c, err);
   checkStory(c, err);
+  checkAchievements(c, err);
   // Round 10 (A9; GDD 3.14): the logic table's classes and the census of every prop.
   checkInteractions(c, err);
 
@@ -658,6 +676,7 @@ function checkDecksAndLooks(c: Content, err: (msg: string) => void): void {
         continue;
       }
       if (role.ships !== 'V1') err(`${where}: deals unshipped role ${id}`);
+      if (role.retired !== undefined) err(`${where}: deals retired role ${id}`);
       if (lookIdOf(id) === null) err(`${where}: ${id} has no look`);
       if (classRows.has(id)) err(`${where}: lists the class row ${id}`);
     }

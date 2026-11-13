@@ -1973,7 +1973,8 @@ as a block, a tension gauge with the snap line. The set points are felt, never d
 a phone) and a jolt of the pin when a lifted pin crosses its band under light tension. Pointer: press a pin and drag
 it up and down; hold the pick button for tension and let go to try the pin. Keyboard: Left and Right choose the pin,
 Up and Down lift it, Space or Enter holds and lets go. The answer is the trace the server replays. D4a adds the effect
-Resistant (`icon_effect_resistant`), named by the data and with no copy of its own.
+Resistant (`icon_effect_resistant`), named by the data and with no copy of its own. Story R5 adds Ascended (`icon_effect_ascended`, a halo over a rising
+arrow), the 10X Vicar's buff (GDD 3.20), the same way: the own body panel only, no sign on the figure.
 
 | Line | Text | Where |
 |---|---|---|
@@ -2200,23 +2201,43 @@ reach the player's own client only (`PROTOCOL.md`); every title, line, goal and 
 |---|---|---|
 | `title` | The chapter's name, its set-up lines | `story.card.begin` |
 | `beat` | A line of narration or dialogue, an optional portrait, the next goal | `story.card.continue` |
+| `section` (part 2) | The section's name and set-up line; replaces the chapter title card after the chapter's first section (A515/A517 owner answers) | `story.card.continue` |
+| `line` (part 2) | A scripted NPC speaking: the speaker's name (`speaker`), the portrait, several lines shown as speech in quotation marks and italics (rich lines, darker folk-horror tone, A515 F1/F2) | `story.card.continue` |
 | `end` | The chapter's name, its lines, the summary counters as rows (a key `loaves_baked` reads "Loaves baked"), the next chapter's title | `story.card.next`, or `story.card.finish` with no `next` |
 
 A card is a modal dialog with the button focused, so Enter or a tap answers it; Esc does nothing (the story waits for
 the player). The panel is at most 36 rem wide, scrolls on a short phone and keeps a 44 px button. The title card is
-opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD band, at most 18 rem
+opaque; a beat dims the world behind it. The goals strip (`story-goals`) sits top-left under the HUD's goal band (76 px down), at most 18 rem
 wide, ticks a goal off (struck through, a "done" label for a screen reader) and is hidden while a card is up and when a
-chapter has no goals; an end card clears it.
+chapter has no goals; an end card clears it. At 600 px and under it shrinks to one line, the next open goal, 10.5 rem wide
+beside the clock, because the phone's top band is full.
 
 The title screen's **Story** entry (`menu-story`, above Join Game) shows only when the build has a story to start. It
-opens the chapter list of the story: each chapter with its set-up line, finished chapters marked and replayable (kept in
+opens the chapter list of the story (the arc's chapters, since P2's #479; a chapter holds several sections): each chapter with its set-up line, finished chapters marked and replayable (kept in
 `localStorage` under `wdi:story:finished`, optional), the next one open and the rest "Play the chapters in order"
 (Q-S4). Begin creates a private party and sends `story.start`; a replay adds the `chapterId`. There is no lobby: the
 server deals the first card and scene.
 
-Screens `story-menu`, `story-title`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
+**Save and resume (part 2, P3 2/3).** The server saves at each chapter break and sends the save in the private
+`story.saved`; the client keeps it whole on the device (`localStorage['wdi:story:save']`, one slot per story, never rolled
+back to an older `rev`, a damaged value is no save) behind the `StorySaveStore` interface (`ui/story/save.ts`), which a
+signed-in account replaces (`docs/accounts/plan.md` 5). The Story menu shows a **Continue from Chapter N** row
+(`story-resume`) above Begin when the saved `nextChapterId` is a chapter this build knows; it sends
+`story.start { storyId, resume }` with the save untouched. The client never composes or edits a save, and the server
+re-validates and decides.
+
+**End screen (part 2, P3 3/3).** When the player closes the story's last end card (one with no `next`), a dedicated
+screen (`story-finale`) lists every chapter of the story in order: its number and title, its one-line `summary` from the
+content (the set-up line when a chapter has none), a "Lost" mark for a chapter the save says failed, and its counters
+(the chapter's end-card counters of this session win over the save's). Below, the **story-tree achievements** this device
+has earned (`readEarned()` with titles from `achievements.json`), or "Nothing earned yet". One button closes it. The
+save's `summaries` are read defensively as `{ chapterId, failed?, counters? }` (proposed to P2); anything else is ignored.
+
+Screens `story-menu`, `story-title`, `story-section`, `story-line`, `story-resume`, `story-finale`, `story-beat` and `story-end`, at `390w` and `1280x720`, come from
 `e2e/screens-story.spec.ts` against the mock server path (`?mock=1`: `net/mock/storyMock.ts`, a fixed three-chapter
-fixture story). Screenshots land in the spec's output like `screens.spec.ts`'s.
+fixture story). `e2e/screens-story-live.spec.ts` plays the same entry against the real server: Story, Begin, the title and
+opening beat cards, the map's cutscene, then the HUD with the goals strip pinned top-left. `e2e/story-replay-live.spec.ts` seeds a save with two finished chapters and checks that Replay on the second starts the second: the menu sends the device's save with `story.start { chapterId, resume }`, because for a guest the server replays only a chapter its save finished. Screenshots land in the specs'
+output like `screens.spec.ts`'s.
 
 ### 14.54 The evidence verbs (10V, round 10)
 
@@ -2306,3 +2327,42 @@ interactions' labels, "Search" (`searchContainer`), "Pick the lock" (`pickContai
 one answers `NEED_TOOL` with "It is locked. A pick or a bar would open it." and, once open, "It stands open, and empty."
 An empty search is not a refusal: the searcher alone reads the system line "Only dregs and cobwebs."
 (`containers.empty`). What a container held shows only in the opener's inventory; no line names it.
+
+### 14.62 The Medium's rite (story R7)
+
+Story R7 (GDD 3.20, DECISIONS A605; `docs/story/rite.md`). Only the martyr's shade sees any of it, and every line follows
+the private `rite` messages (`ui/rite/RiteLayer.ts`, its lines in `ui/copy/rite.ts`). The Medium is drawn like any
+figure, in its look (`villager` until the art gives it one). The shade keeps a living seat's view: the role chip and
+the death toast say it is a shade, not a ghost, and it gets no ghost line. While the rite is open, a banner names the
+rite site's scene. Within `rite.reachTiles` of the Medium, the prompt shows; E or a tap on it sends
+`act.hold { action: 'rite', targetId: <the Medium's handle> }`. While the rite runs, the banner counts the seconds
+down. A toast marks the end of the rite and another the return. The buff shows only in the body panel, as Ascended
+(`icon_effect_ascended`, 14.48). The rite's state lives with the feed, so it outlives the World's restart at every door.
+
+| Line | Text | Where |
+|---|---|---|
+| the shade (`shade.toast`) | You are a shade | the role chip, and a 5 s toast at the death, in place of "You are a ghost" |
+| the way (`shade.banner`) | You are a shade. Find the Medium in {place} before day breaks. | the banner while the rite is open; {place} is the name of `rite.site.scene` |
+| the prompt (`prompt`) | Press E: take the rite | the prompt, within reach of the Medium while the rite is open |
+| the hold (`begun`) | The rite: {s} s | the banner while the rite runs, in whole seconds |
+| done (`done`) | The rite is done. You return at daybreak. | toast, 6 s |
+| back (`returned`) | You are back, stronger until dusk. | toast, 6 s, at the return |
+
+### 14.63 Conversion and the sermon (story I9b)
+
+Story I9b (GDD 3.23, DECISIONS A606). Every line follows the seat's own private view (`ui/conversion/SermonLayer.ts`,
+its lines in `ui/copy/conversion.ts`); no line names a seat. A seat in the Vicar's look standing within the bell's
+reach by day, that has not ended a sermon within `conversion.sermonCooldownS`, sees the sermon prompt beside the bell's own prompt. A
+tap of E still rings the bell; E held half a second, or a tap on the sermon prompt, sends `act.hold { action:
+'sermon', targetId: 'bell' }`, and the banner counts the sermon down. Walking off the bell ends it (the server gives
+nothing). The dealt Vicar's view shows its converted count (`Private.converted`) as a pill under the goal strip once
+it is above zero; it is a number only. The mock: `?vicar=bell` plays the Vicar's look one tile below the bell.
+
+| Line | Text | Where |
+|---|---|---|
+| the prompt (`prompt`) | Hold E: preach a sermon | the prompt, at the bell by day, again after the sermon's cooldown |
+| the sermon (`preaching`) | Preaching: {s} s. Stay by the bell. | the banner while the sermon runs, in whole seconds |
+| heard (`heard`, `heardOne`, `heardNone`) | Your sermon reached {n} souls. / Your sermon reached one soul. / Nobody stayed for your sermon. | toast, 6 s, to the preacher at the end |
+| converted (`converted`) | Your faith is whole. You are converted. | toast, 6 s, to the converted seat alone |
+| the count (`count`) | Converted: {n} | the pill under the goal strip, on the dealt Vicar's view |
+| Peaceful (`peaceful`) | The whole parish is converted. Your Peaceful route is met. | toast, 8 s, to the dealt Vicar alone |

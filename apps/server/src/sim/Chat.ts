@@ -5,6 +5,7 @@ import { emitSim } from './events/bus';
 import { type MeetingStat, flowOf, refuse } from './Flow';
 import { simOf } from './RoomSim';
 import { bodyBlocksAct } from './body/run';
+import { isShade } from './rite/shade';
 import { isOnLine } from './Train';
 import { seatOf } from './seatIds';
 
@@ -23,6 +24,7 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
     typeof payload.text === 'string' ? payload.text.trim().slice(0, balance.chat.maxChars).trim() : '';
   if (text === '') return refuse(room, sessionId, 'SAY_SOMETHING');
   if (isOnLine(room, sessionId)) return refuse(room, sessionId, 'NOT_IN_PLAY'); // round 10, C1: no ghost chat on the line
+  if (isShade(room, sessionId)) return refuse(room, sessionId, 'NOT_IN_PLAY'); // story R2: nor in a shade
   let channel: ChatChannel = 'ghost';
   if (!speaker.dead) {
     if (!SPEAKING_PHASES.includes(room.state.phase)) {
@@ -36,7 +38,7 @@ export function handleSay(room: PartyRoom, sessionId: string, payload: Record<st
     // Round 10, C1: a seat on the line hears neither the ghosts nor the meeting (phases.md 4: it does not attend).
     const seat = seatOf(room, client);
     if (isOnLine(room, seat)) continue;
-    if (channel === 'ghost' && !sim.players.get(seat)?.dead) continue;
+    if (channel === 'ghost' && (!sim.players.get(seat)?.dead || isShade(room, seat))) continue;
     client.send(S2C.chatMsg, { from: sessionId, text, channel });
   }
 }

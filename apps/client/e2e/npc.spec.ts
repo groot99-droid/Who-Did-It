@@ -229,9 +229,16 @@ test('three NPC seats added by hand: the host kills and reports, the NPCs vote i
     // The Killer finishes it. The host and the watcher are the party's only humans, so the deal is Paint The Town
     // Red (round 10, C5, GDD 3.8): the Killers win once their unique NPC kills reach half the NPC seats, rounded
     // up, two of the three here; and two kills also leave the Village at one, the Cabal's own line (A554).
-    await expect(page.getByTestId('hud-clock')).toBeVisible({
+    // An NPC that saw the kill suspects the host and votes for it with `suspectVoteChance` (sim/npc/meeting.ts), so
+    // this meeting can eject the Killer: the Village has then won, and the match has ended on its own line.
+    const gameover = page.getByTestId('gameover');
+    await expect(page.getByTestId('hud-clock').or(gameover)).toBeVisible({
       timeout: (balance.phases.revealS + 30) * 1000,
     });
+    if (await gameover.isVisible()) {
+      await expect(page.getByTestId('gameover-winner')).toContainText(/village/i);
+      return;
+    }
     w.swarm.rooms[0]!.send('debug.clock', { phase: 'dusk', clearCooldowns: true });
     const alive = () => {
       const out: string[] = [];

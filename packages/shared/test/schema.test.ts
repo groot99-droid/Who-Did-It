@@ -102,6 +102,7 @@ describe('shared basics', () => {
       resistant: 14, // round 10, D4a (GDD 3.14), appended
       heartened: 15, // round 10, D4b (GDD 3.14), appended
       tireless: 16, // round 10, D4b (GDD 3.14), appended
+      ascended: 17, // story R5 (GDD 3.20), appended
     });
   });
 });

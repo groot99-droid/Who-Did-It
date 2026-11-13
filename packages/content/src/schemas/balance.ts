@@ -525,6 +525,38 @@ export const BalanceFile = z.strictObject({
    */
   paintTown: Section({ winUnique: Frac }),
   /**
+   * Story mode (GDD 3.34): the seconds the player must share a scene with the seat holding a card, in a world phase,
+   * for `story.company` to be heard (arc E10; the shape of the conversion's shared time, 3.20).
+   */
+  story: Section({ companyS: z.number().positive() }),
+  /**
+   * Story R3 (GDD 3.20, DECISIONS A602): the Medium's rite. The Medium stands at `site` (a scene and one of its
+   * spawns: data, so the map revamp moves it without code); a shade within `reachTiles` of it starts the rite, which
+   * runs `holdS` and cannot be interrupted. Story R5: the returned martyr's buff until dusk multiplies its speed by
+   * `buff.speedFactor` and its maximum health by `buff.maxHpFactor`. Story R6: while the dealt Vicar wears it, every
+   * other seat within `aura.tiles` gains `aura.faithPerS` Faith a second.
+   */
+  rite: Section({
+    holdS: Seconds,
+    reachTiles: Tiles,
+    site: z.strictObject({ scene: z.string().min(1), spawn: z.string().min(1) }),
+    buff: z.strictObject({ speedFactor: z.number().min(1), maxHpFactor: z.number().min(1) }),
+    aura: z.strictObject({ tiles: Tiles, faithPerS: z.number().positive() }),
+  }),
+  /**
+   * Story I9 (GDD 3.23, DECISIONS A606; round 10 scope I9): conversion. A seat is converted once its private Faith
+   * reaches `faithAt`. The Vicar's sermon is a hold of `sermonS` at the hub's bell, again `sermonCooldownS` after one ends; every other seat that
+   * stands within `sermonTiles` of the bell for at least `listenS` of it gains `sermonFaith`, once a day.
+   */
+  conversion: Section({
+    faithAt: z.number().int().positive(),
+    sermonS: Seconds,
+    sermonCooldownS: Seconds,
+    sermonTiles: Tiles,
+    listenS: Seconds,
+    sermonFaith: z.number().int().positive(),
+  }),
+  /**
    * Round 10 (GDD 3.24, T6): the mood hooks. A seat or figure whose mood is not Calm narrows its next work trip with
    * this chance (`moodPool`): Scared to its home or a lit scene, Hungry to the bakery, Angry to the scene of the seat it
    * is angry at, Desperate to a scene nobody stands in.

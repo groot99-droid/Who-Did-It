@@ -35,6 +35,7 @@ import { decaySeconds, spawnClue } from './Clues';
 import { JAIL_GAMES, type JailGame, addStrength, loseMaxHp, markPlayed, playedToday } from './JailGames';
 import { addStack, canAdd, count, take } from './Inventory';
 import { movePurse, TOWN } from './economy/purse';
+import { emitSim } from './events/bus';
 import { emitNoise } from './Noise';
 import { isVerbPhase, reject, sceneIndex, tileCentre } from './World';
 import { refusal, sendRefusal, type Refusal } from './refusal';
@@ -181,6 +182,13 @@ function lockResult(
   state.state = after.state;
   state.untilTick = after.respawnS === null ? 0 : room.state.tick + Math.round(after.respawnS * TICK_RATE);
   room.state.scenes.get(lock.sceneId)?.propStates.set(lock.propId, state);
+  // Story mode (arc E9): a section's goal can be "open the hall door". Server-internal, like every bus event.
+  emitSim(room, {
+    tick: room.state.tick,
+    kind: 'story.picked',
+    seat: sessionId,
+    data: { lock: lock.propId },
+  });
   const mode = interactions.interactions[lock.interactionId]?.modes.find((m) => m.minigame === 'lockpick');
   // The scratch is the same for every picker (seams.md 3 row 12); the fine rolls on `locks`, a stream no client sees.
   if (mode?.leaves === 'scratch') leaveScratch(room, lock);
@@ -366,8 +374,9 @@ export function handleTaskHold(room: PartyRoom, sessionId: string, taskId: strin
 
 /**
  * The global bar as the lists say it: finished real tasks over all real tasks; a ghost's finished ones count up to
- * `ghostShareCap`. The martyred Vicar's ghost (GDD 3.20) counts each real task it finishes in the `martyrS` seconds
- * after its reveal `martyrWeight` times, outside the cap; before and after that window its tasks count as any ghost's.
+ * `ghostShareCap`. The martyred Vicar the Medium's rite brought back (GDD 3.20) counts each real task it finishes in
+ * the `martyrS` seconds after its return `martyrWeight` times, outside the cap; before and after that window its tasks
+ * count as its own (a ghost's before the return).
  * Null when no seat holds a real task (the bar then stays where the deal left it). The `taskBar` invariant reads it.
  */
 export function taskBarValue(room: PartyRoom): number | null {
@@ -384,14 +393,16 @@ export function taskBarValue(room: PartyRoom): number | null {
       total++;
       if (t.done) finished++;
     }
-    if (!ghost) done += finished;
-    else if (id !== martyr?.seat) ghostDone += finished;
-    else {
+    // Story R4 (A600 R-Q6): the returned martyr's real tasks in its window count `martyrWeight` times; the rest count
+    // as its own, living or (killed again) a ghost's.
+    let boosted = 0;
+    if (id === martyr?.seat) {
       const before = Math.min(finished, martyr.doneBefore);
-      const boosted = Math.max(0, Math.min(finished, martyr.doneAtEnd ?? finished) - before);
-      ghostDone += finished - boosted;
+      boosted = Math.max(0, Math.min(finished, martyr.doneAtEnd ?? finished) - before);
       martyrDone += boosted;
     }
+    if (!ghost) done += finished - boosted;
+    else ghostDone += finished - boosted;
   }
   if (total === 0) return null;
   const counted =

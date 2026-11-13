@@ -93,7 +93,10 @@ export class MockNetwork implements NetworkService {
   private readonly story = new StoryMock((type, payload) => this.bus.emit(type, payload as never));
 
   send<K extends ClientMessageType>(type: K, payload: ClientMessages[K]): void {
-    if (type === 'story.start') this.story.start((payload as ClientMessages['story.start']).chapterId);
+    if (type === 'story.start') {
+      const p = payload as ClientMessages['story.start'];
+      this.story.start(p.chapterId, p.resume);
+    }
     if (type === 'story.continue') this.story.continue();
     const room = this.lobby;
     if (room === null) return;

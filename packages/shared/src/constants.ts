@@ -153,6 +153,8 @@ export const EffectId = {
   heartened: 15,
   /** Round 10, D4b (GDD 3.14): the Miner's Pasty's running without stamina cost for a while; private, no status bit. */
   tireless: 16,
+  /** Story R5 (GDD 3.20): the 10X Vicar's buff from the martyr's return to the next dusk; private, no status bit. */
+  ascended: 17,
 } as const;
 export type EffectKey = keyof typeof EffectId;
 export type EffectIdValue = (typeof EffectId)[EffectKey];

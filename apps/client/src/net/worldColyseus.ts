@@ -50,6 +50,7 @@ interface PlayerState {
     tasks?: { forEach(cb: (t: TaskSnap) => void): void };
     purse?: number;
     faith?: number; // round 8, 8D
+    converted?: number; // story I9
     asleep?: boolean; // round 10, A7
     inBed?: number;
     inBedOf?: number;
@@ -110,12 +111,19 @@ export class ColyseusWorldFeed implements WorldFeed {
     room.onMessage('sceneEnter', (m: SceneEnter) => this.bus.emit('sceneEnter', m));
     room.onMessage('noise', (m: NoisePulse) => this.bus.emit('noise', m));
     room.onMessage('killed', (m: WorldFeedEvents['killed']) => {
-      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost.
-      const onLine = Object.keys(m.roles ?? {}).length === 0;
+      // Round 10, C1b (seams.md 3, row 6): a death on the line names no role, and it makes no ghost. Story R2: the
+      // martyr's shade names no role either, but it is dead and walks as a ghost (its view stays a living seat's).
+      const onLine = m.shade !== true && Object.keys(m.roles ?? {}).length === 0;
       this.ghost = !onLine;
       this.line = onLine;
       this.bus.emit('killed', m);
     });
+    // Story R4 (GDD 3.20): the martyr the Medium's rite brought back lives again; R7 draws the rite (`RiteLayer`).
+    room.onMessage('rite', (m: WorldFeedEvents['rite']) => {
+      if (m.stage === 'returned') this.ghost = false;
+      this.bus.emit('rite', m);
+    });
+    room.onMessage('conversion', (m: WorldFeedEvents['conversion']) => this.bus.emit('conversion', m)); // story I9
     room.onMessage('clueFound', (m: WorldFeedEvents['clueFound']) => this.bus.emit('clueFound', m));
     room.onMessage('phaseChange', (m: WorldFeedEvents['phaseChange']) => this.bus.emit('phaseChange', m));
     room.onMessage('aim', (m: WorldFeedEvents['aim']) => this.bus.emit('aim', m));
@@ -423,6 +431,10 @@ export class ColyseusWorldFeed implements WorldFeed {
   // Round 8, 8D (GDD 3.23): Faith, the public HQ tiers and the civic acts.
   faith(): number {
     return this.state.players.get(this.selfId)?.priv?.faith ?? 0;
+  }
+
+  converted(): number {
+    return this.state.players.get(this.selfId)?.priv?.converted ?? 0;
   }
 
   hqTiers(): Record<string, number> {

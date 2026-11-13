@@ -15,7 +15,8 @@
 }
 
 /* The title card is the darkest; a beat lets the room show behind it a little; the end card sums up. */
-.wdi-story--beat {
+.wdi-story--beat,
+.wdi-story--line {
   background: var(--wdi-scrim);
 }
 
@@ -51,7 +52,8 @@
   overflow-wrap: anywhere;
 }
 
-.wdi-story--beat .wdi-story__line {
+.wdi-story--beat .wdi-story__line,
+.wdi-story--line .wdi-story__line {
   font-size: 1.15rem;
 }
 
@@ -101,9 +103,9 @@
 }
 
 /* The goals strip: top-left under the HUD band on a desktop, full width but short on a phone. */
-.wdi-story-goals {
+.wdi-story-goals.wdi-glass {
   position: fixed;
-  top: 56px;
+  top: 76px;
   left: var(--wdi-space-3, 12px);
   z-index: var(--wdi-z-hud);
   max-width: min(18rem, calc(100vw - 2 * var(--wdi-space-3, 12px)));
@@ -162,4 +164,87 @@
   margin: 0;
   color: var(--wdi-text-muted);
   font-size: 0.9rem;
+}
+
+/* On a phone the HUD fills the top: the strip shrinks to one line, the next open goal, beside the clock. */
+@media (max-width: 600px) {
+  .wdi-story-goals.wdi-glass {
+    width: 10.5rem;
+    padding: var(--wdi-space-1, 4px) var(--wdi-space-2, 8px);
+  }
+
+  .wdi-story-goals .wdi-eyebrow,
+  .wdi-story-goals li:not(.is-next) {
+    display: none;
+  }
+
+  .wdi-story-goals li.is-next span:not(.wdi-story-goals__mark) {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+/* A section card (chapter 2 on): a quieter title, the world still dim behind it. */
+.wdi-story--section .wdi-story__panel {
+  border-top: 2px solid var(--wdi-text-muted);
+}
+
+/* A scripted NPC line: the speaker's name, then the lines as speech. Darker and slower than narration (A515 F1/F2). */
+.wdi-story--line .wdi-story__panel {
+  border-left: 3px solid var(--wdi-text-muted);
+}
+
+.wdi-story__speaker {
+  margin: 0;
+  font-family: var(--wdi-font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wdi-story--line .wdi-story__line {
+  font-style: italic;
+}
+
+.wdi-story--line .wdi-story__line::before {
+  content: '\201C';
+}
+
+.wdi-story--line .wdi-story__line::after {
+  content: '\201D';
+}
+
+/* The end screen: the chapters in order with their summaries, then what was earned. */
+.wdi-story--finale .wdi-story__panel {
+  max-height: 100%;
+  overflow-y: auto;
+  text-align: left;
+}
+
+.wdi-story-finale__chapters,
+.wdi-story-finale__earned {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--wdi-space-3, 12px);
+  width: 100%;
+}
+
+.wdi-story-finale__chapters p {
+  margin: 4px 0;
+  color: var(--wdi-text-muted);
+}
+
+.wdi-story-finale__chapters dl {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  margin: 0;
+}
+
+.wdi-story-finale__chapters dd {
+  margin: 0;
+  text-align: right;
 }

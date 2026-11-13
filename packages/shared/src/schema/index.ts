@@ -302,6 +302,11 @@ export const Private = schema(
      * client can link to its session id; '' in the lobby, where a client's seat id is its session id.
      */
     seatId: str(),
+    /**
+     * Story I9 (GDD 3.23, A606; seams row 28): on the dealt Vicar's own view, how many other seats are converted.
+     * A count, never a name; 0 on every other view.
+     */
+    converted: u8(),
   },
   'Private',
 );

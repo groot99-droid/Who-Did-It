@@ -15,6 +15,7 @@ import type { PartyRoom } from '../src/rooms/PartyRoom';
 import { createServer } from '../src/server';
 import { adminConfig, signAdminToken } from '../src/services/adminAuth';
 import { simOf } from '../src/sim/RoomSim';
+import { mediumHandle } from '../src/sim/rite/rite';
 import { figuresOf } from '../src/sim/townsfolk/figures';
 import { emitSim } from '../src/sim/events/bus';
 import { autoOf } from '../src/sim/auto/Auto';
@@ -169,7 +170,8 @@ describe('with the variables set', () => {
     );
     expect(avatars).toBeGreaterThan(0);
     expect(seats.size).toBe(avatars);
-    expect(figures).toBe(figuresOf(room).size); // round 8, 8E: the admin sees every ambient figure
+    // Round 8, 8E: the admin sees every ambient figure; story R3: and the Medium at the rite site, also seatless.
+    expect(figures).toBe(figuresOf(room).size + (mediumHandle(room) === null ? 0 : 1));
     for (const seat of seats) expect(room.state.players.has(seat)).toBe(true);
     await admin.leave();
   });
