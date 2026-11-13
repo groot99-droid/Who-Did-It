@@ -962,8 +962,9 @@ describe('the hunt, the fallback and the streams (R15 to R18)', () => {
       // empty here.
       else if (name === 'loot') expect(key ?? '', k).toBe('');
       // Round 10 (A7): the human seats' homes, drawn once on the first world tick from their own stream.
+      // Round 10 (M1a): barks draw from the public `barks` stream, keyed by the speaker (row 36).
       // Round 10 (C4c): the morning delivery's hardships, a secret stream no NPC draw shares.
-      else expect(['npcNames', 'nodes', 'body', 'homes', 'hardship'], k).toContain(name);
+      else expect(['npcNames', 'nodes', 'body', 'homes', 'barks', 'hardship'], k).toContain(name);
     }
   });
 
