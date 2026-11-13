@@ -186,6 +186,8 @@ export const REFUSAL_COPY: { readonly [R in RefusalReason]: Line<R> } = {
     a.missing?.length
       ? `The oven wants the parts first: ${list(a.missing)}.`
       : 'The oven wants the parts first.',
+  // Round 10, M1 (seams.md 3 row 36)
+  UNKNOWN_PHRASE: '', // the wheel sends only pool ids; an id it lacks is dropped, nothing is shown
 };
 
 /** The per-interaction `fail` lines of `interactions.json`, by interaction id and then reason (failures.md 5). */

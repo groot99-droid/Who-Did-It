@@ -35,6 +35,7 @@ export const STORY_STREAMS = [
   'trialTick',
   'trialChance',
   'autopsy',
+  'barks',
   'hardship', // round 10, C4c (DECISIONS A390): the morning delivery's hardships
 ] as const;
 

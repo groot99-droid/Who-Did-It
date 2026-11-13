@@ -40,7 +40,8 @@
         "pickaxe",
         "hammer",
         "quiltedCoat",
-        "skinningKnife"
+        "skinningKnife",
+        "handcuffs"
       ],
       "buys": []
     },
@@ -66,7 +67,8 @@
         "pickaxe",
         "hammer",
         "quiltedCoat",
-        "skinningKnife"
+        "skinningKnife",
+        "handcuffs"
       ],
       "buys": []
     },
@@ -90,6 +92,7 @@
     "rope": { "ask": 3 },
     "oil": { "ask": 2 },
     "candle": { "ask": 1 },
+    "handcuffs": { "ask": 9 },
     "planks": { "ask": 3 },
     "axe": { "ask": 8 },
     "pickaxe": { "ask": 10 },

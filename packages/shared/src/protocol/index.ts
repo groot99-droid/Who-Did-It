@@ -121,6 +121,8 @@ export const S2C = {
   storyCard: 'story.card',
   /** Story mode, private to the player's own client: the chapter's goals and which are done. */
   storyGoals: 'story.goals',
+  /** Round 10, M1 (seams.md 3 row 36): a quick-chat line over one figure's head, the same from a seat or a figure. */
+  bark: 'bark',
   /** Round 10, C4d (GDD 3.33, seams.md 3 row 37), private to the reader: the Clerk's rent ledger. */
   ledger: 'ledger',
 } as const;
@@ -428,6 +430,8 @@ export interface S2CPayloads {
     unseen?: boolean;
   };
   noise: { sceneId: string; x: number; y: number; kind: string };
+  /** A quick-chat bubble over the avatar `handle`; names no seat, card, side or channel. */
+  bark: { handle: string; phraseId: string };
   /** Where the shout rang; names no seat, no card and no body. */
   shout: { sceneId: string; x: number; y: number };
   /**

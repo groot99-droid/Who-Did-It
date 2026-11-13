@@ -150,10 +150,11 @@ Inventory: 24 slots (the round-10 screen splits them into a hotbar of 6 and a pa
 | Medkit, Bandage, Salts | Heal and stop Bleeding; kill immunity 60 s and stop Bleeding; cure Slowed or Poisoned (3.22) | V1 |
 | Remedy, Nightshade, Fowling Piece | Herbalist's save and poison (one each), and the Remedy cures Poisoned by day (3.22); the Gamekeeper's Last Shot | V1 |
 | Wake Loaf | Food: cures Famished and Weakened and restores stamina (3.22) | V1 |
-| Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier | V1 |
+| Lantern, Candle | Carried light radius 4 / 2; wolves flee light within 4 tiles; off = stealthier. Since round 10 (K3) every card's start kit holds a light, a Candle where it had none | V1 |
 | Pocket Watch, Chalk, Rope | Time; floor marks; free a snared player | V1 |
 | Oil, Wrench, Planks, Letter, Flour | Task deliverables fetched from other scenes | V1 |
-| Forged Alibi, Handcuffs, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
+| Handcuffs | Held in the selected hotbar slot, they cut a cuff hold (3.31) to `kit.handcuffsHoldMult` of `law.cuffHoldS`, and the cuff spends them; sold at the general store. They change nothing outside a manhunt (round 10, K3) | V1.5 |
+| Forged Alibi, Crossbow kit, Lockpicks, Smoke Bomb, Heirlooms | V1.5 kits | V1.5 |
 
 **Snares (round 10, K6; DECISIONS A240).** Anyone holding a Snare may set it (`act.ability {abilityId: 'snare'}`): it
 leaves the pack and lies on the tile the setter stands on, never on a portal and never on a tile that holds one. The
@@ -173,7 +174,7 @@ human. Disarming a seen snare, snares on creatures and the client's drawing foll
 
 **The deal (round 7, A133).** At Start, after the cards, each human seat is dealt its list from the pool of fetch tasks whose source and at least one target stand on the chosen map at the party's profile (3.13); BlackPine, whose scenes hold no station yet, has an empty pool, so it deals nothing and its bar never moves. A Village seat draws `tasksEach` (3.9; round 10, A5: 29 to 48 for the 12-cycle match, capped by the pool until the chores and quests of D9 widen it) real tasks and a Cabal or neutral seat as many fake ones, both without replacement from the same pool, on a stream of their own that nothing public shares. An NPC seat is dealt no list: its brain plays no mini-game, and a list never worked would cap the bar below 100 for the match. The bar starts every match at 0. A ghost finishes its own tasks (3.8) through the same hold and the same mini-game, under the ghost cap above. **Shutter the windows (7M).** The co-op task is dealt like the others. Any seat within `coopRadiusTiles` of the shutters may hold E there, with or without the task on its list; the shared progress runs each tick that `coopPlayers` or more hold, pauses while fewer do, and starts again from nothing once everyone has let go. At `holdS` the task completes for every holder whose own list has it undone (a real one moves the bar, a fake one writes its alibi only) and the helpers earn nothing. Every holder sees the shared progress and the pause. **Fetching (7M).** At a task's source prop the same hold is the pick-up: it puts the task's deliverable (its tool, `toolQty` of it) in your pockets, once at a time (not while you carry that many, not without a free slot), and the puzzle at the target takes it back when the task is done. A fake list's holder goes through the same motion at the same shelf and takes nothing; inventories are private, so nothing public tells the two apart. The `taskBar` invariant (A133) holds the bar to what the lists say (so a fake task never moved it and the ghost cap held), lets no NPC seat hold a list, and matches every `taskDone` of the match log to a finished entry on its seat's list.
 
-**Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: an 8-phrase quick-chat wheel (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go) as speech bubbles within 5 tiles, plus world pings. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
+**Communication.** No voice in V1. Global text chat in meetings, lines of at most 200 characters. Outside meetings: a quick-chat wheel of 16 phrases (Follow me / Where were you? / I saw something / Help! / Clear / Suspicious / Wait / Go, and, since round 10, M1, the world lines Anyone seen the baker? / Got any food to spare? / Mind the wolves / I owe the clerk / Was that the bell? / Wolf! / Keep to the light / Getting dark) as speech bubbles within `chat.quickChatRadiusTiles` (5), plus world pings. A seat barks at most once in `chat.quickGapS` (3 s) and only in a world phase; a meeting has its own chat. **Barks** (round 10, M1, `seams.md` 3 row 36): the bubble is one message, `bark {handle, phraseId}`, sent to the clients that are sent the speaker's figure and to the speaker's own, and it carries no seat, card, side or channel. A human sends it from the wheel; an NPC seat and an ambient figure send the same message from their own `barks` stream, at shared moments (the bell rings, a wolf comes within `bark.wolfTiles` of them, a lantern is lit where they can see it: each rolls `bark.reactChance`, then waits `bark.reactDelayS` and draws a line from that moment's list in `bark.moments`) and at idle moments (a gap drawn from `bark.idleGapS`, whose minimum is the human's own `chat.quickGapS`, and a line from the whole pool). The gate is one function for human and NPC seats, so a seat that cannot act does not bark, and neither a bark at the floor nor a line out of its moment marks a human; every draw is made whether or not the actor may bark. Cabal channel and ghost channel are sent per-recipient by the server; the client never chooses a channel. (M3) A living player may speak only while a meeting runs (discussion, vote and reveal), to everyone; a ghost may speak in any phase, to the other ghosts only; empty lines are refused and long ones are cut to the limit. Proximity text chat is a V1.5 toggle.
 
 ### 3.6 PvE
 
@@ -650,7 +651,10 @@ in a dark scene receives another avatar only within the night radius and a clear
 grid (walls, and the `u` ground that is walkable but blocks sight), or when that avatar stands in the pool of a
 scene light burning now; a lit carried light (Lantern, Torch, Candle) adds 2 tiles (`vision.lanternTiles`) to both
 seeing and being seen, so two lit seats see each other 4 tiles further. Every light starts out: its holder lights
-it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. At night and
+it or puts it out (`act.light`), and a lit light shows on its avatar as the lantern bit, never by card. An NPC seat
+lights the light it holds by the rule a person would follow (round 10, K3): at dusk, by night and in a scene that is
+dark by day, a delay within `kit.npcLightDelayS` after the rule says so, and it puts it out when the rule stops, so a
+lit light marks no human. At night and
 in the Final Night every scene is dark on the server in the same way (round 8, 8L, A190), so a lantern post's pool
 on the square shows who stands in it and nothing else; by day, at dusk and at dawn an ordinary scene is sent whole
 and its darkness stays the client's picture (3.13). Ghosts see everything. (6G; 3.7's lantern line
@@ -1527,7 +1531,8 @@ filing there would tell the table that no human is left on the town side.
 
 **The manhunt (B4).** A passed petition's warrant waits its turn, and one manhunt runs at a time, for
 `manhunt.durationS` (120 s), a world phase rather than a pause. It is public as `GameState.manhunt` (the accused, its
-clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s) with a
+clock and its state: hunting, then cuffed). Any living, free seat may **cuff**: a hold of `law.cuffHoldS` (3 s, `kit.handcuffsHoldMult` of it with Handcuffs in the
+selected hotbar slot, which the cuff spends) with a
 figure in reach (`act.hold {action: 'cuff'}`), stopped if the cuffer moves, the figure leaves reach, the figure strikes
 or the cuffer is struck. The cuff tests the face the figure is drawn with, never the seat behind it: a figure not
 drawn as the accused is refused (`NOT_HUNTED`), the accused drawn as someone else included. It lands on the seat

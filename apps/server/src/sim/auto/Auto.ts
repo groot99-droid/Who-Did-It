@@ -65,6 +65,7 @@ const STREAMS = {
   locks: 1, // round 10, D5
   pairing: 1, // round 10, B8
   autopsy: 1, // round 10, V1b
+  barks: 1, // round 10, M1
   hitman: 1, // round 10, C4
   trialTick: 1, // round 10, B6d2
   trialChance: 1, // round 10, B6d2
