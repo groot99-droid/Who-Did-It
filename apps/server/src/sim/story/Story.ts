@@ -9,7 +9,9 @@ import { ANY_SIM, type SimEvent, emitSim, onSim } from '../events/bus';
 import { flowOf, setPhase } from '../Flow';
 import { settle } from '../Inventory';
 import { dayPartOf } from '../mobs/spawn';
+import { martyrOf } from '../Memorial';
 import { isNpcSeat } from '../Npc';
+import { martyrSeatOf, shadeOf } from '../rite/shade';
 import { simOf } from '../RoomSim';
 import { SCENE_KEYS, isWorldPhase } from '../World';
 import { endMatch } from '../Win';
@@ -18,6 +20,7 @@ import { runAction } from './actions';
 import { type Unit, unitsOf } from './units';
 import { type ChapterSummary, type SaveCtx, type StorySave, saveStoreFor } from '../../accounts/saves';
 import { castTable, holderOf, switchRole } from './handover';
+import { takeShade } from './shadeHandover';
 import { type Latches, hear, holds } from './triggers';
 import { releaseStoryHitman, turnForStory } from '../vendettas/arrival';
 import { resetProgress } from '../vendettas/progress';
@@ -352,6 +355,9 @@ function giveItem(room: PartyRoom, state: StoryState, ref: string): void {
 function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = false): void {
   const chapter = state.units[idx];
   if (chapter === undefined) return;
+  // Arc E17 (R8): a section that needs a waiting shade (`onlyIf: 'shade'`), with none (the Knife never found the
+  // Vicar's look, or the wait is over), is skipped: no handover, no card of its own, ended at once and not failed.
+  if (chapter.onlyIfShade && !replay && shadeOf(room) === null) return skipSection(room, state, idx);
   const previous = state.units[idx - 1];
   if (idx > 0 || replay) {
     // A replay is the same card again: the view starts over and the player is made whole where they stand.
@@ -363,6 +369,8 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
       new Set(state.units.map((c) => c.roleId)),
       chapter.vendetta,
     );
+    // Arc E15 (R8): a section that plays the shade gives the player the martyr's body, not the card in its own.
+    if (chapter.shade && !replay) takeShade(room, state.humanId);
     seekPhase(room, chapter);
   } else if (chapter.look !== undefined) {
     const player = room.state.players.get(state.humanId);
@@ -417,6 +425,28 @@ function startChapter(room: PartyRoom, state: StoryState, idx: number, replay = 
     lines: [...new Set(opening), ...handed.map((h) => h.text)],
   });
   sendGoals(room, state);
+}
+
+/**
+ * Arc E17 (R8): `idx` is skipped. It becomes the running unit only to end at once, not failed: a section's break
+ * (none) or, when it is its chapter's last, the chapter's end card and save, as any end. `story.skip` names it.
+ */
+function skipSection(room: PartyRoom, state: StoryState, idx: number): void {
+  const unit = state.units[idx]!;
+  if (unit.first) {
+    state.totals = {};
+    state.chapterFailed = false;
+  }
+  state.chapterIdx = idx;
+  state.chapterStartTick = room.state.tick;
+  state.ended = false;
+  state.failed = false;
+  state.fired = [];
+  state.latches = { set: new Set() };
+  state.goalsDone = new Set();
+  state.counters = {};
+  emitSim(room, { tick: room.state.tick, kind: 'story.skip', data: { chapterId: unit.id } });
+  endChapter(room, state, false);
 }
 
 function endChapter(room: PartyRoom, state: StoryState, failed: boolean): void {
@@ -606,6 +636,15 @@ function watchCompany(room: PartyRoom, state: StoryState, me: { sceneIdx: number
   }
 }
 
+/**
+ * Arc E16 (R8, arc.md 3.4): in a section that plays the shade, the player's death is no failure while it is the
+ * match's martyr and has not come back (a waiting shade, or a ghost whose wait lapsed with no rite). Once the rite has
+ * brought it back, a death fails the chapter as in any section (Q-A9).
+ */
+function waitsAsShade(room: PartyRoom, state: StoryState, unit: Unit): boolean {
+  return unit.shade && martyrSeatOf(room) === state.humanId && martyrOf(room)?.seat !== state.humanId;
+}
+
 // --- the stage -----------------------------------------------------------------------------------------------------
 
 /**
@@ -669,7 +708,8 @@ export function runStory(room: PartyRoom): void {
   }
 
   const tick = room.state.tick - state.chapterStartTick;
-  if (simOf(room).players.get(state.humanId)?.dead) return endChapter(room, state, true);
+  if (simOf(room).players.get(state.humanId)?.dead && !waitsAsShade(room, state, chapter))
+    return endChapter(room, state, true);
 
   for (const g of chapter.goals)
     if (g.trigger && holds(g.trigger, `g:${g.id}`, tick, state.latches)) completeGoal(room, state, g.id);

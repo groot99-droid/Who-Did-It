@@ -866,6 +866,9 @@ cap, and is converted at `conversion.faithAt` (3.23). The aura follows the dealt
 Vicar's look comes back with the buff and no aura. It draws nothing and tells no one; each seat sees only its own Faith.
 The martyr is named at its death: the first seat of the match in the Vicar's look struck by the Knife is
 the martyr, and it walks as a **shade** until the next day (3.8). A second such death that match is an ordinary ghost.
+**The rite on the bus** (story R8, `docs/story/arc.md` E17, A608): each stage is also a sim event naming the shade's
+seat, `rite.open`, `rite.begun`, `rite.done`, `rite.returned`, and `rite.lapsed` when the wait ends with no rite done.
+The bus reaches the match log and the server's subscribers (a story's triggers), never a client.
 
 ### 3.21 Parties, profiles and friends
 
@@ -1712,6 +1715,19 @@ No number is stated here: the roster, the seed words and the chapters are in `st
   vendetta, carries the Derringer and is offered the contract whose mark is the seat holding the `mark` card. No line is
   sent to the town. A turned story seat never boards the Dusk Train; the section's own end closes it, and the next
   section lets the seat go, its contract and its flag with it.
+- **The martyr's shade** (story R8, `docs/story/arc.md` 3.4 and E16, A608). A section that names `shade: true` plays
+  the match's martyr (3.20) as its shade: the player's death there is no failure while the seat is the martyr and has
+  not come back (a waiting shade, or a ghost whose wait lapsed with no rite). The section ends on its own trigger,
+  which may be a rite stage (3.20, "The rite on the bus"). Once the rite has brought the seat back, a death fails the
+  section as in any other.
+- **The shade handover** (story R8, `arc.md` E15, A608). When a section that plays the shade starts while the match's
+  martyr is an NPC seat waiting as a shade, the card handover runs as at any break (the card, kit, look, traits and
+  name move), and then the two seats exchange bodies: where each stands, whether it lives, its health, its corpse and
+  its figure. The player is then the shade where the martyr fell, with the Vicar's card; the seat it left goes on
+  alive where the player stood, as the NPC holding the player's old card. Every other per-seat memory stays with its
+  seat. With no waiting shade the section starts as any other, unless it names `onlyIf: 'shade'` (`arc.md` E17): then
+  it is skipped, with no handover and no card of its own, and ends at once, not failed (the sim event `story.skip`
+  names it); as its chapter's last section, the chapter's end card and save follow as at any end.
 - **Night-power events.** A night power that lands (Hear Confession, Keep Watch, Remedy, Nightshade), by a human or
   an NPC, emits the sim event `nightPower` with the user's `seat` and `data: { ability, target }`, so a section or a
   goal can end on it (`{ event: 'nightPower', seat: 'player', data: { ability: 'confession' } }`). It is server-side only:

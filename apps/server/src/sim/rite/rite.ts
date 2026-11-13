@@ -3,7 +3,7 @@ import { Avatar, Phase, S2C, TICK_RATE, TILE_PX } from '@wdi/shared';
 import type { PartyRoom } from '../../rooms/PartyRoom';
 import { avatarMemory, avatarOf, newHandle } from '../Avatars';
 import { AnimId } from '../constants';
-import { onSim } from '../events/bus';
+import { emitSim, onSim } from '../events/bus';
 import { mapScenesOf } from '../MapSites';
 import { refusal, sendRefusal, type Refusal } from '../refusal';
 import { simOf } from '../RoomSim';
@@ -53,7 +53,10 @@ function memoryOf(room: PartyRoom): RiteMemory {
     if (!DAWNS.includes(e.data?.to as number)) return;
     const shade = shadeOf(room);
     if (shade === null) return;
-    if (m.done !== shade) return expireShade(room);
+    if (m.done !== shade) {
+      expireShade(room);
+      return riteEvent(room, 'lapsed', shade);
+    }
     const ended = endShade(room)!;
     if (!returnMartyr(room, ended.seat, ended.deathTick)) ghostView(room, ended.seat);
   });
@@ -119,12 +122,14 @@ export function runRite(room: PartyRoom): void {
   if (shade !== null && memory.told !== shade && memory.handle !== null) {
     memory.told = shade;
     room.clients.getById(shade)?.send(S2C.rite, { stage: 'open', medium: memory.handle });
+    riteEvent(room, 'open', shade);
   }
   const running = memory.running;
   if (running && room.state.tick >= running.endTick) {
     memory.running = null;
     memory.done = running.seat;
     room.clients.getById(running.seat)?.send(S2C.rite, { stage: 'done' });
+    riteEvent(room, 'done', running.seat);
   }
 }
 
@@ -153,4 +158,18 @@ export function handleRiteHold(room: PartyRoom, seat: string, handle: string): v
   p.input = null;
   p.hold = null;
   room.clients.getById(seat)?.send(S2C.rite, { stage: 'begun', endsTick: endTick });
+  riteEvent(room, 'begun', seat);
+}
+
+/**
+ * The rite's stages on the sim bus (story R8, arc.md E17): `rite.open`, `rite.begun`, `rite.done`, `rite.returned`
+ * and `rite.lapsed` (the wait ended with no rite: a ghost), each naming the shade's seat, so a story goal or end can
+ * read them. The bus reaches the match log and server subscribers only, never a client.
+ */
+export function riteEvent(
+  room: PartyRoom,
+  stage: 'open' | 'begun' | 'done' | 'returned' | 'lapsed',
+  seat: string,
+): void {
+  emitSim(room, { tick: room.state.tick, kind: `rite.${stage}`, seat });
 }
