@@ -91,7 +91,7 @@ owner's call:
 One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_build.py` for any interior scene:
 
 1. **Read** `scenes/<id>.json`: the grid, the material letters, the props, the lights, the portals and the spawns.
-2. **Shell:** floor and walls from the grid at the same 1.5 m per tile. Wall height and ceiling come from one table per
+2. **Shell:** floor and walls from the grid at 1 m per tile (Q1; the exterior stays at 1.5 m). Wall height and ceiling come from one table per
    biome (`house`, `cave`). Material letters map to Poly Haven roles, as `GROUND_ROLES` does outside.
 3. **Doors:** every portal tile becomes a door, stair or hatch frame on its wall. Its id stays in the object name, so the
    game data and the 3D scene line up.
@@ -102,8 +102,21 @@ One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_
    village look.
 7. **Outputs:** `build/<sceneId>.blend` (git-ignored), plus `--preview` stills, the same as the village.
 8. **Game renders (Q4: the 3D interiors replace the old interior art):** an orthographic camera at the game's isometric
-   angle, framed on the scene's tile grid, so each tile lands where the client draws it. The output format and the
-   client manifest are settled in the data/client PR (section 7).
+   angle, framed on the scene's tile grid (pivot at `toScreen(32N, 32M)`, 58.79 px per vertical metre, so characters keep
+   their height). Proven on `widow_bedroom` (2026-11-14). The delivery, agreed by Story mode (2026-11-14):
+   - **Renders per room:** `bg` (the floor and the back shell, drawn once at depth -25, never an occluder) and one slice per
+     standing solid tile, `<id>#<tx>_<ty>`, cut from the standing pass by its tile-code pass as `tools/sprites/slice.ts` cuts
+     buildings. A walkable tile never gets a slice. Lit like the day sprites; the client adds night, light pools and glows.
+   - **Files:** the interiors PR commits each room as a half-size `multiatlas` `room_<id>` (free-tex-packer JSON
+     `apps/client/public/assets/rooms/room_<id>.json` and its pages `room_<id>-<n>.png`; frames `<id>#bg` and
+     `<id>#<tx>_<ty>`) plus its metadata `rooms/room_<id>.meta.json` (version 1: the canvas, pivot, tile-to-canvas
+     mapping, each slice's tile and trim, the props, spots and portals the render already includes, wall classes,
+     lights and checks). It adds no manifest row, so the client ignores the files until the client PR.
+   - **Client PR (Story mode, after the interiors PR merges):** manifest entries gain `scenes?: string[]`, loaded by
+     `World.preload`, the Studio, `AdminSceneView` and `CutsceneStage`, which free the previous room's texture; `mapStatics`
+     draws `bg` and the slices and skips the kit walls and the props, spots and portal frames the render includes, keeping
+     `hq`, `lanternPost` and the boarded overlays; `StaticView` bounds and the occluder test read `spriteSourceSize`, not
+     `getBounds()`; a scene whose geometry hash differs from the render's falls back to today's art.
 
 **Decision to make first: the scale.** An interior grid is bigger than its shell. `tavern_bar` is 20x12 tiles, 30x18 m at
 1.5 m per tile, while `The_Drowned_Lantern` is about 11 m long. Choose one:
@@ -129,8 +142,7 @@ its GDD text in the same PR (CLAUDE.md):
 ## 6. Order of work
 
 1. **Woods and mine** (in progress, local session). Interiors start when that PR is open.
-2. **Pipeline:** `meshy_interior_build.py` and the scale decision, proven on one small room (`cottage_fisher` or
-   `widow_bedroom`).
+2. **Pipeline:** `meshy_interior_build.py` at 1 m per tile, proven on `widow_bedroom` (2026-11-14).
 3. **HollowMere, Small profile:** `tavern_bar` and `tavern_back`, `apoth_shop` and `apoth_loft`, `bakery` and its four
    rooms, and `widow_parlour` and `widow_bedroom`.
 4. **HollowMere, Medium and Large:** `manor_hall` and `manor_upper`, `barn`, `chapel` and `cellar`.
@@ -151,8 +163,9 @@ its GDD text in the same PR (CLAUDE.md):
 
 ## 8. Open questions for the owner
 
-1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today. A 3D interior is built from
-   its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
+1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today, and need not fit inside the
+   exterior model, so no game data changes for scale. **Changed (owner, 2026-11-14, "the 1m looks fine"):** an interior is
+   built at **1 m per tile**, not 1.5 m, proven on `widow_bedroom`. The exterior 3D world stays at 1.5 m per tile.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior. PARTLY ANSWERED
    (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
    an interior, and the rest of section 3, are open.
