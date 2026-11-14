@@ -1,8 +1,9 @@
-import { Color, Fog, FogExp2, Light, Mesh, Object3D } from 'three';
+import { Color, DirectionalLight, Fog, FogExp2, Light, Mesh, Object3D, Vector3 } from 'three';
 import { BvhCollider } from './physics/collider';
 import { findSpawns, type Spawn } from './spawn';
 
 export const COLLISION_NAME = 'HM_Collision';
+export const AREA_PREFIX = 'Area_';
 
 export interface World {
   root: Object3D;
@@ -11,6 +12,10 @@ export interface World {
   /** `HM_Collision`, or `all meshes` when the GLB has none. */
   collisionSource: string;
   hasLights: boolean;
+  /** A directional light (a sun or moon) is in the GLB; without one the look's moon and sky light are added. */
+  hasSun: boolean;
+  /** The `Area_*` objects (Area_village at the origin, the wild areas 900 m and more away); one shows at a time. */
+  areas: Object3D[];
   fog: Fog | FogExp2 | null;
 }
 
@@ -33,6 +38,34 @@ export function collisionRoots(root: Object3D): { roots: Object3D[]; source: str
 function isAncestor(a: Object3D, b: Object3D): boolean {
   for (let p = b.parent; p; p = p.parent) if (p === a) return true;
   return false;
+}
+
+/** Every `Area_*` object under `root`, outermost only. */
+export function findAreas(root: Object3D): Object3D[] {
+  const areas: Object3D[] = [];
+  root.traverse((o) => {
+    if (o.name.startsWith(AREA_PREFIX) && !areas.some((a) => isAncestor(a, o))) areas.push(o);
+  });
+  return areas;
+}
+
+const at = new Vector3();
+/** The area whose origin is nearest (x, z) on the ground plane, or null when there are none. */
+export function nearestArea(areas: readonly Object3D[], x: number, z: number): Object3D | null {
+  let best: Object3D | null = null;
+  let bestD = Infinity;
+  for (const a of areas) {
+    a.getWorldPosition(at);
+    const d = (at.x - x) ** 2 + (at.z - z) ** 2;
+    if (d < bestD) [best, bestD] = [a, d];
+  }
+  return best;
+}
+
+/** Shows only the area nearest (x, z), so one area never draws another (its lights included). */
+export function showNearestArea(areas: readonly Object3D[], x: number, z: number): void {
+  const keep = nearestArea(areas, x, z);
+  for (const a of areas) a.visible = a === keep;
 }
 
 /** Fog from the scene's glTF extras (Blender custom properties): `fog_color` with `fog_near` and `fog_far`,
@@ -59,8 +92,10 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
   const collider = BvhCollider.fromObjects(roots);
   if (source === COLLISION_NAME) for (const r of roots) r.visible = false;
   let hasLights = false;
+  let hasSun = false;
   root.traverse((obj) => {
     if ((obj as Light).isLight) hasLights = true;
+    if ((obj as DirectionalLight).isDirectionalLight) hasSun = true;
   });
   return {
     root,
@@ -68,6 +103,8 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
     spawns: findSpawns(root),
     collisionSource: source,
     hasLights,
+    hasSun,
+    areas: findAreas(root),
     fog: fogFromExtras(extras),
   };
 }

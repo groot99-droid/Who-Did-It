@@ -1,10 +1,7 @@
 import './style.css';
 import {
-  ACESFilmicToneMapping,
+  AgXToneMapping,
   Clock,
-  Color,
-  DirectionalLight,
-  HemisphereLight,
   Material,
   Mesh,
   PerspectiveCamera,
@@ -18,11 +15,11 @@ import { LOOK, RENDER, WALK } from './config';
 import { Hud } from './hud';
 import { Input } from './input';
 import { glbFromQuery, loadFile, loadUrl, makeLoader } from './load';
+import { DEFAULT_EXPOSURE, defaultFog, defaultLights, exposureFromScene, makeSky } from './look';
 import { Controller, wishFromInput } from './physics/controller';
 import { pickSpawn, type Spawn } from './spawn';
-import { buildWorld, type World } from './world';
+import { buildWorld, showNearestArea, type World } from './world';
 
-const SKY = new Color('#9fb3c8');
 const STICK_RADIUS = 60;
 const params = new URLSearchParams(location.search);
 const debugOn = params.has('debug');
@@ -31,13 +28,15 @@ const canvas = document.querySelector<HTMLCanvasElement>('#view')!;
 const renderer = new WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, RENDER.maxPixelRatio));
 renderer.outputColorSpace = SRGBColorSpace;
-renderer.toneMapping = ACESFilmicToneMapping;
+// AgX as in Blender (which adds its Medium High Contrast look on top); shadows stay off (the lanterns hold their lights).
+renderer.toneMapping = AgXToneMapping;
+const askedExposure = Number(params.get('exposure'));
 
 const scene = new Scene();
-scene.background = SKY.clone();
 const camera = new PerspectiveCamera(RENDER.fov, 1, RENDER.near, RENDER.far);
-const fallbackLights = [new HemisphereLight('#dfe8ff', '#4a4034', 1.6), new DirectionalLight('#fff4e0', 1.4)];
-fallbackLights[1]!.position.set(30, 60, 20);
+const fallbackLights = defaultLights();
+const sky = makeSky(RENDER.far * 0.9);
+scene.add(sky);
 
 const hud = new Hud(document.querySelector<HTMLElement>('#hud')!, debugOn);
 const input = new Input(canvas, STICK_RADIUS);
@@ -50,6 +49,9 @@ let spawn: Spawn | null = null;
 let yaw = 0;
 let pitch = 0;
 let loadError: string | null = null;
+let collisionMs = 0;
+let areaClock = 0;
+const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
 function resize(): void {
   const w = window.innerWidth;
@@ -91,23 +93,33 @@ function goTo(target: Spawn | null): void {
     yaw = 0;
   }
   pitch = 0;
+  showNearestArea(world.areas, controller.position.x, controller.position.z);
 }
 
-function enter(gltf: GLTF): void {
+async function enter(gltf: GLTF): Promise<void> {
   disposeWorld();
   const root = gltf.scene;
+  hud.progress({ fraction: null, loaded: 0, label: 'Building collision' });
+  await nextFrame();
+  await nextFrame();
+  const t0 = performance.now();
   world = buildWorld(root, root.userData as Record<string, unknown>);
+  collisionMs = performance.now() - t0;
   scene.add(root);
-  scene.fog = world.fog;
-  scene.background = world.fog ? world.fog.color.clone() : SKY.clone();
-  if (!world.hasLights) scene.add(...fallbackLights);
+  // Fog from the GLB's extras shows as a flat background; without it the look's fog and sky apply.
+  scene.fog = world.fog ?? defaultFog();
+  scene.background = world.fog ? world.fog.color.clone() : null;
+  sky.visible = !world.fog;
+  if (!world.hasSun) scene.add(...fallbackLights);
+  renderer.toneMappingExposure =
+    askedExposure > 0 ? askedExposure : (exposureFromScene(root) ?? DEFAULT_EXPOSURE);
   controller = new Controller(world.collider);
   goTo(pickSpawn(world.spawns, params.get('spawn')));
+  hud.progress({ fraction: null, loaded: 0, label: 'Preparing shaders' });
+  camera.position.copy(controller.position).y += WALK.eyeHeight;
+  await renderer.compileAsync(scene, camera);
   loadError = null;
-  hud.ready(
-    world.spawns.map((s) => s.id),
-    spawn?.id ?? null,
-  );
+  hud.ready(world.spawns, spawn?.id ?? null);
 }
 
 function fail(err: unknown): void {
@@ -120,7 +132,9 @@ hud.onSpawn = (id) => goTo(world?.spawns.find((s) => s.id === id) ?? null);
 const source = glbFromQuery(location.search);
 if (source) {
   hud.progress({ fraction: 0, loaded: 0, label: 'Downloading' });
-  loadUrl(loader, source, (p) => hud.progress(p)).then(enter, fail);
+  loadUrl(loader, source, (p) => hud.progress(p))
+    .then(enter)
+    .catch(fail);
 } else {
   hud.waiting('No world file is hosted yet. Drop a .glb on the page, or open this page with ?glb=<url>.');
 }
@@ -136,7 +150,10 @@ window.addEventListener('drop', (e) => {
   e.preventDefault();
   hud.showDrop(false);
   const file = e.dataTransfer?.files[0];
-  if (file) loadFile(loader, file, (p) => hud.progress(p)).then(enter, fail);
+  if (file)
+    loadFile(loader, file, (p) => hud.progress(p))
+      .then(enter)
+      .catch(fail);
 });
 
 const clock = new Clock();
@@ -149,6 +166,10 @@ renderer.setAnimationLoop(() => {
   const frame = input.poll(dt);
   yaw -= frame.yaw;
   pitch = Math.max(-LOOK.maxPitch, Math.min(LOOK.maxPitch, pitch - frame.pitch));
+  if (controller && world && (areaClock += dt) > 0.5) {
+    areaClock = 0;
+    showNearestArea(world.areas, controller.position.x, controller.position.z);
+  }
   if (controller) {
     const fell = controller.update(dt, wishFromInput(frame.forward, frame.strafe, yaw, frame.run));
     if (fell) goTo(spawn);
@@ -156,6 +177,7 @@ renderer.setAnimationLoop(() => {
     camera.position.copy(eye);
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
+  sky.position.copy(camera.position);
   const padOn = navigator.getGamepads?.().some((p) => p?.connected) ?? false;
   hud.setHint(padOn ? 'pad' : input.touchSeen ? 'touch' : 'desktop', input.locked);
   if (debugOn) {
@@ -166,8 +188,10 @@ renderer.setAnimationLoop(() => {
         ? `x ${p.x.toFixed(2)} y ${p.y.toFixed(2)} z ${p.z.toFixed(2)} ${controller?.onGround ? 'ground' : 'air'}`
         : '',
       world
-        ? `collision: ${world.collisionSource}${world.collisionSource === 'HM_Collision' ? '' : ' (no HM_Collision)'}`
+        ? `collision: ${world.collisionSource}${world.collisionSource === 'HM_Collision' ? '' : ' (no HM_Collision)'}` +
+          ` · ${(world.collider.geometry.index!.count / 3000).toFixed(0)}k tris in ${collisionMs.toFixed(0)} ms`
         : '',
+      `exposure ${renderer.toneMappingExposure.toFixed(2)} · area ${world?.areas.find((a) => a.visible)?.name ?? '-'}`,
     ]);
   }
   renderer.render(scene, camera);

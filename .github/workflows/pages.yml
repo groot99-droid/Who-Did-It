@@ -1,4 +1,4 @@
-# Builds the client and deploys it to GitHub Pages (docs/ARCHITECTURE.md 5.10).
+# Builds the client, and the V2 walk-through under walk/, and deploys them to GitHub Pages (docs/ARCHITECTURE.md 5.10).
 #
 # One-time setup by the owner (Settings of the repository):
 #   1. Pages > Build and deployment > Source = GitHub Actions
@@ -46,6 +46,13 @@ jobs:
           # The client's production build resolves @wdi/content to its dist, so build the workspace
           # dependencies first (the "..." selector); CI's `pnpm build` does the same across every package.
           pnpm --filter "@wdi/client..." build
+      # The V2 walk-through (apps/walk, DECISIONS A610) is served beside the game at /Who-Did-It/walk/: its own
+      # Vite build (base '/Who-Did-It/walk/') copied into the client's dist. The client's build is unchanged.
+      - name: Build the walk-through
+        run: |
+          pnpm --filter @wdi/walk build
+          if [ -e apps/client/dist/walk ]; then echo "apps/client/dist/walk already exists" >&2; exit 1; fi
+          cp -r apps/walk/dist apps/client/dist/walk
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

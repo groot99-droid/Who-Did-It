@@ -47,5 +47,6 @@ export const RENDER = {
   maxPixelRatio: 2,
   fov: 70,
   near: 0.05,
-  far: 2000,
+  /** At most 500 m with distance fog: the wild areas sit 900 m and more from the village (README, GLB contract). */
+  far: 500,
 } as const;

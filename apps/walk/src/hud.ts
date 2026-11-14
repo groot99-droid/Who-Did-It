@@ -76,12 +76,12 @@ export class Hud {
     this.status.textContent = `${message} · Drop a .glb on the page or open it with ?glb=<url>.`;
   }
 
-  ready(spawns: string[], current: string | null): void {
+  ready(spawns: readonly { id: string; label: string }[], current: string | null): void {
     this.panel.hidden = true;
     this.hint.hidden = false;
     this.select.replaceChildren(
-      ...spawns.map((id) => {
-        const o = el('option', '', id);
+      ...spawns.map(({ id, label }) => {
+        const o = el('option', '', label);
         o.value = id;
         return o;
       }),
