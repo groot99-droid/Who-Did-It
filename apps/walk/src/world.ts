@@ -1,5 +1,7 @@
 import { Color, DirectionalLight, Fog, FogExp2, Light, Mesh, Object3D, Vector3 } from 'three';
+import { exposureFromExtras } from './look';
 import { BvhCollider } from './physics/collider';
+import { findPortals, type Portal } from './portals';
 import { findSpawns, type Spawn } from './spawn';
 
 export const COLLISION_NAME = 'HM_Collision';
@@ -16,6 +18,8 @@ export interface World {
   hasSun: boolean;
   /** The `Area_*` objects (Area_village at the origin, the wild areas 900 m and more away); one shows at a time. */
   areas: Object3D[];
+  /** The `Portal_*` doors, in every area. */
+  portals: Portal[];
   fog: Fog | FogExp2 | null;
 }
 
@@ -68,6 +72,34 @@ export function showNearestArea(areas: readonly Object3D[], x: number, z: number
   for (const a of areas) a.visible = a === keep;
 }
 
+/** What an area changes when the player is in it: from its extras, and indoors for `wdi_indoor` or `Area_room_`. */
+export interface AreaLook {
+  /** Indoors: no moon, sky light or sky dome. */
+  indoor: boolean;
+  fog: Fog | FogExp2 | null;
+  exposure: number | null;
+}
+
+export function areaLook(area: Object3D | null): AreaLook {
+  const x = (area?.userData ?? {}) as Record<string, unknown>;
+  return {
+    indoor: x.wdi_indoor === true || (area?.name.startsWith(`${AREA_PREFIX}room_`) ?? false),
+    fog: fogFromExtras(x),
+    exposure: exposureFromExtras(x),
+  };
+}
+
+/** `wdi_cast_shadow: false` on a node (a lamp mesh, an instance holder) keeps it and everything under it from
+ * casting shadows, instanced meshes included; the lights sit inside those meshes. Shadows are off by default. */
+export function applyShadowFlags(root: Object3D): void {
+  root.traverse((obj) => {
+    if ((obj.userData as Record<string, unknown>).wdi_cast_shadow === false)
+      obj.traverse((o) => {
+        o.castShadow = false;
+      });
+  });
+}
+
 /** Fog from the scene's glTF extras (Blender custom properties): `fog_color` with `fog_near` and `fog_far`,
  * or with `fog_density`. */
 export function fogFromExtras(extras: Record<string, unknown> | undefined): Fog | FogExp2 | null {
@@ -91,6 +123,7 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
   const { roots, source } = collisionRoots(root);
   const collider = BvhCollider.fromObjects(roots);
   if (source === COLLISION_NAME) for (const r of roots) r.visible = false;
+  applyShadowFlags(root);
   let hasLights = false;
   let hasSun = false;
   root.traverse((obj) => {
@@ -105,6 +138,7 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
     hasLights,
     hasSun,
     areas: findAreas(root),
+    portals: findPortals(root),
     fog: fogFromExtras(extras),
   };
 }

@@ -11,6 +11,10 @@ export interface Spawn {
   yaw: number;
   /** Plain words for the picker, from the `wdi_spawn` and `wdi_district` extras, else the id. */
   label: string;
+  /** The spawn's own name, without its district. */
+  name: string;
+  /** Its district in plain words (`wdi_district`), or empty; the picker groups by it. */
+  group: string;
 }
 
 /** `station_street` -> `Station street`; plain words are kept as they are. */
@@ -54,12 +58,15 @@ export function findSpawns(root: Object3D): Spawn[] {
     if (!id || seen.has(id)) return;
     seen.add(id);
     const position = new Vector3().setFromMatrixPosition(obj.matrixWorld);
+    const x = obj.userData as Record<string, unknown>;
     forward.set(0, 0, -1).transformDirection(obj.matrixWorld);
     spawns.push({
       id,
       position,
       yaw: yawFromDirection(forward.x, forward.z),
-      label: spawnLabel(id, obj.userData as Record<string, unknown>),
+      label: spawnLabel(id, x),
+      name: spawnLabel(id, { wdi_spawn: x.wdi_spawn }),
+      group: typeof x.wdi_district === 'string' ? plainWords(x.wdi_district) : '',
     });
   });
   return spawns;

@@ -2,8 +2,10 @@ import './style.css';
 import {
   AgXToneMapping,
   Clock,
+  Color,
   Material,
   Mesh,
+  Object3D,
   PerspectiveCamera,
   Scene,
   SRGBColorSpace,
@@ -17,8 +19,9 @@ import { Input } from './input';
 import { glbFromQuery, loadFile, loadUrl, makeLoader } from './load';
 import { DEFAULT_EXPOSURE, defaultFog, defaultLights, exposureFromScene, makeSky } from './look';
 import { Controller, wishFromInput } from './physics/controller';
-import { pickSpawn, type Spawn } from './spawn';
-import { buildWorld, showNearestArea, type World } from './world';
+import { PortalTrigger, resolvePortal, type Portal } from './portals';
+import { pickSpawn, plainWords, type Spawn } from './spawn';
+import { areaLook, buildWorld, nearestArea, showNearestArea, type World } from './world';
 
 const STICK_RADIUS = 60;
 const params = new URLSearchParams(location.search);
@@ -51,6 +54,12 @@ let pitch = 0;
 let loadError: string | null = null;
 let collisionMs = 0;
 let areaClock = 0;
+let area: Object3D | null | undefined;
+let indoor = false;
+let trigger: PortalTrigger | null = null;
+let travelling = false;
+let trip: { portal: string; spawn: string | null; fallback: boolean } | null = null;
+const INDOOR_BACKGROUND = new Color(0, 0, 0);
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
 function resize(): void {
@@ -93,7 +102,38 @@ function goTo(target: Spawn | null): void {
     yaw = 0;
   }
   pitch = 0;
-  showNearestArea(world.areas, controller.position.x, controller.position.z);
+  trigger?.disarm();
+  hud.setSpawn(spawn?.id ?? null);
+  updateArea(true);
+}
+
+/** Shows only the area the player is in and, when that area changed, applies its look: indoors there is no moon,
+ * sky light or sky; fog and exposure come from the area's extras before the world's. */
+function updateArea(force = false): void {
+  if (!world || !controller) return;
+  const { x, z } = controller.position;
+  const next = nearestArea(world.areas, x, z);
+  showNearestArea(world.areas, x, z);
+  if (next === area && !force) return;
+  area = next;
+  const look = areaLook(next);
+  indoor = look.indoor;
+  scene.fog = look.fog ?? (indoor ? null : (world.fog ?? defaultFog()));
+  scene.background = indoor ? INDOOR_BACKGROUND : world.fog ? world.fog.color.clone() : null;
+  sky.visible = !indoor && !world.fog;
+  for (const light of fallbackLights) light.visible = !indoor;
+  renderer.toneMappingExposure =
+    askedExposure > 0 ? askedExposure : (look.exposure ?? exposureFromScene(world.root) ?? DEFAULT_EXPOSURE);
+}
+
+/** Takes a portal: a short fade to `Spawn_<to>_<toSpawn>`, or to `Spawn_<toSpawn>` when that is missing. */
+function travel(portal: Portal): void {
+  if (!world) return;
+  const found = resolvePortal(portal, world.spawns);
+  trip = { portal: portal.id, spawn: found?.spawn.id ?? null, fallback: found?.fallback ?? false };
+  if (!found) return;
+  travelling = true;
+  void hud.fade(() => goTo(found.spawn)).finally(() => (travelling = false));
 }
 
 async function enter(gltf: GLTF): Promise<void> {
@@ -106,14 +146,11 @@ async function enter(gltf: GLTF): Promise<void> {
   world = buildWorld(root, root.userData as Record<string, unknown>);
   collisionMs = performance.now() - t0;
   scene.add(root);
-  // Fog from the GLB's extras shows as a flat background; without it the look's fog and sky apply.
-  scene.fog = world.fog ?? defaultFog();
-  scene.background = world.fog ? world.fog.color.clone() : null;
-  sky.visible = !world.fog;
+  // Fog from the GLB's extras shows as a flat background; without it the look's fog and sky apply (updateArea).
   if (!world.hasSun) scene.add(...fallbackLights);
-  renderer.toneMappingExposure =
-    askedExposure > 0 ? askedExposure : (exposureFromScene(root) ?? DEFAULT_EXPOSURE);
   controller = new Controller(world.collider);
+  trigger = new PortalTrigger(world.portals);
+  area = undefined;
   goTo(pickSpawn(world.spawns, params.get('spawn')));
   hud.progress({ fraction: null, loaded: 0, label: 'Preparing shaders' });
   camera.position.copy(controller.position).y += WALK.eyeHeight;
@@ -128,6 +165,7 @@ function fail(err: unknown): void {
 }
 
 hud.onSpawn = (id) => goTo(world?.spawns.find((s) => s.id === id) ?? null);
+hud.onUse = () => input.requestUse();
 
 const source = glbFromQuery(location.search);
 if (source) {
@@ -168,13 +206,23 @@ renderer.setAnimationLoop(() => {
   pitch = Math.max(-LOOK.maxPitch, Math.min(LOOK.maxPitch, pitch - frame.pitch));
   if (controller && world && (areaClock += dt) > 0.5) {
     areaClock = 0;
-    showNearestArea(world.areas, controller.position.x, controller.position.z);
+    updateArea();
   }
   if (controller) {
-    const fell = controller.update(dt, wishFromInput(frame.forward, frame.strafe, yaw, frame.run));
+    // Standing still through a portal's fade.
+    const wish = travelling
+      ? { x: 0, z: 0, run: false }
+      : wishFromInput(frame.forward, frame.strafe, yaw, frame.run);
+    const fell = controller.update(dt, wish);
     if (fell) goTo(spawn);
     eye.copy(controller.position).y += WALK.eyeHeight;
     camera.position.copy(eye);
+    if (trigger && !travelling) {
+      const portal = trigger.update(controller.position, frame.use);
+      if (portal) travel(portal);
+      const near = trigger.nearest(controller.position, trigger.useRadius);
+      hud.setDoor(near && !travelling ? plainWords(near.to) : null, input.touchSeen);
+    }
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   sky.position.copy(camera.position);
@@ -191,7 +239,11 @@ renderer.setAnimationLoop(() => {
         ? `collision: ${world.collisionSource}${world.collisionSource === 'HM_Collision' ? '' : ' (no HM_Collision)'}` +
           ` · ${(world.collider.geometry.index!.count / 3000).toFixed(0)}k tris in ${collisionMs.toFixed(0)} ms`
         : '',
-      `exposure ${renderer.toneMappingExposure.toFixed(2)} · area ${world?.areas.find((a) => a.visible)?.name ?? '-'}`,
+      `exposure ${renderer.toneMappingExposure.toFixed(2)} · area ${area?.name ?? '-'}${indoor ? ' (indoor)' : ''}`,
+      trip
+        ? `portal ${trip.portal} → ${trip.spawn ? `Spawn_${trip.spawn}` : 'no spawn'}` +
+          (trip.fallback ? ' (fallback: no Spawn_<to>_<toSpawn>)' : '')
+        : '',
     ]);
   }
   renderer.render(scene, camera);
@@ -209,6 +261,10 @@ if (debugOn) {
       position: controller ? controller.position.toArray() : null,
       onGround: controller?.onGround ?? false,
       yaw,
+      area: area?.name ?? null,
+      indoor,
+      exposure: renderer.toneMappingExposure,
+      trip,
     }),
   });
 }
