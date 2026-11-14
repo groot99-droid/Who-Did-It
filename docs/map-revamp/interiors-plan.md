@@ -101,22 +101,22 @@ One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_
 6. **Look:** a `meshy_looks/interior_*.json`, one per mood (warm house, dark house, cave), with the same keys as the
    village look.
 7. **Outputs:** `build/<sceneId>.blend` (git-ignored), plus `--preview` stills, the same as the village.
-8. **Game renders (Q4: the 3D interiors replace the old interior art):** an orthographic camera at the game's isometric
-   angle, framed on the scene's tile grid (pivot at `toScreen(32N, 32M)`, 58.79 px per vertical metre, so characters keep
-   their height). Proven on `widow_bedroom` (2026-11-14). The delivery, agreed by Story mode (2026-11-14):
-   - **Renders per room:** `bg` (the floor and the back shell, drawn once at depth -25, never an occluder) and one slice per
-     standing solid tile, `<id>#<tx>_<ty>`, cut from the standing pass by its tile-code pass as `tools/sprites/slice.ts` cuts
-     buildings. A walkable tile never gets a slice. Lit like the day sprites; the client adds night, light pools and glows.
-   - **Files:** the interiors PR commits each room as a half-size `multiatlas` `room_<id>` (free-tex-packer JSON
-     `apps/client/public/assets/rooms/room_<id>.json` and its pages `room_<id>-<n>.png`; frames `<id>#bg` and
-     `<id>#<tx>_<ty>`) plus its metadata `rooms/room_<id>.meta.json` (version 1: the canvas, pivot, tile-to-canvas
-     mapping, each slice's tile and trim, the props, spots and portals the render already includes, wall classes,
-     lights and checks). It adds no manifest row, so the client ignores the files until the client PR.
-   - **Client PR (Story mode, after the interiors PR merges):** manifest entries gain `scenes?: string[]`, loaded by
-     `World.preload`, the Studio, `AdminSceneView` and `CutsceneStage`, which free the previous room's texture; `mapStatics`
-     draws `bg` and the slices and skips the kit walls and the props, spots and portal frames the render includes, keeping
-     `hq`, `lanternPost` and the boarded overlays; `StaticView` bounds and the occluder test read `spriteSourceSize`, not
-     `getBounds()`; a scene whose geometry hash differs from the render's falls back to today's art.
+8. **First-person rooms (owner, 2026-11-14: "the rooms should have walls on all sides, the new view of the game is
+   first person").** This replaces the isometric room renders of Q4, which are on hold: no `room_<id>` atlases, no client
+   manifest or `mapStatics` change. Each interior is a full 3D room for the walk viewer (`apps/walk`, DECISIONS A610):
+   walls on every side at full height, a ceiling, real door openings with frames, glazed windows with the night outside,
+   and furniture at real size (Poly Haven first; new Meshy models only with the owner's OK on credits). The delivery,
+   agreed with the Blender session (2026-11-14), needs no viewer change, because the viewer already loads several
+   `HM_Collision_*` meshes and shows only the `Area_*` nearest the player:
+   - each room is one more area in `hollowmere_walk.glb`: `Area_room_<sceneId>` on a far grid from about 3,000 m out, more
+     than 500 m between rooms, all at height 0, with `HM_Collision_room_<sceneId>` (walls, floor, furniture shells);
+   - `Spawn_<sceneId>_<spawnId>` from the scene's `spawns[]`, facing into the room, extras `wdi_spawn` and `wdi_district`
+     (the room's name);
+   - the scene's `lights[]` as `KHR_lights_punctual`, in the village's units;
+   - `Portal_<portalId>` empties at each door, extras `{to, toSpawn, kind}`, and the same at the village's building doors
+     (the overworld portals). Rooms are reached from the spawn picker; walking through a door is a later viewer change;
+   - about 2 to 4 MB a room; if the single file grows too big, the rooms ship as `hollowmere_rooms.glb` with the same
+     contract.
 
 **Decision to make first: the scale.** An interior grid is bigger than its shell. `tavern_bar` is 20x12 tiles, 30x18 m at
 1.5 m per tile, while `The_Drowned_Lantern` is about 11 m long. Choose one:
@@ -142,7 +142,8 @@ its GDD text in the same PR (CLAUDE.md):
 ## 6. Order of work
 
 1. **Woods and mine** (in progress, local session). Interiors start when that PR is open.
-2. **Pipeline:** `meshy_interior_build.py` at 1 m per tile, proven on `widow_bedroom` (2026-11-14).
+2. **Pipeline:** `meshy_interior_build.py` at 1 m per tile, proven on `widow_bedroom` (2026-11-14); first person from
+   then on (step 8).
 3. **HollowMere, Small profile:** `tavern_bar` and `tavern_back`, `apoth_shop` and `apoth_loft`, `bakery` and its four
    rooms, and `widow_parlour` and `widow_bedroom`.
 4. **HollowMere, Medium and Large:** `manor_hall` and `manor_upper`, `barn`, `chapel` and `cellar`.
@@ -170,7 +171,7 @@ its GDD text in the same PR (CLAUDE.md):
    (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
    an interior, and the rest of section 3, are open.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
-4. ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
+4. SUPERSEDED (owner, 2026-11-14: first person, section 4 step 8). Was ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
    renders must therefore line up with the game's isometric camera and each scene's tile grid, and be loadable by the
    client; stills and film alone are not enough. How the client takes them in (asset format, manifest, and whether the
    exterior moves to 3D art too) is a later data/client PR by Story mode, opened once the pipeline (section 6, step 2)
