@@ -1,5 +1,7 @@
 import {
   Box3,
+  InstancedMesh,
+  Matrix4,
   BufferAttribute,
   BufferGeometry,
   DoubleSide,
@@ -21,11 +23,14 @@ export interface Collider {
   readonly bounds: Box3;
 }
 
-/** One position-only geometry with every mesh under `roots` baked into world space. */
+/** One position-only geometry with every mesh under `roots` baked into world space, each instance of an
+ * `InstancedMesh` (EXT_mesh_gpu_instancing) included. */
 export function mergeWorldGeometry(roots: Object3D[]): BufferGeometry {
   const positions: number[] = [];
   const indices: number[] = [];
   const v = new Vector3();
+  const m = new Matrix4();
+  const instance = new Matrix4();
   for (const root of roots) {
     root.updateWorldMatrix(true, true);
     root.traverse((obj) => {
@@ -33,14 +38,20 @@ export function mergeWorldGeometry(roots: Object3D[]): BufferGeometry {
       if (!mesh.isMesh) return;
       const pos = mesh.geometry.getAttribute('position');
       if (!pos) return;
-      const base = positions.length / 3;
-      for (let i = 0; i < pos.count; i++) {
-        v.fromBufferAttribute(pos, i).applyMatrix4(mesh.matrixWorld);
-        positions.push(v.x, v.y, v.z);
-      }
+      const inst = (mesh as InstancedMesh).isInstancedMesh ? (mesh as InstancedMesh) : null;
+      const copies = inst ? inst.count : 1;
       const index = mesh.geometry.getIndex();
-      if (index) for (let i = 0; i < index.count; i++) indices.push(base + index.getX(i));
-      else for (let i = 0; i < pos.count; i++) indices.push(base + i);
+      for (let c = 0; c < copies; c++) {
+        m.copy(mesh.matrixWorld);
+        if (inst) m.multiply(inst.getMatrixAt(c, instance));
+        const base = positions.length / 3;
+        for (let i = 0; i < pos.count; i++) {
+          v.fromBufferAttribute(pos, i).applyMatrix4(m);
+          positions.push(v.x, v.y, v.z);
+        }
+        if (index) for (let i = 0; i < index.count; i++) indices.push(base + index.getX(i));
+        else for (let i = 0; i < pos.count; i++) indices.push(base + i);
+      }
     });
   }
   const geometry = new BufferGeometry();

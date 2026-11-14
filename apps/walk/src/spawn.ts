@@ -9,6 +9,20 @@ export interface Spawn {
   position: Vector3;
   /** Yaw of the empty's -Z axis (0 looks along -Z, positive turns left). */
   yaw: number;
+  /** Plain words for the picker, from the `wdi_spawn` and `wdi_district` extras, else the id. */
+  label: string;
+}
+
+/** `station_street` -> `Station street`; plain words are kept as they are. */
+export function plainWords(raw: string): string {
+  const t = raw.replace(/[_-]+/g, ' ').trim();
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+export function spawnLabel(id: string, extras: Record<string, unknown> = {}): string {
+  const name = plainWords(typeof extras.wdi_spawn === 'string' && extras.wdi_spawn ? extras.wdi_spawn : id);
+  const district = typeof extras.wdi_district === 'string' ? plainWords(extras.wdi_district) : '';
+  return district && district.toLowerCase() !== name.toLowerCase() ? `${name} (${district})` : name;
 }
 
 /** Yaw that looks along a horizontal direction (dx, dz). */
@@ -41,7 +55,12 @@ export function findSpawns(root: Object3D): Spawn[] {
     seen.add(id);
     const position = new Vector3().setFromMatrixPosition(obj.matrixWorld);
     forward.set(0, 0, -1).transformDirection(obj.matrixWorld);
-    spawns.push({ id, position, yaw: yawFromDirection(forward.x, forward.z) });
+    spawns.push({
+      id,
+      position,
+      yaw: yawFromDirection(forward.x, forward.z),
+      label: spawnLabel(id, obj.userData as Record<string, unknown>),
+    });
   });
   return spawns;
 }
