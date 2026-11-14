@@ -24,9 +24,11 @@ export const WALK = {
   /** How quickly the velocity reaches the wished one, per second (ground and air). */
   accelGround: 12,
   accelAir: 2,
-  /** Physics sub-step, seconds; a frame's delta is clamped to `maxFrame`. */
+  /** Physics sub-step, seconds; a frame's delta is clamped to `maxFrame`, which is long enough that a slow device
+   * (4 fps and up; software WebGL in CI runs about 6) keeps real-time speed, and short enough that a frame after a
+   * stall or a hidden tab doesn't jump the player. */
   subStep: 1 / 120,
-  maxFrame: 0.1,
+  maxFrame: 0.25,
   /** Below the world's lowest point by this much, the player returns to the spawn. */
   killDepth: 25,
 } as const;
