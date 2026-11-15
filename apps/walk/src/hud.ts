@@ -31,6 +31,8 @@ export class Hud {
   private readonly drop = el('div', 'drop', 'Drop a .glb to walk it');
   private readonly fader = el('div', 'fade');
   private readonly door = el('button', 'door');
+  private readonly notice = el('div', 'notice');
+  private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
   onUse: (() => void) | null = null;
 
@@ -48,6 +50,7 @@ export class Hud {
     this.stickBase.hidden = true;
     this.drop.hidden = true;
     this.door.hidden = true;
+    this.notice.hidden = true;
     this.door.type = 'button';
     this.door.addEventListener('click', () => this.onUse?.());
     root.append(
@@ -59,6 +62,7 @@ export class Hud {
       this.drop,
       this.fader,
       this.door,
+      this.notice,
     );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
@@ -153,6 +157,14 @@ export class Hud {
     midway();
     this.fader.classList.remove('on');
     await wait();
+  }
+
+  /** A short line in the middle of the screen, gone after `ms`. */
+  say(text: string, ms = 2500): void {
+    this.notice.textContent = text;
+    this.notice.hidden = false;
+    clearTimeout(this.noticeTimer);
+    this.noticeTimer = setTimeout(() => (this.notice.hidden = true), ms);
   }
 
   /** The door prompt near a portal: a button on touch, a key hint otherwise; null hides it. */

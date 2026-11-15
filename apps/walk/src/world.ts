@@ -76,6 +76,8 @@ export function showNearestArea(areas: readonly Object3D[], x: number, z: number
 export interface AreaLook {
   /** Indoors: no moon, sky light or sky dome. */
   indoor: boolean;
+  /** Light baked into the vertex colours of unlit materials (`wdi_baked`); its live lights are off. */
+  baked: boolean;
   fog: Fog | FogExp2 | null;
   exposure: number | null;
 }
@@ -84,9 +86,24 @@ export function areaLook(area: Object3D | null): AreaLook {
   const x = (area?.userData ?? {}) as Record<string, unknown>;
   return {
     indoor: x.wdi_indoor === true || (area?.name.startsWith(`${AREA_PREFIX}room_`) ?? false),
+    baked: x.wdi_baked === true,
     fog: fogFromExtras(x),
     exposure: exposureFromExtras(x),
   };
+}
+
+/**
+ * A `wdi_baked` area has its light baked in Cycles into COLOR_0 under KHR_materials_unlit, which three loads as
+ * MeshBasicMaterial with vertex colours: scene-linear radiance, so AgX and the area's `wdi_exposure` render it as
+ * Blender's view does, and no live light can reach it. The area's exported lights are switched off, so they cost
+ * nothing and light no lit prop on top of the bake.
+ */
+export function switchOffBakedLights(areas: readonly Object3D[]): void {
+  for (const area of areas)
+    if (areaLook(area).baked)
+      area.traverse((o) => {
+        if ((o as Light).isLight) o.visible = false;
+      });
 }
 
 /** `wdi_cast_shadow: false` on a node (a lamp mesh, an instance holder) keeps it and everything under it from
@@ -124,6 +141,8 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
   const collider = BvhCollider.fromObjects(roots);
   if (source === COLLISION_NAME) for (const r of roots) r.visible = false;
   applyShadowFlags(root);
+  const areas = findAreas(root);
+  switchOffBakedLights(areas);
   let hasLights = false;
   let hasSun = false;
   root.traverse((obj) => {
@@ -137,7 +156,7 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
     collisionSource: source,
     hasLights,
     hasSun,
-    areas: findAreas(root),
+    areas,
     portals: findPortals(root),
     fog: fogFromExtras(extras),
   };

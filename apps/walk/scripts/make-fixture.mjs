@@ -12,6 +12,9 @@
 //   - Area_room_widow_bedroom at (3000, 0, 0), wdi_indoor, wdi_exposure 1.5, fog extras: a 6 x 6 room with 3 m walls
 //     (HM_Collision_room_widow_bedroom); Spawn_widow_bedroom_door at (3000, 0, 1.5) facing -Z, into the room;
 //     Portal_widow_bedroom_out at (3000, 0, 2.8) to overworld/widow_door; a lamp mesh with wdi_cast_shadow false.
+//     Baked like the v1.2 rooms (wdi_baked): the room is KHR_materials_unlit with a COLOR_0 of 0.5 grey, and the
+//     room still holds a live KHR_lights_punctual lamp. Portal_wb.door at (3000, 0, -1.2), ahead of the spawn, leads to widow_parlour,
+//     which is not in the file (a door with no target).
 import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -58,7 +61,7 @@ function addAccessor(array, type, componentType, target, minMax) {
   return accessors.length - 1;
 }
 
-function addMesh(name, geometry, material, withNormals) {
+function addMesh(name, geometry, material, withNormals, color) {
   const pos = geometry.getAttribute('position');
   geometry.computeBoundingBox();
   const { min, max } = geometry.boundingBox;
@@ -75,6 +78,11 @@ function addMesh(name, geometry, material, withNormals) {
       5126,
       34962,
     );
+  }
+  if (color) {
+    const colors = new Float32Array(pos.count * 3);
+    for (let i = 0; i < pos.count; i++) colors.set(color, i * 3);
+    attributes.COLOR_0 = addAccessor(colors, 'VEC3', 5126, 34962);
   }
   const indices = addAccessor(new Uint16Array(geometry.getIndex().array), 'SCALAR', 5123, 34963);
   return { name, primitives: [{ attributes, indices, ...(material === null ? {} : { material }) }] };
@@ -95,7 +103,7 @@ function write(file, build, sceneName, sceneExtras) {
   byteLength = 0;
   bufferViews = [];
   accessors = [];
-  const { meshes, nodes, roots } = build();
+  const { meshes, nodes, roots, materials, ...rest } = build();
   const buffer = Buffer.concat(chunks);
   const gltf = {
     asset: { version: '2.0', generator: 'apps/walk/scripts/make-fixture.mjs' },
@@ -109,7 +117,8 @@ function write(file, build, sceneName, sceneExtras) {
     ],
     nodes,
     meshes,
-    materials: MATERIALS,
+    materials: materials ?? MATERIALS,
+    ...rest,
     accessors,
     bufferViews,
     buffers: [
@@ -163,7 +172,7 @@ write(
   () => ({
     meshes: [
       addMesh('Village floor', villageFloor, 0, true),
-      addMesh('Room', room, 1, true),
+      addMesh('Room', room, 3, true, [0.5, 0.5, 0.5]),
       addMesh('Lamp', lamp, 2, true),
       addMesh('HM_Collision', plain(villageFloor), null, false),
       addMesh('HM_Collision_room_widow_bedroom', plain(room), null, false),
@@ -190,8 +199,14 @@ write(
       {
         name: 'Area_room_widow_bedroom',
         translation: [RX, 0, 0],
-        children: [6, 7, 8, 9],
-        extras: { wdi_indoor: true, wdi_exposure: 1.5, fog_color: '#101010', fog_density: 0.01 },
+        children: [6, 7, 8, 9, 12, 13],
+        extras: {
+          wdi_indoor: true,
+          wdi_baked: true,
+          wdi_exposure: 1.5,
+          fog_color: '#101010',
+          fog_density: 0.01,
+        },
       },
       { name: 'Room', mesh: 1, translation: [-RX, 0, 0] },
       { name: 'Lamp', mesh: 2, translation: [-RX, 0, 0], extras: { wdi_cast_shadow: false } },
@@ -207,8 +222,28 @@ write(
       },
       { name: 'HM_Collision', mesh: 3 },
       { name: 'HM_Collision_room_widow_bedroom', mesh: 4 },
+      { name: 'Lamp_light', translation: [0, 2.3, 0], extensions: { KHR_lights_punctual: { light: 0 } } },
+      {
+        name: 'Portal_wb.door',
+        translation: [0, 0, -1.2],
+        extras: { to: 'widow_parlour', toSpawn: 'bedroom', kind: 'door' },
+      },
     ],
     roots: [0, 5, 10, 11],
+    materials: [
+      ...MATERIALS,
+      {
+        name: 'Baked',
+        pbrMetallicRoughness: { baseColorFactor: [1, 1, 1, 1] },
+        extensions: { KHR_materials_unlit: {} },
+      },
+    ],
+    extensionsUsed: ['KHR_materials_unlit', 'KHR_lights_punctual'],
+    extensions: {
+      KHR_lights_punctual: {
+        lights: [{ name: 'Lamp', type: 'point', color: [1, 0.6, 0.3], intensity: 20, range: 6 }],
+      },
+    },
   }),
   'Rooms fixture',
 );

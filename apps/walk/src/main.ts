@@ -131,7 +131,11 @@ function travel(portal: Portal): void {
   if (!world) return;
   const found = resolvePortal(portal, world.spawns);
   trip = { portal: portal.id, spawn: found?.spawn.id ?? null, fallback: found?.fallback ?? false };
-  if (!found) return;
+  if (!found) {
+    // A door whose room is not in this GLB yet (a later export adds it): say so and stay.
+    hud.say(`${plainWords(portal.to)} is not built yet`);
+    return;
+  }
   travelling = true;
   void hud.fade(() => goTo(found.spawn)).finally(() => (travelling = false));
 }
@@ -221,7 +225,9 @@ renderer.setAnimationLoop(() => {
       const portal = trigger.update(controller.position, frame.use);
       if (portal) travel(portal);
       const near = trigger.nearest(controller.position, trigger.useRadius);
-      hud.setDoor(near && !travelling ? plainWords(near.to) : null, input.touchSeen);
+      const built = near && world ? resolvePortal(near, world.spawns) !== null : false;
+      const label = near ? plainWords(near.to) + (built ? '' : ' (not built yet)') : null;
+      hud.setDoor(near && !travelling ? label : null, input.touchSeen);
     }
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');

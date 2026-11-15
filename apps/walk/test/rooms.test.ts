@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { FogExp2, Group, Mesh, Vector3 } from 'three';
+import { FogExp2, Group, Light, Mesh, MeshBasicMaterial, Vector3 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { describe, expect, it } from 'vitest';
 import { Controller } from '../src/physics/controller';
@@ -36,12 +36,35 @@ describe('the rooms fixture', () => {
     expect(w.portals.map((p) => [p.id, p.to, p.toSpawn])).toEqual([
       ['widow_door', 'widow_bedroom', 'door'],
       ['widow_bedroom_out', 'overworld', 'widow_door'],
+      ['wbdoor', 'widow_parlour', 'bedroom'],
     ]);
     expect(w.spawns.map((s) => [s.id, s.group, s.name])).toEqual([
       ['square', 'Village', 'Square'],
       ['overworld_widow_door', 'Village', 'Widow door'],
       ['widow_bedroom_door', 'Widow bedroom', 'Door'],
     ]);
+  });
+
+  it('loads the baked room unlit with its vertex colours, and switches off its live light', async () => {
+    const w = await rooms();
+    const material = (w.root.getObjectByName('Room') as Mesh).material as MeshBasicMaterial;
+    expect(material).toBeInstanceOf(MeshBasicMaterial);
+    expect(material.vertexColors).toBe(true);
+    expect(material.toneMapped).toBe(true);
+    const lights: Light[] = [];
+    w.root.traverse((o) => {
+      if ((o as Light).isLight) lights.push(o as Light);
+    });
+    expect(lights).toHaveLength(1);
+    expect(lights[0]!.visible).toBe(false);
+    expect(areaLook(nearestArea(w.areas, 3000, 0)).baked).toBe(true);
+    expect(areaLook(nearestArea(w.areas, 0, 0)).baked).toBe(false);
+  });
+
+  it('has a door with no target, which resolves to nothing', async () => {
+    const w = await rooms();
+    const parlour = w.portals.find((p) => p.id === 'wbdoor')!;
+    expect(resolvePortal(parlour, w.spawns)).toBeNull();
   });
 
   it('keeps wdi_cast_shadow: false meshes from casting', async () => {

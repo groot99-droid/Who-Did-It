@@ -188,6 +188,18 @@ body {
   pointer-events: auto;
 }
 
+.notice {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--panel);
+  text-align: center;
+}
+
 [hidden] {
   display: none !important;
 }

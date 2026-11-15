@@ -46,3 +46,26 @@ test('walks through the widow door into her room and uses the door back out', as
   await expect.poll(async () => (await state(page)).spawn).toBe('overworld_widow_door');
   expect(await state(page)).toMatchObject({ area: 'Area_village', indoor: false, exposure: 2.38 });
 });
+
+test('a door whose room is not built yet says so and leaves the player where they are', async ({ page }) => {
+  await page.route('**/fixture/walk-rooms.gltf', (route) =>
+    route.fulfill({ body: ROOMS, contentType: 'model/gltf+json' }),
+  );
+  const query = new URLSearchParams({
+    glb: 'http://localhost:4174/fixture/walk-rooms.gltf',
+    spawn: 'widow_bedroom_door',
+    debug: '',
+  });
+  await page.goto(`/Who-Did-It/walk/?${query}`);
+  await expect.poll(async () => (await state(page)).ready).toBe(true);
+  expect(await state(page)).toMatchObject({ spawn: 'widow_bedroom_door', indoor: true });
+
+  // The parlour door is 2.7 m straight ahead; the room's wall stops the walk 1.5 m past it.
+  await page.locator('#view').focus();
+  await page.keyboard.down('KeyW');
+  await expect(page.locator('.notice')).toHaveText('Widow parlour is not built yet');
+  await page.keyboard.up('KeyW');
+  const after = await state(page);
+  expect(after).toMatchObject({ spawn: 'widow_bedroom_door', area: 'Area_room_widow_bedroom' });
+  expect(after.trip).toEqual({ portal: 'wbdoor', spawn: null, fallback: false });
+});
