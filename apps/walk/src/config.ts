@@ -1,8 +1,13 @@
 // Viewer constants for the walk-through. They are not game balance (balance.json owns those) and live only here.
 
-/** Where the world GLB comes from when neither `?glb=` nor a dropped file gives one. Hosting is still open
- * (see the PR that added this app); until it is answered there is no default and the page asks for a file. */
-export const DEFAULT_GLB_URL: string | null = null;
+/** Where the world GLB comes from when neither `?glb=` nor a dropped file gives one. The Pages deploy downloads
+ * `hollowmere_walk.glb` from the `walk-glb` release into the walk's folder and sets `VITE_WALK_GLB` to its name, so
+ * it loads from the same origin. Without that (a local build, CI, no release yet) there is no default and the page
+ * asks for a file. */
+const WALK_GLB_FILE: string | undefined = import.meta.env.VITE_WALK_GLB;
+export const DEFAULT_GLB_URL: string | null = WALK_GLB_FILE
+  ? `${import.meta.env.BASE_URL}${WALK_GLB_FILE}`
+  : null;
 
 export const WALK = {
   /** Camera height above the feet, metres. */

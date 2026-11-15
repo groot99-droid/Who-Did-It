@@ -48,11 +48,26 @@ jobs:
           pnpm --filter "@wdi/client..." build
       # The V2 walk-through (apps/walk, DECISIONS A610) is served beside the game at /Who-Did-It/walk/: its own
       # Vite build (base '/Who-Did-It/walk/') copied into the client's dist. The client's build is unchanged.
+      # The world GLB is the asset hollowmere_walk.glb of the release tagged walk-glb (apps/walk/README.md, "Hosting
+      # the GLB"). It is served from the walk's folder, and the walk build defaults to it only when it was downloaded;
+      # while the release is missing the deploy goes on and the page asks for a file.
+      - name: Fetch the walk-through's world
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/walk-glb"
+          if gh release download walk-glb --repo "$GITHUB_REPOSITORY" --pattern hollowmere_walk.glb --dir "$RUNNER_TEMP/walk-glb"; then
+            echo "VITE_WALK_GLB=hollowmere_walk.glb" >> "$GITHUB_ENV"
+            ls -l "$RUNNER_TEMP/walk-glb"
+          else
+            echo "::warning::No hollowmere_walk.glb on the walk-glb release; the walk page will ask for a file."
+          fi
       - name: Build the walk-through
         run: |
           pnpm --filter @wdi/walk build
           if [ -e apps/client/dist/walk ]; then echo "apps/client/dist/walk already exists" >&2; exit 1; fi
           cp -r apps/walk/dist apps/client/dist/walk
+          if [ -f "$RUNNER_TEMP/walk-glb/hollowmere_walk.glb" ]; then cp "$RUNNER_TEMP/walk-glb/hollowmere_walk.glb" apps/client/dist/walk/; fi
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:

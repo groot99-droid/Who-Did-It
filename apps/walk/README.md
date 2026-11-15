@@ -12,9 +12,17 @@ pnpm --filter @wdi/walk fixture    # rebuild test/fixtures/walk-fixture.gltf and
 
 ## Opening a world
 
-In this order: `?glb=<url>`; a `.glb` (or `.gltf`) dropped on the page; then `DEFAULT_GLB_URL` in `src/config.ts`
-(null until the hosting question is answered). `?spawn=<id>` starts at `Spawn_<id>`; `?debug` shows the FPS readout,
+In this order: `?glb=<url>`; a `.glb` (or `.gltf`) dropped on the page; then `DEFAULT_GLB_URL` in `src/config.ts`,
+which the Pages deploy points at `/Who-Did-It/walk/hollowmere_walk.glb` (below), and which is null in any other build. `?spawn=<id>` starts at `Spawn_<id>`; `?debug` shows the FPS readout,
 the position and the collision source, and exposes `window.__walk` for the e2e spec. Draco, meshopt and KTX2 files load.
+
+## Hosting the GLB
+
+The GLB is too big for the repository (`*.glb` is in LFS, and Pages serves LFS pointers), so it lives as the asset
+`hollowmere_walk.glb` of a GitHub release tagged `walk-glb`. `.github/workflows/pages.yml` downloads it at deploy time
+into the walk's folder, so the page loads it from its own origin with no CORS question. To ship a new export, replace
+that asset (`gh release upload walk-glb hollowmere_walk.glb --clobber`, or the release page) and re-run the `pages`
+workflow. While the release or the asset is missing, the deploy still succeeds and the page asks for a file.
 
 ## The GLB contract
 
