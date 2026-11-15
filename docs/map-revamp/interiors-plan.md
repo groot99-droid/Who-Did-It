@@ -171,7 +171,8 @@ its GDD text in the same PR (CLAUDE.md):
    (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
    an interior, and the rest of section 3, are open.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
-4. SUPERSEDED (owner, 2026-11-14: first person, section 4 step 8). Was ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
+4. CORRECTED (owner, 2026-11-15, DECISIONS A611): the 2.5D game stays and keeps its interior art; the 3D rooms are for the
+   3D first-person view (section 4, step 8), a second view, not a replacement. Was ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
    renders must therefore line up with the game's isometric camera and each scene's tile grid, and be loadable by the
    client; stills and film alone are not enough. How the client takes them in (asset format, manifest, and whether the
    exterior moves to 3D art too) is a later data/client PR by Story mode, opened once the pipeline (section 6, step 2)
