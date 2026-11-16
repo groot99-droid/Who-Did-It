@@ -55,25 +55,25 @@ owner says so. The last column is what the data side still needs.
 
 | Model | Draft place and use (local session) | Still to settle |
 |---|---|---|
-| `Frostwood_Sawmill` (VANE SAWMILL), `log_pond_landing`, `log_chute` | outskirts: on a beck into the mere | interior? |
+| `Frostwood_Sawmill` (VANE SAWMILL), `log_pond_landing`, `log_chute` | outskirts: on a beck into the mere | interior (A612: yes) |
 | `Frostbound_Freight_Dock`, `powder_kegs` | outskirts railyard, on a `Frostbound_Rails` siding | landmark |
-| `The_Winter_Forge` | outskirts railyard | interior? |
-| `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior? |
-| `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior? |
-| `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior? |
-| `Frontier_Post_Office` | outskirts: Station Street; **the Postmaster's post office (owner, 2026-11-12)** | interior? |
-| `Frostbound_County_Jail` | Station Street: the Constable's lock-up | is `cj_cell` its interior? |
-| `Frontier_Detective_Bureau` | Station Street: a courthouse | interior; which role's building |
-| `Frostbound_Outpost` (palisaded fort on a rock) | hills; **the Bandit's hideout (owner, 2026-11-12)** | interior? |
-| `Frostbound_Waystation` | hills: up the line | interior? |
-| `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior? |
-| `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior? |
-| `Frostgrave_Chapel` | the western woods: the Dark Mass chapel | interior; the rite site? |
-| `Frozen_Crypt_of_Bones` | beyond the chapel yard | interior? |
+| `The_Winter_Forge` | outskirts railyard | interior (A612: yes) |
+| `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior (A612: yes) |
+| `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior (A612: yes) |
+| `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior (A612: yes) |
+| `Frontier_Post_Office` | outskirts: Station Street; **the Postmaster's post office (owner, 2026-11-12)** | interior (A612: yes) |
+| `Frostbound_County_Jail` | Station Street: the Constable's lock-up | interior (A612: yes); is `cj_cell` it? |
+| `Frontier_Detective_Bureau` | Station Street: a courthouse | interior (A612: yes); which role's building |
+| `Frostbound_Outpost` (palisaded fort on a rock) | hills; **the Bandit's hideout (owner, 2026-11-12)** | interior (A612: yes) |
+| `Frostbound_Waystation` | hills: up the line | interior (A612: yes) |
+| `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior (A612: yes) |
+| `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior (A612: yes) |
+| `Frostgrave_Chapel` | the western woods: the Dark Mass chapel | interior (A612: yes); the rite site? |
+| `Frozen_Crypt_of_Bones` | beyond the chapel yard | interior (A612: yes) |
 | `broken_trestle`, `cliff_section` | hills | landmarks |
 | `Abandoned_Tin_Mine` | Gallows Wood (the Tin Gallery's face) | none: `cave_entry` exists |
 | `Frostbound_Witch_Hut` | Gallows Wood: the gamekeeper's stall | open-fronted: no interior |
-| `mother_moll_hut`, `charcoal_kiln`, `hanging_oak`, `mine_adit` | the Fenwood | interior for the hut? |
+| `mother_moll_hut`, `charcoal_kiln`, `hanging_oak`, `mine_adit` | the Fenwood | interior for the hut (A612: yes) |
 
 **Draft caveat: the outskirts.** The outskirts lie **outside the playable map**. A building there needs a door portal
 and a scene before a player can enter it. Section 5 covers that: a new scene id, and either a bigger overworld or a new
@@ -168,8 +168,10 @@ its GDD text in the same PR (CLAUDE.md):
    exterior model, so no game data changes for scale. **Changed (owner, 2026-11-14, "the 1m looks fine"):** an interior is
    built at **1 m per tile**, not 1.5 m, proven on `widow_bedroom`. The exterior 3D world stays at 1.5 m per tile.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior. PARTLY ANSWERED
-   (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
-   an interior, and the rest of section 3, are open.
+   (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. **Interior: ANSWERED
+   (owner, 2026-11-16, DECISIONS A612): every enterable building in section 3 gets an interior**, including the Outpost and
+   the Post Office; open-fronted buildings and landmarks with no door get none. What each building is, whose it is and its
+   story are still open.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
 4. CORRECTED (owner, 2026-11-15, DECISIONS A611): the 2.5D game stays and keeps its interior art; the 3D rooms are for the
    3D first-person view (section 4, step 8), a second view, not a replacement. Was ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
