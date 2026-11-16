@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { TILE_PX } from '@wdi/shared';
+import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
@@ -119,6 +119,7 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
  * The spawn squares moved with the round-5 and round-6 maps, so the way is read off the avatars, not assumed.
  */
 async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> {
+  const clock = m.swarm.rooms[0]!.state as unknown as { tick: number; phaseEndsTick: number };
   const held = new Set<string>();
   const set = async (key: string, on: boolean) => {
     if (on === held.has(key)) return;
@@ -132,6 +133,9 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
       m.tilesBetween('Hana', victim) > 1.1 && Date.now() - t0 < ms;
       await sleep(30)
     ) {
+      // The walk can outlast the 30 s dusk it started in; at night the observer stops seeing the host (8L, A554) and
+      // the distance reads `Infinity`, which failed this on loaded CI runners. Renew the dusk while the walk runs.
+      if (clock.phaseEndsTick - clock.tick < 10 * TICK_RATE) m.debug('debug.clock', { phase: 'dusk' });
       const me = m.at('Hana');
       const to = m.at(victim);
       if (!me || !to) continue;
@@ -144,7 +148,11 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
   } finally {
     for (const key of [...held]) await set(key, false);
   }
-  expect(m.tilesBetween('Hana', victim), 'the host reached its target').toBeLessThanOrEqual(1.1);
+  const at = (name: string) => JSON.stringify(m.at(name) ?? null);
+  expect(
+    m.tilesBetween('Hana', victim),
+    `the host reached its target (Hana ${at('Hana')}, ${victim} ${at(victim)})`,
+  ).toBeLessThanOrEqual(1.1);
 }
 
 /** The host walks to `victim`, strikes with Q and reports the body with E. */
