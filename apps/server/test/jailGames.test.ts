@@ -33,6 +33,8 @@ import {
   send,
   start,
   toWorld,
+  flush,
+  queued,
 } from './npcHelpers';
 import { fitting, tried } from './tribunalHelpers';
 
@@ -43,7 +45,6 @@ import { fitting, tried } from './tribunalHelpers';
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -97,9 +98,9 @@ async function open(
   placeSeat(party, seat, 'cj_cell', x, y);
   advance(party, 1);
   const before = starts(party, seat).length;
-  await send(human(party, seat), C2S.hold, { action: 'interact', targetId: id, on: true }, 60);
+  await queued(party, human(party, seat), C2S.hold, { action: 'interact', targetId: id, on: true });
   advance(party, 1);
-  await sleep(60);
+  await flush(party);
   const sent = starts(party, seat);
   return sent.length > before ? (sent.at(-1)!.payload as { kind: string; public: unknown }) : null;
 }
@@ -120,9 +121,9 @@ function solve(kind: string, pub: unknown): unknown {
 }
 
 async function answer(party: Party, seat: string, game: keyof typeof PROPS, payload: unknown): Promise<void> {
-  await send(human(party, seat), 'minigame.result', { taskId: PROPS[game][0], answer: payload }, 60);
+  await queued(party, human(party, seat), 'minigame.result', { taskId: PROPS[game][0], answer: payload });
   advance(party, 1);
-  await sleep(60);
+  await flush(party);
 }
 
 async function play(party: Party, seat: string, game: keyof typeof PROPS, secondsIn = 2): Promise<void> {
@@ -231,9 +232,13 @@ describe('the jail games (GDD 3.27)', () => {
     const { party, seat } = await cell();
     placeSeat(party, seat, 'cj_cell', 2, 2);
     advance(party, 1);
-    await send(human(party, seat), C2S.hold, { action: 'interact', targetId: PROPS.gym[0], on: true }, 60);
+    await queued(party, human(party, seat), C2S.hold, {
+      action: 'interact',
+      targetId: PROPS.gym[0],
+      on: true,
+    });
     advance(party, 1);
-    await sleep(60);
+    await flush(party);
     expect(starts(party, seat)).toHaveLength(0);
     expect(reasons(party, seat)).toContain('TOO_FAR');
   });

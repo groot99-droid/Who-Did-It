@@ -13,7 +13,6 @@ import { hiveOf } from '../src/sim/npc/hive';
 import { npcMemory } from '../src/sim/npc/memory';
 import { simOf } from '../src/sim/RoomSim';
 import { record } from './killHelpers';
-import { sleep } from './simHelpers';
 import {
   type Party,
   advance,
@@ -26,6 +25,7 @@ import {
   setRole,
   start,
   toWorld,
+  flush,
 } from './npcHelpers';
 
 // Round 8, 8R (A174, A176; GDD 3.8, 3.12): the body bands, the shout and the night bell. The forest's open top row
@@ -125,7 +125,7 @@ describe('the body bands (8R)', () => {
       expect(runInvariants(party.room).filter((f) => f.name === 'hiveNoSecrets')).toEqual([]);
     }
     expect(shoutFact).toBe(true);
-    await sleep(300);
+    await flush(party);
     const shouts = (h: typeof holder) => h.log.filter((m) => m.type === S2C.shout).map((m) => m.payload);
     expect(shouts(holder)).toEqual([{ sceneId: 'forest', x: expect.any(Number), y: expect.any(Number) }]);
     expect(shouts(other)).toEqual([]);

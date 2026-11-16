@@ -29,6 +29,7 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
 } from './npcHelpers';
 import { fitting, tried } from './tribunalHelpers';
 
@@ -40,7 +41,6 @@ import { fitting, tried } from './tribunalHelpers';
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -115,7 +115,7 @@ describe('the county jail (GDD 3.27)', () => {
     advance(party, S(balance.jail.walkS) + 1);
     holdPhase(party, Phase.night, 300);
     handleKill(party.room, b, { targetId: avatarMemory(party.room).handleOf.get(c) });
-    await sleep(150);
+    await flush(party);
     const reasons = party.humans[1]!.log.map((m) => (m.payload as { reason?: string }).reason);
     expect(reasons).toContain('IN_JAIL');
   });
@@ -135,7 +135,7 @@ describe('the county jail (GDD 3.27)', () => {
     expect(until).toBeGreaterThan(party.room.state.tick);
     // A jailed seat cannot open a petition: IN_JAIL with the seconds to the train.
     handlePetitionOpen(party.room, d, { accused: c, charge: 'theft', entries: [] });
-    await sleep(150);
+    await flush(party);
     const err = party.humans[3]!.log.find((m) => (m.payload as { reason?: string }).reason === 'IN_JAIL');
     expect((err?.payload as { args?: { untilDawn?: number } }).args?.untilDawn).toBeGreaterThan(0);
     // A train of the same round does not release it; the next one does.
@@ -152,7 +152,7 @@ describe('the county jail (GDD 3.27)', () => {
     expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(0);
     advance(party, 1);
     expect(party.room.state.manhunt.state).toBe(ManhuntState.none);
-    await sleep(150);
+    await flush(party);
     const name = party.room.state.players.get(d)!.name;
     for (const h of party.humans) expect(manifest(h)).toEqual([`${name} steps off the train.`]);
   });
@@ -163,7 +163,7 @@ describe('the county jail (GDD 3.27)', () => {
     hunt(party, d);
     cuffSeat(party.room, d);
     advance(party, S(balance.jail.walkS) + 1);
-    await sleep(150);
+    await flush(party);
     for (const h of party.humans) {
       const views = stateOf(h).players;
       for (const [id, p] of views) {
@@ -212,7 +212,7 @@ describe('the county jail (GDD 3.27)', () => {
       advance(party, S(balance.jail.walkS) + 1);
       for (const h of party.humans) h.log.length = 0;
       train(party);
-      await sleep(150);
+      await flush(party);
       lines.push(party.humans.map((h) => manifest(h).join('|')));
     }
     expect(lines[1]).toEqual(lines[0]);
@@ -279,7 +279,7 @@ describe('the county jail (GDD 3.27)', () => {
     expect(isJailed(party.room, d)).toBe(false);
     expect(simOf(party.room).players.get(d)!.sceneIdx).toBe(sceneIndex('bp_camp'));
     expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(0);
-    await sleep(150);
+    await flush(party);
     for (const h of party.humans) expect(manifest(h)).toEqual([]);
   });
 });

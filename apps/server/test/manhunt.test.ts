@@ -17,6 +17,7 @@ import {
   advance,
   allTownsfolk,
   bootNpcServer,
+  flush,
   holdPhase,
   lobbyOf,
   pauseClock,
@@ -36,7 +37,6 @@ import { fitting, tried } from './tribunalHelpers';
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -95,7 +95,7 @@ describe('the manhunt (GDD 3.31)', () => {
     const [a, , c, d] = ids(party);
     warrant(party, d);
     expect([row(party).accused, row(party).state]).toEqual([d, ManhuntState.hunting]);
-    await sleep(150);
+    await flush(party);
     const seen = party.humans.map((h) => JSON.stringify(stateOf(h).manhunt));
     expect(new Set(seen).size).toBe(1);
     expect(JSON.parse(seen[0]!)).toEqual({ accused: d, untilTick: row(party).untilTick, state: 1 });
@@ -139,7 +139,7 @@ describe('the manhunt (GDD 3.31)', () => {
     placeSeat(party, d, 'overworld', 37, 22);
     advance(party, 1);
     handleCuffHold(party.room, c, handleOf(party, d));
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[2]!)).toEqual(['NOT_HUNTED']);
     warrant(party, d);
     const stop = [
@@ -171,18 +171,19 @@ describe('the manhunt (GDD 3.31)', () => {
       // The accused drawn as another is refused like any other figure.
       disguise(party, d, c);
       handleCuffHold(party.room, a, handleOf(party, d));
-      await sleep(150);
+      await flush(party);
       expect(reasons(party.humans[0]!)).toEqual(['NOT_HUNTED']);
       avatarMemory(party.room).disguise.delete(d);
       if (impersonated) {
         placeSeat(party, d, 'overworld', 10, 10);
         disguise(party, b, d);
       } else advance(party, 1);
+      await flush(party);
       for (const h of party.humans) h.log.length = 0;
       const target = impersonated ? b : d;
       handleCuffHold(party.room, a, handleOf(party, target));
       advance(party, cuffTicks + 1);
-      await sleep(150);
+      await flush(party);
       expect(row(party).state).toBe(ManhuntState.cuffed);
       expect(cuffedOf(party.room)[0]!.seat).toBe(target);
       runs.push(
@@ -210,7 +211,7 @@ describe('the manhunt (GDD 3.31)', () => {
     advance(party, S(economy.notices.sampleS) + 1);
     expect([a, b, c].map(scene)).toEqual(['bakery', 'bakery', 'bakery']);
     expect(scene(d)).toBe('');
-    await sleep(150);
+    await flush(party);
     for (const h of party.humans) {
       const own = stateOf(h).players.get(h.id)?.priv?.huntScene ?? '';
       expect(own).toBe(h.id === d ? '' : 'bakery');
@@ -248,7 +249,7 @@ describe('the manhunt (GDD 3.31)', () => {
       }
       expect(row(party).state).toBe(ManhuntState.none);
       handlePetitionOpen(party.room, c, { accused: b, charge: 'theft', entries: [] });
-      await sleep(150);
+      await flush(party);
       expect(reasons(party.humans[2]!)).toContain('PETITION_GRACE');
     }
   });

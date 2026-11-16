@@ -19,6 +19,8 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
+  queued,
 } from './npcHelpers';
 import { sleep } from './simHelpers';
 
@@ -50,10 +52,9 @@ async function lieDown(p: Party, h: Human, scene: string, kind = 'bed'): Promise
   const bed = bedIn(scene, kind);
   placeSeat(p, h.id, scene as SceneId, bed.x, bed.y);
   const before = h.log.length;
-  h.room.send('act.hold', { action: 'sleep', targetId: bed.id, on: true });
-  await sleep(60);
+  await queued(p, h, 'act.hold', { action: 'sleep', targetId: bed.id, on: true });
   advance(p, 1);
-  await sleep(30);
+  await flush(p);
   return h.log
     .slice(before)
     .filter((m) => m.type === 'error')
@@ -67,7 +68,7 @@ describe('homes and beds', () => {
     const homes = [priv(p, a).home, priv(p, b).home];
     for (const home of homes) expect(bedIn(home), home).toBeDefined();
     expect(new Set(homes).size).toBe(2);
-    await sleep(200); // the patch reaches the clients
+    await flush(p); // the patch reaches the clients
     expect(stateOf(a).players.get(a.id)?.priv?.home).toBe(homes[0]);
     expect(stateOf(b).players.get(a.id)?.priv).toBeUndefined();
   });
@@ -146,10 +147,9 @@ describe('the night skip', () => {
 
     await lieDown(p, a, priv(p, a).home);
     const before = a.log.length;
-    a.room.send('act.bell', {});
-    await sleep(60);
+    await queued(p, a, 'act.bell', {});
     advance(p, 1);
-    await sleep(30);
+    await flush(p);
     const reasons = a.log.slice(before).map((m) => (m.payload as { reason?: string }).reason);
     expect([isAsleep(p.room, a.id), reasons]).toEqual([false, ['ASLEEP']]);
 
