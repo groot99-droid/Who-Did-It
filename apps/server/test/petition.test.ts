@@ -20,6 +20,7 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
 } from './npcHelpers';
 
 /**
@@ -82,7 +83,7 @@ describe('petitions (GDD 3.31)', () => {
     expect(row(party).signed).toBe(0);
     handlePetitionOpen(party.room, c, { accused: a, charge: 'assault', entries: [] }); // one at a time, town-wide
     handlePetitionSign(party.room, a, { id: row(party).id }); // the opener never signs its own
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[2]!)).toContain('PETITION_OPEN');
     expect(reasons(party.humans[0]!)).toContain('BUSY');
     // The signature is a count: no seat id under the public row; the signer alone learns it signed.
@@ -106,7 +107,7 @@ describe('petitions (GDD 3.31)', () => {
     expect(warrantsOf(party.room)).toHaveLength(0);
     handlePetitionOpen(party.room, a, { accused: b, charge: 'theft', entries: [] }); // the opener waits
     handlePetitionOpen(party.room, b, { accused, charge: 'theft', entries: [] }); // so does the accused
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[0]!)).toContain('PETITION_GRACE');
     expect(reasons(party.humans[1]!)).toContain('PETITION_GRACE');
     handlePetitionOpen(party.room, b, { accused: a, charge: 'theft', entries: [] });
@@ -124,7 +125,7 @@ describe('petitions (GDD 3.31)', () => {
     handlePetitionOpen(party.room, a, { accused, charge: 'jaywalking', entries: [] });
     placeSeat(party, a, 'overworld', 10, 10);
     handlePetitionOpen(party.room, a, { accused, charge: 'robbery', entries: [] });
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[0]!)).toEqual(['BAD_REQUEST', 'BAD_REQUEST', 'BAD_REQUEST', 'TOO_FAR']);
     expect(row(party).id).toBe('');
   });

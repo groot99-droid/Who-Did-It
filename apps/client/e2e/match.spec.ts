@@ -1,5 +1,5 @@
 import { balance } from '@wdi/content';
-import { TILE_PX } from '@wdi/shared';
+import { TICK_RATE, TILE_PX } from '@wdi/shared';
 import { expect, test, type Browser, type BrowserContext, type Page } from '@playwright/test';
 import { type Swarm, runSwarm } from '../../../tools/bots/swarm';
 import { E2E_SERVER_URL } from './env';
@@ -119,6 +119,11 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
  * The spawn squares moved with the round-5 and round-6 maps, so the way is read off the avatars, not assumed.
  */
 async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> {
+  const clock = m.swarm.rooms[0]!.state as unknown as { tick: number; phaseEndsTick: number };
+  let last: { x: number; y: number } | undefined;
+  let lastAt = Date.now();
+  let detourUntil = 0;
+  let detourSide = 1;
   const held = new Set<string>();
   const set = async (key: string, on: boolean) => {
     if (on === held.has(key)) return;
@@ -132,19 +137,40 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
       m.tilesBetween('Hana', victim) > 1.1 && Date.now() - t0 < ms;
       await sleep(30)
     ) {
+      // The walk can outlast the 30 s dusk it started in; at night the observer stops seeing the host (8L, A554) and
+      // the distance reads `Infinity`, which failed this on loaded CI runners. Renew the dusk while the walk runs.
+      if (clock.phaseEndsTick - clock.tick < 10 * TICK_RATE) m.debug('debug.clock', { phase: 'dusk' });
       const me = m.at('Hana');
       const to = m.at(victim);
       if (!me || !to) continue;
+      // Steering straight at the target jams on a wall (a loaded CI run stood still 11.8 tiles short). Blocked for
+      // 1.5 s, sidestep for 1.2 s, to the other side each time, then steer at the target again from where it got to.
+      const now = Date.now();
+      if (!last || Math.hypot(me.x - last.x, me.y - last.y) >= TILE_PX / 4) {
+        last = { x: me.x, y: me.y };
+        lastAt = now;
+      } else if (now - lastAt > 1500) {
+        detourUntil = now + 1200;
+        detourSide = -detourSide;
+        lastAt = now;
+      }
       const slack = TILE_PX / 4;
-      await set('KeyD', to.x - me.x > slack);
-      await set('KeyA', me.x - to.x > slack);
-      await set('KeyS', to.y - me.y > slack);
-      await set('KeyW', me.y - to.y > slack);
+      let sx = to.x - me.x > slack ? 1 : me.x - to.x > slack ? -1 : 0;
+      let sy = to.y - me.y > slack ? 1 : me.y - to.y > slack ? -1 : 0;
+      if (now < detourUntil) [sx, sy] = [-sy * detourSide, sx * detourSide];
+      await set('KeyD', sx > 0);
+      await set('KeyA', sx < 0);
+      await set('KeyS', sy > 0);
+      await set('KeyW', sy < 0);
     }
   } finally {
     for (const key of [...held]) await set(key, false);
   }
-  expect(m.tilesBetween('Hana', victim), 'the host reached its target').toBeLessThanOrEqual(1.1);
+  const at = (name: string) => JSON.stringify(m.at(name) ?? null);
+  expect(
+    m.tilesBetween('Hana', victim),
+    `the host reached its target (Hana ${at('Hana')}, ${victim} ${at(victim)})`,
+  ).toBeLessThanOrEqual(1.1);
 }
 
 /** The host walks to `victim`, strikes with Q and reports the body with E. */

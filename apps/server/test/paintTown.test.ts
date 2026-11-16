@@ -14,7 +14,7 @@ import { simOf } from '../src/sim/RoomSim';
 import { townsfolkMemory } from '../src/sim/townsfolk/figures';
 import { isOnLine } from '../src/sim/Train';
 import { endMatch, evaluateWin } from '../src/sim/Win';
-import { type Party, advance, bootNpcServer, lobbyOf, pauseClock } from './npcHelpers';
+import { type Party, advance, bootNpcServer, lobbyOf, pauseClock, flush } from './npcHelpers';
 import { sleep } from './simHelpers';
 
 /** Round 10, C5 (GDD 3.8; world-mode.md 1.6, followup-4 2.2; seams.md row 18): Paint The Town Red. */
@@ -137,7 +137,7 @@ describe('the outcome (GDD 3.8)', () => {
     markDead(room, npcIds[target - 1]!, 'knife', killers[1]);
     expect(evaluateWin(room)).toBe('paintTown');
     endMatch(room, 'paintTown');
-    await sleep(150);
+    await flush(party);
     const over = party.humans[0]!.log.find((e) => e.type === 'gameOver')?.payload as {
       winner: number;
       paintTown?: { target: number };

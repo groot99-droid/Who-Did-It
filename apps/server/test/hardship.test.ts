@@ -15,8 +15,7 @@ import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
 import { MatchSeeds } from '../src/sim/seeds';
 import { forceArrival, isTurned, onDeliveryArrival } from '../src/sim/vendettas/arrival';
-import { type Party, bootNpcServer, pauseClock, setRole, standardParty } from './npcHelpers';
-import { sleep } from './simHelpers';
+import { type Party, bootNpcServer, pauseClock, setRole, standardParty, flush } from './npcHelpers';
 
 /** Round 10, C4c (GDD 3.33; followup-4 2.6 b1 to b5; seams.md 3 row 20): the dormant role and the hardships. */
 
@@ -90,7 +89,7 @@ describe('hardships (GDD 3.33, F4 b2 to b5)', () => {
     const room = party.room;
     const [a, b] = [...room.state.players.keys()] as [string, string];
     looks(party, [a, b]);
-    await sleep(200); // the start's messages settle first
+    await flush(party); // the start's messages settle first
     const log = party.humans.map((h) => h.log.length);
     onDeliveryHardship(room, room.state.round);
     const struck = [a, b].filter((id) => inHardship(room, id));
@@ -99,7 +98,7 @@ describe('hardships (GDD 3.33, F4 b2 to b5)', () => {
     expect(struck.length).toBeLessThanOrEqual(most);
     if (inHardship(room, a)) expect(sign(party, 'bakery', 'flour').dear).toBe(true);
     expect(workOf(room, inHardship(room, a) ? 'baker' : 'herbalist')).toBe('thin');
-    await sleep(150);
+    await flush(party);
     expect(party.humans.map((h) => h.log.length)).toEqual(log); // nothing is sent
     room.state.tick += Math.round(balance.hardship.recoverS * TICK_RATE) + 1; // white-box: the day ends
     expect([a, b].some((id) => inHardship(room, id))).toBe(false);

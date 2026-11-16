@@ -2,8 +2,16 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import type { ColyseusTestServer } from '@colyseus/testing';
 import { C2S, type RefusalFrame } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
-import { sleep } from './simHelpers';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 
 // Round 10 (A13; GDD 3.30): the crafting grid. The client sends the cells; the server matches a hand recipe, takes the
 // inputs and gives the product inside step(). A shapeless recipe matches in any cells, a shaped one only in its shape;
@@ -29,9 +37,9 @@ const own = (p: Party) => p.room.state.players.get(p.humans[0]!.id)!;
 
 async function grid(p: Party, size: 2 | 3, cells: Array<string | null>): Promise<RefusalFrame | undefined> {
   const before = p.humans[0]!.log.filter((m) => m.type === 'error').length;
-  await send(p.humans[0]!, C2S.craftGrid, { size, cells }, 60);
+  await queued(p, p.humans[0]!, C2S.craftGrid, { size, cells });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
   const errs = p.humans[0]!.log.filter((m) => m.type === 'error');
   return errs.length > before ? (errs.at(-1)!.payload as RefusalFrame) : undefined;
 }

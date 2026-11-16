@@ -19,6 +19,7 @@ import {
   placeSeat,
   start,
   toWorld,
+  flush,
 } from './npcHelpers';
 
 /**
@@ -28,7 +29,6 @@ import {
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const maxTicks = S(balance.pairing.answerS.max) + 1;
 
 let colyseus: ColyseusTestServer;
@@ -117,11 +117,11 @@ describe('Walk with me (GDD 3.31)', () => {
     advance(party, 1);
     handlePairAsk(party.room, a, { targetId: handleOf(party, b) });
     handlePairAsk(party.room, a, { targetId: handleOf(party, b) });
-    await sleep(150);
+    await flush(party);
     expect(errors(party.humans[0]!)).toHaveLength(2); // the day's PHASE_CLOSED and the second ask's BUSY
     // b, already asked, asks nobody's leave: a third seat's ask on b would be blocked; here b asks a, who is asking.
     handlePairAsk(party.room, b, { targetId: handleOf(party, a) });
-    await sleep(150);
+    await flush(party);
     expect(errors(party.humans[1]!)).toHaveLength(0);
     expect(pairingMemory(party.room).asks.get(b)?.blocked).toBe(true);
     advance(party, maxTicks + 1);

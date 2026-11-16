@@ -34,6 +34,7 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
 } from './npcHelpers';
 
 /**
@@ -43,7 +44,6 @@ import {
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -130,7 +130,7 @@ describe("the Final Night's end trial (GDD 3.8, B6d)", () => {
     ]);
     expect(simOf(party.room).players.get(d)!.dead).toBe(true);
     for (let i = 0; i < S(30) && party.room.state.phase !== Phase.gameOver; i++) advance(party, 1);
-    await sleep(150);
+    await flush(party);
     const over = gameOver(party.humans[0]!);
     expect(over?.winner).toBe(Winner.village);
     expect(over?.unseen).toBeUndefined();
@@ -141,7 +141,7 @@ describe("the Final Night's end trial (GDD 3.8, B6d)", () => {
     endHunt(party);
     until(party, TribunalStep.filing);
     for (let i = 0; i < S(200) && party.room.state.phase !== Phase.gameOver; i++) advance(party, 1);
-    await sleep(150);
+    await flush(party);
     for (const h of party.humans) expect(gameOver(h)).toMatchObject({ winner: Winner.cabal, unseen: true });
   });
 
@@ -171,7 +171,7 @@ describe("the Final Night's end trial (GDD 3.8, B6d)", () => {
     advance(party, S(balance.phases.revealS));
     expect([row(party).accused, row(party).finding]).toEqual([d, TribunalFinding.dismissed]);
     for (let i = 0; i < S(30) && party.room.state.phase !== Phase.gameOver; i++) advance(party, 1);
-    await sleep(150);
+    await flush(party);
     expect(gameOver(party.humans[0]!)).toMatchObject({ winner: Winner.cabal, unseen: true });
   });
 
@@ -191,7 +191,7 @@ describe("the Final Night's end trial (GDD 3.8, B6d)", () => {
     handleFile(party.room, c, { accused: d, charge: 'murder', entries: [] });
     handleFile(party.room, b, { accused: b, charge: 'murder', entries: [] });
     handleFile(party.room, d, { accused: a, charge: 'piracy', entries: [] });
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[0]!)).toEqual(['PHASE_CLOSED']);
     expect(reasons(party.humans[2]!)).toEqual([]);
     expect(party.room.state.endTrial.cases.map((x) => x.accused)).toEqual([d]);
@@ -210,7 +210,7 @@ describe("the Final Night's end trial (GDD 3.8, B6d)", () => {
       entries: [entry(party, a, ClueKind.footprints, 2)],
     });
     advance(party, 1);
-    await sleep(150);
+    await flush(party);
     const seen = party.humans.map((h) => JSON.stringify(stateOf(h).endTrial));
     expect(new Set(seen).size).toBe(1);
     expect(seen[0]).not.toContain('killer');

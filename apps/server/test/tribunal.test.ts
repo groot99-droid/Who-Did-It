@@ -39,6 +39,7 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
 } from './npcHelpers';
 
 /**
@@ -48,7 +49,6 @@ import {
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const tr = balance.trial;
 
 let colyseus: ColyseusTestServer;
@@ -172,7 +172,7 @@ describe('the Tribunal (GDD 3.8, B6a)', () => {
       TribunalSentence.death,
     ]);
     expect(simOf(party.room).players.get(d)!.dead).toBe(true);
-    await sleep(150);
+    await flush(party);
     for (const h of party.humans)
       expect(h.log.filter((m) => m.type === S2C.tribunalVerdict).map((m) => m.payload)).toEqual([
         { roleId: 'killer' },
@@ -197,7 +197,7 @@ describe('the Tribunal (GDD 3.8, B6a)', () => {
     expect(party.room.state.players.get(d)!.priv.jailUntilTick).toBe(0);
     until(party, TribunalStep.none);
     handlePetitionOpen(party.room, a, { accused: d, charge: 'theft', entries: [] });
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[0]!)).toContain('PETITION_GRACE');
   });
 
@@ -231,7 +231,7 @@ describe('the Tribunal (GDD 3.8, B6a)', () => {
     handlePresent(party.room, b, { entryId: entry(party, b, ClueKind.felt, 0) }); // over presentPerPlayer
     until(party, TribunalStep.defence);
     handlePresent(party.room, c, { entryId: entry(party, c, ClueKind.thread, 1, NotebookStatus.claimed) });
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[0]!)).toEqual(['ALREADY_DONE']);
     expect(reasons(party.humans[1]!)).toEqual(['PHASE_CLOSED', 'SPENT']);
     expect(reasons(party.humans[2]!)).toEqual(['PHASE_CLOSED']);
@@ -260,7 +260,7 @@ describe('the Tribunal (GDD 3.8, B6a)', () => {
     until(party, TribunalStep.case);
     handlePresent(party.room, b, { entryId: entry(party, b, ClueKind.thread, 0) });
     handlePresent(party.room, d, { entryId: entry(party, d, ClueKind.footprints, 0) }); // the free accused defends
-    await sleep(150);
+    await flush(party);
     expect(reasons(party.humans[1]!)).toEqual(['IN_JAIL']);
     expect(row(party).entries.some((e) => e.presenter === b)).toBe(false);
     const seen = party.humans.map((h) => JSON.stringify(stateOf(h).tribunal));
