@@ -31,6 +31,15 @@ export const DEFAULT_EXPOSURE = 2 ** final.color.exposure;
 
 const EXPOSURE_KEYS = ['wdi_exposure', 'tone_mapping_exposure', 'toneMappingExposure', 'exposure'];
 
+/** toneMappingExposure from one object's extras (`wdi_exposure` or an alias, as a multiplier), or null. */
+export function exposureFromExtras(extras: Record<string, unknown> | undefined): number | null {
+  for (const key of EXPOSURE_KEYS) {
+    const v = extras?.[key];
+    if (typeof v === 'number' && v > 0) return v;
+  }
+  return null;
+}
+
 /** toneMappingExposure from the extras of an `Area_*` object (the area at the origin first), else the scene's. */
 export function exposureFromScene(root: Object3D): number | null {
   const holders: Object3D[] = [];
@@ -39,10 +48,8 @@ export function exposureFromScene(root: Object3D): number | null {
   });
   holders.sort((a, b) => a.position.lengthSq() - b.position.lengthSq());
   for (const o of [...holders, root]) {
-    for (const key of EXPOSURE_KEYS) {
-      const v = (o.userData as Record<string, unknown>)[key];
-      if (typeof v === 'number' && v > 0) return v;
-    }
+    const v = exposureFromExtras(o.userData as Record<string, unknown>);
+    if (v !== null) return v;
   }
   return null;
 }

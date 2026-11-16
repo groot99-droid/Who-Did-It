@@ -1,8 +1,13 @@
 // Viewer constants for the walk-through. They are not game balance (balance.json owns those) and live only here.
 
-/** Where the world GLB comes from when neither `?glb=` nor a dropped file gives one. Hosting is still open
- * (see the PR that added this app); until it is answered there is no default and the page asks for a file. */
-export const DEFAULT_GLB_URL: string | null = null;
+/** Where the world GLB comes from when neither `?glb=` nor a dropped file gives one. The Pages deploy downloads
+ * `hollowmere_walk.glb` from the `walk-glb` release into the walk's folder and sets `VITE_WALK_GLB` to its name, so
+ * it loads from the same origin. Without that (a local build, CI, no release yet) there is no default and the page
+ * asks for a file. */
+const WALK_GLB_FILE: string | undefined = import.meta.env.VITE_WALK_GLB;
+export const DEFAULT_GLB_URL: string | null = WALK_GLB_FILE
+  ? `${import.meta.env.BASE_URL}${WALK_GLB_FILE}`
+  : null;
 
 export const WALK = {
   /** Camera height above the feet, metres. */
@@ -24,9 +29,11 @@ export const WALK = {
   /** How quickly the velocity reaches the wished one, per second (ground and air). */
   accelGround: 12,
   accelAir: 2,
-  /** Physics sub-step, seconds; a frame's delta is clamped to `maxFrame`. */
+  /** Physics sub-step, seconds; a frame's delta is clamped to `maxFrame`, which is long enough that a slow device
+   * (4 fps and up; software WebGL in CI runs about 6) keeps real-time speed, and short enough that a frame after a
+   * stall or a hidden tab doesn't jump the player. */
   subStep: 1 / 120,
-  maxFrame: 0.1,
+  maxFrame: 0.25,
   /** Below the world's lowest point by this much, the player returns to the spawn. */
   killDepth: 25,
 } as const;

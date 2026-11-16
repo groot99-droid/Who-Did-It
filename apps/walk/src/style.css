@@ -162,6 +162,44 @@ body {
   font-size: 1.4rem;
 }
 
+.fade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  transition: opacity 0.18s;
+}
+
+.fade.on {
+  opacity: 1;
+}
+
+.door {
+  position: absolute;
+  left: 50%;
+  bottom: 64px;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--ink);
+  font: inherit;
+  pointer-events: auto;
+}
+
+.notice {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: var(--panel);
+  text-align: center;
+}
+
 [hidden] {
   display: none !important;
 }

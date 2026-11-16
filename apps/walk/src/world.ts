@@ -1,5 +1,7 @@
 import { Color, DirectionalLight, Fog, FogExp2, Light, Mesh, Object3D, Vector3 } from 'three';
+import { exposureFromExtras } from './look';
 import { BvhCollider } from './physics/collider';
+import { findPortals, type Portal } from './portals';
 import { findSpawns, type Spawn } from './spawn';
 
 export const COLLISION_NAME = 'HM_Collision';
@@ -16,6 +18,8 @@ export interface World {
   hasSun: boolean;
   /** The `Area_*` objects (Area_village at the origin, the wild areas 900 m and more away); one shows at a time. */
   areas: Object3D[];
+  /** The `Portal_*` doors, in every area. */
+  portals: Portal[];
   fog: Fog | FogExp2 | null;
 }
 
@@ -68,6 +72,51 @@ export function showNearestArea(areas: readonly Object3D[], x: number, z: number
   for (const a of areas) a.visible = a === keep;
 }
 
+/** What an area changes when the player is in it: from its extras, and indoors for `wdi_indoor` or `Area_room_`. */
+export interface AreaLook {
+  /** Indoors: no moon, sky light or sky dome. */
+  indoor: boolean;
+  /** Light baked into the vertex colours of unlit materials (`wdi_baked`); its live lights are off. */
+  baked: boolean;
+  fog: Fog | FogExp2 | null;
+  exposure: number | null;
+}
+
+export function areaLook(area: Object3D | null): AreaLook {
+  const x = (area?.userData ?? {}) as Record<string, unknown>;
+  return {
+    indoor: x.wdi_indoor === true || (area?.name.startsWith(`${AREA_PREFIX}room_`) ?? false),
+    baked: x.wdi_baked === true,
+    fog: fogFromExtras(x),
+    exposure: exposureFromExtras(x),
+  };
+}
+
+/**
+ * A `wdi_baked` area has its light baked in Cycles into COLOR_0 under KHR_materials_unlit, which three loads as
+ * MeshBasicMaterial with vertex colours: scene-linear radiance, so AgX and the area's `wdi_exposure` render it as
+ * Blender's view does, and no live light can reach it. The area's exported lights are switched off, so they cost
+ * nothing and light no lit prop on top of the bake.
+ */
+export function switchOffBakedLights(areas: readonly Object3D[]): void {
+  for (const area of areas)
+    if (areaLook(area).baked)
+      area.traverse((o) => {
+        if ((o as Light).isLight) o.visible = false;
+      });
+}
+
+/** `wdi_cast_shadow: false` on a node (a lamp mesh, an instance holder) keeps it and everything under it from
+ * casting shadows, instanced meshes included; the lights sit inside those meshes. Shadows are off by default. */
+export function applyShadowFlags(root: Object3D): void {
+  root.traverse((obj) => {
+    if ((obj.userData as Record<string, unknown>).wdi_cast_shadow === false)
+      obj.traverse((o) => {
+        o.castShadow = false;
+      });
+  });
+}
+
 /** Fog from the scene's glTF extras (Blender custom properties): `fog_color` with `fog_near` and `fog_far`,
  * or with `fog_density`. */
 export function fogFromExtras(extras: Record<string, unknown> | undefined): Fog | FogExp2 | null {
@@ -91,6 +140,9 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
   const { roots, source } = collisionRoots(root);
   const collider = BvhCollider.fromObjects(roots);
   if (source === COLLISION_NAME) for (const r of roots) r.visible = false;
+  applyShadowFlags(root);
+  const areas = findAreas(root);
+  switchOffBakedLights(areas);
   let hasLights = false;
   let hasSun = false;
   root.traverse((obj) => {
@@ -104,7 +156,8 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
     collisionSource: source,
     hasLights,
     hasSun,
-    areas: findAreas(root),
+    areas,
+    portals: findPortals(root),
     fog: fogFromExtras(extras),
   };
 }

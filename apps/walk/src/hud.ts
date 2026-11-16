@@ -29,7 +29,12 @@ export class Hud {
   private readonly stickBase = el('div', 'stick');
   private readonly stickKnob = el('div', 'knob');
   private readonly drop = el('div', 'drop', 'Drop a .glb to walk it');
+  private readonly fader = el('div', 'fade');
+  private readonly door = el('button', 'door');
+  private readonly notice = el('div', 'notice');
+  private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
+  onUse: (() => void) | null = null;
 
   constructor(
     root: HTMLElement,
@@ -44,7 +49,21 @@ export class Hud {
     this.hint.hidden = true;
     this.stickBase.hidden = true;
     this.drop.hidden = true;
-    root.append(this.panel, this.hint, this.picker, this.debug, this.stickBase, this.drop);
+    this.door.hidden = true;
+    this.notice.hidden = true;
+    this.door.type = 'button';
+    this.door.addEventListener('click', () => this.onUse?.());
+    root.append(
+      this.panel,
+      this.hint,
+      this.picker,
+      this.debug,
+      this.stickBase,
+      this.drop,
+      this.fader,
+      this.door,
+      this.notice,
+    );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
       this.select.blur();
@@ -76,16 +95,33 @@ export class Hud {
     this.status.textContent = `${message} · Drop a .glb on the page or open it with ?glb=<url>.`;
   }
 
-  ready(spawns: readonly { id: string; label: string }[], current: string | null): void {
+  /** Fills the spawn picker, grouped by district when the spawns have one. */
+  ready(
+    spawns: readonly { id: string; label: string; name?: string; group?: string }[],
+    current: string | null,
+  ): void {
     this.panel.hidden = true;
     this.hint.hidden = false;
-    this.select.replaceChildren(
-      ...spawns.map(({ id, label }) => {
-        const o = el('option', '', label);
-        o.value = id;
-        return o;
-      }),
-    );
+    const grouped = spawns.some((s) => s.group);
+    const groups = new Map<string, HTMLElement>();
+    this.select.replaceChildren();
+    for (const s of spawns) {
+      const o = el('option', '', grouped ? (s.name ?? s.label) : s.label);
+      o.value = s.id;
+      if (!grouped) {
+        this.select.append(o);
+        continue;
+      }
+      const key = s.group || 'Other';
+      let g = groups.get(key);
+      if (!g) {
+        g = el('optgroup', '');
+        (g as HTMLOptGroupElement).label = key;
+        groups.set(key, g);
+        this.select.append(g);
+      }
+      g.append(o);
+    }
     if (current) this.select.value = current;
     this.picker.hidden = spawns.length === 0;
   }
@@ -106,6 +142,35 @@ export class Hud {
     this.stickBase.style.left = `${origin.x}px`;
     this.stickBase.style.top = `${origin.y}px`;
     this.stickKnob.style.transform = `translate(${offset.x * radius}px, ${offset.y * radius}px)`;
+  }
+
+  /** Shows the spawn the player is at in the picker. */
+  setSpawn(id: string | null): void {
+    if (id) this.select.value = id;
+  }
+
+  /** Fades to black, runs `midway`, and fades back. */
+  async fade(midway: () => void, ms = 180): Promise<void> {
+    const wait = () => new Promise((r) => setTimeout(r, ms));
+    this.fader.classList.add('on');
+    await wait();
+    midway();
+    this.fader.classList.remove('on');
+    await wait();
+  }
+
+  /** A short line in the middle of the screen, gone after `ms`. */
+  say(text: string, ms = 2500): void {
+    this.notice.textContent = text;
+    this.notice.hidden = false;
+    clearTimeout(this.noticeTimer);
+    this.noticeTimer = setTimeout(() => (this.notice.hidden = true), ms);
+  }
+
+  /** The door prompt near a portal: a button on touch, a key hint otherwise; null hides it. */
+  setDoor(label: string | null, touch: boolean): void {
+    this.door.hidden = label === null;
+    if (label !== null) this.door.textContent = touch ? `Enter ${label}` : `E · enter ${label}`;
   }
 
   showDrop(on: boolean): void {

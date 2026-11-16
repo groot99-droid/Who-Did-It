@@ -7,6 +7,8 @@ export interface InputFrame {
   run: boolean;
   yaw: number;
   pitch: number;
+  /** Use was pressed since the last frame (E or Enter, the pad's A, the HUD's door button). */
+  use: boolean;
 }
 
 const FORWARD = ['KeyW', 'ArrowUp'];
@@ -14,6 +16,7 @@ const BACK = ['KeyS', 'ArrowDown'];
 const LEFT = ['KeyA', 'ArrowLeft'];
 const RIGHT = ['KeyD', 'ArrowRight'];
 const RUN = ['ShiftLeft', 'ShiftRight'];
+const USE = ['KeyE', 'Enter'];
 const HANDLED = new Set([...FORWARD, ...BACK, ...LEFT, ...RIGHT]);
 
 export function deadzone(v: number, dz: number = LOOK.deadzone): number {
@@ -35,6 +38,8 @@ export class Input {
   private stick = { x: 0, y: 0 };
   private lookId: number | null = null;
   private lookLast = { x: 0, y: 0 };
+  private useQueued = false;
+  private padUse = false;
   /** True once a touch has been seen: the HUD shows the touch hint and the stick. */
   touchSeen = false;
   onStick: ((origin: { x: number; y: number } | null, offset: { x: number; y: number }) => void) | null =
@@ -46,6 +51,7 @@ export class Input {
   ) {
     window.addEventListener('keydown', (e) => {
       this.keys.add(e.code);
+      if (USE.includes(e.code) && !e.repeat) this.useQueued = true;
       if (HANDLED.has(e.code)) e.preventDefault();
     });
     window.addEventListener('keyup', (e) => this.keys.delete(e.code));
@@ -116,6 +122,11 @@ export class Input {
     }
   }
 
+  /** Queues a use for the next frame (the HUD's door button on touch). */
+  requestUse(): void {
+    this.useQueued = true;
+  }
+
   private any(codes: string[]): boolean {
     return codes.some((c) => this.keys.has(c));
   }
@@ -134,7 +145,12 @@ export class Input {
     this.lookX = 0;
     this.lookY = 0;
 
+    let use = this.useQueued;
+    this.useQueued = false;
     const pad = firstGamepad();
+    const padUse = pad?.buttons[0]?.pressed ?? false;
+    if (padUse && !this.padUse) use = true;
+    this.padUse = padUse;
     if (pad) {
       strafe += deadzone(pad.axes[0] ?? 0);
       forward -= deadzone(pad.axes[1] ?? 0);
@@ -148,7 +164,7 @@ export class Input {
       )
         run = true;
     }
-    return { forward: clamp1(forward), strafe: clamp1(strafe), run, yaw, pitch };
+    return { forward: clamp1(forward), strafe: clamp1(strafe), run, yaw, pitch, use };
   }
 }
 
