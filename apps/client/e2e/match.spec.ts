@@ -120,6 +120,10 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
  */
 async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> {
   const clock = m.swarm.rooms[0]!.state as unknown as { tick: number; phaseEndsTick: number };
+  let last: { x: number; y: number } | undefined;
+  let lastAt = Date.now();
+  let detourUntil = 0;
+  let detourSide = 1;
   const held = new Set<string>();
   const set = async (key: string, on: boolean) => {
     if (on === held.has(key)) return;
@@ -139,11 +143,25 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
       const me = m.at('Hana');
       const to = m.at(victim);
       if (!me || !to) continue;
+      // Steering straight at the target jams on a wall (a loaded CI run stood still 11.8 tiles short). Blocked for
+      // 1.5 s, sidestep for 1.2 s, to the other side each time, then steer at the target again from where it got to.
+      const now = Date.now();
+      if (!last || Math.hypot(me.x - last.x, me.y - last.y) >= TILE_PX / 4) {
+        last = { x: me.x, y: me.y };
+        lastAt = now;
+      } else if (now - lastAt > 1500) {
+        detourUntil = now + 1200;
+        detourSide = -detourSide;
+        lastAt = now;
+      }
       const slack = TILE_PX / 4;
-      await set('KeyD', to.x - me.x > slack);
-      await set('KeyA', me.x - to.x > slack);
-      await set('KeyS', to.y - me.y > slack);
-      await set('KeyW', me.y - to.y > slack);
+      let sx = to.x - me.x > slack ? 1 : me.x - to.x > slack ? -1 : 0;
+      let sy = to.y - me.y > slack ? 1 : me.y - to.y > slack ? -1 : 0;
+      if (now < detourUntil) [sx, sy] = [-sy * detourSide, sx * detourSide];
+      await set('KeyD', sx > 0);
+      await set('KeyA', sx < 0);
+      await set('KeyS', sy > 0);
+      await set('KeyW', sy < 0);
     }
   } finally {
     for (const key of [...held]) await set(key, false);
