@@ -117,6 +117,10 @@ One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_
      (the overworld portals). Rooms are reached from the spawn picker; walking through a door is a later viewer change;
    - about 2 to 4 MB a room; if the single file grows too big, the rooms ship as `hollowmere_rooms.glb` with the same
      contract.
+   - **Changed (owner, 2026-11-16, DECISIONS A614): each room is its own file, `room_<sceneId>.glb`**, fetched when a
+     portal leads to it, and the village is cut into section files joined by seam portals. The single-file delivery
+     above is dropped (the first room took the file over its 40 MB budget). The far-grid placement and the node names
+     stay until the area contract says otherwise.
 
 **Decision to make first: the scale.** An interior grid is bigger than its shell. `tavern_bar` is 20x12 tiles, 30x18 m at
 1.5 m per tile, while `The_Drowned_Lantern` is about 11 m long. Choose one:
