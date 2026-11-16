@@ -1,0 +1,97 @@
+{
+  "name": "interior_fp",
+  "about": "The first-person rooms' look (meshy_room_build.py): what the vertex bake lights a room with and how the walk viewer shows it. Colours are sRGB hex; the room table (ROOMS) overrides any key per room.",
+  "view": {
+    "view_transform": "AgX",
+    "look": "None",
+    "tone_mapping": "three r186 AgXToneMapping, toneMappingExposure = the area's wdi_exposure"
+  },
+  "ink": "#12141C",
+  "exposure": {
+    "pool_radius_m": 1.8,
+    "pool_percentile": 90,
+    "pool_display": 0.55,
+    "hot_radius_m": 1.3,
+    "hot_display_max": 0.97,
+    "note": "E on the raw bake: the floor and walls within pool_radius_m of the flame at pool_display (their pool_percentile), capped so the hottest large surfaces near it stay under AgX's white; wdi_exposure = E / k, k = 1 / the room light's 99.9th percentile"
+  },
+  "lights": {
+    "lamp": {
+      "color": "#FFB457",
+      "power": 38.0,
+      "radius": 0.04,
+      "note": "the radius is the flame and its glow: it softens the stand top's shadow on the floor"
+    },
+    "moon": { "color": "#7FA8FF", "strength": 0.9, "angle": 0.6 },
+    "fill": {
+      "color": "#F2EDE4",
+      "power": 16.0,
+      "note": "a dim panel under the ceiling: the night's ambient, a near-white (a warm fill made the dim half of the room one orange with the candle). It lights the open floor and the dark furniture's own shape (the ink floor then lifts less), never the floor under the bed"
+    }
+  },
+  "settings": {
+    "default": "midway",
+    "last": {
+      "label": "as the last build",
+      "mix": { "candle": 1.0, "moon": 1.0, "fill": 1.0 },
+      "note": "the lamps at the look's own powers (the build of 2026-11-15 that the re-check judged: candle 38 W, moon 0.9, fill 16 W near-white): the dim half lighter and calmer. By light_numbers: the far wall 0.44 of the candle wall, the moon's patch 1.25 times the floor round it"
+    },
+    "midway": {
+      "label": "midway",
+      "mix": { "candle": 1.0, "moon": 2.3, "fill": 0.6 },
+      "note": "half way between the other two in those two numbers (the far wall over the candle wall, the moon's patch over the floor round it; the manifest's light.numbers has them for every build)"
+    },
+    "first": {
+      "label": "as the first build",
+      "mix": { "candle": 1.0, "moon": 3.5, "fill": 0.3 },
+      "note": "the first build's contrast (it had a 7 W warm fill and let the dim half fall under ink): the fill at 0.3 and the moon at 3.5 times, so the far wall is 0.34 of the candle wall and the patch 1.75 times the floor (the first build: 0.36 and 1.62 by the same measure). The ink floor keeps the dim half's floor and furniture above ink, so the options differ most in the far walls, the ceiling's dim part and the moon's patch"
+    },
+    "note": "the light settings (--light NAME; `default` without it): weights on the three baked light groups (and, per setting, an optional `tint`: a colour over a group's own, as --tint; --mix multiplies the weights). On a group bake (--bake-groups, or --raw of one) they mix the saved groups; on a single bake they scale the lamps. choose_exposure holds the candle's pool at its display level whatever the weights, so what a setting changes is the balance of the dim half and the moon against the candle. The numbers in the notes are light_numbers (display luminance 0..255) from the group bake of 2026-11-16 (384 samples a group)"
+  },
+  "ink_lift": {
+    "margin_luma": 2.5,
+    "meshy_ref_pct": 0.5,
+    "meshy_lift": 0.45,
+    "floor_colour": "#F2EDE4",
+    "floor_neutral": 0.85,
+    "scan_contrast": { "dark_below": 0.08, "p90_over_p1": 2.4, "gamma_min": 0.5 },
+    "form": 0.5,
+    "form_ao": 1.0,
+    "form_knee": 0.5,
+    "form_gamma": 0.5,
+    "form_cell_m": 0.3,
+    "step_ratio": 2.5,
+    "note": "the ink floor (meshy_room_build.post_bake): every vertex's light at least the light that shows its material's reference texel (the 0.5th percentile of texture x factor) at ink's display luminance + margin_luma, solved through AgX with the texel's colour and the floor light's; the floor light's colour is floor_neutral of the way from the vertex's own light to floor_colour, the night's ambient (a red-brown wood lifted in the candle's bounce read as an ember glow); raised toward (1 + form) x that floor with the open sky the vertex sees (its AO, form_ao; without an AO bake, where it is lit relative to its neighbourhood: form_knee, form_gamma, form_cell_m), so a dim surface keeps its creases, bevels and contact shadows. scan_contrast: a dark Poly Haven scan (mean under dark_below) keeps its 90th percentile within p90_over_p1 times its 1st (a gamma about its median, never under gamma_min), so its pale parts do not stand brighter than the wall behind it at the floor. A Meshy texture is kept, its dark tail eased like a scan's (lift_dark at meshy_lift of its mean), so it needs no higher reference. step_ratio: no edge of a mesh steps the light by more than this ratio (the darker end is raised, the hue kept): the viewer's 4x multisampled canvas draws a pixel whose centre is outside its triangle with the vertex colours extrapolated, and across a step of 4 to 5 times a few edge pixels came out black (0 disables)"
+  },
+  "hot": {
+    "knee": 0.55,
+    "max": 0.74,
+    "note": "display luminance of a material's mean colour: past the knee the light eases toward max (AgX turns bright candle-lit wood peach)"
+  },
+  "ao": {
+    "strength": 0.8,
+    "distance_m": 0.5,
+    "samples": 64,
+    "gamma": 1.5,
+    "walls": { "strength": 0.35, "gamma": 1.0 },
+    "trims": { "strength": 0.35, "gamma": 1.0 },
+    "note": "a Cycles AO bake within distance_m: the light times (1 - strength + strength AO^gamma) before the ink floor (the viewer draws no shadows and no AO: contact shadows, the floor under the bed, inside the presses); walls: the walls' and ceiling's own strength and gamma (at their 10 cm rows the full AO drew a dark band beside the picture rail, the skirting and the cornice); trims: the same for the cornice, the picture rail, the skirting and the architraves (at the pieces' strength a room corner's AO on top of a cabinet's shadow left a soot-dark patch on the cornice)"
+  },
+  "bake": {
+    "samples": 1024,
+    "diffuse_bounces": 4,
+    "clamp_indirect": 8.0,
+    "shell_grid_m": 0.05,
+    "furniture_edge_m": 0.15
+  },
+  "emit_display": {
+    "M_flame": [6.0, 3.4, 1.3],
+    "M_moon": [2.6, 2.8, 3.1],
+    "M_lit_window": [1.5, 0.72, 0.24],
+    "M_glass": [0.02, 0.026, 0.04],
+    "note": "scene-linear display values (before AgX, as the viewer exposes them); exported as the colour / wdi_exposure"
+  },
+  "outside": { "gain": 0.55, "sky": "meshy_looks/final.json's sky at its own exposure (2 ^ color.exposure)" },
+  "black_cloth": [0.052, 0.05, 0.05],
+  "linen": "#CBC3B1"
+}

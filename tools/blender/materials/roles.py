@@ -65,6 +65,13 @@ ROLES: dict[str, Role] = {
     "linen": Role("rough_linen", 0.5, "bone"),
     "leather": Role("brown_leather", 0.5, "wood"),
     "fur": Role("curly_teddy_natural", 0.5, "litter"),
+    "carpet": Role("dirty_carpet", 0.6, "brick", note="a worn wool carpet; the interiors' rugs (meshy_interior_build)"),
+    "coverlet": Role("floral_jacquard", 0.253, "slate",
+                     note="a dark floral jacquard: the first-person rooms' bed coverlets (meshy_room_build)"),
+    # the first-person rooms (meshy_room_build): painted plaster walls and ceilings, dark joinery
+    "wall_plaster": Role("beige_wall_001", 3.0, "plaster",
+                         note="smooth painted plaster, toned per room: walls, ceilings and painted joinery"),
+    "joinery": Role("dark_wood", 2.0, "wood", note="dark mahogany: doors, skirting, architraves, picture rails"),
     "flour_sack": Role("hessian_380", 0.5, "bone"),
     "bread_crust": Role("mud_cracked_dry_03", 0.25, "lantern", tint="#D9A066",
                         note="stand-in: a cracked dry crust pattern tinted to the loaf"),
