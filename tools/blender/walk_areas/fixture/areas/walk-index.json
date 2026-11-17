@@ -1,0 +1,286 @@
+{
+  "format": 1,
+  "world": "hollowmere-fixture",
+  "axes": "Metres. Every 3-number vector is in glTF world axes: x east, y up, z = -north. Every field whose name ends in _xy is a plan view in Blender axes: x east, y north. yaw_deg is the yaw of the viewer: 0 looks along -z (north), positive turns left, so west is 90.",
+  "start": "square",
+  "areas": {
+    "room_shop": {
+      "file": "walk-room_shop.gltf",
+      "bytes": 17060,
+      "sha256": "b3b2085ef3508984c5c08aedb70d26c9b33502dcaf9c4648055b67af2bc3a88a",
+      "kind": "room",
+      "scene": "shop",
+      "name": "The shop",
+      "indoor": true,
+      "baked": true,
+      "walk_region_xy": [-3, -3, 3, 3],
+      "look": {
+        "wdi_exposure": 6.3
+      },
+      "spawns": [
+        {
+          "id": "shop_door",
+          "label": "By the door (The shop)",
+          "name": "By the door",
+          "group": "The shop",
+          "position": [0, 0, 2.3],
+          "yaw_deg": 0
+        }
+      ],
+      "portals": [
+        {
+          "id": "shopdoor",
+          "portal_id": "shop.door",
+          "position": [0, 0, 2.8],
+          "to": "overworld",
+          "toSpawn": "shop_door",
+          "kind": "door",
+          "target_area": "village_west"
+        }
+      ],
+      "stats": {
+        "triangles_loaded": 84,
+        "triangles_collision": 72,
+        "draw_calls": 2,
+        "instanced_groups": 0,
+        "images": 0,
+        "texture_gpu_mb": 0,
+        "lights": 1
+      }
+    },
+    "village_east": {
+      "file": "walk-village_east.gltf",
+      "bytes": 14393,
+      "sha256": "63e34981866735c07a7dee4f8c06e6bb5fab93f1c6b8ff8ab9ceffc159597c7a",
+      "kind": "section",
+      "scene": "overworld",
+      "name": "Village east",
+      "indoor": false,
+      "baked": false,
+      "walk_region_xy": [0, -20, 60, 20],
+      "look": {
+        "wdi_exposure": 2.3784,
+        "fog_color": [0.026, 0.034, 0.058],
+        "fog_density": 0.006
+      },
+      "spawns": [
+        {
+          "id": "mill",
+          "label": "Mill (Village east)",
+          "name": "Mill",
+          "group": "Village east",
+          "position": [30, 0, -10],
+          "yaw_deg": 90
+        },
+        {
+          "id": "overworld_seam_west_east_b_1",
+          "label": "West gate, arrival 1 (Village east)",
+          "name": "West gate, arrival 1",
+          "group": "Village east",
+          "position": [1.65, 0, 1.8],
+          "yaw_deg": -90,
+          "picker": false
+        },
+        {
+          "id": "overworld_seam_west_east_b_2",
+          "label": "West gate, arrival 2 (Village east)",
+          "name": "West gate, arrival 2",
+          "group": "Village east",
+          "position": [1.65, 0, 0],
+          "yaw_deg": -90,
+          "picker": false
+        },
+        {
+          "id": "overworld_seam_west_east_b_3",
+          "label": "West gate, arrival 3 (Village east)",
+          "name": "West gate, arrival 3",
+          "group": "Village east",
+          "position": [1.65, 0, -1.8],
+          "yaw_deg": -90,
+          "picker": false
+        }
+      ],
+      "portals": [
+        {
+          "id": "seam_west_east_b_1",
+          "portal_id": "seam_west_east_b_1",
+          "position": [0.45, 0, 1.8],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_a_1",
+          "kind": "gate",
+          "target_area": "village_west",
+          "seam": "west_east"
+        },
+        {
+          "id": "seam_west_east_b_2",
+          "portal_id": "seam_west_east_b_2",
+          "position": [0.45, 0, 0],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_a_2",
+          "kind": "gate",
+          "target_area": "village_west",
+          "seam": "west_east"
+        },
+        {
+          "id": "seam_west_east_b_3",
+          "portal_id": "seam_west_east_b_3",
+          "position": [0.45, 0, -1.8],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_a_3",
+          "kind": "gate",
+          "target_area": "village_west",
+          "seam": "west_east"
+        },
+        {
+          "id": "ovmine",
+          "portal_id": "ov.mine",
+          "position": [55, 0, 0],
+          "to": "mine",
+          "toSpawn": "mouth",
+          "kind": "cave_mouth",
+          "target_area": null
+        }
+      ],
+      "stats": {
+        "triangles_loaded": 60,
+        "triangles_collision": 60,
+        "draw_calls": 1,
+        "instanced_groups": 0,
+        "images": 1,
+        "texture_gpu_mb": 0,
+        "lights": 0
+      }
+    },
+    "village_west": {
+      "file": "walk-village_west.gltf",
+      "bytes": 15131,
+      "sha256": "324cdb45b8e8dfcb94bc4aa26d553cae7c27d021d438305e58f11d1d4fe3bef3",
+      "kind": "section",
+      "scene": "overworld",
+      "name": "Village west",
+      "indoor": false,
+      "baked": false,
+      "walk_region_xy": [-60, -20, 0, 20],
+      "look": {
+        "wdi_exposure": 2.3784,
+        "fog_color": [0.026, 0.034, 0.058],
+        "fog_density": 0.006
+      },
+      "spawns": [
+        {
+          "id": "square",
+          "label": "Square (Village west)",
+          "name": "Square",
+          "group": "Village west",
+          "position": [-30, 0, 0],
+          "yaw_deg": -90
+        },
+        {
+          "id": "overworld_shop_door",
+          "label": "Outside the shop (Village west)",
+          "name": "Outside the shop",
+          "group": "Village west",
+          "position": [-40, 0, -6],
+          "yaw_deg": 180
+        },
+        {
+          "id": "overworld_seam_west_east_a_1",
+          "label": "East gate, arrival 1 (Village west)",
+          "name": "East gate, arrival 1",
+          "group": "Village west",
+          "position": [-1.65, 0, 1.8],
+          "yaw_deg": 90,
+          "picker": false
+        },
+        {
+          "id": "overworld_seam_west_east_a_2",
+          "label": "East gate, arrival 2 (Village west)",
+          "name": "East gate, arrival 2",
+          "group": "Village west",
+          "position": [-1.65, 0, 0],
+          "yaw_deg": 90,
+          "picker": false
+        },
+        {
+          "id": "overworld_seam_west_east_a_3",
+          "label": "East gate, arrival 3 (Village west)",
+          "name": "East gate, arrival 3",
+          "group": "Village west",
+          "position": [-1.65, 0, -1.8],
+          "yaw_deg": 90,
+          "picker": false
+        }
+      ],
+      "portals": [
+        {
+          "id": "ovshop",
+          "portal_id": "ov.shop",
+          "position": [-40, 0, -7.55],
+          "to": "shop",
+          "toSpawn": "door",
+          "kind": "door",
+          "target_area": "room_shop"
+        },
+        {
+          "id": "seam_west_east_a_1",
+          "portal_id": "seam_west_east_a_1",
+          "position": [-0.45, 0, 1.8],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_b_1",
+          "kind": "gate",
+          "target_area": "village_east",
+          "seam": "west_east"
+        },
+        {
+          "id": "seam_west_east_a_2",
+          "portal_id": "seam_west_east_a_2",
+          "position": [-0.45, 0, 0],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_b_2",
+          "kind": "gate",
+          "target_area": "village_east",
+          "seam": "west_east"
+        },
+        {
+          "id": "seam_west_east_a_3",
+          "portal_id": "seam_west_east_a_3",
+          "position": [-0.45, 0, -1.8],
+          "to": "overworld",
+          "toSpawn": "seam_west_east_b_3",
+          "kind": "gate",
+          "target_area": "village_east",
+          "seam": "west_east"
+        }
+      ],
+      "stats": {
+        "triangles_loaded": 60,
+        "triangles_collision": 72,
+        "draw_calls": 1,
+        "instanced_groups": 0,
+        "images": 1,
+        "texture_gpu_mb": 0,
+        "lights": 0
+      }
+    }
+  },
+  "scenes": {
+    "shop": ["room_shop"],
+    "overworld": ["village_east", "village_west"]
+  },
+  "seams": [
+    {
+      "id": "west_east",
+      "kind": "gate",
+      "width_m": 5,
+      "a": "village_west",
+      "b": "village_east",
+      "portals": 3,
+      "opening_xy": [
+        [0, -2.5],
+        [0, 2.5]
+      ],
+      "normal_xy": [1, 0]
+    }
+  ],
+  "pending": ["mine"]
+}
