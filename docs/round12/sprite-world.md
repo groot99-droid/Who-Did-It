@@ -61,12 +61,11 @@ Answered by the owner on 2026-11-17:
 1. "Modeled after the 3D models": the map revamp is drawn after the Blender map of #539 (its shapes, proportions and
    palette); the character and item models are the scale and palette reference. Answer: yes.
 2. Characters without a model (mallory, villagerlass): the owner said "make them". Their A-pose fronts exist; the two
-   models are generated like the other eleven Higgsfield characters, once the credit cap allows (the quote is 38
-   credits each).
+   models were generated like the other eleven Higgsfield characters on 2026-11-17 (38 credits each; the owner
+   allowed going over the 1,000-credit cap).
 3. The five pixel-art sheets (village props, tavern interior, the tier icons, the mixed icons, the icon grid) are the
    owner's own work ("they are mine"). Their `CREDITS.md` rows name the owner as the author; the licence follows the
    repo's rule for owner-made art (CC BY 4.0, `LICENSE-ASSETS`, A19) unless the owner states another.
-
 4. Figure cell size: **64 px** ("Sprites are 64"). It is the size of today's packed character cell, so the figure budget
    line stays where it is; "HD" now means the render (smooth shading, soft light, no pixel quantising), not a larger cell.
    The two characters without a model, mallory and villagerlass, were generated on 2026-11-17 (38 credits each) and join
