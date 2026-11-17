@@ -54,15 +54,24 @@ One branch and one session per step, pull requests under 400 lines, tests for ev
 | S5 | The map revamp pass after the 3D models | per section 5 |
 | S6 | Cut over: remove the three styles and the lobby pick, change `GDD.md` 3.13 and `UI.md`, delete the old atlases | the flag is gone and CI is green |
 
-## 5. Open
+## 5. Owner answers and what is still open
 
-1. "The map revamp modeled after the 3D models": the 3D character and item models of the asset pipeline, or a 3D
-   model of the map the sprites are drawn from (the Blender map of #539)? The plan assumes the second and treats
-   the first as a palette and scale reference.
-2. Figure cell size: 128 or 256 px (a budget line).
-3. Characters without a model (mallory, villagerlass): generate or fall back to the 8-bit atlas.
-4. The pixel-art sheets: sources and licences from the owner.
-5. Whether the camera snap is animated or instant, and whether the HUD compass shows the heading.
+Answered by the owner on 2026-11-17:
+
+1. "Modeled after the 3D models": the map revamp is drawn after the Blender map of #539 (its shapes, proportions and
+   palette); the character and item models are the scale and palette reference. Answer: yes.
+2. Characters without a model (mallory, villagerlass): the owner said "make them". Their A-pose fronts exist; the two
+   models are generated like the other eleven Higgsfield characters, once the credit cap allows (the quote is 38
+   credits each).
+3. The five pixel-art sheets (village props, tavern interior, the tier icons, the mixed icons, the icon grid) are the
+   owner's own work ("they are mine"). Their `CREDITS.md` rows name the owner as the author; the licence follows the
+   repo's rule for owner-made art (CC BY 4.0, `LICENSE-ASSETS`, A19) unless the owner states another.
+
+Still open:
+
+1. Figure cell size: 128 or 256 px (a budget line; the pipeline's HD figure cell is 256).
+2. Whether the camera snap is animated or instant, and whether the HUD shows the heading.
+3. The licence of the sheets if it is not CC BY 4.0 (for example CC0, or AI-generated, which A17 makes CC0).
 
 ## 6. The prototype
 
