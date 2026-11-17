@@ -11,7 +11,7 @@ A 3D scene drawn with flat art, seen from the old isometric pitch, with real dep
 | Part | Made of | Note |
 |---|---|---|
 | Camera | orthographic, fixed pitch (the isometric angle), heading snaps in 90 degree steps | the owner's answer: "90 degree snaps" |
-| Characters | HD sprites, one set per figure, 8 directions, idle and walk | rendered from the character models; the figure's atlas direction is picked from the world facing minus the camera heading |
+| Characters | HD sprites, one set per figure, 8 directions, idle and walk | rendered from the character models at a 64 px cell; the figure's atlas direction is picked from the world facing minus the camera heading |
 | Small objects | 8-bit sprites (the owner's pixel-art sheets, once their licences are recorded) | upright billboards that turn with the camera |
 | Complex objects | 64 to 128 px sprites | 4 directions where the art is not rotation-safe (a table, a cart) |
 | Ground, floors, water | tile planes textured with 2D art | rotate exactly |
@@ -32,7 +32,7 @@ an atlas `<dir>` stays a screen-frame word, now computed from the camera heading
   camera, the DOM overlay HUD unchanged. `ARCHITECTURE.md` 5.1 pins versions; adding Three.js to the client is
   a contract change and needs its own decision before the first PR.
 - **Budgets.** `ASSETS.md` caps the site and the HD set (an 80 MB HD cap, A164). Every figure sprite set is a
-  budget line (SPRITES 10.14); the figure cell is the open size question (128 or 256 px).
+  budget line (SPRITES 10.14); the figure cell is 64 px (section 5).
 - **Visibility.** A rotating camera changes what a player sees behind a wall. The visibility and fog rules of
   `GDD.md` are server-side and unchanged, but the client must never draw what the server did not send; the
   wall cut-away is a draw rule, not a rule change.
@@ -67,11 +67,15 @@ Answered by the owner on 2026-11-17:
    owner's own work ("they are mine"). Their `CREDITS.md` rows name the owner as the author; the licence follows the
    repo's rule for owner-made art (CC BY 4.0, `LICENSE-ASSETS`, A19) unless the owner states another.
 
+4. Figure cell size: **64 px** ("Sprites are 64"). It is the size of today's packed character cell, so the figure budget
+   line stays where it is; "HD" now means the render (smooth shading, soft light, no pixel quantising), not a larger cell.
+   The two characters without a model, mallory and villagerlass, were generated on 2026-11-17 (38 credits each) and join
+   the render batch.
+
 Still open:
 
-1. Figure cell size: 128 or 256 px (a budget line; the pipeline's HD figure cell is 256).
-2. Whether the camera snap is animated or instant, and whether the HUD shows the heading.
-3. The licence of the sheets if it is not CC BY 4.0 (for example CC0, or AI-generated, which A17 makes CC0).
+1. Whether the camera snap is animated or instant, and whether the HUD shows the heading.
+2. The licence of the sheets if it is not CC BY 4.0 (for example CC0, or AI-generated, which A17 makes CC0).
 
 ## 6. The prototype
 
