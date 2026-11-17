@@ -20,6 +20,7 @@
 | [round8/](round8/README.md) | The round-8 contract documents: bodies, coin, motion and art, the teardown answers, the living world, the canon, and the seams of the round. |
 | [round9/](round9/README.md) | The round-9 design of world mode: the core loop, the full-screen phases, the logic table, the refusal reasons, the living world, emergent play, the owner's answers and follow-ups, the GDD map, the round-10 build plan and the admin Studio. |
 | [round10/](round10/README.md) | The round-10 contract: the sessions that build world mode, their models and compaction sizes, and the seams they share. Paused on 2026-10-30: [`part2.md`](round10/part2.md) is the pickup list. |
+| [round12/sprite-world.md](round12/sprite-world.md) | The merged 2.5D look (A615): a sprite world with depth, steps S0 to S6. |
 | [SESSIONS.md](SESSIONS.md) | The parallel build sessions, round by round: path ownership, branches, PR base, seams, briefs and the integration logs. |
 
 Rule: a mechanic change updates `GDD.md` in the same pull request. Numbers never live in two documents.
