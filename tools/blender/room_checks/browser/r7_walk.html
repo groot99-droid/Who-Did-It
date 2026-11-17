@@ -1,0 +1,601 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Room walk test</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        background: #111;
+        color: #9a9;
+        font: 12px monospace;
+      }
+      #o {
+        padding: 6px;
+        white-space: pre;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.186.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.186.1/examples/jsm/",
+          "three-mesh-bvh": "https://unpkg.com/three-mesh-bvh@0.9.16/build/index.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="o">loading</div>
+    <script type="module">
+      // Room check in the browser: the walk viewer's own physics against HM_Collision_room_<id>, with no rendering.
+      // Served by serve.py: ?glb=/glb/<roomId>.glb&grid=/out/reach.json (the grid is r7_reach_json.py's). Drive it with
+      // r7_walk_run.js. Still the bedroom's own in this page: the default GLB, the lattice of starts and the room's bounds
+      // in sweep() (a 10 x 7 m room), the tile arithmetic, the first spawn and the first portal.
+      // Ported line for line from apps/walk on origin/claude/v2-walk (three 0.186.1, three-mesh-bvh 0.9.16 as in its
+      // package.json): physics/collider.ts (mergeWorldGeometry, BvhCollider.groundBelow and pushOut), physics/controller.ts
+      // (Controller.place/update/step/resolveCapsule/settle), config.ts WALK, portals.ts (findPortals, PortalTrigger),
+      // spawn.ts (findSpawns), world.ts collisionRoots. Positions in the API below are Blender room metres (x east, y north);
+      // three's are (x, z up -> y, -y -> z).
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+      import { MeshBVH } from 'three-mesh-bvh';
+
+      const WALK = {
+        eyeHeight: 1.6,
+        bodyHeight: 1.75,
+        radius: 0.3,
+        stepHeight: 0.35,
+        snapDown: 0.35,
+        walkSpeed: 1.4,
+        runSpeed: 3.5,
+        gravity: 9.81,
+        maxFall: 30,
+        accelGround: 12,
+        accelAir: 2,
+        subStep: 1 / 120,
+        maxFrame: 0.25,
+        killDepth: 25,
+      };
+      const q = new URLSearchParams(location.search);
+      const out = document.getElementById('o');
+      const T = { ready: false, errors: [] };
+      window.__w = T;
+
+      function mergeWorldGeometry(roots) {
+        const positions = [],
+          indices = [];
+        const v = new THREE.Vector3(),
+          m = new THREE.Matrix4();
+        for (const root of roots) {
+          root.updateWorldMatrix(true, true);
+          root.traverse((obj) => {
+            if (!obj.isMesh) return;
+            const pos = obj.geometry.getAttribute('position');
+            if (!pos) return;
+            const index = obj.geometry.getIndex();
+            m.copy(obj.matrixWorld);
+            const base = positions.length / 3;
+            for (let i = 0; i < pos.count; i++) {
+              v.fromBufferAttribute(pos, i).applyMatrix4(m);
+              positions.push(v.x, v.y, v.z);
+            }
+            if (index) for (let i = 0; i < index.count; i++) indices.push(base + index.getX(i));
+            else for (let i = 0; i < pos.count; i++) indices.push(base + i);
+          });
+        }
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+        const big = positions.length / 3 > 65535;
+        geometry.setIndex(
+          new THREE.BufferAttribute(big ? new Uint32Array(indices) : new Uint16Array(indices), 1),
+        );
+        return geometry;
+      }
+      const DOWN = new THREE.Vector3(0, -1, 0);
+      class BvhCollider {
+        constructor(geometry) {
+          this.geometry = geometry;
+          this.bvh = new MeshBVH(geometry);
+          this.bounds = new THREE.Box3();
+          geometry.computeBoundingBox();
+          if (geometry.boundingBox) this.bounds.copy(geometry.boundingBox);
+          this.ray = new THREE.Ray();
+          this.seg = new THREE.Line3();
+          this.box = new THREE.Box3();
+          this.triPoint = new THREE.Vector3();
+          this.capPoint = new THREE.Vector3();
+          this.dir = new THREE.Vector3();
+          this.normal = new THREE.Vector3();
+        }
+        groundBelow(x, fromY, z, maxDist) {
+          this.ray.origin.set(x, fromY, z);
+          this.ray.direction.copy(DOWN);
+          const hit = this.bvh.raycastFirst(this.ray, THREE.DoubleSide, 0, maxDist);
+          return hit ? hit.point.y : null;
+        }
+        pushOut(segment, radius, iterations = 3) {
+          const seg = this.seg.copy(segment);
+          const start = segment.start.clone();
+          for (let pass = 0; pass < iterations; pass++) {
+            let moved = false;
+            this.box.makeEmpty().expandByPoint(seg.start).expandByPoint(seg.end);
+            this.box.min.addScalar(-radius);
+            this.box.max.addScalar(radius);
+            this.bvh.shapecast({
+              intersectsBounds: (b) => b.intersectsBox(this.box),
+              intersectsTriangle: (tri) => {
+                const dist = tri.closestPointToSegment(seg, this.triPoint, this.capPoint);
+                if (dist >= radius) return false;
+                const depth = radius - dist;
+                if (dist > 1e-6) this.dir.subVectors(this.capPoint, this.triPoint).divideScalar(dist);
+                else {
+                  tri.getNormal(this.normal);
+                  this.dir.copy(this.normal);
+                }
+                if (this.dir.y > 0) {
+                  this.dir.y = 0;
+                  const flat = this.dir.length();
+                  if (flat < 1e-4) return false;
+                  this.dir.divideScalar(flat);
+                }
+                seg.start.addScaledVector(this.dir, depth);
+                seg.end.addScaledVector(this.dir, depth);
+                moved = true;
+                return false;
+              },
+            });
+            if (!moved) break;
+          }
+          return new THREE.Vector3().subVectors(seg.start, start);
+        }
+        // not in the viewer: the least distance from a segment to the mesh (for the test's own measurements)
+        distance(segment, cap = 1.0) {
+          let best = cap;
+          const box = new THREE.Box3().expandByPoint(segment.start).expandByPoint(segment.end);
+          box.min.addScalar(-cap);
+          box.max.addScalar(cap);
+          const a = new THREE.Vector3(),
+            b = new THREE.Vector3();
+          this.bvh.shapecast({
+            intersectsBounds: (bb) => bb.intersectsBox(box),
+            intersectsTriangle: (tri) => {
+              const d = tri.closestPointToSegment(segment, a, b);
+              if (d < best) best = d;
+              return false;
+            },
+          });
+          return best;
+        }
+      }
+      const PROBES = [
+        [0, 0],
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ];
+      class Controller {
+        constructor(collider) {
+          this.collider = collider;
+          this.p = { ...WALK };
+          this.position = new THREE.Vector3();
+          this.velocity = new THREE.Vector3();
+          this.onGround = false;
+          this.segment = new THREE.Line3();
+        }
+        place(at) {
+          this.position.copy(at);
+          this.velocity.set(0, 0, 0);
+          const ground = this.collider.groundBelow(at.x, at.y + 1, at.z, 3);
+          this.onGround = ground !== null;
+          if (ground !== null) this.position.y = ground;
+        }
+        update(dt, wish) {
+          const total = Math.min(dt, this.p.maxFrame);
+          const n = Math.max(1, Math.ceil(total / this.p.subStep - 1e-9));
+          for (let i = 0; i < n; i++) this.step(total / n, wish);
+          return this.position.y < this.collider.bounds.min.y - this.p.killDepth;
+        }
+        step(dt, wish) {
+          const p = this.p;
+          const speed = wish.run ? p.runSpeed : p.walkSpeed;
+          const k = 1 - Math.exp(-(this.onGround ? p.accelGround : p.accelAir) * dt);
+          this.velocity.x += (wish.x * speed - this.velocity.x) * k;
+          this.velocity.z += (wish.z * speed - this.velocity.z) * k;
+          if (!this.onGround) this.velocity.y = Math.max(this.velocity.y - p.gravity * dt, -p.maxFall);
+          this.position.addScaledVector(this.velocity, dt);
+          this.resolveCapsule();
+          this.settle(dt);
+        }
+        resolveCapsule() {
+          const p = this.p,
+            pos = this.position;
+          this.segment.start.set(pos.x, pos.y + p.stepHeight + p.radius, pos.z);
+          this.segment.end.set(
+            pos.x,
+            pos.y + Math.max(p.bodyHeight - p.radius, p.stepHeight + p.radius),
+            pos.z,
+          );
+          const push = this.collider.pushOut(this.segment, p.radius);
+          pos.add(push);
+          const flat = Math.hypot(push.x, push.z);
+          if (flat > 1e-6) {
+            const nx = push.x / flat,
+              nz = push.z / flat;
+            const into = this.velocity.x * nx + this.velocity.z * nz;
+            if (into < 0) {
+              this.velocity.x -= nx * into;
+              this.velocity.z -= nz * into;
+            }
+          }
+          if (push.y < -1e-6 && this.velocity.y > 0) this.velocity.y = 0;
+        }
+        settle(dt) {
+          const p = this.p,
+            pos = this.position;
+          if (this.velocity.y > 0) {
+            this.onGround = false;
+            return;
+          }
+          const top = pos.y + p.stepHeight;
+          const reach = p.stepHeight + (this.onGround ? p.snapDown : -this.velocity.y * dt + 0.02);
+          const r = p.radius * 0.7;
+          let ground = null;
+          for (const [dx, dz] of PROBES) {
+            const hit = this.collider.groundBelow(pos.x + dx * r, top, pos.z + dz * r, reach);
+            if (hit !== null && (ground === null || hit > ground)) ground = hit;
+          }
+          if (ground === null) {
+            this.onGround = false;
+            return;
+          }
+          pos.y = ground;
+          this.velocity.y = 0;
+          this.onGround = true;
+        }
+      }
+      class PortalTrigger {
+        constructor(portals, radius = 1, useRadius = 2) {
+          this.portals = portals;
+          this.radius = radius;
+          this.useRadius = useRadius;
+          this.armed = false;
+        }
+        disarm() {
+          this.armed = false;
+        }
+        nearest(at, max) {
+          let best = null,
+            bestD = max;
+          for (const p of this.portals) {
+            if (Math.abs(p.position.y - at.y) > 2) continue;
+            const d = Math.hypot(p.position.x - at.x, p.position.z - at.z);
+            if (d <= bestD) [best, bestD] = [p, d];
+          }
+          return best;
+        }
+        update(at, use) {
+          if (use) {
+            const near = this.nearest(at, this.useRadius);
+            if (near) {
+              this.armed = false;
+              return near;
+            }
+          }
+          const inside = this.nearest(at, this.radius);
+          if (!inside) {
+            this.armed = true;
+            return null;
+          }
+          if (!this.armed) return null;
+          this.armed = false;
+          return inside;
+        }
+      }
+
+      const b2t = (x, y, z = 0) => new THREE.Vector3(x, z, -y);
+      const t2b = (v) => [+v.x.toFixed(4), +(-v.z).toFixed(4), +v.y.toFixed(4)];
+      let collider = null,
+        visible = null,
+        spawn = null,
+        portals = [],
+        grid = null;
+      const seg = new THREE.Line3();
+      function capsuleSeg(pos) {
+        seg.start.set(pos.x, pos.y + 0.65, pos.z);
+        seg.end.set(pos.x, pos.y + 1.45, pos.z);
+        return seg;
+      }
+
+      // one walk: the feet placed at `start`, a constant wish along `dir` (Blender x, y) for `seconds` at 60 updates a second
+      function walk(start, dir, seconds, run = false, record = null) {
+        const c = new Controller(collider);
+        c.place(b2t(start[0], start[1], start[2] || 0));
+        const L = Math.hypot(dir[0], dir[1]) || 1;
+        const wish = { x: dir[0] / L, z: -dir[1] / L, run };
+        let minY = c.position.y,
+          maxY = c.position.y,
+          air = 0,
+          fell = false;
+        const n = Math.round(seconds * 60);
+        for (let i = 0; i < n; i++) {
+          fell = c.update(1 / 60, wish) || fell;
+          if (c.position.y < minY) minY = c.position.y;
+          if (c.position.y > maxY) maxY = c.position.y;
+          if (!c.onGround) air++;
+          if (record) record(c.position);
+        }
+        return {
+          start,
+          dir,
+          end: t2b(c.position),
+          minY: +minY.toFixed(4),
+          maxY: +maxY.toFixed(4),
+          airFrames: air,
+          fell,
+          onGround: c.onGround,
+          clearance: +collider.distance(capsuleSeg(c.position)).toFixed(4),
+        };
+      }
+      // distances at a standing point (Blender x, y; feet on z): capsule to collision, capsule to the visible meshes, the eye
+      // (1.6 m) to the visible meshes
+      function at(x, y, z = 0) {
+        const p = b2t(x, y, z);
+        const s = capsuleSeg(p);
+        const eye = new THREE.Vector3(p.x, p.y + 1.6, p.z);
+        const tgt = {};
+        const e = visible.bvh.closestPointToPoint(eye, tgt, 0, 2);
+        return {
+          feet: [x, y, z],
+          capsule_to_collision: +collider.distance(s).toFixed(4),
+          capsule_to_visible: +visible.distance(s).toFixed(4),
+          eye_to_visible: e ? +e.distance.toFixed(4) : null,
+          eye_nearest: e ? t2b(e.point) : null,
+        };
+      }
+      const cellOf = (x, y) => [Math.round((x - grid.x0) / grid.cell), Math.round((y - grid.y0) / grid.cell)];
+      const inGrid = (i, j) => i >= 0 && j >= 0 && i < grid.nx && j < grid.ny;
+      const reachAt = (i, j) => inGrid(i, j) && grid.reach[j][i] === '1';
+      function reachNear(i, j, r = 1) {
+        for (let dj = -r; dj <= r; dj++)
+          for (let di = -r; di <= r; di++) if (reachAt(i + di, j + dj)) return true;
+        return false;
+      }
+
+      // many walks from a lattice of reachable points in `ndir` directions; every position of every update is checked
+      async function sweep(step = 0.5, ndir = 16, seconds = 3, run = true) {
+        const visited = new Uint8Array(grid.nx * grid.ny);
+        const res = {
+          walks: 0,
+          positions: 0,
+          minY: 1e9,
+          maxY: -1e9,
+          airFrames: 0,
+          fell: 0,
+          outside_room: 0,
+          off_reach: 0,
+          off_reach_examples: [],
+          min_clearance_at_rest: 1e9,
+          worst_rest: null,
+          deepest_into_collision: 0,
+        };
+        const starts = [];
+        for (let y = -3.25; y <= 3.26; y += step)
+          for (let x = -4.75; x <= 4.76; x += step) {
+            const [i, j] = cellOf(x, y);
+            if (reachAt(i, j)) starts.push([+x.toFixed(2), +y.toFixed(2)]);
+          }
+        res.starts = starts.length;
+        let k = 0;
+        for (const s of starts) {
+          for (let d = 0; d < ndir; d++) {
+            const a = (d / ndir) * 2 * Math.PI;
+            const w = walk(s, [Math.cos(a), Math.sin(a)], seconds, run, (pos) => {
+              res.positions++;
+              const bx = pos.x,
+                by = -pos.z;
+              const [i, j] = cellOf(bx, by);
+              if (inGrid(i, j)) visited[j * grid.nx + i] = 1;
+              if (bx < -4.705 || bx > 4.705 || by < -3.205 || by > 3.205) res.outside_room++;
+              if (!reachNear(i, j, 1)) {
+                res.off_reach++;
+                if (res.off_reach_examples.length < 10)
+                  res.off_reach_examples.push([+bx.toFixed(3), +by.toFixed(3), +pos.y.toFixed(3)]);
+              }
+            });
+            res.walks++;
+            if (w.minY < res.minY) res.minY = w.minY;
+            if (w.maxY > res.maxY) res.maxY = w.maxY;
+            res.airFrames += w.airFrames;
+            if (w.fell) res.fell++;
+            if (w.clearance < res.min_clearance_at_rest) {
+              res.min_clearance_at_rest = w.clearance;
+              res.worst_rest = w;
+            }
+          }
+          if (++k % 8 === 0) await new Promise((r) => setTimeout(r, 0));
+        }
+        let seen = 0,
+          reach = 0,
+          seenReach = 0;
+        for (let j = 0; j < grid.ny; j++)
+          for (let i = 0; i < grid.nx; i++) {
+            const v = visited[j * grid.nx + i],
+              r = reachAt(i, j);
+            if (v) seen++;
+            if (r) reach++;
+            if (v && r) seenReach++;
+          }
+        res.cells_visited = seen;
+        res.reach_cells = reach;
+        res.reach_cells_visited = seenReach;
+        res.reach_coverage = +(seenReach / reach).toFixed(4);
+        res.visited_not_reach = seen - seenReach;
+        // which scene tiles (1 m, tile (tx, ty), x east from the W wall, y south from the N wall) were stood on
+        const tiles = {};
+        for (let j = 0; j < grid.ny; j++)
+          for (let i = 0; i < grid.nx; i++)
+            if (visited[j * grid.nx + i]) {
+              const x = grid.x0 + i * grid.cell,
+                y = grid.y0 + j * grid.cell;
+              const tx = Math.floor(x + 5) + 1,
+                ty = Math.floor(3.5 - y) + 1;
+              tiles[tx + ',' + ty] = (tiles[tx + ',' + ty] || 0) + 1;
+            }
+        res.tiles_stood_on = Object.keys(tiles).length;
+        res.tiles = tiles;
+        T.visited = visited;
+        return res;
+      }
+      // the portal: arrive at the spawn (disarmed), walk off north, come back south; where it fires
+      function portalTest() {
+        const trig = new PortalTrigger(portals);
+        const c = new Controller(collider);
+        c.place(spawn.position.clone());
+        trig.disarm();
+        const res = {
+          spawn: t2b(c.position),
+          portal: t2b(portals[0].position),
+          portal_extras: portals[0].extras,
+          portal_id: portals[0].id,
+          spawn_to_portal: +Math.hypot(
+            c.position.x - portals[0].position.x,
+            c.position.z - portals[0].position.z,
+          ).toFixed(4),
+        };
+        res.fires_on_arrival = trig.update(c.position, false) !== null;
+        res.use_at_spawn = (() => {
+          const t2 = new PortalTrigger(portals);
+          t2.disarm();
+          const p = t2.update(c.position, true);
+          return p ? p.id : null;
+        })();
+        let armedAt = null,
+          firedAt = null;
+        const north = { x: 0, z: -1, run: false },
+          south = { x: 0, z: 1, run: false };
+        for (let i = 0; i < 60 * 3 && firedAt === null; i++) {
+          // 3 s north
+          c.update(1 / 60, north);
+          const p = trig.update(c.position, false);
+          if (armedAt === null && trig.armed) armedAt = t2b(c.position);
+          if (p) firedAt = ['walking away', t2b(c.position)];
+        }
+        res.armed_at = armedAt;
+        res.turn_at = t2b(c.position);
+        for (let i = 0; i < 60 * 6 && firedAt === null; i++) {
+          // back south
+          c.update(1 / 60, south);
+          const p = trig.update(c.position, false);
+          if (p)
+            firedAt = [
+              p.id,
+              t2b(c.position),
+              +Math.hypot(c.position.x - p.position.x, c.position.z - p.position.z).toFixed(4),
+            ];
+        }
+        res.fired = firedAt;
+        // the closest the feet get to the portal: walk on south into the door
+        for (let i = 0; i < 60 * 3; i++) c.update(1 / 60, south);
+        res.closest_feet = t2b(c.position);
+        res.closest_m = +Math.hypot(
+          c.position.x - portals[0].position.x,
+          c.position.z - portals[0].position.z,
+        ).toFixed(4);
+        res.use_within_2m_cells = null;
+        return res;
+      }
+      async function save(name, obj) {
+        const r = await fetch('/save?name=' + encodeURIComponent(name), {
+          method: 'POST',
+          body: JSON.stringify(obj, null, 1),
+        });
+        return r.ok;
+      }
+      Object.assign(T, { walk, at, sweep, portalTest, save, WALK, THREE });
+
+      const draco = new DRACOLoader().setDecoderPath(
+        'https://unpkg.com/three@0.186.1/examples/jsm/libs/draco/gltf/',
+      );
+      new GLTFLoader().setDRACOLoader(draco).load(
+        q.get('glb') || '/glb/widow_bedroom.glb',
+        async (gltf) => {
+          try {
+            const root = gltf.scene;
+            root.updateWorldMatrix(true, true);
+            const named = [];
+            root.traverse((o) => {
+              if (o.name === 'HM_Collision' || o.name.startsWith('HM_Collision_')) named.push(o);
+            });
+            const t0 = performance.now();
+            collider = new BvhCollider(mergeWorldGeometry(named));
+            const ms = performance.now() - t0;
+            const vis = [];
+            root.traverse((o) => {
+              if (o.isMesh && !named.includes(o) && !o.material.transparent && !/Outside_/.test(o.name))
+                vis.push(o);
+            });
+            visible = new BvhCollider(mergeWorldGeometry(vis));
+            root.traverse((o) => {
+              if (o.name.startsWith('Spawn_') && !spawn) {
+                const f = new THREE.Vector3(0, 0, -1).transformDirection(o.matrixWorld);
+                spawn = {
+                  id: o.name.slice(6),
+                  position: new THREE.Vector3().setFromMatrixPosition(o.matrixWorld),
+                  yaw: Math.atan2(-f.x, -f.z),
+                  extras: o.userData,
+                };
+              }
+              if (
+                o.name.startsWith('Portal_') &&
+                typeof o.userData.to === 'string' &&
+                typeof o.userData.toSpawn === 'string'
+              )
+                portals.push({
+                  id: o.name.slice(7),
+                  position: new THREE.Vector3().setFromMatrixPosition(o.matrixWorld),
+                  to: o.userData.to,
+                  toSpawn: o.userData.toSpawn,
+                  kind: o.userData.kind,
+                  extras: o.userData,
+                });
+            });
+            grid = await (await fetch(q.get('grid') || '/out/reach.json')).json();
+            Object.assign(T, {
+              ready: true,
+              revision: THREE.REVISION,
+              collision: {
+                roots: named.map((o) => o.name),
+                triangles: collider.geometry.index.count / 3,
+                bvh_ms: +ms.toFixed(1),
+                bounds: [t2b(collider.bounds.min), t2b(collider.bounds.max)],
+              },
+              visible_triangles: visible.geometry.index.count / 3,
+              spawn: { id: spawn.id, at: t2b(spawn.position), yaw: spawn.yaw, extras: spawn.extras },
+              portals: portals.map((p) => ({
+                id: p.id,
+                at: t2b(p.position),
+                to: p.to,
+                toSpawn: p.toSpawn,
+                kind: p.kind,
+              })),
+              grid: { nx: grid.nx, ny: grid.ny, cell: grid.cell },
+            });
+            out.textContent = 'ready: collision ' + T.collision.triangles + ' tris';
+          } catch (e) {
+            T.errors.push(String((e && e.stack) || e));
+            out.textContent = 'error ' + e;
+          }
+        },
+        undefined,
+        (e) => {
+          T.errors.push(String(e));
+          out.textContent = 'error ' + e;
+        },
+      );
+    </script>
+  </body>
+</html>

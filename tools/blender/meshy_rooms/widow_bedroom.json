@@ -1,0 +1,254 @@
+{
+  "room": "widow_bedroom",
+  "about": "The widow's bedroom as meshy_room_build.py builds it for the first-person walk: the room's own choices (the wall colours, the door and the window, the night outside, where every piece stands, the stills' views). The builder reads this file for --scene widow_bedroom; its load_room explains the keys. Colours are sRGB hex. Positions are metres in the room's frame: x east, y north, z up, the floor's centre on the origin. A key named note, or <key>_note beside <key>, is a comment: the builder drops it. The room checks keep their own numbers for this room in tools/blender/room_checks/rooms/widow_bedroom.json; the two files are merged in a later step.",
+  "district": "Widow's bedroom",
+  "spawn_labels": { "door": "By the door" },
+  "height": 3.0,
+  "wall_t": 0.3,
+  "floor": { "slug": "old_wood_floor", "role": "wood_floor", "zoom": 1.55, "factor": [0.86, 1.0, 0.78] },
+  "wall_colour": "#80866E",
+  "wall_colour_note": "a muted sage drab: never pink or lilac under the candle and the moon",
+  "ceiling_colour": "#D6D0C2",
+  "ceiling_colour_note": "lime white",
+  "paint_colour": "#CFC5AD",
+  "paint_colour_note": "the window's cream paint",
+  "wood_colour": "#45301F",
+  "wood_colour_note": "the joinery's dark brown mahogany (the scan's grain on this colour)",
+  "skirting": 0.22,
+  "picture_rail": 2.5,
+  "cornice": 0.2,
+  "door": { "portal": "wb.door", "width": 0.9, "height": 2.15, "knob": "E" },
+  "window": {
+    "prop": "wb.draped_window",
+    "width": 0.9,
+    "sill": 0.75,
+    "head": 2.3,
+    "panes": [2, 2],
+    "rod": 2.44,
+    "curtain_colour": "#4A5264",
+    "swag": true
+  },
+  "outside": {
+    "ground": -3.2,
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "note": "the village's own Meshy models in place of the boxes and cones; a house is [model, u, d, size, turn]",
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    }
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "from straight out of the window, toward its wall's +s side"
+  },
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "layout": "bed_north",
+  "layout_note": "The arrangement. `pieces` and `views` are the room as it is built by default, `bed_north`: the owner's first-person layout (2026-11-16, \"Move it\"): the bed's head against the north wall under his photographs, its foot to the south; wardrobe_body turned in its corner to stand against the east wall (the north wall free, an aisle beside the bed); the candle stand beside the bed's head, in the nook between the washstand and the bed; the chest at the bed's foot; the photographs raised as a group over the head board. The 2.5D game keeps its own map. `layouts` holds the other arrangements as overrides by piece id (a piece's keys replaced whole) and by view name: `mapped` is the room as the game's map has it (built until 2026-11-15: the bed free in mid-room, the photographs 1.8 m north of it), kept buildable with --layout mapped.",
+  "pieces": [
+    {
+      "id": "wb.wardrobe",
+      "spot": true,
+      "key": "wardrobe",
+      "face": "E",
+      "place": ["wall", "W", "N"],
+      "spec": { "tall": 2.1, "kmax": null, "lod": 0.6 }
+    },
+    {
+      "note": "its doors shut here: ajar (as in `mapped`) they would cut the 0.86 m aisle beside the bed to 0.65 m",
+      "id": "wb.wardrobe_body",
+      "spot": true,
+      "key": "wb.wardrobe_body",
+      "face": "W",
+      "place": ["wall", "E", "N"],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "mirror": false,
+        "lod": 0.6,
+        "doors": {
+          "GothicCabinet_01_door1": 0.0,
+          "GothicCabinet_01_door2": 0.0,
+          "GothicCabinet_01_door3": 0.0,
+          "GothicCabinet_01_door4": 0.0
+        }
+      }
+    },
+    {
+      "note": "the press's open door is the upper one at its south end (door2): door1's leaf, at its north end, would stand in the mouth of the aisle beside the bed",
+      "id": "wb.linen_press",
+      "key": "linen_press",
+      "face": "W",
+      "place": ["wall", "E", 1.0],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "extras": [],
+        "lod": 0.6,
+        "doors": {
+          "GothicCabinet_01_door1": 0.0,
+          "GothicCabinet_01_door2": 118.0,
+          "GothicCabinet_01_door3": 0.0,
+          "GothicCabinet_01_door4": 0.0
+        }
+      },
+      "sheets": true
+    },
+    {
+      "id": "wb.dressing_table",
+      "key": "dressing_table",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "spec": { "extras": [], "lod": 0.7 },
+      "cloth": "all",
+      "dress_lod": { "ornate_mirror_01": 0.25 }
+    },
+    {
+      "id": "wb.washstand",
+      "key": "washstand",
+      "face": "S",
+      "place": ["wall", "N", 0.94],
+      "dress_lod": { "jug_01": 0.4, "brass_pot_02": 0.6 }
+    },
+    {
+      "id": "wb.candle",
+      "key": "candle",
+      "face": "S",
+      "place": ["at", 1.43, 2.78],
+      "spec": { "scale": 1.0, "lod": 0.5 }
+    },
+    {
+      "note": "6 cm west of the photographs' old centre (x 2.5), and they with it: at 2.5 the aisle between the coverlet and wardrobe_body was 0.80 m to the centimetre",
+      "id": "wb.bed",
+      "key": "bed",
+      "face": "S",
+      "place": ["wall", "N", 2.44],
+      "lift": 0.22,
+      "bedding": true,
+      "spec": { "lod": 0.7 }
+    },
+    {
+      "id": "wb.blanket_chest",
+      "key": "wb.blanket_chest",
+      "face": "S",
+      "place": ["beside", "wb.bed", "S", 2.44],
+      "gap": 0.07,
+      "spec": { "lod": 0.5 }
+    },
+    { "id": "wb.rug", "key": "rug", "place": ["at", -0.5, -1.0] },
+    {
+      "note": "raised 0.28 m: the two small frames clear the head board's crest (1.26 m) by 0.16 m, the three ovals the head posts' tops (1.68 m) by 0.11 m, the group's top 0.17 m under the picture rail",
+      "id": "wb.photos",
+      "key": "photos",
+      "place": ["wall", "N", 2.44],
+      "rise": 0.28
+    },
+    {
+      "note": "this piece and the two after it are the first person's dressing (decor: not in the scene's props; locked Poly Haven models, real size): her tub armchair on the west wall (at y 0.5 it is whole in the spawn's view and between two tile centres: at y -1.5 its arm was cut by the frame's corner), a nightstand with the mantel clock in the south-west corner, a settle on the south wall. Each stands against its wall and leaves part of every walkable tile open.",
+      "id": "wb.decor.armchair",
+      "decor": true,
+      "face": "E",
+      "place": ["wall", "W", 0.5],
+      "spec": { "model": "ph", "slug": "ArmChair_01", "scale": 1.0, "lod": 0.4 }
+    },
+    {
+      "id": "wb.decor.nightstand",
+      "decor": true,
+      "face": "E",
+      "place": ["wall", "W", -2.85],
+      "spec": {
+        "model": "ph",
+        "slug": "ClassicNightstand_01",
+        "scale": 1.0,
+        "lod": 0.22,
+        "dress": [{ "slug": "mantel_clock_01", "scale": 1.0, "at": [0.0, 0.1, 0.0], "lod": 0.5 }]
+      }
+    },
+    {
+      "id": "wb.decor.settle",
+      "decor": true,
+      "face": "N",
+      "place": ["wall", "S", 1.5],
+      "spec": { "model": "ph", "slug": "painted_wooden_bench", "scale": 1.0, "lod": 0.5 }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees. The eye's 1.6 m and the 70 degrees are the walk viewer's own (the builder's EYE and VFOV).",
+  "views": {
+    "spawn": [[-2.5, -3.0, 1.6], [-2.5, 3.5, 1.25], 70.0],
+    "bed": [[0.55, -0.75, 1.6], [2.3, 2.75, 0.95], 70.0],
+    "bed_note": "the bed, the candle and his photographs",
+    "window": [[1.15, -1.55, 1.6], [-0.95, 2.05, 0.9], 70.0],
+    "dressing": [[-2.15, 0.95, 1.6], [-2.5, 3.5, 1.12], 70.0],
+    "press": [[2.2, -0.9, 1.6], [4.4, 1.0, 1.15], 70.0],
+    "press_note": "the linen press and the room in front of it",
+    "door": [[-2.2, -0.55, 1.6], [-2.5, -3.5, 1.1], 70.0],
+    "photos": [[2.44, 0.45, 1.6], [2.44, 3.5, 1.55], 70.0],
+    "photos_note": "from the bed's foot, over the chest",
+    "south": [[1.1, 1.7, 1.6], [-3.4, -2.6, 0.9], 70.0]
+  },
+  "layouts": {
+    "mapped": {
+      "pieces": {
+        "wb.wardrobe_body": {
+          "face": "S",
+          "place": ["wall", "N", "E"],
+          "spec": {
+            "tall": 2.1,
+            "kmax": null,
+            "mirror": false,
+            "lod": 0.6,
+            "doors": {
+              "GothicCabinet_01_door1": -30.0,
+              "GothicCabinet_01_door2": 22.0,
+              "GothicCabinet_01_door3": 0.0,
+              "GothicCabinet_01_door4": 0.0
+            }
+          }
+        },
+        "wb.linen_press": {
+          "spec": {
+            "tall": 2.1,
+            "kmax": null,
+            "extras": [],
+            "lod": 0.6,
+            "doors": {
+              "GothicCabinet_01_door1": -118.0,
+              "GothicCabinet_01_door2": 0.0,
+              "GothicCabinet_01_door3": 0.0,
+              "GothicCabinet_01_door4": 0.0
+            }
+          }
+        },
+        "wb.candle": { "place": ["at", 2.12, 2.22] },
+        "wb.bed": { "face": "E", "place": ["at", 2.86, 1.0] },
+        "wb.blanket_chest": {
+          "note": "12 cm off the bed's side (it stood 2 cm off it, 4.2 cm inside the coverlet's drape)",
+          "place": ["beside", "wb.bed", "S", 2.5],
+          "gap": 0.12
+        },
+        "wb.photos": { "place": ["wall", "N", 2.5], "rise": 0.0 }
+      },
+      "views": {
+        "bed": [[4.0, -1.75, 1.6], [2.25, 1.45, 0.82], 70.0],
+        "press": [[2.3, 1.98, 1.6], [4.3, 2.55, 1.25], 70.0],
+        "photos": [[2.95, 1.98, 1.6], [2.5, 3.5, 1.55], 70.0],
+        "south": [[1.4, 1.6, 1.6], [-3.4, -2.6, 0.9], 70.0]
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
   "name": "interior_fp",
-  "about": "The first-person rooms' look (meshy_room_build.py): what the vertex bake lights a room with and how the walk viewer shows it. Colours are sRGB hex; the room table (ROOMS) overrides any key per room.",
+  "about": "The first-person rooms' look (meshy_room_build.py): what the vertex bake lights a room with and how the walk viewer shows it. Colours are sRGB hex; the room's own file (meshy_rooms/<id>.json) overrides any key per room.",
   "view": {
     "view_transform": "AgX",
     "look": "None",

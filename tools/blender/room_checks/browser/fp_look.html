@@ -1,0 +1,1092 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Room look check</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+        width: 100vw;
+        height: 100vh;
+        object-fit: contain;
+      }
+      #out {
+        position: absolute;
+        left: 4px;
+        top: 4px;
+        color: #9a9;
+        font: 11px monospace;
+        white-space: pre;
+        pointer-events: none;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.186.1/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.186.1/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="view"></canvas>
+    <div id="out"></div>
+    <script type="module">
+      // Room check in the browser: the first-person look of a baked room GLB. Served by serve.py:
+      // ?mode=still&w=960&h=540&glb=/glb/<roomId>.glb; r10_viewer.js runs the frame sweeps on it. Still the bedroom's own
+      // in this page: the default GLB, the named views (the first layout's stills) and mirrorSliver.
+      // The room is rendered as the walk viewer renders a room
+      // (apps/walk/src/main.ts updateArea + world.ts areaLook on origin/claude/v2-walk, three 0.186.1 as in its package.json):
+      //   AgXToneMapping, SRGBColorSpace output, toneMappingExposure = the Area_room_*'s wdi_exposure,
+      //   scene.background = black, scene.fog = null (the area has no fog extras), the sky dome and the look's moon and
+      //   sky light hidden indoors (so none are added here), HM_Collision* hidden, the GLB's own KHR lights kept,
+      //   PerspectiveCamera(fov 70, aspect, near 0.05, far 500) (config.ts RENDER), the eye 1.6 m over the feet (WALK).
+      // ?mode=still : a fixed w x h canvas at pixel ratio 1 (for measurement and the comparison with the Blender stills)
+      // ?mode=perf  : the viewer's own canvas (window size, pixel ratio min(dpr, 2)) for frame times.
+      import * as THREE from 'three';
+      import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+      import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
+
+      const q = new URLSearchParams(location.search);
+      const MODE = q.get('mode') || 'still';
+      const GLB = q.get('glb') || '/glb/widow_bedroom.glb';
+      const W = +(q.get('w') || 1920),
+        H = +(q.get('h') || 1080);
+      const canvas = document.getElementById('view');
+      const out = document.getElementById('out');
+      const T0 = performance.now();
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        powerPreference: 'high-performance',
+        preserveDrawingBuffer: MODE === 'still',
+      });
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.AgXToneMapping;
+      if (MODE === 'still') {
+        renderer.setPixelRatio(1);
+        renderer.setSize(W, H, false);
+      } else {
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(innerWidth, innerHeight, false);
+      }
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(
+        70,
+        MODE === 'still' ? W / H : innerWidth / innerHeight,
+        0.05,
+        500,
+      );
+      const draco = new DRACOLoader().setDecoderPath(
+        'https://unpkg.com/three@0.186.1/examples/jsm/libs/draco/gltf/',
+      );
+      const loader = new GLTFLoader().setDRACOLoader(draco);
+      const INK = [0x12, 0x14, 0x1c];
+      const INK_LUMA = 0.2126 * INK[0] + 0.7152 * INK[1] + 0.0722 * INK[2];
+      const V = { ready: false, mode: MODE, revision: THREE.REVISION, timings: {}, errors: [] };
+      window.__v = V;
+
+      // Blender (x, y, z) -> three (x, z, -y)
+      const b2t = (p) => new THREE.Vector3(p[0], p[2], -p[1]);
+      const t2b = (v) => [v.x, -v.z, v.y];
+
+      // eye, target in Blender metres (the first seven are the builder's stills: meshy_rooms/widow_bedroom.json views)
+      const VIEWS = {
+        spawn: [
+          [-2.5, -3.0, 1.6],
+          [-2.5, 3.5, 1.25],
+        ],
+        bed: [
+          [4.0, -1.75, 1.6],
+          [2.25, 1.45, 0.82],
+        ],
+        window: [
+          [1.15, -1.55, 1.6],
+          [-0.95, 2.05, 0.9],
+        ],
+        dressing: [
+          [-2.15, 0.95, 1.6],
+          [-2.5, 3.5, 1.12],
+        ],
+        press: [
+          [2.3, 1.98, 1.6],
+          [4.3, 2.55, 1.25],
+        ],
+        door: [
+          [-2.2, -0.55, 1.6],
+          [-2.5, -3.5, 1.1],
+        ],
+        photos: [
+          [2.95, 1.98, 1.6],
+          [2.5, 3.5, 1.55],
+        ],
+      };
+
+      let root = null,
+        area = null,
+        spawn = null;
+      const meshes = [];
+      function setView(name) {
+        const v = VIEWS[name];
+        if (!v) throw new Error('no view ' + name);
+        return look(v[0], v[1]);
+      }
+      function look(eye, target) {
+        camera.position.copy(b2t(eye));
+        camera.up.set(0, 1, 0);
+        camera.lookAt(b2t(target));
+        camera.updateMatrixWorld();
+        V.view = { eye, target };
+        return V.view;
+      }
+      function atSpawn() {
+        // the viewer's goTo(): the feet at the spawn, the eye 1.6 m up, yaw from the spawn's -Z, pitch 0
+        const p = new THREE.Vector3().setFromMatrixPosition(spawn.matrixWorld);
+        const f = new THREE.Vector3(0, 0, -1).transformDirection(spawn.matrixWorld);
+        camera.position.set(p.x, p.y + 1.6, p.z);
+        camera.rotation.set(0, Math.atan2(-f.x, -f.z), 0, 'YXZ');
+        camera.updateMatrixWorld();
+        V.view = {
+          spawn: spawn.name,
+          eye: t2b(camera.position),
+          yawDeg: (camera.rotation.y * 180) / Math.PI,
+        };
+        return V.view;
+      }
+      // a walker's view: feet at (x, y) Blender, eye 1.6 m up; yaw in degrees (0 looks north = Blender +Y, 90 looks west)
+      function walker(x, y, yawDeg, pitchDeg = 0) {
+        camera.position.copy(b2t([x, y, 1.6]));
+        camera.rotation.set((pitchDeg * Math.PI) / 180, (yawDeg * Math.PI) / 180, 0, 'YXZ');
+        camera.updateMatrixWorld();
+        V.view = { feet: [x, y], yawDeg, pitchDeg };
+        return V.view;
+      }
+
+      function rgb2hsv(r, g, b) {
+        const mx = Math.max(r, g, b),
+          mn = Math.min(r, g, b),
+          d = mx - mn;
+        let h = 0;
+        if (d > 0) {
+          if (mx === r) h = ((g - b) / d) % 6;
+          else if (mx === g) h = (b - r) / d + 2;
+          else h = (r - g) / d + 4;
+          h *= 60;
+          if (h < 0) h += 360;
+        }
+        return [h, mx ? d / mx : 0, mx / 255];
+      }
+      // palette classes of one display pixel
+      function classify(r, g, b) {
+        const [h, s, v] = rgb2hsv(r, g, b);
+        return {
+          magenta: (r > g + 25 && b > g + 25) || (h >= 285 && h < 335 && s > 0.25 && v > 0.15),
+          lilac: r > g + 6 && b > g + 6,
+          pink: (h >= 335 || h < 12) && s > 0.2 && v > 0.35, // rose / salmon-pink, not orange
+          h,
+          s,
+          v,
+        };
+      }
+
+      function frameStats() {
+        renderer.render(scene, camera);
+        const gl = renderer.getContext();
+        const w = gl.drawingBufferWidth,
+          h = gl.drawingBufferHeight;
+        const px = new Uint8Array(w * h * 4);
+        gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        V._px = { px, w, h };
+        const n = w * h,
+          lum = new Float32Array(n);
+        let sum = 0,
+          under = 0,
+          black = 0,
+          belowAll = 0,
+          magenta = 0,
+          lilac = 0,
+          pink = 0,
+          maxL = 0;
+        const mean = [0, 0, 0];
+        for (let i = 0; i < n; i++) {
+          const r = px[4 * i],
+            g = px[4 * i + 1],
+            b = px[4 * i + 2];
+          const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          lum[i] = l;
+          sum += l;
+          if (l > maxL) maxL = l;
+          mean[0] += r;
+          mean[1] += g;
+          mean[2] += b;
+          if (l < INK_LUMA - 0.5) under++;
+          if (r === 0 && g === 0 && b === 0) black++;
+          if (r < INK[0] && g < INK[1] && b < INK[2]) belowAll++;
+          const c = classify(r, g, b);
+          if (c.magenta) magenta++;
+          else if (c.lilac) lilac++;
+          if (c.pink) pink++;
+        }
+        const s = Float32Array.from(lum).sort();
+        const pct = (p) => +s[Math.min(n - 1, Math.floor(p * n))].toFixed(1);
+        return {
+          w,
+          h,
+          lum_mean: +(sum / n).toFixed(1),
+          p1: pct(0.01),
+          p5: pct(0.05),
+          p50: pct(0.5),
+          p95: pct(0.95),
+          p99: pct(0.99),
+          min: +s[0].toFixed(1),
+          max: +maxL.toFixed(1),
+          under_ink: +(under / n).toFixed(4),
+          black,
+          below_ink_all_channels: belowAll,
+          magenta,
+          lilac,
+          pink,
+          pink_share: +(pink / n).toFixed(4),
+          mean_rgb: mean.map((x) => +(x / n).toFixed(1)),
+        };
+      }
+
+      // ID and world-position passes (no MSAA, no tone mapping), to attribute pixels to objects and give coordinates
+      let idRT = null,
+        posRT = null;
+      const idMats = new Map(),
+        posMats = new Map();
+      function passes(includeGlass = false) {
+        const w = renderer.getContext().drawingBufferWidth,
+          h = renderer.getContext().drawingBufferHeight;
+        if (!idRT || idRT.width !== w || idRT.height !== h) {
+          idRT = new THREE.WebGLRenderTarget(w, h, { type: THREE.UnsignedByteType, samples: 0 });
+          posRT = new THREE.WebGLRenderTarget(w, h, { type: THREE.FloatType, samples: 0 });
+        }
+        const saved = new Map();
+        const bg = scene.background;
+        scene.background = new THREE.Color(0, 0, 0);
+        const tm = renderer.toneMapping;
+        renderer.toneMapping = THREE.NoToneMapping;
+        for (const m of meshes) {
+          saved.set(m, { mat: m.material, vis: m.visible });
+          if (m.userData.__glass && !includeGlass) m.visible = false;
+          if (!idMats.has(m)) {
+            const id = m.userData.__id + 1;
+            idMats.set(
+              m,
+              new THREE.ShaderMaterial({
+                side: m.material.side,
+                vertexShader: 'void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+                fragmentShader: `void main(){gl_FragColor=vec4(${(id & 255) / 255},${((id >> 8) & 255) / 255},gl_FrontFacing?1.0:0.5,1.0);}`,
+              }),
+            );
+            posMats.set(
+              m,
+              new THREE.ShaderMaterial({
+                side: m.material.side,
+                vertexShader:
+                  'varying vec3 vw; void main(){vec4 w=modelMatrix*vec4(position,1.0); vw=w.xyz; gl_Position=projectionMatrix*viewMatrix*w;}',
+                fragmentShader: 'varying vec3 vw; void main(){gl_FragColor=vec4(vw,1.0);}',
+              }),
+            );
+          }
+        }
+        for (const m of meshes) m.material = idMats.get(m);
+        renderer.setRenderTarget(idRT);
+        renderer.setClearColor(0x000000, 1);
+        renderer.clear();
+        renderer.render(scene, camera);
+        const ids = new Uint8Array(w * h * 4);
+        renderer.readRenderTargetPixels(idRT, 0, 0, w, h, ids);
+        for (const m of meshes) m.material = posMats.get(m);
+        renderer.setRenderTarget(posRT);
+        renderer.setClearColor(0x000000, 0);
+        renderer.clear();
+        renderer.render(scene, camera);
+        const pos = new Float32Array(w * h * 4);
+        renderer.readRenderTargetPixels(posRT, 0, 0, w, h, pos);
+        renderer.setRenderTarget(null);
+        for (const [m, s] of saved) {
+          m.material = s.mat;
+          m.visible = s.vis;
+        }
+        scene.background = bg;
+        renderer.toneMapping = tm;
+        return { ids, pos, w, h };
+      }
+      const meshName = (id) =>
+        id === 0
+          ? '(background)'
+          : meshes[id - 1]
+            ? meshes[id - 1].name + '/' + meshes[id - 1].material.name
+            : '?' + id;
+
+      // per-object stats of the current colour frame, with flagged pixels' world boxes (Blender metres)
+      function objectStats() {
+        const st = frameStats();
+        const { px, w, h } = V._px;
+        const { ids, pos } = passes();
+        const per = new Map();
+        const box = () => [1e9, 1e9, 1e9, -1e9, -1e9, -1e9];
+        for (let i = 0; i < w * h; i++) {
+          const id = ids[4 * i] + 256 * ids[4 * i + 1];
+          const back = ids[4 * i + 2] < 200 && id !== 0;
+          const r = px[4 * i],
+            g = px[4 * i + 1],
+            b = px[4 * i + 2];
+          const l = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          let e = per.get(id);
+          if (!e) {
+            e = {
+              n: 0,
+              sum: 0,
+              min: 1e9,
+              max: 0,
+              under: 0,
+              lilac: 0,
+              magenta: 0,
+              pink: 0,
+              back: 0,
+              rgb: [0, 0, 0],
+              ub: box(),
+              lb: box(),
+              pb: box(),
+              bb: box(),
+            };
+            per.set(id, e);
+          }
+          e.n++;
+          e.sum += l;
+          if (l < e.min) e.min = l;
+          if (l > e.max) e.max = l;
+          e.rgb[0] += r;
+          e.rgb[1] += g;
+          e.rgb[2] += b;
+          const c = classify(r, g, b);
+          const flags = [
+            [l < INK_LUMA - 0.5, 'under', e.ub],
+            [c.lilac || c.magenta, 'lilac', e.lb],
+            [c.pink, 'pink', e.pb],
+            [back, 'back', e.bb],
+          ];
+          const X = pos[4 * i],
+            Y = pos[4 * i + 1],
+            Z = pos[4 * i + 2],
+            A = pos[4 * i + 3];
+          for (const [on, key, tgt] of flags) {
+            if (!on) continue;
+            e[key]++;
+            if (key === 'lilac' && c.magenta) e.magenta++;
+            if (A > 0) {
+              const bb = [X, -Z, Y];
+              for (let k = 0; k < 3; k++) {
+                tgt[k] = Math.min(tgt[k], bb[k]);
+                tgt[k + 3] = Math.max(tgt[k + 3], bb[k]);
+              }
+            }
+          }
+        }
+        const rows = [];
+        for (const [id, e] of per) {
+          const r = {
+            name: meshName(id),
+            share: +(e.n / (w * h)).toFixed(4),
+            lum_mean: +(e.sum / e.n).toFixed(1),
+            lum_min: +e.min.toFixed(1),
+            lum_max: +e.max.toFixed(1),
+            mean_rgb: e.rgb.map((x) => +(x / e.n).toFixed(0)),
+            under: e.under,
+            lilac: e.lilac,
+            magenta: e.magenta,
+            pink: e.pink,
+            backfacing: e.back,
+          };
+          const fx = (b) => b.map((v) => +v.toFixed(2));
+          if (e.under) r.under_box = fx(e.ub);
+          if (e.lilac) r.lilac_box = fx(e.lb);
+          if (e.pink) r.pink_box = fx(e.pb);
+          if (e.back) r.back_box = fx(e.bb);
+          rows.push(r);
+        }
+        rows.sort((a, b) => b.share - a.share);
+        renderer.render(scene, camera);
+        return { frame: st, objects: rows };
+      }
+
+      // what is at a pixel (x, y from the top-left of the w x h frame): object, world position, colour
+      function probe(x, y) {
+        const { ids, pos, w, h } = passes();
+        renderer.render(scene, camera);
+        const gl = renderer.getContext();
+        const yy = h - 1 - y,
+          i = yy * w + x;
+        const px = new Uint8Array(4);
+        gl.readPixels(x, yy, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const id = ids[4 * i] + 256 * ids[4 * i + 1];
+        return {
+          obj: meshName(id),
+          front: ids[4 * i + 2] > 200,
+          blender: [pos[4 * i], -pos[4 * i + 2], pos[4 * i + 1]].map((v) => +v.toFixed(3)),
+          rgb: Array.from(px.slice(0, 3)),
+        };
+      }
+
+      // z-fighting: pixels whose object id differs from both horizontal (or both vertical) neighbours while those two agree,
+      // counted per pair; flat interleaving of two ids over an area is the z-fight signature (edges give few such pixels)
+      function zfight(minCount = 30) {
+        const { ids, pos, w, h } = passes();
+        const idAt = (x, y) => ids[4 * (y * w + x)] + 256 * ids[4 * (y * w + x) + 1];
+        const pairs = new Map();
+        for (let y = 1; y < h - 1; y++)
+          for (let x = 1; x < w - 1; x++) {
+            const c = idAt(x, y);
+            if (!c) continue;
+            const l = idAt(x - 1, y),
+              r = idAt(x + 1, y),
+              u = idAt(x, y - 1),
+              d = idAt(x, y + 1);
+            let other = 0;
+            if (l === r && l !== c && l) other = l;
+            else if (u === d && u !== c && u) other = u;
+            if (!other) continue;
+            const key = Math.min(c, other) + ':' + Math.max(c, other);
+            let e = pairs.get(key);
+            if (!e) {
+              e = { n: 0, box: [1e9, 1e9, 1e9, -1e9, -1e9, -1e9] };
+              pairs.set(key, e);
+            }
+            e.n++;
+            const i = y * w + x;
+            const A = pos[4 * i + 3];
+            if (A > 0) {
+              const bb = [pos[4 * i], -pos[4 * i + 2], pos[4 * i + 1]];
+              for (let k = 0; k < 3; k++) {
+                e.box[k] = Math.min(e.box[k], bb[k]);
+                e.box[k + 3] = Math.max(e.box[k + 3], bb[k]);
+              }
+            }
+          }
+        renderer.render(scene, camera);
+        const rows = [];
+        for (const [k, e] of pairs)
+          if (e.n >= minCount) {
+            const [a, b] = k.split(':').map(Number);
+            rows.push({ a: meshName(a), b: meshName(b), n: e.n, box: e.box.map((v) => +v.toFixed(2)) });
+          }
+        rows.sort((p, q2) => q2.n - p.n);
+        return rows;
+      }
+
+      async function save(name) {
+        renderer.render(scene, camera);
+        const blob = await new Promise((r) => canvas.toBlob(r, 'image/png'));
+        const res = await fetch('/save?name=' + encodeURIComponent(name), { method: 'POST', body: blob });
+        return { name, bytes: blob.size, ok: res.ok };
+      }
+      async function saveJSON(name, obj) {
+        const res = await fetch('/save?name=' + encodeURIComponent(name), {
+          method: 'POST',
+          body: JSON.stringify(obj, null, 1),
+        });
+        return res.ok;
+      }
+      async function shoot(name, viewName) {
+        if (viewName === 'spawn_viewer') atSpawn();
+        else if (viewName) setView(viewName);
+        const s = frameStats();
+        const r = await save(name + '.png');
+        return { name, view: V.view, stats: s, saved: r };
+      }
+
+      // all decoded geometry (world positions in Blender metres, COLOR_0, UVs, indices) for the offline bake analysis
+      async function dumpGeometry(name) {
+        const header = { meshes: [] },
+          blobs = [];
+        let off = 0;
+        const add = (arr) => {
+          const b = new Uint8Array(arr.buffer, arr.byteOffset, arr.byteLength);
+          const o = off;
+          blobs.push(b);
+          off += b.byteLength;
+          const pad = (4 - (off % 4)) % 4;
+          if (pad) {
+            blobs.push(new Uint8Array(pad));
+            off += pad;
+          }
+          return o;
+        };
+        const all = [];
+        root.traverse((o) => {
+          if (o.isMesh) all.push(o);
+        });
+        for (const m of all) {
+          const g = m.geometry,
+            P = g.attributes.position,
+            C = g.attributes.color,
+            U = g.attributes.uv;
+          const wp = new Float32Array(P.count * 3),
+            v = new THREE.Vector3();
+          for (let i = 0; i < P.count; i++) {
+            v.fromBufferAttribute(P, i).applyMatrix4(m.matrixWorld);
+            const b = t2b(v);
+            wp[3 * i] = b[0];
+            wp[3 * i + 1] = b[1];
+            wp[3 * i + 2] = b[2];
+          }
+          const e = {
+            name: m.name,
+            material: m.material.name,
+            type: m.material.type,
+            count: P.count,
+            pos: add(wp),
+            side: m.material.side,
+          };
+          if (C) {
+            const c = new Float32Array(C.count * C.itemSize);
+            for (let i = 0; i < C.count; i++)
+              for (let k = 0; k < C.itemSize; k++) c[C.itemSize * i + k] = C.getComponent(i, k);
+            e.color = add(c);
+            e.colorSize = C.itemSize;
+            e.colorType = C.array.constructor.name;
+            e.colorNormalized = C.normalized;
+          }
+          if (U) {
+            const u = new Float32Array(U.count * 2);
+            for (let i = 0; i < U.count; i++) {
+              u[2 * i] = U.getX(i);
+              u[2 * i + 1] = U.getY(i);
+            }
+            e.uv = add(u);
+          }
+          if (g.index) {
+            const ix = new Uint32Array(g.index.count);
+            for (let i = 0; i < g.index.count; i++) ix[i] = g.index.getX(i);
+            e.index = add(ix);
+            e.indexCount = g.index.count;
+          }
+          const map = m.material.map;
+          if (map && map.image)
+            e.map = {
+              w: map.image.width,
+              h: map.image.height,
+              name: map.name,
+              repeat: map.repeat.toArray(),
+              offset: map.offset.toArray(),
+              wrapS: map.wrapS,
+            };
+          e.factor = m.material.color.toArray();
+          e.transparent = m.material.transparent;
+          e.opacity = m.material.opacity;
+          e.vertexColors = m.material.vertexColors;
+          let vis = true;
+          for (let p = m; p; p = p.parent) if (p.visible === false) vis = false;
+          e.visible = vis;
+          header.meshes.push(e);
+        }
+        const hj = new TextEncoder().encode(JSON.stringify(header));
+        const hl = new Uint32Array([hj.byteLength]);
+        const hpad = (4 - ((4 + hj.byteLength) % 4)) % 4;
+        const body = new Blob([hl, hj, new Uint8Array(hpad), ...blobs]);
+        const res = await fetch('/save?name=' + encodeURIComponent(name), { method: 'POST', body });
+        return { ok: res.ok, bytes: body.size, meshes: header.meshes.length };
+      }
+
+      // the viewer's loop at the spawn: rAF intervals, CPU submit time and GPU time from a timer query
+      async function perf(frames = 300) {
+        atSpawn();
+        const gl = renderer.getContext();
+        const ext = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+        const recs = [],
+          gpu = [],
+          queries = [];
+        let last = performance.now();
+        await new Promise((done) => {
+          let k = 0;
+          renderer.setAnimationLoop(() => {
+            const t = performance.now();
+            const dt = t - last;
+            last = t;
+            let qq = null;
+            if (ext) {
+              qq = gl.createQuery();
+              gl.beginQuery(ext.TIME_ELAPSED_EXT, qq);
+            }
+            const c0 = performance.now();
+            renderer.render(scene, camera);
+            const cpu = performance.now() - c0;
+            if (ext) {
+              gl.endQuery(ext.TIME_ELAPSED_EXT);
+              queries.push(qq);
+            }
+            recs.push({ dt, cpu });
+            for (let i = queries.length - 1; i >= 0; i--) {
+              const qx = queries[i];
+              if (gl.getQueryParameter(qx, gl.QUERY_RESULT_AVAILABLE)) {
+                if (!gl.getParameter(ext.GPU_DISJOINT_EXT))
+                  gpu.push(gl.getQueryParameter(qx, gl.QUERY_RESULT) / 1e6);
+                gl.deleteQuery(qx);
+                queries.splice(i, 1);
+              }
+            }
+            if (++k >= frames) {
+              renderer.setAnimationLoop(null);
+              done();
+            }
+          });
+        });
+        const sorted = (a) => Float64Array.from(a).sort();
+        const dt = sorted(recs.slice(10).map((d) => d.dt)),
+          cpu = sorted(recs.slice(10).map((d) => d.cpu)),
+          g = sorted(gpu.slice(5));
+        const p = (a, x) =>
+          a.length ? +a[Math.min(a.length - 1, Math.floor(x * a.length))].toFixed(2) : null;
+        return {
+          frames,
+          size: [gl.drawingBufferWidth, gl.drawingBufferHeight],
+          dpr: devicePixelRatio,
+          dt_ms: { p50: p(dt, 0.5), p95: p(dt, 0.95), max: p(dt, 1) },
+          cpu_submit_ms: { p50: p(cpu, 0.5), p95: p(cpu, 0.95) },
+          gpu_ms: { n: g.length, p50: p(g, 0.5), p95: p(g, 0.95), max: p(g, 1) },
+          calls: renderer.info.render.calls,
+          triangles: renderer.info.render.triangles,
+          programs: renderer.info.programs?.length,
+          textures: renderer.info.memory.textures,
+          geometries: renderer.info.memory.geometries,
+          glRenderer: (() => {
+            const d = gl.getExtension('WEBGL_debug_renderer_info');
+            return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+          })(),
+          hidden: document.hidden,
+          visibility: document.visibilityState,
+        };
+      }
+
+      // frame cost without vsync (the pane may be hidden, which throttles requestAnimationFrame): `frames` renders at the
+      // spawn view, each followed by gl.finish(), on a w x h drawing buffer at pixel ratio 1; GPU time from a timer query
+      async function bench(frames = 200, w = 1920, h = 1080) {
+        const keep = [renderer.getPixelRatio(), renderer.getSize(new THREE.Vector2())];
+        renderer.setPixelRatio(1);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        atSpawn();
+        const gl = renderer.getContext();
+        const ext = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+        for (let i = 0; i < 10; i++) {
+          renderer.render(scene, camera);
+        }
+        gl.finish();
+        const wall = [],
+          gpu = [];
+        for (let i = 0; i < frames; i++) {
+          let qq = null;
+          if (ext) {
+            qq = gl.createQuery();
+            gl.beginQuery(ext.TIME_ELAPSED_EXT, qq);
+          }
+          const t0 = performance.now();
+          renderer.render(scene, camera);
+          if (ext) gl.endQuery(ext.TIME_ELAPSED_EXT);
+          gl.finish();
+          wall.push(performance.now() - t0);
+          if (ext) {
+            for (let k = 0; k < 50 && !gl.getQueryParameter(qq, gl.QUERY_RESULT_AVAILABLE); k++)
+              await new Promise((r) => setTimeout(r, 0));
+            if (gl.getQueryParameter(qq, gl.QUERY_RESULT_AVAILABLE) && !gl.getParameter(ext.GPU_DISJOINT_EXT))
+              gpu.push(gl.getQueryParameter(qq, gl.QUERY_RESULT) / 1e6);
+            gl.deleteQuery(qq);
+          }
+        }
+        const s = (a) => {
+          const b = Float64Array.from(a).sort();
+          const p = (x) =>
+            b.length ? +b[Math.min(b.length - 1, Math.floor(x * b.length))].toFixed(2) : null;
+          return { n: b.length, p50: p(0.5), p95: p(0.95), max: p(1) };
+        };
+        const res = {
+          size: [w, h],
+          wall_ms_render_plus_finish: s(wall),
+          gpu_ms: s(gpu),
+          calls: renderer.info.render.calls,
+          triangles: renderer.info.render.triangles,
+          programs: renderer.info.programs?.length,
+          textures: renderer.info.memory.textures,
+          glRenderer: (() => {
+            const d = gl.getExtension('WEBGL_debug_renderer_info');
+            return d ? gl.getParameter(d.UNMASKED_RENDERER_WEBGL) : gl.getParameter(gl.RENDERER);
+          })(),
+          visibility: document.visibilityState,
+        };
+        renderer.setPixelRatio(keep[0]);
+        renderer.setSize(keep[1].x, keep[1].y, false);
+        camera.aspect = keep[1].x / keep[1].y;
+        camera.updateProjectionMatrix();
+        return res;
+      }
+
+      // frame cost by throughput: n renders back to back, then a 1-pixel readPixels that waits for the GPU (ms per frame)
+      function throughput(n = 40, w = 1920, h = 1080) {
+        const keep = renderer.getSize(new THREE.Vector2());
+        renderer.setPixelRatio(1);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        atSpawn();
+        const gl = renderer.getContext();
+        const px = new Uint8Array(4);
+        renderer.render(scene, camera);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const t0 = performance.now();
+        for (let i = 0; i < n; i++) renderer.render(scene, camera);
+        gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const ms = (performance.now() - t0) / n;
+        renderer.setSize(keep.x, keep.y, false);
+        camera.aspect = keep.x / keep.y;
+        camera.updateProjectionMatrix();
+        return +ms.toFixed(2);
+      }
+
+      // z-fighting by draw order: the id pass drawn in mesh order and in reverse (depthFunc LESS); pixels whose winner
+      // changes are where two meshes' surfaces tie in depth
+      function zfightOrder(minCount = 20) {
+        const gl = renderer.getContext();
+        const w = gl.drawingBufferWidth,
+          h = gl.drawingBufferHeight;
+        const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.UnsignedByteType, samples: 0 });
+        const prt = new THREE.WebGLRenderTarget(w, h, { type: THREE.FloatType, samples: 0 });
+        const mats = meshes.map(
+          (m, i) =>
+            new THREE.ShaderMaterial({
+              side: m.material.side,
+              depthFunc: THREE.LessDepth,
+              vertexShader: 'void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+              fragmentShader: `void main(){gl_FragColor=vec4(${((i + 1) & 255) / 255},${(((i + 1) >> 8) & 255) / 255},0.0,1.0);}`,
+            }),
+        );
+        const posMat = new THREE.ShaderMaterial({
+          side: THREE.DoubleSide,
+          vertexShader:
+            'varying vec3 vw; void main(){vec4 q=modelMatrix*vec4(position,1.0); vw=q.xyz; gl_Position=projectionMatrix*viewMatrix*q;}',
+          fragmentShader: 'varying vec3 vw; void main(){gl_FragColor=vec4(vw,1.0);}',
+        });
+        const pass = (rev, withPos) => {
+          const saved = meshes.map((m) => [m, m.material, m.visible, m.renderOrder]);
+          meshes.forEach((m, i) => {
+            m.material = mats[i];
+            if (m.userData.__glass) m.visible = false;
+            m.renderOrder = rev ? meshes.length - i : i;
+          });
+          const bg = scene.background;
+          scene.background = new THREE.Color(0, 0, 0);
+          const tm = renderer.toneMapping;
+          renderer.toneMapping = THREE.NoToneMapping;
+          renderer.setRenderTarget(rt);
+          renderer.setClearColor(0, 1);
+          renderer.clear();
+          renderer.render(scene, camera);
+          const ids = new Uint8Array(w * h * 4);
+          renderer.readRenderTargetPixels(rt, 0, 0, w, h, ids);
+          let pos = null;
+          if (withPos) {
+            for (const m of meshes) m.material = posMat;
+            renderer.setRenderTarget(prt);
+            renderer.setClearColor(0, 0);
+            renderer.clear();
+            renderer.render(scene, camera);
+            pos = new Float32Array(w * h * 4);
+            renderer.readRenderTargetPixels(prt, 0, 0, w, h, pos);
+          }
+          renderer.setRenderTarget(null);
+          for (const [m, mat, vis, ro] of saved) {
+            m.material = mat;
+            m.visible = vis;
+            m.renderOrder = ro;
+          }
+          scene.background = bg;
+          renderer.toneMapping = tm;
+          return { ids, pos };
+        };
+        const a = pass(false, true),
+          b = pass(true, false);
+        const pairs = new Map();
+        for (let i = 0; i < w * h; i++) {
+          const ia = a.ids[4 * i] + 256 * a.ids[4 * i + 1],
+            ib = b.ids[4 * i] + 256 * b.ids[4 * i + 1];
+          if (ia === ib) continue;
+          const key = Math.min(ia, ib) + ':' + Math.max(ia, ib);
+          let e = pairs.get(key);
+          if (!e) {
+            e = { n: 0, box: [1e9, 1e9, 1e9, -1e9, -1e9, -1e9] };
+            pairs.set(key, e);
+          }
+          e.n++;
+          if (a.pos[4 * i + 3] > 0) {
+            const bb = [a.pos[4 * i], -a.pos[4 * i + 2], a.pos[4 * i + 1]];
+            for (let k = 0; k < 3; k++) {
+              e.box[k] = Math.min(e.box[k], bb[k]);
+              e.box[k + 3] = Math.max(e.box[k + 3], bb[k]);
+            }
+          }
+        }
+        for (const m of mats) m.dispose();
+        posMat.dispose();
+        rt.dispose();
+        prt.dispose();
+        renderer.render(scene, camera);
+        const rows = [];
+        for (const [k, e] of pairs)
+          if (e.n >= minCount) {
+            const [x, y] = k.split(':').map(Number);
+            rows.push({ a: meshName(x), b: meshName(y), n: e.n, box: e.box.map((q2) => +q2.toFixed(2)) });
+          }
+        return rows.sort((p, q2) => q2.n - p.n);
+      }
+
+      // holes to the void: id pass on a small canvas from a grid of walker positions, 8 yaws x 3 pitches; counts id-0 pixels
+      function holeProbe(step = 1.5, w = 480, h = 270) {
+        const keep = renderer.getSize(new THREE.Vector2());
+        renderer.setPixelRatio(1);
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.UnsignedByteType, samples: 0 });
+        const mats = meshes.map(
+          (m, i) =>
+            new THREE.ShaderMaterial({
+              side: THREE.DoubleSide,
+              vertexShader: 'void main(){gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
+              fragmentShader: `void main(){gl_FragColor=vec4(${((i + 1) & 255) / 255},${(((i + 1) >> 8) & 255) / 255},0.0,1.0);}`,
+            }),
+        );
+        const hits = [];
+        let total = 0,
+          views = 0;
+        for (let x = -4.5; x <= 4.51; x += step)
+          for (let y = -3.0; y <= 3.01; y += step)
+            for (let yaw = 0; yaw < 360; yaw += 45)
+              for (const pitch of [-60, 0, 60]) {
+                walker(x, y, yaw, pitch);
+                const saved = meshes.map((m) => [m, m.material, m.visible]);
+                meshes.forEach((m, i) => {
+                  m.material = mats[i];
+                  if (m.userData.__glass) m.visible = false;
+                });
+                const bg = scene.background;
+                scene.background = new THREE.Color(0, 0, 0);
+                const tm = renderer.toneMapping;
+                renderer.toneMapping = THREE.NoToneMapping;
+                renderer.setRenderTarget(rt);
+                renderer.setClearColor(0, 1);
+                renderer.clear();
+                renderer.render(scene, camera);
+                const ids = new Uint8Array(w * h * 4);
+                renderer.readRenderTargetPixels(rt, 0, 0, w, h, ids);
+                renderer.setRenderTarget(null);
+                for (const [m, mat, vis] of saved) {
+                  m.material = mat;
+                  m.visible = vis;
+                }
+                scene.background = bg;
+                renderer.toneMapping = tm;
+                let n = 0;
+                for (let i = 0; i < w * h; i++) if (ids[4 * i] === 0 && ids[4 * i + 1] === 0) n++;
+                views++;
+                total += n;
+                if (n) hits.push([x, y, yaw, pitch, n]);
+              }
+        for (const m of mats) m.dispose();
+        rt.dispose();
+        renderer.setSize(keep.x, keep.y, false);
+        camera.aspect = keep.x / keep.y;
+        camera.updateProjectionMatrix();
+        return { views, total, hits };
+      }
+
+      // bare mirror glass beside the black cloth: pale (s < 0.55, max > 60) pixels of the ornate mirror seen from `eye`
+      function mirrorSliver(eye, target = [-2.5, 3.3, 1.2]) {
+        look(eye, target);
+        frameStats();
+        const { px, w, h } = V._px;
+        const { ids } = passes();
+        let pale = 0,
+          mirror = 0,
+          cloth = 0;
+        for (let i = 0; i < w * h; i++) {
+          const id = ids[4 * i] + 256 * ids[4 * i + 1];
+          if (!id) continue;
+          const mn = meshes[id - 1].material.name;
+          if (mn.includes('black_cloth') && meshes[id - 1].name.includes('dressing')) cloth++;
+          if (!mn.includes('ornate_mirror')) continue;
+          mirror++;
+          const R = px[4 * i],
+            G = px[4 * i + 1],
+            B = px[4 * i + 2];
+          const mx = Math.max(R, G, B),
+            mi = Math.min(R, G, B);
+          if (mx > 60 && (mx - mi) / mx < 0.55) pale++;
+        }
+        renderer.render(scene, camera);
+        return { eye, mirrorPx: mirror, paleMirrorPx: pale, clothPx: cloth };
+      }
+
+      Object.assign(V, {
+        setView,
+        look,
+        atSpawn,
+        walker,
+        frameStats,
+        objectStats,
+        probe,
+        zfight,
+        zfightOrder,
+        holeProbe,
+        mirrorSliver,
+        throughput,
+        save,
+        saveJSON,
+        shoot,
+        dumpGeometry,
+        perf,
+        bench,
+        views: Object.keys(VIEWS),
+        VIEWS,
+        THREE,
+        scene,
+        camera,
+        renderer,
+        meshes,
+        b2t,
+        t2b,
+      });
+
+      // load as the viewer does (load.ts loadUrl: GLTFLoader.load with progress; main.ts enter(): build, add, compileAsync)
+      (async () => {
+        try {
+          const tf = performance.now();
+          let tDownloaded = null;
+          const gltf = await new Promise((resolve, reject) =>
+            loader.load(
+              GLB,
+              resolve,
+              (e) => {
+                if (e.lengthComputable && e.loaded === e.total && tDownloaded === null)
+                  tDownloaded = performance.now();
+              },
+              reject,
+            ),
+          );
+          const tp = performance.now();
+          root = gltf.scene;
+          root.updateMatrixWorld(true);
+          let id = 0;
+          const lights = [],
+            areas = [],
+            spawns = [],
+            portals = [];
+          root.traverse((o) => {
+            if (o.name === 'HM_Collision' || o.name.startsWith('HM_Collision_')) o.visible = false;
+            if (o.name.startsWith('Area_')) areas.push(o);
+            if (o.name.startsWith('Spawn_')) spawns.push(o);
+            if (o.name.startsWith('Portal_'))
+              portals.push({
+                name: o.name,
+                extras: o.userData,
+                pos: t2b(new THREE.Vector3().setFromMatrixPosition(o.matrixWorld)),
+              });
+            if (o.isLight)
+              lights.push({
+                name: o.name,
+                type: o.type,
+                intensity: o.intensity,
+                distance: o.distance,
+                decay: o.decay,
+                color: o.color.toArray(),
+                pos: t2b(new THREE.Vector3().setFromMatrixPosition(o.matrixWorld)),
+              });
+          });
+          root.traverse((o) => {
+            if (o.isMesh) {
+              let hidden = false;
+              for (let p = o; p; p = p.parent) if (p.visible === false) hidden = true;
+              if (hidden) return;
+              o.userData.__id = id++;
+              if (o.material.transparent) o.userData.__glass = true;
+              meshes.push(o);
+            }
+          });
+          area = areas[0];
+          spawn = spawns[0];
+          scene.add(root);
+          scene.background = new THREE.Color(0, 0, 0);
+          scene.fog = null;
+          renderer.toneMappingExposure = +(q.get('exposure') || area.userData.wdi_exposure);
+          atSpawn();
+          const tc0 = performance.now();
+          await renderer.compileAsync(scene, camera);
+          const tc = performance.now();
+          renderer.render(scene, camera);
+          renderer.getContext().finish();
+          const tr = performance.now();
+          const mats = {};
+          let tris = 0,
+            verts = 0;
+          const colorTypes = {};
+          for (const m of meshes) {
+            mats[m.material.type] = (mats[m.material.type] || 0) + 1;
+            const g = m.geometry;
+            verts += g.attributes.position.count;
+            tris += (g.index ? g.index.count : g.attributes.position.count) / 3;
+            const C = g.attributes.color;
+            const k = C ? `${C.array.constructor.name}/${C.itemSize}/${C.normalized}` : 'none';
+            colorTypes[k] = (colorTypes[k] || 0) + 1;
+          }
+          Object.assign(V, {
+            ready: true,
+            area: { name: area.name, extras: area.userData },
+            spawn: spawn.name,
+            spawnsAll: spawns.map((s) => s.name),
+            areasAll: areas.map((a) => a.name),
+            portals,
+            lights,
+            materials: mats,
+            meshCount: meshes.length,
+            tris,
+            verts,
+            colorTypes,
+            exposure: renderer.toneMappingExposure,
+            toneMapping: renderer.toneMapping,
+            outputColorSpace: renderer.outputColorSpace,
+            vertexColors: meshes.filter((m) => m.material.vertexColors).length,
+            transparent: meshes
+              .filter((m) => m.material.transparent)
+              .map((m) => m.name + '/' + m.material.name),
+            noColor: meshes
+              .filter((m) => !m.geometry.attributes.color)
+              .map((m) => m.name + '/' + m.material.name),
+            timings: {
+              page_to_fetch_ms: +(tf - T0).toFixed(0),
+              download_ms: tDownloaded ? +(tDownloaded - tf).toFixed(0) : null,
+              load_parse_decode_ms: +(tp - tf).toFixed(0),
+              compile_ms: +(tc - tc0).toFixed(0),
+              first_frame_ms: +(tr - tc).toFixed(0),
+              total_ms: +(tr - tf).toFixed(0),
+            },
+          });
+          out.textContent = q.has('info') ? JSON.stringify(V.timings) : '';
+        } catch (e) {
+          V.errors.push(String((e && e.stack) || e));
+          out.textContent = 'ERROR ' + e;
+        }
+      })();
+    </script>
+  </body>
+</html>

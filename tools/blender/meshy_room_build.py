@@ -9,8 +9,8 @@ Blender (one Blender at a time on the laptop; --factory-startup is required):
         [--bake-groups] [--save-raw F.npz] [--raw F.npz] [--mix fill=1.3] [--tint fill=#F2EDE4]
         [--layout mapped] [--light last|midway|first] [--sweep "fill=0.5,moon=1.2;fill=0.7"]
 
-`--layout` picks the room's arrangement from its table (ROOMS[...]["layouts"]); the default is the table's own
-(widow_bedroom: `bed_north`, the owner's first-person layout of 2026-11-16, the bed's head against the north wall
+`--layout` picks the room's arrangement from its file (`layouts` in meshy_rooms/<id>.json); the default is the file's
+own (widow_bedroom: `bed_north`, the owner's first-person layout of 2026-11-16, the bed's head against the north wall
 under his photographs; `mapped` is the room as the game's map has it, kept buildable). `--light` picks one of the
 look file's light settings (`settings`: weights on the candle, the moon and the fill; the default is the look's
 own): on a group bake it is a mix of the saved groups, on a single bake it scales the lamps. `--sweep` (with a
@@ -21,8 +21,9 @@ Plain Python with Pillow (no Blender), after a `--preview` run (the Blender run 
     python tools/blender/meshy_room_build.py --scene widow_bedroom [--out DIR] --step plan
 
 The room comes from `packages/content/data/scenes/<id>.json` through `meshy_interior_build.Room` (the grid, props,
-spots, portals, spawns and lights) and the per-room choices in `ROOMS` below (wall colours, door and window, the
-night outside, the first-person placement of every piece, the light, the views). Furniture is the round-3 kit:
+spots, portals, spawns and lights) and the per-room choices in the room's own file, `meshy_rooms/<id>.json`, read by
+`load_room` below (wall colours, door and window, the night outside, the first-person placement of every piece, the
+light, the views). No room's data stands in this script: adding a room adds a file. Furniture is the round-3 kit:
 `meshy_interior_build`'s prop table and Poly Haven piece builders (`ph_master`, `ph_kit`, `assemble`), which import
 `meshy_wild_build` and `meshy_village_build` (neither is edited); here every piece stands at real size against its
 wall, facing into the room. The Meshy blanket chest keeps its own textures.
@@ -97,7 +98,7 @@ ATTR = "wdi_light"          # the baked light: a POINT-domain FLOAT_COLOR attrib
 INK = (0x12, 0x14, 0x1C)    # palette ink: the darkest value of any pixel (never black)
 EYE = 1.6                   # the viewer's eye height (apps/walk/src/config.ts WALK.eyeHeight)
 CAPSULE_R, STEP_H, BODY_H = 0.3, 0.35, 1.75   # WALK.radius, stepHeight, bodyHeight
-VFOV = 70.0                 # RENDER.fov (vertical, degrees)
+VFOV = 70.0                 # RENDER.fov (vertical, degrees); the room files' views carry EYE and VFOV as numbers
 GAP = 0.02                  # a piece stands this far off the wall behind it
 REF_PCT_DEFAULT = 0.5       # the ink floor's reference texel: a material's 0.5th percentile (luminance)
 MESHY_REF_PCT = 0.5         # ... a Meshy texture's too, once its dark tail is eased (the look's ink_lift.meshy_lift)
@@ -107,135 +108,106 @@ DRACO = dict(export_draco_mesh_compression_enable=True, export_draco_mesh_compre
 
 # ---------------------------------------------------------------- the per-room choices
 #
-# Colours are sRGB hex (converted to linear); positions are room metres (x east, y north, z up, the grid's centre on
-# the origin). A piece's `place` is one of: ("wall", side, along) its back GAP off that wall (N, E, S, W), centred at
-# `along` on the wall's axis, or snapped GAP off the named end wall when `along` is a side letter; ("at", x, y) its
-# footprint centred there; ("beside", piece id, side, along) its back GAP off that side of another piece. `face` is
-# the way its front looks (S, E, N, W). `key` names the round-3 prop table entry (meshy_interior_build.PROP_MODELS /
-# SPOT_MODELS); `spec` overrides it for first person (real sizes: the iso tile rule is gone).
-ROOMS: dict[str, dict] = {
-    "widow_bedroom": dict(
-        district="Widow's bedroom",
-        spawn_labels={"door": "By the door"},
-        height=3.0, wall_t=0.30,
-        floor=dict(slug="old_wood_floor", role="wood_floor", zoom=1.55, factor=(0.86, 1.0, 0.78)),
-        wall_colour="#80866E",          # a muted sage drab: never pink or lilac under the candle and the moon
-        ceiling_colour="#D6D0C2",       # lime white
-        paint_colour="#CFC5AD",         # the window's cream paint
-        wood_colour="#45301F",          # the joinery's dark brown mahogany (the scan's grain on this colour)
-        skirting=0.22, picture_rail=2.50, cornice=0.20,
-        door=dict(portal="wb.door", width=0.90, height=2.15, knob="E"),
-        window=dict(prop="wb.draped_window", width=0.90, sill=0.75, head=2.30, panes=(2, 2), rod=2.44,
-                    curtain_colour="#4A5264", swag=True),
-        outside=dict(ground=-3.2, fence_y=9.5, houses=((-15.0, 30.0, 8.0, 6.0, 0.0), (4.0, 36.0, 9.0, 6.5, 0.0),
-                                                         (20.0, 28.0, 7.0, 6.0, 0.0)),
-                     trees=(38.0, 75.0), lit_window=(1, -1.6, 2.2), gain=0.55,
-                     # the village's own Meshy models in place of the boxes and cones: (model, u, d, size, turn)
-                     meshy=dict(houses=(("fisher_cottage", -15.0, 30.0, 8.0, None),
-                                        ("Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, None),
-                                        ("mother_moll_hut", 20.0, 28.0, 6.3, None)),
-                                trees=16, house_lod=0.03, tree_lod=0.04)),
-        moon=dict(azimuth=15.0, elevation=32.0),     # from straight out of the window, toward its wall's +s side
-        exposure=None,                               # None: chosen from the bake (see choose_exposure)
-        # The arrangement. `pieces` and `views` are the room as it is built by default, `bed_north`: the owner's
-        # first-person layout (2026-11-16, "Move it"): the bed's head against the north wall under his photographs,
-        # its foot to the south; wardrobe_body turned in its corner to stand against the east wall (the north wall
-        # free, an aisle beside the bed); the candle stand beside the bed's head, in the nook between the washstand
-        # and the bed; the chest at the bed's foot; the photographs raised as a group over the head board. The 2.5D
-        # game keeps its own map. `layouts` holds the other arrangements as overrides by piece id (a piece's keys
-        # replaced whole) and by view name: `mapped` is the room as the game's map has it (built until 2026-11-15:
-        # the bed free in mid-room, the photographs 1.8 m north of it), kept buildable with --layout mapped.
-        layout="bed_north",
-        pieces=[
-            dict(id="wb.wardrobe", spot=True, key="wardrobe", face="E", place=("wall", "W", "N"),
-                 spec=dict(tall=2.10, kmax=None, lod=0.6)),
-            # its doors shut here: ajar (as in `mapped`) they would cut the 0.86 m aisle beside the bed to 0.65 m
-            dict(id="wb.wardrobe_body", spot=True, key="wb.wardrobe_body", face="W", place=("wall", "E", "N"),
-                 spec=dict(tall=2.10, kmax=None, mirror=False, lod=0.6,
-                           doors={"GothicCabinet_01_door1": 0.0, "GothicCabinet_01_door2": 0.0,
-                                  "GothicCabinet_01_door3": 0.0, "GothicCabinet_01_door4": 0.0})),
-            # the press's open door is the upper one at its south end (door2): door1's leaf, at its north end,
-            # would stand in the mouth of the aisle beside the bed
-            dict(id="wb.linen_press", key="linen_press", face="W", place=("wall", "E", 1.0),
-                 spec=dict(tall=2.10, kmax=None, extras=(), lod=0.6,
-                           doors={"GothicCabinet_01_door1": 0.0, "GothicCabinet_01_door2": 118.0,
-                                  "GothicCabinet_01_door3": 0.0, "GothicCabinet_01_door4": 0.0}),
-                 sheets=True),
-            dict(id="wb.dressing_table", key="dressing_table", face="S", place=("wall", "N", -2.5),
-                 spec=dict(extras=(), lod=0.7), cloth="all", dress_lod={"ornate_mirror_01": 0.25}),
-            dict(id="wb.washstand", key="washstand", face="S", place=("wall", "N", 0.94),
-                 dress_lod={"jug_01": 0.4, "brass_pot_02": 0.6}),
-            dict(id="wb.candle", key="candle", face="S", place=("at", 1.43, 2.78),
-                 spec=dict(scale=1.0, lod=0.5)),
-            # 6 cm west of the photographs' old centre (x 2.5), and they with it: at 2.5 the aisle between the
-            # coverlet and wardrobe_body was 0.80 m to the centimetre
-            dict(id="wb.bed", key="bed", face="S", place=("wall", "N", 2.44), lift=0.22, bedding=True,
-                 spec=dict(lod=0.7)),
-            dict(id="wb.blanket_chest", key="wb.blanket_chest", face="S", place=("beside", "wb.bed", "S", 2.44),
-                 gap=0.07, spec=dict(lod=0.5)),
-            dict(id="wb.rug", key="rug", place=("at", -0.5, -1.0)),
-            # raised 0.28 m: the two small frames clear the head board's crest (1.26 m) by 0.16 m, the three ovals
-            # the head posts' tops (1.68 m) by 0.11 m, the group's top 0.17 m under the picture rail
-            dict(id="wb.photos", key="photos", place=("wall", "N", 2.44), rise=0.28),
-            # the first person's dressing (decor: not in the scene's props; locked Poly Haven models, real size): her
-            # tub armchair on the west wall (at y 0.5 it is whole in the spawn's view and between two tile centres:
-            # at y -1.5 its arm was cut by the frame's corner), a nightstand with the mantel clock in the south-west
-            # corner, a settle on the south wall. Each stands against its wall and leaves part of every walkable
-            # tile open.
-            dict(id="wb.decor.armchair", decor=True, face="E", place=("wall", "W", 0.5),
-                 spec=dict(model="ph", slug="ArmChair_01", scale=1.0, lod=0.4)),
-            dict(id="wb.decor.nightstand", decor=True, face="E", place=("wall", "W", -2.85),
-                 spec=dict(model="ph", slug="ClassicNightstand_01", scale=1.0, lod=0.22,
-                           dress=(dict(slug="mantel_clock_01", scale=1.0, at=(0.0, 0.10, 0.0), lod=0.5),))),
-            dict(id="wb.decor.settle", decor=True, face="N", place=("wall", "S", 1.5),
-                 spec=dict(model="ph", slug="painted_wooden_bench", scale=1.0, lod=0.5)),
-        ],
-        # name -> (eye x, y, z), (target x, y, z), vertical field of view in degrees
-        views={
-            "spawn": ((-2.5, -3.0, EYE), (-2.5, 3.5, 1.25), VFOV),
-            "bed": ((0.55, -0.75, EYE), (2.3, 2.75, 0.95), VFOV),       # the bed, the candle and his photographs
-            "window": ((1.15, -1.55, EYE), (-0.95, 2.05, 0.9), VFOV),
-            "dressing": ((-2.15, 0.95, EYE), (-2.5, 3.5, 1.12), VFOV),
-            "press": ((2.2, -0.9, EYE), (4.4, 1.0, 1.15), VFOV),        # the linen press and the room in front of it
-            "door": ((-2.2, -0.55, EYE), (-2.5, -3.5, 1.1), VFOV),
-            "photos": ((2.44, 0.45, EYE), (2.44, 3.5, 1.55), VFOV),     # from the bed's foot, over the chest
-            "south": ((1.1, 1.7, EYE), (-3.4, -2.6, 0.9), VFOV),
-        },
-        layouts=dict(
-            mapped=dict(
-                pieces={
-                    "wb.wardrobe_body": dict(face="S", place=("wall", "N", "E"),
-                                             spec=dict(tall=2.10, kmax=None, mirror=False, lod=0.6,
-                                                       doors={"GothicCabinet_01_door1": -30.0,
-                                                              "GothicCabinet_01_door2": 22.0,
-                                                              "GothicCabinet_01_door3": 0.0,
-                                                              "GothicCabinet_01_door4": 0.0})),
-                    "wb.linen_press": dict(spec=dict(tall=2.10, kmax=None, extras=(), lod=0.6,
-                                                     doors={"GothicCabinet_01_door1": -118.0,
-                                                            "GothicCabinet_01_door2": 0.0,
-                                                            "GothicCabinet_01_door3": 0.0,
-                                                            "GothicCabinet_01_door4": 0.0})),
-                    "wb.candle": dict(place=("at", 2.12, 2.22)),
-                    "wb.bed": dict(face="E", place=("at", 2.86, 1.0)),
-                    # 12 cm off the bed's side (it stood 2 cm off it, 4.2 cm inside the coverlet's drape)
-                    "wb.blanket_chest": dict(place=("beside", "wb.bed", "S", 2.5), gap=0.12),
-                    "wb.photos": dict(place=("wall", "N", 2.5), rise=0.0),
-                },
-                views={
-                    "bed": ((4.0, -1.75, EYE), (2.25, 1.45, 0.82), VFOV),
-                    "press": ((2.3, 1.98, EYE), (4.3, 2.55, 1.25), VFOV),
-                    "photos": ((2.95, 1.98, EYE), (2.5, 3.5, 1.55), VFOV),
-                    "south": ((1.4, 1.6, EYE), (-3.4, -2.6, 0.9), VFOV),
-                },
-            ),
-        ),
-    ),
-}
+# One file a room: meshy_rooms/<sceneId>.json (JSON: a room's row is plain data, so the checks and the exporter can
+# read it without Blender). Until 2026-11-16 the rows stood here as a table, ROOMS, and every new room changed this
+# script's md5, which every saved bake and every manifest records. Now a room's file has its own md5 (the manifest's
+# `source`) and this script's md5 changes only when shared code does. After such a change
+# `bash tools/blender/room_checks/regress.sh <roomId>` rebuilds a finished room from its saved bake and compares its
+# GLB with the golden value in meshy_rooms/golden.json. (room_checks/rooms/<sceneId>.json is another file, the
+# checks' own numbers for the room: the two are kept apart until a later step merges them.)
+#
+# In a room file colours are sRGB hex (converted to linear); positions are room metres (x east, y north, z up, the
+# grid's centre on the origin). A piece's `place` is one of: ["wall", side, along] its back GAP off that wall (N, E,
+# S, W), centred at `along` on the wall's axis, or snapped GAP off the named end wall when `along` is a side letter;
+# ["at", x, y] its footprint centred there; ["beside", piece id, side, along] its back GAP off that side of another
+# piece. `face` is the way its front looks (S, E, N, W). `key` names the round-3 prop table entry
+# (meshy_interior_build.PROP_MODELS / SPOT_MODELS); `spec` overrides it for first person (real sizes: the iso tile
+# rule is gone; null removes a key). A view is [eye x, y, z], [target x, y, z], the vertical field of view in
+# degrees (the viewer's EYE and VFOV as numbers). `layout` names the arrangement that `pieces` and `views` hold;
+# `layouts` holds the others as overrides by piece id and by view name (apply_layout). A key named `note`, or
+# `<key>_note` beside `<key>`, is a comment: it never reaches the builder.
+ROOMS_DIR = os.path.join(HERE, "meshy_rooms")
+ROOM_KEYS = ("district", "spawn_labels", "height", "wall_t", "floor", "wall_colour", "ceiling_colour", "paint_colour",
+             "wood_colour", "skirting", "picture_rail", "cornice", "door", "window", "outside", "moon", "pieces",
+             "views")       # what the builder reads without a default
+
+
+def room_path(scene_id: str) -> str:
+    return os.path.join(ROOMS_DIR, f"{scene_id}.json")
+
+
+def from_root(path: str) -> str:
+    """A path as a message and the manifest give it: from the repo root, with forward slashes."""
+    try:
+        path = os.path.relpath(path, ROOT)
+    except ValueError:      # another drive
+        pass
+    return path.replace("\\", "/")
+
+
+def is_note(key: str, obj: dict) -> bool:
+    """A comment in a room file: a key named `note`, or `<key>_note` beside `<key>` in the same object."""
+    return key == "note" or (key.endswith("_note") and key[:-5] in obj)
+
+
+def _room_object(pairs: list) -> dict:
+    """A JSON object of a room file. A key that stands twice stops the load: JSON would keep the last one and say
+    nothing."""
+    out = {}
+    for k, v in pairs:
+        if k in out:
+            raise ValueError(f'the key "{k}" stands twice in one object')
+        out[k] = v
+    return out
+
+
+def _room_value(x, where: str):
+    """A room file's value as the builder uses it: every note dropped, an array a tuple (as the table had them)."""
+    if isinstance(x, dict):
+        out = {}
+        for k, v in x.items():
+            if is_note(k, x):
+                if not isinstance(v, str):
+                    raise SystemExit(f"meshy_room_build: {where}: `{k}` is a comment and must be text")
+                continue
+            out[k] = _room_value(v, where)
+        return out
+    if isinstance(x, list):
+        return tuple(_room_value(v, where) for v in x)
+    return x
+
+
+def load_room(scene_id: str) -> dict:
+    """The per-room choices of `scene_id` from its file, as the table's row was: the file's own `room` and `about`
+    and every note left out, arrays as tuples, `pieces` a list. Stops with a plain message when the file is missing,
+    is not JSON, gives a key twice, names another room or lacks a key the builder reads."""
+    path = room_path(scene_id)
+    shown = from_root(path)
+    if not os.path.isfile(path):
+        raise SystemExit(f"meshy_room_build: no room file for {scene_id}: {shown} is missing (each first-person room "
+                         f"has its own file in {os.path.dirname(shown)}/)")
+    with open(path, encoding="utf-8") as fh:
+        try:
+            data = json.load(fh, object_pairs_hook=_room_object)
+        except ValueError as err:
+            raise SystemExit(f"meshy_room_build: {shown} cannot be read: {err}")
+    if not isinstance(data, dict) or data.get("room") != scene_id:
+        named = data.get("room") if isinstance(data, dict) else None
+        raise SystemExit(f"meshy_room_build: {shown} is not {scene_id}'s room file: its `room` is {named!r}")
+    row = _room_value(data, shown)
+    del row["room"]
+    row.pop("about", None)
+    missing = [k for k in ROOM_KEYS if k not in row]
+    if missing:
+        raise SystemExit(f"meshy_room_build: {shown} lacks {', '.join(missing)}")
+    row["pieces"] = list(row["pieces"])
+    return row
 
 
 def apply_layout(cfg: dict, name: str | None) -> str:
-    """Make `cfg` (a copy of a ROOMS row) the named arrangement: the table's own when `name` is None or its
-    `layout`; otherwise that layout's piece overrides (a piece's keys replaced whole) and views. Returns the name."""
+    """Make `cfg` (a copy of a room's row, load_room) the named arrangement: the file's own when `name` is None or
+    its `layout`; otherwise that layout's piece overrides (a piece's keys replaced whole) and views. Returns the
+    name."""
     own = cfg.get("layout", "default")
     name = name or own
     cfg["pieces"] = [dict(p) for p in cfg["pieces"]]
@@ -243,12 +215,12 @@ def apply_layout(cfg: dict, name: str | None) -> str:
     if name != own:
         lay = (cfg.get("layouts") or {}).get(name)
         if lay is None:
-            raise SystemExit(f"meshy_room_build: no layout {name!r} (the table has {own!r} and "
+            raise SystemExit(f"meshy_room_build: no layout {name!r} (the room file has {own!r} and "
                              f"{sorted(cfg.get('layouts') or {})})")
         ids = {p["id"] for p in cfg["pieces"]}
         for pid in lay.get("pieces", {}):
             if pid not in ids:
-                raise SystemExit(f"meshy_room_build: layout {name!r} names a piece the table has not: {pid}")
+                raise SystemExit(f"meshy_room_build: layout {name!r} names a piece the room file has not: {pid}")
         for p in cfg["pieces"]:
             p.update(lay.get("pieces", {}).get(p["id"], {}))
         cfg["views"].update(lay.get("views", {}))
@@ -283,6 +255,20 @@ def bake_look_md5(look: dict) -> str:
     part = {k: v for k, v in look.items() if k not in BAKE_LOOK_DROP}
     if isinstance(part.get("ao"), dict):
         part["ao"] = {k: part["ao"].get(k) for k in ("distance_m", "samples")}
+    return hashlib.md5(json.dumps(part, sort_keys=True).encode()).hexdigest()
+
+
+BAKE_ROOM_DROP = ("district", "spawn_labels", "views", "layout", "layouts", "exposure")
+
+
+def bake_room_md5(cfg: dict) -> str:
+    """The md5 of a room's bake-relevant part: its row with the layout applied (apply_layout; before the look's
+    defaults are merged into it), without the labels, the stills' views, the exposure override, the layout's name
+    (recorded and compared apart) and the table of the other layouts. It is taken from the data, not from the file:
+    a note, a view or a layout that is not built can change, and the file can be laid out anew, while a saved bake
+    and the build made from it still agree on it."""
+    import hashlib
+    part = {k: v for k, v in cfg.items() if k not in BAKE_ROOM_DROP}
     return hashlib.md5(json.dumps(part, sort_keys=True).encode()).hexdigest()
 
 
@@ -2110,7 +2096,7 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
 
 
 def build_furniture(fr: Frame, mt: dict) -> dict:
-    """Every piece of the room's table, at real size, against its wall; returns the light anchors (the flame)."""
+    """Every piece of the room's file, at real size, against its wall; returns the light anchors (the flame)."""
     anchors = {}
     for piece in CFG["pieces"]:
         pid = piece["id"]
@@ -2145,7 +2131,7 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
 
 
 def build_cabinet(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
-    """A GothicCabinet press at its real height (`tall`), its doors as the table says (shut, ajar, open), the folded
+    """A GothicCabinet press at its real height (`tall`), its doors as the room file says (shut, ajar, open), the folded
     linen on the upper shelf where the piece asks for it."""
     slug = spec["slug"]
     m0 = mib.ph_master(slug, {d: 0.0 for d in mib.CABINET_DOORS})
@@ -3549,7 +3535,8 @@ RAW_META: dict = {}         # a loaded raw bake's own samples, seconds and file 
 def save_raw(path: str, objs: list, groups: dict, samples: int = 0, seconds: float = 0.0,
              meta: dict | None = None) -> None:
     """The raw bake: each mesh's light per vertex and per group (and its AO), with what made it (`meta`: the
-    script's, the look's and the kit's md5, the layout), so a later --raw run can show it came from the same code."""
+    script's, the room file's, the look's and the kit's md5, the layout), so a later --raw run can show it came from
+    the same code and the same room data."""
     arrs = {"meta|samples": np.array(int(samples)), "meta|bakeSeconds": np.array(float(seconds)),
             "meta|baked": np.array(time.strftime("%Y-%m-%d %H:%M:%S"))}
     for k_, v_ in (meta or {}).items():
@@ -4873,14 +4860,19 @@ def blender_main(a) -> None:
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
     room = mib.Room(a.scene)
-    if room.id not in ROOMS:
-        raise SystemExit(f"meshy_room_build: no first-person table for {room.id} (ROOMS)")
-    CFG = dict(ROOMS[room.id])
+    row = load_room(room.id)
+    CFG = dict(row)
     layout = apply_layout(CFG, a.layout)
     with open(FP_LOOK, encoding="utf-8") as fh:
         look = json.load(fh)
+    # What made the outputs, each input by its own md5: this script (the shared code: no room's data stands in it,
+    # so adding a room does not change it), the room's own file, the look file and the kit. scriptMd5, roomMd5,
+    # lookMd5 and kitMd5 are the files as saved; roomBakeMd5 and lookBakeMd5 are taken from the data that reaches
+    # the bake (bake_room_md5, bake_look_md5)
     src = dict(script=os.path.relpath(os.path.abspath(__file__), ROOT).replace("\\", "/"),
                scriptMd5=file_md5(os.path.abspath(__file__)),
+               room=from_root(room_path(room.id)), roomMd5=file_md5(room_path(room.id)),
+               roomBakeMd5=bake_room_md5(CFG),
                look=os.path.relpath(FP_LOOK, ROOT).replace("\\", "/"), lookMd5=file_md5(FP_LOOK),
                lookBakeMd5=bake_look_md5(look),
                kit="tools/blender/meshy_interior_build.py", kitMd5=file_md5(os.path.join(HERE, "meshy_interior_build.py")),
@@ -4963,21 +4955,38 @@ def blender_main(a) -> None:
     outside_names = {r["obj"].name for r in OBJS if r["what"] == "outside"}
     bake_s = 0.0
     groups = None
-    bake_meta = dict(scriptMd5=src["scriptMd5"], lookMd5=src["lookMd5"], lookBakeMd5=src["lookBakeMd5"],
-                     kitMd5=src["kitMd5"], layout=layout)
+    bake_meta = dict(scriptMd5=src["scriptMd5"], roomMd5=src["roomMd5"], roomBakeMd5=src["roomBakeMd5"],
+                     lookMd5=src["lookMd5"], lookBakeMd5=src["lookBakeMd5"], kitMd5=src["kitMd5"], layout=layout)
     if a.raw:
         groups = load_raw(a.raw, targets)
         log(f"the raw bake from {a.raw} (no bake)", json.dumps(RAW_META))
-        # does the saved bake come from this script, kit, layout and bake-relevant look? (the post step's keys and
-        # the light settings are tuned on a saved bake, so the whole look file's md5 may differ)
+        # rawAgrees: does the saved bake come from this run's code and data? Each answer compares what the bake
+        # recorded when it was saved (save_raw's meta) with this run's `source`:
+        #   script     this script's md5. No room's data stands in the script, so adding or editing a room leaves it
+        #              alone; it changes with any shared code, the post step included, which is tuned on a saved bake
+        #              (the bedroom's READY build of 2026-11-16 says false here for that reason);
+        #   kit        meshy_interior_build.py's md5;
+        #   layout     the arrangement's name;
+        #   lookBake   the look file's bake-relevant part (bake_look_md5);
+        #   roomBake   the room file's bake-relevant part with the layout applied (bake_room_md5);
+        #   lookWhole, roomWhole   the two files as saved, for the record: a --raw run tunes the rest of both (the
+        #              light settings, the ink floor, the views) on a saved bake, so these may differ.
+        # A bake saved before the rooms had files records no room md5 (the room's row was part of the script then,
+        # and `script` covered it): roomBake and roomWhole are null for it, not known, and the note below is written.
+        # None of the answers proves the geometry: load_raw has compared every mesh's vertices with the bake's own
+        # by then, and room_checks/regress.sh compares the whole GLB with its golden md5.
+        def room_agrees(key: str):
+            return None if RAW_META.get(key) is None else RAW_META.get(key) == src[key]
+
         same = dict(script=RAW_META.get("scriptMd5") == src["scriptMd5"], kit=RAW_META.get("kitMd5") == src["kitMd5"],
                     layout=RAW_META.get("layout") == layout, lookBake=RAW_META.get("lookBakeMd5") == src["lookBakeMd5"],
-                    lookWhole=RAW_META.get("lookMd5") == src["lookMd5"])
+                    lookWhole=RAW_META.get("lookMd5") == src["lookMd5"], roomBake=room_agrees("roomBakeMd5"),
+                    roomWhole=room_agrees("roomMd5"))
         src["rawAgrees"] = same
         log("the raw bake agrees with this build on", json.dumps(same))
-        if not all(v for k_, v in same.items() if k_ != "lookWhole"):
-            NOTES.append(f"the raw bake {RAW_META.get('file')} was made by other code or another layout than this "
-                         f"run's: {json.dumps(same)}")
+        if not all(v for k_, v in same.items() if k_ not in ("lookWhole", "roomWhole")):
+            NOTES.append(f"the raw bake {RAW_META.get('file')} was made by other code, other room data or another "
+                         f"layout than this run's: {json.dumps(same)}")
     elif a.no_bake:
         quick_light(targets, flame, moon, win)
     elif a.bake_groups:
@@ -5125,10 +5134,10 @@ def blender_main(a) -> None:
     manifest = dict(
         version=1, scene=room.id, name=CFG["district"], built=time.strftime("%Y-%m-%d %H:%M:%S"),
         script="tools/blender/meshy_room_build.py",
-        # what made these outputs: the script, the look file and the kit by md5, the layout, the arguments, and
-        # (with --raw) the saved bake with the md5s of the code that baked it
+        # what made these outputs: the script, the room's file, the look file and the kit by md5, the layout, the
+        # arguments, and (with --raw) the saved bake with the md5s of the code and the data that baked it
         source=src, layout=layout,
-        layouts=dict(default=ROOMS[room.id].get("layout"), others=sorted(ROOMS[room.id].get("layouts") or {})),
+        layouts=dict(default=row.get("layout"), others=sorted(row.get("layouts") or {})),
         light=dict(setting=ex.get("light"), weights=ex.get("weights"), numbers=ex.get("lightNumbers"),
                    settings=sets, note="numbers: meshy_room_build.light_numbers (display luminance 0..255)"),
         spots=spots, pillows=list(PILLOW_STATS),
@@ -5200,7 +5209,7 @@ def parse(argv: list[str]):
     p.add_argument("--raw", help="use a saved raw bake (.npz from --save-raw on the same build) instead of baking")
     p.add_argument("--mix", help="weights for a group bake, e.g. fill=2,candle=1 (relative to the look's powers)")
     p.add_argument("--tint", help="colours for a group bake's groups, e.g. fill=#F0EEE8 (over the look's own colour)")
-    p.add_argument("--layout", help="the room's arrangement (its table's `layouts`; default: the table's own)")
+    p.add_argument("--layout", help="the room's arrangement (its file's `layouts`; default: the file's own)")
     p.add_argument("--light", help="one of the look file's light settings (default: the look's own)")
     p.add_argument("--sweep", help="print the light numbers of these mixes of a group bake and write nothing: "
                                    "'fill=0.5,moon=1.2;fill=0.7' (weights on the look's own powers)")

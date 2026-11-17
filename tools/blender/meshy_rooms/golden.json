@@ -1,0 +1,17 @@
+{
+  "about": "The golden values of the room regression gate (tools/blender/room_checks/regress.sh; not a room file). One row for each finished first-person room: the md5 of the GLB that meshy_room_build.py makes from the room's saved bake, the light setting and the layout it is built with, its counts, the saved bake it is rebuilt from and the day the row was written. A change to shared builder code must leave every row as it is. A room gets its row when it has passed its checks, and the row is replaced only when the room itself is changed on purpose and checked again: tools/blender/room_checks/regress.py record writes it from the build.",
+  "rooms": {
+    "widow_bedroom": {
+      "glbMd5": "b78a247a31446d8db2f8a1c91fa94aa6",
+      "glbBytes": 3664892,
+      "light": "midway",
+      "layout": "bed_north",
+      "vertices": 287457,
+      "triangles": 389157,
+      "raw": "widow_bedroom_raw_groups.npz",
+      "rawMd5": "8f212f7d41c9308df71a94ce519afabb",
+      "recorded": "2026-11-16",
+      "note": "The build judged READY by the independent check of 2026-11-16."
+    }
+  }
+}

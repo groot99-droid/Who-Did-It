@@ -1,0 +1,110 @@
+{
+  "room": "widow_bedroom",
+  "about": "The widow's bedroom as the room checks know it (tools/blender/room_checks): the numbers that stood in the scripts while this was the only room. Metres in the room's frame: x east, y north, z up, the floor's centre on the origin. A later step reads them from the builder's manifest and the scene instead.",
+  "ceiling_m": 3.0,
+  "door": {
+    "wall": "S",
+    "width_m": 0.9,
+    "height_m": 2.15,
+    "note": "cc_geom.py: the joinery's opening, held to 3 cm. The door is the scene's first portal; the scan is written for a door in the south wall."
+  },
+  "window": {
+    "wall": "N",
+    "search": {
+      "x": [-1.6, 0.6],
+      "z": [0.3, 2.8],
+      "note": "cc_geom.py looks for the wall's cut in this part of the wall. The scan is written for a window in the north wall."
+    },
+    "cracks": {
+      "x": [-1.15, 0.15],
+      "z": [0.55, 2.5],
+      "eyes": [
+        [-0.5, 2.5, 1.6],
+        [-2.0, 1.5, 1.2],
+        [1.0, 1.2, 2.2]
+      ],
+      "note": "cc_cracks.py's dense scan through the window: the span it covers, and its eye points as x, metres back from the window wall's inner face, z."
+    }
+  },
+  "lights": {
+    "exported": 2,
+    "note": "cc_struct.py: the candle and the moon. The scene's third light is the day and dusk window light, which a night room does not export."
+  },
+  "glb_bytes": { "min": 2000000, "max": 4000000 },
+  "no_color0": ["wb.candle:flame", "moon_disc", "lit_window", "wb.draped_window:glass"],
+  "no_color0_note": "cc_struct.py: the wdi_id of every primitive that carries no baked light on purpose (the flame, the moon disc, the lit window outside, the glass). The collision mesh never carries one.",
+  "banned_words": ["crepe", "crape", "georgette", "torch", "rope", "gallows", "noose", "sconce"],
+  "banned_words_note": "r7_extra.py: no name or extra in the GLB may hold one of these, in any letter case (the owner's look rules: no crepe, torch pair, oak rope or gallows).",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "58 of the map's 62 walkable tiles can be stood on. (8,1) and (8,2) lie under the bed, (10,2) is the 0.18 m gap between the two cabinets, (7,1) is the strip beside the bed's head. The layout's own doing (bed_north, the owner's layout of 2026-11-16); severity 1 in the independent check of that day."
+    },
+    {
+      "check": "r7_extra:every_spot_and_prop_can_be_walked_up_to",
+      "why": "The photographs hang over the bed's head, 0.57 m from the nearest standing point (the limit is 0.55 m). Severity 1 in the same check."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails.",
+  "browser": {
+    "sweep_points": [
+      [-4.4, -2.0],
+      [-4.4, -0.9],
+      [-4.4, 1.3],
+      [-3.3, -3.1],
+      [-3.3, -2.0],
+      [-3.3, -0.9],
+      [-3.3, 0.2],
+      [-3.3, 1.3],
+      [-3.3, 2.4],
+      [-2.2, -3.1],
+      [-2.2, -2.0],
+      [-2.2, -0.9],
+      [-2.2, 0.2],
+      [-2.2, 1.3],
+      [-2.2, 2.4],
+      [-1.1, -3.1],
+      [-1.1, -2.0],
+      [-1.1, -0.9],
+      [-1.1, 0.2],
+      [-1.1, 1.3],
+      [-1.1, 2.4],
+      [0.0, -3.1],
+      [0.0, -2.0],
+      [0.0, -0.9],
+      [0.0, 0.2],
+      [0.0, 1.3],
+      [0.0, 2.4],
+      [1.1, -2.0],
+      [1.1, -0.9],
+      [1.1, 0.2],
+      [1.1, 1.3],
+      [1.1, 2.4],
+      [2.2, -2.0],
+      [2.2, -0.9],
+      [2.2, 0.2],
+      [3.3, -3.1],
+      [3.3, -2.0],
+      [3.3, -0.9],
+      [3.3, 0.2],
+      [3.3, 1.3],
+      [4.4, -3.1],
+      [4.4, -2.0],
+      [4.4, -0.9],
+      [-2.5, -3.0],
+      [-2.5, -3.15],
+      [-3.75, 3.2],
+      [3.8, 3.2],
+      [-0.5, 3.2],
+      [2.44, 0.55],
+      [3.62, 1.7],
+      [3.6, 3.0],
+      [1.3, 1.9],
+      [3.0, 0.5],
+      [4.6, -3.1],
+      [0.5, -3.15],
+      [-1.2, 2.4]
+    ],
+    "note": "The 56 standing points (x, y; the eye 1.6 m up) of the frame sweep in the independent check of 2026-11-16: browser/r10_viewer.js sweep on browser/fp_look.html, 8 headings and 3 pitches from each."
+  }
+}
