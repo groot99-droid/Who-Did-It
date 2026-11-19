@@ -7,7 +7,7 @@ owner uploads by hand (round 11, H1; `docs/ASSETS.md` 6.12). This folder pins th
 
 - `schema` 1. `repo` names the repository whose releases hold the zips.
 - `sources` gives `{licence, basis}` per source. `basis` names the DECISIONS row: A17 for Higgsfield, A616 Q1 for
-  Meshy.
+  Meshy (CC0-1.0, the owner's answer of 2026-11-19).
 - `releases` gives each zip's `{asset, sha256, size}`, keyed by tag.
 - `models` has one row per GLB, with `id`, `kind`, `path`, `source`, `release`, `sha256` and `size`.
   - `id` is unique: the character id, or the file name of a prop or item. A second copy is `<id>_alt` with
