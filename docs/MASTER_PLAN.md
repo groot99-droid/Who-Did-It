@@ -1,5 +1,7 @@
 # Who Did It — Master Plan (V1 top-down 2.5D, V2 first-person)
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-10. Current state: the living documents it seeded (`docs/GDD.md`, `WORLD.md`, `ARCHITECTURE.md`, `ASSETS.md`, `ROADMAP.md`, `DECISIONS.md`) have moved on round by round since; V1 is isometric (A49) and the quick mode is gone (A115). Superseded by `docs/README.md` and the documents it indexes; `docs/ROADMAP.md` 7.0 gives each milestone's status.
+
 Status: v0.1 master plan, committed 2026-10-10 for owner review. The working documents under `docs/` (`GDD.md`, `WORLD.md`, `ARCHITECTURE.md`, `ASSETS.md`, `ROADMAP.md`, `DECISIONS.md`, `RESEARCH.md`) are generated from this file; once the owner answers the open questions in `DECISIONS.md` the working documents become the source of truth and this file stays as the frozen snapshot. `GDD.md` and `packages/content/data/balance.json` are the only sources of numbers; every other document references them.
 
 Amendments since v0.1 (the hat trait approved, masters on the owner's laptop, the One Night Ultimate Baguette quick mode, the ROSW repo connection, Phaser 4.2.1, Render Free then Railway, the full loop before the quick mode) are logged in `docs/DECISIONS.md` under Amendments and applied to the working documents. This snapshot is not edited.

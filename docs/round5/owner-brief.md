@@ -1,5 +1,7 @@
 # Round 5: the owner's brief and ONUB spec (2026-10-17, verbatim)
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-17. Current state: round 5 built it (`docs/round5/README.md`); the ONUB spec was removed with the quick mode in round 7 (A115).
+
 The owner's request that started round 5, and the One Night Ultimate Baguette text the owner attached, quoted
 word for word. The decisions taken on them are DECISIONS A49 (the owner's answers) and A50 (the round-5
 contract); the rules are `docs/GDD.md`. The 13 room images the owner attached are listed in `art-index.md`

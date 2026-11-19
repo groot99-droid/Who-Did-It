@@ -1,5 +1,7 @@
 # Map revamp: the interiors plan
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-11-12 (amended to 2026-11-16). Current state: the woods, mine and outskirts it lists as in progress merged with #539; the owner then gave every enterable building an interior (A612), made the game two modes (A613) and each room its own GLB (A614), which drops this plan's single-file delivery. The decisions are DECISIONS A611 to A614; the GLB contract is `apps/walk/README.md`.
+
 Written 2026-11-12 by the orchestrator (session "Story mode", `session_01M5mAcY1JPqjhPmoZ8CZDFp`) for the owner and the
 local "Blender tools setup" session, which build the interiors together. It restates no rule or number: rules live in
 `docs/GDD.md`, frozen ids in `docs/WORLD.md` 4.3, and the pipeline in `tools/blender/README.md`.
