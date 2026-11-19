@@ -228,6 +228,8 @@ Black crepe on the manor door; stopped clock at 11:47; tide chart with the next 
 
 Keep every scene, portal, spawn and clue id; 1 tile = 1 m. Manor floors and the cellar become real volumes while `zoneId` keeps their visibility and Ledger scope; cottages, tavern, chapel and barn stay portal-loaded. One-way drops become ledges, the hollow log a crouch tunnel, the tide a water volume. Baked sprites are discarded for the original Blender meshes.
 
+V2 began on 2026-11-13 as `apps/walk`, a single-player first-person walk through a 3D HollowMere built from the owner's Meshy models (DECISIONS A610). The 3D view's scale, its rooms (one GLB each, A614) and its portals are set in `tools/blender/README.md`, `apps/walk/README.md` and `docs/map-revamp/interiors-plan.md`; its scene, portal and spawn ids are this section's.
+
 ### 4.10 Blackpine
 
 **BlackPine** is the Harrow Timber & Coal Syndicate's camp in the pine valley above HollowMere, the same December of 1893 (`docs/round8/canon.md`, A201). It was Vane's timber-and-tin camp until the tin ran out; Harrow bought it and found coal under the old workings. The deed is Harrow's and the name on the mill is still Vane's. Log bunkhouses and a water-driven sawmill stand at the foot of the hill the old tin workings run into, and the motto over the camp reads PRODUCTION IS OBLIGATION.
