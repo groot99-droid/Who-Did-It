@@ -3,9 +3,13 @@ name: CI
 on:
   push:
   pull_request:
+  # The `blender` job's nightly run (round 11, T1). The other jobs skip the schedule.
+  schedule:
+    - cron: '17 3 * * *'
 
 jobs:
   check:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -38,6 +42,7 @@ jobs:
           true
 
   server:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -118,3 +123,40 @@ jobs:
             apps/walk/test-results
           if-no-files-found: ignore
           retention-days: 7
+
+  # The tests that need the `bpy` wheel (tools/blender/tests/bpy: the rig opens, a GLB imports, an isometric frame
+  # has its size and alpha, two runs write the same bytes; round 11 T1) on a pull request that touches
+  # tools/blender/ or this workflow, and nightly. Not required at first: it is its own job, nothing else needs it.
+  blender:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'schedule'
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          lfs: false
+      - name: Paths
+        id: paths
+        shell: bash
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git fetch --depth=1 origin "$BASE_SHA"
+          if git diff --name-only "$BASE_SHA" HEAD | grep -qE '^(tools/blender/|\.github/workflows/ci\.yml$)'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Nothing under tools/blender changed; the job reports green without running." | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Set up bpy
+        if: steps.paths.outputs.run == 'true'
+        run: bash tools/blender/setup.sh
+      - name: bpy tests
+        if: steps.paths.outputs.run == 'true'
+        env:
+          EGL_PLATFORM: surfaceless
+        run: tools/blender/.venv/bin/python -m unittest discover -s tools/blender/tests/bpy -v
