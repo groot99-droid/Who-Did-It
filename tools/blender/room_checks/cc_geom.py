@@ -11,10 +11,17 @@ Frames: Blender room metres (x east, y north, z up) = glTF (x, -z, y); the area'
 The viewer's walker (apps/walk/src/physics on origin/claude/v2-walk): feet on the ground; a capsule of radius 0.30 whose
 axis runs from 0.65 to 1.45 m above the feet (stepHeight + radius .. bodyHeight - radius); five ground rays (centre and
 +-0.21 m) from 0.35 m above the feet, 0.70 m down (stepHeight + snapDown); push-out from HM_Collision_room_<id> only.
-The room file gives the ceiling's height, the door's size and wall, and the window's wall and the part of it searched
-for the cut. Still the bedroom's own in this script: the first spawn and the first portal only, the door in the south
-wall and the window in the north wall (`roomcfg.need_walls` stops any other room file), shell boxes wider than 9 m as
-the floor and ceiling, the origins of the wall rays (inside a 10 x 7 m room), the curtains and the swag as one piece.
+The room's check file (rooms/<roomId>.json) gives the ceiling's height, the door's size and wall, and the window's wall
+and the part of it searched for the cut. Still the bedroom's own in this script:
+  the first spawn and the first portal only;
+  the door in the south wall and the window in the north wall (`roomcfg.need_walls` stops any other check file);
+  the door's scans, sized for its 0.9 x 2.15 m door in a 0.30 m wall: the wall's cut searched 0.8 m either side of the
+  door's centre and up to 2.6 m, the leaf 0.6 m either side and up to 2.4 m, the joinery taken from the door's
+  vertices within the wall's 0.30 m, the strip across the head 2.0 to 2.2 m up and 0.43 m either side;
+  the window's strips at its sill and its head, 0.6 to 0.9 m and 2.2 to 2.4 m up;
+  the ids lit_window and moon_disc counted as outside;
+  shell boxes wider than 9 m as the floor and ceiling, the origins of the wall rays (inside a 10 x 7 m room), the
+  curtains and the swag as one piece.
 --quick is a coarse run (10 cm cells, 12 fan points, 24 eyes); walls_closed_collision_fans wants 20 fan points, so a
 quick run always fails it.
 Writes <out>/cc_geom.json, cc_reach.png, cc_grid.npz, cc_vertices.npz. cc_cracks.py and r7_extra.py run this file's

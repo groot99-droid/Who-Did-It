@@ -1,9 +1,12 @@
-"""Tests of the first-person rooms' own files (meshy_rooms/<sceneId>.json) and of the regression gate's golden values
-(meshy_rooms/golden.json). The files are read with the standard library alone; the builder's loader needs numpy
-(meshy_room_build.py imports it), so its tests are skipped where numpy is missing."""
+"""Tests of the first-person rooms' own files (meshy_rooms/<sceneId>.json) and of the regression gate: its golden values
+(meshy_rooms/golden.json) and the steps of room_checks/regress.py that run without Blender, on stand-in files. The
+files are read with the standard library alone; the builder's loader needs numpy (meshy_room_build.py imports it), so
+its tests are skipped where numpy is missing."""
 
+import hashlib
 import json
 import os
+import struct
 import subprocess
 import sys
 import tempfile
@@ -12,7 +15,12 @@ import unittest
 BLENDER = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 ROOMS_DIR = os.path.join(BLENDER, "meshy_rooms")
 SCENES_DIR = os.path.normpath(os.path.join(BLENDER, "..", "..", "packages", "content", "data", "scenes"))
+REGRESS = os.path.join(BLENDER, "room_checks", "regress.py")
+BUILT = os.path.join(BLENDER, "build", "rooms")             # the finished rooms' builds: local files, git-ignored
 sys.path.insert(0, BLENDER)
+sys.path.insert(0, os.path.join(BLENDER, "room_checks"))
+import regress  # noqa: E402  (standard library only)
+
 try:
     import meshy_room_build as mrb  # noqa: E402
 except ImportError:  # no numpy here: the files are still checked
@@ -42,6 +50,22 @@ def walk(x, where=""):
     elif isinstance(x, (list, tuple)):
         for i, v in enumerate(x):
             yield from walk(v, f"{where}[{i}]")
+
+
+def md5_of(path):
+    with open(path, "rb") as fh:
+        return hashlib.md5(fh.read()).hexdigest()
+
+
+def tiny_glb(path, generator=None, extra=None, indent=None):
+    """A GLB with a JSON chunk only: what regress.py reads of a rebuild, without Blender. `indent` writes the same
+    JSON with other bytes."""
+    asset = {"version": "2.0"} if generator is None else {"version": "2.0", "generator": generator}
+    j = json.dumps({"asset": asset, "extras": extra}, indent=indent).encode()
+    j += b" " * (-len(j) % 4)
+    with open(path, "wb") as fh:
+        fh.write(b"glTF" + struct.pack("<II", 2, 20 + len(j)) + struct.pack("<I4s", len(j), b"JSON") + j)
+    return path
 
 
 class RoomFiles(unittest.TestCase):
@@ -86,6 +110,18 @@ class Golden(unittest.TestCase):
             self.assertIn(row["layout"], {data.get("layout", "default"), *(data.get("layouts") or {})})
             if "rawMd5" in row:
                 self.assertRegex(row["rawMd5"], r"^[0-9a-f]{32}$")
+            self.assertRegex(row["generator"], r"^Khronos glTF Blender I/O v\d+\.\d+\.\d+$", f"{rid}: generator")
+
+    def test_a_row_names_the_writer_of_its_glb_where_the_build_is_here(self):
+        """Where a room's finished build is on this machine (never on CI), the row's generator is its GLB's own."""
+        here = 0
+        for rid, row in read("golden.json")["rooms"].items():
+            glb = os.path.join(BUILT, rid + ".glb")
+            if os.path.isfile(glb) and md5_of(glb) == row["glbMd5"]:
+                here += 1
+                self.assertEqual(regress.generator(glb), row["generator"], rid)
+        if not here:
+            self.skipTest("no finished room's build is on this machine")
 
 
 class GatePlan(unittest.TestCase):
@@ -117,6 +153,134 @@ class GatePlan(unittest.TestCase):
             self.assertEqual(len(done.stdout.splitlines()), 6, done.stdout)
         else:
             self.assertEqual(done.stdout, "")
+
+    def test_a_row_that_does_not_name_its_writer_is_refused(self):
+        gold = read("golden.json")
+        del gold["rooms"]["widow_bedroom"]["generator"]
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "golden.json")
+            with open(path, "w", encoding="utf-8") as fh:
+                json.dump(gold, fh)
+            done = subprocess.run([sys.executable, REGRESS, "plan", "widow_bedroom", "--golden", path],
+                                  capture_output=True, text=True)
+        self.assertEqual(done.returncode, 2, done.stderr)
+        self.assertIn("lacks generator", done.stderr)
+
+
+class GateWriter(unittest.TestCase):
+    """The golden row names the program that wrote its GLB (`generator`, the GLB's asset.generator): `regress.py
+    record` writes it, and the verdict on a rebuild that another Blender build wrote says so before anything else, as
+    that md5 cannot match. On stand-in files, no Blender; the room id is no room of the repo, so no golden GLB of it is
+    on this machine to compare part by part."""
+
+    ROOM = "test_room"
+    OURS, NEWER = "Khronos glTF Blender I/O v5.2.40", "Khronos glTF Blender I/O v5.3.1"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.dir = self.tmp.name
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def regress(self, *args):
+        return subprocess.run([sys.executable, REGRESS, *args], capture_output=True, text=True)
+
+    def build(self, name, generator, extra=None):
+        """A stand-in build in the folder `name`: the GLB and the manifest regress.py reads."""
+        folder = os.path.join(self.dir, name)
+        os.makedirs(folder)
+        glb = tiny_glb(os.path.join(folder, self.ROOM + ".glb"), generator, extra)
+        manifest = dict(scene=self.ROOM, glb=dict(bytes=os.path.getsize(glb)), light=dict(setting="midway"),
+                        layout="bed_north", counts=dict(vertices=8, triangles=12), source={})
+        with open(os.path.join(folder, self.ROOM + ".json"), "w", encoding="utf-8") as fh:
+            json.dump(manifest, fh)
+        return folder, glb
+
+    def golden(self, glb):
+        """A golden file whose one row is `glb`'s."""
+        row = dict(glbMd5=md5_of(glb), glbBytes=os.path.getsize(glb), generator=regress.generator(glb),
+                   light="midway", layout="bed_north", vertices=8, triangles=12, raw="test_room_raw_groups.npz",
+                   recorded="2026-11-19")
+        path = os.path.join(self.dir, "golden.json")
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump({"rooms": {self.ROOM: row}}, fh)
+        return path
+
+    def verdict(self, folder, golden):
+        done = self.regress("verdict", self.ROOM, "--out", folder, "--golden", golden)
+        with open(os.path.join(folder, "regress.json"), encoding="utf-8") as fh:
+            return done, json.load(fh)
+
+    def test_the_glb_of_the_row_matches(self):
+        folder, glb = self.build("rebuild", self.OURS)
+        done, res = self.verdict(folder, self.golden(glb))
+        self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+        self.assertIn("MATCH", done.stdout.splitlines()[0])
+        self.assertEqual((res["built"]["generator"], res["golden"]["generator"]), (self.OURS, self.OURS))
+
+    def test_another_blender_is_said_first(self):
+        _, ours = self.build("golden_build", self.OURS)
+        folder, _ = self.build("rebuild", self.NEWER)
+        done, res = self.verdict(folder, self.golden(ours))
+        self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+        first = done.stdout.splitlines()[0]
+        self.assertIn("MISMATCH, another Blender build: the md5 cannot match; record again only after the room has "
+                      "been checked again", first)
+        self.assertIn(f"generator  {self.NEWER}  (golden {self.OURS})", done.stdout.splitlines()[1])
+        self.assertTrue(res["anotherBlender"])
+        self.assertIn("generator", res["fieldsThatDiffer"])
+
+    def test_the_same_blender_with_other_bytes_is_a_plain_mismatch(self):
+        _, ours = self.build("golden_build", self.OURS)
+        folder, _ = self.build("rebuild", self.OURS, extra="a change")
+        done, res = self.verdict(folder, self.golden(ours))
+        self.assertEqual(done.returncode, 1, done.stdout + done.stderr)
+        self.assertIn("MISMATCH. The rebuilt GLB is not the golden one.", done.stdout.splitlines()[0])
+        self.assertNotIn("another Blender", done.stdout)
+        self.assertFalse(res["anotherBlender"])
+
+    def test_record_writes_the_writer_and_plan_takes_the_row(self):
+        folder, glb = self.build("finished", self.OURS)
+        raw = os.path.join(folder, "saved_bake.npz")
+        with open(raw, "wb") as fh:
+            fh.write(b"a stand-in for the saved bake")
+        golden = os.path.join(self.dir, "golden_new.json")
+        done = self.regress("record", self.ROOM, "--glb", glb, "--manifest", os.path.join(folder, self.ROOM + ".json"),
+                            "--raw", raw, "--golden", golden)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        with open(golden, encoding="utf-8") as fh:
+            row = json.load(fh)["rooms"][self.ROOM]
+        self.assertEqual(list(row)[:3], ["glbMd5", "glbBytes", "generator"])
+        self.assertEqual(row["generator"], self.OURS)
+        done = self.regress("plan", self.ROOM, "--golden", golden, "--raw", raw, "--out", os.path.join(self.dir, "o"))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertEqual(len(done.stdout.splitlines()), 6, done.stdout)
+
+    def test_record_refuses_a_glb_that_names_no_writer(self):
+        folder, glb = self.build("finished", None)
+        raw = os.path.join(folder, "saved_bake.npz")
+        with open(raw, "wb") as fh:
+            fh.write(b"a stand-in for the saved bake")
+        golden = os.path.join(self.dir, "golden_new.json")
+        done = self.regress("record", self.ROOM, "--glb", glb, "--manifest", os.path.join(folder, self.ROOM + ".json"),
+                            "--raw", raw, "--golden", golden)
+        self.assertEqual(done.returncode, 2, done.stdout)
+        self.assertIn("asset.generator", done.stderr)
+        self.assertFalse(os.path.exists(golden))
+
+    def test_parts_all_alike_under_a_mismatch_say_the_bytes_differ_elsewhere(self):
+        a = tiny_glb(os.path.join(self.dir, "a.glb"), self.OURS)
+        b = tiny_glb(os.path.join(self.dir, "b.glb"), self.OURS, indent=1)    # the same JSON, other bytes
+        self.assertNotEqual(md5_of(a), md5_of(b))
+        lines = regress.glb_differences(b, a)
+        self.assertIn("the file's own fields: the same", lines)
+        self.assertTrue(lines[-1].startswith("every part named above is the same, so the bytes differ outside them"),
+                        lines)
+        c = tiny_glb(os.path.join(self.dir, "c.glb"), self.NEWER)
+        lines = regress.glb_differences(c, a)
+        self.assertIn("the file's own fields: differ in asset", lines)
+        self.assertFalse(any(r.startswith("every part named above") for r in lines), lines)
 
 
 @unittest.skipIf(mrb is None, "numpy is not installed, so meshy_room_build cannot be imported")

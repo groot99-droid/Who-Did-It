@@ -98,7 +98,10 @@
       const b2t = (p) => new THREE.Vector3(p[0], p[2], -p[1]);
       const t2b = (v) => [v.x, -v.z, v.y];
 
-      // eye, target in Blender metres (the first seven are the builder's stills: meshy_rooms/widow_bedroom.json views)
+      // eye, target in Blender metres: seven of the builder's stills of meshy_rooms/widow_bedroom.json. spawn, window,
+      // dressing and door are the room file's own views (the same in both its layouts); bed, press and photos are the
+      // views of its `mapped` layout (the room as the game's map has it), not of the default bed_north. The file's
+      // eighth view, south, is not here.
       const VIEWS = {
         spawn: [
           [-2.5, -3.0, 1.6],

@@ -22,6 +22,10 @@ for one that was changed on purpose and checked again. It runs no Blender: run r
 value that the room's own saved bake cannot rebuild is of no use. `rooms` prints the ids that have a golden row, one
 a line.
 
+A row records the program that wrote its GLB (`generator`, the GLB's asset.generator, e.g. "Khronos glTF Blender I/O
+v5.2.40"): another Blender build writes other bytes for the same room, so its md5 cannot match. The verdict says so
+first; the row is recorded again only after the room, built with that Blender, has passed its checks again.
+
 Exit codes, regress.sh's too: 0 the rebuilt GLB has the golden md5; 1 it differs, or the rebuild failed; 2 a bad
 call; 3 the saved bake is not on this machine (tools/blender/build/ is git-ignored), so nothing was compared.
 """
@@ -40,7 +44,7 @@ ROOT = roomcfg.ROOT
 ROOMS = os.path.join(ROOT, "tools", "blender", "build", "rooms")
 GOLDEN = os.path.join(ROOT, "tools", "blender", "meshy_rooms", "golden.json")
 PLAN = ("room", "light", "layout", "raw", "out", "golden")
-FIELDS = ("light", "layout", "vertices", "triangles", "glbBytes")     # what a golden row says of its GLB besides md5
+FIELDS = ("light", "layout", "vertices", "triangles", "glbBytes", "generator")    # what a row says of its GLB besides md5
 PLAIN = re.compile(r"[A-Za-z0-9_.-]+")      # a light setting's or a layout's name, as the builder's arguments take it
 shown = roomcfg.shown
 
@@ -56,6 +60,23 @@ def file_md5(path):
         for part in iter(lambda: fh.read(1 << 20), b""):
             h.update(part)
     return h.hexdigest()
+
+
+def generator(path):
+    """The program that wrote a GLB (its JSON chunk's asset.generator), or None when the file does not say."""
+    try:
+        with open(path, "rb") as fh:
+            head = fh.read(20)
+            if len(head) < 20 or head[:4] != b"glTF":
+                return None
+            clen, ctype = struct.unpack_from("<I4s", head, 12)
+            if ctype != b"JSON":
+                return None
+            j = json.loads(fh.read(clen))
+    except (OSError, ValueError):
+        return None
+    g = (j.get("asset") or {}).get("generator") if isinstance(j, dict) else None
+    return g if isinstance(g, str) and g else None
 
 
 def load_golden(path):
@@ -211,7 +232,7 @@ def mesh_change(a, b):
 def glb_differences(got, golden, limit=12):
     """Plain lines saying where a rebuilt GLB differs from the golden one."""
     A, B = glb_parts(got), glb_parts(golden)
-    lines = []
+    lines, alike = [], 0
 
     def some(names):
         return ", ".join(names[:limit]) + (f" and {len(names) - limit} more" if len(names) > limit else "")
@@ -222,6 +243,7 @@ def glb_differences(got, golden, limit=12):
         changed = [n for n in a if n in b and a[n] != b[n]]
         if not (new or gone or changed):
             lines.append(f"{kind}: all {len(b)} the same")
+            alike += 1
             continue
         lines.append(f"{kind}: {len(changed)} of {len(b)} differ" + (f", {len(new)} new" if new else "")
                      + (f", {len(gone)} gone" if gone else ""))
@@ -250,6 +272,9 @@ def glb_differences(got, golden, limit=12):
             lines.append(f"  ... and {left} more")
     keys = [k for k in A["file"] if A["file"][k] != B["file"][k]]
     lines.append("the file's own fields: " + ("the same" if not keys else "differ in " + ", ".join(keys)))
+    if alike == 4 and not keys:
+        lines.append("every part named above is the same, so the bytes differ outside them: the file's length, the "
+                     "order or padding of its buffer, or a field of its JSON that is not compared here")
     return lines
 
 
@@ -295,8 +320,9 @@ def verdict(a):
     if a.build_exit != 0 or not os.path.isfile(glb) or not os.path.isfile(manifest):
         res["verdict"] = "failed"
         missing = [os.path.basename(p) for p in (glb, manifest) if not os.path.isfile(p)]
-        say.append(f"regress {a.room}: FAILED. The rebuild did not finish (Blender's exit code {a.build_exit}"
-                   + (", not written: " + ", ".join(missing) if missing else "") + "), so nothing was compared.")
+        say.append(f"regress {a.room}: FAILED. The rebuild did not finish (the builder or the lock wrapper ended with "
+                   f"exit code {a.build_exit}" + (", not written: " + ", ".join(missing) if missing else "")
+                   + "), so nothing was compared.")
         tail = log_tail(os.path.join(out, "build.log"))
         if tail:
             say.append(f"  the end of {shown(os.path.join(out, 'build.log'))}:")
@@ -307,17 +333,20 @@ def verdict(a):
     else:
         with open(manifest, encoding="utf-8") as fh:
             m = json.load(fh)
-        got = dict(glbMd5=file_md5(glb), glbBytes=os.path.getsize(glb), light=(m.get("light") or {}).get("setting"),
-                   layout=m.get("layout"), vertices=(m.get("counts") or {}).get("vertices"),
-                   triangles=(m.get("counts") or {}).get("triangles"))
+        got = dict(glbMd5=file_md5(glb), glbBytes=os.path.getsize(glb), generator=generator(glb),
+                   light=(m.get("light") or {}).get("setting"), layout=m.get("layout"),
+                   vertices=(m.get("counts") or {}).get("vertices"), triangles=(m.get("counts") or {}).get("triangles"))
         src = m.get("source") or {}
         raw_md5 = (src.get("raw") or {}).get("fileMd5")        # the bake the build says it was made from
         res.update(built=got, rawMd5=raw_md5, source={k: src.get(k) for k in (
             "scriptMd5", "roomMd5", "roomBakeMd5", "lookMd5", "lookBakeMd5", "kitMd5", "rawAgrees")})
         off = [k for k in FIELDS if got[k] != row[k]]
         same = got["glbMd5"] == row["glbMd5"]
+        # another Blender build writes other bytes for the same room: then the md5 cannot match, whatever the code did
+        other_blender = not same and got["generator"] is not None and got["generator"] != row["generator"]
         res["verdict"] = "match" if same and not off else "mismatch"
         res["fieldsThatDiffer"] = off
+        res["anotherBlender"] = other_blender
         when = f"recorded {row.get('recorded')}" if row.get("recorded") else "no date recorded"
 
         def num(v):
@@ -333,11 +362,18 @@ def verdict(a):
                 say.append(f"regress {a.room}: MISMATCH in the golden row. The rebuilt GLB has the golden md5, but "
                            f"the row's {', '.join(off)} do not describe it: write the row again from the build "
                            "(regress.py record --replace).")
+            elif other_blender:
+                say.append(f"regress {a.room}: MISMATCH, another Blender build: the md5 cannot match; record again "
+                           "only after the room has been checked again.")
+                say.append(f"  generator  {got['generator']}  (golden {row['generator']})")
             else:
                 say.append(f"regress {a.room}: MISMATCH. The rebuilt GLB is not the golden one.")
             say.append(f"  glb md5    {got['glbMd5']}  ({got['glbBytes']:,} bytes)")
             say.append(f"  golden     {row['glbMd5']}  ({row['glbBytes']:,} bytes; {when})")
-            for k in ("light", "layout", "vertices", "triangles"):
+            keys = ["light", "layout", "vertices", "triangles"]
+            if got["generator"] != row["generator"] and not other_blender:
+                keys.append("generator")
+            for k in keys:
                 say.append(f"  {k:<10} {num(got[k])}" + ("" if got[k] == row[k] else f"  (golden {num(row[k])})"))
         if raw_md5 is None:
             say.append("  saved bake the build in --out was not made from one (its manifest names none)")
@@ -362,9 +398,14 @@ def verdict(a):
             else:
                 say.append(f"  The golden GLB itself is not on this machine ({shown(ref)} is missing or is another "
                            "build), so the two were not compared part by part.")
-            say.append("  A change to shared builder code must leave a finished room as it was: find what changed it. "
-                       "Only when the room itself was changed on purpose and has passed its checks again is the row "
-                       f"replaced: python tools/blender/room_checks/regress.py record {a.room} --replace")
+            if other_blender:
+                say.append("  This Blender writes the room's GLB with other bytes. Build the room with it, run its checks "
+                           "(run.sh), and only when they end as they did before record the row again: python "
+                           f"tools/blender/room_checks/regress.py record {a.room} --replace")
+            else:
+                say.append("  A change to shared builder code must leave a finished room as it was: find what changed "
+                           "it. Only when the room itself was changed on purpose and has passed its checks again is the "
+                           f"row replaced: python tools/blender/room_checks/regress.py record {a.room} --replace")
     if a.seconds is not None:
         say.append(f"  rebuilt into {shown(out)} in {a.seconds:g} s")
     os.makedirs(out, exist_ok=True)
@@ -393,12 +434,16 @@ def record(a):
     if used and used != raw_md5:
         stop(2, f"the build was made from another saved bake (md5 {used}) than {shown(raw)} (md5 {raw_md5}): the "
                 "gate could not rebuild it from this one")
+    gen = generator(glb)
+    if gen is None:
+        stop(2, f"{shown(glb)} does not name the program that wrote it (asset.generator): not a GLB of Blender's "
+                "glTF exporter")
     gold = load_golden(a.golden) if os.path.isfile(a.golden) else {"rooms": {}}
     rows = gold.setdefault("rooms", {})
     try:
-        row = dict(glbMd5=file_md5(glb), glbBytes=size, light=m["light"]["setting"], layout=m["layout"],
-                   vertices=m["counts"]["vertices"], triangles=m["counts"]["triangles"], raw=os.path.basename(raw),
-                   rawMd5=raw_md5, recorded=time.strftime("%Y-%m-%d"))
+        row = dict(glbMd5=file_md5(glb), glbBytes=size, generator=gen, light=m["light"]["setting"],
+                   layout=m["layout"], vertices=m["counts"]["vertices"], triangles=m["counts"]["triangles"],
+                   raw=os.path.basename(raw), rawMd5=raw_md5, recorded=time.strftime("%Y-%m-%d"))
     except (KeyError, TypeError):
         stop(2, f"{shown(manifest)} lacks light.setting, layout or counts: not a manifest of meshy_room_build.py")
     if a.note:
@@ -413,9 +458,10 @@ def record(a):
     with open(a.golden, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(gold, fh, indent=2, ensure_ascii=False)
         fh.write("\n")
-    print(f"regress: {a.room}'s golden row written to {shown(a.golden)}: glb md5 {row['glbMd5']}, light "
-          f"{row['light']}, layout {row['layout']}, {row['vertices']:,} vertices, {row['triangles']:,} triangles, "
-          f"saved bake {row['raw']} (md5 {row['rawMd5']}). Now run: bash tools/blender/room_checks/regress.sh {a.room}")
+    print(f"regress: {a.room}'s golden row written to {shown(a.golden)}: glb md5 {row['glbMd5']} ({row['generator']}), "
+          f"light {row['light']}, layout {row['layout']}, {row['vertices']:,} vertices, {row['triangles']:,} "
+          f"triangles, saved bake {row['raw']} (md5 {row['rawMd5']}). Now run: bash "
+          f"tools/blender/room_checks/regress.sh {a.room}")
 
 
 def rooms(a):

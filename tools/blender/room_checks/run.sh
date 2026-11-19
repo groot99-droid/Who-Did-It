@@ -11,8 +11,15 @@
 #             20 fan points and a coarse run takes 12 (the check as it was written, kept).
 #   The four Blender steps go through tools/blender/bl.sh, one at a time under its lock (WDI_BLENDER_LOCK, BLENDER);
 #   each waits for the lock. PYTHON names the Python of the two plain steps (it needs numpy and Pillow).
+#   -h, --help   prints this text.
 # Read-only on the build: it writes the GLB's md5 before and after, and only into the results folder. Ends with
 # <out>/summary.json and exit code 0 when every check passed, 1 when anything failed or did not run, 2 on a bad call.
+for X in "$@"; do
+  if [ "$X" = -h ] || [ "$X" = --help ]; then
+    sed -n '2,/^[^#]/s/^# \{0,1\}//p' "${BASH_SOURCE[0]}" # the comment above, without its marks
+    exit 0
+  fi
+done
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)" || exit 2
 ROOT="$(cd "$HERE/../../.." && pwd)" || exit 2
 PY="${PYTHON:-}"

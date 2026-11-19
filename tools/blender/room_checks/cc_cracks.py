@@ -4,10 +4,14 @@ Usage: bash tools/blender/bl.sh -b --factory-startup -P tools/blender/room_check
            <roomId> [--glb F] [--scene F] [--out DIR] [--config F]                                 (roomcfg.py)
 Reuses cc_geom.py's decode sections (the GLB parser and the add-on's Draco bridge; `roomcfg.cc_geom_head`). Rays from
 eye points to dense grids behind the door, beyond the window and 3 mm outside the room's 12 edges; a ray that meets no
-visible surface would show the viewer's black background (a crack). The room file gives the window's span and the eye
-points that look through it. Still the bedroom's own here: the door in the south wall and the window in the north
-wall (`roomcfg.need_walls`), the first portal as the door, the four eye points of the edge scan (inside a 10 x 7 m
-room). Writes <out>/cc_cracks.json.
+visible surface would show the viewer's black background (a crack). The room's check file (rooms/<roomId>.json) gives
+the window's span and the eye points that look through it. Still the bedroom's own here:
+  the door in the south wall and the window in the north wall (`roomcfg.need_walls`), the first portal as the door;
+  the door's grid, 0.12 m behind the wall's inner face, 0.65 m either side of the door's centre and from 0.02 m under
+  the floor to 2.40 m up, and its four eye points, 0.5 to 2 m in front of the door and up to 1.2 m to either side;
+  the window's grid, 0.45 m beyond the wall's inner face;
+  the four eye points of the edge scan (inside a 10 x 7 m room).
+Writes <out>/cc_cracks.json.
 """
 import json
 import os

@@ -7,8 +7,9 @@ Usage: python summary.py <roomId> [--glb F] [--out DIR] [--config F] [--quick]  
 the checks are read-only and the two must agree. Without it, reads the six result files in <out> and run.sh's
 <out>/steps.tsv (step, exit code, seconds; `skipped` for a step --quick leaves out) and writes <out>/summary.json: per
 script whether it ran and passed, its named checks, its failed ones, a few counts and the file it wrote. A fail the
-room file lists under known_fails is marked known. Any fail, a script that did not run, a missing result or a GLB
-that changed ends with exit code 1; otherwise 0. cc_display.py has no pass or fail of its own: it counts.
+room's check file lists under known_fails is marked known. A result file that is missing, cut short or not a JSON
+object means its script did not run. Any fail, a script that did not run or a GLB that changed ends with exit code 1;
+otherwise 0. cc_display.py has no pass or fail of its own: it counts.
 """
 import hashlib
 import json
@@ -37,10 +38,26 @@ def md5(path):
 
 
 def read_md5(path):
+    """The md5 in a stamp file; None when it is missing or empty."""
     if not os.path.exists(path):
         return None
-    with open(path, encoding="utf-8") as fh:
-        return fh.read().split()[0]
+    with open(path, encoding="utf-8", errors="replace") as fh:
+        words = fh.read().split()
+    return words[0] if words else None
+
+
+def read_result(path):
+    """A script's result file: (its data, None), or (None, why it cannot be read)."""
+    if not os.path.exists(path):
+        return None, "no result file"
+    try:
+        with open(path, encoding="utf-8") as fh:
+            d = json.load(fh)
+    except (OSError, ValueError) as err:                   # cut short, not JSON or not UTF-8
+        return None, f"the result file is cut short or not JSON ({err})"
+    if not isinstance(d, dict):
+        return None, "the result file is not a JSON object"
+    return d, None
 
 
 def pick(d, *path):
@@ -127,14 +144,11 @@ def main():
             continue
         e["exit"] = None if code is None else int(code)
         e["seconds"] = None if secs is None else float(secs)
-        d = None
-        if os.path.exists(path):
-            with open(path, encoding="utf-8") as fh:
-                d = json.load(fh)
+        d, unread = read_result(path)
         e["ran"] = d is not None and e["exit"] in (None, 0)
         if not e["ran"]:
             e["pass"] = False
-            e["problem"] = "no result file" if d is None else f"exit code {e['exit']}"
+            e["problem"] = unread or f"exit code {e['exit']}"
             broken.append(name)
             S["scripts"].append(e)
             continue
