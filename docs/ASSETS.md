@@ -264,7 +264,7 @@ and 32 items, all Meshy).
   `fetch_models.py` beside it fills the git-ignored `tools/blender/build/models/` and refuses any mismatch. Its README
   gives the format.
 - **Licences.** The lock gives the licence per source: Higgsfield follows A17, and Meshy on the owner's plan is the
-  owner's to ship (A616 Q1).
+  owner's to ship (A616 Q1) and is CC0-1.0 (the owner's answer, 2026-11-19).
 - **Masters and uploads.** The masters stay on the owner's laptop (CLAUDE.md, 6.10). Only the owner uploads; a changed
   model is a new zip under the same tag, with a pull request that rewrites its lock rows.
 - **Credits.** Each shipped render's `CREDITS.md` row cites its model's lock `id` and source (and a Higgsfield model's ROSW catalog id).
