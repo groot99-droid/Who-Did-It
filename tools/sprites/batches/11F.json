@@ -1,0 +1,100 @@
+{
+  "session": "11F",
+  "about": "The figure drops (round 11, F2 to Fn): each character model of tools/blender/models/models.lock.json, the look id it renders under, and the drop that ships it. Rendered by tools/blender/render_figures.py, halved by `pixel --finish off`, packed by `pack --style hd`, copied into apps/client/public/assets/figures/ by figures.ts.",
+  "commands": [
+    "EGL_PLATFORM=surfaceless tools/blender/.venv/bin/python tools/blender/render_figures.py --model <model> --look <look> --out <raw>",
+    "pnpm -s --filter @wdi/sprites pixel <raw>/<look> <fin>/<look> --finish off",
+    "pnpm -s --filter @wdi/sprites run pack <fin>/<look> <packed> --style hd",
+    "pnpm -C tools/sprites exec tsx figures.ts <packed>"
+  ],
+  "figures": [
+    {
+      "model": "baker",
+      "look": "baker",
+      "source": "higgsfield",
+      "drop": "F2a"
+    },
+    {
+      "model": "constable",
+      "look": "constable",
+      "source": "higgsfield",
+      "drop": "F2a"
+    },
+    {
+      "model": "detective",
+      "look": "detective",
+      "source": "higgsfield",
+      "drop": "F2a"
+    },
+    {
+      "model": "doctor",
+      "look": "doctor",
+      "source": "higgsfield",
+      "drop": "F2a"
+    },
+    {
+      "model": "fisher",
+      "look": "fisher",
+      "source": "higgsfield",
+      "drop": "F2a"
+    },
+    {
+      "model": "gamekeeper",
+      "look": "gamekeeper",
+      "source": "higgsfield",
+      "drop": "F2b"
+    },
+    {
+      "model": "herbalist",
+      "look": "herbalist",
+      "source": "higgsfield",
+      "drop": "F2b"
+    },
+    {
+      "model": "lamplighter",
+      "look": "lamplighter",
+      "source": "higgsfield",
+      "drop": "F2b"
+    },
+    {
+      "model": "tinner",
+      "look": "tinner",
+      "source": "higgsfield",
+      "drop": "F2b"
+    },
+    {
+      "model": "watchman",
+      "look": "watchman",
+      "source": "higgsfield",
+      "drop": "F2b"
+    },
+    {
+      "model": "villager",
+      "look": "villager",
+      "source": "higgsfield",
+      "drop": "F2c"
+    },
+    {
+      "model": "villagerlass",
+      "look": "villagerlass",
+      "source": "higgsfield",
+      "drop": "F2c"
+    }
+  ],
+  "gaps": [
+    {
+      "model": "mallory",
+      "source": "higgsfield",
+      "gap": "a model with no look: looks.json has no mallory, so it renders under no id until a look is added (the owner's call)"
+    },
+    {
+      "model": "killer",
+      "source": "meshy",
+      "gap": "a cover card (looks.json bodyAtlas null): never a world character, so never a figure; render_figures refuses it"
+    },
+    {
+      "look": "vicar",
+      "gap": "a look with no model: no character GLB in models.lock.json renders the vicar; today's packed vicar stays until one does"
+    }
+  ]
+}
