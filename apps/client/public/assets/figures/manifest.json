@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "art": "figures",
+  "entries": [
+    {
+      "key": "fig_baker",
+      "type": "multiatlas",
+      "url": "char_baker.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_constable",
+      "type": "multiatlas",
+      "url": "char_constable.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_detective",
+      "type": "multiatlas",
+      "url": "char_detective.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_doctor",
+      "type": "multiatlas",
+      "url": "char_doctor.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_fisher",
+      "type": "multiatlas",
+      "url": "char_fisher.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    }
+  ]
+}
