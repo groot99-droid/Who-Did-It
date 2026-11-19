@@ -22,6 +22,7 @@ import bmesh  # after bpy: the bpy wheel registers bmesh on import
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rig  # noqa: E402
+import render_lock  # noqa: E402
 import rig_common as rc  # noqa: E402
 import batch_render  # noqa: E402
 from batch_render import feet_px, render_to, touches_border  # noqa: E402
@@ -32,6 +33,7 @@ from build_villager import box, frustum, ring  # noqa: E402,F401  (re-exported s
 # out of sys.argv here, at import, so each script's own parser sees only its flags.
 STYLE, TEXTURED = rc.style_from_argv(sys.argv)
 FACTOR = rc.STYLE_FACTOR[STYLE]
+CHANGED = render_lock.changed_from_argv(sys.argv)  # `--changed`: skip the frames whose render lock hash is unchanged (T4)
 if TEXTURED:
     from materials import retexture  # noqa: E402
 
@@ -199,6 +201,28 @@ def clear(objs) -> None:
 # ---------------------------------------------------------------- output
 
 
+def new_lock(out_dir: str, atlas: str) -> render_lock.Lock:
+    """The render lock of an atlas written by the running script (T4): the script, the shared sources, the flags and,
+    when the render swaps in the library's roles, their material lock entries."""
+    materials = []
+    if TEXTURED or STYLE == "hd":
+        from materials import roles
+
+        materials = roles.slugs()
+    script = getattr(sys.modules["__main__"], "__file__", None) or __file__
+    return render_lock.Lock(out_dir, atlas, script, {"style": STYLE, "textured": TEXTURED}, materials=materials,
+                            blender=bpy.app.version_string, changed=CHANGED)
+
+
+def write_png_lock(out_dir: str, atlas: str) -> None:
+    """A lock for a script that writes bare PNGs and no manifest (the ground and the tiles): one frame a PNG."""
+    lock = new_lock(out_dir, atlas)
+    for file in sorted(os.listdir(out_dir)):
+        if file.endswith(".png"):
+            lock.record(file[:-4])
+    lock.write()
+
+
 class Sheet:
     """Collects rendered frames of one atlas and writes its manifest."""
 
@@ -207,11 +231,22 @@ class Sheet:
         os.makedirs(self.dir, exist_ok=True)
         self.atlas = atlas
         self.frames: dict[str, dict] = {}
+        self.lock = new_lock(self.dir, atlas)
+        self.old_frames: dict[str, dict] = {}
+        old = os.path.join(self.dir, "manifest.json")
+        if CHANGED and os.path.exists(old):
+            with open(old) as fh:
+                self.old_frames = json.load(fh)["frames"]
 
-    def render(self, scene, name: str, pivot: bool = True) -> None:
-        """Render the current scene as frame `name`; `pivot` records the projected origin."""
+    def render(self, scene, name: str, pivot: bool = True, extra=None) -> None:
+        """Render the current scene as frame `name`; `pivot` records the projected origin. `extra` is any per-frame
+        input for the frame's render lock hash; `--changed` skips a frame whose hash and PNG are unchanged."""
         file = name.replace("/", "_") + ".png"
         path = os.path.join(self.dir, file)
+        if name in self.old_frames and self.lock.unchanged(name, path, extra):
+            self.frames[name] = self.old_frames[name]
+            return
+        self.lock.record(name, extra)
         bpy.context.view_layer.update()
         render_to(scene, path)
         cell = scene.render.resolution_x
@@ -231,6 +266,7 @@ class Sheet:
             json.dump({"version": 1, "atlas": self.atlas, "style": STYLE, "factor": FACTOR, "frames": self.frames},
                       fh, indent=2, sort_keys=True)
             fh.write("\n")
+        self.lock.write()
         print(f"{self.atlas}: {len(self.frames)} frames -> {self.dir}")
 
 
