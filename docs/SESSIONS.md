@@ -4676,3 +4676,6 @@ merges need the owner's word.
   row in `seams.md`.
 - 2026-11-19: T1 (#555), the Meshy CC0 answer (#561), P1 (#556) and the flake fixes (#562, #564) merged. 11F started
   (`session_01M5mAcUfh6GJsoxRXNaUHaC`). 11D finished and was archived.
+- 2026-11-19: R1 (#565, #566, #567), T4 (#559) and the P2 brief (#569) merged. 11P's row in `seams.md` takes the
+  P2 paths of `tiles-brief.md` 6; Q-P5, Q-P7 and Q-P8 take 11P's defaults, Q-P6 (the sheets' licence) is with the
+  owner.
