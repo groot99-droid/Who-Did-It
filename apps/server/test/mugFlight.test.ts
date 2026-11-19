@@ -89,6 +89,11 @@ async function world(
   placeSeat(party, target, 'cellar', RUN.x, RUN.y);
   placeFigure(party, mugger, 'cellar', RUN.x + apart, RUN.y);
   needsOf(mugger.brain).hunger = 1;
+  // The roll is certain, so the mugging opens on the first whole second the two are alone. At the real
+  // `chancePerS` (about 2% a second here) it is a draw on the figure's own crypto-seeded stream, and its tail ran
+  // past the 180 s that `atPrompt` and `untilState` wait for it (CI, 2026-11-19, the Fight test). These tests are
+  // about the answers, not the chance; `mugChance` has its own tests.
+  Object.assign(m.chancePerS, { light: 1, heavy: 1 });
   // The stake of the look is paid on the first world ticks (8C): then the purse is set to exactly `purse`.
   advance(party, 2);
   movePurse(room, target, TOWN, balanceOf(room, target), 'buy');
@@ -119,7 +124,11 @@ function npcAnswers(w: { pay: number; flee: number; fight: number; silent?: numb
   Object.assign(m.npcAnswer, { silent: 0 }, w);
 }
 const npcDefault = { ...m.npcAnswer };
-afterEach(() => npcAnswers(npcDefault));
+const chanceDefault = { ...m.chancePerS };
+afterEach(() => {
+  npcAnswers(npcDefault);
+  Object.assign(m.chancePerS, chanceDefault);
+});
 
 /** Steps until an NPC seat's mugging reaches `state` (the draw is taken when the threat ends). */
 function untilState(party: Party, target: string, state: string): boolean {
