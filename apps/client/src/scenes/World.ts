@@ -72,6 +72,8 @@ import { loadMapName, loadSceneName } from '../view/sceneNames';
 import { nearestAvatar } from '../view/targets';
 import { DEFAULT_MAP_ID } from '../net/protocol';
 import { REG_AUDIO, REG_CUTSCENE, getFlags, getNet } from './registry';
+import { readRenderMode } from '../flags';
+import type { SpriteWorldHandle } from '../world3'; // round 11, R1: types only; the module loads on `?render=sprite`
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -183,6 +185,10 @@ export class World extends Phaser.Scene {
   private ground: GroundView | null = null;
   private bell: { x: number; y: number } | null = null;
   private statics!: StaticView;
+  /** Round 11, R1: the Three.js sprite world under this canvas, with `?render=sprite` (A618). */
+  private sprite: SpriteWorldHandle | null = null;
+  private spriteOn = false;
+  private spriteRun = 0;
   private readonly bodyViews = new Map<string, BodyView>();
   private hud!: Hud;
   /** Round 10, 10Y (UI.md 14.51): when each NEED_* refusal last showed, for the second one's hint. */
@@ -252,17 +258,18 @@ export class World extends Phaser.Scene {
     if (!feed) throw new Error('World started without a feed');
     this.feed = feed;
     const flags = readDevFlags(location.search);
+    this.spriteOn = readRenderMode(location.search) === 'sprite';
 
     this.buildMap();
     this.swing = this.add.graphics().setDepth(DEPTH.decal);
     this.statics = new StaticView(this);
-    this.statics.set(
-      mapStatics(this.map, {
-        mapId: this.map.mapId ?? this.matchMap(),
-        theme: this.map.theme ?? '',
-        hasFrame: (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame),
-      }),
-    );
+    const defs = mapStatics(this.map, {
+      mapId: this.map.mapId ?? this.matchMap(),
+      theme: this.map.theme ?? '',
+      hasFrame: (atlas, frame) => this.textures.exists(atlas) && this.textures.get(atlas).has(frame),
+    });
+    this.statics.set(this.spriteOn ? [] : defs);
+    if (this.spriteOn) this.mountSprite(defs);
     this.statics.setLit(isLit(dayPartOf(feed.clock().phase)));
     this.clueView = new ClueView(this);
     this.nodeView = new NodeView(this);
@@ -423,6 +430,9 @@ export class World extends Phaser.Scene {
       this.cutscenes.destroy();
       this.ground?.destroy();
       this.ground = null;
+      this.sprite?.destroy();
+      this.sprite = null;
+      this.spriteRun++;
       this.statics.destroy();
       for (const b of this.bodyViews.values()) b.destroy();
       this.bodyViews.clear();
@@ -476,6 +486,7 @@ export class World extends Phaser.Scene {
     this.sheet.update();
     this.focusNewEntry();
     this.statics.update(self ? worldOf(self) : null, delta / 1000, this.cameras.main.worldView);
+    this.sprite?.frame(this.cameras.main);
 
     this.lighting.set({
       visible: WORLD_PHASES.has(clock.phase) && self !== null,
@@ -530,9 +541,11 @@ export class World extends Phaser.Scene {
     this.touch?.setHidden(true);
     this.departedScreen?.setHidden(true); // C4b: a meeting still opens for a departed seat
     this.lighting.setHidden(true);
+    this.sprite?.setHidden(true);
   }
 
   private onWake(): void {
+    this.sprite?.setHidden(false);
     this.hud.setHidden(false);
     this.touch?.setHidden(false);
     this.departedScreen?.setHidden(false);
@@ -932,12 +945,24 @@ export class World extends Phaser.Scene {
     this.map = readSceneMap(this.cache.tilemap.get(key).data as TiledMap);
     this.portals = this.map.portals;
     this.bell = bellSpot(this.map.props);
-    this.ground = new GroundView(this, key, this.map);
+    if (!this.spriteOn) this.ground = new GroundView(this, key, this.map);
     applyFilters(
       this.textures,
       peekManifest(getFlags(this).art, import.meta.env.BASE_URL) ?? { version: 1, art: '', entries: [] },
     );
-    this.cameras.main.setBackgroundColor(colorOf(palette.colors[this.map.voidColour]));
+    this.cameras.main.setBackgroundColor(
+      this.spriteOn ? 'rgba(0,0,0,0)' : colorOf(palette.colors[this.map.voidColour]),
+    );
+  }
+
+  /** Round 11, R1: loads the sprite world (its own chunk) and lays it under this canvas; Phaser draws the rest. */
+  private mountSprite(defs: ReturnType<typeof mapStatics>): void {
+    const tiled = this.cache.tilemap.get(sceneMapKey(this.sceneId)).data as TiledMap;
+    const run = ++this.spriteRun; // the scene restarts for every scene: a late load must not mount the last one's
+    void import('../world3').then(({ mountSpriteWorld }) => {
+      if (run !== this.spriteRun) return;
+      this.sprite = mountSpriteWorld(this.game.canvas, this.textures, this.map, tiled, defs);
+    });
   }
 
   /** Camera zoom snaps to a multiple of 0.5 (SPRITES 10.9); bounds hold the scene's diamond, centred if smaller. */
@@ -957,8 +982,11 @@ export class World extends Phaser.Scene {
   private drawDoors(tick: number): void {
     this.swing.clear();
     const doors = this.feed.doors();
-    for (const p of this.portals)
-      this.statics.setShown(`${p.id}~boarded`, doors.find((d) => d.id === p.id)?.state === 1);
+    for (const p of this.portals) {
+      const boarded = doors.find((d) => d.id === p.id)?.state === 1;
+      this.statics.setShown(`${p.id}~boarded`, boarded);
+      this.sprite?.setShown(`${p.id}~boarded`, boarded);
+    }
     for (const d of doors) {
       if (tick >= d.swingUntilTick) continue;
       const p = this.portals.find((q) => q.id === d.id);

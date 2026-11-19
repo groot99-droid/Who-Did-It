@@ -32,6 +32,7 @@ from bpy_extras.object_utils import world_to_camera_view
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_rig  # noqa: E402
 import palettize  # noqa: E402
+import render_lock  # noqa: E402
 import rig_common as rc  # noqa: E402
 
 LOOPING = {name for name, clip in rc.R8_CLIPS.items() if clip.loop}
@@ -53,7 +54,17 @@ def _args(argv: list[str]) -> argparse.Namespace:
     p.add_argument("--style", default="8bit", choices=rc.ART_STYLES,
                    help="art style: hd renders at twice the display scale with the HD finish (art.md 3)")
     p.add_argument("--textured", action="store_true", help="the library's roles in place of flat materials")
+    p.add_argument("--changed", action="store_true", help="skip frames whose render lock hash is unchanged (T4)")
     return p.parse_args(argv)
+
+
+def _lock_slugs(style: str, textured: bool) -> list[str]:
+    """The material slugs a render reads, for its lock: every role's when it swaps in the library (T4)."""
+    if style != "hd" and not textured:
+        return []
+    from materials import roles
+
+    return roles.slugs()
 
 
 def load_rig(path: str | None) -> bpy.types.Scene:
@@ -353,6 +364,10 @@ def render_character(scene, args) -> None:
                 "style": args.style, "factor": factor, "passes": args.passes.split(","), "frames": {}}
 
     clipped: list[str] = []
+    # The render lock (T4): the master, the model's pinned sha256 and the flags go into every frame's hash.
+    lock = render_lock.Lock(out_root, args.body, __file__, {"style": args.style, "textured": args.textured},
+                            master=args.char, model=args.body, blender=bpy.app.version_string, changed=args.changed,
+                            materials=_lock_slugs(args.style, args.textured))
     own = rc.look_clips(args.body)
     wanted_dirs = args.dirs.split(",") if args.dirs else list(rc.DIRECTIONS)
     for anim in (args.anims.split(",") if args.anims else list(own)):
@@ -378,7 +393,11 @@ def render_character(scene, args) -> None:
                     scene.frame_set(f)
                     name = rc.frame_name(args.body, anim, rc.DIRECTIONS[d_index], n)
                     path = os.path.join(out_root, pass_name, name + ".png")
+                    key = name if pass_name == "body" else f"{pass_name}/{name}"
+                    if lock.unchanged(key, path):
+                        continue
                     render_to(scene, path)
+                    lock.record(key)
                     # Every pass records the pivot, so a run that renders only overlays still writes
                     # a complete manifest; all passes of a frame project the same Feet.
                     entry = manifest["frames"].setdefault(name, {})
@@ -390,6 +409,7 @@ def render_character(scene, args) -> None:
                         clipped.append(name)
 
     write_manifest(os.path.join(out_root, "manifest.json"), manifest)
+    lock.write()
     _place(scene, scene.camera, rc.CELL_PX, rc.FEET_ROW_PX)
     if clipped:
         print(f"warning: {len(clipped)} body frames touch the cell edge, e.g. {clipped[0]}")
