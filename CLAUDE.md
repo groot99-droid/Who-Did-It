@@ -57,8 +57,8 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   V2 reads the same graph. `SCENE_IDS` is append-only; a new map adds new ids with new
   prefixes and never renames or reuses one (GDD 3.13, WORLD 4.3).
 - Atlas keys are `char/<lookId>/<anim>/<dir>` with the look ids of `looks.json` (plus
-  `villager` for figures that are not seats); cover cards have no world character. Both modes
-  present isometrically on the client only: data, wire and facing are world frame, an atlas
+  `villager` for figures that are not seats); cover cards have no world character. The 2.5D
+  mode presents isometrically on the client only: data, wire and facing are world frame, an atlas
   `<dir>` is screen frame, and the direction table lives once in `@wdi/shared` (`dirFromVector`).
 - Assets: CC0 by default, CC-BY only with a `CREDITS.md` row, never Synty, never raw
   Mixamo or Quaternius sources in the repo. See `docs/ASSETS.md` 6.5.
