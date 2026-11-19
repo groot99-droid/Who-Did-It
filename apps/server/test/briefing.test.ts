@@ -12,6 +12,7 @@ import {
   advance,
   allTownsfolk,
   bootNpcServer,
+  flush,
   holdPhase,
   lobbyOf,
   pauseClock,
@@ -26,7 +27,6 @@ import {
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -60,7 +60,7 @@ const clue = (party: Party, kind: number, value: number, tx = 4) =>
 /** Steps past the briefing window and lets the messages arrive. */
 async function pastWindow(party: Party): Promise<void> {
   advance(party, S(balance.law.briefingAfterS) + 2);
-  await sleep(150);
+  await flush(party);
 }
 
 describe("the Constables' briefing (GDD 3.31)", () => {
@@ -68,10 +68,10 @@ describe("the Constables' briefing (GDD 3.31)", () => {
     const party = await world();
     const id = clue(party, ClueKind.footprints, 2);
     advance(party, S(balance.law.briefingAfterS) - 2);
-    await sleep(100);
+    await flush(party);
     expect(briefings(party, 0)).toEqual([]);
     advance(party, 3);
-    await sleep(150);
+    await flush(party);
     const line = "Constables' briefing: footprints in Crumb's Ovens, tall.";
     expect(briefingLine({ sceneId: 'bakery', kind: ClueKind.footprints, value: 2 }, true)).toBe(line);
     expect(briefings(party, 0)).toEqual([line]);

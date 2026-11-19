@@ -15,8 +15,8 @@ import {
   pauseClock,
   start,
   toWorld,
+  queued,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10, D4b (GDD 3.14): the pastry parts and the Game Pie, the Berry Tart (Heartened) and the Miner's Pasty
 // (Tireless).
@@ -42,8 +42,7 @@ async function eat(p: Party, item: string, ability: string): Promise<void> {
   const h = p.humans[0]!;
   const seat = p.room.state.players.get(h.id)!;
   addStack(seat, item as never, 1);
-  h.room.send('act.ability', { abilityId: ability });
-  await sleep(60);
+  await queued(p, h, 'act.ability', { abilityId: ability });
   advance(p, 1);
   expect(count(seat, item as never)).toBe(0);
 }
