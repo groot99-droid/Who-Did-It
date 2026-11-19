@@ -85,6 +85,20 @@ class Clips(unittest.TestCase):
         self.assertLess(packed_px, 1.0)
 
 
+class Height(unittest.TestCase):
+    def test_a_tall_figure_is_shrunk_to_the_cap_and_a_short_one_kept(self):
+        self.assertEqual(fg.fit_scale(1.70), 1.0)
+        self.assertEqual(fg.fit_scale(fg.MAX_HEIGHT_M), 1.0)
+        self.assertAlmostEqual(1.87 * fg.fit_scale(1.87), fg.MAX_HEIGHT_M, places=5)
+        with self.assertRaises(ValueError):
+            fg.fit_scale(0.0)
+
+    def test_the_cap_leaves_rows_above_the_crown(self):
+        rows = fg.MAX_HEIGHT_M * rc.display_px_per_vertical_m()
+        self.assertLess(rows, rc.FEET_ROW_PX - 4, "a few display rows for the bob and a lean")
+        self.assertGreater(rows, 0.9 * rc.FEET_ROW_PX)
+
+
 class Sun(unittest.TestCase):
     def test_cl3a_turns_the_key_45_degrees_clockwise(self):
         # today's key: camera azimuth 225 is world azimuth 180 (rig_common.world_azimuth); CL3a turns it to 225

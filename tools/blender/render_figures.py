@@ -275,7 +275,11 @@ def render_figure(args) -> dict:
     arm.matrix_parent_inverse = Matrix.Translation((-cx, -cy, -floor))
     holder.rotation_euler.z = fg.FORWARD_TURN[args.forward]
     bpy.context.view_layer.update()
-    height = max((o.matrix_world @ Vector(c)).z for o in meshes for c in o.bound_box) / rc.Z_SCALE
+    model_height = max((o.matrix_world @ Vector(c)).z for o in meshes for c in o.bound_box) / rc.Z_SCALE
+    scale = fg.fit_scale(model_height)  # a hat or a tall model must not leave the cell (SPRITES 1, the 112 px cap)
+    holder.scale = (scale, scale, scale)
+    bpy.context.view_layer.update()
+    height = model_height * scale
 
     out_root = os.path.join(args.out, look)
     os.makedirs(os.path.join(out_root, "body"), exist_ok=True)
@@ -284,6 +288,7 @@ def render_figure(args) -> dict:
     manifest = {"version": 1, "body": look, "cell": CELL, "fps": rc.OUTPUT_FPS, "style": "hd", "factor": 1,
                 "passes": ["body"], "frames": {},
                 "figure": {"model": args.model, "clip": action.name, "walk": walk, "heightM": round(height, 3),
+                           "modelHeightM": round(model_height, 3), "scale": scale,
                            "breathM": fg.BREATH_LIFT_M, "forward": args.forward}}
     clipped: list[str] = []
 

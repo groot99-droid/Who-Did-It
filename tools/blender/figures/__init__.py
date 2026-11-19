@@ -29,6 +29,11 @@ FIGURE_CLIPS = {"idle": (IDLE_FRAMES, True), "walk": (8, True)}
 # of a packed pixel, which the 2 x 2 box halve keeps as a soft shift of the shoulders and head.
 BREATH_LIFT_M = 0.016
 
+# The tallest a figure stands, crown and hat included, in true metres (SPRITES 1: the figure is 1.7 m and nothing rises
+# above the crown by more than about 0.05 m, so the 112 px cap keeps a few rows for the walk's bob and a lean). A
+# taller model is shrunk to it whole; a shorter one keeps its height, so the deck's figures keep their differences.
+MAX_HEIGHT_M = 1.75
+
 # The sun (A616 Q4): CL3a's direction at the default heading, 25 degrees up, turned 45 degrees clockwise (seen from
 # above) from today's key (rig_common.KEY_LIGHT: camera azimuth 225, which is world azimuth 180).
 SUN_ELEVATION_DEG = 25.0
@@ -63,6 +68,13 @@ def toward(azimuth_deg: float, elevation_deg: float) -> tuple[float, float, floa
     """Unit vector from the origin towards a light at this world bearing and elevation."""
     az, el = math.radians(azimuth_deg), math.radians(elevation_deg)
     return (math.sin(az) * math.cos(el), math.cos(az) * math.cos(el), math.sin(el))
+
+
+def fit_scale(height_m: float, max_height_m: float = MAX_HEIGHT_M) -> float:
+    """The uniform scale that brings a figure of this standing height under the cap: 1 when it already fits."""
+    if height_m <= 0.0:
+        raise ValueError("a figure has a height")
+    return 1.0 if height_m <= max_height_m else round(max_height_m / height_m, 6)
 
 
 def find_period(samples: list[list[float]], tolerance: float = PERIOD_TOLERANCE,

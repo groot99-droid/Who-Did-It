@@ -240,6 +240,11 @@ class FigureRig(unittest.TestCase):
                 self.assertEqual(digest(os.path.join(out, "villager", "body", name)),
                                  digest(os.path.join(self.dir, "body", name)), name)
 
+    def test_the_figure_fits_under_the_height_cap(self):
+        fig = self.manifest["figure"]
+        self.assertLessEqual(fig["heightM"], fg.MAX_HEIGHT_M + 1e-6)
+        self.assertAlmostEqual(fig["heightM"], fig["modelHeightM"] * fig["scale"], places=2)
+
     def test_a_render_lock_is_written(self):
         import render_lock
 
