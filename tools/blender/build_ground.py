@@ -275,6 +275,7 @@ def render_theme(scene, theme: str, kits: str, out: str, only: str = GROUND_ROWS
             render_to(scene, os.path.join(out, f"{NAMES[char]}_{v}.png"))
             sc.clear(objs)
             bpy.data.materials.remove(mat)
+    sc.write_png_lock(out, f"ground_{theme}")
     print(f"ground: {theme}, {len(only)} materials x {VARIANTS} -> {out}")
 
 

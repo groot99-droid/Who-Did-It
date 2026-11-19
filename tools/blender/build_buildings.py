@@ -596,6 +596,10 @@ def build_one(scene, objs, w, h, out_dir, name, frames):
 
 
 def write_manifest(out_dir: str, atlas: str, frames: dict) -> None:
+    lock = sc.new_lock(out_dir, atlas)
+    for name in frames:
+        lock.record(name)
+    lock.write()
     path = os.path.join(out_dir, "manifest.json")
     if os.path.exists(path):  # a partial run keeps the other entries
         with open(path) as fh:

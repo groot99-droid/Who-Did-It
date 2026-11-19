@@ -20,3 +20,4 @@ tools/blender/.cache/
 
 # A session's own Claude Code settings (docs/round10/README.md, "Compaction")
 .claude/settings.local.json
+tools/blender/.venv/
