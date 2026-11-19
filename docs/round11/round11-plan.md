@@ -1,5 +1,8 @@
 # Round 11: the build plan (the full Blender makeover)
 
+> **2026-11-19:** A613 and A615 changed the round's target from three styles to one sprite world. The revised plan,
+> [`round11-plan-v2.md`](round11-plan-v2.md), was approved on 2026-11-19 (A616) and replaces this one.
+
 Session 11A, at 6Z's request of 2026-10-30. Design only: this document plans code, it writes none. It orders the
 round-11 pull requests that build `pipeline.md` (11A) and `look.md` (11B) as amended by the owner's answers
 (`owner-answers.md`: 21 defaults, and CL3 changed to yes). Where those three disagree, `owner-answers.md` wins, then
