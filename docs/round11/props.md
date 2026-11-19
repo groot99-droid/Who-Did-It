@@ -5,7 +5,7 @@ Every prop of the 31 scenes against the art that will draw it, for P3 (the prop 
 (A616) sets the split: **small objects come from the owner's pixel-art sheets, complex objects (64 to 128 px) are
 rendered from the 3D prop models.** The sheets, the models index and the model overview are in the handoff
 (`docs/round11/handoff/`: `sheet_village_props.png`, `sheet_tavern_interior.png`, `models-index.json`,
-`prop-models.md`, `prop_models_overview.jpg`; until PR #553 merges, on branch `claude/elegant-archimedes-ybxzlj`).
+`prop-models.md`, `prop_models_overview.jpg`).
 
 ## 1. What is listed
 
