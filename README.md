@@ -19,7 +19,7 @@ served from GitHub Pages against the Railway server. The player manuals are in
 round 10 (world mode) and story mode's part 2 are merged in part, with what is left in
 [`docs/round10/part2.md`](docs/round10/part2.md). The first step of V2, a first-person walk through the 3D
 HollowMere, is served at [`/Who-Did-It/walk/`](https://groot99-droid.github.io/Who-Did-It/walk/).
-`docs/ROADMAP.md` 7.1 carries each milestone's status. Everything about the design lives in [`docs/`](docs/README.md).
+`docs/ROADMAP.md` 7.0 carries each milestone's status. Everything about the design lives in [`docs/`](docs/README.md).
 
 | Version | Rendering | Networking | Players | Art |
 |---|---|---|---|---|

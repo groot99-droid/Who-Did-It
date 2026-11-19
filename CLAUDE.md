@@ -11,7 +11,7 @@ it once had was removed in round 7 (DECISIONS A115, `GDD.md` 3.11).
 
 Implementation started 2026-10-10 in four parallel sessions and has run in rounds since; `docs/SESSIONS.md`
 says which paths each session owns, round by round. Everything in the layout below is built and merged;
-`docs/ROADMAP.md` 7.1 gives each milestone's status.
+`docs/ROADMAP.md` 7.0 gives each milestone's status.
 
 ## Read first
 
