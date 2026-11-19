@@ -1,8 +1,7 @@
 # Round 11, revised: building the sprite world (A615)
 
-Status: **draft for the owner's approval** (Story mode orchestrator, 2026-11-19). When the owner approves it, it
-replaces `round11-plan.md` (A236) as the round's build plan and takes its own `DECISIONS.md` row. Until then
-nothing is built from it, and nothing outside `docs/` changes.
+Status: **approved by the owner on 2026-11-19 with every default of section 6** (A616). It replaces
+`round11-plan.md` (A236) as the round's build plan.
 
 The approved plan of 2026-10-30 was written for three 2.5D styles (8-bit, low poly, HD) rendered through one Blender
 rig. Three owner decisions have changed that since:
