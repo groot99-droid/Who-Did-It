@@ -5,7 +5,8 @@ import { join } from 'node:path';
 import zlib from 'node:zlib';
 import { describe, expect, it } from 'vitest';
 import { FIGURES_DIR, figureEntry, figureLooks } from '../figures.ts';
-import { TONE, kmeans, toneReport } from '../figure-tone.ts';
+import { INK_FLOOR, TONE, fromOklab, inkFloor, kmeans, toneReport } from '../figure-tone.ts';
+import { decodePng } from '../bleed.ts';
 import { CHAR_PAGE, DIRECTIONS } from '../keys.ts';
 import { oklab, type Lab } from '../oklab.ts';
 
@@ -155,6 +156,26 @@ describe('the tone check (figure-tone.ts)', () => {
     expect(
       toneReport(solidPng(2, 2, [0, 0, 0, 0]), [{ name: 'clear', x: 0, y: 0, w: 2, h: 2 }]).darkerThanInk,
     ).toBe(0);
+  });
+
+  it('lifts a pixel darker than ink to ink and leaves a lighter one untouched (the ink floor)', () => {
+    const samples: [number, number, number][] = [
+      [200, 40, 40],
+      [18, 20, 28],
+      [111, 122, 140],
+    ];
+    for (const rgb of samples) {
+      expect(fromOklab(oklab(...rgb))).toEqual(rgb);
+    }
+    const black = toneReport(inkFloor(solidPng(2, 2, [0, 0, 0, 255])), [
+      { name: 'k', x: 0, y: 0, w: 2, h: 2 },
+    ]);
+    expect(black.darkerThanInk).toBe(0);
+    const coat = inkFloor(solidPng(1, 1, [30, 24, 20, 255]));
+    expect(inkFloor(solidPng(1, 1, [30, 24, 20, 255]))).toEqual(coat);
+    const light = decodePng(inkFloor(solidPng(1, 1, [120, 110, 100, 255]))).data;
+    expect(oklab(120, 110, 100)[0]).toBeGreaterThan(INK_FLOOR.knee);
+    expect([...light]).toEqual([120, 110, 100, 255]);
   });
 });
 

@@ -5,6 +5,7 @@
 import { copyFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inkFloor } from './figure-tone.ts';
 
 export const FIGURES_DIR = join(import.meta.dirname, '../../apps/client/public/assets/figures');
 const ATLAS_RE = /^char_([a-z][a-z0-9]*)\.json$/;
@@ -44,14 +45,18 @@ export function writeManifest(dir: string): void {
   writeFileSync(join(dir, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
 }
 
-/** Copies every packed atlas of `packed` (its JSON and the pages it names) into `dir`, then rewrites the manifest. */
+/**
+ * Copies every packed atlas of `packed` into `dir`, its pages through the ink floor (`figure-tone.ts`), then rewrites
+ * the manifest.
+ */
 export function dropFigures(packed: string, dir = FIGURES_DIR): string[] {
   mkdirSync(dir, { recursive: true });
   const looks = figureLooks(packed);
   for (const look of looks) {
     const file = `char_${look}.json`;
     const atlas = JSON.parse(readFileSync(join(packed, file), 'utf8')) as { textures: { image: string }[] };
-    for (const t of atlas.textures) copyFileSync(join(packed, t.image), join(dir, t.image));
+    for (const t of atlas.textures)
+      writeFileSync(join(dir, t.image), inkFloor(readFileSync(join(packed, t.image))));
     copyFileSync(join(packed, file), join(dir, file));
   }
   writeManifest(dir);
