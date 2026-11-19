@@ -17,7 +17,7 @@ import {
   queued,
   stateOf,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
+import { until } from './flowHelpers';
 
 /** Round 10, W1a (seams.md 3 row 25, scope.md 2.1): the hidden seats, step 1: fresh seat ids at Start. */
 
@@ -102,7 +102,8 @@ describe('fresh seat ids at Start (row 25)', () => {
     const h = party.humans[2]!;
     const seat = seatOf(room, { sessionId: h.room.sessionId });
     await h.room.leave();
-    await sleep(200);
+    // onLeave marks the seat disconnected and records the death in the same call: wait for it, not for wall time.
+    await until(() => room.state.players.get(seat)?.connected === false);
     expect(room.state.players.get(seat)?.connected).toBe(false);
     expect(simOf(room).deaths.some((d) => d.playerId === seat && d.cause === 'vanished')).toBe(true);
   });
