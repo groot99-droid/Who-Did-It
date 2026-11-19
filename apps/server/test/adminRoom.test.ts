@@ -22,7 +22,7 @@ import { autoOf } from '../src/sim/auto/Auto';
 import { clockOf } from '../src/sim/auto/clock';
 import { until } from './flowHelpers';
 import { registerInvariant } from '../src/sim/auto/invariants';
-import { advance, lobbyOf, pauseClock, start, toWorld } from './npcHelpers';
+import { type Human, advance, flush, lobbyOf, pauseClock, start, toWorld } from './npcHelpers';
 import { sleep } from './simHelpers';
 
 vi.setConfig({ testTimeout: 40_000 });
@@ -145,7 +145,12 @@ describe('with the variables set', () => {
     for (let i = 0; i < 4000 && room.state.phase !== Phase.grace; i++) advance({ humans: [], room }, 1);
     expect(room.state.phase).toBe(Phase.grace);
     advance({ humans: [], room }, 8);
-    await sleep(500);
+    // Wait until the patches of those steps have reached the admin client (npcHelpers' flush, on a seatless client).
+    const watcher: Human = { room: admin, id: '', log: [] };
+    admin.onMessage('*', (type: string | number, payload: unknown) =>
+      watcher.log.push({ type: String(type), payload }),
+    );
+    await flush({ humans: [watcher], room }, [watcher]);
 
     const state = admin.state as unknown as GameStateType;
     expect(state.players.size).toBe(room.state.players.size);
