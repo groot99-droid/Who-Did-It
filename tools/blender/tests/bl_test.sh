@@ -41,7 +41,8 @@ cp "$SRC" "$T/root/tools/blender/bl.sh" || exit 2
 ROOTD="$T/root"
 BL="$ROOTD/tools/blender/bl.sh"
 FAKE="$T/fake.sh"
-unset WDI_BLENDER_LOCK FAKE_LOG FAKE_SLEEP FAKE_EXIT FAKE_MODE FAKE_PID FAKE_COUNT EXPECT_LOCK BL_ASK_HOOK BL_BLENDER_UP
+unset WDI_BLENDER_LOCK FAKE_LOG FAKE_SLEEP FAKE_EXIT FAKE_MODE FAKE_PID FAKE_COUNT EXPECT_LOCK
+unset BL_ASK_HOOK BL_BLENDER_UP BL_ASK_FAIL
 export BLENDER="$FAKE" # never a real Blender, in any call
 REALSLEEP="$(command -v sleep)"
 export REALSLEEP
@@ -117,19 +118,45 @@ cat >"$SHIM/$ASK" <<'EOF'
 #!/bin/bash
 # Stands in for the wrapper's question whether a Blender runs (tasklist on Windows, pgrep elsewhere). If BL_ASK_HOOK
 # names a script, it runs once first: what another caller does while the question is asked. The answer is yes when the
-# file BL_BLENDER_UP exists.
+# file BL_BLENDER_UP exists. tasklist lists other programs either way, blender-mcp.exe among them, which is not a
+# Blender, and tasklist.exe itself, as the real one does. BL_ASK_FAIL=1 makes the question fail (an error, and exit
+# code 1 as tasklist gives, 2 as pgrep gives); BL_ASK_FAIL=empty makes tasklist answer nothing with exit code 0, and
+# BL_ASK_FAIL=header makes it print its header and no process, not even itself.
 if [ -n "$BL_ASK_HOOK" ] && [ ! -e "$BL_ASK_HOOK.done" ]; then
   : >"$BL_ASK_HOOK.done"
   bash "$BL_ASK_HOOK"
 fi
-if [ -n "$BL_BLENDER_UP" ] && [ -e "$BL_BLENDER_UP" ]; then
-  echo "blender.exe                   4242 Console                    1    99,999 K"
+me="${0##*/}"
+case "$BL_ASK_FAIL" in
+  1)
+    echo "ERROR: the process list could not be read." >&2
+    [ "$me" = pgrep ] && exit 2
+    exit 1
+    ;;
+  empty) exit 0 ;;
+esac
+up=""
+[ -n "$BL_BLENDER_UP" ] && [ -e "$BL_BLENDER_UP" ] && up=1
+if [ "$me" = pgrep ]; then
+  [ -n "$up" ] || exit 1
+  echo 4242
   exit 0
 fi
-exit 1
+printf '\r\nImage Name                     PID Session Name        Session#    Mem Usage\r\n'
+printf '========================= ======== ================ =========== ============\r\n'
+[ "$BL_ASK_FAIL" != header ] || exit 0
+printf 'System Idle Process              0 Services                   0          8 K\r\n'
+printf 'blender-mcp.exe              44708 Console                    1      2,196 K\r\n'
+[ -z "$up" ] || printf 'blender.exe                   4242 Console                    1     99,999 K\r\n'
+printf 'tasklist.exe                 12345 Console                    1      9,876 K\r\n'
+exit 0
 EOF
 chmod +x "$SHIM/sleep" "$SHIM/$ASK"
 SHIMPATH="$SHIM:$PATH"
+# The same fast poll with nothing to ask whether a Blender runs: the sleep shim and /usr/bin alone, which in Git Bash
+# has neither tasklist nor pgrep.
+SHIMNOASK="$T/shimnoask"
+mkdir -p "$SHIMNOASK" && cp "$SHIM/sleep" "$SHIMNOASK/sleep" || exit 2
 # A mkdir that keeps the wrapper in it for BL_MKDIR_DELAY seconds after the folder was made: a signal that comes then
 # is held back until mkdir returns. It is in a folder of its own, so that the cases that do not want it never get it.
 REALMKDIR="$(command -v mkdir)"
@@ -177,6 +204,12 @@ listing() { (cd "$1" && ls -A | sort); }
 alive() { kill -0 "$1" 2>/dev/null; }
 gone() { ! alive "$1"; }
 has() { grep -q -- "$1" "$2" 2>/dev/null; }
+ends() { # <text> <file>: true when a line of the file ends with the text, taken as it is (a folder's [ or * too)
+  local line
+  [ -f "$2" ] || return 1
+  while IFS= read -r line || [ -n "$line" ]; do [[ "$line" == *"$1" ]] && return 0; done <"$2"
+  return 1
+}
 state() { # <lock> <pid>: how a lock and a process stand, for a message
   echo "lock $([ -d "$1" ] && echo kept || echo freed), process $(alive "$2" && echo alive || echo gone)"
 }
@@ -267,7 +300,7 @@ run_abs() { # <label> <lock as given> <the same lock as a POSIX path> <folder to
     bash "$BL" -b "a b" --x 'c  d' '*' '' >"$O/$label.out" 2>"$O/$label.err")
   code=$?
   if [ "$code" = 0 ]; then ok "$label: exit 0"; else bad "$label: exit $code ($(cat "$O/$label.err"))"; fi
-  if has "cwd $ROOTD lock_held yes nargs 6\$" "$O/$label.log"; then
+  if ends " cwd $ROOTD lock_held yes nargs 6" "$O/$label.log"; then
     ok "$label: ran in the root with the lock held and 6 arguments"
   else
     bad "$label: start line: $(head -1 "$O/$label.log" 2>&1)"
@@ -467,6 +500,36 @@ if [ "$CODE" = 0 ] && has "^start" "$O/e_ask.log" && [ ! -e "$lock" ]; then
 else
   bad "e_ask: exit $CODE after the lock was freed"
 fi
+# The question cannot be answered: it fails, it answers nothing, it lists not even tasklist itself, or there is nothing
+# to ask with. A stale lock then stays (its Blender may still run), and the wrapper says so once.
+for how in fail empty header none; do
+  if { [ "$how" = empty ] || [ "$how" = header ]; } && [ -z "$WIN" ]; then
+    skip "e_$how: pgrep has no such answer"
+    continue
+  fi
+  if [ "$how" = none ] && (PATH=/usr/bin && { command -v tasklist || command -v pgrep; }) >/dev/null 2>&1; then
+    skip "e_none: /usr/bin has tasklist or pgrep here"
+    continue
+  fi
+  case "$how" in
+    fail) extra=(BL_ASK_FAIL=1) ;;
+    empty) extra=(BL_ASK_FAIL=empty) ;;
+    header) extra=(BL_ASK_FAIL=header) ;;
+    none) extra=(PATH="$SHIMNOASK:/usr/bin") ;;
+  esac
+  lock="$L/e_$how.lock"
+  stale_lock "$lock" 50
+  run_fast "e_$how" "$lock" 3 "${extra[@]}"
+  code=$?
+  notes="$(grep -c 'cannot be asked' "$O/e_$how.err" 2>/dev/null)"
+  if [ "$code" = 124 ] && [ ! -e "$O/e_$how.log" ] && [ -d "$lock" ] && [ "$notes" = 1 ]; then
+    ok "e_$how: a 50-minute-old lock stayed when no answer could be had ($how), and the wrapper said so once"
+  else
+    bad "e_$how: exit $code, lock $([ -d "$lock" ] && echo kept || echo removed), stand-in $([ -e "$O/e_$how.log" ] &&
+      echo ran || echo 'did not run'), $notes notes"
+  fi
+  rmdir "$lock" 2>/dev/null
+done
 # the machine's own question and the wrapper's own 5 s poll
 blender_up() { # true when a Blender runs on this machine now (someone else's: this test starts none)
   if [ -n "$WIN" ]; then
@@ -713,7 +776,8 @@ if wait_for 30 test -s "$pidf"; then
   kill -TERM "$W"
   finish "$W" 60
   if [ "$CODE" = 143 ]; then ok "h5: exit 143"; else bad "h5: exit $CODE"; fi
-  if has "could not end Blender (pid [0-9]*): the lock stays: $lock" "$O/h5.err"; then
+  if has "could not end Blender (pid [0-9]*): the lock stays: " "$O/h5.err" &&
+    ends ": the lock stays: $lock" "$O/h5.err"; then
     ok "h5: says so on stderr"
   else
     bad "h5: stderr: $(cat "$O/h5.err")"
@@ -730,6 +794,96 @@ else
   bad "h5: the stand-in did not start"
   kill -KILL "$W" 2>/dev/null
 fi
+
+echo "== H5b. A signal the wrapper does not catch (USR1): it ends, Blender runs on, the lock stays, it says so"
+lock="$L/h5b.lock"
+pidf="$O/h5b.pid"
+rm -f "$pidf" "$O/h5b.log"
+bg h5b "$lock" FAKE_LOG="$O/h5b.log" FAKE_SLEEP=60 FAKE_PID="$pidf" -- a
+if wait_for 30 test -s "$pidf"; then
+  c="$(cat "$pidf")"
+  kill -USR1 "$W"
+  finish "$W" 30
+  want=$((128 + $(kill -l USR1)))
+  if [ "$CODE" = "$want" ]; then ok "h5b: exit $want"; else bad "h5b: exit $CODE, not $want"; fi
+  if has "Blender (pid [0-9]*) still runs: the lock stays: " "$O/h5b.err" && ! has "could not end" "$O/h5b.err"; then
+    ok "h5b: says that Blender still runs, not that it could not be ended"
+  else
+    bad "h5b: stderr: $(cat "$O/h5b.err")"
+  fi
+  if [ -d "$lock" ] && alive "$c"; then
+    ok "h5b: the lock stays while the stand-in lives"
+  else
+    bad "h5b: $(state "$lock" "$c")"
+  fi
+  reap "$pidf"
+  wait_for 10 gone "$c"
+  rmdir "$lock" 2>/dev/null
+else
+  bad "h5b: the stand-in did not start"
+  kill -KILL "$W" 2>/dev/null
+fi
+
+# The two instants a signal used to slip through, each held for 2 s with a DEBUG trap that BASH_ENV puts into the
+# wrapper under test (and into nothing else)
+HOLD="$T/hold_env.sh"
+cat >"$HOLD" <<'EOF'
+# BASH_ENV of the hold cases. In the wrapper only (not the stand-in or the shims), before one chosen command it writes
+# BL_HOLD_MARK and sleeps 2 s, once, so that a signal can be sent in that instant. BL_HOLD_AT=release: before
+# release()'s first command, as the wrapper exits; BL_HOLD_AT=pid: after Blender started, before its pid is kept.
+[[ $0 == */tools/blender/bl.sh ]] || return 0
+set -T
+BL_HELD=""
+trap '[ -z "$BL_HELD" ] &&
+  { { [ "$BL_HOLD_AT" = release ] && [ "${FUNCNAME[0]}" = release ]; } ||
+    { [ "$BL_HOLD_AT" = pid ] && [ "$BASH_COMMAND" = "CHILD=\$!" ]; }; } &&
+  { BL_HELD=1; : >"$BL_HOLD_MARK"; "$REALSLEEP" 2; }' DEBUG
+EOF
+
+echo "== H11. TERM in the instant the wrapper exits after Blender ended: the lock is freed all the same"
+lock="$L/h11.lock"
+mark="$T/h11.mark"
+rm -f "$mark" "$O/h11.log"
+bg h11 "$lock" BASH_ENV="$HOLD" BL_HOLD_AT=release BL_HOLD_MARK="$mark" FAKE_LOG="$O/h11.log" -- a
+if wait_for 30 test -e "$mark"; then
+  kill -TERM "$W"
+  finish "$W" 20
+  if [ "$CODE" = 0 ] && [ ! -e "$lock" ] && has "^end" "$O/h11.log"; then
+    ok "h11: TERM as the wrapper exited after Blender ended changed nothing: exit 0, the lock freed"
+  else
+    bad "h11: exit $CODE, the lock $([ -d "$lock" ] && echo 'LEFT with no Blender' || echo freed)"
+  fi
+else
+  bad "h11: the wrapper was never held as it exited"
+  kill -KILL "$W" 2>/dev/null
+fi
+rmdir "$lock" 2>/dev/null
+
+echo "== H12. USR1 just after Blender started, before its pid was kept: the lock stays while Blender runs"
+lock="$L/h12.lock"
+mark="$T/h12.mark"
+pidf="$O/h12.pid"
+rm -f "$mark" "$pidf" "$O/h12.log"
+bg h12 "$lock" BASH_ENV="$HOLD" BL_HOLD_AT=pid BL_HOLD_MARK="$mark" FAKE_LOG="$O/h12.log" FAKE_SLEEP=60 \
+  FAKE_PID="$pidf" -- a
+if wait_for 30 test -e "$mark" && wait_for 30 test -s "$pidf"; then
+  c="$(cat "$pidf")"
+  kill -USR1 "$W"
+  finish "$W" 20
+  want=$((128 + $(kill -l USR1)))
+  if [ "$CODE" = "$want" ] && [ -d "$lock" ] && alive "$c" && has "still runs: the lock stays" "$O/h12.err"; then
+    ok "h12: USR1 before Blender's pid was kept: exit $want, the lock stays while the stand-in runs, said on stderr"
+  else
+    bad "h12: exit $CODE, $(state "$lock" "$c"), stderr: $(cat "$O/h12.err")"
+  fi
+  reap "$pidf"
+  wait_for 10 gone "$c"
+else
+  bad "h12: the wrapper was never held after starting the stand-in"
+  kill -KILL "$W" 2>/dev/null
+  reap "$pidf"
+fi
+rmdir "$lock" 2>/dev/null
 
 echo "== H6. TERM to a wrapper that is still waiting"
 lock="$L/h6.lock"

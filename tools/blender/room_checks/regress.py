@@ -23,8 +23,9 @@ value that the room's own saved bake cannot rebuild is of no use. `rooms` prints
 a line.
 
 A row records the program that wrote its GLB (`generator`, the GLB's asset.generator, e.g. "Khronos glTF Blender I/O
-v5.2.40"): another Blender build writes other bytes for the same room, so its md5 cannot match. The verdict says so
-first; the row is recorded again only after the room, built with that Blender, has passed its checks again.
+v5.2.40"): another version of Blender's glTF exporter writes other bytes for the same room, so its md5 cannot match.
+The verdict says so first; the row is recorded again only after the room, built with that Blender, has passed its
+checks again. A Blender release that keeps the exporter's version gives a plain MISMATCH.
 
 Exit codes, regress.sh's too: 0 the rebuilt GLB has the golden md5; 1 it differs, or the rebuild failed; 2 a bad
 call; 3 the saved bake is not on this machine (tools/blender/build/ is git-ignored), so nothing was compared.
@@ -44,7 +45,8 @@ ROOT = roomcfg.ROOT
 ROOMS = os.path.join(ROOT, "tools", "blender", "build", "rooms")
 GOLDEN = os.path.join(ROOT, "tools", "blender", "meshy_rooms", "golden.json")
 PLAN = ("room", "light", "layout", "raw", "out", "golden")
-FIELDS = ("light", "layout", "vertices", "triangles", "glbBytes", "generator")    # what a row says of its GLB besides md5
+# what a golden row says of its GLB besides md5
+FIELDS = ("light", "layout", "vertices", "triangles", "glbBytes", "generator")
 PLAIN = re.compile(r"[A-Za-z0-9_.-]+")      # a light setting's or a layout's name, as the builder's arguments take it
 shown = roomcfg.shown
 
@@ -342,7 +344,7 @@ def verdict(a):
             "scriptMd5", "roomMd5", "roomBakeMd5", "lookMd5", "lookBakeMd5", "kitMd5", "rawAgrees")})
         off = [k for k in FIELDS if got[k] != row[k]]
         same = got["glbMd5"] == row["glbMd5"]
-        # another Blender build writes other bytes for the same room: then the md5 cannot match, whatever the code did
+        # another glTF exporter (another Blender build) writes other bytes for the same room: the md5 cannot match
         other_blender = not same and got["generator"] is not None and got["generator"] != row["generator"]
         res["verdict"] = "match" if same and not off else "mismatch"
         res["fieldsThatDiffer"] = off
@@ -399,13 +401,14 @@ def verdict(a):
                 say.append(f"  The golden GLB itself is not on this machine ({shown(ref)} is missing or is another "
                            "build), so the two were not compared part by part.")
             if other_blender:
-                say.append("  This Blender writes the room's GLB with other bytes. Build the room with it, run its checks "
-                           "(run.sh), and only when they end as they did before record the row again: python "
+                say.append("  This Blender writes the room's GLB with other bytes. Build the room with it, run its "
+                           "checks (run.sh), and only when they end as they did before record the row again: python "
                            f"tools/blender/room_checks/regress.py record {a.room} --replace")
             else:
-                say.append("  A change to shared builder code must leave a finished room as it was: find what changed "
-                           "it. Only when the room itself was changed on purpose and has passed its checks again is the "
-                           f"row replaced: python tools/blender/room_checks/regress.py record {a.room} --replace")
+                say.append("  A change to shared builder code must leave a finished room as it was: find what "
+                           "changed it. Only when the room itself was changed on purpose and has passed its checks "
+                           f"again is the row replaced: python tools/blender/room_checks/regress.py record {a.room} "
+                           "--replace")
     if a.seconds is not None:
         say.append(f"  rebuilt into {shown(out)} in {a.seconds:g} s")
     os.makedirs(out, exist_ok=True)

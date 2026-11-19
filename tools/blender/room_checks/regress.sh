@@ -12,8 +12,8 @@
 #   -h, --help   prints this text.
 #   A relative path is taken from where you stand. The rebuild is one Blender run through tools/blender/bl.sh under
 #   its lock (WDI_BLENDER_LOCK, BLENDER), with the golden row's own --light and --layout and no stills: about a
-#   minute for the bedroom (55 to 75 s), and longer while another Blender job holds the lock, for which it waits.
-#   PYTHON names the Python of regress.py (standard library only).
+#   minute for the bedroom (49 to 73 s measured), and longer while another Blender job holds the lock, for which it
+#   waits. PYTHON names the Python of regress.py (standard library only).
 # The build it checks is only read. It writes into --out: the rebuild, build.log (the builder's output, with
 # absolute local paths: do not publish it as it is) and regress.json (the verdict).
 # Exit code 0: the rebuilt GLB has the golden md5. 1: it differs, or the rebuild failed; regress.py says what
