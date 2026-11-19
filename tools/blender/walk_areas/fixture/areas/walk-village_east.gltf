@@ -7,7 +7,7 @@
   "scenes": [
     {
       "name": "Walk fixture village_east",
-      "nodes": [9, 10]
+      "nodes": [11, 12]
     }
   ],
   "nodes": [
@@ -56,6 +56,16 @@
         "wdi_district": "Village east",
         "wdi_facing_deg": 0,
         "wdi_picker": false
+      }
+    },
+    {
+      "name": "Spawn_overworld_mouth_east",
+      "translation": [20, 0, 10.5],
+      "rotation": [0, 0, 0, 1],
+      "extras": {
+        "wdi_spawn": "Outside the east cave mouth",
+        "wdi_district": "Village east",
+        "wdi_facing_deg": 90
       }
     },
     {
@@ -108,8 +118,18 @@
       }
     },
     {
+      "name": "Portal_um.east_in",
+      "translation": [20, 0, 12],
+      "extras": {
+        "to": "undermere",
+        "toSpawn": "mouth_east",
+        "kind": "cave_mouth",
+        "wdi_portal_id": "um.east_in"
+      }
+    },
+    {
       "name": "Area_village_east",
-      "children": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+      "children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
       "extras": {
         "wdi_area": "village_east",
         "wdi_kind": "section",

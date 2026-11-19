@@ -1,8 +1,10 @@
-// Writes the small multi-file test world of docs/walk-areas.md (contract version 1):
+// Writes the small multi-file test world of docs/walk-areas.md (contract version 1.1; index format 1):
 //   areas/walk-index.json           the index
 //   areas/walk-village_west.gltf    Area_village_west   a village section (outdoors)
 //   areas/walk-village_east.gltf    Area_village_east   the section east of it; the two share the seam "west_east"
 //   areas/walk-room_shop.gltf       Area_room_shop      a room (indoors, baked), at its own origin
+//   areas/walk-under_a.gltf         Area_under_a        a cave of the walk-only scene "undermere" (indoors, baked)
+//   areas/walk-under_b.gltf         Area_under_b        the cave east of it; the two share the cave seam "a_b"
 //
 //   node make-areas-fixture.mjs [out folder]        default: the folder "areas" beside this script
 //   MUTATE=<name> node make-areas-fixture.mjs <out>  one variant of the world (mutants.py runs every name):
@@ -29,6 +31,16 @@
 //                  Portal_shop.door (0, -2.8), which leads to scene "overworld", spawn "shop_door".
 // The room's own spawn id is "shop_door" and its way out asks for "overworld" + "shop_door" = "overworld_shop_door":
 // the two share the bare id on purpose. A loader that falls back to the bare id goes to the wrong spawn here.
+//   the caves      under the east section, in the village frame (a cave keeps the village's coordinates): one passage
+//                  2.4 m wide (y -11.2..-8.8) with its floor at z = -10 and its roof 2.6 m above the floor, cut at
+//                  x = 32 into under_a (x 20..32) and under_b (x 32..44). Box collision, not compressed.
+//   seam a_b       the line x = 32, a "passage". The opening is the passage, 2.4 m wide; each file closes it with a
+//                  wall from the floor to the roof. Two portal points a side, 1.2 m apart, 0.45 m in front of the wall:
+//                  Portal_seam_a_b_a_1..2 at (31.55, -10.6 | -9.4), Portal_seam_a_b_b_1..2 at (32.45, ...); arrivals
+//                  Spawn_undermere_seam_a_b_a_1..2 at (30.35, ...) looking west, ..._b_1..2 at (33.65, ...) looking east.
+//   cave mouth     "east": Portal_um.east_in (20, -12) in village_east leads to undermere + mouth_east, the spawn
+//                  Spawn_undermere_mouth_east (22, -10) in under_a, which looks east, 1.5 m from Portal_um.east_out
+//                  (20.5, -10), whose way back arrives at Spawn_overworld_mouth_east (20, -10.5), looking north.
 import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
 import { mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -78,9 +90,20 @@ const MUTANTS = [
   'baked_one_side',
   'polygon_odd',
   'chamfer_open',
+  // the caves (contract version 1.1)
+  'cave_not_indoor',
+  'cave_not_baked',
+  'cave_seam_open_roof',
+  'cave_seam_to_overworld',
+  'cave_look_differs',
+  'walk_scene_is_game_scene',
+  'cave_id_prefix',
+  'cave_door_between_caves',
+  'cave_spawn_near_portal',
+  'cave_gate_to_missing_spawn',
 ];
 // allowed worlds that must draw a note, and worlds that must pass as they are
-const NOTED = ['way_back_far', 'no_way_in'];
+const NOTED = ['way_back_far', 'no_way_in', 'gate_pending'];
 const VALID = [
   'slope_along_seam',
   'pending_bare_id',
@@ -88,6 +111,8 @@ const VALID = [
   'polygon_flat',
   'polygon_string',
   'polygon_chamfer',
+  'cave_stacked_levels',
+  'cave_seam_ramp',
 ];
 if (MUTATE && ![...MUTANTS, ...NOTED, ...VALID].includes(MUTATE)) {
   console.error(`unknown MUTATE "${MUTATE}"; known: ${[...MUTANTS, ...NOTED, ...VALID].join(', ')}`);
@@ -356,7 +381,8 @@ class Gltf {
     });
     return this.accessors.length - 1;
   }
-  mesh(name, m, material) {
+  /** The POSITION accessor of a glTF-axes mesh, with the min and max glTF asks for. */
+  positions(m) {
     const mn = [Infinity, Infinity, Infinity],
       mx = [-Infinity, -Infinity, -Infinity];
     for (let i = 0; i < m.pos.length; i += 3)
@@ -364,11 +390,18 @@ class Gltf {
         mn[k] = Math.min(mn[k], m.pos[i + k]);
         mx[k] = Math.max(mx[k], m.pos[i + k]);
       }
-    const attributes = { POSITION: this.accessor(m.pos, 'VEC3', 5126, 34962, { min: mn, max: mx }) };
+    return this.accessor(m.pos, 'VEC3', 5126, 34962, { min: mn, max: mx });
+  }
+  mesh(name, m, material) {
+    const attributes = { POSITION: this.positions(m) };
     if (material !== null) attributes.NORMAL = this.accessor(m.nrm, 'VEC3', 5126, 34962);
     if (m.col) attributes.COLOR_0 = this.accessor(m.col, 'VEC3', 5126, 34962);
     if (m.textured) attributes.TEXCOORD_0 = this.accessor(m.uv, 'VEC2', 5126, 34962);
-    const indices = this.accessor(m.idx, 'SCALAR', 5123, 34963);
+    return this.meshOf(name, attributes, this.accessor(m.idx, 'SCALAR', 5123, 34963), material);
+  }
+  /** A mesh of one primitive from accessors already written: a cave draws its collision boxes with the same
+   * positions and indices (unlit and baked, it needs no normals), which keeps the file small. */
+  meshOf(name, attributes, indices, material) {
     this.meshes.push({
       name,
       primitives: [{ attributes, indices, ...(material === null ? {} : { material }) }],
@@ -477,47 +510,101 @@ const spawnLabel = (id, extras = {}) => {
 
 // ---------------------------------------------------------------- the world both the files and the index come from
 
+// The walk-only scenes, as the checkers read them (tools/blender/walk_areas/walk_scenes.json). The index lists the
+// entries of the walk-only scenes the files use under walk_scenes.
+const WALK_SCENES = JSON.parse(readFileSync(join(here, '..', 'walk_scenes.json'), 'utf8'));
+
+// A seam: its line is x = `x` (Blender), its points stand at the places `ys` along it, side a west of the line.
 const SEAM = {
   id: 'west_east',
+  scene: 'overworld',
   kind: 'gate',
   width: 5,
   a: 'village_west',
   b: 'village_east',
+  x: 0,
   ys: [-1.8, 0, 1.8],
+  words: { a: 'East gate', b: 'West gate' }, // the picker words of the arrivals on each side
 };
 const OUTDOOR_LOOK = { wdi_exposure: 2.3784, fog_color: [0.026, 0.034, 0.058], fog_density: 0.006 };
+// The caves: one passage under village_east, cut at x = 32 into two files. A cave keeps the village's coordinates.
+// cave_id_prefix names the west cave cave_a, which a cave may not be called (the game has the scenes cave_entry and
+// cave_gallery): the id of a cave starts with the area prefix of its walk-only scene, under_.
+const CAVE_A = MUTATE === 'cave_id_prefix' ? 'cave_a' : 'under_a';
+const CAVE = { floor: -10, roof: 2.6, ys: [-11.2, -8.8] }; // the floor's height, the roof above it, the passage's sides
+const CAVE_SEAM = {
+  id: 'a_b',
+  scene: 'undermere',
+  kind: 'passage',
+  width: 2.4,
+  a: CAVE_A,
+  b: 'under_b',
+  x: 32,
+  ys: [-10.6, -9.4],
+  words: { a: 'East passage', b: 'West passage' },
+};
+// One look for every cave: the ink as the fog colour, written as the viewer reads a colour string (three's Color).
+const CAVE_LOOK = { wdi_exposure: 4, fog_color: '#12141C', fog_density: 0.05 };
 
-function seamPortals(side) {
-  // the row a section owns: side a stands at x = -0.45, side b at x = +0.45
-  const x = side === 'a' ? -0.45 : 0.45,
+function seamPortals(S, side) {
+  // the row a section or a cave owns: side a stands 0.45 m west of the line, side b 0.45 m east of it
+  const x = r6(S.x + (side === 'a' ? -0.45 : 0.45)),
     other = side === 'a' ? 'b' : 'a';
-  return SEAM.ys.map((y, k) => ({
-    name: `Portal_seam_${SEAM.id}_${side}_${k + 1}`,
+  return S.ys.map((y, k) => ({
+    name: `Portal_seam_${S.id}_${side}_${k + 1}`,
     at: [x, y],
-    to: 'overworld',
-    toSpawn: `seam_${SEAM.id}_${other}_${k + 1}`,
+    to: S.scene,
+    toSpawn: `seam_${S.id}_${other}_${k + 1}`,
     kind: 'gate',
-    pid: `seam_${SEAM.id}_${side}_${k + 1}`,
-    seam: SEAM.id,
-    seamKind: SEAM.kind,
-    width: SEAM.width,
+    pid: `seam_${S.id}_${side}_${k + 1}`,
+    seam: S.id,
+    seamKind: S.kind,
+    width: S.width,
     n: k + 1,
   }));
 }
-function seamArrivals(side, district) {
+function seamArrivals(S, side, district) {
   // where a walker from the other side arrives: 1.65 m inside this side's wall
-  const x = side === 'a' ? -1.65 : 1.65,
+  const x = r6(S.x + (side === 'a' ? -1.65 : 1.65)),
     heading = side === 'a' ? 180 : 0;
-  return SEAM.ys.map((y, k) => ({
-    id: `overworld_seam_${SEAM.id}_${side}_${k + 1}`,
+  return S.ys.map((y, k) => ({
+    id: `${S.scene}_seam_${S.id}_${side}_${k + 1}`,
     at: [x, y],
     heading,
-    spawn: `${side === 'a' ? 'East' : 'West'} gate, arrival ${k + 1}`,
+    spawn: `${S.words[side]}, arrival ${k + 1}`,
     district,
     picker: false,
     n: k + 1,
   }));
 }
+/** The index's entry of a seam, as walk_index.py derives it from the files (`count`: a variant that drops points). */
+const seamEntry = (S) => ({
+  id: S.id,
+  kind: S.kind,
+  width_m: S.width,
+  a: S.a,
+  b: S.b,
+  portals: S.count ?? S.ys.length,
+  opening_xy: [
+    [S.x, r6((S.ys[0] + S.ys[S.ys.length - 1]) / 2 - S.width / 2)],
+    [S.x, r6((S.ys[0] + S.ys[S.ys.length - 1]) / 2 + S.width / 2)],
+  ],
+  normal_xy: [1, 0],
+});
+/** A cave: a stretch of the passage from x0 to x1, its floor at the height `floor`. */
+const cave = (name, x0, x1, floor, spawns, portals) => ({
+  kind: 'cave',
+  scene: 'undermere',
+  name,
+  indoor: true,
+  baked: true,
+  at: [0, 0],
+  floor,
+  look: { ...CAVE_LOOK },
+  walk: [x0, CAVE.ys[0], x1, CAVE.ys[1]],
+  spawns,
+  portals,
+});
 
 const WORLD = {
   start: 'square',
@@ -540,7 +627,7 @@ const WORLD = {
           spawn: 'Outside the shop',
           district: 'Village west',
         },
-        ...seamArrivals('a', 'Village west'),
+        ...seamArrivals(SEAM, 'a', 'Village west'),
       ],
       portals: [
         {
@@ -551,7 +638,7 @@ const WORLD = {
           kind: 'door',
           pid: 'ov.shop',
         },
-        ...seamPortals('a'),
+        ...seamPortals(SEAM, 'a'),
       ],
     },
     village_east: {
@@ -565,10 +652,17 @@ const WORLD = {
       walk: [0, -20, 60, 20],
       spawns: [
         { id: 'mill', at: [30, 10], heading: 180, spawn: 'mill', district: 'Village east' },
-        ...seamArrivals('b', 'Village east'),
+        ...seamArrivals(SEAM, 'b', 'Village east'),
+        {
+          id: 'overworld_mouth_east',
+          at: [20, -10.5],
+          heading: 90,
+          spawn: 'Outside the east cave mouth',
+          district: 'Village east',
+        },
       ],
       portals: [
-        ...seamPortals('b'),
+        ...seamPortals(SEAM, 'b'),
         {
           name: 'Portal_ov.mine',
           at: [55, 0],
@@ -576,6 +670,14 @@ const WORLD = {
           toSpawn: 'mouth',
           kind: 'cave_mouth',
           pid: 'ov.mine',
+        },
+        {
+          name: 'Portal_um.east_in',
+          at: [20, -12],
+          to: 'undermere',
+          toSpawn: 'mouth_east',
+          kind: 'cave_mouth',
+          pid: 'um.east_in',
         },
       ],
     },
@@ -600,22 +702,43 @@ const WORLD = {
         },
       ],
     },
-  },
-  seams: [
-    {
-      id: SEAM.id,
-      kind: SEAM.kind,
-      width_m: SEAM.width,
-      a: SEAM.a,
-      b: SEAM.b,
-      portals: SEAM.ys.length,
-      opening_xy: [
-        [0, -SEAM.width / 2],
-        [0, SEAM.width / 2],
+    [CAVE_A]: cave(
+      'The Undermere, mouth passage',
+      20,
+      32,
+      CAVE.floor,
+      [
+        {
+          id: 'undermere_mouth_east',
+          at: [22, -10],
+          heading: 0,
+          spawn: 'East cave mouth',
+          district: 'The Undermere',
+        },
+        ...seamArrivals(CAVE_SEAM, 'a', 'The Undermere'),
       ],
-      normal_xy: [1, 0],
-    },
-  ],
+      [
+        {
+          name: 'Portal_um.east_out',
+          at: [20.5, -10],
+          to: 'overworld',
+          toSpawn: 'mouth_east',
+          kind: 'cave_mouth',
+          pid: 'um.east_out',
+        },
+        ...seamPortals(CAVE_SEAM, 'a'),
+      ],
+    ),
+    under_b: cave(
+      'The Undermere, far passage',
+      32,
+      44,
+      CAVE.floor,
+      [...seamArrivals(CAVE_SEAM, 'b', 'The Undermere')],
+      [...seamPortals(CAVE_SEAM, 'b')],
+    ),
+  },
+  seams: [CAVE_SEAM, SEAM], // in the order of their ids, as walk_index.py lists them
   pending: ['mine'],
 };
 
@@ -626,6 +749,9 @@ const WORLD = {
 // everything the file holds with no transform on any node; `sceneExtras`; `sun`; `lightName`; `ghostLight`;
 // `requireExt`; `polygon` (the outline of the walk region as [x, y] pairs), with `polygonForm` 'string' to write it as
 // a JSON string and `polygonRaw` to write a broken value instead.
+// `caveRamp` is how much the floor (and the roof) of every cave rises for each metre toward the east, across the cave
+// seam; `openRoof` names the cave whose seam wall stops 0.3 m under the roof; `walkScenes` is the list of walk-only
+// scenes a variant writes beside its files (mutants.py hands it to both checkers with --walk-scenes).
 const FLAGS = {
   noBarrier: null,
   noCollision: null,
@@ -634,6 +760,9 @@ const FLAGS = {
   noSouthWall: null,
   edgeGap: null,
   chamfer: null,
+  caveRamp: 0,
+  openRoof: null,
+  walkScenes: null,
 };
 // polygon_chamfer and chamfer_open: the north-west corner of village_west is cut off along the diagonal from (-50, 20)
 // to (-60, 10). Its outline is then a pentagon (counter-clockwise), and CHAMFER_WALL stands on the diagonal: a wall that
@@ -649,7 +778,9 @@ const CHAMFER_WALL = { a: [-50, 20], b: [-60, 10], out: [-Math.SQRT1_2, Math.SQR
 {
   const W = WORLD.areas.village_west,
     E = WORLD.areas.village_east,
-    R = WORLD.areas.room_shop;
+    R = WORLD.areas.room_shop,
+    CA = WORLD.areas[CAVE_A],
+    CB = WORLD.areas.under_b;
   const isArrival = (s) => s.id.startsWith('overworld_seam_');
   const isSeam = (p) => p.name.startsWith('Portal_seam_');
   const renumber = (A, side) => {
@@ -674,7 +805,7 @@ const CHAMFER_WALL = { a: [-50, 20], b: [-60, 10], out: [-Math.SQRT1_2, Math.SQR
       A.spawns = A.spawns.filter((s) => !isArrival(s) || keep.includes(s.n));
       renumber(A, side);
     }
-    WORLD.seams[0].portals = keep.length;
+    SEAM.count = keep.length;
   };
   switch (MUTATE) {
     case 'arrival_close':
@@ -861,20 +992,155 @@ const CHAMFER_WALL = { a: [-50, 20], b: [-60, 10], out: [-Math.SQRT1_2, Math.SQR
     case 'slope_along_seam':
       FLAGS.slopeNorth = 0.03;
       break; // VALID: the ground of both sections rises 3 % toward the north; walls stay 3 m above it
+    // the caves (contract version 1.1)
+    case 'cave_not_indoor':
+      CA.indoor = false;
+      break; // the cave's Area has no wdi_indoor: the viewer would draw the moon, the sky light and the sky dome in it
+    case 'cave_not_baked':
+      CA.baked = false;
+      break; // the cave's Area has no wdi_baked
+    case 'cave_seam_open_roof':
+      FLAGS.openRoof = CAVE_A;
+      break; // the seam wall of the west cave stops 0.3 m under the roof: the passage is not closed up to it
+    case 'cave_seam_to_overworld':
+      CA.portals.filter(isSeam).forEach((p) => {
+        p.to = 'overworld';
+      });
+      break; // the cave seam's points of side a lead into the village, not into the caves' own scene
+    case 'cave_look_differs':
+      CB.look = { ...CB.look, fog_density: 0.08 };
+      break; // the east cave carries thicker fog than the west one, in its file and in the index
+    case 'walk_scene_is_game_scene':
+      FLAGS.walkScenes = {
+        ...WALK_SCENES,
+        shop: { name: 'The shop cellars', kind: 'cave', area_prefix: 'shopcave_', portal_ns: 'sc' },
+      };
+      break; // walk_scenes.json also lists "shop", the game scene of the room room_shop, as a walk-only scene
+    case 'cave_id_prefix':
+      break; // the west cave is called cave_a (CAVE_A above), not under_<key>
+    case 'cave_door_between_caves': {
+      // the cave seam is gone; two plain doors join the caves instead, each with its arrival 1.2 m behind it
+      for (const A of [CA, CB]) {
+        A.portals = A.portals.filter((p) => !isSeam(p));
+        A.spawns = A.spawns.filter((s) => !s.id.startsWith('undermere_seam_'));
+      }
+      CA.portals.push({
+        name: 'Portal_ua.east',
+        at: [31.55, -10],
+        to: 'undermere',
+        toSpawn: 'b_west',
+        kind: 'door',
+        pid: 'ua.east',
+      });
+      CA.spawns.push({
+        id: 'undermere_a_east',
+        at: [30.35, -10],
+        heading: 180,
+        spawn: 'East door',
+        district: 'The Undermere',
+      });
+      CB.portals.push({
+        name: 'Portal_ub.west',
+        at: [32.45, -10],
+        to: 'undermere',
+        toSpawn: 'a_east',
+        kind: 'door',
+        pid: 'ub.west',
+      });
+      CB.spawns.push({
+        id: 'undermere_b_west',
+        at: [33.65, -10],
+        heading: 0,
+        spawn: 'West door',
+        district: 'The Undermere',
+      });
+      WORLD.seams = WORLD.seams.filter((S) => S !== CAVE_SEAM);
+      break; // a crossing between two caves of one scene that is no seam
+    }
+    case 'cave_spawn_near_portal':
+      CA.spawns.find((s) => s.id === 'undermere_mouth_east').at = [21.3, -10];
+      break; // the cave mouth's arrival stands 0.8 m from Portal_um.east_out, inside its walk-in radius
+    case 'cave_gate_to_missing_spawn':
+      CA.spawns = CA.spawns.filter((s) => s.id !== 'undermere_mouth_east');
+      break; // Portal_um.east_in leads to undermere + mouth_east, and no cave holds Spawn_undermere_mouth_east
+    case 'gate_pending':
+      delete WORLD.areas[CAVE_A];
+      delete WORLD.areas.under_b;
+      WORLD.seams = WORLD.seams.filter((S) => S !== CAVE_SEAM);
+      WORLD.pending = ['mine', 'undermere'];
+      break; // NOTED: the cave mouth leads into the caves before any cave file exists: undermere is pending
+    case 'cave_stacked_levels':
+      // VALID: a third cave lies directly under the west cave, 6 m lower, reached by its own mouth from village_west.
+      // Its mouth's portal and arrival stand at the same places in plan as those of the west cave, in another file.
+      WORLD.areas.under_c = cave(
+        'The Undermere, lower passage',
+        20,
+        32,
+        CAVE.floor - 6,
+        [
+          {
+            id: 'undermere_mouth_west',
+            at: [22, -10],
+            heading: 0,
+            spawn: 'West cave mouth',
+            district: 'The Undermere',
+          },
+        ],
+        [
+          {
+            name: 'Portal_um.west_out',
+            at: [20.5, -10],
+            to: 'overworld',
+            toSpawn: 'mouth_west',
+            kind: 'cave_mouth',
+            pid: 'um.west_out',
+          },
+        ],
+      );
+      W.spawns.push({
+        id: 'overworld_mouth_west',
+        at: [-20, -10.5],
+        heading: 90,
+        spawn: 'Outside the west cave mouth',
+        district: 'Village west',
+      });
+      W.portals.push({
+        name: 'Portal_um.west_in',
+        at: [-20, -12],
+        to: 'undermere',
+        toSpawn: 'mouth_west',
+        kind: 'cave_mouth',
+        pid: 'um.west_in',
+      });
+      break;
+    case 'cave_seam_ramp':
+      FLAGS.caveRamp = 0.06;
+      break; // VALID: the floor and roof of both caves rise 6 % toward the east, across the cave seam
     default:
       break;
   }
 }
 
-/** How high the ground of an area stands at a plan place: flat at 0 unless a variant slopes or lifts it. */
-const heightAt = (A, yNorth) => (A.up ?? 0) + (A.kind === 'section' ? FLAGS.slopeNorth * yNorth : 0);
-/** A glTF-axes mesh of an area as a variant wants it: sheared to the slope, lifted, moved in plan. */
+/** How high the ground of an area stands at a plan place, above its floor: flat unless a variant slopes, ramps or lifts
+ * it. A section slopes toward the north (slope_along_seam), a cave ramps toward the east about the cave seam's line. */
+const heightAt = (A, xEast, yNorth) =>
+  (A.up ?? 0) +
+  (A.kind === 'section' ? FLAGS.slopeNorth * yNorth : 0) +
+  (A.kind === 'cave' ? FLAGS.caveRamp * (xEast - CAVE_SEAM.x) : 0);
+/** A glTF-axes mesh of an area as a variant wants it: sheared to the slope or the ramp, lifted, moved in plan. */
 function shaped(mesh, A) {
   const [sx, sy] = A.shift ?? [0, 0];
-  if (!A.up && !sx && !sy && !(A.kind === 'section' && FLAGS.slopeNorth)) return mesh;
+  if (
+    !A.up &&
+    !sx &&
+    !sy &&
+    !(A.kind === 'section' && FLAGS.slopeNorth) &&
+    !(A.kind === 'cave' && FLAGS.caveRamp)
+  )
+    return mesh;
   const pos = new Float32Array(mesh.pos);
   for (let i = 0; i < pos.length; i += 3) {
-    pos[i + 1] += heightAt(A, -pos[i + 2]);
+    pos[i + 1] += heightAt(A, pos[i], -pos[i + 2]);
     pos[i] += sx;
     pos[i + 2] -= sy;
   }
@@ -882,10 +1148,11 @@ function shaped(mesh, A) {
 }
 /** An area's walk region as the file gives it: the Area node's move and a variant's plan shift are added. */
 const walkRegion = (A) => A.walk.map((v, i) => v + A.at[i % 2] + (A.shift ?? [0, 0])[i % 2]);
-/** Where a spawn or a portal of an area stands, in glTF axes, in the Area's own coordinates. */
+/** Where a spawn or a portal of an area stands, in glTF axes, in the Area's own coordinates: on its floor (a cave's
+ * lies under the village, at `floor`). */
 const placed = (A, at) => {
   const [sx, sy] = A.shift ?? [0, 0];
-  return [r6(at[0] + sx), r6(heightAt(A, at[1])), r6(-(at[1] + sy))];
+  return [r6(at[0] + sx), r6((A.floor ?? 0) + heightAt(A, at[0], at[1])), r6(-(at[1] + sy))];
 };
 
 // ---------------------------------------------------------------- one area file
@@ -919,10 +1186,32 @@ function sectionBoxes(id) {
   return { collision, render, slabs };
 }
 
+/** A cave's passage: floor, roof, side walls and end walls, 0.3 m thick, from its walk region and its floor. The end
+ * on the cave seam's line (x = 32) is the seam wall, from the floor to the roof; cave_seam_open_roof stops it 0.3 m
+ * short. The rest of the passage is closed too, which the index checkers do not test (the cave builder's Blender check
+ * does). The boxes are both the collision and what is drawn. */
+function caveBoxes(id) {
+  const A = WORLD.areas[id];
+  const [x0, y0, x1, y1] = A.walk,
+    z = A.floor,
+    h = CAVE.roof,
+    t = 0.3;
+  const top = (x) => z + (FLAGS.openRoof === id && x === CAVE_SEAM.x ? h - 0.3 : h);
+  return [
+    bbox(x0 - t, y0 - t, z - 0.2, x1 + t, y1 + t, z), // the floor
+    bbox(x0 - t, y0 - t, z + h, x1 + t, y1 + t, z + h + 0.2), // the roof
+    bbox(x0 - t, y0 - t, z, x1 + t, y0, z + h), // the south wall
+    bbox(x0 - t, y1, z, x1 + t, y1 + t, z + h), // the north wall
+    bbox(x0 - t, y0, z, x0, y1, top(x0)), // the west end: in under_b the seam wall, its face on x = 32
+    bbox(x1, y0, z, x1 + t, y1, top(x1)), // the east end: in under_a the seam wall, its face on x = 32
+  ];
+}
+
 function writeArea(id) {
   const A = WORLD.areas[id];
   const G = new Gltf();
-  G.materials = id === 'room_shop' ? [...MATERIALS] : MATERIALS.slice(0, 3);
+  G.materials =
+    id === 'room_shop' ? [...MATERIALS] : A.kind === 'cave' ? [MATERIALS[3]] : MATERIALS.slice(0, 3);
   const atG = [A.at[0], 0, -A.at[1]]; // the Area node's glTF translation: zero unless a mutant moves it
   const children = [];
   const stats = {
@@ -939,7 +1228,8 @@ function writeArea(id) {
     stats.draw_calls += 1;
     return G.node({ name, mesh: G.mesh(name, mesh, material), ...extra });
   };
-  let collisionMesh;
+  let collisionMesh,
+    collisionShared = null; // a cave's collision: the accessors of its drawn passage
   const sectionLights = []; // light definitions a variant adds to a section; the plain fixture has none
 
   if (id === 'room_shop') {
@@ -969,6 +1259,16 @@ function writeArea(id) {
     );
     stats.lights = 1;
     collisionMesh = moved(shaped(boxesToMesh(room), A), atG); // collision is in world coordinates
+  } else if (A.kind === 'cave') {
+    // the passage is drawn with its collision boxes, the same positions and indices, in the unlit baked material and
+    // with no vertex colours or normals: the test world stays small, and no checker reads what a cave looks like
+    const m = shaped(boxesToMesh(caveBoxes(id)), A);
+    const POSITION = G.positions(m),
+      indices = G.accessor(m.idx, 'SCALAR', 5123, 34963);
+    stats.triangles_loaded += m.idx.length / 3;
+    stats.draw_calls += 1;
+    children.push(G.node({ name: 'Passage', mesh: G.meshOf('Passage', { POSITION }, indices, 0) }));
+    collisionShared = { POSITION, indices, triangles: m.idx.length / 3 };
   } else {
     const { collision, render, slabs } = sectionBoxes(id);
     const ground = shaped(boxesToMesh(render), A);
@@ -1056,11 +1356,18 @@ function writeArea(id) {
   });
   G.roots = [area];
   if (FLAGS.noCollision !== id) {
-    stats.triangles_collision = collisionMesh.idx.length / 3;
+    stats.triangles_collision = collisionShared ? collisionShared.triangles : collisionMesh.idx.length / 3;
     G.roots.push(
       G.node({
         name: `HM_Collision_${id}`,
-        mesh: G.mesh(`HM_Collision_${id}`, collisionMesh, null),
+        mesh: collisionShared
+          ? G.meshOf(
+              `HM_Collision_${id}`,
+              { POSITION: collisionShared.POSITION },
+              collisionShared.indices,
+              null,
+            )
+          : G.mesh(`HM_Collision_${id}`, collisionMesh, null),
         extras: { wdi_collision: true },
       }),
     );
@@ -1080,16 +1387,18 @@ function writeArea(id) {
             },
           },
         }
-      : {
-          images: [{ uri: `data:image/png;base64,${png4x4().toString('base64')}`, name: 'snow_4x4' }],
-          textures: [{ source: 0 }],
-          ...(sectionLights.length
-            ? {
-                extensionsUsed: ['KHR_lights_punctual'],
-                extensions: { KHR_lights_punctual: { lights: sectionLights } },
-              }
-            : {}),
-        };
+      : A.kind === 'cave'
+        ? { extensionsUsed: ['KHR_materials_unlit'] } // a cave is baked: unlit, its light in the vertex colours
+        : {
+            images: [{ uri: `data:image/png;base64,${png4x4().toString('base64')}`, name: 'snow_4x4' }],
+            textures: [{ source: 0 }],
+            ...(sectionLights.length
+              ? {
+                  extensionsUsed: ['KHR_lights_punctual'],
+                  extensions: { KHR_lights_punctual: { lights: sectionLights } },
+                }
+              : {}),
+          };
   if (A.requireExt) {
     extra.extensionsUsed = [...(extra.extensionsUsed ?? []), A.requireExt];
     extra.extensionsRequired = [A.requireExt];
@@ -1118,9 +1427,20 @@ const index = {
   start: WORLD.start,
   areas: {},
   scenes: sceneAreas,
-  seams: WORLD.seams,
+  seams: WORLD.seams.map(seamEntry),
   pending: WORLD.pending,
 };
+// walk_scenes: the entries of the walk-only scenes the files use (an area's scene, or where a portal leads), only when
+// there is one. walk_scene_is_game_scene writes its own list of walk-only scenes beside the files.
+{
+  const scenes = FLAGS.walkScenes ?? WALK_SCENES;
+  const used = new Set(AREAS.flatMap(([, A]) => [A.scene, ...A.portals.map((p) => p.to)]));
+  const listed = Object.keys(scenes)
+    .filter((s) => used.has(s))
+    .sort();
+  if (listed.length) index.walk_scenes = Object.fromEntries(listed.map((s) => [s, scenes[s]]));
+  if (FLAGS.walkScenes) writeFileSync(join(OUT, 'walk_scenes.json'), `${prettyJson(FLAGS.walkScenes)}\n`);
+}
 for (const [id, A] of AREAS) {
   const path = join(OUT, written[id].file);
   const world = (at) => {

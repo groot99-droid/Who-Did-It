@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""walk_index.py: builds walk-index.json from area files and checks them against docs/walk-areas.md (version 1).
+"""walk_index.py: builds walk-index.json from area files and checks them against docs/walk-areas.md (version 1.1;
+the index it writes says "format": 1).
 
     python walk_index.py <folder>                     build <folder>/walk-index.json from its walk-*.glb / walk-*.gltf
     python walk_index.py <folder> --check             write nothing: check the index in the folder against the files
     python walk_index.py --legacy --out <index.json> <file.glb> [<file.glb> ...]
                                                       today's files as they are: each difference is a WARNING
 
+The walk-only scenes (the caves, which the game does not have) are read from walk_scenes.json beside this script, or
+from the file given with --walk-scenes.
+
 Plain Python 3, standard library only. It reads the JSON part of every file, the headers of the images and, when a
 collision mesh is not Draco-compressed (the fixture), its triangles. It never decodes Draco data, so three things are
 left to the exporter's Blender checks on real files: that spawns and portals stand on the ground, that a seam's wall
-is closed and 3 m high, and that the rest of a village section's edge is closed too. Triangles in view are not
-measured here either.
+is closed (3 m high in the village, up to the roof in a cave), and that the rest of a village section's edge is closed
+too. Whether a cave is closed is the cave builder's Blender check. Triangles in view are not measured here either.
 
 Every line it prints starts with PASS, FAIL, WARN or NOTE, then the rule's name, then what was found.
 A file or an index that cannot be read is a FAIL line (<file>.readable, index.readable), not a Python trace.
@@ -45,11 +49,16 @@ SEAM = dict(
     arrival_clear_min=1.20,    # the arrival is at least this far from EVERY portal of its file (its return row too)
     row_clear_min=2.00,        # no portal outside a seam's row stands this close to a point of it (two 1 m discs)
     height_max=0.15,           # the two files put the ground at the seam line at the same height, within this
-    wall_height=3.0,           # the wall is at least this high above the ground across the whole opening
+    wall_height=3.0,           # in the village the wall is at least this high above the ground across the whole opening
+    roof_gap=0.10,             # in a cave the wall closes the passage up to this far under the roof
+    roof_max=50.0,             # ... and the roof above the row is looked for this far up
     tol=0.05,                  # measuring tolerance for the distances above
     width_max=100.0,           # not a rule of the contract: these tools do not sample an opening wider than this (a typo
                                # such as 5000 for 5 would otherwise keep them busy for minutes)
 )
+# The rays of the wall check of a cave seam: these heights above the floor (those under the roof), and one 0.1 m under
+# the roof (docs/walk-areas.md, section 6). In a roofed passage the village's "3 m above the ground" does not apply.
+CAVE_WALL_HEIGHTS = (0.25, 1.0, 2.0)
 # The closed edge of a village section (docs/walk-areas.md, section 4). Metres.
 EDGE = dict(
     step=0.25,                 # the edge is sampled this often (a gap the walker's capsule, 0.6 m across, fits through is wider)
@@ -59,7 +68,18 @@ EDGE = dict(
     reach=3.0,                 # how far a ray looks
     max_length=100_000.0,      # an edge longer than this is not sampled: it is no village section
 )
-SEAM_KINDS = ("gate", "level_crossing", "footbridge", "lychgate", "stile", "cutting", "belt_gate")
+# The kinds of an area (wdi_kind). The areas of a sectioned scene are joined by seams: the village sections of
+# overworld, and the caves of a walk-only scene (walk_scenes.json).
+AREA_KINDS = ("section", "room", "wild", "cave")
+SECTIONED_KINDS = ("section", "cave")
+# What a seam's device may be (wdi_seam_kind), by the kind of the two areas it joins
+SEAM_KINDS = {
+    "section": ("gate", "level_crossing", "footbridge", "lychgate", "stile", "cutting", "belt_gate"),
+    "cave": ("passage", "arch", "mine_door", "bend", "squeeze", "choke", "curtain", "sump_ledge"),
+}
+# The kind of a walk-only scene (walk_scenes.json) -> the portal kind of its mouths
+MOUTH_KINDS = {"cave": "cave_mouth"}
+GATE_RE = re.compile(r"^([a-z][a-z0-9_]*)_(in|out)$")     # <gate>_in, <gate>_out after the namespace and its dot
 PORTAL_RADIUS = 1.0            # the viewer's walk-in radius (apps/walk/src/portals.ts, PortalTrigger)
 PORTAL_HEIGHT_WINDOW = 2.0     # ... and it does not see a portal more than this above or below the player
 WAY_BACK_FAR_M = 10.0          # a note: a room's way out arrives farther than this from the door that leads in
@@ -93,6 +113,8 @@ PLANNING_TARGETS = {
     "section": dict(bytes=15_000_000, triangles_loaded=2_000_000, texture_gpu_mb=192.0, draw_calls=248, lights=24,
                     triangles_collision=150_000),
     "room": dict(bytes=6_000_000, triangles_loaded=600_000, texture_gpu_mb=64.0, triangles_collision=10_000),
+    "cave": dict(bytes=10_000_000, triangles_loaded=1_500_000, texture_gpu_mb=96.0, draw_calls=160, lights=8,
+                 triangles_collision=60_000),
 }
 PLANNING_TARGETS["wild"] = PLANNING_TARGETS["section"]   # no figures were set for wild areas; the section ones are used
 TEXTURE_CEILING_MB = 255.0
@@ -103,7 +125,11 @@ AREA_ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
 SPAWN_ID_RE = re.compile(r"^[a-z0-9_]+$")
 SEAM_ID_RE = re.compile(r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$")
 SEAM_PORTAL_RE = re.compile(r"^seam_(.+)_([ab])_([1-9][0-9]*)$")
-SEAM_SPAWN_RE = re.compile(r"^overworld_seam_(.+)_([ab])_([1-9][0-9]*)$")
+# walk_scenes.json (docs/walk-areas.md, section 2): the forms of a walk-only scene's entry
+WALK_SCENE_ID_RE = re.compile(r"^[a-z][a-z0-9_]*$")
+WALK_PREFIX_RE = re.compile(r"^[a-z][a-z0-9]*_$")
+WALK_NS_RE = re.compile(r"^[a-z][a-z0-9]*$")
+WALK_ENTRY_KEYS = ("name", "kind", "area_prefix", "portal_ns")
 # node names as they are written in the file (docs/walk-areas.md, section 2)
 RAW_AREA_RE = re.compile(r"^Area_[a-z][a-z0-9_]*$")
 RAW_COLLISION_RE = re.compile(r"^HM_Collision(_[a-z][a-z0-9_]*)?$")
@@ -137,6 +163,67 @@ class Results:
 
     def count(self, status):
         return sum(1 for r in self.rows if r[0] == status)
+
+
+# --------------------------------------------------------------------------------------------- the walk-only scenes
+
+class WalkScenes:
+    """The walk-only scenes of walk_scenes.json (docs/walk-areas.md, section 2): scenes of the walk that the game does
+    not have. Each is cut into areas of one kind (caves) joined by seams, and reached from the village by its mouths.
+    `entries` holds the well-formed entries only; `problems` says, in words, what is wrong with the others."""
+
+    def __init__(self, entries=None, problems=(), missing=False):
+        self.entries = dict(entries or {})
+        self.problems = list(problems)
+        self.missing = missing
+        self.ids = set(self.entries)
+        # the scenes whose areas are joined by seams: the village, and every walk-only scene
+        self.sectioned = {"overworld"} | self.ids
+        alt = "|".join(re.escape(s) for s in sorted(self.sectioned, key=len, reverse=True))
+        # a seam arrival's id, Spawn_<scene>_seam_<seamId>_<side>_<n> without Spawn_: scene, seam id, side, number
+        self.seam_spawn = re.compile(r"^(%s)_seam_(.+)_([ab])_([1-9][0-9]*)$" % alt)
+        self.by_ns = {e["portal_ns"]: s for s, e in self.entries.items()}
+        self.prefixes = tuple(e["area_prefix"] for e in self.entries.values())
+
+
+def read_walk_scenes(path):
+    """WalkScenes from the file, with each malformed entry named. Raises ValueError when the file is not a JSON object."""
+    with open(path, "r", encoding="utf-8") as fh:
+        data = json.load(fh)
+    if not isinstance(data, dict):
+        raise ValueError("it is not a JSON object of walk-only scenes")
+    entries, problems = {}, []
+    for sid, e in data.items():
+        probs = []
+        if not WALK_SCENE_ID_RE.match(sid):
+            probs.append("the id is not lower-case words joined by _")
+        if not isinstance(e, dict):
+            problems.append("%r: its entry is not an object" % sid)
+            continue
+        if sorted(e) != sorted(WALK_ENTRY_KEYS):
+            probs.append("its fields are %s, not %s" % (", ".join(sorted(map(str, e))) or "none", ", ".join(WALK_ENTRY_KEYS)))
+        if not (isinstance(e.get("name"), str) and e.get("name")):
+            probs.append("name is not words")
+        if not isinstance(e.get("kind"), str) or e.get("kind") not in MOUTH_KINDS:
+            probs.append("kind is %r, not one of %s" % (e.get("kind"), ", ".join(MOUTH_KINDS)))
+        if not (isinstance(e.get("area_prefix"), str) and WALK_PREFIX_RE.match(e["area_prefix"])) or e.get("area_prefix") in ("village_", "room_"):
+            probs.append("area_prefix is %r: lower-case letters and digits ending in _, and not village_ or room_" % (e.get("area_prefix"),))
+        if not (isinstance(e.get("portal_ns"), str) and WALK_NS_RE.match(e["portal_ns"])):
+            probs.append("portal_ns is %r: lower-case letters and digits" % (e.get("portal_ns"),))
+        if probs:
+            problems.append("%r: %s" % (sid, "; ".join(probs)))
+        else:
+            entries[sid] = e
+    # two scenes may not share an area prefix (or have one prefix start another) or a portal namespace
+    ids = sorted(entries)
+    for i, s in enumerate(ids):
+        for t in ids[i + 1:]:
+            p, q = entries[s]["area_prefix"], entries[t]["area_prefix"]
+            if p.startswith(q) or q.startswith(p):
+                problems.append("%r and %r: the area prefixes %s and %s overlap" % (s, t, p, q))
+            if entries[s]["portal_ns"] == entries[t]["portal_ns"]:
+                problems.append("%r and %r: both use the portal namespace %s" % (s, t, entries[s]["portal_ns"]))
+    return WalkScenes(entries, problems)
 
 
 # --------------------------------------------------------------------------------------------- small helpers
@@ -543,7 +630,7 @@ class AreaFile:
     def _derive(self):
         x, i = self.extras, self.id or ""
         k = x.get("wdi_kind")
-        if k in ("section", "room", "wild"):
+        if k in AREA_KINDS:
             self.kind = k
         elif i.startswith("room_"):
             self.kind = "room"
@@ -734,7 +821,7 @@ def in_polygon(x, y, poly):
 
 # --------------------------------------------------------------------------------------------- rules for one file
 
-def check_file(a, R, known_scenes):
+def check_file(a, R, known_scenes, walk):
     i = a.id or a.base
     x = a.extras
     # names
@@ -787,17 +874,31 @@ def check_file(a, R, known_scenes):
         slot = slot_in(region) or slot_in([t[0], -t[2], t[0], -t[2]])
         if slot:
             R.note(i + ".slot", "it stands on the far grid of the old single file, around (%d, %d) m. Slots are not used for separate files: a room sits at its own origin" % slot)
-    # the id and what it says
+    # the id and what it says. A cave's id is the area prefix of its walk-only scene and a key (under_<key>); a room and
+    # a wild area belong to a game scene, never to a walk-only one
     id_ok = bool(AREA_ID_RE.match(a.id))
-    form = ("village_<key>" if a.kind == "section" else "room_<sceneId>" if a.kind == "room" else "<sceneId>")
+    entry = walk.entries.get(a.scene)
+    form = {"section": "village_<key>", "room": "room_<sceneId>", "wild": "<sceneId>"}.get(
+        a.kind, "%s<key>" % entry["area_prefix"] if entry else "<the area prefix of a walk-only scene><key>")
     kind_ok = ((a.kind == "section" and a.id.startswith("village_") and len(a.id) > 8)
                or (a.kind == "room" and a.id.startswith("room_") and len(a.id) > 5)
-               or (a.kind == "wild" and not a.id.startswith(("village_", "room_")) and a.id != LEGACY_AREA_ID))
-    scene_ok = ((a.kind == "section" and a.scene == "overworld") or (a.kind == "room" and a.scene == a.id[len("room_"):])
-                or (a.kind == "wild" and a.scene == a.id))
-    clash = known_scenes is not None and ((a.kind in ("section", "room") and a.id in known_scenes) or (a.kind in ("room", "wild") and a.scene not in known_scenes))
+               or (a.kind == "wild" and not a.id.startswith(("village_", "room_") + walk.prefixes) and a.id != LEGACY_AREA_ID)
+               or (a.kind == "cave" and entry is not None and entry["kind"] == "cave"
+                   and re.match(r"^%s[a-z][a-z0-9_]*$" % re.escape(entry["area_prefix"]), a.id) is not None))
+    scene_ok = ((a.kind == "section" and a.scene == "overworld")
+                or (a.kind == "room" and a.scene == a.id[len("room_"):] and a.scene not in walk.ids)
+                or (a.kind == "wild" and a.scene == a.id and a.scene not in walk.ids)
+                or (a.kind == "cave" and entry is not None and entry["kind"] == "cave"))
+    clash = known_scenes is not None and ((a.kind in ("section", "room", "cave") and a.id in known_scenes) or (a.kind in ("room", "wild") and a.scene not in known_scenes))
+    why = []
+    if a.kind == "cave" and entry is None:
+        why.append("%s is not a walk-only scene of walk_scenes.json" % a.scene)
+    if a.kind in ("room", "wild") and a.scene in walk.ids:
+        why.append("%s is a walk-only scene, and a room or a wild area belongs to a game scene" % a.scene)
+    if clash:
+        why.append("clashes with or is missing from the game's scene ids")
     R.check(i + ".area_id", id_ok and kind_ok and scene_ok and not clash,
-            "id %s, kind %s (form %s), scene %s%s" % (a.id, a.kind, form, a.scene, "; clashes with or is missing from the game's scene ids" if clash else ""),
+            "id %s, kind %s (form %s), scene %s%s" % (a.id, a.kind, form, a.scene, "".join("; " + w for w in why)),
             legacy_ok=a.id == LEGACY_AREA_ID and id_ok and scene_ok and not clash)
     # the Area's extras: every missing or wrong one is named
     missing, wrong = [], []
@@ -809,7 +910,7 @@ def check_file(a, R, known_scenes):
             wrong.append("%s (%s)" % (key, why))
 
     need("wdi_area", x.get("wdi_area") == a.id, "is %r, the node says %r" % (x.get("wdi_area"), a.id))
-    need("wdi_kind", x.get("wdi_kind") in ("section", "room", "wild"), "is %r" % (x.get("wdi_kind"),))
+    need("wdi_kind", x.get("wdi_kind") in AREA_KINDS, "is %r" % (x.get("wdi_kind"),))
     need("wdi_scene", isinstance(x.get("wdi_scene"), str) and x.get("wdi_scene") != "", "must be a scene id")
     need("wdi_name", isinstance(x.get("wdi_name"), str) and x.get("wdi_name") != "", "must be words")
     w = x.get("wdi_walk_region")
@@ -819,11 +920,16 @@ def check_file(a, R, known_scenes):
         wrong.append("wdi_walk_polygon (must be three or more points: a flat list [x0, y0, x1, y1, ...], a list of [x, y] pairs, or either of them as a JSON string)")
     if a.kind == "room":
         need("wdi_indoor", x.get("wdi_indoor") is True, "a room says true")
+    elif a.kind == "cave":
+        # a cave is indoors (no moon, sky light or sky dome) and its light is baked (the viewer switches its lights off)
+        need("wdi_indoor", x.get("wdi_indoor") is True, "a cave says true")
+        need("wdi_baked", x.get("wdi_baked") is True, "a cave says true")
     elif a.kind == "section" and x.get("wdi_indoor") is True:
         wrong.append("wdi_indoor (a village section is outdoors)")
-    if "wdi_baked" in x and not isinstance(x["wdi_baked"], bool):
+    if a.kind != "cave" and "wdi_baked" in x and not isinstance(x["wdi_baked"], bool):
         wrong.append("wdi_baked (must be true or false)")
-    if not a.indoor:
+    if not a.indoor or a.kind == "cave":
+        # outdoors, and in a cave, which is indoors and carries the fog of the whole cave network (the ink)
         fc = x.get("fog_color")
         need("fog_color", isinstance(fc, str) or (isinstance(fc, list) and len(fc) >= 3 and all(is_number(v) for v in fc)), "must be a colour")
         if not ((is_number(x.get("fog_density")) and x.get("fog_density") > 0) or (is_number(x.get("fog_near")) and is_number(x.get("fog_far")))):
@@ -831,7 +937,7 @@ def check_file(a, R, known_scenes):
     ok = not missing and not wrong
     only_legacy = not wrong and all(k in LEGACY_OK_MISSING for k in missing)
     R.check(i + ".area_extras", ok,
-            "all present: wdi_area, wdi_kind, wdi_scene, wdi_name, wdi_walk_region, wdi_exposure%s" % (", wdi_indoor" if a.kind == "room" else ", fog") if ok
+            "all present: wdi_area, wdi_kind, wdi_scene, wdi_name, wdi_walk_region, wdi_exposure%s" % {"room": ", wdi_indoor", "cave": ", wdi_indoor, wdi_baked, fog"}.get(a.kind, ", fog") if ok
             else "missing: %s%s" % (", ".join(missing) or "none", "; wrong: " + "; ".join(wrong) if wrong else ""), legacy_ok=only_legacy)
     # names the loader would change
     mine = [(raw, name) for raw, name in a.renamed if raw.startswith(("Area_", "HM_Collision", "Spawn_", "Portal_"))]
@@ -853,16 +959,20 @@ def check_file(a, R, known_scenes):
         R.check(i + ".no_directional_light", not a.sun_nodes,
                 "none of the %d lights is directional: the viewer adds the look's moon and sky light, as in every section" % a.stats["lights"] if not a.sun_nodes
                 else "a directional light on %s. The viewer adds its own moon and sky light only to a file that has none, so this section would be lit differently from its neighbours" % ", ".join(a.sun_nodes))
+    elif a.kind == "cave":
+        R.check(i + ".no_directional_light", not a.sun_nodes,
+                "none of the %d lights is directional: a cave is lit by its bake, as every cave of the network" % a.stats["lights"] if not a.sun_nodes
+                else "a directional light on %s. A cave holds none: it is lit by its bake, and the caves carry one look" % ", ".join(a.sun_nodes))
     lost = [s["raw_name"] for s in a.spawns if not s["under"]] + [p["raw_name"] for p in a.portals if not p["under"]]
     R.check(i + ".nodes_under_area", not lost, "%d spawns and %d portals under the Area%s" % (len(a.spawns), len(a.portals), "; outside it: " + ", ".join(lost) if lost else ""))
     # spawns
     bad_ids = [s["id"] for s in a.spawns if not SPAWN_ID_RE.match(s["id"])]
     no_words = [s["id"] for s in a.spawns if not (isinstance(s["extras"].get("wdi_spawn"), str) and s["extras"].get("wdi_spawn") and isinstance(s["extras"].get("wdi_district"), str) and s["extras"].get("wdi_district"))]
     bad_flag = [s["id"] for s in a.spawns if "wdi_picker" in s["extras"] and not isinstance(s["extras"]["wdi_picker"], bool)]
-    # in a room or a wild area every spawn is Spawn_<sceneId>_<spawnId>: only such a spawn can be a portal's target
-    no_scene = [s["id"] for s in a.spawns if a.kind in ("room", "wild") and not s["id"].startswith(a.scene + "_")]
+    # in a room, a wild area or a cave every spawn is Spawn_<sceneId>_<spawnId>: only such a spawn can be a portal's target
+    no_scene = [s["id"] for s in a.spawns if a.kind in ("room", "wild", "cave") and not s["id"].startswith(a.scene + "_")]
     R.check(i + ".spawn_extras", not bad_ids and not no_words and not bad_flag and not no_scene,
-            "%d spawns: ids are lower-case words%s, wdi_spawn and wdi_district give the picker words" % (len(a.spawns), " that start with %s_" % a.scene if a.kind in ("room", "wild") else "") if not (bad_ids or no_words or bad_flag or no_scene)
+            "%d spawns: ids are lower-case words%s, wdi_spawn and wdi_district give the picker words" % (len(a.spawns), " that start with %s_" % a.scene if a.kind in ("room", "wild", "cave") else "") if not (bad_ids or no_words or bad_flag or no_scene)
             else "bad id: %s; id does not start with the scene id %s_: %s; no picker words: %s; wdi_picker not true or false: %s" % (bad_ids or "-", a.scene, no_scene or "-", no_words or "-", bad_flag or "-"))
     # portals
     unread = [p["raw_name"] for p in a.portals if not p["read_by_viewer"]]
@@ -893,12 +1003,12 @@ def check_file(a, R, known_scenes):
             gaps.append(d)
             if d <= PORTAL_RADIUS + 1e-6:
                 near.append("%s is %s m from %s" % (s["raw_name"], fmt(d), p["raw_name"]))
-    if a.kind == "section":
+    if a.kind in SECTIONED_KINDS:
         R.check(i + ".spawn_clear_of_portals", not near,
                 "%d spawns, each more than %s m from every portal of the file%s" % (len(a.spawns), num(PORTAL_RADIUS), " (the nearest pair is %s m apart)" % fmt(min(gaps)) if gaps else "") if not near
-                else "%s. In a village section every spawn stands more than %s m from every portal: inside the radius the walk-in trigger is off until the player steps out, and the nearest portal takes the door prompt" % ("; ".join(near), num(PORTAL_RADIUS)))
+                else "%s. In a village section and in a cave every spawn stands more than %s m from every portal: inside the radius the walk-in trigger is off until the player steps out, and the nearest portal takes the door prompt" % ("; ".join(near), num(PORTAL_RADIUS)))
     elif near:
-        R.note(i + ".spawn_inside_portal_radius", "%s: arriving there the walk-in trigger stays off until the player steps out and comes back. The arrival of a room or a wild area may stand like this; a spawn of a village section may not" % "; ".join(near))
+        R.note(i + ".spawn_inside_portal_radius", "%s: arriving there the walk-in trigger stays off until the player steps out and comes back. The arrival of a room or a wild area may stand like this; a spawn of a village section or a cave may not" % "; ".join(near))
     # geometry that needs triangles
     if a.coll and a.coll["triangles"] is not None:
         off = []
@@ -912,6 +1022,8 @@ def check_file(a, R, known_scenes):
             check_edge(a, R)
     elif a.coll and a.coll["draco"]:
         R.note(i + ".geometry_not_checked", "the collision mesh is Draco-compressed: standing on the ground, the closed edge of a section and seam walls are not checked here (the exporter's Blender checks do that)")
+    # a cave is not held to the closed-edge rule here: its first surface from the top is its roof, not its floor. That a
+    # cave cannot be walked out of is the cave builder's Blender check (docs/walk-areas.md, section 4)
 
 
 def region_outline(a):
@@ -990,11 +1102,14 @@ def check_edge(a, R):
 
 
 def check_targets(a, R):
-    t = PLANNING_TARGETS[a.kind]
+    t = PLANNING_TARGETS.get(a.kind)
+    if t is None:
+        R.add("FAIL", (a.id or a.base) + ".planning_targets", "no planning targets are set for the kind %r (they are set for %s)" % (a.kind, ", ".join(sorted(PLANNING_TARGETS))))
+        return
     have = dict(a.stats, bytes=a.size)
     over = []
     for key, limit in t.items():
-        if have[key] > limit:
+        if have.get(key, 0) > limit:
             over.append("%s %s against %s" % (key, have[key], limit))
     if a.stats["texture_gpu_mb"] > TEXTURE_CEILING_MB:
         over.append("texture_gpu_mb is above the planning ceiling of %s" % TEXTURE_CEILING_MB)
@@ -1011,8 +1126,8 @@ def check_targets(a, R):
 
 # --------------------------------------------------------------------------------------------- rules across files
 
-def seam_tables(areas):
-    """Every seam portal and arrival spawn, grouped by seam id and side."""
+def seam_tables(areas, walk):
+    """Every seam portal and arrival spawn, grouped by seam id and side. An arrival also says which scene its id names."""
     seams = {}
     for a in areas:
         for p in a.portals:
@@ -1028,10 +1143,10 @@ def seam_tables(areas):
                 s["bad_names"].append(p["raw_name"])
             s["portals"].setdefault(side, []).append(dict(p, n=n, area=a.id))
         for sp in a.spawns:
-            m = SEAM_SPAWN_RE.match(sp["id"])
+            m = walk.seam_spawn.match(sp["id"])
             if m:
-                s = seams.setdefault(m.group(1), dict(portals={}, arrivals={}, bad_names=[]))
-                s["arrivals"].setdefault(m.group(2), []).append(dict(sp, n=int(m.group(3)), area=a.id))
+                s = seams.setdefault(m.group(2), dict(portals={}, arrivals={}, bad_names=[]))
+                s["arrivals"].setdefault(m.group(3), []).append(dict(sp, n=int(m.group(4)), area=a.id, scene=m.group(1)))
     return seams
 
 
@@ -1053,22 +1168,31 @@ def row_height(row, row_lat, s):
     return row[k]["pos"][1] + (row[k + 1]["pos"][1] - row[k]["pos"][1]) * (s - row_lat[k]) / span
 
 
-def check_seams(areas, R):
+def check_seams(areas, R, walk):
     by_id = {a.id: a for a in areas}
     out = []
-    for sid, s in sorted(seam_tables(areas).items()):
+    for sid, s in sorted(seam_tables(areas, walk).items()):
         rule = "seam.%s." % sid
         P, A = s["portals"], s["arrivals"]
         rows = {side: sorted(P.get(side, []), key=lambda p: p["n"]) for side in ("a", "b")}
         homes = {side: sorted({p["area"] for p in rows[side]}) for side in ("a", "b")}
-        sides_ok = (bool(SEAM_ID_RE.match(sid)) and not s["bad_names"] and set(P) <= {"a", "b"} and len(homes["a"]) == 1 and len(homes["b"]) == 1
-                    and homes["a"] != homes["b"] and all(by_id[h[0]].kind == "section" for h in homes.values()))
+        # a seam joins two sections of one scene: two village sections, or two caves of one walk-only scene
+        one_each = len(homes["a"]) == 1 and len(homes["b"]) == 1 and homes["a"] != homes["b"]
+        joined = one_each and (by_id[homes["a"][0]].kind in SECTIONED_KINDS and by_id[homes["a"][0]].kind == by_id[homes["b"][0]].kind
+                               and by_id[homes["a"][0]].scene == by_id[homes["b"][0]].scene)
+        sides_ok = bool(SEAM_ID_RE.match(sid)) and not s["bad_names"] and set(P) <= {"a", "b"} and joined
+
+        def where(side):
+            return ", ".join("%s (%s, scene %s)" % (h, by_id[h].kind, by_id[h].scene) for h in homes[side]) or "no file"
+
         R.check(rule + "sides", sides_ok,
-                "side a is %s, side b is %s" % (homes["a"][0], homes["b"][0]) if sides_ok
-                else "seam id %r; side a in %s, side b in %s; names that do not fit Portal_seam_<seamId>_<a or b>_<n>: %s; a seam joins two village sections" % (sid, homes["a"] or "no file", homes["b"] or "no file", s["bad_names"] or "-"))
+                "side a is %s, side b is %s, two %s of the scene %s" % (homes["a"][0], homes["b"][0], "caves" if by_id[homes["a"][0]].kind == "cave" else "village sections", by_id[homes["a"][0]].scene) if sides_ok
+                else "seam id %r; side a in %s, side b in %s; names that do not fit Portal_seam_<seamId>_<a or b>_<n>: %s; a seam joins two sections of one scene: two village sections, or two caves of one walk-only scene" % (sid, where("a"), where("b"), s["bad_names"] or "-"))
         if not sides_ok:
             continue
         a_area, b_area = homes["a"][0], homes["b"][0]
+        scene, area_kind = by_id[a_area].scene, by_id[a_area].kind
+        cave = area_kind == "cave"
         na, nb = [p["n"] for p in rows["a"]], [p["n"] for p in rows["b"]]
         count = len(na)
         R.check(rule + "numbering", na == list(range(1, count + 1)) and nb == na,
@@ -1082,8 +1206,8 @@ def check_seams(areas, R):
             for p in rows[side]:
                 e, want_id = p["extras"], "seam_%s_%s_%d" % (sid, side, p["n"])
                 probs = []
-                if e.get("to") != "overworld":
-                    probs.append("to is %r, not 'overworld'" % (e.get("to"),))
+                if e.get("to") != scene:
+                    probs.append("to is %r, not %r (a seam leads into its own scene)" % (e.get("to"), scene))
                 if e.get("toSpawn") != "seam_%s_%s_%d" % (sid, other, p["n"]):
                     probs.append("toSpawn is %r" % (e.get("toSpawn"),))
                 if e.get("kind") != "gate":
@@ -1092,13 +1216,13 @@ def check_seams(areas, R):
                     probs.append("wdi_portal_id is %r" % (e.get("wdi_portal_id"),))
                 if e.get("wdi_seam") != sid:
                     probs.append("wdi_seam is %r" % (e.get("wdi_seam"),))
-                if e.get("wdi_seam_kind") not in SEAM_KINDS or e.get("wdi_seam_kind") != kind:
-                    probs.append("wdi_seam_kind is %r" % (e.get("wdi_seam_kind"),))
+                if e.get("wdi_seam_kind") not in SEAM_KINDS[area_kind] or e.get("wdi_seam_kind") != kind:
+                    probs.append("wdi_seam_kind is %r (a seam between %s is one of: %s)" % (e.get("wdi_seam_kind"), "caves" if cave else "village sections", ", ".join(SEAM_KINDS[area_kind])))
                 if not is_number(e.get("wdi_width_m")) or not 0 < e.get("wdi_width_m") <= SEAM["width_max"] or e.get("wdi_width_m") != width:
                     probs.append("wdi_width_m is %r (a number above 0, the same on every portal of the seam; these tools do not sample an opening wider than %s m)" % (e.get("wdi_width_m"), num(SEAM["width_max"])))
                 if probs:
                     bad.append("%s: %s" % (p["raw_name"], ", ".join(probs)))
-        R.check(rule + "extras", not bad, "to overworld, kind gate, wdi_seam_kind %s, wdi_width_m %s on all %d portals" % (kind, width, 2 * count) if not bad else "; ".join(bad))
+        R.check(rule + "extras", not bad, "to %s, kind gate, wdi_seam_kind %s, wdi_width_m %s on all %d portals" % (scene, kind, width, 2 * count) if not bad else "; ".join(bad))
         if not is_number(width) or not 0 < width <= SEAM["width_max"] or count == 0 or len(rows["b"]) == 0:
             continue
         # the two rows: straight, parallel, 0.9 m apart, the same numbers facing each other
@@ -1158,7 +1282,7 @@ def check_seams(areas, R):
             for p in rows[side]:
                 sp = arr.get(p["n"])
                 if sp is None:
-                    bad.append("no Spawn_overworld_seam_%s_%s_%d" % (sid, other, p["n"]))
+                    bad.append("no Spawn_%s_seam_%s_%s_%d" % (scene, sid, other, p["n"]))
                     continue
                 dx, dy = xy(sp["pos"])[0] - xy(p["pos"])[0], xy(sp["pos"])[1] - xy(p["pos"])[1]
                 beyond = dx * travel[0] + dy * travel[1]
@@ -1181,6 +1305,8 @@ def check_seams(areas, R):
                         probs.append("%s m from %s, under %s" % (fmt(g), q_name, SEAM["arrival_clear_min"]))
                 if sp["extras"].get("wdi_picker") is not False:
                     probs.append("wdi_picker is not false")
+                if sp["scene"] != scene:
+                    probs.append("its id names the scene %s, and the seam is in %s (Spawn_%s_seam_%s_%s_%d)" % (sp["scene"], scene, scene, sid, other, p["n"]))
                 if probs:
                     bad.append("%s: %s" % (sp["raw_name"], ", ".join(probs)))
         for side in ("a", "b"):
@@ -1222,7 +1348,7 @@ def check_seams(areas, R):
         step_bad = ["point %d: side a puts the ground at the line at %s m, side b at %s m" % (n, fmt(line_h[("a", n)]), fmt(line_h[("b", n)])) for d, n in steps if d > SEAM["height_max"] + 1e-6]
         R.check(rule + "height", bool(steps) and not step_bad,
                 "the two files put the ground at the seam line at the same height: at most %s m apart at %d points (the rule is %s m)" % (fmt(max(d for d, _ in steps)), len(steps), SEAM["height_max"]) if steps and not step_bad
-                else "%s. Village sections share the village's coordinates, heights too: the two sides differ by more than %s m" % ("; ".join(step_bad) or "no pair of points to compare", SEAM["height_max"]))
+                else "%s. The two sides share the village's coordinates, heights too: they differ by more than %s m" % ("; ".join(step_bad) or "no pair of points to compare", SEAM["height_max"]))
         # the look is the same on both sides, in the files. wdi_baked is part of it: the viewer switches off every
         # light of an area that says so (world.ts, switchOffBakedLights), so one baked side changes the picture
         la_, lb_ = by_id[a_area].look, by_id[b_area].look
@@ -1243,6 +1369,7 @@ def check_seams(areas, R):
             row_lat = [lat(p["pos"]) for p in row]
             d3 = (toward[0], 0.0, -toward[1])
             holes, rays, cols = [], 0, max(1, int(round((width - 0.1) / 0.25)))
+            roofs = []
             for k in range(cols + 1):
                 s_lat = -width / 2 + 0.05 + (width - 0.1) * k / cols
                 px, py = base[0] + tg[0] * (s_lat - base_lat), base[1] + tg[1] * (s_lat - base_lat)
@@ -1254,21 +1381,38 @@ def check_seams(areas, R):
                     holes.append("at %s m along the opening: no ground under the row" % fmt(s_lat))
                     continue
                 ground = start - t_down
-                for h in (0.25, 1.0, 2.0, SEAM["wall_height"] - 0.05):
+                if cave:
+                    # a roofed passage: the wall closes it from the floor to the roof. The roof above the row must be
+                    # found; the rays go at 0.25, 1 and 2 m above the floor (those under the roof) and 0.1 m under it
+                    t_up = ray_first_hit(c["triangles"], (px, ground + 0.05, -py), (0.0, 1.0, 0.0), SEAM["roof_max"])
+                    if t_up is None:
+                        rays += len(CAVE_WALL_HEIGHTS) + 1
+                        holes.append("at %s m along the opening: no roof above the row within %s m" % (fmt(s_lat), num(SEAM["roof_max"])))
+                        continue
+                    roof = 0.05 + t_up
+                    roofs.append(roof)
+                    heights = [h for h in CAVE_WALL_HEIGHTS if h < roof - SEAM["roof_gap"]] + [roof - SEAM["roof_gap"]]
+                else:
+                    heights = (0.25, 1.0, 2.0, SEAM["wall_height"] - 0.05)
+                for h in heights:
                     rays += 1
                     t_hit = ray_first_hit(c["triangles"], (px, ground + h, -py), d3, 50.0)
                     if t_hit is None or abs(t_hit - SEAM["portal_to_wall"]) > SEAM["tol"]:
-                        holes.append("at %s m along the opening, %s m above the ground: %s" % (fmt(s_lat), h, "nothing within 50 m" if t_hit is None else "wall at %s m" % fmt(t_hit)))
+                        holes.append("at %s m along the opening, %s m above the %s: %s" % (fmt(s_lat), fmt(h) if cave else h, "floor" if cave else "ground", "nothing within 50 m" if t_hit is None else "wall at %s m" % fmt(t_hit)))
             back = []
             for sp in A.get(side, []):
                 rays += 1
                 t_hit = ray_first_hit(c["triangles"], (sp["pos"][0], sp["pos"][1] + 1.0, sp["pos"][2]), d3, 50.0)
                 if t_hit is None or abs(t_hit - SEAM["arrival_inside"]) > SEAM["tol"]:
                     back.append("%s: %s" % (sp["raw_name"], "no wall behind it" if t_hit is None else "wall %s m behind it, not %s" % (fmt(t_hit), SEAM["arrival_inside"])))
+            reach = ("from 0.25 m above the floor to %s m under the roof (the roof stands %s to %s m above the floor)" % (num(SEAM["roof_gap"]), fmt(min(roofs)), fmt(max(roofs)))
+                     if cave and roofs else "up to %s m above the ground under each" % (SEAM["wall_height"] - 0.05))
             R.check(rule + "barrier." + side, not holes and not back,
-                    "%s: %d rays across the %s m opening, up to %s m above the ground under each, all meet the wall %s m in front of the row; arrivals stand %s m inside it"
-                    % (area_id, rays, num(width, 3), SEAM["wall_height"] - 0.05, SEAM["portal_to_wall"], SEAM["arrival_inside"]) if not holes and not back
-                    else "%s: %d of %d rays find no wall %s m in front of the row (%s)%s" % (area_id, len(holes), rays, SEAM["portal_to_wall"], "; ".join(holes[:3]), "; " + "; ".join(back[:3]) if back else ""))
+                    "%s: %d rays across the %s m opening, %s, all meet the wall %s m in front of the row; arrivals stand %s m inside it"
+                    % (area_id, rays, num(width, 3), reach, SEAM["portal_to_wall"], SEAM["arrival_inside"]) if not holes and not back
+                    else "%s: %d of %d rays find no wall %s m in front of the row (%s)%s%s" % (
+                        area_id, len(holes), rays, SEAM["portal_to_wall"], "; ".join(holes[:3]), "; " + "; ".join(back[:3]) if back else "",
+                        ". In a cave the wall closes the passage from the floor to the roof" if cave else ""))
         half = width / 2
         out.append(dict(id=sid, kind=kind, width_m=num(width), a=a_area, b=b_area, portals=count,
                         opening_xy=[[num(mid[0] - tg[0] * half), num(mid[1] - tg[1] * half)], [num(mid[0] + tg[0] * half), num(mid[1] + tg[1] * half)]],
@@ -1276,9 +1420,106 @@ def check_seams(areas, R):
     return out
 
 
-def check_world(areas, R, known_scenes, declared_pending, pending_is_declared):
+def check_walk_scenes(areas, R, known_scenes, game_portals, walk):
+    """docs/walk-areas.md, section 2: walk_scenes.json is well formed, and no walk-only scene id is a game scene id.
+    The game's scene ids are what --scene-ids gives, and in any case overworld and the scene of every room and wild area
+    of the folder. With --scene-ids, no game scene id starts with an area prefix, and (when it is the folder of the
+    scene files) no game portal id uses a walk-only portal namespace."""
+    if walk.missing:
+        R.note("world.walk_scenes", "walk_scenes.json is not beside this script: no walk-only scene is known, so a cave, or a portal into one, fails")
+        return
+    game = {"overworld": "the village's scene"}
+    for a in areas:
+        if a.kind in ("room", "wild"):
+            game.setdefault(a.scene, "the scene of %s" % a.id)
+    for s in known_scenes or ():
+        game.setdefault(s, "one of the game's scene ids")
+    bad = list(walk.problems)
+    bad += ["%s is a game scene id (%s): a walk-only scene never is" % (s, game[s]) for s in sorted(walk.ids & set(game))]
+    if known_scenes is not None:
+        for s, e in sorted(walk.entries.items()):
+            clash = sorted(g for g in known_scenes if g.startswith(e["area_prefix"]))
+            if clash:
+                bad.append("the game scene id %s starts with %s, the area prefix of %s: a wild area of that scene would read as a cave" % (", ".join(clash), e["area_prefix"], s))
+    if game_portals is not None:
+        for s, e in sorted(walk.entries.items()):
+            used = sorted(p for p in game_portals if p.startswith(e["portal_ns"] + "."))
+            if used:
+                bad.append("the game's portals %s use %s., the portal namespace of %s" % (", ".join(used), e["portal_ns"], s))
+    told = ["none is overworld or the scene of a room or a wild area of the folder"]
+    if known_scenes is not None:
+        told.append("none is one of the game's %d scene ids, and none of those starts with an area prefix" % len(known_scenes))
+    if game_portals is not None:
+        told.append("none of the game's %d portals uses a walk-only portal namespace" % len(game_portals))
+    R.check("world.walk_scenes", not bad,
+            "%d walk-only scene%s (%s), well formed: %s" % (len(walk.ids), "" if len(walk.ids) == 1 else "s", ", ".join(sorted(walk.ids)) or "none", "; ".join(told)) if not bad
+            else "walk_scenes.json: %s" % "; ".join(bad))
+
+
+def check_mouths(areas, R, walk):
+    """docs/walk-areas.md, section 5: a walk-only scene is reached from the village by its mouths, door-like portals in
+    the scene's own namespace: Portal_<ns>.<gate>_in in the village {to <scene>, toSpawn mouth_<gate>, kind cave_mouth}
+    and Portal_<ns>.<gate>_out in one of its caves {to overworld, toSpawn mouth_<gate>, kind cave_mouth}. Every crossing
+    between the village and a walk-only scene is a mouth. Printed when the folder has a mouth or a walk-only scene."""
+    bad, mouths, seen = [], 0, False
+    for a in areas:
+        for p in a.portals:
+            pid = p["portal_id"] if isinstance(p["portal_id"], str) else p["raw_name"][len("Portal_"):]
+            ns, dot, rest = pid.partition(".")
+            scene = walk.by_ns.get(ns) if dot else None
+            if scene is not None:
+                seen = True
+                m = GATE_RE.match(rest)
+                if not m:
+                    bad.append("%s: the namespace %s. holds only the mouths of %s, %s.<gate>_in and %s.<gate>_out" % (p["raw_name"], ns, scene, ns, ns))
+                    continue
+                gate, way = m.group(1), m.group(2)
+                home, to = ("overworld", scene) if way == "in" else (scene, "overworld")
+                kind = MOUTH_KINDS[walk.entries[scene]["kind"]]
+                probs = []
+                if a.scene != home:
+                    probs.append("it stands in %s, whose scene is %s, not %s" % (a.id, a.scene, home))
+                if p["to"] != to:
+                    probs.append("to is %r, not %r" % (p["to"], to))
+                if p["toSpawn"] != "mouth_" + gate:
+                    probs.append("toSpawn is %r, not 'mouth_%s'" % (p["toSpawn"], gate))
+                if p["kind"] != kind:
+                    probs.append("kind is %r, not %r" % (p["kind"], kind))
+                if probs:
+                    bad.append("%s: %s" % (p["raw_name"], ", ".join(probs)))
+                else:
+                    mouths += 1
+            elif a.scene == "overworld" and isinstance(p["to"], str) and p["to"] in walk.ids:
+                seen = True
+                bad.append("%s leads from %s into %s and is not one of its mouths (Portal_%s.<gate>_in)" % (p["raw_name"], a.id, p["to"], walk.entries[p["to"]]["portal_ns"]))
+            elif a.scene in walk.ids and p["to"] == "overworld":
+                seen = True
+                bad.append("%s leads from %s into the village and is not one of the mouths of %s (Portal_%s.<gate>_out)" % (p["raw_name"], a.id, a.scene, walk.entries[a.scene]["portal_ns"]))
+    if seen or any(a.scene in walk.ids for a in areas):
+        R.check("world.cave_mouths", not bad,
+                "%d mouth portal%s: Portal_<ns>.<gate>_in in the village and Portal_<ns>.<gate>_out in a cave, with toSpawn mouth_<gate> and kind cave_mouth; every crossing between the village and a walk-only scene is a mouth" % (mouths, "" if mouths == 1 else "s") if not bad
+                else "; ".join(bad))
+
+
+def check_cave_look(areas, R):
+    """docs/walk-areas.md, section 4: every cave of the index carries the same look (exposure, fog, wdi_baked): one look
+    for the whole cave network, because its seams need it. Printed when the folder holds a cave."""
+    caves = sorted((a for a in areas if a.kind == "cave"), key=lambda q: q.id)
+    if not caves:
+        return
+    looks = {}
+    for a in caves:
+        looks.setdefault(json.dumps([a.look, a.baked], sort_keys=True), []).append(a)
+    R.check("world.cave_look", len(looks) == 1,
+            "the %d caves carry one look: %s, wdi_baked %s" % (len(caves), json.dumps(caves[0].look, sort_keys=True), json.dumps(caves[0].baked)) if len(looks) == 1
+            else "%s. Every cave carries the same exposure, fog and wdi_baked: one look for the whole cave network" % "; ".join(
+                "%s has %s, wdi_baked %s" % (" and ".join(a.id for a in group), json.dumps(group[0].look, sort_keys=True), json.dumps(group[0].baked)) for group in looks.values()))
+
+
+def check_world(areas, R, known_scenes, declared_pending, pending_is_declared, walk, game_portals=None):
     """Rules across the files. Returns (spawn id -> area id, pending scene ids, seams)."""
     by_id = {a.id: a for a in areas}
+    check_walk_scenes(areas, R, known_scenes, game_portals, walk)
     homes = {}
     for a in areas:
         for s in a.spawns:
@@ -1316,8 +1557,8 @@ def check_world(areas, R, known_scenes, declared_pending, pending_is_declared):
             hint = " (a spawn with the bare id %r exists in %s: the single-file fallback of today would take it; with an index it is not used)" % (p["toSpawn"], bare[0]) if bare else ""
             if p["to"] in built:
                 bad.append("%s: scene %s is built and has no Spawn_%s%s" % (p["raw_name"], p["to"], exact, hint))
-            elif known_scenes is not None and p["to"] not in known_scenes:
-                bad.append("%s: %r is not one of the game's scene ids%s" % (p["raw_name"], p["to"], hint))
+            elif known_scenes is not None and p["to"] not in known_scenes and p["to"] not in walk.ids:
+                bad.append("%s: %r is neither one of the game's scene ids nor a walk-only scene%s" % (p["raw_name"], p["to"], hint))
             elif known_scenes is None and p["to"] not in declared_pending:
                 bad.append("%s: scene %r is in no file and is not %s%s" % (p["raw_name"], p["to"], "listed under pending in the index" if pending_is_declared else "named with --pending (or known through --scene-ids)", hint))
             else:
@@ -1339,30 +1580,36 @@ def check_world(areas, R, known_scenes, declared_pending, pending_is_declared):
     hazards += waiting_bare
     if hazards:
         R.note("world.bare_id_hazard", "a loader that falls back to the bare toSpawn would go wrong at: " + "; ".join(hazards) + ". With an index the exact id is the only lookup")
-    # a crossing between two village sections is always a seam; the stem seam_ is reserved for seams
+    # a crossing between two sections of one scene (two village sections, or two caves) is always a seam; the stem
+    # seam_ is reserved for seams
     bad = []
     for a in areas:
         for p in a.portals:
             t = p.get("target_area")
             is_seam = p["raw_name"].startswith("Portal_seam_")
-            if t and t != a.id and a.kind == "section" and by_id[t].kind == "section" and not is_seam:
-                bad.append("%s crosses from %s to %s and is not a seam portal" % (p["raw_name"], a.id, t))
-            if is_seam and a.kind != "section":
-                bad.append("%s is a seam portal in %s, which is not a village section" % (p["raw_name"], a.id))
+            if (t and t != a.id and a.kind in SECTIONED_KINDS and by_id[t].kind == a.kind and by_id[t].scene == a.scene
+                    and not is_seam):
+                bad.append("%s crosses from %s to %s, two %s of the scene %s, and is not a seam portal" % (
+                    p["raw_name"], a.id, t, "caves" if a.kind == "cave" else "village sections", a.scene))
+            if is_seam and a.kind not in SECTIONED_KINDS:
+                bad.append("%s is a seam portal in %s, which is neither a village section nor a cave" % (p["raw_name"], a.id))
             if not is_seam and (p["id"].startswith("seam_") or str(p["toSpawn"]).startswith("seam_")):
                 bad.append("%s uses the stem seam_, which is kept for seams" % p["raw_name"])
         for s in a.spawns:
-            if s["id"].startswith("seam_") or (s["id"].startswith("overworld_seam_") and not SEAM_SPAWN_RE.match(s["id"])):
+            if s["id"].startswith("seam_") or (any(s["id"].startswith(sc + "_seam_") for sc in walk.sectioned) and not walk.seam_spawn.match(s["id"])):
                 bad.append("Spawn_%s uses the stem seam_, which is kept for seam arrivals" % s["id"])
-    R.check("world.seams_only_between_sections", not bad, "every crossing between two village sections is a seam, and only seams use the stem seam_" if not bad else "; ".join(bad))
-    seams = check_seams(areas, R)
+    R.check("world.seams_only_between_sections", not bad,
+            "every crossing between two sections of one scene (village sections, caves) is a seam, and only seams use the stem seam_" if not bad else "; ".join(bad))
+    check_mouths(areas, R, walk)
+    check_cave_look(areas, R)
+    seams = check_seams(areas, R, walk)
     return {k: v[0] for k, v in homes.items()}, sorted(pending), seams
 
 
 def note_reach(areas, R, spawn_home, start):
     """Two notes, never failures. An area that no portal of another area leads into (the area the viewer starts in is
-    left out). And a way out of a room or a wild area that arrives in another file than the door that leads in, or
-    more than 10 m from that door."""
+    left out). And a way out of a room, a wild area or a cave (a portal that leaves its scene: a door, a cave mouth's
+    _out) that arrives in another file than the door that leads in, or more than 10 m from that door."""
     by_id = {a.id: a for a in areas}
     into = {}
     for a in areas:
@@ -1375,11 +1622,11 @@ def note_reach(areas, R, spawn_home, start):
             if a.id != spawn_home.get(start):
                 R.note(a.id + ".no_way_in", "no portal of another area leads into %s: the player reaches it only through the picker, or a link that names one of its spawns" % a.id)
             continue
-        if a.kind not in ("room", "wild"):
+        if a.kind not in ("room", "wild", "cave"):
             continue
         for p in a.portals:
             t = p.get("target_area")
-            if not t or t == a.id:
+            if not t or t == a.id or p["to"] == a.scene:      # a seam stays in its scene: it is no way out
                 continue
             spawn = next((s for s in by_id[t].spawns if s["id"] == "%s_%s" % (p["to"], p["toSpawn"])), None)
             if spawn is None:
@@ -1397,8 +1644,18 @@ def note_reach(areas, R, spawn_home, start):
 
 # --------------------------------------------------------------------------------------------- the index
 
-def build_index(areas, world, start, pending, seams):
+def walk_scenes_used(areas, walk):
+    """The entries of walk_scenes.json for the walk-only scenes the files use: the scene of an area, or where a portal
+    leads. The index lists them under walk_scenes, and has no such field when there are none."""
+    used = {a.scene for a in areas} | {p["to"] for a in areas for p in a.portals if p["read_by_viewer"]}
+    return {s: dict(walk.entries[s]) for s in sorted(used & walk.ids)}
+
+
+def build_index(areas, world, start, pending, seams, walk):
     idx = dict(format=FORMAT, world=world, axes=AXES_NOTE, start=start, areas={}, scenes={}, seams=seams, pending=pending)
+    used = walk_scenes_used(areas, walk)
+    if used:
+        idx["walk_scenes"] = used
     for a in sorted(areas, key=lambda q: q.id):
         e = dict(file=a.base, bytes=a.size, sha256=a.sha256, kind=a.kind, scene=a.scene, name=a.name, indoor=a.indoor, baked=a.baked,
                  walk_region_xy=a.walk_region())
@@ -1550,6 +1807,12 @@ def compare_index(disk, built, R):
     for key in ("scenes", "seams"):
         lines = differences(disk.get(key), built[key], key)
         R.check("index." + key, not lines, "%s in the index are what the files give" % key if not lines else "; ".join(lines[:6]))
+    # walk_scenes: the entries of walk_scenes.json for the walk-only scenes the files use, and no field when none is
+    lines = differences(disk.get("walk_scenes"), built.get("walk_scenes"), "walk_scenes")
+    R.check("index.walk_scenes", not lines,
+            ("walk_scenes in the index are the entries of walk_scenes.json for the walk-only scenes the files use: %s" % ", ".join(built["walk_scenes"])
+             if built.get("walk_scenes") else "the files use no walk-only scene, and the index lists none") if not lines
+            else "; ".join(lines[:6]) + ". walk_scenes lists the entries of walk_scenes.json for the walk-only scenes the files use")
 
 
 # --------------------------------------------------------------------------------------------- the command
@@ -1561,8 +1824,27 @@ def read_scene_ids(path):
         return set(json.load(fh))
 
 
+def read_game_portals(path):
+    """The game's portal ids, when --scene-ids is the folder of the scene files (each lists its portals); else None.
+    A file that cannot be read leaves the answer None: the namespace check is then not made."""
+    if not os.path.isdir(path):
+        return None
+    ids = set()
+    try:
+        for f in sorted(os.listdir(path)):
+            if f.endswith(".json") and not f.endswith(".nav.json"):
+                with open(os.path.join(path, f), "r", encoding="utf-8") as fh:
+                    scene = json.load(fh)
+                for p in (scene.get("portals") or []) if isinstance(scene, dict) else []:
+                    if isinstance(p, dict) and isinstance(p.get("id"), str):
+                        ids.add(p["id"])
+    except (OSError, ValueError, AttributeError, TypeError):
+        return None
+    return ids
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(description="Build or check walk-index.json (docs/walk-areas.md, version 1).")
+    ap = argparse.ArgumentParser(description="Build or check walk-index.json (docs/walk-areas.md, version 1.1; index format 1).")
     ap.add_argument("inputs", nargs="+", help="a folder of walk-*.glb / walk-*.gltf files, or the files themselves")
     ap.add_argument("--check", action="store_true", help="write nothing: check the index in the folder against the files")
     ap.add_argument("--out", help="where to write the index (default: walk-index.json in the folder)")
@@ -1570,6 +1852,7 @@ def main(argv=None):
     ap.add_argument("--world", default="hollowmere", help="a label for the world")
     ap.add_argument("--scene-ids", help="the game's scene ids: a JSON list, or a folder of <sceneId>.json files (packages/content/data/scenes)")
     ap.add_argument("--pending", default="", help="scene ids that are not built yet, with commas (needed when --scene-ids is not given)")
+    ap.add_argument("--walk-scenes", help="the walk-only scenes (default: walk_scenes.json beside this script)")
     ap.add_argument("--legacy", action="store_true", help="accept today's files: each difference from the contract is a WARNING")
     ap.add_argument("--strict-targets", action="store_true", help="count a file over a planning target as a failure")
     ap.add_argument("--json", help="also write the results as JSON here")
@@ -1604,8 +1887,22 @@ def main(argv=None):
     if known is not None and not known:
         print("--scene-ids: no scene ids found there", file=sys.stderr)
         return 2
+    game_portals = read_game_portals(args.scene_ids) if args.scene_ids else None
+    walk_path = args.walk_scenes or os.path.join(os.path.dirname(os.path.abspath(__file__)), "walk_scenes.json")
+    if args.walk_scenes and not os.path.isfile(walk_path):
+        print("--walk-scenes: no such file: %s" % os.path.basename(walk_path), file=sys.stderr)
+        return 2
 
     R = Results(legacy=args.legacy, strict_targets=args.strict_targets)
+    # the walk-only scenes: a registry that cannot be read is one FAIL line, and the rest is checked as if it were empty
+    if not os.path.isfile(walk_path):
+        walk = WalkScenes(missing=True)
+    else:
+        try:
+            walk = read_walk_scenes(walk_path)
+        except (OSError, ValueError) as err:
+            R.add("FAIL", "walk_scenes.readable", "%s could not be read as the list of walk-only scenes: %s" % (os.path.basename(walk_path), err))
+            walk = WalkScenes()
 
     def finish(wrote=""):
         fails = R.count("FAIL")
@@ -1625,7 +1922,7 @@ def main(argv=None):
             R.add("FAIL", os.path.basename(p) + ".readable", "could not be read as glTF: %s" % (str(err) or err.__class__.__name__))
     for a in read:
         try:
-            check_file(a, R, known)
+            check_file(a, R, known, walk)
             areas.append(a)
         except broken as err:
             R.add("FAIL", a.base + ".readable", "the checks could not finish on this file (%s: %s); it is left out of the rules across files" % (err.__class__.__name__, err))
@@ -1654,7 +1951,7 @@ def main(argv=None):
         if isinstance(disk.get("pending"), list):
             disk_pending = sorted({s for s in disk["pending"] if isinstance(s, str)})
         declared |= set(disk_pending)
-    spawn_home, pending, seams = check_world(areas, R, known, declared, args.check)
+    spawn_home, pending, seams = check_world(areas, R, known, declared, args.check, walk, game_portals)
     all_spawns = [s["id"] for a in areas for s in a.spawns]
     start = disk.get("start") if args.check else args.start
     if not (isinstance(start, str) and start):
@@ -1662,14 +1959,14 @@ def main(argv=None):
     R.check("index.start", start in spawn_home, "the viewer starts at Spawn_%s in %s" % (start, spawn_home.get(start)) if start in spawn_home else "the start spawn %r is in no file" % (start,))
     note_reach(areas, R, spawn_home, start)
     world = disk.get("world") if args.check and isinstance(disk.get("world"), str) else args.world
-    built = build_index(areas, world, start, pending, seams)
+    built = build_index(areas, world, start, pending, seams, walk)
     if args.check:
         built["pending"] = disk_pending
         stale = [s for s in built["pending"] if s in built["scenes"]]
         unused = [s for s in built["pending"] if s not in pending and s not in stale]
-        unknown = [s for s in built["pending"] if known is not None and s not in known]
+        unknown = [s for s in built["pending"] if known is not None and s not in known and s not in walk.ids]
         R.check("index.pending", not stale and not unknown,
-                "pending: %s" % (", ".join(built["pending"]) or "nothing") if not stale and not unknown else "listed as pending and yet built: %s; not a scene id of the game: %s" % (stale or "-", unknown or "-"))
+                "pending: %s" % (", ".join(built["pending"]) or "nothing") if not stale and not unknown else "listed as pending and yet built: %s; neither a scene id of the game nor a walk-only scene: %s" % (stale or "-", unknown or "-"))
         if unused:
             R.note("index.pending_unused", "listed under pending and no portal leads there: " + ", ".join(unused))
         check_schema(disk, R, "the index in the folder")

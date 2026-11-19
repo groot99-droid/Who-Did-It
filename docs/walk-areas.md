@@ -4,33 +4,48 @@ The contract between the Blender exporter (`tools/blender/`) and the first-perso
 `claude/v2-walk`) for a world that is no longer one file. The owner's directive: every room is its own GLB, and the
 village is cut into sections joined by portals, as the 2.5D game joins its scenes.
 
-Version 1, 2026-11-16. The tools that prove a set of files obeys it are in `tools/blender/walk_areas/`.
+Version 1.1, 2026-11-19: version 1 of 2026-11-16 with a cave network added. The owner asked on 2026-11-19 for caves
+cut like the village (each cave section its own GLB, joined by portals), reached from four surface gates (in The West
+Woods, Up the Line and the North Woods, The East Hills and Mill Lane), large and geologically diverse. The caves are
+for the 3D walk only: no game scene id is added for them and `packages/content/data/scenes` is not touched. The index
+still says `"format": 1` (section 12 says why). The tools that prove a set of files obeys this contract are in
+`tools/blender/walk_areas/`.
 
-Words used here. An **area** is what one file holds: a village section, a room or a wild area. A **scene** is a game
-scene id from `packages/content/data/scenes` (`overworld` is the village; `widow_bedroom` is a room). A **seam** is a
-crossing between two village sections. Lengths are metres. "Measured" means read from a file or run on 2026-11-16;
-"estimated" means worked out and not run. Blender axes are x east, y north, z up; glTF writes Blender's (x, y, z) as
-(x, z, -y). Line numbers of the viewer are in `apps/walk/src/` at commit `509df801` of `claude/v2-walk`; line numbers
-of the exporter are in `tools/blender/meshy_walk_export.py` and were read at commits `f2f5dbff` and `957a02b3` of
+Words used here. An **area** is what one file holds: a village section, a room, a wild area or a cave. A **scene** is
+a game scene id from `packages/content/data/scenes` (`overworld` is the village; `widow_bedroom` is a room), or a
+**walk-only scene**: a scene of the walk that the game does not have, listed in
+`tools/blender/walk_areas/walk_scenes.json`. There is one: `undermere`, The Undermere, the caves. A **cave** is an
+area of a walk-only scene: a cave section, cut like a village section. A **sectioned scene** is a scene cut into areas
+joined by seams: `overworld` (its village sections) and every walk-only scene (its caves). A **seam** is a crossing
+between two areas of one sectioned scene: two village sections, or two caves. A **cave mouth** is one of the surface
+gates: a pair of door-like portals between the village and the caves. Lengths are metres. "Measured" means read from
+a file or run on 2026-11-16, or on 2026-11-19 for what version 1.1 added; "estimated" means worked out and not run.
+Blender axes are x east, y north, z up; glTF writes Blender's (x, y, z) as (x, z, -y). Line numbers of the viewer are
+in `apps/walk/src/` at commit `509df801` of `claude/v2-walk`; line numbers of the exporter are in
+`tools/blender/meshy_walk_export.py` and were read at commits `f2f5dbff` and `957a02b3` of
 `claude/hollowmere-walk-export` (the same lines in both).
 
 ## 1. The whole thing in ten lines
 
 1. The world is one folder: a file `walk-<areaId>.glb` for every area, and one `walk-index.json`.
-2. An area is a village section (`village_<key>`), a room (`room_<sceneId>`) or a wild area (its scene id). A file
-   holds exactly one: one `Area_<areaId>` node and one `HM_Collision_<areaId>` node at its scene root.
-3. A file's coordinates are its own. All village sections keep the village's coordinates, so a seam is at the same
-   place in both files. A room and a wild area sit at their own origin.
+2. An area is a village section (`village_<key>`), a room (`room_<sceneId>`), a wild area (its scene id) or a cave
+   (`under_<key>`). A file holds exactly one: one `Area_<areaId>` node and one `HM_Collision_<areaId>` node at its
+   scene root.
+3. A file's coordinates are its own. All village sections and all caves keep the village's coordinates, so a seam is
+   at the same place in both files; the caves lie below the ground. A room and a wild area sit at their own origin.
 4. The viewer has one area in its scene at a time.
 5. The index lists every area's file, spawns and portals, so the viewer knows which file holds a spawn without
    opening it. `walk_index.py` writes the index from the files; nobody writes it by hand.
-6. A portal names a scene and a spawn (`to`, `toSpawn`). Its target is the spawn whose id is exactly
-   `<to>_<toSpawn>`, looked up in the whole index. Spawn ids are unique in the whole index.
+6. A portal names a scene and a spawn (`to`, `toSpawn`). The scene is a game scene id or a walk-only scene id. Its
+   target is the spawn whose id is exactly `<to>_<toSpawn>`, looked up in the whole index. Spawn ids are unique in
+   the whole index. The caves are reached from the village only through cave mouths: door-like portals named
+   `Portal_um.<gate>_in` and `Portal_um.<gate>_out`.
 7. A scene that has no file yet is listed under `pending`. A portal into it says "... is not built yet", as today.
 8. A seam is a closed wall in each file with a row of portal points 0.45 m in front of it. The walker arrives 1.65 m
    inside the other file's wall, 2.1 m beyond the point they left by. No other portal stands near the row or the
-   arrivals. Exposure, fog, whether the light is baked, and the height of the ground are equal on both sides. The
-   rest of a village section's edge is closed by a wall too, so that nobody walks off it.
+   arrivals. Exposure, fog, whether the light is baked, and the height of the ground are equal on both sides. In the
+   village the wall stands 3 m high; in a cave it closes the passage from the floor to the roof. The rest of a village
+   section's edge is closed by a wall too, so that nobody walks off it.
 9. The viewer can cross between files in two ways: load the page again with the arrival spawn in the address (about
    11 hours of work, estimated) or swap the area inside the page (about 22 hours, estimated). The files, the index,
    the seams and the checkers are the same for both.
@@ -45,14 +60,18 @@ of the exporter are in `tools/blender/meshy_walk_export.py` and were read at com
 | Area id of a village section | `village_<key>` | `village_west` |
 | Area id of a room | `room_<sceneId>` | `room_widow_bedroom` |
 | Area id of a wild area | its scene id | `forest` |
+| A walk-only scene | an id of `tools/blender/walk_areas/walk_scenes.json` | `undermere` |
+| Area id of a cave | the area prefix of its walk-only scene and a key: `under_<key>` | `under_a` |
 | The area's root node | `Area_<areaId>` | `Area_room_widow_bedroom` |
 | The area's collision node | `HM_Collision_<areaId>` | `HM_Collision_room_widow_bedroom` |
-| A spawn in a room or a wild area | `Spawn_<sceneId>_<spawnId>` | `Spawn_widow_bedroom_door` |
+| A spawn in a room, a wild area or a cave | `Spawn_<sceneId>_<spawnId>` | `Spawn_widow_bedroom_door`, `Spawn_undermere_mouth_east` |
 | A spawn in a village section | `Spawn_overworld_<spawnId>` for the scene's own spawns; `Spawn_<district>` for the district spawns | `Spawn_overworld_widow`, `Spawn_square` |
 | A portal | `Portal_<portalId>`, the game's portal id with its dot | `Portal_wb.door` |
-| A seam | `<seamId>`: lower-case words joined by `_` | `west_east` |
+| A cave mouth's portals | `Portal_<ns>.<gate>_in` in the village and `Portal_<ns>.<gate>_out` in a cave; `<ns>` is the walk-only scene's portal namespace, `um` | `Portal_um.east_in`, `Portal_um.east_out` |
+| A cave mouth's arrivals | `Spawn_overworld_mouth_<gate>` in the village, `Spawn_<scene>_mouth_<gate>` in a cave | `Spawn_overworld_mouth_east`, `Spawn_undermere_mouth_east` |
+| A seam | `<seamId>`: lower-case words joined by `_`, unique in the whole index | `west_east`, `a_b` |
 | A seam's portal points | `Portal_seam_<seamId>_<side>_<n>` | `Portal_seam_west_east_a_2` |
-| A seam's arrival spawns | `Spawn_overworld_seam_<seamId>_<side>_<n>` | `Spawn_overworld_seam_west_east_b_2` |
+| A seam's arrival spawns | `Spawn_<scene>_seam_<seamId>_<side>_<n>`, the scene being `overworld` or the walk-only scene | `Spawn_overworld_seam_west_east_b_2`, `Spawn_undermere_seam_a_b_b_2` |
 
 Rules for the names:
 
@@ -63,9 +82,22 @@ Rules for the names:
 - A **spawn id** is the node's name without `Spawn_`. It is unique across every file of the index.
 - A **portal id** is unique across every file of the index too, both as the viewer reads it (`wbdoor`) and as the
   game writes it (`wb.door`): `world.portal_unique`.
-- The area id of a section (`village_<key>`) or a room (`room_<sceneId>`) is never itself a game scene id. A room's
-  `<sceneId>` and a wild area's id are game scene ids. `walk_index.py --scene-ids` checks both.
+- The area id of a section (`village_<key>`), a room (`room_<sceneId>`) or a cave (`under_<key>`) is never itself a
+  game scene id. A room's `<sceneId>` and a wild area's id are game scene ids, never walk-only ones; a cave's scene is
+  a walk-only scene. `walk_index.py --scene-ids` checks both (`<area>.area_id`, in both checkers since version 1.1;
+  `check_areas.mjs` has no list of the game's scene ids and checks the forms only).
+- **The walk-only scenes** are listed in `tools/blender/walk_areas/walk_scenes.json`, which is committed:
+  `{"undermere": {"name": "The Undermere", "kind": "cave", "area_prefix": "under_", "portal_ns": "um"}}`. Each entry
+  says the scene's plain words, the kind of its areas (`cave`, the only kind so far), the prefix of its area ids and
+  the namespace of its cave mouths' portals. **A walk-only scene id is never a game scene id**: both checkers fail one
+  that is `overworld` or the scene of a room or a wild area of the folder, and `walk_index.py --scene-ids` also one
+  that is any game scene id, a game scene id that starts with an area prefix, and a game portal id that uses a
+  walk-only namespace (`world.walk_scenes`). Measured on 2026-11-19: none of the game's 32 scene ids starts with
+  `under_`, and none of its 82 portal ids with `um.`. That is also why caves are not called `cave_<key>`: the game has
+  the scene ids `cave_entry` and `cave_gallery`, so `cave_` would start game scene ids (the variant `cave_id_prefix`).
+  An area prefix is not `village_` or `room_`, and two walk-only scenes share no prefix and no namespace.
 - The stem `seam_` belongs to seams: no other portal or spawn uses it.
+- A walk-only scene's namespace (`um.`) belongs to its cave mouths: no other portal uses it, and the game does not.
 - No Area, collision, spawn or portal name is used twice in one file. three.js would rename the second one
   (`Spawn_x` becomes `Spawn_x_1`) and the viewer would see a spawn nobody asked for. three.js also removes
   `. [ ] : /` from names and turns spaces into `_`, so `Portal_wb.door` is read by the viewer as the id `wbdoor`
@@ -104,7 +136,7 @@ How the viewer is told which world to open:
 `walk-index.json` is written by `tools/blender/walk_areas/walk_index.py` from the area files themselves. Every value
 in it can be read back from the files, and `walk_index.py <folder> --check` does exactly that. Three things are given
 to the tool and not read from the files: `world` (a label), `start`, and which unbuilt scenes are real (the game's
-scene ids, or a list).
+scene ids, or a list). The walk-only scenes come from `walk_scenes.json` beside the tool.
 
 **Axes.** Every 3-number vector is in glTF world axes: x east, y up, z = -north. Every field whose name ends in `_xy`
 is a plan view in Blender axes: x east, y north. `yaw_deg` is the viewer's yaw: 0 looks along -z (north), positive
@@ -117,13 +149,14 @@ turns left, so west is 90. The index says this itself, in its `axes` field.
 | `world` | a label | nobody | no |
 | `start` | the spawn id to start at when the address names none | viewer | yes |
 | `areas` | area id to the entry below | viewer, tools | yes |
-| `scenes` | scene id to the area ids that make it up (`overworld` is every village section) | tools | yes |
-| `seams` | every seam: `id`, `kind`, `width_m`, sides `a` and `b` (area ids), `portals` (points per side), `opening_xy` (the two ends of the opening), `normal_xy` (the unit direction from side a to side b) | tools: the checker walks the viewer's trigger across each opening | yes, may be empty |
-| `pending` | scene ids that are not built yet | tools: it is what tells an unbuilt scene from a misspelt one. The viewer does not need it: a target that is not in the index is "not built yet". | yes, may be empty |
+| `scenes` | scene id, a game scene id or a walk-only one, to the area ids that make it up (`overworld` is every village section, `undermere` every cave) | tools | yes |
+| `seams` | every seam, between two village sections or two caves: `id`, `kind`, `width_m`, sides `a` and `b` (area ids), `portals` (points per side), `opening_xy` (the two ends of the opening), `normal_xy` (the unit direction from side a to side b) | tools: the checker walks the viewer's trigger across each opening | yes, may be empty |
+| `pending` | scene ids, game or walk-only, that are not built yet | tools: it is what tells an unbuilt scene from a misspelt one. The viewer does not need it: a target that is not in the index is "not built yet". | yes, may be empty |
+| `walk_scenes` | the walk-only scenes the files use (the scene of an area, or where a portal leads), each entry copied from `walk_scenes.json`: `name`, `kind`, `area_prefix`, `portal_ns`. Left out when the files use none, so the index of today's two files is the same as before (measured on 2026-11-19: the same 15,571 bytes) | tools; a viewer that wants better words for a door into the caves ("The Undermere" rather than "Undermere") | no; version 1.1 |
 | `areas.<id>.file` | the file's name, no folder | viewer | yes |
 | `areas.<id>.bytes` | the file's size in bytes | viewer: the loading bar, when the server sends no length | yes |
 | `areas.<id>.sha256` | the hash of the file's bytes | viewer: its first 8 characters can go on the address so a new export is never mixed with a cached old file; tools | yes |
-| `areas.<id>.kind` | `section`, `room` or `wild` | tools | yes |
+| `areas.<id>.kind` | `section`, `room`, `wild` or `cave` | tools | yes |
 | `areas.<id>.scene` | the scene this area belongs to | tools | yes |
 | `areas.<id>.name` | plain words (the Area's `wdi_name`) | viewer, if it wants better words in the door prompt | yes |
 | `areas.<id>.indoor`, `baked` | as the viewer reads them from the Area | tools; the seam check holds `baked` equal on both sides | yes |
@@ -137,8 +170,8 @@ turns left, so west is 90. The index says this itself, in its `axes` field.
 | `areas.<id>.stats` | counts read from the file: triangles loaded, collision triangles, draw calls, instanced groups, images, GPU texture megabytes, lights | tools | no |
 
 The viewer must ignore fields it does not know. The shape of the file is in
-`tools/blender/walk_areas/schema/walk-index.schema.json`; the schema lists exactly the fields of version 1, and a
-later optional field is added to it there.
+`tools/blender/walk_areas/schema/walk-index.schema.json`; the schema lists exactly the fields of version 1.1 (those of
+version 1, and the optional `walk_scenes`), and a later optional field is added to it there.
 
 **Order.** `walk_index.py` lists the areas by their ids and each area's spawns and portals as the file has them. The
 order carries no meaning. In what order the picker shows the spawns is the viewer's choice.
@@ -205,6 +238,19 @@ spawn that faces it:
 { "id": "overworld_seam_west_east_a_2", "label": "East gate, arrival 2 (Village west)", "name": "East gate, arrival 2", "group": "Village west", "position": [-1.65, 0, 0], "yaw_deg": 90, "picker": false }
 ```
 
+And these show the caves of the test world (version 1.1): the cave seam, a point of its row, the cave mouth's portal
+in `village_east`, the arrival it leads to in `under_a`, a cave's entry (its size, hash, spawns, portals and counts
+left out), and the field `walk_scenes`, which comes last in the index:
+
+```json
+{ "id": "a_b", "kind": "passage", "width_m": 2.4, "a": "under_a", "b": "under_b", "portals": 2, "opening_xy": [[32, -11.2], [32, -8.8]], "normal_xy": [1, 0] }
+{ "id": "seam_a_b_a_2", "portal_id": "seam_a_b_a_2", "position": [31.55, -10, 9.4], "to": "undermere", "toSpawn": "seam_a_b_b_2", "kind": "gate", "target_area": "under_b", "seam": "a_b" }
+{ "id": "umeast_in", "portal_id": "um.east_in", "position": [20, 0, 12], "to": "undermere", "toSpawn": "mouth_east", "kind": "cave_mouth", "target_area": "under_a" }
+{ "id": "undermere_mouth_east", "label": "East cave mouth (The Undermere)", "name": "East cave mouth", "group": "The Undermere", "position": [22, -10, 10], "yaw_deg": -90 }
+"under_a": { "file": "walk-under_a.gltf", "kind": "cave", "scene": "undermere", "name": "The Undermere, mouth passage", "indoor": true, "baked": true, "walk_region_xy": [20, -11.2, 32, -8.8], "look": { "wdi_exposure": 4, "fog_color": "#12141C", "fog_density": 0.05 } }
+"walk_scenes": { "undermere": { "name": "The Undermere", "kind": "cave", "area_prefix": "under_", "portal_ns": "um" } }
+```
+
 ## 4. The area file
 
 Standard glTF 2.0 in a `.glb`, Y up, metres, as the exporter writes today.
@@ -224,7 +270,8 @@ Standard glTF 2.0 in a `.glb`, Y up, metres, as the exporter writes today.
   No other node in the file is named `Area_...`.
 - A village section holds no directional light. The viewer adds the look's moon and sky light only to a file that
   has no directional light of its own (`main.ts` line 154), so one section with a sun would be lit differently from
-  its neighbours. Today's village holds 24 point lights and no directional one (measured).
+  its neighbours. Today's village holds 24 point lights and no directional one (measured). A cave holds none either:
+  it is lit by its bake, and the caves carry one look (below).
 - `HM_Collision_<areaId>` is one mesh with one primitive, in the file's own coordinates: no transform, no children, no
   material, extra `wdi_collision: true` (measured: both of today's collision meshes have one primitive; a second one
   fails `<area>.reserved_names`, section 2). The viewer hides it and collides only with it. No other node is named
@@ -265,6 +312,11 @@ is not written yet (section 11).
   0.5 m strip. The same holds under a seam's portal row: a sill there counts as the ground for the seam-wall check.
 - A room or a wild area is not held to this rule: its walls are its own, and its walk region can be looser than they
   are.
+- A cave is not held to this rule by the checkers here. The rule takes the first surface a ray meets going down from
+  the top of the collision mesh for the ground, and in a cave that is the roof. That a cave cannot be walked out of
+  is a check of the cave builder in Blender (not written yet, section 11). What the checkers do hold a cave to: every
+  spawn and portal stands on ground found by a ray from 1 m above it (`<area>.stand_on_ground`, as everywhere), and
+  its seams (section 6).
 - Run once, with a throwaway script that is not kept, on today's village collision (148,000 triangles, decoded from its
   Draco data) as if the unsplit village were one section: the village already closes its walk region with four quads on
   the region's edge (x = -112 and 206, y = -40 and 142), each rising from -30 m to 90 m. The rule found 3,991 of 3,992
@@ -277,15 +329,15 @@ is not written yet (section 11).
 | Extra | Value | Read by |
 |---|---|---|
 | `wdi_area` | the area id | tools |
-| `wdi_kind` | `section`, `room` or `wild` | tools, the index |
-| `wdi_scene` | the scene id: `overworld` for a village section, the scene id for a room or a wild area | tools, the index |
+| `wdi_kind` | `section`, `room`, `wild` or `cave` | tools, the index |
+| `wdi_scene` | the scene id: `overworld` for a village section, the scene id for a room or a wild area, the walk-only scene for a cave (`undermere`) | tools, the index |
 | `wdi_name` | plain words | the index |
 | `wdi_walk_region` | `[x0, y0, x1, y1]` in Blender metres, in the file's own coordinates. It holds every spawn and every portal of the file, those on its edge too; in a room and a wild area it also holds the origin (0, 0) | tools, the index |
 | `wdi_walk_polygon` | optional: the outline when the walkable ground is not the whole rectangle. Three or more points in Blender metres, written as a flat list `[x0, y0, x1, y1, ...]`, or as a JSON string of that list or of a list of pairs; a list of `[x, y]` pairs is read too (note below the table) | tools, the index |
 | `wdi_exposure` | a number above 0 | the viewer |
-| `fog_color` with `fog_density` (or with `fog_near` and `fog_far`) | outdoors only | the viewer |
-| `wdi_indoor: true` | rooms, and a wild area that is indoors; never on a village section | the viewer |
-| `wdi_baked` | optional: `true` when the light is baked into vertex colours. The viewer switches off every light of such an Area (`world.ts`, `switchOffBakedLights`), so on a village section it is part of the look (section 6) | the viewer, the seam check |
+| `fog_color` with `fog_density` (or with `fog_near` and `fog_far`) | outdoors, and in every cave | the viewer |
+| `wdi_indoor: true` | rooms, every cave, and a wild area that is indoors; never on a village section | the viewer |
+| `wdi_baked` | optional: `true` when the light is baked into vertex colours. The viewer switches off every light of such an Area (`world.ts`, `switchOffBakedLights`), so on a village section and a cave it is part of the look (section 6). Required, and `true`, on a cave | the viewer, the seam check |
 
 **Why the outline has more than one form.** Today's exporter writes lists of numbers as lists (`wdi_walk_region` and
 `wdi_offset` in the village's Area) and nested data as a JSON string (`wdi_look_json` in the same Area); both measured.
@@ -295,11 +347,32 @@ string, and a writer that is not Blender may write pairs. The index always lists
 
 `wdi_kind` has another meaning on other nodes. There it is the exporter's class of a model (`building`, `kit`,
 `prop`, `vehicle`; measured: 131 nodes of today's village and 3 of the bedroom carry it, and the exporter reads it).
-That is not this extra and stays as it is. Only the Area node's `wdi_kind` says `section`, `room` or `wild`, and the
-tools read it nowhere else.
+That is not this extra and stays as it is. Only the Area node's `wdi_kind` says `section`, `room`, `wild` or `cave`,
+and the tools read it nowhere else.
 
 Other extras the files carry today (`wdi_look`, `wdi_look_json`, `wdi_light_mode`, `wdi_k`, `wdi_color0`,
 `wdi_offset`) may stay. Nothing in this contract reads them. There is no offset or origin field any more.
+
+**A cave** (version 1.1) is an area of a walk-only scene: `wdi_kind: "cave"`, `wdi_scene` the walk-only scene, its id
+the scene's area prefix and a key (`under_<key>`). What it carries, and why:
+
+- `wdi_indoor: true` and `wdi_baked: true`, both required (`<area>.area_extras`). Indoors the viewer draws no moon,
+  sky light or sky dome (`world.ts`, `areaLook`; `main.ts` lines 121-124); without `wdi_indoor` a cave would show the
+  moon (the variant `cave_not_indoor`). Baked, the viewer switches off the cave's own lights and its light is in its
+  vertex colours, as in a baked room.
+- Fog in its Area's extras, like any area that is not a room: `fog_color` and `fog_density` (or `fog_near` and
+  `fog_far`). The fog colour is meant to be the ink, `#12141C` (a colour string, which the viewer reads with three's
+  `Color`, is one way to write it); the checkers test that the fog is there, not its colour.
+- **One look for every cave.** Every cave of an index carries the same `wdi_exposure`, the same fog and the same
+  `wdi_baked`, the same JSON values exactly: the network is one place to the eye, and its seams need it. A cave whose
+  look differs from another cave's fails `world.cave_look`, whether or not the two share a seam (the variant
+  `cave_look_differs`). The look may differ across a cave mouth: the walk fades there (section 5).
+- No directional light (`<area>.no_directional_light`), and the Area node carries no transform, as every Area.
+- **The village frame.** A cave is built in the village's coordinates (x east, y north, z up), below the ground, so
+  that a seam between two caves is at the same place in both files. Its walk region need not hold the origin (0, 0)
+  (that rule is for rooms and wild areas), and caves may lie over one another in different files: the valid variant
+  `cave_stacked_levels` puts a cave 6 m under another, its mouth's portal and arrival at the same places in plan.
+- In a cave, as in a village section, every spawn stands more than 1 m from every portal of its file (section 5).
 
 **Extras of spawns and portals.**
 
@@ -308,8 +381,8 @@ Other extras the files carry today (`wdi_look`, `wdi_look_json`, `wdi_light_mode
 | spawn | `wdi_spawn`, `wdi_district` | required: the picker's words and the district it groups by |
 | spawn | `wdi_picker: false` | on a spawn that is only an arrival (every seam arrival); left out otherwise |
 | spawn | `wdi_facing_deg` and the rest | as today; informational |
-| portal | `to`, `toSpawn` | required: a scene id and a spawn id within that scene. The viewer skips a portal without them. |
-| portal | `kind` | required: the game's portal kind (`door`, `hatch`, `forest_gate` ...); `gate` on every seam portal |
+| portal | `to`, `toSpawn` | required: a scene id (a game scene id or a walk-only one) and a spawn id within that scene. The viewer skips a portal without them. |
+| portal | `kind` | required: the game's portal kind (`door`, `hatch`, `forest_gate` ...); `gate` on every seam portal, the village's and the caves'; `cave_mouth` on both portals of a cave mouth |
 | portal | `wdi_portal_id` | required: the node's name without `Portal_`, with its dot |
 | seam portal | `wdi_seam`, `wdi_seam_kind`, `wdi_width_m` | section 6 |
 
@@ -339,7 +412,8 @@ three of the first four and uses unlit.
 **Coordinates.** A file's coordinates are its own, and the Area node sits at the file's origin.
 
 - Village sections all use the village's coordinates as they are today. Nothing is moved when the village is cut:
-  a point on a seam has the same coordinates in both files.
+  a point on a seam has the same coordinates in both files. Caves use the village's coordinates too, below the
+  ground, for the same reason (above).
 - A room and a wild area are built around their own origin: the origin lies on the ground the player can walk. The
   far-grid slots of the single-file form (3,000 m and more out, 600 m apart) are not used for separate files. The
   checkers fail an Area node that carries a transform (`<area>.area_at_origin`), and a room or a wild area whose
@@ -358,7 +432,9 @@ textures. No Meshy model or texture is replaced by another, or dropped, to save 
 **The legacy single file.** The unsplit village stays valid as a single file opened with `?glb=`. In that mode
 everything of today stays legal: several Areas in one file, rooms on far-grid slots, the viewer's nearest-origin
 rule, the bare-id fallback, the unsuffixed `HM_Collision`. `walk_index.py --legacy` also accepts today's two files in
-an index and prints each difference as a warning. The accepted differences, measured on the two files:
+an index and prints each difference as a warning. The legacy village may hold cave mouths (`Portal_um.<gate>_in` and
+`Spawn_overworld_mouth_<gate>`): in the interim world of section 11 cave files can stand in the index beside it. The
+accepted differences, measured on the two files:
 
 | | The contract | `hollowmere_walk.glb` today | `rooms/widow_bedroom.glb` today |
 |---|---|---|---|
@@ -372,8 +448,9 @@ Everything else the checkers test passes on both files as they are.
 
 ## 5. Portals, and how a target is found
 
-A portal's extras are `{to, toSpawn, kind}`, as today. `to` is always a **game scene id** (`overworld`,
-`widow_bedroom`, `forest`), never an area id.
+A portal's extras are `{to, toSpawn, kind}`, as today. `to` is always a **scene id**, never an area id: a game scene
+id (`overworld`, `widow_bedroom`, `forest`) or a walk-only scene id (`undermere`). A walk-only scene is looked up
+exactly as a game scene is.
 
 With an index, the target is found in one way only:
 
@@ -394,8 +471,11 @@ two real files no portal's bare `toSpawn` equals any spawn id (measured: 0 of 13
 there yet.
 
 What the checkers require of every portal: the exact id exists in exactly one area and that area's scene is `to`; or
-`to` is listed under `pending`. When `to` is a scene that is built, or a scene that is in no file and not listed under
-`pending`, a target that exists only by its bare id is a failure. When `to` is pending it is no fault, even if a spawn
+`to` is listed under `pending`. `pending` may hold a game scene id or a walk-only one (the noted variant
+`gate_pending`: a cave mouth leads into `undermere` before any cave file exists, and the viewer says "Undermere is not
+built yet"). With `--scene-ids`, `walk_index.py` also requires `to` to be a game scene id or a walk-only scene id. When
+`to` is a scene that is built, or a scene that is in no file and not listed under `pending`, a target that exists
+only by its bare id is a failure. When `to` is pending it is no fault, even if a spawn
 of another scene has the bare id: with an index the viewer says "... is not built yet" and never looks at the bare id.
 Both checkers print the note `world.bare_id_hazard` for such a portal, and for any portal whose exact target exists
 beside a spawn with the same bare id, because a loader that fell back to the bare id would go wrong there.
@@ -419,6 +499,30 @@ spawn `overworld_forest_gate`. Today's two real files have no such pair; the for
 id would leave the player in the forest, which is what single-file mode does when the forest's file is opened
 alone (section 8). Both checkers print the note `world.bare_id_hazard` for it.
 
+**Cave mouths** (version 1.1). The caves are reached from the village by their mouths, the surface gates: four are
+planned, in The West Woods, Up the Line and the North Woods, The East Hills and Mill Lane. A mouth is an ordinary
+door-like portal between two scenes, never a seam. For the gate `<gate>` (lower-case words, for example `east`):
+
+| | In the village (a section, or the legacy village file) | In a cave |
+|---|---|---|
+| The portal | `Portal_um.<gate>_in` | `Portal_um.<gate>_out` |
+| Its extras | `to: undermere`, `toSpawn: mouth_<gate>`, `kind: cave_mouth` | `to: overworld`, `toSpawn: mouth_<gate>`, `kind: cave_mouth` |
+| Where the other one arrives | `Spawn_overworld_mouth_<gate>` | `Spawn_undermere_mouth_<gate>` |
+
+- `um` is the `portal_ns` of `undermere` in `walk_scenes.json`. The namespace `um.` is the walk's own: the game does
+  not use it, and in the walk it holds only mouths.
+- **Every crossing between the village and the caves is a mouth**, both ways: a portal of a village area that leads
+  into `undermere`, and a portal of a cave that leads into `overworld`, must be one (`world.cave_mouths`, in both
+  checkers, printed when the folder has a mouth or a cave). A crossing between two caves is a seam (section 6). A door
+  between a cave and a room or a wild area is not described here and not forbidden.
+- The two sides of a mouth may differ in look: the walk fades between them, as at any door.
+- Each arrival is an ordinary spawn of its file: more than 1 m from every portal of the file, in the village and in a
+  cave (below). It faces away from its mouth, into the place the walker arrives in.
+- A mouth's `_in` may stand in today's legacy village file as well as in a section file later.
+- In the test world: `Portal_um.east_in` at (20, -12) in `village_east` leads to `Spawn_undermere_mouth_east`
+  (22, -10) in `under_a`, which looks east into the cave, 1.5 m from `Portal_um.east_out` (20.5, -10); that one leads
+  back to `Spawn_overworld_mouth_east` (20, -10.5), which looks north, 1.5 m from `Portal_um.east_in`.
+
 **Where spawns stand near portals.** The viewer fires a portal when the player walks within 1 m of it on the ground
 plan (and within 2 m of height), once the player has been outside every portal's radius since the last trip; or on
 the use key within 2 m (`apps/walk/src/portals.ts`, `PortalTrigger`). A player who arrives inside a radius finds
@@ -426,8 +530,9 @@ the walk-in trigger off, for every portal of the file, until they have stepped o
 prompt names the nearest portal within 2 m. "Near" below is the viewer's own measure: the distance on the ground
 plan, between things no more than 2 m apart in height. So:
 
-- **In a village section every spawn stands more than 1.0 m from every portal of its file.** 1.0 m or less is a
-  failure (`<area>.spawn_clear_of_portals`). It is the exporter's own rule (`PORTAL_SPAWN_M`,
+- **In a village section and in a cave every spawn stands more than 1.0 m from every portal of its file.** 1.0 m or
+  less is a failure (`<area>.spawn_clear_of_portals`; the variant `cave_spawn_near_portal` puts a cave mouth's arrival
+  0.8 m from the mouth's other portal). It is the exporter's own rule (`PORTAL_SPAWN_M`,
   `tools/blender/meshy_walk_export.py` line 265; a spawn that stands closer is moved out to 1.2 m, `SPAWN_CLEAR_M`,
   line 266), with one difference at the edge: the exporter tests `< 1.0`, while the viewer's trigger counts a player
   at exactly 1.0 m as inside (`portals.ts`, `nearest`), and so do the checkers. Measured in today's village: the
@@ -443,9 +548,12 @@ plan, between things no more than 2 m apart in height. So:
 - `<area>.no_way_in`: no portal of another area leads into this area, so the player reaches it only through the
   picker or a link that names one of its spawns. The area the viewer starts in is left out. With today's two files
   the bedroom gets this note: the parlour that leads to it is not built.
-- `<area>.way_back`: the way out of a room or a wild area arrives in another file than the door that leads in, or
-  more than 10 m from that door. The player would come out somewhere else than they went in. 10 m is a choice made
-  for this contract. Measured on today's village: each of its twelve doors `Portal_ov.<x>` stands 1.19 to 7.76 m from
+- `<area>.way_back`: the way out of a room, a wild area or a cave arrives in another file than the door that leads in,
+  or more than 10 m from that door. The player would come out somewhere else than they went in. A way out is a portal
+  that leaves its scene: a room's door, or a cave mouth's `_out`; a seam stays in its scene and is none (version 1.1
+  adds the caves). Measured on an altered copy of the test world (not kept): with `Spawn_overworld_mouth_east` moved
+  30 m from its mouth, both checkers print `under_a.way_back`. 10 m is a choice made for this contract. Measured on
+  today's village: each of its twelve doors `Portal_ov.<x>` stands 1.19 to 7.76 m from
   `Spawn_overworld_<x>`, the spawn the game's scene data makes the room's way out arrive at (the two front doors,
   of the manor and of the tavern, are the far ones: 7.76 and 7.63 m). Two other exits in the scene data arrive
   somewhere else on purpose: the barn's loft drop at `overworld_barn_loft_drop`, 12.5 m from the barn's door, and the
@@ -454,9 +562,17 @@ plan, between things no more than 2 m apart in height. So:
 
 ## 6. Seams, exactly
 
-A seam joins two village sections. Both belong to the scene `overworld`, so a seam portal's `to` is `overworld`.
-A crossing between two sections is always a seam; the checkers fail any other portal that leads from one section
-into another. A portal between the village and a room or a wild area is an ordinary portal (section 5).
+A seam joins two sections of one sectioned scene: two village sections, which belong to the scene `overworld`, or
+(version 1.1) two caves of one walk-only scene, `undermere`. A seam portal's `to` is that scene: `overworld` at a
+village seam, `undermere` at a cave seam. A crossing between two sections of one scene is always a seam; the checkers
+fail any other portal that leads from one into another (`world.seams_only_between_sections`, in both checkers since
+version 1.1; the variant `cave_door_between_caves`). A cave never seams to a village section: they belong to
+different scenes, and the checkers fail such a seam (`seam.<id>.sides`). A portal between the village and a room or
+a wild area is an ordinary portal (section 5), and so is a cave mouth. Seam ids are one namespace for the whole index,
+caves and village alike.
+
+Everything below holds for a cave seam as for a village seam, with the same numbers, except the height of the wall
+(the first point under "In each file") and the list of devices (`wdi_seam_kind`).
 
 **The seam line and the two sides.** A seam has one straight line in village coordinates, the same in both files, and
 an **opening** on it, `wdi_width_m` wide. One section is side `a`, the other side `b`; the letter says which file a
@@ -472,13 +588,21 @@ The exporter measures the gap and writes the number.
    toward the player is on the seam line. (Its thickness lies beyond the line, on ground this file's player never
    reaches.) The wall is part of `HM_Collision_<areaId>`. What the player sees there, a closed gate or a cutting,
    is up to the design. The rest of the section's edge is closed as well (section 4).
+   **In a cave** the wall closes the passage's whole cross-section, from the floor to the roof. The roof above the row
+   must be found (a ray goes up from the floor under each sample of the row), and rays at 0.25, 1 and 2 m above the
+   floor (those that are under the roof) and one 0.1 m under the roof must meet the wall 0.45 m in front of the row.
+   The village's "3 m above anything the walker can stand on" does not apply in a roofed passage: the test world's
+   passage is 2.6 m high. A wall that stops short of the roof fails (the variant `cave_seam_open_roof`: a wall 0.3 m
+   short fails at the 10 rays 0.1 m under the roof). What closes a cave seam in the picture is up to the design too:
+   a passage, an arch, a mine door, a bend, a squeeze, a choke, a curtain of flowstone or ice, a sump ledge.
 2. A **row of portal points** stands 0.45 m in front of the wall, on a line parallel to it:
    `Portal_seam_<seamId>_<side>_<n>`, numbered from 1 along the row, in the same direction in both files, so that
    point `a_2` faces point `b_2`. An opening up to 2 m wide may have one point. A wider opening has a row: neighbours
    at most 1.8 m apart, the row centred on the opening, the first and last point at most 1.0 m from its ends.
 3. An **arrival spawn** stands behind each portal point, 1.65 m inside the wall and so 1.2 m behind its own row:
-   `Spawn_overworld_seam_<seamId>_<side>_<n>`, with `wdi_picker: false` and the usual picker words. It faces away
-   from the wall: the direction of travel of the walker who arrives there.
+   `Spawn_<scene>_seam_<seamId>_<side>_<n>` (`Spawn_overworld_seam_...` in the village, `Spawn_undermere_seam_...` in
+   a cave), with `wdi_picker: false` and the usual picker words. It faces away from the wall: the direction of travel
+   of the walker who arrives there.
 4. **Nothing else stands near.** Every arrival is at least 1.2 m from every portal of its file, a door or another
    seam as much as its own row. And no portal that is not of this seam's row stands within 2.0 m of a point of the
    row, so that no other 1 m disc reaches into the row's discs. Why: a door 0.6 m from an arrival keeps the viewer's
@@ -490,18 +614,21 @@ The exporter measures the gap and writes the number.
 
 - The two rows are 0.9 m apart and point `a_n` faces point `b_n`.
 - **The ground is at the same height on both sides.** Each file's ground, carried to the seam line from its portal
-  point and the arrival behind it, is at the same height within 0.15 m. Village sections share the village's
+  point and the arrival behind it, is at the same height within 0.15 m. Village sections and caves share the village's
   coordinates, heights too; a section exported 0.5 m higher than its neighbour keeps every position in plan right
-  and still shows a 0.5 m step at the crossing (the variant `seam_step`).
+  and still shows a 0.5 m step at the crossing (the variant `seam_step`). A ramp across the seam is no step: in the
+  valid variant `cave_seam_ramp` the floor of both caves rises 6 % across the cave seam, so the two rows stand 0.05 m
+  apart in height and the arrivals 0.20 m (measured), and both files put the floor at the line at the same height.
 - The look is equal (below).
 
 **What happens.** A walker in section a comes within 1 m of `Portal_seam_<id>_a_2`. Its target is the spawn
-`overworld_seam_<id>_b_2`, which stands in section b. The viewer fades, opens b, and puts the walker there: 2.1 m
-beyond the point they left by, looking the way the arrival faces. Two things the walker can notice. The point that
-fires is the nearest one, and the arrival stands behind that point, not behind the walker: a walker who crosses
-between two points is moved sideways by up to 0.9 m (measured: at most 0.90 m over 89 places across the 5 m opening
-of the test world). And the walker is turned to the arrival's facing, straight across the seam, whatever way they
-were looking (`goTo` sets the yaw, `main.ts` line 96).
+`overworld_seam_<id>_b_2` (at a cave seam `undermere_seam_<id>_b_2`), which stands in section b. The viewer fades,
+opens b, and puts the walker there: 2.1 m beyond the point they left by, looking the way the arrival faces. Two
+things the walker can notice. The point that fires is the nearest one, and the arrival stands behind that point, not
+behind the walker: a walker who crosses between two points is moved sideways by up to 0.9 m (measured: at most
+0.90 m over 89 places across the 5 m opening of the test world; at most 0.60 m over 37 places across the 2.4 m cave
+seam). And the walker is turned to the arrival's facing, straight across the seam, whatever way they were looking
+(`goTo` sets the yaw, `main.ts` line 96).
 
 ```
  plan view, the seam line running up the page; x marks a portal point, S an arrival spawn, < > the way it faces
@@ -529,7 +656,8 @@ were looking (`goTo` sets the yaw, `main.ts` line 96).
 |---|---|---|
 | 1 m | the viewer's walk-in radius around a portal point | `apps/walk/src/portals.ts`, `PortalTrigger` (read) |
 | 0.45 m | a seam portal stands this far in front of its file's wall, within 0.05 m | the exporter's distance of a door portal from its building (`PORTAL_OUT_M`, `tools/blender/meshy_walk_export.py` line 248), taken over for seams |
-| 3 m | the wall is at least this high above the ground, across the whole opening | decided |
+| 3 m | in the village, the wall is at least this high above the ground, across the whole opening | decided |
+| 0.1 m | in a cave, the wall closes the passage up to this far under the roof; rays at 0.25, 1 and 2 m above the floor (those under the roof) as well | decided on 2026-11-19 |
 | 1.8 m | neighbours in a row are at most this far apart | decided; see the arithmetic below |
 | 1.0 m | the first and last point are at most this far from the ends of the opening | follows from "wider than 2 m needs a row" |
 | 1.65 m | an arrival stands this far inside its file's wall, within 0.05 m | decided |
@@ -553,13 +681,13 @@ walker crossing a 5 m opening is taken through at 89 of 89 places, 5 cm apart, w
 
 | Extra | Value |
 |---|---|
-| `to` | `overworld` |
+| `to` | the seam's scene: `overworld`, or for a cave seam the walk-only scene (`undermere`) |
 | `toSpawn` | `seam_<seamId>_<otherSide>_<n>` |
-| `kind` | `gate` |
+| `kind` | `gate`, at a cave seam too |
 | `wdi_portal_id` | `seam_<seamId>_<side>_<n>` (the node's name without `Portal_`) |
 | `wdi_seam` | `<seamId>` |
-| `wdi_seam_kind` | what the device is: `gate`, `level_crossing`, `footbridge`, `lychgate`, `stile`, `cutting` or `belt_gate` |
-| `wdi_width_m` | the width of the opening, the same number on every portal of the seam |
+| `wdi_seam_kind` | what the device is. Between village sections: `gate`, `level_crossing`, `footbridge`, `lychgate`, `stile`, `cutting` or `belt_gate`. Between caves: `passage`, `arch`, `mine_door`, `bend`, `squeeze`, `choke`, `curtain` (a flowstone or ice curtain) or `sump_ledge`. A cave device between village sections fails, and the other way round |
+| `wdi_width_m` | the width of the opening, the same number on every portal of the seam; in a cave, the width of the passage where the wall closes it |
 
 **The look.** `wdi_exposure`, `fog_color` and `fog_density` (or `fog_near`, `fog_far`), and `wdi_baked`, are equal on
 both sides: equal in the two files' Area extras and equal in the index. Otherwise the picture changes at the crossing.
@@ -569,7 +697,8 @@ equal. Equal means the same JSON value, exactly: write both sections' looks from
 1e-10 between two exports fails the seam (checked: 2.3784 against 2.3784000001). The look is more than these
 extras. Neither file carries fog or exposure on
 its glTF scene, and neither holds a directional light (section 4): either would change the picture on one side only,
-with the Area extras still equal.
+with the Area extras still equal. Every cave carries one look besides (section 4, `world.cave_look`), so at a cave
+seam the look is equal by that rule as well.
 
 **Where the rules are stricter than the picture.** Four cases look the same in the viewer and still fail a rule, and
 are left as they are rather than loosened: `fog_near` and `fog_far` written beside `fog_density` on one side (the
@@ -583,14 +712,16 @@ of them has to change the rule here and in both checkers.
 other; spacing and coverage; each arrival's distance, sideways place and facing, and its distance from every portal
 of its file; that no other portal stands within 2 m of a row; that the two files agree on the height of the ground
 at the line; the look on both sides, `wdi_baked` included; and, when the collision mesh can be read, that rays from
-the row meet the wall at 0.45 m across the whole opening up to 2.95 m above the ground under each ray, that each
-arrival has the wall 1.65 m behind it, and that the rest of the section's edge is closed (section 4).
+the row meet the wall at 0.45 m across the whole opening up to 2.95 m above the ground under each ray (in a cave: from
+0.25 m above the floor to 0.1 m under the roof, which must be found), that each arrival has the wall 1.65 m behind it,
+and that the rest of a village section's edge is closed (section 4).
 `check_areas.mjs` also runs the viewer's own `PortalTrigger`, holding every portal of the file as the viewer does: a
 walker crossing the opening every 5 cm must be taken by a point of the row first, and a walker who has just arrived
 and walks straight back to the wall must be taken by the return row.
 
 What they cannot test. The wall check and the closed-edge check need triangles, so they run on the test world only:
-real collision meshes are Draco-compressed, and for them they have to be exporter checks in Blender. The height rule
+real collision meshes are Draco-compressed, and for them they have to be exporter checks in Blender (for caves, checks
+of the cave builder). The height rule
 needs no triangles and runs on real files. The width of the opening is taken as declared (above); the tools do not
 sample an opening wider than 100 m, which is a limit of the tools and not a rule of this contract.
 
@@ -748,22 +879,25 @@ no limit of this kind. `walk_index.py` prints a note when a file is over one, an
   150,000 and 10,000 collision triangles, beside the 0.10 to 0.48 s that today's 148,000 took to build on a laptop;
   and the whole room column (6 MB, 0.6 million triangles, 64 MB), set beside today's bedroom with no derivation
   written down.
+- **Set for caves on 2026-11-19** (version 1.1), a ruling of the lead for this work, with no cave file to measure:
+  the whole cave column.
 
-| Measure | Target, section file | Target, room file | Today's village (measured) | Today's bedroom (measured) |
-|---|---|---|---|---|
-| File size | 15 MB | 6 MB | 38.72 MB | 3.66 MB |
-| Triangles loaded | 2.0 million | 0.6 million | 4,053,662 | 389,157 |
-| Triangles in view | 1.0 million, ceiling 1.5 million | none given | 3,073,957 at the worst spawn (the exporter's own estimate with a 75 degree lens; the viewer's is 70, so this is the higher figure; not measured here) | not measured |
-| GPU texture memory | 192 MB, never above 255 MB | 64 MB | 254.7 MB | 60.4 MB |
-| Draw calls | 248 | none given | 247 | 69 |
-| Lights | 24 | none given | 24 | 2 |
-| Collision triangles | 150,000 | 10,000 | 148,000 | 2,952 |
+| Measure | Target, section file | Target, room file | Target, cave file | Today's village (measured) | Today's bedroom (measured) |
+|---|---|---|---|---|---|
+| File size | 15 MB | 6 MB | 10 MB | 38.72 MB | 3.66 MB |
+| Triangles loaded | 2.0 million | 0.6 million | 1.5 million | 4,053,662 | 389,157 |
+| Triangles in view | 1.0 million, ceiling 1.5 million | none given | 1.0 million, ceiling 1.2 million | 3,073,957 at the worst spawn (the exporter's own estimate with a 75 degree lens; the viewer's is 70, so this is the higher figure; not measured here) | not measured |
+| GPU texture memory | 192 MB, never above 255 MB | 64 MB | 96 MB, never above 255 MB | 254.7 MB | 60.4 MB |
+| Draw calls | 248 | none given | 160 | 247 | 69 |
+| Lights | 24 | none given | 8 | 24 | 2 |
+| Collision triangles | 150,000 | 10,000 | 60,000 | 148,000 | 2,952 |
 
 - GPU texture memory is counted as RGBA8 with a full chain of smaller copies: width x height x 4 x 4/3 bytes, in MB
   of a million bytes (254.7 MB is 202 images; 60.4 MB is 34 images; both measured from the image headers).
 - 248 draw calls and 255 MB are also the numbers the exporter fits the unsplit village to today (`DRAW_BUDGET` and
   `TEX_BUDGET_MB`, `tools/blender/meshy_walk_export.py` lines 377 and 380).
-- No figures were set for wild areas. `walk_index.py` holds them to the section figures.
+- No figures were set for wild areas. `walk_index.py` holds them to the section figures. A kind with no figures at all
+  would be one `FAIL` line of `<area>.planning_targets`, not a stack trace (no such kind can reach the table today).
 - Triangles in view are not measured by the tools here; the exporter's report does that.
 - Whether a cut of the village can meet these is not shown. On one trial cut (illustrative rectangles, not a
   proposal) the middle section stays under the in-view ceiling only while it draws almost nothing beyond its own ground
@@ -773,10 +907,13 @@ no limit of this kind. `walk_index.py` prints a note when a file is over one, an
 ## 10. How to test without the exporter
 
 The test world is committed in `tools/blender/walk_areas/fixture/areas/`: two village sections joined by the seam
-`west_east`, a room, and the index. Its files total 54,700 bytes (measured). Its layout is at the top of
+`west_east`, a room, two caves (`under_a`, `under_b`: one passage 2.4 m wide with a roof 2.6 m above its floor, 10 m
+under `village_east`) joined by the cave seam `a_b`, the cave mouth `east` from `village_east` into `under_a`, and
+the index. Its files total 73,898 bytes (measured on 2026-11-19; 54,700 before the caves). Its layout is at the top of
 `fixture/make-areas-fixture.mjs`. It was built to hold the awkward cases: a row of three points in a 5 m opening, a
 room whose way out shares a bare id with the room's own spawn, a door into a scene that is not built, a room arrival
-inside its door's radius, one texture in each section.
+inside its door's radius, one texture in each section, and a cave seam closed from the floor to a roof that is lower
+than the village's 3 m.
 
 ```
 python tools/blender/walk_areas/walk_index.py tools/blender/walk_areas/fixture/areas --check
@@ -784,11 +921,12 @@ node   tools/blender/walk_areas/check_areas.mjs tools/blender/walk_areas/fixture
 python tools/blender/walk_areas/mutants.py --src <path to apps/walk/src>
 ```
 
-Results on 2026-11-16 (Windows 11, Python 3.13.14, Node 26.13.0): 114 pass and 0 fail; 89 pass and 0 fail, with the
-scripted journey 21 of 21 steps; 36 of 36 broken variants caught on the intended rule by both checkers, 2 of 2
-allowed variants noted, 6 of 6 valid variants passed, and 29 of 29 odd inputs (not JSON, a loop of nodes, an empty
-folder ...) ended in FAIL lines and no stack trace. `tools/blender/walk_areas/README.md` says what each tool proves
-and what it cannot see.
+Results on 2026-11-19, with the caves (Windows 11, Python 3.13.14, Node 26.13.0): 190 pass and 0 fail; 157 pass and
+0 fail, with the scripted journey 32 of 32 steps; 46 of 46 broken variants caught on the intended rule by both
+checkers, 3 of 3 allowed variants noted, 8 of 8 valid variants passed, and 37 of 37 odd inputs (not JSON, a loop of
+nodes, an empty folder, a list of walk-only scenes that is not JSON ...) ended in FAIL lines and no stack trace. (On
+2026-11-16, before the caves: 114, 89 with 21 steps, 36, 2, 6 and 29.) `tools/blender/walk_areas/README.md` says what
+each tool proves and what it cannot see.
 
 For the viewer's own tests, copy `fixture/areas/` into `apps/walk/test/fixtures/areas/`. The files are already in
 the layout the repository's formatter gives JSON, so `pnpm format` leaves them alone (it must: the index records each
@@ -802,15 +940,22 @@ file's size and hash). These values come from the checker's journey through the 
    west fires `seam_west_east_b_2` at x = 1.45, and the arrival is `overworld_seam_west_east_a_2`, yaw 90.
 3. The shop door fires as `ovshop` at y = 6.56 (Blender). The room arrival `shop_door` stands 0.5 m from the way out
    and nothing fires until the player has stepped 1 m away and come back.
-4. The picker lists four spawns, `square`, `overworld_shop_door`, `mill` and `shop_door`, in whatever order the
-   viewer chooses, and not the six seam arrivals.
+4. The picker lists six spawns, `square`, `overworld_shop_door`, `mill`, `shop_door`, `overworld_mouth_east` and
+   `undermere_mouth_east`, in whatever order the viewer chooses, and not the ten seam arrivals (six of the village
+   seam, four of the cave seam).
 5. For Option 1: each section holds one 4 x 4 texture, so a test can count textures before and after a swap and back.
-   With today's `disposeWorld` that count grows.
+   With today's `disposeWorld` that count grows. The caves hold no texture.
 6. With the index's `start` changed to `overworld_shop_door` and no `?spawn=` in the address, the player starts at
    `overworld_shop_door` in `village_west`, not at `square`. The same with `?spawn=no_such_spawn`. (Passing
    `params.get('spawn')` to `pickSpawn`, as line 158 of `main.ts` does today, gives `square` in both cases.)
 7. Opened alone with `?glb=` (single-file mode, section 8), `walk-room_shop.gltf` takes the bare-id fallback at its
    door: the way out goes to its own spawn `shop_door`, and the words are not "... is not built yet".
+8. The caves. From `overworld_mouth_east`, walking to the mouth fires `umeast_in` (the viewer reads
+   `Portal_um.east_in` so); its target `undermere_mouth_east` is in `under_a`, which opens. Walking east along the
+   passage fires `seam_a_b_a_2` at x = 30.63; the arrival is `undermere_seam_a_b_b_2` in `under_b` at (33.65, -9.4),
+   yaw -90 degrees, and walking on east fires nothing. Walking back west fires `seam_a_b_b_2` at x = 33.44, and the
+   arrival is `undermere_seam_a_b_a_2` in `under_a`, yaw 90. Walking west to the mouth fires `umeast_out`, and the
+   walker comes out at `overworld_mouth_east` in `village_east`, 1.50 m from `Portal_um.east_in`.
 
 ## 11. Open points, and what is not verified
 
@@ -839,6 +984,14 @@ file's size and hash). These values come from the checker's journey through the 
   seam's wall is closed and 3 m high, and that the rest of a village section's edge is closed, must be checked by the
   exporter in Blender. That check is not written yet; the wall check and the closed-edge check of `walk_index.py`
   (rays at heights counted from the ground under each ray) are the model for it.
+- **The caves** (version 1.1) were tried only on the test world, its variants and a few altered copies made by hand
+  (not kept): box passages, uncompressed collision. No cave file exists, no cave was loaded in the viewer, and no
+  cave's size, load time or frame time was measured. The cave figures of section 9 have no measurement behind them.
+- For real caves the cave builder has to check in Blender what the checkers here cannot see in Draco data: that each
+  cave seam's wall closes the passage from the floor to the roof, and that a cave cannot be walked out of (the
+  closed-edge rule of section 4 does not apply to caves). Neither check is written yet.
+- That a cave's fog is the ink, `#12141C`, is not checked: only that the fog is there and that every cave carries the
+  same look.
 - How the Pages host caches files was not read. Hence the hash on the address in section 7.
 
 **Open.**
@@ -854,9 +1007,10 @@ file's size and hash). These values come from the checker's journey through the 
   that scenery come from the exporter's existing far tiers (the 256 px far textures, `TEX_FAR`, and the decimated far
   meshes, whose names end `walk_far`, in `tools/blender/meshy_walk_export.py`), made from the same Meshy models and
   textures. No Meshy model or texture is replaced by another, or dropped, to save size.
-- **The closed edge of a room or a wild area.** The rule of section 4 holds for village sections only: a room's
-  walls are its own and its walk region can be looser than they are. Nothing checks that a room or a wild area cannot
-  be walked out of; with a polygon outline of the ground, the same rays could.
+- **The closed edge of a room, a wild area or a cave.** The rule of section 4 holds for village sections only: a
+  room's walls are its own and its walk region can be looser than they are. Nothing checks that a room or a wild area
+  cannot be walked out of; with a polygon outline of the ground, the same rays could. In a cave the rays would find
+  the roof for the ground, which is why that check is the cave builder's, in Blender (above).
 - **The width of an opening** is what the files declare (`wdi_width_m`). No checker measures the real gap
   (section 6).
 - **Where the files are hosted, and publishing them.** Not part of this contract. Today the Pages workflow downloads
@@ -868,20 +1022,58 @@ file's size and hash). These values come from the checker's journey through the 
   in the file on this side, and the lighting near a seam differs between the two files. The look rule (section 6)
   covers exposure, fog and `wdi_baked`, not lights.
 - **The door prompt at a seam.** The viewer words the prompt from `to`, which at a seam is always `overworld`, and at
-  a room's way out too. The index gives `target_area` and that area's `name` for better words. The viewer's call.
+  a room's way out too. The index gives `target_area` and that area's `name` for better words. The viewer's call. At a
+  cave seam `to` is `undermere`, which the viewer words "Undermere"; at a cave mouth into a cave that is not built
+  yet the words are "Undermere is not built yet". `walk_scenes.undermere.name` in the index gives "The Undermere".
+- **Where the four cave mouths stand**, their gate keys, how the caves are cut, and which device closes each cave
+  seam: the cave builder's work. Nothing in this contract depends on it.
+- **A door between a cave and a room or a wild area** is neither described nor forbidden. A crossing between the
+  village and the caves must be a cave mouth (section 5), and one between two caves a seam (section 6).
+- **Lights at a cave seam**: as at a village seam (above). A cave is baked, so the viewer switches its lights off, and
+  the light near a cave seam is what each file's bake holds.
 - **Scene ids where one starts another** (`forest`, `forest_deep`). `forest` + `deep_x` and `forest_deep` + `x` make
   the same node name. The checkers catch it as a doubled id or a target in the wrong scene. The game's data has no
   such pair today (searched in `packages/content/data/scenes`: 32 scenes and 112 scene-and-spawn names, none doubled).
 - **The room texture target.** Today's bedroom uses 60.4 MB of the 64 MB target; a richer room will not fit.
 - **An interim world.** Until the village is cut, an index built with `--legacy` can list the unsplit village beside
   room files, so that rooms can be walked into as they are finished. It works only in a viewer that takes file names
-  from the index.
+  from the index. Cave files can stand beside it in the same way, with the cave mouths' `Portal_um.<gate>_in` and
+  `Spawn_overworld_mouth_<gate>` in the legacy village file.
 
 ## 12. Version
 
-Version 1, 2026-11-16. The index says `"format": 1`. A change that a version 1 viewer would misread takes a new
+Version 1.1, 2026-11-19. The index says `"format": 1`. A change that a version 1 viewer would misread takes a new
 `format` number; a new optional field does not.
+
+**Does version 1.1 change the format? No.** The test is whether a viewer written for version 1 would misread anything
+in an index or a file of version 1.1, and it would not:
+
+- The one new field of the index, `walk_scenes`, is optional, and a viewer ignores fields it does not know
+  (section 3). Nothing in it is needed to open a file, place the player or find a portal's target; it only offers
+  better words.
+- A walk-only scene id in `to`, in `scenes` or in `pending` is looked up exactly as a game scene id is: the exact id
+  `<to>_<toSpawn>` among the spawns of the index, or "... is not built yet" (section 5). A version 1 viewer that
+  never heard of walk-only scenes finds every cave spawn by it.
+- The new value `cave` of `kind`, and the new seam devices, are read by tools only.
+- A cave's Area carries only extras a version 1 viewer already reads, with the meaning it already gives them:
+  `wdi_indoor`, `wdi_baked`, `wdi_exposure` and the fog. A cave seam and a cave mouth are portals and spawns of the
+  forms version 1 has.
+
+So a version 1 viewer walks a version 1.1 world as it is meant to be walked, and the format stays 1.
 
 The tools in `tools/blender/walk_areas/` check every rule of this document that can be checked without Blender, and
 their `README.md` lists the rules by name. `walk_index.py --legacy` writes 15,571 bytes for today's two files
-(measured, section 3).
+(measured, section 3); the tools of version 1.1 write the same bytes (measured on 2026-11-19).
+
+**Changes.**
+
+- Version 1, 2026-11-16: the first version.
+- Version 1.1, 2026-11-19: the caves. Walk-only scenes, listed in `tools/blender/walk_areas/walk_scenes.json`
+  (`undermere`), never a game scene id; the area kind `cave` (`under_<key>`, indoors and baked, with fog, one look for
+  every cave, built in the village frame); seams between two caves of one scene, whose wall closes the passage from
+  the floor to the roof, with eight cave devices; cave mouths (`Portal_um.<gate>_in` in the village,
+  `Portal_um.<gate>_out` in a cave, kind `cave_mouth`), and every crossing between the village and the caves one of
+  them; `pending` and `to` may name a walk-only scene; the optional index field `walk_scenes`; planning targets for
+  caves; the way-back note for caves. Rules new in both checkers: `world.walk_scenes`, `index.walk_scenes`,
+  `world.cave_mouths`, `world.cave_look`; rules now in `check_areas.mjs` too: `<area>.area_id`,
+  `world.seams_only_between_sections`, the note `world.pending.<scene>`. The index format stays 1.

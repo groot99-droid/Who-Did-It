@@ -1,13 +1,15 @@
-// check_areas.mjs: checks a folder of area files and its walk-index.json against docs/walk-areas.md (version 1),
-// with the walk viewer's OWN code: findSpawns, pickSpawn (spawn.ts), findPortals, resolvePortal, PortalTrigger
-// (portals.ts).
+// check_areas.mjs: checks a folder of area files and its walk-index.json against docs/walk-areas.md (version 1.1;
+// the index says "format": 1), with the walk viewer's OWN code: findSpawns, pickSpawn (spawn.ts), findPortals,
+// resolvePortal, PortalTrigger (portals.ts).
 //
-//   node check_areas.mjs <folder with walk-index.json> --src <path to apps/walk/src> [--three <path to the three package>] [--json out.json]
+//   node check_areas.mjs <folder with walk-index.json> --src <path to apps/walk/src> [--three <path to the three package>] [--walk-scenes <file>] [--json out.json]
 //
 // --src    a checkout of the viewer's source folder apps/walk/src (branch claude/v2-walk). Required: without it this
 //          script stops with a message. Nothing is installed and nothing in that folder is changed.
 // --three  optional: the real three.js package (for example apps/walk/node_modules/three). Files that are not
 //          Draco-compressed are then also parsed by the real GLTFLoader and compared with the stand-in.
+// --walk-scenes  optional: the walk-only scenes (the caves, which the game does not have); by default walk_scenes.json
+//          beside this script.
 //
 // How the viewer's TypeScript runs here: Node removes the types (node:module stripTypeScriptTypes). Node cannot
 // remove "constructor(private readonly x ...)", so that one form is first written out as "this.x = x" lines, and the
@@ -15,8 +17,8 @@
 // how many lines it rewrote.
 //
 // It reads .gltf and .glb. Draco data is never decoded, so the checks that need triangles (spawns stand on the ground;
-// a seam's wall is closed and 3 m high; the rest of a village section's edge is closed too) run only on files whose
-// collision mesh is not compressed: the fixture.
+// a seam's wall is closed, 3 m high in the village and up to the roof in a cave; the rest of a village section's edge
+// is closed too) run only on files whose collision mesh is not compressed: the fixture.
 // Every line starts with PASS, FAIL, NOTE or CTRL. CTRL is a control: a deliberately wrong way of doing things, shown
 // to go wrong. A file or an index that cannot be read is a FAIL line (<file>.readable, index.readable), not a trace.
 // Exit code: 0 no rule failed, 1 at least one FAIL, 2 the command could not run.
@@ -30,11 +32,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 // ------------------------------------------------------------------------------------------------ the command line
 const argv = process.argv.slice(2);
-const opts = { dir: null, src: null, three: null, json: null };
+const opts = { dir: null, src: null, three: null, json: null, walkScenes: null };
 for (let k = 0; k < argv.length; k++) {
   if (argv[k] === '--src') opts.src = argv[++k];
   else if (argv[k] === '--three') opts.three = argv[++k];
   else if (argv[k] === '--json') opts.json = argv[++k];
+  else if (argv[k] === '--walk-scenes') opts.walkScenes = argv[++k];
   else if (!argv[k].startsWith('--') && !opts.dir) opts.dir = argv[k];
 }
 const stop = (text) => {
@@ -43,8 +46,10 @@ const stop = (text) => {
 };
 if (!opts.dir)
   stop(
-    'usage: node check_areas.mjs <folder with walk-index.json> --src <path to apps/walk/src> [--three <path to three>] [--json out.json]',
+    'usage: node check_areas.mjs <folder with walk-index.json> --src <path to apps/walk/src> [--three <path to three>] [--walk-scenes <file>] [--json out.json]',
   );
+const walkScenesPath = opts.walkScenes ? resolve(opts.walkScenes) : join(here, 'walk_scenes.json');
+if (opts.walkScenes && !existsSync(walkScenesPath)) stop(`--walk-scenes: no such file: ${opts.walkScenes}`);
 
 const defaultSrc = resolve(here, '../../../apps/walk/src');
 const src = opts.src ? resolve(opts.src) : existsSync(join(defaultSrc, 'spawn.ts')) ? defaultSrc : null;
@@ -178,10 +183,15 @@ const SEAM = {
   arrivalClearMin: 1.2, // from EVERY portal of the arrival's file, its return row too
   rowClearMin: 2.0, // no portal outside a seam's row stands this close to a point of it (two 1 m discs)
   heightMax: 0.15, // the two files put the ground at the seam line at the same height, within this
-  wallHeight: 3.0,
+  wallHeight: 3.0, // in the village the wall is at least this high above the ground across the whole opening
+  roofGap: 0.1, // in a cave the wall closes the passage up to this far under the roof ...
+  roofMax: 50, // ... and the roof above the row is looked for this far up
   tol: 0.05,
   widthMax: 100, // not a rule of the contract: this script does not sample an opening wider than this (a typo such as 5000 for 5 would keep it busy for minutes)
 };
+// The rays of the wall check of a cave seam: these heights above the floor (those under the roof), and one 0.1 m under
+// the roof (docs/walk-areas.md, section 6). In a roofed passage the village's "3 m above the ground" does not apply.
+const CAVE_WALL_HEIGHTS = [0.25, 1.0, 2.0];
 // The closed edge of a village section (docs/walk-areas.md, section 4). Metres.
 const EDGE = {
   step: 0.25, // the edge is sampled this often (a gap the walker's capsule, 0.6 m across, fits through is wider)
@@ -191,7 +201,18 @@ const EDGE = {
   reach: 3, // how far a ray looks
   maxLength: 100000, // an edge longer than this is not sampled: it is no village section
 };
-const SEAM_KINDS = ['gate', 'level_crossing', 'footbridge', 'lychgate', 'stile', 'cutting', 'belt_gate'];
+// The kinds of an area (wdi_kind). The areas of a sectioned scene are joined by seams: the village sections of
+// overworld, and the caves of a walk-only scene (walk_scenes.json).
+const AREA_KINDS = ['section', 'room', 'wild', 'cave'];
+const SECTIONED_KINDS = ['section', 'cave'];
+// What a seam's device may be (wdi_seam_kind), by the kind of the two areas it joins
+const SEAM_KINDS = {
+  section: ['gate', 'level_crossing', 'footbridge', 'lychgate', 'stile', 'cutting', 'belt_gate'],
+  cave: ['passage', 'arch', 'mine_door', 'bend', 'squeeze', 'choke', 'curtain', 'sump_ledge'],
+};
+// The kind of a walk-only scene (walk_scenes.json) -> the portal kind of its mouths
+const MOUTH_KINDS = { cave: 'cave_mouth' };
+const GATE_RE = /^([a-z][a-z0-9_]*)_(in|out)$/; // <gate>_in, <gate>_out after the namespace and its dot
 const CAPSULE = 0.3; // the walker's radius, apps/walk/src/config.ts WALK.radius
 const RADIUS = new PortalTrigger([]).radius; // the viewer's own walk-in radius (1 m)
 const WAY_BACK_FAR = 10; // a note: a room's way out arrives farther than this from the door that leads in
@@ -268,6 +289,87 @@ const deg = (r) => (r * 180) / Math.PI;
 const angDiff = (a, b) => Math.abs(((a - b + 540) % 360) - 180);
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+/** JSON text with the keys of every object in order, so that two values compare whatever order their keys came in. */
+const canon = (v) =>
+  JSON.stringify(v, (_, x) =>
+    x !== null && typeof x === 'object' && !Array.isArray(x)
+      ? Object.fromEntries(
+          Object.keys(x)
+            .sort()
+            .map((k) => [k, x[k]]),
+        )
+      : x,
+  );
+
+// ------------------------------------------------------------------------------------------------ the walk-only scenes
+// walk_scenes.json (docs/walk-areas.md, section 2): scenes of the walk that the game does not have. Each is cut into
+// areas of one kind (caves) joined by seams, and reached from the village by its mouths. `entries` holds the well
+// formed entries only; `problems` says, in words, what is wrong with the others. walk_index.py reads it the same way.
+function walkScenes(entries = Object.create(null), problems = [], missing = false) {
+  const ids = new Set(Object.keys(entries));
+  const sectioned = ['overworld', ...ids];
+  const alt = [...sectioned]
+    .sort((a, b) => b.length - a.length)
+    .map((s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .join('|');
+  return {
+    entries,
+    problems,
+    missing,
+    ids,
+    sectioned,
+    // a seam arrival's id, Spawn_<scene>_seam_<seamId>_<side>_<n> without Spawn_: scene, seam id, side, number
+    seamSpawn: new RegExp(`^(${alt})_seam_(.+)_([ab])_([1-9][0-9]*)$`),
+    byNs: new Map(Object.entries(entries).map(([s, e]) => [e.portal_ns, s])),
+    prefixes: Object.values(entries).map((e) => e.area_prefix),
+  };
+}
+function readWalkScenes(path) {
+  const data = JSON.parse(readFileSync(path, 'utf8'));
+  if (!isObject(data)) throw new Error('it is not a JSON object of walk-only scenes');
+  const keys = ['name', 'kind', 'area_prefix', 'portal_ns'],
+    entries = Object.create(null), // no inherited keys: a scene id such as "constructor" finds no entry
+    problems = [];
+  for (const [sid, e] of Object.entries(data)) {
+    const probs = [];
+    if (!/^[a-z][a-z0-9_]*$/.test(sid)) probs.push('the id is not lower-case words joined by _');
+    if (!isObject(e)) {
+      problems.push(`${JSON.stringify(sid)}: its entry is not an object`);
+      continue;
+    }
+    if (!same(Object.keys(e).sort(), [...keys].sort()))
+      probs.push(`its fields are ${Object.keys(e).sort().join(', ') || 'none'}, not ${keys.join(', ')}`);
+    if (!(typeof e.name === 'string' && e.name)) probs.push('name is not words');
+    if (typeof e.kind !== 'string' || !Object.hasOwn(MOUTH_KINDS, e.kind))
+      probs.push(`kind is ${JSON.stringify(e.kind)}, not one of ${Object.keys(MOUTH_KINDS).join(', ')}`);
+    if (
+      !(typeof e.area_prefix === 'string' && /^[a-z][a-z0-9]*_$/.test(e.area_prefix)) ||
+      ['village_', 'room_'].includes(e.area_prefix)
+    )
+      probs.push(
+        `area_prefix is ${JSON.stringify(e.area_prefix)}: lower-case letters and digits ending in _, and not village_ or room_`,
+      );
+    if (!(typeof e.portal_ns === 'string' && /^[a-z][a-z0-9]*$/.test(e.portal_ns)))
+      probs.push(`portal_ns is ${JSON.stringify(e.portal_ns)}: lower-case letters and digits`);
+    if (probs.length) problems.push(`${JSON.stringify(sid)}: ${probs.join('; ')}`);
+    else entries[sid] = e;
+  }
+  // two scenes may not share an area prefix (or have one prefix start another) or a portal namespace
+  const ids = Object.keys(entries).sort();
+  for (const [i, s] of ids.entries())
+    for (const t of ids.slice(i + 1)) {
+      const [p, q] = [entries[s].area_prefix, entries[t].area_prefix];
+      if (p.startsWith(q) || q.startsWith(p))
+        problems.push(
+          `${JSON.stringify(s)} and ${JSON.stringify(t)}: the area prefixes ${p} and ${q} overlap`,
+        );
+      if (entries[s].portal_ns === entries[t].portal_ns)
+        problems.push(
+          `${JSON.stringify(s)} and ${JSON.stringify(t)}: both use the portal namespace ${entries[s].portal_ns}`,
+        );
+    }
+  return walkScenes(entries, problems);
+}
 
 // ------------------------------------------------------------------------------------------------ reading a .gltf or .glb
 function readGltf(path) {
@@ -577,6 +679,20 @@ const hasTransform = (n) => {
 };
 
 // ------------------------------------------------------------------------------------------------ the index and the files
+let WALK;
+if (!existsSync(walkScenesPath)) WALK = walkScenes(Object.create(null), [], true);
+else
+  try {
+    WALK = readWalkScenes(walkScenesPath);
+  } catch (e) {
+    // a registry that cannot be read is one FAIL line, and the rest is checked as if it were empty
+    check(
+      'walk_scenes.readable',
+      false,
+      `walk_scenes.json could not be read as the list of walk-only scenes: ${String(e.message).split('\n')[0]}`,
+    );
+    WALK = walkScenes();
+  }
 const dir = resolve(opts.dir);
 if (!existsSync(join(dir, 'walk-index.json')))
   stop(`no walk-index.json in ${opts.dir}. Build one with: python walk_index.py <folder>`);
@@ -807,7 +923,7 @@ for (const [id, L] of Object.entries(loaded)) {
   need('wdi_area', x.wdi_area === id, `is ${JSON.stringify(x.wdi_area)}`);
   need(
     'wdi_kind',
-    x.wdi_kind === A.kind && ['section', 'room', 'wild'].includes(x.wdi_kind),
+    x.wdi_kind === A.kind && AREA_KINDS.includes(x.wdi_kind),
     `is ${JSON.stringify(x.wdi_kind)}, the index says ${A.kind}`,
   );
   need(
@@ -829,12 +945,17 @@ for (const [id, L] of Object.entries(loaded)) {
     );
   const indoor = x.wdi_indoor === true || area.name.startsWith('Area_room_'); // the viewer's rule, world.ts areaLook
   if (A.kind === 'room') need('wdi_indoor', x.wdi_indoor === true, 'a room says true');
-  else if (A.kind === 'section' && x.wdi_indoor === true)
+  else if (A.kind === 'cave') {
+    // a cave is indoors (no moon, sky light or sky dome) and its light is baked (the viewer switches its lights off)
+    need('wdi_indoor', x.wdi_indoor === true, 'a cave says true');
+    need('wdi_baked', x.wdi_baked === true, 'a cave says true');
+  } else if (A.kind === 'section' && x.wdi_indoor === true)
     wrong.push('wdi_indoor (a village section is outdoors)');
   if (indoor !== A.indoor) wrong.push(`indoor (the file reads as ${indoor}, the index says ${A.indoor})`);
   if ((x.wdi_baked === true) !== A.baked)
     wrong.push(`wdi_baked (the file says ${x.wdi_baked === true}, the index says ${A.baked})`);
-  if (!indoor) {
+  if (!indoor || A.kind === 'cave') {
+    // outdoors, and in a cave, which is indoors and carries the fog of the whole cave network (the ink)
     const fc = x.fog_color;
     need(
       'fog_color',
@@ -848,9 +969,45 @@ for (const [id, L] of Object.entries(loaded)) {
     `${id}.area_extras`,
     missing.length === 0 && wrong.length === 0,
     missing.length === 0 && wrong.length === 0
-      ? `all present: wdi_area, wdi_kind, wdi_scene, wdi_name, wdi_walk_region, wdi_exposure${A.kind === 'room' ? ', wdi_indoor' : ', fog'}`
+      ? `all present: wdi_area, wdi_kind, wdi_scene, wdi_name, wdi_walk_region, wdi_exposure${{ room: ', wdi_indoor', cave: ', wdi_indoor, wdi_baked, fog' }[A.kind] ?? ', fog'}`
       : `missing: ${missing.join(', ') || 'none'}${wrong.length ? `; wrong: ${wrong.join('; ')}` : ''}`,
   );
+  // the id and what it says (walk_index.py has the same rule, and with --scene-ids also holds the ids against the
+  // game's): a cave's id is the area prefix of its walk-only scene and a key (under_<key>); a room and a wild area
+  // belong to a game scene, never to a walk-only one
+  {
+    const entry = Object.hasOwn(WALK.entries, A.scene) ? WALK.entries[A.scene] : null;
+    const form =
+      { section: 'village_<key>', room: 'room_<sceneId>', wild: '<sceneId>' }[A.kind] ??
+      (entry ? `${entry.area_prefix}<key>` : '<the area prefix of a walk-only scene><key>');
+    const idOk = /^[a-z][a-z0-9_]*$/.test(id);
+    const kindOk =
+      (A.kind === 'section' && id.startsWith('village_') && id.length > 8) ||
+      (A.kind === 'room' && id.startsWith('room_') && id.length > 5) ||
+      (A.kind === 'wild' &&
+        !['village_', 'room_', ...WALK.prefixes].some((p) => id.startsWith(p)) &&
+        id !== 'village') ||
+      (A.kind === 'cave' &&
+        entry?.kind === 'cave' &&
+        id.startsWith(entry.area_prefix) &&
+        /^[a-z][a-z0-9_]*$/.test(id.slice(entry.area_prefix.length)));
+    const sceneOk =
+      (A.kind === 'section' && A.scene === 'overworld') ||
+      (A.kind === 'room' && A.scene === id.slice('room_'.length) && !WALK.ids.has(A.scene)) ||
+      (A.kind === 'wild' && A.scene === id && !WALK.ids.has(A.scene)) ||
+      (A.kind === 'cave' && entry?.kind === 'cave');
+    const why = [
+      ...(A.kind === 'cave' && !entry ? [`${A.scene} is not a walk-only scene of walk_scenes.json`] : []),
+      ...((A.kind === 'room' || A.kind === 'wild') && WALK.ids.has(A.scene)
+        ? [`${A.scene} is a walk-only scene, and a room or a wild area belongs to a game scene`]
+        : []),
+    ];
+    check(
+      `${id}.area_id`,
+      idOk && kindOk && sceneOk,
+      `id ${id}, kind ${A.kind} (form ${form}), scene ${A.scene}${why.map((w) => `; ${w}`).join('')}`,
+    );
+  }
   check(
     `${id}.look_matches_index`,
     same(L.look, A.look),
@@ -901,6 +1058,14 @@ for (const [id, L] of Object.entries(loaded)) {
       L.sunNodes.length === 0
         ? "no light of the file is directional: the viewer adds the look's moon and sky light, as in every section"
         : `a directional light on ${L.sunNodes.join(', ')}. The viewer adds its own moon and sky light only to a file that has none, so this section would be lit differently from its neighbours`,
+    );
+  else if (A.kind === 'cave')
+    check(
+      `${id}.no_directional_light`,
+      L.sunNodes.length === 0,
+      L.sunNodes.length === 0
+        ? 'no light of the file is directional: a cave is lit by its bake, as every cave of the network'
+        : `a directional light on ${L.sunNodes.join(', ')}. A cave holds none: it is lit by its bake, and the caves carry one look`,
     );
   // with --three: the real GLTFLoader and the stand-in must give the viewer the same spawns and portals
   if (L.real) {
@@ -1003,18 +1168,18 @@ for (const [id, L] of Object.entries(loaded)) {
     const p = probe.nearest(s.position, RADIUS);
     if (p) near.push(`Spawn_${s.id} is ${f2(planGap(s.position, p.position))} m from Portal_${p.id}`);
   }
-  if (A.kind === 'section')
+  if (SECTIONED_KINDS.includes(A.kind))
     check(
       `${id}.spawn_clear_of_portals`,
       near.length === 0,
       near.length === 0
         ? `${L.spawns.length} spawns, each more than ${RADIUS} m from every portal of the file${gaps.length ? ` (the nearest pair is ${f2(Math.min(...gaps))} m apart)` : ''}`
-        : `${near.join('; ')}. In a village section every spawn stands more than ${RADIUS} m from every portal: inside the radius the walk-in trigger is off until the player steps out, and the nearest portal takes the door prompt`,
+        : `${near.join('; ')}. In a village section and in a cave every spawn stands more than ${RADIUS} m from every portal: inside the radius the walk-in trigger is off until the player steps out, and the nearest portal takes the door prompt`,
     );
   else if (near.length)
     note(
       `${id}.spawn_inside_portal_radius`,
-      `${near.join('; ')}: arriving there the walk-in trigger stays off until the player steps out and comes back. The arrival of a room or a wild area may stand like this; a spawn of a village section may not`,
+      `${near.join('; ')}: arriving there the walk-in trigger stays off until the player steps out and comes back. The arrival of a room or a wild area may stand like this; a spawn of a village section or a cave may not`,
     );
   // standing on the ground, when the collision triangles can be read
   if (L.triangles) {
@@ -1106,7 +1271,8 @@ const rawPortal = (L, p) => {
 // to the bare id. `exactHazards` are portals whose exact target exists; `waitingHazards` lead into a scene that is not
 // built yet (docs/walk-areas.md, section 5): with an index the viewer says so and never looks at the bare id.
 const exactHazards = [],
-  waitingHazards = [];
+  waitingHazards = [],
+  neededBy = new Map(); // a scene that is not built yet -> the portals that lead into it
 for (const L of Object.values(loaded)) {
   const bad = [];
   let ok = 0,
@@ -1132,8 +1298,10 @@ for (const L of Object.values(loaded)) {
     else if (!pending.has(p.to))
       bad.push(`Portal_${p.id}: scene "${p.to}" is in no file and is not listed under pending${hint}`);
     else {
-      // a scene that is not built yet: the viewer says so, whether or not another scene has a spawn with the bare id
+      // a scene that is not built yet (a game scene or a walk-only one): the viewer says so, whether or not another
+      // scene has a spawn with the bare id
       waiting++;
+      neededBy.set(p.to, [...(neededBy.get(p.to) ?? []), `${rawPortal(L, p)} in ${L.id}`]);
       if (bare)
         waitingHazards.push(
           `${rawPortal(L, p)} in ${L.id} (scene ${p.to} is not built yet, so the viewer says so; the bare id '${p.toSpawn}' is a spawn in ${bare.area})`,
@@ -1180,15 +1348,72 @@ for (const L of Object.values(loaded)) {
       : drift.join('; '),
   );
 }
+for (const [scene, by] of [...neededBy].sort(([a], [b]) => (a < b ? -1 : 1)))
+  note(`world.pending.${scene}`, `not built yet, needed by ${by.join('; ')}`);
 if (exactHazards.length + waitingHazards.length)
   note(
     'world.bare_id_hazard',
     `a loader that falls back to the bare toSpawn would go wrong at: ${[...exactHazards, ...waitingHazards].join('; ')}. With an index the exact id is the only lookup`,
   );
 
+// The walk-only scenes (docs/walk-areas.md, section 2): walk_scenes.json is well formed and none of its ids is a game
+// scene id: overworld, or the scene of a room or a wild area of the index (walk_index.py --scene-ids also holds them
+// against the game's own list). And the index's walk_scenes are the entries of walk_scenes.json for the walk-only
+// scenes the files use, with no such field when there are none.
+{
+  if (WALK.missing)
+    note(
+      'world.walk_scenes',
+      'walk_scenes.json is not beside this script: no walk-only scene is known, so a cave, or a portal into one, fails',
+    );
+  else {
+    const game = new Map([['overworld', "the village's scene"]]);
+    for (const [aid, A] of Object.entries(index.areas ?? {}))
+      if ((A.kind === 'room' || A.kind === 'wild') && !game.has(A.scene))
+        game.set(A.scene, `the scene of ${aid}`);
+    const bad = [
+      ...WALK.problems,
+      ...[...WALK.ids]
+        .filter((s) => game.has(s))
+        .sort()
+        .map((s) => `${s} is a game scene id (${game.get(s)}): a walk-only scene never is`),
+    ];
+    check(
+      'world.walk_scenes',
+      bad.length === 0,
+      bad.length === 0
+        ? `${WALK.ids.size} walk-only scene${WALK.ids.size === 1 ? '' : 's'} (${[...WALK.ids].sort().join(', ') || 'none'}), well formed: none is overworld or the scene of a room or a wild area of the index (walk_index.py --scene-ids also holds them against the game's scene ids)`
+        : `walk_scenes.json: ${bad.join('; ')}`,
+    );
+  }
+  const used = new Set();
+  for (const L of Object.values(loaded)) {
+    used.add(L.A.scene);
+    for (const p of L.portals) used.add(p.to);
+  }
+  const want = Object.fromEntries(
+    [...used]
+      .filter((s) => WALK.ids.has(s))
+      .sort()
+      .map((s) => [s, WALK.entries[s]]),
+  );
+  const got = index.walk_scenes;
+  const ok = Object.keys(want).length ? canon(got) === canon(want) : got === undefined;
+  check(
+    'index.walk_scenes',
+    ok,
+    ok
+      ? Object.keys(want).length
+        ? `walk_scenes in the index are the entries of walk_scenes.json for the walk-only scenes the files use: ${Object.keys(want).join(', ')}`
+        : 'the files use no walk-only scene, and the index lists none'
+      : `the index says ${JSON.stringify(got) ?? 'nothing'}; walk_scenes.json gives ${Object.keys(want).length ? JSON.stringify(want) : 'nothing, for the files use no walk-only scene'}. walk_scenes lists the entries of walk_scenes.json for the walk-only scenes the files use`,
+  );
+}
+
 // Two notes, never failures (walk_index.py prints the same two). An area that no portal of another area leads into;
-// the area the viewer starts in is left out. And a way out of a room or a wild area that arrives in another file than
-// the door that leads in, or more than 10 m from that door.
+// the area the viewer starts in is left out. And a way out of a room, a wild area or a cave (a portal that leaves its
+// scene: a door, a cave mouth's _out) that arrives in another file than the door that leads in, or more than 10 m
+// from that door.
 {
   const into = new Map(); // area id -> the portals of other areas that lead into it
   for (const L of Object.values(loaded))
@@ -1207,8 +1432,9 @@ if (exactHazards.length + waitingHazards.length)
         );
       continue;
     }
-    if (L.A.kind !== 'room' && L.A.kind !== 'wild') continue;
+    if (!['room', 'wild', 'cave'].includes(L.A.kind)) continue;
     for (const p of L.portals) {
+      if (p.to === L.A.scene) continue; // a seam stays in its scene: it is no way out
       const hit = resolveAcross(p);
       const spawn = hit && hit.area !== L.id ? loaded[hit.area]?.spawns.find((s) => s.id === hit.id) : null;
       if (!spawn) continue;
@@ -1229,6 +1455,132 @@ if (exactHazards.length + waitingHazards.length)
           `Portal_${p.id} arrives at Spawn_${hit.id}, ${f2(far, 1)} m from Portal_${door.id}, the nearest door into ${L.id}: more than ${WAY_BACK_FAR} m from where the player went in`,
         );
     }
+  }
+}
+
+// ------------------------------------------------------------------------------------------------ crossings
+// A crossing between two sections of one scene (two village sections, or two caves of one walk-only scene) is always
+// a seam; the stem seam_ is reserved for seams (walk_index.py has the same rule).
+{
+  const bad = [];
+  for (const L of Object.values(loaded)) {
+    const { kind, scene } = L.A;
+    for (const p of L.portals) {
+      const raw = rawPortal(L, p),
+        t = resolveAcross(p)?.area,
+        isSeam = raw.startsWith('Portal_seam_');
+      if (
+        t &&
+        t !== L.id &&
+        SECTIONED_KINDS.includes(kind) &&
+        index.areas[t]?.kind === kind &&
+        index.areas[t]?.scene === scene &&
+        !isSeam
+      )
+        bad.push(
+          `${raw} crosses from ${L.id} to ${t}, two ${kind === 'cave' ? 'caves' : 'village sections'} of the scene ${scene}, and is not a seam portal`,
+        );
+      if (isSeam && !SECTIONED_KINDS.includes(kind))
+        bad.push(`${raw} is a seam portal in ${L.id}, which is neither a village section nor a cave`);
+      if (!isSeam && (p.id.startsWith('seam_') || p.toSpawn.startsWith('seam_')))
+        bad.push(`${raw} uses the stem seam_, which is kept for seams`);
+    }
+    for (const s of L.spawns)
+      if (
+        s.id.startsWith('seam_') ||
+        (WALK.sectioned.some((sc) => s.id.startsWith(`${sc}_seam_`)) && !WALK.seamSpawn.test(s.id))
+      )
+        bad.push(`Spawn_${s.id} uses the stem seam_, which is kept for seam arrivals`);
+  }
+  check(
+    'world.seams_only_between_sections',
+    bad.length === 0,
+    bad.length === 0
+      ? 'every crossing between two sections of one scene (village sections, caves) is a seam, and only seams use the stem seam_'
+      : bad.join('; '),
+  );
+}
+// A walk-only scene is reached from the village by its mouths (docs/walk-areas.md, section 5): door-like portals in the
+// scene's own namespace, Portal_<ns>.<gate>_in in the village {to <scene>, toSpawn mouth_<gate>, kind cave_mouth} and
+// Portal_<ns>.<gate>_out in one of its caves {to overworld, toSpawn mouth_<gate>, kind cave_mouth}. Every crossing
+// between the village and a walk-only scene is a mouth. Printed when the folder has a mouth or a walk-only scene.
+{
+  const bad = [];
+  let mouths = 0,
+    seen = false;
+  for (const L of Object.values(loaded)) {
+    const scene = L.A.scene;
+    for (const p of L.portals) {
+      const raw = rawPortal(L, p),
+        node = L.nodes?.find((o) => o.name === `Portal_${p.id}`);
+      const pid =
+        typeof node?.userData.wdi_portal_id === 'string'
+          ? node.userData.wdi_portal_id
+          : raw.slice('Portal_'.length);
+      const dot = pid.indexOf('.');
+      const ws = dot > 0 ? WALK.byNs.get(pid.slice(0, dot)) : undefined;
+      if (ws !== undefined) {
+        seen = true;
+        const ns = pid.slice(0, dot),
+          m = GATE_RE.exec(pid.slice(dot + 1));
+        if (!m) {
+          bad.push(
+            `${raw}: the namespace ${ns}. holds only the mouths of ${ws}, ${ns}.<gate>_in and ${ns}.<gate>_out`,
+          );
+          continue;
+        }
+        const [, gate, way] = m;
+        const [home, to] = way === 'in' ? ['overworld', ws] : [ws, 'overworld'];
+        const kind = MOUTH_KINDS[WALK.entries[ws].kind];
+        const probs = [];
+        if (scene !== home) probs.push(`it stands in ${L.id}, whose scene is ${scene}, not ${home}`);
+        if (p.to !== to) probs.push(`to is ${JSON.stringify(p.to)}, not "${to}"`);
+        if (p.toSpawn !== `mouth_${gate}`)
+          probs.push(`toSpawn is ${JSON.stringify(p.toSpawn)}, not "mouth_${gate}"`);
+        if (p.kind !== kind) probs.push(`kind is ${JSON.stringify(p.kind)}, not "${kind}"`);
+        if (probs.length) bad.push(`${raw}: ${probs.join(', ')}`);
+        else mouths++;
+      } else if (scene === 'overworld' && WALK.ids.has(p.to)) {
+        seen = true;
+        bad.push(
+          `${raw} leads from ${L.id} into ${p.to} and is not one of its mouths (Portal_${WALK.entries[p.to].portal_ns}.<gate>_in)`,
+        );
+      } else if (WALK.ids.has(scene) && p.to === 'overworld') {
+        seen = true;
+        bad.push(
+          `${raw} leads from ${L.id} into the village and is not one of the mouths of ${scene} (Portal_${WALK.entries[scene].portal_ns}.<gate>_out)`,
+        );
+      }
+    }
+  }
+  if (seen || Object.values(loaded).some((L) => WALK.ids.has(L.A.scene)))
+    check(
+      'world.cave_mouths',
+      bad.length === 0,
+      bad.length === 0
+        ? `${mouths} mouth portal${mouths === 1 ? '' : 's'}: Portal_<ns>.<gate>_in in the village and Portal_<ns>.<gate>_out in a cave, with toSpawn mouth_<gate> and kind cave_mouth; every crossing between the village and a walk-only scene is a mouth`
+        : bad.join('; '),
+    );
+}
+// Every cave of the index carries the same look (exposure, fog, wdi_baked): one look for the whole cave network,
+// because its seams need it (docs/walk-areas.md, section 4). Printed when the folder holds a cave.
+{
+  const caves = Object.values(loaded)
+    .filter((L) => L.A.kind === 'cave' && L.area)
+    .sort((a, b) => (a.id < b.id ? -1 : 1));
+  if (caves.length) {
+    const looks = new Map();
+    for (const L of caves) {
+      const key = canon([L.look, L.baked]);
+      looks.set(key, [...(looks.get(key) ?? []), L]);
+    }
+    check(
+      'world.cave_look',
+      looks.size === 1,
+      looks.size === 1
+        ? `the ${caves.length} caves carry one look: ${JSON.stringify(caves[0].look)}, wdi_baked ${caves[0].baked}`
+        : `${[...looks.values()].map((group) => `${group.map((L) => L.id).join(' and ')} has ${JSON.stringify(group[0].look)}, wdi_baked ${group[0].baked}`).join('; ')}. Every cave carries the same exposure, fog and wdi_baked: one look for the whole cave network`,
+    );
   }
 }
 
@@ -1258,14 +1610,16 @@ for (const L of Object.values(loaded)) {
         id: raw.slice('Portal_'.length),
       });
     }
-    m = /^Spawn_overworld_seam_(.+)_([ab])_([1-9][0-9]*)$/.exec(raw);
+    // a seam arrival, Spawn_<scene>_seam_<seamId>_<side>_<n>: the scene its id names is kept, to be held to the seam's
+    m = raw.startsWith('Spawn_') ? WALK.seamSpawn.exec(raw.slice('Spawn_'.length)) : null;
     if (m) {
-      const S = (seams[m[1]] ??= { portals: { a: [], b: [] }, arrivals: { a: [], b: [] }, badNames: [] });
+      const S = (seams[m[2]] ??= { portals: { a: [], b: [] }, arrivals: { a: [], b: [] }, badNames: [] });
       const sp = L.spawns.find((s) => s.id === raw.slice('Spawn_'.length));
-      S.arrivals[m[2]].push({
-        n: Number(m[3]),
+      S.arrivals[m[3]].push({
+        n: Number(m[4]),
         raw,
         area: L.id,
+        scene: m[1],
         extras: o.userData,
         pos: worldPos(o),
         yaw: sp?.yaw ?? 0,
@@ -1278,21 +1632,31 @@ for (const [sid, S] of Object.entries(seams).sort()) {
   const rule = `seam.${sid}.`;
   const rows = { a: S.portals.a.sort((p, q) => p.n - q.n), b: S.portals.b.sort((p, q) => p.n - q.n) };
   const home = { a: [...new Set(rows.a.map((p) => p.area))], b: [...new Set(rows.b.map((p) => p.area))] };
+  // a seam joins two sections of one scene: two village sections, or two caves of one walk-only scene
+  const [ka, kb] = [index.areas[home.a[0]], index.areas[home.b[0]]];
   const sidesOk =
     /^[a-z][a-z0-9]*(_[a-z0-9]+)*$/.test(sid) &&
     S.badNames.length === 0 &&
     home.a.length === 1 &&
     home.b.length === 1 &&
     home.a[0] !== home.b[0] &&
-    [home.a[0], home.b[0]].every((h) => index.areas[h]?.kind === 'section');
+    SECTIONED_KINDS.includes(ka?.kind) &&
+    ka.kind === kb?.kind &&
+    ka.scene === kb.scene;
+  const where = (side) =>
+    home[side].map((h) => `${h} (${index.areas[h]?.kind}, scene ${index.areas[h]?.scene})`).join(', ') ||
+    'no file';
   check(
     `${rule}sides`,
     sidesOk,
     sidesOk
-      ? `side a is ${home.a[0]}, side b is ${home.b[0]}`
-      : `seam id "${sid}"; side a in ${home.a.join(', ') || 'no file'}, side b in ${home.b.join(', ') || 'no file'}; names that do not fit Portal_seam_<seamId>_<a or b>_<n>: ${S.badNames.join(', ') || '-'}; a seam joins two village sections`,
+      ? `side a is ${home.a[0]}, side b is ${home.b[0]}, two ${ka.kind === 'cave' ? 'caves' : 'village sections'} of the scene ${ka.scene}`
+      : `seam id "${sid}"; side a in ${where('a')}, side b in ${where('b')}; names that do not fit Portal_seam_<seamId>_<a or b>_<n>: ${S.badNames.join(', ') || '-'}; a seam joins two sections of one scene: two village sections, or two caves of one walk-only scene`,
   );
   if (!sidesOk) continue;
+  const scene = ka.scene,
+    areaKind = ka.kind,
+    cave = areaKind === 'cave';
   const count = rows.a.length,
     na = rows.a.map((p) => p.n),
     nb = rows.b.map((p) => p.n);
@@ -1316,14 +1680,17 @@ for (const [sid, S] of Object.entries(seams).sort()) {
       const e = p.extras,
         other = side === 'a' ? 'b' : 'a',
         probs = [];
-      if (e.to !== 'overworld') probs.push(`to is ${JSON.stringify(e.to)}, not "overworld"`);
+      if (e.to !== scene)
+        probs.push(`to is ${JSON.stringify(e.to)}, not "${scene}" (a seam leads into its own scene)`);
       if (e.toSpawn !== `seam_${sid}_${other}_${p.n}`) probs.push(`toSpawn is ${JSON.stringify(e.toSpawn)}`);
       if (e.kind !== 'gate') probs.push(`kind is ${JSON.stringify(e.kind)}, not "gate"`);
       if (e.wdi_portal_id !== `seam_${sid}_${side}_${p.n}`)
         probs.push(`wdi_portal_id is ${JSON.stringify(e.wdi_portal_id)}`);
       if (e.wdi_seam !== sid) probs.push(`wdi_seam is ${JSON.stringify(e.wdi_seam)}`);
-      if (!SEAM_KINDS.includes(e.wdi_seam_kind) || e.wdi_seam_kind !== kind)
-        probs.push(`wdi_seam_kind is ${JSON.stringify(e.wdi_seam_kind)}`);
+      if (!SEAM_KINDS[areaKind].includes(e.wdi_seam_kind) || e.wdi_seam_kind !== kind)
+        probs.push(
+          `wdi_seam_kind is ${JSON.stringify(e.wdi_seam_kind)} (a seam between ${cave ? 'caves' : 'village sections'} is one of: ${SEAM_KINDS[areaKind].join(', ')})`,
+        );
       if (
         !isNum(e.wdi_width_m) ||
         !(e.wdi_width_m > 0 && e.wdi_width_m <= SEAM.widthMax) ||
@@ -1338,7 +1705,7 @@ for (const [sid, S] of Object.entries(seams).sort()) {
     `${rule}extras`,
     badExtras.length === 0,
     badExtras.length === 0
-      ? `to overworld, kind gate, wdi_seam_kind ${kind}, wdi_width_m ${width} on all ${2 * count} portals`
+      ? `to ${scene}, kind gate, wdi_seam_kind ${kind}, wdi_width_m ${width} on all ${2 * count} portals`
       : badExtras.join('; '),
   );
   if (!isNum(width) || !(width > 0 && width <= SEAM.widthMax)) continue;
@@ -1407,7 +1774,7 @@ for (const [sid, S] of Object.entries(seams).sort()) {
     for (const p of rows[side]) {
       const sp = S.arrivals[other].find((s) => s.n === p.n);
       if (!sp) {
-        badArr.push(`no Spawn_overworld_seam_${sid}_${other}_${p.n}`);
+        badArr.push(`no Spawn_${scene}_seam_${sid}_${other}_${p.n}`);
         continue;
       }
       nArr++;
@@ -1429,6 +1796,10 @@ for (const [sid, S] of Object.entries(seams).sort()) {
       for (const [gap, q] of close)
         probs.push(`${f2(gap)} m from Portal_${q.id}, under ${SEAM.arrivalClearMin}`);
       if (sp.extras.wdi_picker !== false) probs.push('wdi_picker is not false');
+      if (sp.scene !== scene)
+        probs.push(
+          `its id names the scene ${sp.scene}, and the seam is in ${scene} (Spawn_${scene}_seam_${sid}_${other}_${p.n})`,
+        );
       // and by the viewer's own trigger, holding every portal of that file: it is ready at once, and a walk
       // straight back to the wall (to 0.3 m short of the line, the walker's radius) fires a point of the return row
       const trigger = new PortalTrigger(filePortals);
@@ -1517,7 +1888,7 @@ for (const [sid, S] of Object.entries(seams).sort()) {
       steps.length > 0 && stepBad.length === 0,
       steps.length > 0 && stepBad.length === 0
         ? `the two files put the ground at the seam line at the same height: at most ${f2(Math.max(...steps.map((s) => s.step)))} m apart at ${steps.length} points (the rule is ${SEAM.heightMax} m)`
-        : `${stepBad.join('; ') || 'no pair of points to compare'}. Village sections share the village's coordinates, heights too: the two sides differ by more than ${SEAM.heightMax} m`,
+        : `${stepBad.join('; ') || 'no pair of points to compare'}. The two sides share the village's coordinates, heights too: they differ by more than ${SEAM.heightMax} m`,
     );
   }
   // the look: equal in the two files and in the index. wdi_baked is part of it: the viewer switches off every light of
@@ -1556,6 +1927,7 @@ for (const [sid, S] of Object.entries(seams).sort()) {
     const rowLat = row.map((p) => lat(p.pos)),
       d3 = [toward[0], 0, -toward[1]];
     const holes = [],
+      roofs = [],
       cols = Math.max(1, Math.round((width - 0.1) / 0.25));
     let rays = 0;
     for (let k = 0; k <= cols; k++) {
@@ -1571,12 +1943,26 @@ for (const [sid, S] of Object.entries(seams).sort()) {
         continue;
       }
       const ground = start - down;
-      for (const h of [0.25, 1.0, 2.0, SEAM.wallHeight - 0.05]) {
+      let heights = [0.25, 1.0, 2.0, SEAM.wallHeight - 0.05];
+      if (cave) {
+        // a roofed passage: the wall closes it from the floor to the roof. The roof above the row must be found; the
+        // rays go at 0.25, 1 and 2 m above the floor (those under the roof) and 0.1 m under it
+        const up = rayFirstHit(L.triangles, [px, ground + 0.05, -py], [0, 1, 0], SEAM.roofMax);
+        if (up === null) {
+          rays += CAVE_WALL_HEIGHTS.length + 1;
+          holes.push(`at ${f2(s)} m along the opening: no roof above the row within ${SEAM.roofMax} m`);
+          continue;
+        }
+        const roof = 0.05 + up;
+        roofs.push(roof);
+        heights = [...CAVE_WALL_HEIGHTS.filter((h) => h < roof - SEAM.roofGap), roof - SEAM.roofGap];
+      }
+      for (const h of heights) {
         rays++;
         const hit = rayFirstHit(L.triangles, [px, ground + h, -py], d3, 50);
         if (hit === null || Math.abs(hit - SEAM.portalToWall) > SEAM.tol)
           holes.push(
-            `at ${f2(s)} m along the opening, ${h} m above the ground: ${hit === null ? 'nothing within 50 m' : `wall at ${f2(hit)} m`}`,
+            `at ${f2(s)} m along the opening, ${cave ? f2(h) : h} m above the ${cave ? 'floor' : 'ground'}: ${hit === null ? 'nothing within 50 m' : `wall at ${f2(hit)} m`}`,
           );
       }
     }
@@ -1589,12 +1975,16 @@ for (const [sid, S] of Object.entries(seams).sort()) {
           `${sp.raw}: ${hit === null ? 'no wall behind it' : `wall ${f2(hit)} m behind it, not ${SEAM.arrivalInside}`}`,
         );
     }
+    const reach =
+      cave && roofs.length
+        ? `from 0.25 m above the floor to ${SEAM.roofGap} m under the roof (the roof stands ${f2(Math.min(...roofs))} to ${f2(Math.max(...roofs))} m above the floor)`
+        : `up to ${SEAM.wallHeight - 0.05} m above the ground under each`;
     check(
       `${rule}barrier.${side}`,
       holes.length === 0 && back.length === 0,
       holes.length === 0 && back.length === 0
-        ? `${L.id}: ${rays} rays across the ${width} m opening, up to ${SEAM.wallHeight - 0.05} m above the ground under each, all meet the wall ${SEAM.portalToWall} m in front of the row; arrivals stand ${SEAM.arrivalInside} m inside it`
-        : `${L.id}: ${holes.length} of ${rays} rays find no wall ${SEAM.portalToWall} m in front of the row (${holes.slice(0, 3).join('; ')})${back.length ? `; ${back.slice(0, 3).join('; ')}` : ''}`,
+        ? `${L.id}: ${rays} rays across the ${width} m opening, ${reach}, all meet the wall ${SEAM.portalToWall} m in front of the row; arrivals stand ${SEAM.arrivalInside} m inside it`
+        : `${L.id}: ${holes.length} of ${rays} rays find no wall ${SEAM.portalToWall} m in front of the row (${holes.slice(0, 3).join('; ')})${back.length ? `; ${back.slice(0, 3).join('; ')}` : ''}${cave ? '. In a cave the wall closes the passage from the floor to the roof' : ''}`,
     );
   }
   // coverage: the row's ends against the opening, then the viewer's own trigger walked across the whole opening
@@ -1629,7 +2019,7 @@ for (const [sid, S] of Object.entries(seams).sort()) {
     );
     control(
       `${rule}one_point_only`,
-      `with only the middle portal of side a, the viewer's trigger fires at ${one.fired} of ${one.total} places across the ${width} m opening; a walker is not taken through at ${one.runs} m from the middle. That is why an opening wider than 2 m has a row`,
+      `with only ${count % 2 ? 'the middle portal' : `${middle.raw}, one of the two middle portals,`} of side a, the viewer's trigger fires at ${one.fired} of ${one.total} places across the ${width} m opening; a walker is not taken through at ${one.runs} m from the middle. That is why an opening wider than 2 m has a row`,
     );
   }
   derivedSeams.push({
@@ -1880,9 +2270,9 @@ function rowHeight(row, rowLat, s) {
 }
 
 // 2. The journey: the trip a loader has to make, driven through the viewer's own trigger. Written for the fixture.
+const FIXTURE_AREAS = ['room_shop', 'under_a', 'under_b', 'village_east', 'village_west'];
 const FIXTURE =
-  ['village_west', 'village_east', 'room_shop'].every((k) => loaded[k]?.area) &&
-  same(Object.keys(index.areas).sort(), ['room_shop', 'village_east', 'village_west']);
+  FIXTURE_AREAS.every((k) => loaded[k]?.area) && same(Object.keys(index.areas).sort(), FIXTURE_AREAS);
 function journey() {
   const log = [],
     fails = [];
@@ -2018,20 +2408,71 @@ function journey() {
     walk(g2(50, 0)) === null && walk(g2(55.5, 0))?.id === 'ovmine',
     'stepping away and coming back fires it again',
   );
+  // the caves: in through the east cave mouth, across the cave seam and back, and out by the mouth again
+  expect(
+    enter('overworld_mouth_east') === 'village_east',
+    'the picker: choosing "overworld_mouth_east" opens village_east',
+  );
+  const mouthIn = loaded.village_east.portals.find((q) => q.id === 'umeast_in');
+  p = walk([mouthIn.position.x, mouthIn.position.z]);
+  expect(
+    p?.id === 'umeast_in',
+    `walking to the cave mouth fires ${p?.id} (the viewer reads Portal_um.east_in as "umeast_in")`,
+  );
+  t = travel(p);
+  expect(
+    t.area === 'under_a' && t.fetched && t.to === 'undermere_mouth_east',
+    `the cave mouth: the exact id ${t.to} is in ${t.area}; that file opens`,
+  );
+  p = walk(g2(31.7, -9.7)); // 0.3 m north of the passage's middle, so that the north point of the row is the nearer
+  expect(
+    p?.id === 'seam_a_b_a_2',
+    `walking east in the cave fires ${p?.id} at x = ${f2(pos.x)} (the portal stands at 31.55)`,
+  );
+  t = travel(p);
+  expect(
+    t.area === 'under_b' && t.fetched && t.to === 'undermere_seam_a_b_b_2',
+    `the cave seam: the exact id ${t.to} is in ${t.area}; that file opens`,
+  );
+  expect(
+    Math.abs(pos.x - 33.65) < 1e-6 && Math.abs(pos.z - 9.4) < 1e-6 && Math.abs(deg(yaw) + 90) < 0.01,
+    `arrival at (${f2(pos.x)}, ${f2(-pos.z)}) looking east (yaw ${f2(deg(yaw), 1)}), 2.1 m beyond the point left by`,
+  );
+  expect(walk(g2(42, -9.4)) === null, 'walking on east through the far cave fires nothing');
+  p = walk(g2(32.3, -9.4));
+  expect(p?.id === 'seam_a_b_b_2', `walking back west fires ${p?.id} at x = ${f2(pos.x)}`);
+  t = travel(p);
+  expect(
+    t.area === 'under_a' && t.fetched && t.to === 'undermere_seam_a_b_a_2' && Math.abs(deg(yaw) - 90) < 0.01,
+    `back through the cave seam: ${t.to} in ${t.area}, looking west (yaw ${f2(deg(yaw), 1)})`,
+  );
+  p = walk(g2(20.3, -10));
+  expect(p?.id === 'umeast_out', `walking west to the cave mouth fires ${p?.id}`);
+  t = travel(p);
+  expect(
+    t.area === 'village_east' &&
+      t.fetched &&
+      t.to === 'overworld_mouth_east' &&
+      Math.hypot(pos.x - mouthIn.position.x, pos.z - mouthIn.position.z) >= 1.2,
+    `out of the caves: ${t.to} in ${t.area}, ${f2(Math.hypot(pos.x - mouthIn.position.x, pos.z - mouthIn.position.z))} m from the mouth's portal`,
+  );
   expect(
     enter('shop_door') === 'room_shop',
     'a link straight into a room: the spawn "shop_door" opens room_shop first',
   );
   const arrivalIds = indexSpawns.filter((s) => s.picker === false).map((s) => s.id);
+  const rows = (index.seams ?? []).reduce((n, s) => n + 2 * s.portals, 0);
   expect(
-    arrivalIds.length === 6 &&
+    arrivalIds.length === rows &&
       arrivalIds.every((id) => pickSpawn(loaded[spawnArea[id]].spawns, id)?.id === id),
-    `every arrival spawn can be opened by its id alone (${arrivalIds.length} ids): what a page reload with the spawn in the address needs`,
+    `every arrival spawn of the ${index.seams.length} seams can be opened by its id alone (${arrivalIds.length} ids): what a page reload with the spawn in the address needs`,
   );
   return { log, fails };
 }
 let J = {
-  log: ['not run: the scripted journey is written for the fixture (village_west, village_east, room_shop)'],
+  log: [
+    'not run: the scripted journey is written for the fixture (village_west, village_east, room_shop, under_a, under_b)',
+  ],
   fails: [],
 };
 if (FIXTURE) {

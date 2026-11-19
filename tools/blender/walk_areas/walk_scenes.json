@@ -1,0 +1,8 @@
+{
+  "undermere": {
+    "name": "The Undermere",
+    "kind": "cave",
+    "area_prefix": "under_",
+    "portal_ns": "um"
+  }
+}

@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "tools/blender/walk_areas/schema/walk-index.schema.json",
   "title": "walk-index.json, format 1",
-  "description": "The index of a walk world: one entry per area file. Contract: docs/walk-areas.md, version 1. Axes: every 3-number vector is in glTF world axes (x east, y up, z = -north), in metres; every field whose name ends in _xy is a plan view in Blender axes (x east, y north), in metres.",
+  "description": "The index of a walk world: one entry per area file. Contract: docs/walk-areas.md, version 1.1 (the index is still format 1). Axes: every 3-number vector is in glTF world axes (x east, y up, z = -north), in metres; every field whose name ends in _xy is a plan view in Blender axes (x east, y north), in metres.",
   "type": "object",
   "required": ["format", "axes", "start", "areas", "scenes", "seams", "pending"],
   "additionalProperties": false,
@@ -26,7 +26,7 @@
       "minProperties": 1,
       "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
       "additionalProperties": { "$ref": "#/$defs/area" },
-      "description": "Area id to area. A village section is village_<key>, a room is room_<sceneId>, a wild area is its scene id."
+      "description": "Area id to area. A village section is village_<key>, a room is room_<sceneId>, a wild area is its scene id, a cave is the area prefix of its walk-only scene and a key (under_<key>)."
     },
     "scenes": {
       "type": "object",
@@ -36,22 +36,49 @@
         "uniqueItems": true,
         "items": { "type": "string" }
       },
-      "description": "Game scene id to the area ids that make it up. overworld is all the village sections."
+      "description": "Scene id (a game scene id, or a walk-only scene id of walk_scenes) to the area ids that make it up. overworld is all the village sections; a walk-only scene is all its caves."
     },
     "seams": {
       "type": "array",
       "items": { "$ref": "#/$defs/seam" },
-      "description": "The crossings between village sections."
+      "description": "The crossings between two sections of one scene: two village sections, or two caves of one walk-only scene."
     },
     "pending": {
       "type": "array",
       "uniqueItems": true,
       "items": { "type": "string" },
-      "description": "Game scene ids that are not built yet. A portal into one says so and does not move the player."
+      "description": "Scene ids (game scene ids or walk-only scene ids) that are not built yet. A portal into one says so and does not move the player."
+    },
+    "walk_scenes": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/walkScene" },
+      "description": "Optional (contract 1.1): the walk-only scenes the files use (an area's scene, or where a portal leads), each entry copied from tools/blender/walk_areas/walk_scenes.json. Left out when the files use none. For tools, and for a viewer that wants better words for a door into one; a viewer needs nothing here to load a file, place the player or find a portal's target."
     }
   },
   "$defs": {
     "spawnId": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "walkScene": {
+      "type": "object",
+      "required": ["name", "kind", "area_prefix", "portal_ns"],
+      "additionalProperties": false,
+      "description": "A scene of the walk that the game does not have, cut into areas of one kind joined by seams.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "description": "Plain words for people." },
+        "kind": { "enum": ["cave"], "description": "The kind of its areas." },
+        "area_prefix": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*_$",
+          "description": "The id of each of its areas is this and a key: under_<key>."
+        },
+        "portal_ns": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "description": "Its mouths are the portals <portal_ns>.<gate>_in in the village and <portal_ns>.<gate>_out in one of its areas."
+        }
+      }
+    },
     "vec3": {
       "type": "array",
       "minItems": 3,
@@ -95,8 +122,12 @@
           "pattern": "^[0-9a-f]{64}$",
           "description": "The hash of the file's bytes."
         },
-        "kind": { "enum": ["section", "room", "wild"] },
-        "scene": { "type": "string", "minLength": 1, "description": "The game scene this area belongs to." },
+        "kind": { "enum": ["section", "room", "wild", "cave"] },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The scene this area belongs to: a game scene, or for a cave its walk-only scene."
+        },
         "name": {
           "type": "string",
           "minLength": 1,
@@ -192,7 +223,11 @@
           "description": "wdi_portal_id: the same id with its dot."
         },
         "position": { "$ref": "#/$defs/vec3" },
-        "to": { "type": "string", "minLength": 1, "description": "A game scene id, never an area id." },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A scene id, never an area id: a game scene id, or a walk-only scene id (walk_scenes)."
+        },
         "toSpawn": { "type": "string", "minLength": 1 },
         "kind": { "type": "string" },
         "target_area": {
@@ -209,7 +244,24 @@
       "properties": {
         "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$" },
         "kind": {
-          "enum": ["gate", "level_crossing", "footbridge", "lychgate", "stile", "cutting", "belt_gate"]
+          "enum": [
+            "gate",
+            "level_crossing",
+            "footbridge",
+            "lychgate",
+            "stile",
+            "cutting",
+            "belt_gate",
+            "passage",
+            "arch",
+            "mine_door",
+            "bend",
+            "squeeze",
+            "choke",
+            "curtain",
+            "sump_ledge"
+          ],
+          "description": "The device: one of the first seven between village sections, one of the last eight between caves."
         },
         "width_m": { "type": "number", "exclusiveMinimum": 0, "description": "The width of the opening." },
         "a": { "type": "string", "description": "The area id of side a." },

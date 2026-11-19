@@ -5,7 +5,9 @@
     python mutants.py --python-only            walk_index.py alone (check_areas.mjs needs the viewer's source)
 
 For each name below, fixture/make-areas-fixture.mjs writes a variant of the fixture (MUTATE=<name>) into its own
-folder; then  walk_index.py <folder> --check  and  check_areas.mjs <folder>  run on it. There are four kinds:
+folder; then  walk_index.py <folder> --check  and  check_areas.mjs <folder>  run on it. When the variant's folder holds
+its own walk_scenes.json (the list of walk-only scenes), both checkers are given it with --walk-scenes. There are four
+kinds:
 
   MUTANTS  a broken world. It is caught when the checker exits 1 and the intended rule is among its FAIL lines.
   NOTED    an allowed world that deserves a word. It is caught when the intended NOTE line is printed, walk_index.py
@@ -71,12 +73,24 @@ MUTANTS = [
     ("baked_one_side", "village_east says wdi_baked: true, in its file and in the index, and village_west does not: the viewer switches off the lights of village_east only", r"seam\.west_east\.look_equal"),
     ("polygon_odd", "village_west: wdi_walk_polygon is a flat list of five numbers, which is no list of points", r"village_west\.area_extras"),
     ("chamfer_open", "village_west: the outline cuts off its north-west corner along a diagonal, and no wall stands on the diagonal: 14.1 m of open edge that is not parallel to an axis", r"village_west\.edge_closed"),
+    # the caves (contract version 1.1)
+    ("cave_not_indoor", "under_a has no wdi_indoor: the viewer would draw the moon, the sky light and the sky dome in a cave", r"under_a\.area_extras"),
+    ("cave_not_baked", "under_a has no wdi_baked, in its file and in the index", r"under_a\.area_extras"),
+    ("cave_seam_open_roof", "the seam wall of under_a stops 0.3 m under the roof: the rays 0.1 m under the roof find no wall", r"seam\.a_b\.barrier\.a"),
+    ("cave_seam_to_overworld", "the cave seam's points in under_a say to: overworld, not to: undermere", r"seam\.a_b\.extras"),
+    ("cave_look_differs", "under_b carries fog density 0.08 and under_a 0.05: the caves do not carry one look", r"world\.cave_look"),
+    ("walk_scene_is_game_scene", "walk_scenes.json also lists shop, the game scene of the room room_shop, as a walk-only scene", r"world\.walk_scenes"),
+    ("cave_id_prefix", "the west cave is called cave_a: a cave's id starts with under_, the area prefix of undermere (the game has the scenes cave_entry and cave_gallery)", r"cave_a\.area_id"),
+    ("cave_door_between_caves", "the cave seam is replaced by two plain doors between under_a and under_b, two caves of one scene", r"world\.seams_only_between_sections"),
+    ("cave_spawn_near_portal", "under_a: Spawn_undermere_mouth_east stands 0.8 m from Portal_um.east_out, inside its walk-in radius", r"under_a\.spawn_clear_of_portals"),
+    ("cave_gate_to_missing_spawn", "Portal_um.east_in leads to undermere + mouth_east, and no cave holds Spawn_undermere_mouth_east", r"village_east\.portal_target"),
 ]
 
 # name, what is unusual, the NOTE that must be printed (a pattern on the rule's name; the same in both checkers)
 NOTED = [
     ("way_back_far", "the shop's way out arrives at Spawn_overworld_shop_door in village_east, 60 m from the door in village_west that leads in", r"room_shop\.way_back"),
     ("no_way_in", "the shop's door in village_west is gone: no portal leads into room_shop", r"room_shop\.no_way_in"),
+    ("gate_pending", "no cave file yet: the cave mouth Portal_um.east_in in village_east leads into undermere, which the index lists under pending", r"world\.pending\.undermere"),
 ]
 
 # name, what is unusual; both checkers must pass it
@@ -87,6 +101,8 @@ VALID = [
     ("polygon_flat", "village_west writes its outline as a flat list of numbers, the form a Blender custom property can hold; the index lists it as pairs"),
     ("polygon_string", "village_west writes its outline as a JSON string, as today's exporter writes nested data; the index lists it as pairs"),
     ("polygon_chamfer", "village_west cuts off its north-west corner along a diagonal, writes the outline and stands a wall on the diagonal: the closed-edge rule follows an outline that is not a rectangle"),
+    ("cave_stacked_levels", "a third cave, under_c, lies directly under under_a, 6 m lower, reached by its own mouth from village_west; its mouth's portal and arrival stand at the same places in plan as those of under_a"),
+    ("cave_seam_ramp", "the floor and roof of both caves rise 6 % toward the east, across the cave seam: the rows stand 0.05 m apart in height and the arrivals 0.20 m, and both files put the floor at the seam line at the same height"),
 ]
 
 
@@ -168,6 +184,7 @@ def _width_huge(folder):
 
 
 WEST, EAST, SHOP, INDEX = "walk-village_west.gltf", "walk-village_east.gltf", "walk-room_shop.gltf", "walk-index.json"
+CAVE, WALK_SCENES = "walk-under_a.gltf", "walk_scenes.json"
 # name, what is odd, how it is made from the fixture, and whether it is also read with the real GLTFLoader when
 # --three is given
 ODD = [
@@ -200,6 +217,15 @@ ODD = [
     ("polygon_cut_off", "wdi_walk_polygon of village_west is the text [[1,2, a JSON string that stops in the middle", _edit(WEST, lambda j: _node(j, "Area_")["extras"].__setitem__("wdi_walk_polygon", "[[1,2")), False),
     ("matrix_zeros", "a spawn node holds a matrix of sixteen zeros, which has no rotation and no scale", _edit(EAST, _matrix_zeros), False),
     ("width_huge", "both files of the seam declare an opening 1e9 m wide", _width_huge, False),
+    # the walk-only scenes and the caves (contract version 1.1); a walk_scenes.json in the folder is handed to both
+    ("walk_scenes_not_json", "walk_scenes.json holds the words 'not json'", _text(WALK_SCENES, "not json"), False),
+    ("walk_scenes_list", "walk_scenes.json is a JSON list", _text(WALK_SCENES, "[1, 2]"), False),
+    ("walk_scenes_entry_word", "the entry of undermere in walk_scenes.json is the word caves", _text(WALK_SCENES, '{"undermere": "caves"}'), False),
+    ("walk_scenes_kind_list", "in walk_scenes.json the kind of undermere is a list and its area prefix a number", _text(WALK_SCENES, '{"undermere": {"name": "x", "kind": ["cave"], "area_prefix": 5, "portal_ns": "um"}}'), False),
+    ("index_walk_scenes_word", "walk_scenes in the index is the number 5", _edit(INDEX, lambda j: j.update(walk_scenes=5)), False),
+    ("index_cave_scene_list", "the scene of under_a in the index is a list", _edit(INDEX, lambda j: j["areas"]["under_a"].__setitem__("scene", ["undermere"])), False),
+    ("mouth_to_list", "the extra to of Portal_um.east_in is a list", _edit(EAST, lambda j: _named(j, "Portal_um.east_in")["extras"].__setitem__("to", ["undermere"])), False),
+    ("cave_kind_word", "the wdi_kind of under_a is the number 7 and its wdi_scene a list", _edit(CAVE, lambda j: _node(j, "Area_")["extras"].update(wdi_kind=7, wdi_scene=["undermere"])), False),
 ]
 
 
@@ -260,10 +286,15 @@ def main():
     js_tail = (["--src", src] if src else []) + (["--three", args.three] if args.three else [])
     who = "both checkers" if use_node else "walk_index.py (check_areas.mjs was NOT run)"
 
+    def walk_scenes(folder):
+        """--walk-scenes <its file> when a variant writes its own list of walk-only scenes beside its files."""
+        path = os.path.join(folder, WALK_SCENES)
+        return ["--walk-scenes", path] if os.path.exists(path) else []
+
     def both(folder):
-        out = {"walk_index.py": run(py + [folder, "--check"])}
+        out = {"walk_index.py": run(py + [folder, "--check"] + walk_scenes(folder))}
         if use_node:
-            out["check_areas.mjs"] = run(js + [folder] + js_tail)
+            out["check_areas.mjs"] = run(js + [folder] + js_tail + walk_scenes(folder))
         for name, result in out.items():
             with open(os.path.join(folder, name + ".txt"), "w", encoding="utf-8", newline="\n") as fh:
                 fh.write(result[3])
@@ -386,9 +417,9 @@ def main():
             bad += 1
             continue
         make(folder)
-        runs = [("walk_index.py", py + [folder, "--check"])]
+        runs = [("walk_index.py", py + [folder, "--check"] + walk_scenes(folder))]
         if use_node:
-            runs.append(("check_areas.mjs", js + [folder, "--src", src] + (["--three", args.three] if three and args.three else [])))
+            runs.append(("check_areas.mjs", js + [folder, "--src", src] + (["--three", args.three] if three and args.three else []) + walk_scenes(folder)))
         cells, all_ok = [], True
         for checker, cmd in runs:
             ok, code, fails, trace = run_odd(cmd)

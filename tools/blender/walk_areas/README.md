@@ -1,18 +1,20 @@
 # walk_areas: the tools that prove a set of area files obeys the contract
 
-The contract is `docs/walk-areas.md` (version 1, 2026-11-16): one GLB per area, one `walk-index.json` beside them.
-These tools need no Blender and no install. Python 3 (standard library only) runs `walk_index.py` and `mutants.py`.
-Node 22.13 or newer runs `check_areas.mjs` and the fixture generator.
+The contract is `docs/walk-areas.md` (version 1.1, 2026-11-19; version 1 was of 2026-11-16): one GLB per area, one
+`walk-index.json` beside them, and since version 1.1 a cave network beside the village. The index still says
+`"format": 1`. These tools need no Blender and no install. Python 3 (standard library only) runs `walk_index.py` and
+`mutants.py`. Node 22.13 or newer runs `check_areas.mjs` and the fixture generator.
 
 | File | What it is |
 |---|---|
 | `walk_index.py` | Builds `walk-index.json` from a folder of area files, or checks an index that is already there. Checks every rule that can be read from the files without decoding Draco data. |
 | `check_areas.mjs` | The cross-check with the walk viewer's own code: it runs the viewer's `spawn.ts` and `portals.ts` on the same files and index. |
 | `three_standin.mjs` | A stand-in for the two three.js classes those viewer files import, so nothing has to be installed. Not three.js. |
+| `walk_scenes.json` | The walk-only scenes: scenes of the walk that the game does not have (version 1.1). One today, `undermere`, The Undermere, the caves: `{"name", "kind": "cave", "area_prefix": "under_", "portal_ns": "um"}`. Both checkers read it from beside themselves, or from the file given with `--walk-scenes`. |
 | `schema/walk-index.schema.json` | The shape of the index, as a JSON Schema (draft 2020-12). `walk_index.py` checks every index against it. |
-| `fixture/make-areas-fixture.mjs` | Writes the small test world: two village sections joined by one seam, and one room. With `MUTATE=<name>` it writes one variant of it. |
-| `fixture/areas/` | That world, committed: three `.gltf` files and `walk-index.json`, 54,700 bytes in all (measured). |
-| `mutants.py` | Runs every variant of the fixture through both checkers: 36 broken ones that must fail on the intended rule, 2 allowed ones that must draw a note, 6 unusual valid ones that must pass; and 29 odd inputs that must end in FAIL lines and no stack trace. |
+| `fixture/make-areas-fixture.mjs` | Writes the small test world: two village sections joined by one seam, one room, two caves joined by a cave seam, and one cave mouth from a section into a cave. With `MUTATE=<name>` it writes one variant of it. |
+| `fixture/areas/` | That world, committed: five `.gltf` files and `walk-index.json`, 73,898 bytes in all (measured on 2026-11-19; 54,700 before the caves). |
+| `mutants.py` | Runs every variant of the fixture through both checkers: 46 broken ones that must fail on the intended rule, 3 allowed ones that must draw a note, 8 unusual valid ones that must pass; and 37 odd inputs that must end in FAIL lines and no stack trace. |
 
 ## How to run
 
@@ -25,10 +27,13 @@ Builds `<folder>/walk-index.json` from the `walk-*.glb` (or `walk-*.gltf`) files
 prints the failures, writes nothing and ends with exit code 1. Options:
 
 - `--scene-ids packages/content/data/scenes` gives it the game's scene ids, so that a portal into a scene that is not
-  built yet is listed under `pending` and a misspelt scene id is a failure. Without it, name the unbuilt scenes
-  yourself: `--pending forest,cellar`. The fixture's scenes (`shop`, `mine`) are made up, so the fixture is built
-  with `--world hollowmere-fixture --pending mine` and checked without `--scene-ids`. Built that way, the index is
-  byte for byte the committed one (measured: 8,116 bytes).
+  built yet is listed under `pending` and a misspelt scene id is a failure. A walk-only scene of `walk_scenes.json` is
+  no misspelling: a portal into `undermere` before any cave is built is listed under `pending` too. Given the folder
+  of scene files, it also reads the game's portal ids, to hold the walk-only namespaces against them. Without it, name
+  the unbuilt scenes yourself: `--pending forest,cellar`. The fixture's scenes (`shop`, `mine`) are made up, so the
+  fixture is built with `--world hollowmere-fixture --pending mine` and checked without `--scene-ids`. Built that way,
+  the index is byte for byte the committed one (measured on 2026-11-19: 13,393 bytes).
+- `--walk-scenes <file>` reads the walk-only scenes from that file instead of `walk_scenes.json` beside the script.
 - `--start <spawn id>` sets the spawn the viewer starts at. The default is `square` when a file has it.
 - `--out <path>` writes the index somewhere else. `--json <path>` also writes every result as JSON.
 - `--strict-targets` turns a file over a planning target into a failure. By default that is a note.
@@ -46,7 +51,8 @@ python tools/blender/walk_areas/walk_index.py --legacy --out <index.json> --scen
 Today's two files as they are. Each difference from the contract is printed as a `WARN` instead of a `FAIL`, and the
 index is written. Section 4 of the contract lists the differences that are accepted this way. The two files are not
 in the repository: `tools/blender/build/` is ignored by git (`tools/blender/.gitignore`). The village file is the
-asset of the release `walk-glb`; the bedroom file exists only where the room build has been run.
+asset of the release `walk-glb`; the bedroom file exists only where the room build has been run. Cave files can be
+given beside them (the interim world of the contract's section 11), and the legacy village may hold cave mouths.
 
 ```
 node tools/blender/walk_areas/check_areas.mjs <folder> --src <path to apps/walk/src>
@@ -55,16 +61,19 @@ node tools/blender/walk_areas/check_areas.mjs <folder> --src <path to apps/walk/
 merged, make a second working folder for it: `git worktree add ../walk-viewer origin/claude/v2-walk`, then
 `--src ../walk-viewer/apps/walk/src`. Without the viewer's source the script stops and says what it needs. It installs
 nothing and changes nothing there. Add `--three <path to node_modules/three>` to parse the files with the real
-three.js GLTFLoader as well (only files that are not Draco-compressed, so in practice the fixture).
+three.js GLTFLoader as well (only files that are not Draco-compressed, so in practice the fixture). `--walk-scenes
+<file>` is as for `walk_index.py`.
 
 ```
 node tools/blender/walk_areas/fixture/make-areas-fixture.mjs
 python tools/blender/walk_areas/mutants.py --src <path to apps/walk/src>
 ```
-The first rewrites `fixture/areas/` (measured: the same bytes each time). The second runs the 44 variants and the
-29 odd inputs; `--python-only` runs them through `walk_index.py` alone; `--keep <folder>` keeps the variants and each checker's
+The first rewrites `fixture/areas/` (measured: the same bytes each time). The second runs the 57 variants and the
+37 odd inputs; `--python-only` runs them through `walk_index.py` alone; `--keep <folder>` keeps the variants and each checker's
 output (the odd inputs under `odd/`); `--only name,name` runs only those; `--three <path>` is passed on to
-`check_areas.mjs`. A checker that is still running after 300 seconds on a variant is counted as failed.
+`check_areas.mjs`. A variant that writes its own `walk_scenes.json` beside its files (`walk_scene_is_game_scene`, and
+the odd inputs about that file) has it handed to both checkers with `--walk-scenes`. A checker that is still running
+after 300 seconds on a variant is counted as failed.
 
 **The fixture and the repository's formatter.** CI runs `prettier --check .`, and Prettier reads `.json` and `.gltf`
 files as JSON. The index records the size and the hash of every area file, so a re-format of a `.gltf` would make the
@@ -84,20 +93,24 @@ contract's allow-list (which is not the list of what the viewer's loader reads);
 node per file, at the scene root; the Area's extras, with every missing one named; no fog or exposure on the glTF scene
 and no directional light in a village section; names written with the allowed characters, used once, and no reserved
 prefix on a scene, camera, light definition or mesh; spawn ids used once in the whole world; every portal leading, by
-the exact id `<to>_<toSpawn>`, to a spawn in a file of the right scene, or into a scene listed as pending; in a village
-section, every spawn more than 1 m from every portal; a room and a wild area around their own origin; every seam
-rule that is about where nodes stand (rows, spacing, arrivals and their distance from every portal, nothing else
-within 2 m of a row, facing, the height of the ground on both sides, the look on both sides, `wdi_baked` included); on
-collision that is not compressed, that spawns and portals stand on the ground, that each seam has its wall and that the
-whole edge of a village section's walk region is closed; the index fitting the schema; and, with `--check`, the index
-saying what the files say. It prints each file's size, triangle counts, draw calls, texture memory and lights against
-the planning targets.
+the exact id `<to>_<toSpawn>`, to a spawn in a file of the right scene, or into a scene listed as pending (a game scene
+or a walk-only one); in a village section and in a cave, every spawn more than 1 m from every portal; a room and a wild
+area around their own origin; the walk-only scenes of `walk_scenes.json` well formed and none of them a game scene id;
+a cave indoors, baked and with fog, every cave with one look; every crossing between the village and the caves a cave
+mouth of the right form; every seam rule that is about where nodes stand (rows, spacing, arrivals and their distance
+from every portal, nothing else within 2 m of a row, facing, the height of the ground on both sides, the look on both
+sides, `wdi_baked` included), at village seams and cave seams alike; on collision that is not compressed, that spawns
+and portals stand on the ground, that each seam has its wall (3 m high in the village, from the floor to the roof in a
+cave) and that the whole edge of a village section's walk region is closed; the index fitting the schema; and, with
+`--check`, the index saying what the files say. It prints each file's size, triangle counts, draw calls, texture
+memory and lights against the planning targets of its kind.
 
 It cannot see: anything inside Draco-compressed geometry. On real files it therefore does not check that spawns and
-portals stand on the ground, that a seam's wall is closed and 3 m high, or that the rest of a village section's edge is
-closed. It checks all three on the fixture, whose collision is not compressed. It does not measure triangles in view.
-A collision shell that stands on the 0.5 m strip inside an edge is taken for the ground there (`docs/walk-areas.md`,
-section 4).
+portals stand on the ground, that a seam's wall is closed (3 m high, or up to a cave's roof), or that the rest of a
+village section's edge is closed. It checks all three on the fixture, whose collision is not compressed. It does not
+check that a cave is closed at all: the closed-edge rule would take a cave's roof for its ground, so that is the cave
+builder's check in Blender. It does not measure triangles in view. A collision shell that stands on the 0.5 m strip
+inside an edge is taken for the ground there (`docs/walk-areas.md`, section 4).
 It knows the picker's words and three.js's naming only as copies of the viewer's rules; `check_areas.mjs` is what
 tests those copies.
 
@@ -107,15 +120,18 @@ file that holds it, finds every spawn of the index, the start among them; `resol
 exact id and never needs its bare-id fallback. It runs `PortalTrigger` three ways, always holding every portal of
 the file as the viewer does: walked across each seam opening every 5 cm, a point of the row must fire first
 everywhere; from every seam arrival straight back to the wall, the return row must fire; and a spawn of a village
-section must not stand inside any portal's radius. On the fixture it also walks a scripted journey of 21 steps:
-through the seam and back, into the room and out, to a door whose scene is not built, a link straight into the room,
-and a start that is not `square`. It repeats the structural and seam rules of `walk_index.py`, so that two programs
-written separately have to agree.
+section or a cave must not stand inside any portal's radius. On the fixture it also walks a scripted journey of 32
+steps: through the seam and back, into the room and out, to a door whose scene is not built, in through the cave
+mouth, across the cave seam and back and out again, a link straight into the room, and a start that is not `square`.
+It repeats the structural, cave and seam rules of `walk_index.py` (since version 1.1 also `area_id` and
+`seams_only_between_sections`), so that two programs written separately have to agree. It has no list of the game's
+scene ids: it holds a walk-only scene against `overworld` and the scenes of the index's rooms and wild areas only.
 
-Four lines it prints are marked `CTRL` (`seam.<id>.one_point_only`, `journey.bare_id_fallback`,
+Five lines it prints are marked `CTRL` (`seam.<id>.one_point_only`, once for each seam, `journey.bare_id_fallback`,
 `viewer.nearest_area_rule` and `viewer.start_without_the_id`, in the order below). Each is a wrong way of doing
 things, shown to go wrong: one portal point in a
-5 m opening leaves a walker standing at 50 of 89 places; the viewer's bare-id fallback sends the shop's way out to the
+5 m opening leaves a walker standing at 50 of 89 places (and one of the two points of the 2.4 m cave seam at 11 of
+37); the viewer's bare-id fallback sends the shop's way out to the
 shop's own spawn; two areas in one scene make the viewer's nearest-origin rule show the wrong one; and
 `pickSpawn(world.spawns, null)`, which is what `main.ts` does today when the address names no spawn, starts the
 player at `square` whatever the index's `start` says.
@@ -136,9 +152,10 @@ not a rule of the contract, and `seam.<id>.extras` fails it with a line that say
 otherwise keep them busy for minutes).
 
 **`mutants.py`** proves that the checkers can fail: a checker that passes everything proves nothing. It also proves
-that two notes are printed when they should be, that unusual valid worlds are not failed (sloping ground, a node
+that three notes are printed when they should be, that unusual valid worlds are not failed (sloping ground, a node
 written with a matrix, a cut corner, the outline in each form it may take, a door into a pending scene with the bare id
-of a spawn that exists), and that input which is no area file at all ends in FAIL lines and not in a stack trace.
+of a spawn that exists, caves over one another, a cave seam on a ramp), and that input which is no area file at all
+ends in FAIL lines and not in a stack trace.
 
 ## The rules by name
 
@@ -156,43 +173,48 @@ Both tools print the same rule names. "py" is `walk_index.py`, "js" is `check_ar
 | `<area>.scene_extras` | the glTF scene carries no fog and no exposure: the look is on the Area node | py, js |
 | `<area>.collision_form` | the collision node has a mesh, no transform, no material, no children, `wdi_collision: true` | py, js |
 | `<area>.area_at_origin` | the Area node carries no transform | py, js |
-| `<area>.origin_in_walk_region` | a room or a wild area: the file's origin (0, 0) lies inside its walk region (a note names the old far-grid slot when the region lies around one) | py, js |
-| `<area>.area_id` | the id fits its kind and its scene | py |
-| `<area>.area_extras` | the Area's extras; every missing or wrong one is named, `wdi_walk_polygon` included (a flat list, a list of pairs, or either as a JSON string) | py, js |
+| `<area>.origin_in_walk_region` | a room or a wild area: the file's origin (0, 0) lies inside its walk region (a note names the old far-grid slot when the region lies around one). A cave is built in the village frame and is not held to it | py, js |
+| `<area>.area_id` | the id fits its kind and its scene: `village_<key>`, `room_<sceneId>`, a wild area's scene id, a cave's `<area prefix><key>` with a walk-only scene; a room or a wild area never in a walk-only scene (py with `--scene-ids` also: no section, room or cave id is a game scene id) | py, js (js since 1.1) |
+| `<area>.area_extras` | the Area's extras; every missing or wrong one is named, `wdi_walk_polygon` included (a flat list, a list of pairs, or either as a JSON string); a cave needs `wdi_indoor: true`, `wdi_baked: true` and fog | py, js |
 | `<area>.look_matches_index` | the index's `look` is the Area's own exposure and fog | py (`--check`), js |
 | `<area>.names_unique_in_file` | no Area, collision, spawn or portal node would be renamed by the loader: no name used twice, none taken first by the scene, a camera or a light definition | py, js |
 | `<area>.reserved_names` | no scene, camera or light definition has a name that begins `Area_`, `HM_Collision`, `Spawn_` or `Portal_`; a mesh has one only when it has one primitive and its nodes have names and no camera or light | py, js |
 | `<area>.raw_names` | the Area, collision, spawn and portal names as written in the file: lower-case letters, digits and `_` after the prefix, dots allowed inside a portal's id | py, js |
-| `<area>.no_directional_light` | a village section holds no directional light | py, js |
+| `<area>.no_directional_light` | a village section or a cave holds no directional light | py, js |
 | `<area>.nodes_under_area` | spawns and portals are under the Area | py |
 | `<area>.spawn_extras`, `<area>.portal_extras` | ids and extras of spawns and portals | py |
 | `<area>.inside_walk_region`, `<area>.spawn_inside_collision` | where they stand, in plan | py |
-| `<area>.spawn_clear_of_portals` | a village section: every spawn more than 1 m from every portal of the file (js: by the viewer's own `PortalTrigger`). In a room or a wild area a spawn inside a radius is the note `spawn_inside_portal_radius` | py, js |
-| `<area>.stand_on_ground` | spawns and portals stand on the collision floor (uncompressed collision only) | py, js |
-| `<area>.edge_closed` | a village section: the whole edge of its walk region is closed by collision 3 m above the ground, the wall's face within 0.3 m of the edge (uncompressed collision only) | py, js |
-| `<area>.portal_target` | every portal leads somewhere by the exact id, or into a pending scene (a pending scene is no fault even when another scene has a spawn with the bare id; a built scene or a scene in no file is) | py, js |
+| `<area>.spawn_clear_of_portals` | a village section or a cave: every spawn more than 1 m from every portal of the file (js: by the viewer's own `PortalTrigger`). In a room or a wild area a spawn inside a radius is the note `spawn_inside_portal_radius` | py, js |
+| `<area>.stand_on_ground` | spawns and portals stand on the collision floor, found by a ray from 1 m above (uncompressed collision only; caves too) | py, js |
+| `<area>.edge_closed` | a village section: the whole edge of its walk region is closed by collision 3 m above the ground, the wall's face within 0.3 m of the edge (uncompressed collision only). Not for caves: the cave builder checks that a cave is closed | py, js |
+| `<area>.portal_target` | every portal leads somewhere by the exact id, or into a pending scene, game or walk-only (a pending scene is no fault even when another scene has a spawn with the bare id; a built scene or a scene in no file is) | py, js |
 | `<area>.viewer_spawns`, `<area>.viewer_portals` | the viewer's own readers give what the index lists | js |
 | `<area>.spawns_match_index`, `portals_match_index`, `stats_match_index`, `index_fields` | the index says what the files say (js: `portals_match_index` only, for `target_area`, `portal_id` and `seam`) | py (`--check`), js |
-| `<area>.planning_targets` | the file against the planning targets (a note, not a failure) | py |
+| `<area>.planning_targets` | the file against the planning targets of its kind, caves included (a note, not a failure; a kind with no targets would be a failure, never a trace) | py |
 | `world.bare_id_hazard` | a note: a portal whose bare `toSpawn` is also a spawn id: harmless with an index, where the exact id is the only lookup, and a trap for a loader that falls back to the bare id (also printed when the portal leads into a pending scene) | py, js |
 | `<area>.no_way_in` | a note: no portal of another area leads into this area (the start area is left out) | py, js |
-| `<area>.way_back` | a note: the way out of a room or a wild area arrives in another file than the door that leads in, or more than 10 m from it | py, js |
+| `<area>.way_back` | a note: the way out of a room, a wild area or a cave (a portal that leaves its scene: a door, a cave mouth's `_out`; never a seam) arrives in another file than the door that leads in, or more than 10 m from it | py, js |
 | `world.spawn_unique`, `world.portal_unique` | ids used once in the whole index | py (js: spawns) |
-| `world.seams_only_between_sections` | a crossing between two village sections is always a seam | py |
-| `seam.<id>.sides`, `.numbering`, `.extras` | two sections, rows numbered 1 to n, the extras of section 6 | py, js |
+| `world.seams_only_between_sections` | a crossing between two sections of one scene (two village sections, or two caves) is always a seam; only seams use the stem `seam_` | py, js (js since 1.1) |
+| `world.walk_scenes` | `walk_scenes.json` is well formed and none of its ids is a game scene id: `overworld` or the scene of a room or a wild area of the folder (py with `--scene-ids` also: any game scene id, a game scene id that starts with an area prefix, a game portal id in a walk-only namespace). A missing `walk_scenes.json` is a note | py, js (1.1) |
+| `walk_scenes.readable` | `walk_scenes.json` (or the file of `--walk-scenes`) is a JSON object; when it is not, it is one FAIL line and no walk-only scene is known | py, js (1.1) |
+| `world.cave_mouths` | every portal in a walk-only namespace is `Portal_um.<gate>_in` in the village or `Portal_um.<gate>_out` in a cave, with `toSpawn: mouth_<gate>`, `kind: cave_mouth` and the right `to`; every crossing between the village and the caves is one. Printed when the folder has a mouth or a cave | py, js (1.1) |
+| `world.cave_look` | every cave carries the same exposure, fog and `wdi_baked`. Printed when the folder has a cave | py, js (1.1) |
+| `seam.<id>.sides`, `.numbering`, `.extras` | two sections of one scene (two village sections, or two caves), rows numbered 1 to n, the extras of section 6 (`to` is the seam's scene; the device is one of its kind's list) | py, js |
 | `seam.<id>.row`, `.spacing`, `.coverage` | straight rows 0.9 m apart, neighbours at most 1.8 m apart, the opening covered (js also walks the viewer's trigger across it, holding every portal of the file) | py, js |
-| `seam.<id>.arrival` | every arrival 2.1 m beyond its departure portal, in line, facing the way of travel, at least 1.2 m from every portal of its file (js also walks the viewer's trigger straight back to the wall) | py, js |
+| `seam.<id>.arrival` | every arrival 2.1 m beyond its departure portal, in line, facing the way of travel, at least 1.2 m from every portal of its file, named for the seam's scene (js also walks the viewer's trigger straight back to the wall) | py, js |
 | `seam.<id>.clear` | no portal outside the seam's own row within 2 m of a point of it | py, js |
 | `seam.<id>.height` | the two files put the ground at the seam line at the same height, within 0.15 m | py, js |
 | `seam.<id>.look_equal` | exposure, fog and `wdi_baked` equal on both sides | py (files), js (files and index) |
-| `seam.<id>.barrier.a`, `.barrier.b` | the wall across the opening, 3 m above the ground under each ray (uncompressed collision only) | py, js |
+| `seam.<id>.barrier.a`, `.barrier.b` | the wall across the opening, 3 m above the ground under each ray; at a cave seam from 0.25 m above the floor to 0.1 m under the roof, which must be found (uncompressed collision only) | py, js |
 | `index.schema` | the index fits the schema | py |
+| `index.walk_scenes` | the index's `walk_scenes` are the entries of `walk_scenes.json` for the walk-only scenes the files use, and there is no such field when they use none | py (`--check`), js (1.1) |
 | `index.start`, `index.spawn_by_id` | the start spawn, and every spawn of the index, is found by its id in the file that holds it | py (start), js |
 | `index.areas`, `index.scenes`, `index.seams`, `index.pending` | the index's own lists | py, js (areas, seams) |
 | `index.area_ids_unique`, `index.one_folder` | no area id is used by two files; every area file is in one folder, where the index goes too (with `--legacy`, today's two folders are accepted with a warning) | py |
 | `index.format` | the index says `format` 1 and carries its `axes` note | js |
 | `index.pending_unused` | a note: a scene listed under `pending` that no portal leads into | py |
-| `world.pending.<scene>` | a note: a scene that is not built yet, and the portals that need it | py |
+| `world.pending.<scene>` | a note: a scene that is not built yet, game or walk-only, and the portals that need it | py, js (js since 1.1) |
 | `journey` | the scripted trip through the fixture | js |
 | `<area>.file` | the file the index names is in the folder | js |
 | `<area>.standin_matches_three` | with `--three`: the real GLTFLoader gives the viewer the same spawns and portals as the stand-in | js |
@@ -203,8 +225,8 @@ things no more than 2 m apart in height.
 
 ## The variants
 
-Each row is one run of the generator with `MUTATE=<name>`. Run on 2026-11-16: 36 of 36 broken
-variants caught by both checkers, 2 of 2 allowed variants noted, 6 of 6 valid variants passed, 29 of 29 odd inputs
+Each row is one run of the generator with `MUTATE=<name>`. Run on 2026-11-19: 46 of 46 broken
+variants caught by both checkers, 3 of 3 allowed variants noted, 8 of 8 valid variants passed, 37 of 37 odd inputs
 ended in FAIL lines and no trace, and the unbroken fixture passes both.
 
 **Broken.** Both checkers must exit 1 with the rule in the last column among their failures.
@@ -247,10 +269,20 @@ ended in FAIL lines and no trace, and the unbroken fixture passes both.
 | `baked_one_side` | `village_east` says `wdi_baked: true` (file and index), `village_west` does not: the viewer switches off the lights of one side only | `seam.west_east.look_equal` |
 | `polygon_odd` | the outline `wdi_walk_polygon` of `village_west` is five numbers, which is no list of points | `village_west.area_extras` |
 | `chamfer_open` | `village_west` cuts off its north-west corner along a diagonal in its outline, and no wall stands on the diagonal: 14.1 m of open edge that is not parallel to an axis | `village_west.edge_closed` |
+| `cave_not_indoor` | `under_a` has no `wdi_indoor`: the viewer would draw the moon, the sky light and the sky dome in a cave | `under_a.area_extras` |
+| `cave_not_baked` | `under_a` has no `wdi_baked`, in its file and in the index | `under_a.area_extras` |
+| `cave_seam_open_roof` | the seam wall of `under_a` stops 0.3 m under the roof: the 10 rays 0.1 m under the roof find no wall | `seam.a_b.barrier.a` |
+| `cave_seam_to_overworld` | the cave seam's points in `under_a` say `to: overworld`, not `to: undermere` | `seam.a_b.extras` |
+| `cave_look_differs` | `under_b` carries fog density 0.08 and `under_a` 0.05 | `world.cave_look` |
+| `walk_scene_is_game_scene` | the variant's own `walk_scenes.json` also lists `shop`, the game scene of the room `room_shop`, as a walk-only scene | `world.walk_scenes` |
+| `cave_id_prefix` | the west cave is called `cave_a`, not `under_<key>` (the game has the scenes `cave_entry` and `cave_gallery`) | `cave_a.area_id` |
+| `cave_door_between_caves` | the cave seam is replaced by two plain doors between `under_a` and `under_b` | `world.seams_only_between_sections` |
+| `cave_spawn_near_portal` | `Spawn_undermere_mouth_east` stands 0.8 m from `Portal_um.east_out` | `under_a.spawn_clear_of_portals` |
+| `cave_gate_to_missing_spawn` | `Portal_um.east_in` leads to `undermere` + `mouth_east`, and no cave holds `Spawn_undermere_mouth_east` | `village_east.portal_target` |
 
 The variants are listed in the order they were added: the first nineteen test the rules the checkers were first
-written with, and from `arrival_near_door` on each one is a file set that a simpler checker passes and that goes wrong in the
-viewer. In
+written with, from `arrival_near_door` to `chamfer_open` each one is a file set that a simpler checker passes and that
+goes wrong in the viewer, and the last ten are the caves of version 1.1. In
 `room_at_slot` the mistake is a room standing on the old far-grid slot, because a room now sits at its own origin.
 `no_barrier` also fails `<area>.edge_closed` as a consequence: the seam wall is part of the edge.
 
@@ -261,6 +293,7 @@ fail nothing but its scripted journey, which is written for the unchanged fixtur
 |---|---|---|
 | `way_back_far` | the shop's way out arrives in the other section, 60 m from the door that leads in | `room_shop.way_back` |
 | `no_way_in` | the shop's door is gone: no portal leads into the room | `room_shop.no_way_in` |
+| `gate_pending` | no cave file yet: the cave mouth `Portal_um.east_in` leads into `undermere`, which the index lists under `pending` (the scripted journey is not run: the world is not the fixture's) | `world.pending.undermere` |
 
 **Valid.** Both checkers must pass it.
 
@@ -272,18 +305,43 @@ fail nothing but its scripted journey, which is written for the unchanged fixtur
 | `polygon_flat` | `village_west` writes its outline as a flat list of numbers, the form a Blender custom property can hold; the index lists it as pairs |
 | `polygon_string` | `village_west` writes its outline as a JSON string, as today's exporter writes nested data; the index lists it as pairs |
 | `polygon_chamfer` | `village_west` cuts off its north-west corner along a diagonal, writes the outline and stands a wall on the diagonal: the closed-edge rule follows an outline that is not a rectangle |
+| `cave_stacked_levels` | a third cave, `under_c`, lies directly under `under_a`, 6 m lower, reached by its own mouth `west` from `village_west`; its mouth's portal and arrival stand at the same places in plan as those of `under_a` (the scripted journey is not run: the world is not the fixture's) |
+| `cave_seam_ramp` | the floor and roof of both caves rise 6 % toward the east, across the cave seam: the rows stand 0.05 m apart in height and the arrivals 0.20 m, and both files put the floor at the seam line at the same height; the scripted journey passes |
 
 **Odd inputs.** Not a world at all, but input a checker may meet: a file that is not JSON, a spawn whose extras are a
 word, a translation with a word in it, nodes that are each other's children, an index that is a list, an accessor that
 is not there, a four-byte `.glb`, an empty folder, a matrix of zeros, two files that declare a seam opening 1e9 m wide
-(a checker that sampled it would never finish), and 19 more (the list `ODD` in `mutants.py` has all 29). Each
+(a checker that sampled it would never finish), a `walk_scenes.json` that is not JSON, is a list, or holds a word or a
+list where an entry or a kind belongs, a cave whose kind is a number and whose scene is a list, and 22 more (the list
+`ODD` in `mutants.py` has all 37). Each
 checker must end with FAIL lines and exit code 1 (exit code 2 for the empty folder, which has nothing to check) and
 print no stack trace. It matters because a checker that stops with a trace, or with an exit code of 0 after an
 internal error, says nothing about the files.
 
 ## What was run, and on what
 
-2026-11-16, Windows 11, Python 3.13.14, Node 26.13.0, the viewer's source at commit `509df801` of `claude/v2-walk`
+**2026-11-19, version 1.1 (the caves).** Windows 11, Python 3.13.14, Node 26.13.0; the viewer's `spawn.ts` and
+`portals.ts` as at commit `509df801` (unchanged in the checkout that was used):
+
+- `walk_index.py fixture/areas --check`: 190 pass, 0 fail, 3 notes.
+- `check_areas.mjs fixture/areas`: 157 pass, 0 fail, 3 notes, 5 controls; the journey 32 of 32 steps.
+- `walk_index.py fixture/areas` (build, with `--world hollowmere-fixture --pending mine`) writes the committed index
+  byte for byte (13,393 bytes); the generator writes the five `.gltf` files and the index again with the same bytes
+  (73,898 in all).
+- `mutants.py`: 46 of 46, 3 of 3, 8 of 8, and 37 of 37 odd inputs, in about 60 s. `--three` was not run: no copy of
+  three.js was at hand.
+- `walk_index.py --legacy` on today's two files writes the same index as version 1, byte for byte (15,571 bytes):
+  43 pass (one more than before: `world.walk_scenes`), 0 fail, 7 warnings, 15 notes.
+- Five altered copies of the fixture made by hand, not kept, each through both checkers: a cave mouth's arrival 30 m
+  from its mouth (the note `under_a.way_back` in both); a plain door from the village into a cave
+  (`world.cave_mouths` fails in both); a seam whose side b is a cave and whose side a a village section
+  (`seam.<id>.sides` fails in both); a mouth's `_in` in a room (`world.cave_mouths` fails in both); a village device
+  (`lychgate`) at the cave seam (`seam.a_b.extras` fails in both).
+- `prettier --check` (3.9.10) on every changed file Prettier covers, ESLint 10.12.0 with the repository's
+  `eslint.config.js` on the three `.mjs` files (outside the repository), and `pyflakes` on the two Python files: no
+  finding.
+
+**2026-11-16, version 1.** Windows 11, Python 3.13.14, Node 26.13.0, the viewer's source at commit `509df801` of `claude/v2-walk`
 (a copy, compared with the branch: 12 of 12 files equal):
 
 - `walk_index.py fixture/areas --check`: 114 pass, 0 fail, 3 notes.

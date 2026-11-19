@@ -1,0 +1,163 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "tools/blender/walk_areas/fixture/make-areas-fixture.mjs"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Walk fixture under_b",
+      "nodes": [5, 6]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Passage",
+      "mesh": 0
+    },
+    {
+      "name": "Spawn_undermere_seam_a_b_b_1",
+      "translation": [33.65, -10, 10.6],
+      "rotation": [0, -0.707106781186547, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "West passage, arrival 1",
+        "wdi_district": "The Undermere",
+        "wdi_facing_deg": 0,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Spawn_undermere_seam_a_b_b_2",
+      "translation": [33.65, -10, 9.4],
+      "rotation": [0, -0.707106781186547, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "West passage, arrival 2",
+        "wdi_district": "The Undermere",
+        "wdi_facing_deg": 0,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Portal_seam_a_b_b_1",
+      "translation": [32.45, -10, 10.6],
+      "extras": {
+        "to": "undermere",
+        "toSpawn": "seam_a_b_a_1",
+        "kind": "gate",
+        "wdi_portal_id": "seam_a_b_b_1",
+        "wdi_seam": "a_b",
+        "wdi_seam_kind": "passage",
+        "wdi_width_m": 2.4
+      }
+    },
+    {
+      "name": "Portal_seam_a_b_b_2",
+      "translation": [32.45, -10, 9.4],
+      "extras": {
+        "to": "undermere",
+        "toSpawn": "seam_a_b_a_2",
+        "kind": "gate",
+        "wdi_portal_id": "seam_a_b_b_2",
+        "wdi_seam": "a_b",
+        "wdi_seam_kind": "passage",
+        "wdi_width_m": 2.4
+      }
+    },
+    {
+      "name": "Area_under_b",
+      "children": [0, 1, 2, 3, 4],
+      "extras": {
+        "wdi_area": "under_b",
+        "wdi_kind": "cave",
+        "wdi_scene": "undermere",
+        "wdi_name": "The Undermere, far passage",
+        "wdi_walk_region": [32, -11.2, 44, -8.8],
+        "wdi_indoor": true,
+        "wdi_baked": true,
+        "wdi_exposure": 4,
+        "fog_color": "#12141C",
+        "fog_density": 0.05
+      }
+    },
+    {
+      "name": "HM_Collision_under_b",
+      "mesh": 1,
+      "extras": {
+        "wdi_collision": true
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Passage",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "HM_Collision_under_b",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Baked",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1, 1, 1, 1]
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "extensionsUsed": ["KHR_materials_unlit"],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 144,
+      "type": "VEC3",
+      "min": [31.700000762939453, -10.199999809265137, 8.5],
+      "max": [44.29999923706055, -7.199999809265137, 11.5]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5123,
+      "count": 216,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1728,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1728,
+      "byteLength": 432,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2160,
+      "uri": "data:application/octet-stream;base64,MzMxQjMzI8EAAAhBMzMxQgAAIMEAAAhBMzMxQgAAIMEAADhBMzMxQjMzI8EAADhBmpn9QTMzI8EAADhBmpn9QQAAIMEAADhBmpn9QQAAIMEAAAhBmpn9QTMzI8EAAAhBmpn9QQAAIMEAAAhBmpn9QQAAIMEAADhBMzMxQgAAIMEAADhBMzMxQgAAIMEAAAhBmpn9QTMzI8EAADhBmpn9QTMzI8EAAAhBMzMxQjMzI8EAAAhBMzMxQjMzI8EAADhBMzMxQjMzI8EAADhBMzMxQgAAIMEAADhBmpn9QQAAIMEAADhBmpn9QTMzI8EAADhBmpn9QTMzI8EAAAhBmpn9QQAAIMEAAAhBMzMxQgAAIMEAAAhBMzMxQjMzI8EAAAhBMzMxQs3M7MAAAAhBMzMxQmZm5sAAAAhBMzMxQmZm5sAAADhBMzMxQs3M7MAAADhBmpn9Qc3M7MAAADhBmpn9QWZm5sAAADhBmpn9QWZm5sAAAAhBmpn9Qc3M7MAAAAhBmpn9QWZm5sAAAAhBmpn9QWZm5sAAADhBMzMxQmZm5sAAADhBMzMxQmZm5sAAAAhBmpn9Qc3M7MAAADhBmpn9Qc3M7MAAAAhBMzMxQs3M7MAAAAhBMzMxQs3M7MAAADhBMzMxQs3M7MAAADhBMzMxQmZm5sAAADhBmpn9QWZm5sAAADhBmpn9Qc3M7MAAADhBmpn9Qc3M7MAAAAhBmpn9QWZm5sAAAAhBMzMxQmZm5sAAAAhBMzMxQs3M7MAAAAhBMzMxQgAAIMEzMzNBMzMxQs3M7MAzMzNBMzMxQs3M7MAAADhBMzMxQgAAIMEAADhBmpn9QQAAIMEAADhBmpn9Qc3M7MAAADhBmpn9Qc3M7MAzMzNBmpn9QQAAIMEzMzNBmpn9Qc3M7MAzMzNBmpn9Qc3M7MAAADhBMzMxQs3M7MAAADhBMzMxQs3M7MAzMzNBmpn9QQAAIMEAADhBmpn9QQAAIMEzMzNBMzMxQgAAIMEzMzNBMzMxQgAAIMEAADhBMzMxQgAAIMEAADhBMzMxQs3M7MAAADhBmpn9Qc3M7MAAADhBmpn9QQAAIMEAADhBmpn9QQAAIMEzMzNBmpn9Qc3M7MAzMzNBMzMxQs3M7MAzMzNBMzMxQgAAIMEzMzNBMzMxQgAAIMEAAAhBMzMxQs3M7MAAAAhBMzMxQs3M7MDNzAxBMzMxQgAAIMHNzAxBmpn9QQAAIMHNzAxBmpn9Qc3M7MDNzAxBmpn9Qc3M7MAAAAhBmpn9QQAAIMEAAAhBmpn9Qc3M7MAAAAhBmpn9Qc3M7MDNzAxBMzMxQs3M7MDNzAxBMzMxQs3M7MAAAAhBmpn9QQAAIMHNzAxBmpn9QQAAIMEAAAhBMzMxQgAAIMEAAAhBMzMxQgAAIMHNzAxBMzMxQgAAIMHNzAxBMzMxQs3M7MDNzAxBmpn9Qc3M7MDNzAxBmpn9QQAAIMHNzAxBmpn9QQAAIMEAAAhBmpn9Qc3M7MAAAAhBMzMxQs3M7MAAAAhBMzMxQgAAIMEAAAhBAAAAQgAAIMHNzAxBAAAAQs3M7MDNzAxBAAAAQs3M7MAzMzNBAAAAQgAAIMEzMzNBmpn9QQAAIMEzMzNBmpn9Qc3M7MAzMzNBmpn9Qc3M7MDNzAxBmpn9QQAAIMHNzAxBmpn9Qc3M7MDNzAxBmpn9Qc3M7MAzMzNBAAAAQs3M7MAzMzNBAAAAQs3M7MDNzAxBmpn9QQAAIMEzMzNBmpn9QQAAIMHNzAxBAAAAQgAAIMHNzAxBAAAAQgAAIMEzMzNBAAAAQgAAIMEzMzNBAAAAQs3M7MAzMzNBmpn9Qc3M7MAzMzNBmpn9QQAAIMEzMzNBmpn9QQAAIMHNzAxBmpn9Qc3M7MDNzAxBAAAAQs3M7MDNzAxBAAAAQgAAIMHNzAxBMzMxQgAAIMHNzAxBMzMxQs3M7MDNzAxBMzMxQs3M7MAzMzNBMzMxQgAAIMEzMzNBAAAwQgAAIMEzMzNBAAAwQs3M7MAzMzNBAAAwQs3M7MDNzAxBAAAwQgAAIMHNzAxBAAAwQs3M7MDNzAxBAAAwQs3M7MAzMzNBMzMxQs3M7MAzMzNBMzMxQs3M7MDNzAxBAAAwQgAAIMEzMzNBAAAwQgAAIMHNzAxBMzMxQgAAIMHNzAxBMzMxQgAAIMEzMzNBMzMxQgAAIMEzMzNBMzMxQs3M7MAzMzNBAAAwQs3M7MAzMzNBAAAwQgAAIMEzMzNBAAAwQgAAIMHNzAxBAAAwQs3M7MDNzAxBMzMxQs3M7MDNzAxBMzMxQgAAIMHNzAxBAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAeAB5AHoAeAB6AHsAfAB9AH4AfAB+AH8AgACBAIIAgACCAIMAhACFAIYAhACGAIcAiACJAIoAiACKAIsAjACNAI4AjACOAI8A"
+    }
+  ]
+}
