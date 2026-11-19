@@ -23,8 +23,8 @@ Section 5 lists the two other things the scenes draw that are not props: **spots
 
 - **Small**: one tile or less, and rotation-safe (it looks the same from every heading): a single billboard. Round
   things (barrel, stool, pot, lamp post), sacks, piles, rocks. **Wall decals** (windows, portraits, lamps on a wall,
-  plaques) are small too, as one frontal image on the wall plane that turns with the wall; that is _proposed_
-  (`sprite-world.md` 2 draws walls as textured boxes), and they are counted in section 3 as "of which wall decal".
+  plaques) are small too, as one frontal image on the wall plane that turns with the wall; the owner chose this on 2026-11-19 (Q-P3;
+  `sprite-world.md` 2 draws walls as textured boxes), and they are counted in section 3 as "of which wall decal".
 - **Complex**: larger than a tile, or it has a front (a table, a bed, a cart, a chest, a counter, a cabinet): four
   directions, one render per heading from a 3D model.
 - A tile is taken as about a metre; the scene files give a footprint for only 24 props, so size is judged from the
@@ -62,7 +62,7 @@ sheets drawing those).
 |---|---|
 | `barrel` (28 entries, 18 scenes) | **Closed by the tavern sheet**: t001, t002, t007, t008 (upright barrels) and v043. A barrel is round, so it is small |
 | `bottle_crate` (10) | **Closed**: t025 (slatted crate), alt t017 |
-| `tavern_table` (5) | **Closed if the tavern tables are round**: t058 is a round table, rotation-safe, so one view serves. t031 is a straight table top. Needs the owner (Q-P2) |
+| `tavern_table` (5) | **Closed if the tavern tables are round**: t058 is a round table, rotation-safe, so one view serves. t031 is a straight table top. Owner answer 2026-11-19 (Q-P2): round |
 | `bar_counter` (4) | **Gap for the four views.** The tavern sheet has a straight piece (t030), a long one (t039) and an L corner (t050), one view each |
 | `bar_counter_taps` (1) | **Gap.** No art in the sheets, the models or Poly Haven |
 | `keg_rack` (1) | **Gap.** t003 is one keg on a stand, not a rack of kegs |
@@ -254,7 +254,7 @@ a note. Generated from the scene files by the method of section 7.
 | `store_shelf` | 4 | tavern_back ×4 | complex | M `store_shelf` |  |
 | `stump` | 15 | bp_woods ×7, forest ×4, forest_deep ×2, overworld ×2 | small | sheet v031, v032; PH alt `tree_stump_01` |  |
 | `tally_board` | 1 | bp_mine | complex | **GAP** | a tally board |
-| `tavern_table` | 5 | tavern_bar ×5 | complex | sheet t058 (round); t031 is a one-view table top | a round table is rotation-safe, so one view serves. Listed as a gap in the handoff. Needs the owner to confirm the tavern tables are round |
+| `tavern_table` | 5 | tavern_bar ×5 | complex | sheet t058 (round); t031 is a one-view table top | a round table is rotation-safe, so one view serves. Listed as a gap in the handoff. The owner confirmed on 2026-11-19 that the tavern tables are round (Q-P2) |
 | `tea_table` | 1 | widow_parlour | complex | M `tea_table` |  |
 | `teachingClue` | 2 | bp_camp, overworld | small | **GAP** | the teaching clue (a paper); a rules prop |
 | `telephone` | 1 | bp_office | small | **GAP** |  |
@@ -357,17 +357,17 @@ the prop drops.
 | `ov.bld_chapel` | overworld | `chapel` | 9x8 |
 | `ov.bld_netloft` | overworld | `netloft` | 5x9 |
 
-## 6. Questions for the orchestrator (proposed defaults taken)
+## 6. Questions, answered by the owner on 2026-11-19 ("use the defaults")
 
-- **Q-P1. Who draws the 51 spot variants?** _Proposed_: P3 draws a spot with the art of the prop at its tile where one
+- **Q-P1. Who draws the 51 spot variants?** _Answered (the proposed default)_: P3 draws a spot with the art of the prop at its tile where one
   exists (26 of 85), and lists the rest as gaps in a follow-up of this list before P3 starts; the 14 buildings stay with
   M1 and M2.
-- **Q-P2. Are the tavern tables round?** The scenes do not say. _Proposed_: yes, one round table from t058 serves the
+- **Q-P2. Are the tavern tables round?** The scenes do not say. _Answered (the proposed default)_: yes, one round table from t058 serves the
   five, `_b` variants included; if a table is rectangular it is a complex prop and `tavern_table` joins the gaps.
-- **Q-P3. Wall decals as one image on the wall plane.** _Proposed_: yes (section 2). If a decal must be a billboard,
+- **Q-P3. Wall decals as one image on the wall plane.** _Answered (the proposed default)_: yes (section 2). If a decal must be a billboard,
   the 20 wall types turn complex.
 - **Q-P4. The four sheet-closed gaps.** The handoff lists barrel, bottle_crate and tavern_table as gaps; the tavern
-  sheet has art for all three. _Proposed_: use the sheet; the handoff note is out of date.
+  sheet has art for all three. _Answered (the proposed default)_: use the sheet; the handoff note is out of date.
 
 ## 7. Method
 
