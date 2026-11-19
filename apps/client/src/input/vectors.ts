@@ -23,14 +23,27 @@ export function stickVector(
 }
 
 /**
+ * A world vector turned by `quarterTurns` quarter turns of the camera heading (round 11, R2): each turn maps (x, y) to
+ * (y, -x), the turn the sprite world's camera makes per heading step. `+ 0` keeps a zero from becoming -0.
+ */
+export function turnByHeading(v: { x: number; y: number }, quarterTurns: number): { x: number; y: number } {
+  let { x, y } = v;
+  for (let i = 0; i < ((quarterTurns % 4) + 4) % 4; i++) [x, y] = [y + 0, -x + 0];
+  return { x, y };
+}
+
+/**
  * The key and stick vectors, both in screen axes, as one world-frame move (SPRITES 10.8): keys through
- * `keysToWorld`, the stick through its exact inverse projection, then summed. The server normalises the length.
+ * `keysToWorld`, the stick through its exact inverse projection, then summed and turned by the camera `heading`
+ * (0 to 3; always 0 off the sprite world). The server normalises the length and sees world frame, as before.
  */
 export function worldMove(
   key: { dx: number; dy: number },
   stick: { dx: number; dy: number },
+  heading = 0,
 ): { dx: number; dy: number } {
   const k = keysToWorld(key.dx, key.dy);
   const s = stickToWorld(stick.dx, stick.dy);
-  return { dx: k.x + s.x, dy: k.y + s.y };
+  const w = turnByHeading({ x: k.x + s.x, y: k.y + s.y }, heading);
+  return { dx: w.x, dy: w.y };
 }
