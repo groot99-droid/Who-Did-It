@@ -1,5 +1,7 @@
 # Map revamp: the interiors plan
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-11-12 (amended to 2026-11-16). Current state: the woods, mine and outskirts it lists as in progress merged with #539; the owner then gave every enterable building an interior (A612), made the game two modes (A613) and each room its own GLB (A614), which drops this plan's single-file delivery. The decisions are DECISIONS A611 to A614; the GLB contract is `apps/walk/README.md`.
+
 Written 2026-11-12 by the orchestrator (session "Story mode", `session_01M5mAcY1JPqjhPmoZ8CZDFp`) for the owner and the
 local "Blender tools setup" session, which build the interiors together. It restates no rule or number: rules live in
 `docs/GDD.md`, frozen ids in `docs/WORLD.md` 4.3, and the pipeline in `tools/blender/README.md`.
@@ -55,25 +57,25 @@ owner says so. The last column is what the data side still needs.
 
 | Model | Draft place and use (local session) | Still to settle |
 |---|---|---|
-| `Frostwood_Sawmill` (VANE SAWMILL), `log_pond_landing`, `log_chute` | outskirts: on a beck into the mere | interior? |
+| `Frostwood_Sawmill` (VANE SAWMILL), `log_pond_landing`, `log_chute` | outskirts: on a beck into the mere | interior (A612: yes) |
 | `Frostbound_Freight_Dock`, `powder_kegs` | outskirts railyard, on a `Frostbound_Rails` siding | landmark |
-| `The_Winter_Forge` | outskirts railyard | interior? |
-| `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior? |
-| `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior? |
-| `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior? |
-| `Frontier_Post_Office` | outskirts: Station Street; **the Postmaster's post office (owner, 2026-11-12)** | interior? |
-| `Frostbound_County_Jail` | Station Street: the Constable's lock-up | is `cj_cell` its interior? |
-| `Frontier_Detective_Bureau` | Station Street: a courthouse | interior; which role's building |
-| `Frostbound_Outpost` (palisaded fort on a rock) | hills; **the Bandit's hideout (owner, 2026-11-12)** | interior? |
-| `Frostbound_Waystation` | hills: up the line | interior? |
-| `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior? |
-| `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior? |
-| `Frostgrave_Chapel` | the western woods: the Dark Mass chapel | interior; the rite site? |
-| `Frozen_Crypt_of_Bones` | beyond the chapel yard | interior? |
+| `The_Winter_Forge` | outskirts railyard | interior (A612: yes) |
+| `Blackpine_Mining_Office_Bank` | outskirts railyard: the Company Bank | interior (A612: yes) |
+| `Frostbound_Union_Hall`, `notice_board_2` | outskirts railyard | interior (A612: yes) |
+| `Blackpine_Bunkhouse`, `shift_bell_post` | outskirts railyard | interior (A612: yes) |
+| `Frontier_Post_Office` | outskirts: Station Street; **the Postmaster's post office (owner, 2026-11-12)** | interior (A612: yes) |
+| `Frostbound_County_Jail` | Station Street: the Constable's lock-up | interior (A612: yes); is `cj_cell` it? |
+| `Frontier_Detective_Bureau` | Station Street: a courthouse | interior (A612: yes); which role's building |
+| `Frostbound_Outpost` (palisaded fort on a rock) | hills; **the Bandit's hideout (owner, 2026-11-12)** | interior (A612: yes) |
+| `Frostbound_Waystation` | hills: up the line | interior (A612: yes) |
+| `Frosted_Hearth_Cabin` | hills: a trapper's cabin | interior (A612: yes) |
+| `Frostwood_Witch_Hut` | hills: a crooked cottage | whose; interior (A612: yes) |
+| `Frostgrave_Chapel` | the western woods: the Dark Mass chapel | interior (A612: yes); the rite site? |
+| `Frozen_Crypt_of_Bones` | beyond the chapel yard | interior (A612: yes) |
 | `broken_trestle`, `cliff_section` | hills | landmarks |
 | `Abandoned_Tin_Mine` | Gallows Wood (the Tin Gallery's face) | none: `cave_entry` exists |
 | `Frostbound_Witch_Hut` | Gallows Wood: the gamekeeper's stall | open-fronted: no interior |
-| `mother_moll_hut`, `charcoal_kiln`, `hanging_oak`, `mine_adit` | the Fenwood | interior for the hut? |
+| `mother_moll_hut`, `charcoal_kiln`, `hanging_oak`, `mine_adit` | the Fenwood | interior for the hut (A612: yes) |
 
 **Draft caveat: the outskirts.** The outskirts lie **outside the playable map**. A building there needs a door portal
 and a scene before a player can enter it. Section 5 covers that: a new scene id, and either a bigger overworld or a new
@@ -91,7 +93,7 @@ owner's call:
 One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_build.py` for any interior scene:
 
 1. **Read** `scenes/<id>.json`: the grid, the material letters, the props, the lights, the portals and the spawns.
-2. **Shell:** floor and walls from the grid at the same 1.5 m per tile. Wall height and ceiling come from one table per
+2. **Shell:** floor and walls from the grid at 1 m per tile (Q1; the exterior stays at 1.5 m). Wall height and ceiling come from one table per
    biome (`house`, `cave`). Material letters map to Poly Haven roles, as `GROUND_ROLES` does outside.
 3. **Doors:** every portal tile becomes a door, stair or hatch frame on its wall. Its id stays in the object name, so the
    game data and the 3D scene line up.
@@ -101,9 +103,26 @@ One new script, `tools/blender/meshy_interior_build.py`, mirrors `meshy_village_
 6. **Look:** a `meshy_looks/interior_*.json`, one per mood (warm house, dark house, cave), with the same keys as the
    village look.
 7. **Outputs:** `build/<sceneId>.blend` (git-ignored), plus `--preview` stills, the same as the village.
-8. **Game renders (Q4: the 3D interiors replace the old interior art):** an orthographic camera at the game's isometric
-   angle, framed on the scene's tile grid, so each tile lands where the client draws it. The output format and the
-   client manifest are settled in the data/client PR (section 7).
+8. **First-person rooms (owner, 2026-11-14: "the rooms should have walls on all sides, the new view of the game is
+   first person").** This replaces the isometric room renders of Q4, which are on hold: no `room_<id>` atlases, no client
+   manifest or `mapStatics` change. Each interior is a full 3D room for the walk viewer (`apps/walk`, DECISIONS A610):
+   walls on every side at full height, a ceiling, real door openings with frames, glazed windows with the night outside,
+   and furniture at real size (Poly Haven first; new Meshy models only with the owner's OK on credits). The delivery,
+   agreed with the Blender session (2026-11-14), needs no viewer change, because the viewer already loads several
+   `HM_Collision_*` meshes and shows only the `Area_*` nearest the player:
+   - each room is one more area in `hollowmere_walk.glb`: `Area_room_<sceneId>` on a far grid from about 3,000 m out, more
+     than 500 m between rooms, all at height 0, with `HM_Collision_room_<sceneId>` (walls, floor, furniture shells);
+   - `Spawn_<sceneId>_<spawnId>` from the scene's `spawns[]`, facing into the room, extras `wdi_spawn` and `wdi_district`
+     (the room's name);
+   - the scene's `lights[]` as `KHR_lights_punctual`, in the village's units;
+   - `Portal_<portalId>` empties at each door, extras `{to, toSpawn, kind}`, and the same at the village's building doors
+     (the overworld portals). Rooms are reached from the spawn picker; walking through a door is a later viewer change;
+   - about 2 to 4 MB a room; if the single file grows too big, the rooms ship as `hollowmere_rooms.glb` with the same
+     contract.
+   - **Changed (owner, 2026-11-16, DECISIONS A614): each room is its own file, `room_<sceneId>.glb`**, fetched when a
+     portal leads to it, and the village is cut into section files joined by seam portals. The single-file delivery
+     above is dropped (the first room took the file over its 40 MB budget). The far-grid placement and the node names
+     stay until the area contract says otherwise.
 
 **Decision to make first: the scale.** An interior grid is bigger than its shell. `tavern_bar` is 20x12 tiles, 30x18 m at
 1.5 m per tile, while `The_Drowned_Lantern` is about 11 m long. Choose one:
@@ -129,8 +148,8 @@ its GDD text in the same PR (CLAUDE.md):
 ## 6. Order of work
 
 1. **Woods and mine** (in progress, local session). Interiors start when that PR is open.
-2. **Pipeline:** `meshy_interior_build.py` and the scale decision, proven on one small room (`cottage_fisher` or
-   `widow_bedroom`).
+2. **Pipeline:** `meshy_interior_build.py` at 1 m per tile, proven on `widow_bedroom` (2026-11-14); first person from
+   then on (step 8).
 3. **HollowMere, Small profile:** `tavern_bar` and `tavern_back`, `apoth_shop` and `apoth_loft`, `bakery` and its four
    rooms, and `widow_parlour` and `widow_bedroom`.
 4. **HollowMere, Medium and Large:** `manor_hall` and `manor_upper`, `barn`, `chapel` and `cellar`.
@@ -151,13 +170,17 @@ its GDD text in the same PR (CLAUDE.md):
 
 ## 8. Open questions for the owner
 
-1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today. A 3D interior is built from
-   its scene grid at 1.5 m per tile and need not fit inside the exterior model, so no game data changes for scale.
+1. ANSWERED (owner, 2026-11-12): option (a). Rooms are their own spaces, as in the game today, and need not fit inside the
+   exterior model, so no game data changes for scale. **Changed (owner, 2026-11-14, "the 1m looks fine"):** an interior is
+   built at **1 m per tile**, not 1.5 m, proven on `widow_bedroom`. The exterior 3D world stays at 1.5 m per tile.
 2. For each building in section 3: what it is, which map it stands on, and whether it has an interior. PARTLY ANSWERED
-   (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. Whether either has
-   an interior, and the rest of section 3, are open.
+   (owner, 2026-11-12): the Outpost is the Bandit's hideout and the Post Office is the Postmaster's. **Interior: ANSWERED
+   (owner, 2026-11-16, DECISIONS A612): every enterable building in section 3 gets an interior**, including the Outpost and
+   the Post Office; open-fronted buildings and landmarks with no door get none. What each building is, whose it is and its
+   story are still open.
 3. ANSWERED (owner, 2026-11-12): the net loft gets no interior. It stays exterior only.
-4. ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
+4. CORRECTED (owner, 2026-11-15, DECISIONS A611): the 2.5D game stays and keeps its interior art; the 3D rooms are for the
+   3D first-person view (section 4, step 8), a second view, not a replacement. Was ANSWERED (owner, 2026-11-12, relayed by the local session): "the 3d interiors replace the old interior art". Interior
    renders must therefore line up with the game's isometric camera and each scene's tile grid, and be loadable by the
    client; stills and film alone are not enough. How the client takes them in (asset format, manifest, and whether the
    exterior moves to 3D art too) is a later data/client PR by Story mode, opened once the pipeline (section 6, step 2)

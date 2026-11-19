@@ -77,8 +77,8 @@ export async function act(bot: Bot, type: string, payload: unknown, ms = 200): P
     const after = stateOf(bot).tick;
     await until(() => stateOf(bot).tick > after, ACT_TICK_WAIT_MS);
   }
-  const left = ms - (Date.now() - sentAt);
-  if (left > 0) await sleep(left);
+  // A timer can fire a millisecond early by `Date.now()` (CI: 199 ms of a 200 ms floor), so sleep until it has passed.
+  for (let left = ms - (Date.now() - sentAt); left > 0; left = ms - (Date.now() - sentAt)) await sleep(left);
 }
 
 /** A horizontal run of `len` walkable tiles in a scene: the first tile. */

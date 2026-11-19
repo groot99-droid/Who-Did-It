@@ -9,10 +9,12 @@ import {
   type Party,
   advance,
   bootNpcServer,
+  flush,
   holdPhase,
   lobbyOf,
   pauseClock,
   placeSeat,
+  queued,
   send,
   start,
   toWorld,
@@ -60,9 +62,9 @@ describe('chat.quick', () => {
     placeSeat(party, b.id, 'overworld', 12, 10);
     placeSeat(party, c.id, 'tavern_bar', 5, 5);
     advance(party, 2);
-    await send(a, 'chat.quick', { phraseId: 'followMe' }, 40);
+    await queued(party, a, 'chat.quick', { phraseId: 'followMe' });
     advance(party, 1);
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     const handle = avatarMemory(party.room).handleOf.get(a.id);
     expect(barks(a)).toEqual([{ handle, phraseId: 'followMe' }]);
     expect(barks(b)).toEqual(barks(a));
@@ -73,16 +75,16 @@ describe('chat.quick', () => {
   it('refuses an unknown id, a repeat inside the gap and a ghost, each with its reason', async () => {
     const party = await world(2, 0);
     const [a, b] = party.humans as [Human, Human];
-    await send(a, 'chat.quick', { phraseId: 'nope' }, 40);
+    await queued(party, a, 'chat.quick', { phraseId: 'nope' });
     advance(party, 1);
-    await send(a, 'chat.quick', { phraseId: 'wait' }, 40);
+    await queued(party, a, 'chat.quick', { phraseId: 'wait' });
     advance(party, 1);
-    await send(a, 'chat.quick', { phraseId: 'wait' }, 40);
+    await queued(party, a, 'chat.quick', { phraseId: 'wait' });
     advance(party, 1);
     simOf(party.room).players.get(b.id)!.dead = true;
-    await send(b, 'chat.quick', { phraseId: 'wait' }, 40);
+    await queued(party, b, 'chat.quick', { phraseId: 'wait' });
     advance(party, 1);
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     expect(reasons(a)).toEqual(['UNKNOWN_PHRASE', 'CHAT_RATE']);
     expect(reasons(b)).toEqual(['NOT_IN_PLAY']);
   });
@@ -91,9 +93,9 @@ describe('chat.quick', () => {
     const party = await world(1, 2);
     const a = party.humans[0]!;
     holdPhase(party, Phase.meetingDiscussion, 60);
-    await send(a, 'chat.quick', { phraseId: 'wait' }, 40);
+    await queued(party, a, 'chat.quick', { phraseId: 'wait' });
     advance(party, 1);
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     expect(reasons(a)).toEqual(['PHASE_CLOSED']);
     expect(barks(a)).toHaveLength(0);
   });
@@ -109,7 +111,7 @@ describe('NPC and figure barks', () => {
     for (const id of npc) placeSeat(party, id, 'overworld', 11, 11);
     placeSeat(party, a.id, 'overworld', 10, 11);
     advance(party, 60 * TICK_RATE);
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     const heard = barks(a);
     expect(heard.length).toBeGreaterThan(0);
     for (const b of heard) {

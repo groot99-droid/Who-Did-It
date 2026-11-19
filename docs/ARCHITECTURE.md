@@ -20,19 +20,22 @@
 | Type stubs | `@types/node ^22`, `@types/express ^5` | Added 2026-10-10 |
 | Python | 3.12+ for `tools/blender` tests (`python3 -m unittest`); the `bpy 5.2.0` wheel only for rendering | CI runs the tests without Blender |
 | Blender / Tiled / Audacity | 5.2 LTS / 1.11 / 4.0.1 | Tiled only from M6 |
+| Three.js (V2 walk) | `three 0.186.1`, `three-mesh-bvh 0.9.16`, `@types/three 0.186.0` (exact pins) | `apps/walk` only, the single-player first-person walk-through (W3D, 2026-11-13, DECISIONS A610); the Draco and Basis decoders ship inside `three` |
+| Three.js (`apps/client`, the sprite world) | `three 0.186.1`, `@types/three 0.186.0` (exact pins, the same as `apps/walk`) | The 2.5D sprite world (A615, DECISIONS A618): 11R adds the dependency in R1. The renderer lives in `apps/client/src/world3/` and is reached only through a dynamic `import()` behind `?render=sprite`, so Vite emits it as its own chunk and a default load never fetches it. Measured on 2026-11-19 (Vite 8.3, tree-shaken, minified): `WebGLRenderer`, `OrthographicCamera`, `Scene`, `Group`, `Mesh`, `PlaneGeometry`, `BoxGeometry`, `Sprite`/`SpriteMaterial`, `MeshLambertMaterial`/`MeshStandardMaterial`, directional, point, ambient and hemisphere lights, PCF soft shadow maps and the texture loaders come to 542 kB minified, **134 kB gzip**. Budget: the `three` chunk stays at or under **160 kB gzip** (measured plus headroom for R2 to R6), counted inside the first-load cap of `ASSETS.md` 6.8 when the flag is on and outside it when it is off. Phaser stays the default renderer until C1: with the flag on both load, since the boot, the lobby and every view not yet ported by R5 still run on Phaser; C1 removes Phaser and its chunk. The DOM overlay HUD is unchanged |
 
 ### 5.2 Monorepo
 
 ```
 Who-Did-It/
 ├─ package.json  pnpm-workspace.yaml  .nvmrc  .gitattributes  tsconfig.base.json  eslint.config.js
-├─ .github/workflows/ci.yml  pages.yml          # only two workflows
+├─ .github/workflows/ci.yml  pages.yml  soak.yml   # soak runs by hand and weekly, never on push (5.12)
 ├─ LICENSE (MIT, code)  LICENSE-ASSETS  CREDITS.md  LICENSES/
 ├─ apps/client/      # Phaser + Vite; base '/Who-Did-It/'; src/{main,net,scenes,view,ui,flags}
+├─ apps/walk/        # V2 first step (A610): Vite + Three.js single-player walk-through of the 3D HollowMere GLB; base '/Who-Did-It/walk/'
 ├─ apps/server/      # Colyseus; src/{index,rooms/PartyRoom,rooms/handlers,sim/{Step,Commands,Collision,Visibility,Portals},services}
 ├─ packages/shared/  # @wdi/shared: schema/, protocol/, rules/, constants.ts, metrics.ts, version.ts
 ├─ packages/content/ # @wdi/content: data/{roles,traits,items,abilities,clues,tasks,balance,metrics}.json, scenes/*.json, zod validators
-├─ tools/            # grid/export.ts (ASCII grid -> tilemap + nav), tiled/export.ts (M6), sprites/{placeholder,pack,gen-anims}.ts, blender/{render_rig.blend,batch_render.py,palettize.py}, bots/swarm.ts
+├─ tools/            # grid/export.ts (ASCII grid -> tilemap + nav), sprites/{placeholder,pack,pixel,gen-anims}.ts, blender/{build_rig.py,batch_render.py,palettize.py,meshy_*.py}, bots/{swarm,soak,story}.ts, auto/run.ts (headless all-NPC matches); tiled/export.ts (M6) is not built
 ├─ assets/source/MANIFEST.md   # masters live outside the repo
 └─ docs/
 ```
@@ -141,7 +144,7 @@ Scene flow (round 3): `NetworkService.room` (getter, plus a `room` bus event, `n
 
 - The server bundles `@wdi/shared` and `@wdi/content` from source with tsup (both are devDependencies resolved with the `development` export condition), so `node build/index.js` needs no workspace package at runtime (A28).
 - `ci.yml` (push / PR): checkout@v7, setup-node@v7 (22), pnpm via corepack, `pnpm lint && pnpm typecheck && pnpm test`, a dist size report; on a pull request that touches the client, the server, the shared or content packages, the lockfile or the workflow, the `e2e` job runs the whole Playwright suite (5.12).
-- `pages.yml` (main): build the client and its workspace dependencies (`pnpm --filter "@wdi/client..." build`, since the production build resolves `@wdi/content` to its `dist`) with the server URL from `apps/client/.env.production` (an Actions variable `VITE_SERVER_URL` overrides it) and `VITE_BUILD_VERSION=${GITHUB_SHA::8}`, configure-pages@v6, upload-pages-artifact@v5 (`apps/client/dist`), deploy-pages@v5; Pages source = GitHub Actions; `base: '/Who-Did-It/'`; hash routing.
+- `pages.yml` (main): build the client and its workspace dependencies (`pnpm --filter "@wdi/client..." build`, since the production build resolves `@wdi/content` to its `dist`) with the server URL from `apps/client/.env.production` (an Actions variable `VITE_SERVER_URL` overrides it) and `VITE_BUILD_VERSION=${GITHUB_SHA::8}`, configure-pages@v6, upload-pages-artifact@v5 (`apps/client/dist`), deploy-pages@v5; Pages source = GitHub Actions; `base: '/Who-Did-It/'`; hash routing. The V2 walk-through (`apps/walk`, A610) is built after the client (`pnpm --filter @wdi/walk build`, `base: '/Who-Did-It/walk/'`) and copied into `apps/client/dist/walk`, so it is served at `/Who-Did-It/walk/` from the same artifact.
 - **Server host, two steps (owner decision 2026-10-10).** M0 to M3: **Render Free** web service built from the GitHub repo (same build and start commands), accepting the 15-minute idle spin-down and the one-minute wake; the landing page polls `/health` and shows "Waking the village..." until the server answers. From the first playtest with friends (M3 exit): **Railway Hobby ($5/month, always-on, managed wss)** through Railway's GitHub integration; `railway.json` at the root carries the build (`pnpm install --frozen-lockfile --prod=false && pnpm --filter @wdi/server build`: the server's bundler and the two workspace packages are devDependencies, and a `NODE_ENV=production` variable would otherwise make the install skip them) and the start (`node apps/server/build/index.js`) with `/health` as the health check, so nothing is typed into the Railway UI; the server reads only `PORT` and `WDI_DEBUG`, which stays unset. Only `VITE_SERVER_URL` changes on the client side. No Dockerfile, no deploy workflow, no staging server, no PR previews. Single process; no Redis.
 - `GET /health` -> `{ok, build, rooms, tickP95, patchBytes}`. CORS restricted to `https://groot99-droid.github.io` and localhost. The client pings every 20 s. `BUILD_VERSION` from `@wdi/shared/version.ts` is injected on both sides (the server takes `BUILD_VERSION`, else the first 8 characters of the host's commit variable, `RAILWAY_GIT_COMMIT_SHA` or `RENDER_GIT_COMMIT`; the client takes `VITE_BUILD_VERSION`, the same 8 characters in `pages.yml`); mismatches are refused with the generic join error and the client shows "refresh to update".
 
@@ -178,7 +181,7 @@ Vitest (shared): property tests for roles, traits, votes, suspects, win checks, 
 
 ### 5.13 V2 migration path
 
-Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`.
+Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`. The owner overrode the gate for one lane (DECISIONS A610): `apps/walk` is a single-player Three.js walk-through with no server, and the 2.5D and 3D modes of A613 share nothing on the wire yet.
 
 ### 5.13a Story mode (the engine)
 

@@ -5,7 +5,8 @@ All seven fonts are SIL Open Font License 1.1 and are self-hosted (no CDN) from
 packages `@fontsource-variable/oswald` 5.3.0, `@fontsource-variable/inter` 5.3.0,
 `@fontsource-variable/pixelify-sans` 5.3.0 and `@fontsource/press-start-2p` 5.3.0 (Press Start 2P
 has one weight and no variable build). Round 10's three (A257) are `@fontsource/alegreya-sc`, `alegreya-sans` and
-`ibm-plex-mono` 5.2.5, one file per weight, under one OFL text with their three copyright lines.
+`ibm-plex-mono` 5.2.5, one file per weight, under one OFL text with their three copyright lines. The help pages (`docs/guides/` served at `/help/`) carry
+their own copies of Pixelify Sans and Press Start 2P in `apps/client/public/help/fonts/`, under the same licences.
 
 | Font | Use | Licence text |
 |---|---|---|

@@ -7,9 +7,10 @@
 | [WORLD.md](WORLD.md) | World bible: Hollowmere, scene graph with ids and exits, overworld sketch, portal rules, bestiary, lighting. |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, monorepo layout, lobby and join codes, state schema and role secrecy, protocol, netcode, deployment, security, testing, V2 path. |
 | [ASSETS.md](ASSETS.md) | Palette, Blender 8-direction rig, per-asset pipelines, Higgsfield tool map, Adobe usage, licensing policy, backlog, budgets. |
-| [ROADMAP.md](ROADMAP.md) | Milestones M0-M7, parallel tracks, placeholder strategy, risk register, playtest plan, day 1-14 schedule, V2 outline. |
+| [ROADMAP.md](ROADMAP.md) | Milestones and their status, parallel tracks, placeholder strategy, risk register, playtest plan, day 1-14 schedule, V2 outline. |
 | [DECISIONS.md](DECISIONS.md) | Decisions locked with the owner, changes from review, open questions. |
 | [PROTOCOL.md](PROTOCOL.md) | Generated wire protocol: message tables, payload types, error codes (`pnpm docs:protocol`). |
+| [SPRITES.md](SPRITES.md) | Sprite conventions: atlas keys, frame names, cells, pivots, the manifest and the art styles; the contract between `tools/blender`, `tools/sprites` and the client. |
 | [UI.md](UI.md) | DOM design system: palette roles, type and spacing scale, components, card frames, measured contrast, screen mockups, the M3 copy deck. |
 | [guides/](guides/README.md) | Player manuals: how to play, the host guide and the admin guide. Served beside the game at `/help/`. |
 | [PLAYTESTS/](PLAYTESTS/README.md) | How a playtest session runs, the feedback form, the fun-or-stop scorecard, the notes template and one entry per session. |
@@ -20,7 +21,13 @@
 | [round7/](round7/README.md) | The round-7 contract documents: the whole-game re-skin to the owner's two mockups, open and private parties with profiles and friends, the map intro tracks and cinematic openings, and the vendettas, the Daily Train and the Vicar's memorial. |
 | [round8/](round8/README.md) | The round-8 contract documents: bodies, coin, motion and art, the teardown answers, the living world, the canon, and the seams of the round. |
 | [round9/](round9/README.md) | The round-9 design of world mode: the core loop, the full-screen phases, the logic table, the refusal reasons, the living world, emergent play, the owner's answers and follow-ups, the GDD map, the round-10 build plan and the admin Studio. |
-| [round10/](round10/README.md) | The round-10 contract: the sessions that build world mode, their models and compaction sizes, and the seams they share. Paused on 2026-10-30: [`part2.md`](round10/part2.md) is the pickup list. |
+| [round10/](round10/README.md) | The round-10 contract: the sessions that build world mode, their models and compaction sizes, and the seams they share. Paused on 2026-10-30. The pull requests open at the pause merged between 2026-11-07 and 2026-11-12; the steps still to build (B6b, B6c, B7, W1a2 to W8 and the rest) are in [`part2.md`](round10/part2.md). |
+| [round11/](round11/README.md) | The round-11 plan, the full Blender makeover: the render pipeline, materials and budgets, the owner's answers and the approved plan. Design only; not built yet. The revised plan for the sprite world of A615, [`round11-plan-v2.md`](round11/round11-plan-v2.md), replaced it on 2026-11-19 (A616). |
+| [round12/sprite-world.md](round12/sprite-world.md) | The merged 2.5D look (A615): a sprite world with depth, steps S0 to S6. |
+| [story/](story/README.md) | Story mode: the part-1 contract, the arc, the script, the rite, the test plan, the orchestrator's handoff and the status log. Part 2 merged into the base with #538. |
+| [accounts/](accounts/plan.md) | The player-accounts plan (a plan, not code). |
+| [map-revamp/](map-revamp/interiors-plan.md) | The map revamp's interiors plan for the 3D HollowMere (DECISIONS A611 to A614). |
+| [ui/](ui/) | Screenshots of the client's screens at 390 px and 1280x720, cited by `UI.md`. |
 | [SESSIONS.md](SESSIONS.md) | The parallel build sessions, round by round: path ownership, branches, PR base, seams, briefs and the integration logs. |
 
 Rule: a mechanic change updates `GDD.md` in the same pull request. Numbers never live in two documents.

@@ -113,6 +113,47 @@ export async function send(h: Human, type: string, payload: unknown = {}, ms = 1
   await sleep(ms);
 }
 
+const FLUSH = 'test.flush';
+let flushes = 0;
+
+/**
+ * Waits until every message the server has sent so far has reached `humans` (default: the whole party). The server
+ * sends each human a marker, which a websocket delivers after everything sent before it. Once a human's marker
+ * arrives the marker is dropped from the log, so the log holds only the server's own messages. This is a wait on the
+ * messages themselves, not on wall time: on a slow runner a fixed sleep can finish before a message arrives.
+ * Granted 2026-11-15 by the orchestrator to fix timing races.
+ */
+export async function flush(party: Party, humans: Human[] = party.humans, ms = 5000): Promise<void> {
+  const id = ++flushes;
+  for (const h of humans) {
+    const client = party.room.clients.find((c) => c.sessionId === h.room.sessionId);
+    if (!client) throw new Error(`flush: no client for ${h.room.sessionId}`);
+    client.send(FLUSH, id);
+  }
+  const seen = (h: Human) => h.log.some((m) => m.type === FLUSH && m.payload === id);
+  if (!(await until(() => humans.every(seen), ms))) throw new Error(`flush: no marker within ${ms} ms`);
+  for (const h of humans) {
+    for (let i = h.log.length - 1; i >= 0; i--) if (h.log[i]!.type === FLUSH) h.log.splice(i, 1);
+  }
+}
+
+/**
+ * Sends one step command and waits until the room has queued it, so the next `advance` consumes it. Paused clock only:
+ * a running clock can drain the queue before the check sees it.
+ */
+export async function queued(
+  party: Party,
+  h: Human,
+  type: string,
+  payload: unknown = {},
+  ms = 5000,
+): Promise<void> {
+  const before = party.room.commands.size;
+  h.room.send(type, payload);
+  if (!(await until(() => party.room.commands.size > before, ms)))
+    throw new Error(`queued: ${type} not queued`);
+}
+
 export const errors = (h: Human): number[] =>
   h.log.filter((m) => m.type === 'error').map((m) => (m.payload as { code: number }).code);
 

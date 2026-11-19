@@ -212,12 +212,14 @@ export function startWalker(room: Room, rng: () => number, behavior: BotBehavior
     const state = room.state as unknown as StateLike | undefined;
     // Round 10, W1a (seams.md 3 row 25): in a world match the seat ids are fresh at Start; the own seat's id is the
     // one `priv.seatId` this client's view holds, and the session id only in the lobby.
+    // The state exists before its first patch, with no `players` in it yet: a tick that lands there has nothing to read.
+    const players = state?.players as StateLike['players'] | undefined;
     let selfId = '';
-    state?.players.forEach((p) => {
+    players?.forEach((p) => {
       if (selfId === '' && p.priv?.seatId) selfId = p.priv.seatId;
     });
     selfId ||= room.sessionId;
-    const me = state?.players.get(selfId);
+    const me = players?.get(selfId);
     if (!state || !me) return;
     const now = Date.now();
 

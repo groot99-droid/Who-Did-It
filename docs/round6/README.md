@@ -1,5 +1,7 @@
 # Round 6: the contract documents
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-22. Current state: round 6 landed with #81 (`11168d1`); its rules live in `docs/GDD.md` and `packages/content/data`. `docs/ROADMAP.md` 7.0 gives the round's status.
+
 What the fifteen round-6 sessions (6Z, then 6A to 6P) build against, written by 6Z before the others started and
 edited to match the pre-seed it landed on top of a60d855 (DECISIONS A81). The rules and every number stay in
 `docs/GDD.md` and `packages/content/data`: these documents point at them and never restate a rule differently.

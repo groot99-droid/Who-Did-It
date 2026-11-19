@@ -1,0 +1,3051 @@
+{
+ "about": "Who-Did-It 3D asset index. characters: rigged (see bones/clips), item and prop models are static, origin at the base centre, +Y up. Item and prop sizes are in model units and only relative within their own sheet: scale to real size in Blender. See INDEX.md.",
+ "counts": {
+  "characters": 40,
+  "items": 32,
+  "props_main": 118,
+  "props_duplicates": 6,
+  "props_extras": 8
+ },
+ "characters": [
+  {
+   "id": "baker",
+   "file": "characters/higgsfield_24bone/baker.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.039,
+    1.74,
+    0.358
+   ]
+  },
+  {
+   "id": "constable",
+   "file": "characters/higgsfield_24bone/constable.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.1,
+    1.82,
+    0.375
+   ]
+  },
+  {
+   "id": "detective",
+   "file": "characters/higgsfield_24bone/detective.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.328,
+    1.8,
+    0.367
+   ]
+  },
+  {
+   "id": "doctor",
+   "file": "characters/higgsfield_24bone/doctor.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.076,
+    1.78,
+    0.387
+   ]
+  },
+  {
+   "id": "fisher",
+   "file": "characters/higgsfield_24bone/fisher.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.093,
+    1.76,
+    0.43
+   ]
+  },
+  {
+   "id": "gamekeeper",
+   "file": "characters/higgsfield_24bone/gamekeeper.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.088,
+    1.82,
+    0.42
+   ]
+  },
+  {
+   "id": "herbalist",
+   "file": "characters/higgsfield_24bone/herbalist.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.11,
+    1.62,
+    0.526
+   ]
+  },
+  {
+   "id": "lamplighter",
+   "file": "characters/higgsfield_24bone/lamplighter.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.005,
+    1.76,
+    0.424
+   ]
+  },
+  {
+   "id": "mallory",
+   "file": "characters/higgsfield_24bone/mallory.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    0.954,
+    1.7,
+    0.49
+   ]
+  },
+  {
+   "id": "tinner",
+   "file": "characters/higgsfield_24bone/tinner.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.019,
+    1.72,
+    0.423
+   ]
+  },
+  {
+   "id": "villager",
+   "file": "characters/higgsfield_24bone/villager.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    0.955,
+    1.72,
+    0.333
+   ]
+  },
+  {
+   "id": "villagerlass",
+   "file": "characters/higgsfield_24bone/villagerlass.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.192,
+    1.7,
+    0.49
+   ]
+  },
+  {
+   "id": "watchman",
+   "file": "characters/higgsfield_24bone/watchman.glb",
+   "source": "higgsfield",
+   "bones": 24,
+   "clips": [
+    "Armature|Casual_Walk|baselayer"
+   ],
+   "size_m": [
+    1.129,
+    1.85,
+    0.423
+   ]
+  },
+  {
+   "id": "accomplice",
+   "file": "characters/meshy_rigged/accomplice.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.186,
+    1.7,
+    0.386
+   ]
+  },
+  {
+   "id": "ada_kerrow",
+   "file": "characters/meshy_rigged/ada_kerrow.glb",
+   "source": "meshy",
+   "bones": 36,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.002,
+    1.7,
+    0.579
+   ]
+  },
+  {
+   "id": "bandit",
+   "file": "characters/meshy_rigged/bandit.glb",
+   "source": "meshy",
+   "bones": 44,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.929,
+    1.7,
+    0.455
+   ]
+  },
+  {
+   "id": "butler",
+   "file": "characters/meshy_rigged/butler.glb",
+   "source": "meshy",
+   "bones": 74,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.945,
+    1.7,
+    0.401
+   ]
+  },
+  {
+   "id": "child",
+   "file": "characters/meshy_rigged/child.glb",
+   "source": "meshy",
+   "bones": 52,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.017,
+    1.7,
+    0.458
+   ]
+  },
+  {
+   "id": "collier",
+   "file": "characters/meshy_rigged/collier.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.236,
+    1.7,
+    0.518
+   ]
+  },
+  {
+   "id": "company_clerk",
+   "file": "characters/meshy_rigged/company_clerk.glb",
+   "source": "meshy",
+   "bones": 50,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.01,
+    1.7,
+    0.365
+   ]
+  },
+  {
+   "id": "drifter",
+   "file": "characters/meshy_rigged/drifter.glb",
+   "source": "meshy",
+   "bones": 44,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.083,
+    1.7,
+    0.467
+   ]
+  },
+  {
+   "id": "foreman_hask",
+   "file": "characters/meshy_rigged/foreman_hask.glb",
+   "source": "meshy",
+   "bones": 68,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.599,
+    1.7,
+    0.679
+   ]
+  },
+  {
+   "id": "heir",
+   "file": "characters/meshy_rigged/heir.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.182,
+    1.7,
+    0.364
+   ]
+  },
+  {
+   "id": "hitman",
+   "file": "characters/meshy_rigged/hitman.glb",
+   "source": "meshy",
+   "bones": 50,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.126,
+    1.7,
+    0.311
+   ]
+  },
+  {
+   "id": "killer",
+   "file": "characters/meshy_rigged/killer.glb",
+   "source": "meshy",
+   "bones": 48,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.957,
+    1.7,
+    0.446
+   ]
+  },
+  {
+   "id": "lord_vane",
+   "file": "characters/meshy_rigged/lord_vane.glb",
+   "source": "meshy",
+   "bones": 58,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.193,
+    1.7,
+    0.432
+   ]
+  },
+  {
+   "id": "medium",
+   "file": "characters/meshy_rigged/medium.glb",
+   "source": "meshy",
+   "bones": 63,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.963,
+    1.7,
+    0.567
+   ]
+  },
+  {
+   "id": "mother_moll",
+   "file": "characters/meshy_rigged/mother_moll.glb",
+   "source": "meshy",
+   "bones": 81,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.169,
+    1.7,
+    0.621
+   ]
+  },
+  {
+   "id": "mrs_grieves",
+   "file": "characters/meshy_rigged/mrs_grieves.glb",
+   "source": "meshy",
+   "bones": 58,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.129,
+    1.7,
+    0.515
+   ]
+  },
+  {
+   "id": "pennock",
+   "file": "characters/meshy_rigged/pennock.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.307,
+    1.7,
+    0.462
+   ]
+  },
+  {
+   "id": "postmaster",
+   "file": "characters/meshy_rigged/postmaster.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.96,
+    1.7,
+    0.339
+   ]
+  },
+  {
+   "id": "ranger",
+   "file": "characters/meshy_rigged/ranger.glb",
+   "source": "meshy",
+   "bones": 50,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.32,
+    1.7,
+    0.475
+   ]
+  },
+  {
+   "id": "stallholder",
+   "file": "characters/meshy_rigged/stallholder.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.117,
+    1.7,
+    0.374
+   ]
+  },
+  {
+   "id": "tallyman",
+   "file": "characters/meshy_rigged/tallyman.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.91,
+    1.7,
+    0.466
+   ]
+  },
+  {
+   "id": "tamsin_crumb",
+   "file": "characters/meshy_rigged/tamsin_crumb.glb",
+   "source": "meshy",
+   "bones": 85,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.025,
+    1.7,
+    0.494
+   ]
+  },
+  {
+   "id": "thief",
+   "file": "characters/meshy_rigged/thief.glb",
+   "source": "meshy",
+   "bones": 55,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.369,
+    1.7,
+    0.446
+   ]
+  },
+  {
+   "id": "villagerclerk",
+   "file": "characters/meshy_rigged/villagerclerk.glb",
+   "source": "meshy",
+   "bones": 66,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.101,
+    1.7,
+    0.296
+   ]
+  },
+  {
+   "id": "villagerelder",
+   "file": "characters/meshy_rigged/villagerelder.glb",
+   "source": "meshy",
+   "bones": 58,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.106,
+    1.7,
+    0.411
+   ]
+  },
+  {
+   "id": "villagergoodwife",
+   "file": "characters/meshy_rigged/villagergoodwife.glb",
+   "source": "meshy",
+   "bones": 44,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.197,
+    1.7,
+    0.74
+   ]
+  },
+  {
+   "id": "widow_vane",
+   "file": "characters/meshy_rigged/widow_vane.glb",
+   "source": "meshy",
+   "bones": 82,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    1.118,
+    1.7,
+    0.645
+   ]
+  }
+ ],
+ "items": [
+  {
+   "name": "account_book",
+   "file": "items/account_book.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.317,
+    0.224,
+    0.306
+   ]
+  },
+  {
+   "name": "bakers_peel",
+   "file": "items/bakers_peel.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.302,
+    0.168,
+    0.214
+   ]
+  },
+  {
+   "name": "basket",
+   "file": "items/basket.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.248,
+    0.188,
+    0.263
+   ]
+  },
+  {
+   "name": "bindle",
+   "file": "items/bindle.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.304,
+    0.236,
+    0.092
+   ]
+  },
+  {
+   "name": "bread_token",
+   "file": "items/bread_token.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.245,
+    0.189,
+    0.211
+   ]
+  },
+  {
+   "name": "candle",
+   "file": "items/candle.glb",
+   "sheet": "items_sheet_1",
+   "size_model_units": [
+    0.194,
+    0.209,
+    0.182
+   ]
+  },
+  {
+   "name": "cane",
+   "file": "items/cane.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.04,
+    0.433,
+    0.037
+   ]
+  },
+  {
+   "name": "charcoal_rake",
+   "file": "items/charcoal_rake.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.153,
+    0.412,
+    0.196
+   ]
+  },
+  {
+   "name": "charcoal_sack",
+   "file": "items/charcoal_sack.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.241,
+    0.286,
+    0.228
+   ]
+  },
+  {
+   "name": "company_ledger",
+   "file": "items/company_ledger.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.338,
+    0.04,
+    0.465
+   ]
+  },
+  {
+   "name": "crowbar",
+   "file": "items/crowbar.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.315,
+    0.173,
+    0.445
+   ]
+  },
+  {
+   "name": "dip_pen",
+   "file": "items/dip_pen.glb",
+   "sheet": "items_sheet_2",
+   "size_model_units": [
+    0.318,
+    0.046,
+    0.495
+   ]
+  },
+  {
+   "name": "field_bag",
+   "file": "items/field_bag.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.271,
+    0.247,
+    0.201
+   ]
+  },
+  {
+   "name": "fowling_piece",
+   "file": "items/fowling_piece.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.348,
+    0.269,
+    0.042
+   ]
+  },
+  {
+   "name": "gnarled_stick",
+   "file": "items/gnarled_stick.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.095,
+    0.328,
+    0.115
+   ]
+  },
+  {
+   "name": "knife",
+   "file": "items/knife.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.27,
+    0.036,
+    0.06
+   ]
+  },
+  {
+   "name": "letters",
+   "file": "items/letters.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.318,
+    0.123,
+    0.303
+   ]
+  },
+  {
+   "name": "lighting_pole",
+   "file": "items/lighting_pole.glb",
+   "sheet": "items_sheet_3",
+   "size_model_units": [
+    0.295,
+    0.25,
+    0.015
+   ]
+  },
+  {
+   "name": "magnifying_lens",
+   "file": "items/magnifying_lens.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.237,
+    0.189,
+    0.156
+   ]
+  },
+  {
+   "name": "manor_ledger",
+   "file": "items/manor_ledger.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.22,
+    0.258,
+    0.217
+   ]
+  },
+  {
+   "name": "medical_bag",
+   "file": "items/medical_bag.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.25,
+    0.214,
+    0.265
+   ]
+  },
+  {
+   "name": "miners_pick",
+   "file": "items/miners_pick.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.217,
+    0.195,
+    0.106
+   ]
+  },
+  {
+   "name": "pail",
+   "file": "items/pail.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.204,
+    0.241,
+    0.183
+   ]
+  },
+  {
+   "name": "parcel",
+   "file": "items/parcel.glb",
+   "sheet": "items_sheet_4",
+   "size_model_units": [
+    0.351,
+    0.082,
+    0.246
+   ]
+  },
+  {
+   "name": "strongbox",
+   "file": "items/strongbox.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.222,
+    0.202,
+    0.202
+   ]
+  },
+  {
+   "name": "tally_stick",
+   "file": "items/tally_stick.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.267,
+    0.19,
+    0.228
+   ]
+  },
+  {
+   "name": "tankard_tray",
+   "file": "items/tankard_tray.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.285,
+    0.111,
+    0.279
+   ]
+  },
+  {
+   "name": "teacup",
+   "file": "items/teacup.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.215,
+    0.1,
+    0.208
+   ]
+  },
+  {
+   "name": "walking_staff",
+   "file": "items/walking_staff.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.072,
+    0.348,
+    0.025
+   ]
+  },
+  {
+   "name": "walking_stick",
+   "file": "items/walking_stick.glb",
+   "sheet": "items_sheet_6",
+   "size_model_units": [
+    0.088,
+    0.331,
+    0.013
+   ]
+  },
+  {
+   "name": "wooden_knife",
+   "file": "items/wooden_knife.glb",
+   "sheet": "items_sheet_7",
+   "size_model_units": [
+    0.321,
+    0.058,
+    0.417
+   ]
+  },
+  {
+   "name": "work_ledger",
+   "file": "items/work_ledger.glb",
+   "sheet": "items_sheet_7",
+   "size_model_units": [
+    0.425,
+    0.084,
+    0.317
+   ]
+  }
+ ],
+ "props": [
+  {
+   "name": "copper_still",
+   "file": "props_3d/copper_still.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.284,
+    0.254,
+    0.17
+   ],
+   "triangles": 980,
+   "scene_prop_kinds": [
+    "still"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hanging_herb_rack",
+   "file": "props_3d/hanging_herb_rack.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.286,
+    0.312,
+    0.12
+   ],
+   "triangles": 1742,
+   "scene_prop_kinds": [
+    "herb_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "glass_display_counter_case",
+   "file": "props_3d/glass_display_counter_case.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.326,
+    0.162,
+    0.25
+   ],
+   "triangles": 1462,
+   "scene_prop_kinds": [
+    "counter_case"
+   ],
+   "note": ""
+  },
+  {
+   "name": "show_globe",
+   "file": "props_3d/show_globe.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.188,
+    0.265,
+    0.175
+   ],
+   "triangles": 954,
+   "scene_prop_kinds": [
+    "show_globe"
+   ],
+   "note": ""
+  },
+  {
+   "name": "mortar_pestle_table",
+   "file": "props_3d/mortar_pestle_table.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.286,
+    0.204,
+    0.282
+   ],
+   "triangles": 2156,
+   "scene_prop_kinds": [
+    "mortar_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "leech_jar",
+   "file": "props_3d/leech_jar.glb",
+   "category": "main",
+   "sheet": "folder00",
+   "size_model_units": [
+    0.216,
+    0.243,
+    0.213
+   ],
+   "triangles": 833,
+   "scene_prop_kinds": [
+    "leech_jar"
+   ],
+   "note": ""
+  },
+  {
+   "name": "couche_proofing_rack",
+   "file": "props_3d/couche_proofing_rack.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.309,
+    0.284,
+    0.16
+   ],
+   "triangles": 1487,
+   "scene_prop_kinds": [
+    "couche_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bread_display_case",
+   "file": "props_3d/bread_display_case.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.302,
+    0.236,
+    0.163
+   ],
+   "triangles": 1218,
+   "scene_prop_kinds": [
+    "bread_case"
+   ],
+   "note": ""
+  },
+  {
+   "name": "shaping_table",
+   "file": "props_3d/shaping_table.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.366,
+    0.228,
+    0.189
+   ],
+   "triangles": 660,
+   "scene_prop_kinds": [
+    "shaping_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bread_basket",
+   "file": "props_3d/bread_basket.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.313,
+    0.251,
+    0.327
+   ],
+   "triangles": 1446,
+   "scene_prop_kinds": [
+    "bread_basket"
+   ],
+   "note": ""
+  },
+  {
+   "name": "cooling_rack",
+   "file": "props_3d/cooling_rack.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.286,
+    0.267,
+    0.238
+   ],
+   "triangles": 1939,
+   "scene_prop_kinds": [
+    "cooling_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dough_mixer",
+   "file": "props_3d/dough_mixer.glb",
+   "category": "main",
+   "sheet": "folder01",
+   "size_model_units": [
+    0.197,
+    0.281,
+    0.258
+   ],
+   "triangles": 1326,
+   "scene_prop_kinds": [
+    "doughMixer"
+   ],
+   "note": ""
+  },
+  {
+   "name": "shop_counter_till",
+   "file": "props_3d/shop_counter_till.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.279,
+    0.253,
+    0.165
+   ],
+   "triangles": 749,
+   "scene_prop_kinds": [
+    "counter"
+   ],
+   "note": ""
+  },
+  {
+   "name": "store_shelf",
+   "file": "props_3d/store_shelf.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.242,
+    0.313,
+    0.155
+   ],
+   "triangles": 2240,
+   "scene_prop_kinds": [
+    "store_shelf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "company_desk",
+   "file": "props_3d/company_desk.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.346,
+    0.16,
+    0.232
+   ],
+   "triangles": 933,
+   "scene_prop_kinds": [
+    "hq"
+   ],
+   "note": ""
+  },
+  {
+   "name": "log_basket",
+   "file": "props_3d/log_basket.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.278,
+    0.273,
+    0.277
+   ],
+   "triangles": 1865,
+   "scene_prop_kinds": [
+    "log_basket"
+   ],
+   "note": ""
+  },
+  {
+   "name": "water_bucket",
+   "file": "props_3d/water_bucket.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.249,
+    0.211,
+    0.181
+   ],
+   "triangles": 1554,
+   "scene_prop_kinds": [
+    "water_bucket"
+   ],
+   "note": ""
+  },
+  {
+   "name": "tin_cabinet",
+   "file": "props_3d/tin_cabinet.glb",
+   "category": "main",
+   "sheet": "folder02",
+   "size_model_units": [
+    0.182,
+    0.311,
+    0.094
+   ],
+   "triangles": 526,
+   "scene_prop_kinds": [
+    "tin_cabinet"
+   ],
+   "note": ""
+  },
+  {
+   "name": "flour_sacks",
+   "file": "props_3d/flour_sacks.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.297,
+    0.279,
+    0.366
+   ],
+   "triangles": 1338,
+   "scene_prop_kinds": [
+    "flour_sacks"
+   ],
+   "note": ""
+  },
+  {
+   "name": "cold_storage_shelf",
+   "file": "props_3d/cold_storage_shelf.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.117,
+    0.337,
+    0.404
+   ],
+   "triangles": 1058,
+   "scene_prop_kinds": [
+    "cold_shelf",
+    "coldShelves"
+   ],
+   "note": ""
+  },
+  {
+   "name": "refrigeration_compressor",
+   "file": "props_3d/refrigeration_compressor.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.311,
+    0.274,
+    0.23
+   ],
+   "triangles": 1796,
+   "scene_prop_kinds": [
+    "compressor"
+   ],
+   "note": ""
+  },
+  {
+   "name": "oil_barrel",
+   "file": "props_3d/oil_barrel.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.214,
+    0.281,
+    0.299
+   ],
+   "triangles": 1195,
+   "scene_prop_kinds": [
+    "oil_barrel"
+   ],
+   "note": ""
+  },
+  {
+   "name": "milk_churn",
+   "file": "props_3d/milk_churn.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.185,
+    0.284,
+    0.181
+   ],
+   "triangles": 1165,
+   "scene_prop_kinds": [
+    "milk_churn"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wall_light_bracket",
+   "file": "props_3d/wall_light_bracket.glb",
+   "category": "main",
+   "sheet": "folder03",
+   "size_model_units": [
+    0.184,
+    0.303,
+    0.11
+   ],
+   "triangles": 1501,
+   "scene_prop_kinds": [
+    "wall_bulb"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bread_plate",
+   "file": "props_3d/bread_plate.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.294,
+    0.072,
+    0.305
+   ],
+   "triangles": 1393,
+   "scene_prop_kinds": [
+    "plate"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dough_trough",
+   "file": "props_3d/dough_trough.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.307,
+    0.141,
+    0.339
+   ],
+   "triangles": 974,
+   "scene_prop_kinds": [
+    "dough_trough"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dead_loaf",
+   "file": "props_3d/dead_loaf.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.262,
+    0.123,
+    0.293
+   ],
+   "triangles": 2490,
+   "scene_prop_kinds": [
+    "deadLoaf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "proofing_cabinet",
+   "file": "props_3d/proofing_cabinet.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.218,
+    0.313,
+    0.2
+   ],
+   "triangles": 1520,
+   "scene_prop_kinds": [
+    "proofingCabinet"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wake_table",
+   "file": "props_3d/wake_table.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.301,
+    0.122,
+    0.343
+   ],
+   "triangles": 998,
+   "scene_prop_kinds": [
+    "wakeTable"
+   ],
+   "note": ""
+  },
+  {
+   "name": "ledger_stand",
+   "file": "props_3d/ledger_stand.glb",
+   "category": "main",
+   "sheet": "folder04",
+   "size_model_units": [
+    0.278,
+    0.279,
+    0.26
+   ],
+   "triangles": 991,
+   "scene_prop_kinds": [
+    "ledger"
+   ],
+   "note": ""
+  },
+  {
+   "name": "workbench",
+   "file": "props_3d/workbench.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.291,
+    0.179,
+    0.267
+   ],
+   "triangles": 1106,
+   "scene_prop_kinds": [
+    "bench"
+   ],
+   "note": ""
+  },
+  {
+   "name": "coat_stand",
+   "file": "props_3d/coat_stand.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.09,
+    0.304,
+    0.077
+   ],
+   "triangles": 897,
+   "scene_prop_kinds": [
+    "coat_stand"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wall_shelf_bottles",
+   "file": "props_3d/wall_shelf_bottles.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.293,
+    0.15,
+    0.197
+   ],
+   "triangles": 1146,
+   "scene_prop_kinds": [
+    "shelf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "drying_frame",
+   "file": "props_3d/drying_frame.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.232,
+    0.21,
+    0.188
+   ],
+   "triangles": 3329,
+   "scene_prop_kinds": [
+    "drying_frame"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wash_basin",
+   "file": "props_3d/wash_basin.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.246,
+    0.203,
+    0.246
+   ],
+   "triangles": 868,
+   "scene_prop_kinds": [
+    "basin"
+   ],
+   "note": ""
+  },
+  {
+   "name": "washstand",
+   "file": "props_3d/washstand.glb",
+   "category": "main",
+   "sheet": "folder05",
+   "size_model_units": [
+    0.24,
+    0.224,
+    0.233
+   ],
+   "triangles": 1034,
+   "scene_prop_kinds": [
+    "washstand"
+   ],
+   "note": ""
+  },
+  {
+   "name": "upright_piano",
+   "file": "props_3d/upright_piano.glb",
+   "category": "main",
+   "sheet": "folder06",
+   "size_model_units": [
+    0.254,
+    0.235,
+    0.208
+   ],
+   "triangles": 1247,
+   "scene_prop_kinds": [
+    "piano"
+   ],
+   "note": ""
+  },
+  {
+   "name": "inglenook_fireplace",
+   "file": "props_3d/inglenook_fireplace.glb",
+   "category": "main",
+   "sheet": "folder06",
+   "size_model_units": [
+    0.227,
+    0.267,
+    0.152
+   ],
+   "triangles": 4694,
+   "scene_prop_kinds": [
+    "inglenook",
+    "fireplace"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hanging_bar_lamp",
+   "file": "props_3d/hanging_bar_lamp.glb",
+   "category": "main",
+   "sheet": "folder06",
+   "size_model_units": [
+    0.095,
+    0.353,
+    0.085
+   ],
+   "triangles": 1092,
+   "scene_prop_kinds": [
+    "bar_counter_lamp"
+   ],
+   "note": ""
+  },
+  {
+   "name": "settle_bench",
+   "file": "props_3d/settle_bench.glb",
+   "category": "main",
+   "sheet": "folder06",
+   "size_model_units": [
+    0.219,
+    0.225,
+    0.191
+   ],
+   "triangles": 771,
+   "scene_prop_kinds": [
+    "settle"
+   ],
+   "note": ""
+  },
+  {
+   "name": "pomegranate",
+   "file": "props_3d/_extras_not_in_interior_list/pomegranate.glb",
+   "category": "extra",
+   "sheet": "folder07",
+   "size_model_units": [
+    0.244,
+    0.237,
+    0.239
+   ],
+   "triangles": 782,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "berry_bowl",
+   "file": "props_3d/_extras_not_in_interior_list/berry_bowl.glb",
+   "category": "extra",
+   "sheet": "folder07",
+   "size_model_units": [
+    0.28,
+    0.128,
+    0.249
+   ],
+   "triangles": 2448,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "lavender_bunch",
+   "file": "props_3d/_extras_not_in_interior_list/lavender_bunch.glb",
+   "category": "extra",
+   "sheet": "folder07",
+   "size_model_units": [
+    0.198,
+    0.19,
+    0.139
+   ],
+   "triangles": 851,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "tincture_bottle",
+   "file": "props_3d/_extras_not_in_interior_list/tincture_bottle.glb",
+   "category": "extra",
+   "sheet": "folder07",
+   "size_model_units": [
+    0.136,
+    0.256,
+    0.141
+   ],
+   "triangles": 762,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "bread_loaf",
+   "file": "props_3d/_extras_not_in_interior_list/bread_loaf.glb",
+   "category": "extra",
+   "sheet": "folder08",
+   "size_model_units": [
+    0.353,
+    0.179,
+    0.309
+   ],
+   "triangles": 512,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "cheese_wedge",
+   "file": "props_3d/_extras_not_in_interior_list/cheese_wedge.glb",
+   "category": "extra",
+   "sheet": "folder08",
+   "size_model_units": [
+    0.282,
+    0.145,
+    0.222
+   ],
+   "triangles": 2137,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "grain_sack",
+   "file": "props_3d/_extras_not_in_interior_list/grain_sack.glb",
+   "category": "extra",
+   "sheet": "folder08",
+   "size_model_units": [
+    0.141,
+    0.177,
+    0.134
+   ],
+   "triangles": 2306,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "apple",
+   "file": "props_3d/_extras_not_in_interior_list/apple.glb",
+   "category": "extra",
+   "sheet": "folder08",
+   "size_model_units": [
+    0.185,
+    0.202,
+    0.181
+   ],
+   "triangles": 348,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "sawdust_pile",
+   "file": "props_3d/sawdust_pile.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.354,
+    0.13,
+    0.342
+   ],
+   "triangles": 1164,
+   "scene_prop_kinds": [
+    "sawdust"
+   ],
+   "note": ""
+  },
+  {
+   "name": "inn_bed",
+   "file": "props_3d/inn_bed.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.275,
+    0.151,
+    0.34
+   ],
+   "triangles": 1314,
+   "scene_prop_kinds": [
+    "innBed"
+   ],
+   "note": ""
+  },
+  {
+   "name": "black_market_stash_crate",
+   "file": "props_3d/black_market_stash_crate.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.257,
+    0.137,
+    0.282
+   ],
+   "triangles": 1495,
+   "scene_prop_kinds": [
+    "blackMarket"
+   ],
+   "note": ""
+  },
+  {
+   "name": "jar_shelf",
+   "file": "props_3d/jar_shelf.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.223,
+    0.206,
+    0.124
+   ],
+   "triangles": 2216,
+   "scene_prop_kinds": [
+    "jar_shelf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "apothecary_drawer_cabinet",
+   "file": "props_3d/apothecary_drawer_cabinet.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.256,
+    0.239,
+    0.151
+   ],
+   "triangles": 842,
+   "scene_prop_kinds": [
+    "apoth_drawers"
+   ],
+   "note": ""
+  },
+  {
+   "name": "flour_bin",
+   "file": "props_3d/flour_bin.glb",
+   "category": "main",
+   "sheet": "folder09",
+   "size_model_units": [
+    0.254,
+    0.214,
+    0.252
+   ],
+   "triangles": 869,
+   "scene_prop_kinds": [
+    "flourBin"
+   ],
+   "note": ""
+  },
+  {
+   "name": "card_table",
+   "file": "props_3d/card_table.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.257,
+    0.178,
+    0.261
+   ],
+   "triangles": 554,
+   "scene_prop_kinds": [
+    "card_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "ship_wheel",
+   "file": "props_3d/ship_wheel.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.25,
+    0.3,
+    0.077
+   ],
+   "triangles": 2192,
+   "scene_prop_kinds": [
+    "ship_wheel"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bottle_shelf",
+   "file": "props_3d/bottle_shelf.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.206,
+    0.301,
+    0.153
+   ],
+   "triangles": 2130,
+   "scene_prop_kinds": [
+    "bottle_shelf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "tide_chart",
+   "file": "props_3d/tide_chart.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.187,
+    0.298,
+    0.036
+   ],
+   "triangles": 280,
+   "scene_prop_kinds": [
+    "tide_chart"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dartboard",
+   "file": "props_3d/dartboard.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.242,
+    0.283,
+    0.138
+   ],
+   "triangles": 2252,
+   "scene_prop_kinds": [
+    "dartboard"
+   ],
+   "note": ""
+  },
+  {
+   "name": "chalkboard_easel",
+   "file": "props_3d/chalkboard_easel.glb",
+   "category": "main",
+   "sheet": "folder10",
+   "size_model_units": [
+    0.217,
+    0.33,
+    0.215
+   ],
+   "triangles": 780,
+   "scene_prop_kinds": [
+    "chalkboard"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hidden_key_cache",
+   "file": "props_3d/hidden_key_cache.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.248,
+    0.206,
+    0.108
+   ],
+   "triangles": 1077,
+   "scene_prop_kinds": [
+    "keyCache"
+   ],
+   "note": ""
+  },
+  {
+   "name": "shuttered_window",
+   "file": "props_3d/shuttered_window.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.218,
+    0.236,
+    0.167
+   ],
+   "triangles": 1297,
+   "scene_prop_kinds": [
+    "window"
+   ],
+   "note": ""
+  },
+  {
+   "name": "letter_box",
+   "file": "props_3d/letter_box.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.225,
+    0.278,
+    0.218
+   ],
+   "triangles": 1333,
+   "scene_prop_kinds": [
+    "letter_box"
+   ],
+   "note": ""
+  },
+  {
+   "name": "locked_door",
+   "file": "props_3d/locked_door.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.24,
+    0.277,
+    0.1
+   ],
+   "triangles": 1446,
+   "scene_prop_kinds": [
+    "lockedDoor"
+   ],
+   "note": ""
+  },
+  {
+   "name": "iron_safe",
+   "file": "props_3d/iron_safe.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.203,
+    0.203,
+    0.226
+   ],
+   "triangles": 2494,
+   "scene_prop_kinds": [
+    "safe"
+   ],
+   "note": ""
+  },
+  {
+   "name": "stained_glass_panel",
+   "file": "props_3d/stained_glass_panel.glb",
+   "category": "main",
+   "sheet": "folder11",
+   "size_model_units": [
+    0.178,
+    0.261,
+    0.11
+   ],
+   "triangles": 320,
+   "scene_prop_kinds": [
+    "stained_glass"
+   ],
+   "note": ""
+  },
+  {
+   "name": "big_brick_oven",
+   "file": "props_3d/big_brick_oven.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.27,
+    0.273,
+    0.299
+   ],
+   "triangles": 1319,
+   "scene_prop_kinds": [
+    "brickOven"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wooden_stool",
+   "file": "props_3d/wooden_stool.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.223,
+    0.168,
+    0.219
+   ],
+   "triangles": 504,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "scales",
+   "file": "props_3d/scales.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.25,
+    0.192,
+    0.259
+   ],
+   "triangles": 1959,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "baker_peel_rack",
+   "file": "props_3d/baker_peel_rack.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.212,
+    0.269,
+    0.211
+   ],
+   "triangles": 663,
+   "scene_prop_kinds": [
+    "peel_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bread_oven",
+   "file": "props_3d/bread_oven.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.277,
+    0.172,
+    0.284
+   ],
+   "triangles": 739,
+   "scene_prop_kinds": [
+    "oven"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bread_shelf",
+   "file": "props_3d/bread_shelf.glb",
+   "category": "main",
+   "sheet": "folder12",
+   "size_model_units": [
+    0.236,
+    0.25,
+    0.222
+   ],
+   "triangles": 1687,
+   "scene_prop_kinds": [
+    "bread_shelf"
+   ],
+   "note": ""
+  },
+  {
+   "name": "armchair",
+   "file": "props_3d/armchair.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.186,
+    0.193,
+    0.207
+   ],
+   "triangles": 816,
+   "scene_prop_kinds": [
+    "armchair"
+   ],
+   "note": ""
+  },
+  {
+   "name": "tea_table",
+   "file": "props_3d/tea_table.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.209,
+    0.19,
+    0.196
+   ],
+   "triangles": 1238,
+   "scene_prop_kinds": [
+    "tea_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "sideboard",
+   "file": "props_3d/sideboard.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.334,
+    0.196,
+    0.177
+   ],
+   "triangles": 2847,
+   "scene_prop_kinds": [
+    "sideboard"
+   ],
+   "note": ""
+  },
+  {
+   "name": "writing_desk",
+   "file": "props_3d/writing_desk.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.271,
+    0.209,
+    0.156
+   ],
+   "triangles": 1437,
+   "scene_prop_kinds": [
+    "writing_desk"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dining_table",
+   "file": "props_3d/dining_table.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.319,
+    0.246,
+    0.305
+   ],
+   "triangles": 960,
+   "scene_prop_kinds": [
+    "dining_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "dressing_table",
+   "file": "props_3d/dressing_table.glb",
+   "category": "main",
+   "sheet": "folder13",
+   "size_model_units": [
+    0.206,
+    0.301,
+    0.19
+   ],
+   "triangles": 942,
+   "scene_prop_kinds": [
+    "dressing_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "lantern_hook",
+   "file": "props_3d/lantern_hook.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.286,
+    0.227,
+    0.143
+   ],
+   "triangles": 648,
+   "scene_prop_kinds": [
+    "lantern_hook"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hay_bale",
+   "file": "props_3d/hay_bale.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.225,
+    0.18,
+    0.359
+   ],
+   "triangles": 3327,
+   "scene_prop_kinds": [
+    "hay_bale"
+   ],
+   "note": ""
+  },
+  {
+   "name": "plank_stack",
+   "file": "props_3d/plank_stack.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.2,
+    0.156,
+    0.37
+   ],
+   "triangles": 186,
+   "scene_prop_kinds": [
+    "planks"
+   ],
+   "note": ""
+  },
+  {
+   "name": "single_bed",
+   "file": "props_3d/single_bed.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.225,
+    0.16,
+    0.367
+   ],
+   "triangles": 863,
+   "scene_prop_kinds": [
+    "bed"
+   ],
+   "note": ""
+  },
+  {
+   "name": "rope_coil",
+   "file": "props_3d/rope_coil.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.309,
+    0.1,
+    0.325
+   ],
+   "triangles": 2340,
+   "scene_prop_kinds": [
+    "rope"
+   ],
+   "note": ""
+  },
+  {
+   "name": "child_cot",
+   "file": "props_3d/child_cot.glb",
+   "category": "main",
+   "sheet": "folder14",
+   "size_model_units": [
+    0.215,
+    0.182,
+    0.314
+   ],
+   "triangles": 1101,
+   "scene_prop_kinds": [
+    "cot"
+   ],
+   "note": ""
+  },
+  {
+   "name": "memorial_plaque",
+   "file": "props_3d/memorial_plaque.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.237,
+    0.257,
+    0.204
+   ],
+   "triangles": 970,
+   "scene_prop_kinds": [
+    "memorial"
+   ],
+   "note": ""
+  },
+  {
+   "name": "candle_stand",
+   "file": "props_3d/candle_stand.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.095,
+    0.307,
+    0.091
+   ],
+   "triangles": 1065,
+   "scene_prop_kinds": [
+    "candle_stand"
+   ],
+   "note": ""
+  },
+  {
+   "name": "votive_rack",
+   "file": "props_3d/votive_rack.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.259,
+    0.202,
+    0.264
+   ],
+   "triangles": 1460,
+   "scene_prop_kinds": [
+    "votive_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bell_rope",
+   "file": "props_3d/bell_rope.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.065,
+    0.348,
+    0.061
+   ],
+   "triangles": 1148,
+   "scene_prop_kinds": [
+    "rope"
+   ],
+   "note": ""
+  },
+  {
+   "name": "stained_glass_saint",
+   "file": "props_3d/stained_glass_saint.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.19,
+    0.334,
+    0.162
+   ],
+   "triangles": 596,
+   "scene_prop_kinds": [
+    "stained_glass"
+   ],
+   "note": ""
+  },
+  {
+   "name": "flower_stand",
+   "file": "props_3d/flower_stand.glb",
+   "category": "main",
+   "sheet": "folder15",
+   "size_model_units": [
+    0.132,
+    0.337,
+    0.125
+   ],
+   "triangles": 3032,
+   "scene_prop_kinds": [
+    "flower_stand"
+   ],
+   "note": ""
+  },
+  {
+   "name": "boot_rack",
+   "file": "props_3d/boot_rack.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.27,
+    0.214,
+    0.258
+   ],
+   "triangles": 1466,
+   "scene_prop_kinds": [
+    "boot_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "nightstand",
+   "file": "props_3d/nightstand.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.202,
+    0.233,
+    0.197
+   ],
+   "triangles": 1095,
+   "scene_prop_kinds": [
+    "nightstand"
+   ],
+   "note": ""
+  },
+  {
+   "name": "blanket_chest",
+   "file": "props_3d/blanket_chest.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.283,
+    0.177,
+    0.263
+   ],
+   "triangles": 1786,
+   "scene_prop_kinds": [
+    "blanket_chest"
+   ],
+   "note": ""
+  },
+  {
+   "name": "birdcage",
+   "file": "props_3d/birdcage.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.112,
+    0.303,
+    0.103
+   ],
+   "triangles": 1282,
+   "scene_prop_kinds": [
+    "birdcage"
+   ],
+   "note": ""
+  },
+  {
+   "name": "linen_press",
+   "file": "props_3d/linen_press.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.232,
+    0.306,
+    0.216
+   ],
+   "triangles": 1076,
+   "scene_prop_kinds": [
+    "linen_press"
+   ],
+   "note": ""
+  },
+  {
+   "name": "lamp_table",
+   "file": "props_3d/lamp_table.glb",
+   "category": "main",
+   "sheet": "folder16",
+   "size_model_units": [
+    0.175,
+    0.293,
+    0.149
+   ],
+   "triangles": 855,
+   "scene_prop_kinds": [
+    "lamp_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "lectern",
+   "file": "props_3d/lectern.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.162,
+    0.238,
+    0.145
+   ],
+   "triangles": 779,
+   "scene_prop_kinds": [
+    "lectern"
+   ],
+   "note": ""
+  },
+  {
+   "name": "altar",
+   "file": "props_3d/altar.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.183,
+    0.198,
+    0.246
+   ],
+   "triangles": 2151,
+   "scene_prop_kinds": [
+    "altar"
+   ],
+   "note": ""
+  },
+  {
+   "name": "church_pew",
+   "file": "props_3d/church_pew.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.273,
+    0.184,
+    0.153
+   ],
+   "triangles": 1403,
+   "scene_prop_kinds": [
+    "pew"
+   ],
+   "note": ""
+  },
+  {
+   "name": "baptismal_font",
+   "file": "props_3d/baptismal_font.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.229,
+    0.22,
+    0.225
+   ],
+   "triangles": 336,
+   "scene_prop_kinds": [
+    "font"
+   ],
+   "note": ""
+  },
+  {
+   "name": "pulpit",
+   "file": "props_3d/pulpit.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.188,
+    0.193,
+    0.268
+   ],
+   "triangles": 956,
+   "scene_prop_kinds": [
+    "pulpit"
+   ],
+   "note": ""
+  },
+  {
+   "name": "alms_box",
+   "file": "props_3d/alms_box.glb",
+   "category": "main",
+   "sheet": "folder17",
+   "size_model_units": [
+    0.156,
+    0.207,
+    0.157
+   ],
+   "triangles": 1783,
+   "scene_prop_kinds": [
+    "alms_box"
+   ],
+   "note": ""
+  },
+  {
+   "name": "brick_fireplace",
+   "file": "props_3d/brick_fireplace.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.228,
+    0.26,
+    0.123
+   ],
+   "triangles": 424,
+   "scene_prop_kinds": [
+    "fireplace"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hymn_board",
+   "file": "props_3d/hymn_board.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.177,
+    0.263,
+    0.064
+   ],
+   "triangles": 450,
+   "scene_prop_kinds": [
+    "hymn_board"
+   ],
+   "note": ""
+  },
+  {
+   "name": "coat_hook_board",
+   "file": "props_3d/coat_hook_board.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.347,
+    0.104,
+    0.063
+   ],
+   "triangles": 2173,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "wall_oil_lamp",
+   "file": "props_3d/wall_oil_lamp.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.119,
+    0.281,
+    0.156
+   ],
+   "triangles": 2501,
+   "scene_prop_kinds": [
+    "lamp"
+   ],
+   "note": ""
+  },
+  {
+   "name": "bookcase",
+   "file": "props_3d/bookcase.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.246,
+    0.253,
+    0.077
+   ],
+   "triangles": 636,
+   "scene_prop_kinds": [
+    "bookcase"
+   ],
+   "note": ""
+  },
+  {
+   "name": "cobweb_corner",
+   "file": "props_3d/cobweb_corner.glb",
+   "category": "main",
+   "sheet": "folder18",
+   "size_model_units": [
+    0.248,
+    0.252,
+    0.082
+   ],
+   "triangles": 2031,
+   "scene_prop_kinds": [
+    "cobweb"
+   ],
+   "note": ""
+  },
+  {
+   "name": "tool_rack",
+   "file": "props_3d/tool_rack.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.229,
+    0.325,
+    0.075
+   ],
+   "triangles": 2315,
+   "scene_prop_kinds": [
+    "tool_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "fishing_net",
+   "file": "props_3d/fishing_net.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.119,
+    0.3,
+    0.156
+   ],
+   "triangles": 1030,
+   "scene_prop_kinds": [],
+   "note": ""
+  },
+  {
+   "name": "fisherman_dining_table",
+   "file": "props_3d/fisherman_dining_table.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.358,
+    0.116,
+    0.338
+   ],
+   "triangles": 594,
+   "scene_prop_kinds": [
+    "dining_table"
+   ],
+   "note": ""
+  },
+  {
+   "name": "feed_trough",
+   "file": "props_3d/feed_trough.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.321,
+    0.136,
+    0.266
+   ],
+   "triangles": 220,
+   "scene_prop_kinds": [
+    "feed_trough"
+   ],
+   "note": ""
+  },
+  {
+   "name": "cottage_fireplace",
+   "file": "props_3d/cottage_fireplace.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.276,
+    0.277,
+    0.313
+   ],
+   "triangles": 1478,
+   "scene_prop_kinds": [
+    "fireplace"
+   ],
+   "note": ""
+  },
+  {
+   "name": "scarecrow",
+   "file": "props_3d/scarecrow.glb",
+   "category": "main",
+   "sheet": "folder19",
+   "size_model_units": [
+    0.211,
+    0.317,
+    0.177
+   ],
+   "triangles": 2649,
+   "scene_prop_kinds": [
+    "scarecrow"
+   ],
+   "note": ""
+  },
+  {
+   "name": "lantern_hook",
+   "file": "props_3d/_duplicates_of_set_14/lantern_hook.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.362,
+    0.288,
+    0.185
+   ],
+   "triangles": 730,
+   "scene_prop_kinds": [
+    "lantern_hook"
+   ],
+   "note": ""
+  },
+  {
+   "name": "hay_bale",
+   "file": "props_3d/_duplicates_of_set_14/hay_bale.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.217,
+    0.197,
+    0.335
+   ],
+   "triangles": 3091,
+   "scene_prop_kinds": [
+    "hay_bale"
+   ],
+   "note": ""
+  },
+  {
+   "name": "plank_stack",
+   "file": "props_3d/_duplicates_of_set_14/plank_stack.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.239,
+    0.163,
+    0.417
+   ],
+   "triangles": 460,
+   "scene_prop_kinds": [
+    "planks"
+   ],
+   "note": ""
+  },
+  {
+   "name": "single_bed",
+   "file": "props_3d/_duplicates_of_set_14/single_bed.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.23,
+    0.19,
+    0.379
+   ],
+   "triangles": 1140,
+   "scene_prop_kinds": [
+    "bed"
+   ],
+   "note": ""
+  },
+  {
+   "name": "rope_coil",
+   "file": "props_3d/_duplicates_of_set_14/rope_coil.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.332,
+    0.151,
+    0.336
+   ],
+   "triangles": 1868,
+   "scene_prop_kinds": [
+    "rope"
+   ],
+   "note": ""
+  },
+  {
+   "name": "child_cot",
+   "file": "props_3d/_duplicates_of_set_14/child_cot.glb",
+   "category": "duplicate",
+   "sheet": "folder20",
+   "size_model_units": [
+    0.218,
+    0.186,
+    0.34
+   ],
+   "triangles": 940,
+   "scene_prop_kinds": [
+    "cot"
+   ],
+   "note": ""
+  },
+  {
+   "name": "gas_pocket_vent",
+   "file": "props_3d/gas_pocket_vent.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.287,
+    0.208,
+    0.369
+   ],
+   "triangles": 1807,
+   "scene_prop_kinds": [
+    "gasPocket"
+   ],
+   "note": ""
+  },
+  {
+   "name": "vestry_cot",
+   "file": "props_3d/vestry_cot.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.286,
+    0.13,
+    0.312
+   ],
+   "triangles": 783,
+   "scene_prop_kinds": [
+    "cot"
+   ],
+   "note": ""
+  },
+  {
+   "name": "goat_pen",
+   "file": "props_3d/goat_pen.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.299,
+    0.175,
+    0.33
+   ],
+   "triangles": 862,
+   "scene_prop_kinds": [
+    "goat"
+   ],
+   "note": ""
+  },
+  {
+   "name": "ossuary",
+   "file": "props_3d/ossuary.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.258,
+    0.186,
+    0.255
+   ],
+   "triangles": 1931,
+   "scene_prop_kinds": [
+    "ossuary"
+   ],
+   "note": ""
+  },
+  {
+   "name": "wine_cask",
+   "file": "props_3d/wine_cask.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.268,
+    0.222,
+    0.27
+   ],
+   "triangles": 1094,
+   "scene_prop_kinds": [
+    "wine_cask"
+   ],
+   "note": ""
+  },
+  {
+   "name": "harness_rack",
+   "file": "props_3d/harness_rack.glb",
+   "category": "main",
+   "sheet": "folder21",
+   "size_model_units": [
+    0.263,
+    0.248,
+    0.269
+   ],
+   "triangles": 1432,
+   "scene_prop_kinds": [
+    "harness_rack"
+   ],
+   "note": ""
+  },
+  {
+   "name": "tall_vane_family_portrait",
+   "file": "props_3d/tall_vane_family_portrait.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.22,
+    0.285,
+    0.125
+   ],
+   "triangles": 1162,
+   "scene_prop_kinds": [
+    "vane_portrait"
+   ],
+   "note": ""
+  },
+  {
+   "name": "woven_rug",
+   "file": "props_3d/woven_rug.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.246,
+    0.012,
+    0.464
+   ],
+   "triangles": 921,
+   "scene_prop_kinds": [
+    "rug"
+   ],
+   "note": "rug mesh came out as a green leaf patch: regenerate"
+  },
+  {
+   "name": "photo_wall",
+   "file": "props_3d/photo_wall.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.308,
+    0.254,
+    0.017
+   ],
+   "triangles": 1260,
+   "scene_prop_kinds": [
+    "photos"
+   ],
+   "note": ""
+  },
+  {
+   "name": "framed_family_portrait",
+   "file": "props_3d/framed_family_portrait.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.235,
+    0.209,
+    0.07
+   ],
+   "triangles": 750,
+   "scene_prop_kinds": [
+    "portrait"
+   ],
+   "note": ""
+  },
+  {
+   "name": "grandfather_clock",
+   "file": "props_3d/grandfather_clock.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.122,
+    0.321,
+    0.065
+   ],
+   "triangles": 1296,
+   "scene_prop_kinds": [
+    "clock"
+   ],
+   "note": ""
+  },
+  {
+   "name": "draped_curtain_window",
+   "file": "props_3d/draped_curtain_window.glb",
+   "category": "main",
+   "sheet": "folder22",
+   "size_model_units": [
+    0.233,
+    0.318,
+    0.055
+   ],
+   "triangles": 1859,
+   "scene_prop_kinds": [
+    "draped_window"
+   ],
+   "note": ""
+  }
+ ],
+ "interior_prop_kinds_without_a_model": [
+  "bar_counter",
+  "bar_counter_taps",
+  "barrel",
+  "bottle_crate",
+  "keg_rack",
+  "tavern_table",
+  "tin_crate"
+ ],
+ "meshy_name_to_character": {
+  "Hooded_Wayfarer": "thief",
+  "Keykeeper_Matron": "mrs_grieves",
+  "Masked_Corsair": "bandit",
+  "Patchwork_Wanderer": "child",
+  "Pilgrim_Woman": "villagergoodwife",
+  "Shadow_Pilgrim": "collier",
+  "Shadowblade_Envoy": "heir",
+  "Stoic_Matriarch": "medium",
+  "The_Bearded_Gentleman": "lord_vane",
+  "The_Boneleaf_Elder": "mother_moll",
+  "The_Dapper_Keymaster": "butler",
+  "The_Frontier_Wanderer": "tallyman",
+  "The_Gentleman_Inventor": "villagerclerk",
+  "The_Lantern_Ranger": "ranger",
+  "The_Old_Scholar": "villagerelder",
+  "The_Shadow_Detective": "killer",
+  "The_Stern_Matriarch": "widow_vane",
+  "The_Timekeeper": "company_clerk",
+  "The_Village_Artisan": "ada_kerrow",
+  "The_Village_Craftsman": "stallholder",
+  "The_Weary_Baker": "tamsin_crumb",
+  "The_Weathered_Detective": "pennock",
+  "The_Weathered_Voyager": "drifter",
+  "The_Weathered_Wanderer": "accomplice",
+  "The_Weathered_Watchman": "foreman_hask",
+  "Victorian_Gentleman": "hitman",
+  "Vintage_Postal_Courier": "postmaster"
+ }
+}

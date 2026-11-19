@@ -19,6 +19,8 @@ import {
   send,
   start,
   toWorld,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (D9c; GDD 3.24 "Talk to a figure", seams.md 3 row 16): `talk.ask` is answered to the asker alone.
@@ -68,7 +70,7 @@ function figureBeside(party: Party, seat: string, kind: string): Figure {
 
 /** Sends `talk.ask` and runs one tick, which is when the queue is read. */
 async function sendAsk(party: Party, h: Human, payload: unknown): Promise<void> {
-  await send(h, 'talk.ask', payload, 40);
+  await queued(party, h, 'talk.ask', payload);
   advance(party, 1);
 }
 const ask = (party: Party, h: Human, f: Figure, kind: 'town' | 'time') =>
@@ -81,10 +83,10 @@ describe('talk.ask', () => {
     const f = figureBeside(party, a.id, 'villager');
     await ask(party, a, f, 'time');
     advance(party, DELAY - 1);
-    await send(a, 'net.ping', {}, 40);
+    await flush(party);
     expect(lines(a)).toHaveLength(0);
     advance(party, 2);
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     const got = lines(a);
     expect(got).toHaveLength(1);
     expect(got[0]).toMatchObject({ channel: 'system', from: talk.figures.names.villager });
@@ -110,11 +112,11 @@ describe('talk.ask', () => {
     q.sceneIdx = p.sceneIdx;
     q.x = p.x;
     q.y = p.y;
-    await send(a, 'talk.ask', { targetId: f.handle, ask: 'town' }, 40);
-    await send(b, 'talk.ask', { targetId: f.handle, ask: 'town' }, 40);
+    await queued(party, a, 'talk.ask', { targetId: f.handle, ask: 'town' });
+    await queued(party, b, 'talk.ask', { targetId: f.handle, ask: 'town' });
     advance(party, 1, pin); // both asks are read in one tick, so they fall due together
     advance(party, DELAY + 2, pin);
-    await send(a, 'net.ping', {}, 80);
+    await flush(party);
     const [la] = lines(a);
     const [lb] = lines(b);
     expect(la?.text).toContain(looks.looks.vicar!.name);
@@ -139,7 +141,7 @@ describe('talk.ask', () => {
     });
     await ask(party, a, f, 'town');
     advance(party, DELAY + 2);
-    await send(a, 'net.ping', {}, 80);
+    await flush(party);
     expect(lines(a)[0]?.text).toContain("Constables' briefing: footprints in the square.");
   });
 
@@ -158,7 +160,7 @@ describe('talk.ask', () => {
     await ask(party, a, f, 'time');
     sim.players.get(a.id)!.dead = true;
     await ask(party, a, f, 'time');
-    await send(a, 'net.ping', {}, 60);
+    await flush(party);
     expect(reasons(a)).toEqual(['NO_TARGET', 'BAD_REQUEST', 'TOO_FAR', 'COOLDOWN', 'NOT_IN_PLAY']);
   });
 });

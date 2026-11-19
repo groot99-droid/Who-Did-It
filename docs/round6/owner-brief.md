@@ -1,5 +1,7 @@
 # Round 6: the owner's brief
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-22. Current state: rounds 6 to 10 and story mode built from it; the rules live in `docs/GDD.md` and `packages/content/data`, the story in `docs/story/`.
+
 The owner's request of 2026-10-21, word for word, then the Bible it carried, word for word. Nothing here is a
 rule: the rules it implies are written in `docs/GDD.md` and `packages/content/data` by the sessions that build
 them, and the staging of its systems across rounds 6 to 9 is `bible-seams.md`. The decisions the owner took while

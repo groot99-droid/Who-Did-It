@@ -19,6 +19,7 @@ import {
   start,
   stateOf,
   toWorld,
+  flush,
 } from './npcHelpers';
 import { sleep } from './simHelpers';
 
@@ -132,7 +133,7 @@ describe('Exhaustion', () => {
     body(p, b).stamina = 0;
     advance(p, TICK_RATE);
     expect(body(p, b).stamina).toBeCloseTo(body(p, a).stamina / 2, 5);
-    await sleep(200); // the patch reaches the clients
+    await flush(p); // the patch reaches the clients
     expect(stateOf(b).players.get(b.id)?.priv?.body.maxStamina).toBe(balance.body.maxStamina / 2);
     expect(stateOf(a).players.get(b.id)?.priv).toBeUndefined();
     holdPhase(p, Phase.dusk, 600);

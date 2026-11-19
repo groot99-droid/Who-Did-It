@@ -1,0 +1,1870 @@
+{
+  "schema": 1,
+  "repo": "groot99-droid/Who-Did-It",
+  "sources": {
+    "higgsfield": {
+      "licence": "CC0-1.0",
+      "basis": "DECISIONS A17: AI-generated art is CC0 1.0; the generation's catalog id in ROSW studio/library/catalog.json goes in its CREDITS.md row"
+    },
+    "meshy": {
+      "licence": "CC0-1.0",
+      "basis": "DECISIONS A616 Q1: Meshy output on the owner's plan is the owner's to ship; released as AI art under A17 (proposed)"
+    }
+  },
+  "releases": {
+    "char-models": {
+      "asset": "char-models.zip",
+      "sha256": "5800aebd9b6f9cfd4e5d9aeac442b37f020b875f62fa64399f4277f092968197",
+      "size": 122896722
+    },
+    "prop-models": {
+      "asset": "prop-models.zip",
+      "sha256": "3d178ee749b8ef201e6509ce8f4acbe7df145cfe07757f0713d28ce530a76cfd",
+      "size": 112035006
+    }
+  },
+  "models": [
+    {
+      "id": "baker",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/baker.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "c577bc16913bf3e83525bb958cc7404df3b6d891e6b71014ac1f827f777b1dd7",
+      "size": 3197356
+    },
+    {
+      "id": "constable",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/constable.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "df5a6cf82959b8cb112f7defdbac0959ebe4adc7e7dd7a887fce08ee070f7d43",
+      "size": 3377104
+    },
+    {
+      "id": "detective",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/detective.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "65b3f32f36e27d8f4d6e48cc1291cdedd5c23fdc9bea0c464406e4a95843bb3a",
+      "size": 3392072
+    },
+    {
+      "id": "doctor",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/doctor.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "5faaa06e2524d1d44ed65a6584620b3f6987824e6518ceb2acc2afaa0f1ed305",
+      "size": 3081056
+    },
+    {
+      "id": "fisher",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/fisher.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "30111c8fc9c17e0da040def9e2b0a8a5de8c20ada77ec3309cb62860d654361a",
+      "size": 3341636
+    },
+    {
+      "id": "gamekeeper",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/gamekeeper.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "43066d3a272d26b97d895ed3449fde94c8ffd2bea380ff3469e525c50d63c047",
+      "size": 3787956
+    },
+    {
+      "id": "herbalist",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/herbalist.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "1fff5f9c578a46a06a28c9ff70c04b3eb06787d24822c5a3b0ef9758a0c64e2d",
+      "size": 3775156
+    },
+    {
+      "id": "lamplighter",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/lamplighter.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "e8cb10cb7a39ebb74fa7f8bf46b93375db4a78ee26775c72cd5878ff25cbee44",
+      "size": 3203508
+    },
+    {
+      "id": "mallory",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/mallory.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "0039afb00c0c67250ea02694b86b5b084e531f04c735d47bfbafd158a542bfb6",
+      "size": 3733416
+    },
+    {
+      "id": "tinner",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/tinner.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "0fbd8fe0118fa6b0fa9994df787a2566cb13f0b9942201662b95cc076f9bab79",
+      "size": 3386728
+    },
+    {
+      "id": "villager",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/villager.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "add9fdc12dffea922517ea037379d2cc39259952eb436f3e2795e3b4c48b6be1",
+      "size": 3145796
+    },
+    {
+      "id": "villagerlass",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/villagerlass.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "f89d01b61f0791eedae0232c9d295c5e40e99e24ac092c7d8ce67db0079827f4",
+      "size": 3344268
+    },
+    {
+      "id": "watchman",
+      "kind": "character",
+      "path": "characters/higgsfield_24bone/watchman.glb",
+      "source": "higgsfield",
+      "release": "char-models",
+      "sha256": "69ff86cd0259a07d84102be154905c584ab518161ce4d7b342a6090ab298b68d",
+      "size": 3271144
+    },
+    {
+      "id": "accomplice",
+      "kind": "character",
+      "path": "characters/meshy_rigged/accomplice.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "061940677265408ded697c4efb58f8adc2e3a500aee39fe4c751abc36cbdd251",
+      "size": 3305248
+    },
+    {
+      "id": "ada_kerrow",
+      "kind": "character",
+      "path": "characters/meshy_rigged/ada_kerrow.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "7febfe3f98ac4cc80bdbc86fba14265921ea48f728d24fd084d28f750c5e4af1",
+      "size": 3438096
+    },
+    {
+      "id": "bandit",
+      "kind": "character",
+      "path": "characters/meshy_rigged/bandit.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "4489f2f31fc466605175fc631ea94e0027371e85d273db90f92174e901d08528",
+      "size": 3520680
+    },
+    {
+      "id": "butler",
+      "kind": "character",
+      "path": "characters/meshy_rigged/butler.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "30ed9d1d10c7cba355762a48b849fd5aae9a4744c8f7955a0079965ba215a653",
+      "size": 3565952
+    },
+    {
+      "id": "child",
+      "kind": "character",
+      "path": "characters/meshy_rigged/child.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "2cd54dbe53663201abfe8d66e2e6369a0b696cf9a36d1dfb4899a5d806fd8005",
+      "size": 3204200
+    },
+    {
+      "id": "collier",
+      "kind": "character",
+      "path": "characters/meshy_rigged/collier.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "5066ba9f7f2d798458b028a0c5904431810d4b6b9d716d85d9feb716a77befd9",
+      "size": 3743168
+    },
+    {
+      "id": "company_clerk",
+      "kind": "character",
+      "path": "characters/meshy_rigged/company_clerk.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "f71a774ed3ee390dca9314f232f1968838fff9ebb0b0cbe1e53c305ddfd671cf",
+      "size": 3829268
+    },
+    {
+      "id": "drifter",
+      "kind": "character",
+      "path": "characters/meshy_rigged/drifter.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "a6efab0577a6a5be0ab9524dfb641890e1e7d8bce683d03041a363a5cffd6736",
+      "size": 3356724
+    },
+    {
+      "id": "foreman_hask",
+      "kind": "character",
+      "path": "characters/meshy_rigged/foreman_hask.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "d203ad1522bac84e73826ab9a04a0341c070743f191f7d1927ac080f0efac6c4",
+      "size": 3882328
+    },
+    {
+      "id": "heir",
+      "kind": "character",
+      "path": "characters/meshy_rigged/heir.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "8fd526dcbb5b1dd919fc96d1c6d5cd8c318485566606268e92150df3acf38032",
+      "size": 3577892
+    },
+    {
+      "id": "hitman",
+      "kind": "character",
+      "path": "characters/meshy_rigged/hitman.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "0316946d316ff6c35930e6ea0879303998574860222cd2877a3bdcaeae1a859a",
+      "size": 3611204
+    },
+    {
+      "id": "killer",
+      "kind": "character",
+      "path": "characters/meshy_rigged/killer.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "0c6fd305422777740ac47dcd565d55fcaeacafae7890b509fb24144bde597ed8",
+      "size": 3175544
+    },
+    {
+      "id": "lord_vane",
+      "kind": "character",
+      "path": "characters/meshy_rigged/lord_vane.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "45ee896268c0a50606b5f90b5f36d4d2462d0ae3d86f32d6761f61cab5493190",
+      "size": 3483780
+    },
+    {
+      "id": "medium",
+      "kind": "character",
+      "path": "characters/meshy_rigged/medium.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "e19c0749a749871795d707ccc8be25e8d2c269a63fadc12143d700fc999d7c79",
+      "size": 3803580
+    },
+    {
+      "id": "mother_moll",
+      "kind": "character",
+      "path": "characters/meshy_rigged/mother_moll.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "6f157675e52e79f01d5749dbee77df0303fe7355a58734dbed7e628c964bbe7b",
+      "size": 4076508
+    },
+    {
+      "id": "mrs_grieves",
+      "kind": "character",
+      "path": "characters/meshy_rigged/mrs_grieves.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "e7e995b49ec544d2ff2afa44e5ceeb783144e2409897078982b1fde7e3385030",
+      "size": 3446036
+    },
+    {
+      "id": "pennock",
+      "kind": "character",
+      "path": "characters/meshy_rigged/pennock.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "693bddba886c3fd13dc3c0312f8ce96bb6fb6c12f787b33f73c6cdbea6a3ac58",
+      "size": 3753192
+    },
+    {
+      "id": "postmaster",
+      "kind": "character",
+      "path": "characters/meshy_rigged/postmaster.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "fa5fef908d72763a95696825479e253beb50c7f4c3c9a455e8754ec92f4e6ce5",
+      "size": 3706324
+    },
+    {
+      "id": "ranger",
+      "kind": "character",
+      "path": "characters/meshy_rigged/ranger.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "2a7074bfd395f185b7292ece1fcf84b63c6fa49a0aae3ab0305c0d7cab17b550",
+      "size": 3733872
+    },
+    {
+      "id": "stallholder",
+      "kind": "character",
+      "path": "characters/meshy_rigged/stallholder.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "d474020bde7bf77b97fab52ac0fc907ab112c246e355f8f4bbff17cca3f7ff10",
+      "size": 3593240
+    },
+    {
+      "id": "tallyman",
+      "kind": "character",
+      "path": "characters/meshy_rigged/tallyman.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "7f8395f4793725179e1fdd434ca36aaa7b9f9bd0068489b271e5f1fc88a95490",
+      "size": 3562688
+    },
+    {
+      "id": "tamsin_crumb",
+      "kind": "character",
+      "path": "characters/meshy_rigged/tamsin_crumb.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "56e140922cad9f623d242632661548939668a26fce8b66dfbb5100b311f9ec50",
+      "size": 3889760
+    },
+    {
+      "id": "thief",
+      "kind": "character",
+      "path": "characters/meshy_rigged/thief.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "5a5ca2513de4a39f998e341d8c6ad5b339502b0b2ec7edf76d75ee8e31b075be",
+      "size": 3609228
+    },
+    {
+      "id": "villagerclerk",
+      "kind": "character",
+      "path": "characters/meshy_rigged/villagerclerk.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "da0ea76d57936fc71e5b412ff4e622baf134b854aa06311559033c627354be69",
+      "size": 3529916
+    },
+    {
+      "id": "villagerelder",
+      "kind": "character",
+      "path": "characters/meshy_rigged/villagerelder.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "fdabc64d0262032cd93dcc52233afa8ef5a2c66f648f72c26f2ca8bf81ded1cc",
+      "size": 3126072
+    },
+    {
+      "id": "villagergoodwife",
+      "kind": "character",
+      "path": "characters/meshy_rigged/villagergoodwife.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "0c8719839a267a34f148efe4dd4aa19ad34c98909f980d1b5dba413c9e64d82f",
+      "size": 3050284
+    },
+    {
+      "id": "widow_vane",
+      "kind": "character",
+      "path": "characters/meshy_rigged/widow_vane.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "d95acf4122259afdb71bf02d1177de87146d36bc1900b2973916be4148877a38",
+      "size": 3203336
+    },
+    {
+      "id": "account_book",
+      "kind": "item",
+      "path": "items/account_book.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f1e1cbd2f087c039ebc29e4179440874405e1b67a66143875f91a433620e4879",
+      "size": 746556
+    },
+    {
+      "id": "bakers_peel",
+      "kind": "item",
+      "path": "items/bakers_peel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "25029a857ced40aa6d2c297bd422721d11df26b29f511c1a2f71e3d1ee6b0fe9",
+      "size": 771956
+    },
+    {
+      "id": "basket",
+      "kind": "item",
+      "path": "items/basket.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "ff976ac4a7bcb0ea8a8667beed3cf971069e6d67fe5d2830f8dc9c3edcb19034",
+      "size": 911000
+    },
+    {
+      "id": "bindle",
+      "kind": "item",
+      "path": "items/bindle.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1758fb0e5690374119bb123a194ac1de2c1b0e7475ab28f85be35edd2be57251",
+      "size": 797976
+    },
+    {
+      "id": "bread_token",
+      "kind": "item",
+      "path": "items/bread_token.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d995ed019472aa7f4ce5a389995b8e00a0158511f6820dbaa71a5fcfd91c62e3",
+      "size": 759000
+    },
+    {
+      "id": "candle",
+      "kind": "item",
+      "path": "items/candle.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2694c47f67fe29dffc0f2563facd7e55ec7d29645bd245a1f2aa7dc71572eacb",
+      "size": 788884
+    },
+    {
+      "id": "cane",
+      "kind": "item",
+      "path": "items/cane.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "694ff76cedaa28a6b76dbf8e6466bd404b5ffe43eaa0ab3655dabf1c9711d05a",
+      "size": 516444
+    },
+    {
+      "id": "charcoal_rake",
+      "kind": "item",
+      "path": "items/charcoal_rake.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "079242c07ebae49e3b559fca2aa9f46623ae99ee13cbf2763b737f255d53adf5",
+      "size": 518384
+    },
+    {
+      "id": "charcoal_sack",
+      "kind": "item",
+      "path": "items/charcoal_sack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e64c14fe73eb3d2a977626ecdcdf59f19df51ed32427a4dc0fed20571119ec16",
+      "size": 763788
+    },
+    {
+      "id": "company_ledger",
+      "kind": "item",
+      "path": "items/company_ledger.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "5b5df80ba3908b4e7d24f3a44926362b019baf81e8412f7414399fa401fda48b",
+      "size": 533416
+    },
+    {
+      "id": "crowbar",
+      "kind": "item",
+      "path": "items/crowbar.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2e408a772b81859f47345b5541cad189910075c03a9634f8e2242ec6c8098986",
+      "size": 518104
+    },
+    {
+      "id": "dip_pen",
+      "kind": "item",
+      "path": "items/dip_pen.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b08ef764cac897275f0ba7579e0b5d2b238a4d1843862fb2f2ee203ecb7d4c50",
+      "size": 515228
+    },
+    {
+      "id": "field_bag",
+      "kind": "item",
+      "path": "items/field_bag.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8cf27c2ad9cb9a26d3796cd4bb616a2259b7459d38440d7ccebb16edb4d217e5",
+      "size": 795308
+    },
+    {
+      "id": "fowling_piece",
+      "kind": "item",
+      "path": "items/fowling_piece.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2b229456b44f8a62bcffb7415b292ab7dafec75b6972e74f45dba57868a8523d",
+      "size": 851364
+    },
+    {
+      "id": "gnarled_stick",
+      "kind": "item",
+      "path": "items/gnarled_stick.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e8ad06971f709236f07daff6325dc0559f0618269915e67846a2e0680137f9f4",
+      "size": 766584
+    },
+    {
+      "id": "knife",
+      "kind": "item",
+      "path": "items/knife.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a65c5a2e7ddbdb5455d8ca2e1395638099cbf9c9012e11c351f44dd84e95ad96",
+      "size": 726180
+    },
+    {
+      "id": "letters",
+      "kind": "item",
+      "path": "items/letters.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "14d84df4cf2fe07dca7a5762b5eeb946038df47148f0c7929ae59294c4a5a26a",
+      "size": 812140
+    },
+    {
+      "id": "lighting_pole",
+      "kind": "item",
+      "path": "items/lighting_pole.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f1be6e09bc7653e8cdaf7bc4d188bbf894f5d610292bb64afafd3ab003e37af7",
+      "size": 729176
+    },
+    {
+      "id": "magnifying_lens",
+      "kind": "item",
+      "path": "items/magnifying_lens.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "3be46971ef27b0f1701902b88b7d7ff5b341fdef33495c488a836639ca96f5a0",
+      "size": 714664
+    },
+    {
+      "id": "manor_ledger",
+      "kind": "item",
+      "path": "items/manor_ledger.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d452c8fd0ffbdc83d5a2f6b0a552c9636ee093e0147b8dced5c913be63c28cea",
+      "size": 703244
+    },
+    {
+      "id": "medical_bag",
+      "kind": "item",
+      "path": "items/medical_bag.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "079721be8f8b18a00dbc610b2c6a4d94b446490eac2dbb77951d3a8afb43498e",
+      "size": 732948
+    },
+    {
+      "id": "miners_pick",
+      "kind": "item",
+      "path": "items/miners_pick.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "267c24b03912f4ee463547c75d13dac530a44001ad4256d101f1f18ad5e150ff",
+      "size": 724336
+    },
+    {
+      "id": "pail",
+      "kind": "item",
+      "path": "items/pail.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9b27f471942a3bd9ece091eb456744b75a4030add3be57dbd175509c4e24f708",
+      "size": 831060
+    },
+    {
+      "id": "parcel",
+      "kind": "item",
+      "path": "items/parcel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "cd15b6cc9d6d615ba8e13e3632292d885524e22f218334f0dc0da1264a8a5437",
+      "size": 780956
+    },
+    {
+      "id": "strongbox",
+      "kind": "item",
+      "path": "items/strongbox.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "30d182f0b98e93cc49c9c1d7abe5e0aaee7484b9c4f43668d9e32582f1003bd1",
+      "size": 718176
+    },
+    {
+      "id": "tally_stick",
+      "kind": "item",
+      "path": "items/tally_stick.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "06ee244eb1e2bfefc72443615178fdd961c8029d7fd1c6fdccb9b5d38960b874",
+      "size": 590880
+    },
+    {
+      "id": "tankard_tray",
+      "kind": "item",
+      "path": "items/tankard_tray.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "5a10aebbc8d7c1832bae841d755bd8b24fc8d0fc1d3cfa3c9d93476f17c54848",
+      "size": 737584
+    },
+    {
+      "id": "teacup",
+      "kind": "item",
+      "path": "items/teacup.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2a069f354a9f51df9acb2af3203272d33ce4507b8b92ee4fcf608fd99bca61a9",
+      "size": 619888
+    },
+    {
+      "id": "walking_staff",
+      "kind": "item",
+      "path": "items/walking_staff.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "c087063359e543dc05342a14aa6d309c2666b2151fc1180fb4305d411da56026",
+      "size": 602112
+    },
+    {
+      "id": "walking_stick",
+      "kind": "item",
+      "path": "items/walking_stick.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "efe09e79808db31489e2866c198eb47e15871d94255a6bd9d3a989d0c1739307",
+      "size": 601692
+    },
+    {
+      "id": "wooden_knife",
+      "kind": "item",
+      "path": "items/wooden_knife.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "3ce46a6bf0a0e33c4eff5608b65f6f53b109c48b09f1511ff0beb8482564f3fa",
+      "size": 705688
+    },
+    {
+      "id": "work_ledger",
+      "kind": "item",
+      "path": "items/work_ledger.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8d5b7f4baa6ae6a1fc51fac944c1b81f7ba7623a984e9b3d01f363319084dbee",
+      "size": 1120980
+    },
+    {
+      "id": "child_cot_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/child_cot.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "c227f29f92582f400d0f1f0454019225ac804935ed720c475c00ab95024db8d1",
+      "size": 776360,
+      "alternateOf": "child_cot"
+    },
+    {
+      "id": "hay_bale_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/hay_bale.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "0e6a186a6258de366cced6bfd2ea2e224b3e432022095ca341ca59763e7df01d",
+      "size": 860832,
+      "alternateOf": "hay_bale"
+    },
+    {
+      "id": "lantern_hook_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/lantern_hook.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2aca7e67fe2177fae4ed6c3a8b0de969ba5267f5a5cc3fe043c82dabc5c8e590",
+      "size": 766696,
+      "alternateOf": "lantern_hook"
+    },
+    {
+      "id": "plank_stack_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/plank_stack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a335c615560e420e3d9a9d9a3bbe2f3dcc9a9826660433d13779fd56481a8b46",
+      "size": 758048,
+      "alternateOf": "plank_stack"
+    },
+    {
+      "id": "rope_coil_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/rope_coil.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7839e845df20bbd29fbcf8bd35d32c16499395776ada8f53cfd6e7f218f678fd",
+      "size": 809480,
+      "alternateOf": "rope_coil"
+    },
+    {
+      "id": "single_bed_alt",
+      "kind": "prop",
+      "path": "props/_duplicates_of_set_14/single_bed.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "759f68bb8a996fcda1769a121a84e7e7bb2fe808351252e01328e2d38426cbe6",
+      "size": 784136,
+      "alternateOf": "single_bed"
+    },
+    {
+      "id": "apple",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/apple.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f43768ffb455a9a1b5e99dc6937293f0f08504ca0e88e3b00b6c1548cf641387",
+      "size": 666396
+    },
+    {
+      "id": "berry_bowl",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/berry_bowl.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f91c71d6fecb12564b7ff7049e17c6bd4a28d27ddfa684ed1c5d5fbdf70e63a9",
+      "size": 819164
+    },
+    {
+      "id": "bread_loaf",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/bread_loaf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a414fc635aa3f53c374e54b0ef5aeb15e649a404366db928047ed530945516db",
+      "size": 670956
+    },
+    {
+      "id": "cheese_wedge",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/cheese_wedge.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d3288f6e2e72946602b5aa3ee42ed557d3d4e6d3463aedf1a9ec80f3ac5549eb",
+      "size": 743136
+    },
+    {
+      "id": "grain_sack",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/grain_sack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b51343876a4bb45231f6fda8a7bfff992e9eeb7df63854792746aa6789a74b6b",
+      "size": 764572
+    },
+    {
+      "id": "lavender_bunch",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/lavender_bunch.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8ab6d7f400a7c9d5100d33d7d578a0a13caa3f469b275cfaa207ae1f7452d315",
+      "size": 768928
+    },
+    {
+      "id": "pomegranate",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/pomegranate.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "35eaa7bb2d7c84fa5eed14ef2fdf59111166f3da1d1e2b52e9531391ea6dcd16",
+      "size": 746232
+    },
+    {
+      "id": "tincture_bottle",
+      "kind": "prop",
+      "path": "props/_extras_not_in_interior_list/tincture_bottle.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e32eedb190b489942b9f44eb56bf27ff29cc5c20ee89c264f1e1af8a7a00ce64",
+      "size": 745972
+    },
+    {
+      "id": "alms_box",
+      "kind": "prop",
+      "path": "props/alms_box.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d1ff9c96c9012d7d063ae758980d22ed25317882278ff82ba5aaea1f9742ba57",
+      "size": 772952
+    },
+    {
+      "id": "altar",
+      "kind": "prop",
+      "path": "props/altar.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "3b671601a5ee0d7ad3a4a90015d7a4a143529af55280cd2cde2329aed8b81218",
+      "size": 775160
+    },
+    {
+      "id": "apothecary_drawer_cabinet",
+      "kind": "prop",
+      "path": "props/apothecary_drawer_cabinet.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "eebfc710427460cd68503ab0aedb2019ce85542828ce88b665b09eacdd108c75",
+      "size": 659456
+    },
+    {
+      "id": "armchair",
+      "kind": "prop",
+      "path": "props/armchair.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "14e7ecfde429b8f90a3187e32c177b5e79b0b61c00944df569c188b90d7665bd",
+      "size": 635120
+    },
+    {
+      "id": "baker_peel_rack",
+      "kind": "prop",
+      "path": "props/baker_peel_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d0c36f402d2f5f10db128287a6059dea67345a16fe6fb974bbebcb41bad1f19b",
+      "size": 602624
+    },
+    {
+      "id": "baptismal_font",
+      "kind": "prop",
+      "path": "props/baptismal_font.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8c7a8ed50a24d46e18ebac625526ca83d2f646ab188873c59b5c9648343d2c52",
+      "size": 697500
+    },
+    {
+      "id": "bell_rope",
+      "kind": "prop",
+      "path": "props/bell_rope.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "150ab4ddcbfc5f2fda10c466d1a82dc2fdd36d980c86c9a013120fce86da7328",
+      "size": 715104
+    },
+    {
+      "id": "big_brick_oven",
+      "kind": "prop",
+      "path": "props/big_brick_oven.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "28052871c039da2f86fb7d85f1cd6a623f0d93b92bc876ef7f8c6f92d2f74d06",
+      "size": 631532
+    },
+    {
+      "id": "birdcage",
+      "kind": "prop",
+      "path": "props/birdcage.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "711a5f2d26dc3d1a252d07d39b31adf7b5dc410552a10713279e02fd96124d35",
+      "size": 702352
+    },
+    {
+      "id": "black_market_stash_crate",
+      "kind": "prop",
+      "path": "props/black_market_stash_crate.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9223d2da873cffcce837fa99e2451188fbe084ca3c5a753c6967ecb1e196a17d",
+      "size": 682140
+    },
+    {
+      "id": "blanket_chest",
+      "kind": "prop",
+      "path": "props/blanket_chest.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1be039e5ff94f7336d5b67fc81ae95e964b1b980cb244f34e2e0e9bae5d12ffc",
+      "size": 722868
+    },
+    {
+      "id": "bookcase",
+      "kind": "prop",
+      "path": "props/bookcase.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "fc17e24e0306e8961b05bee7f65a370f9e44ca2901a17543d1eaae95f5b071bf",
+      "size": 732028
+    },
+    {
+      "id": "boot_rack",
+      "kind": "prop",
+      "path": "props/boot_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "cf8ab67a3e97ff0bb1ca10c9e08044338244a6f8ed02ea0507854101636817f5",
+      "size": 705968
+    },
+    {
+      "id": "bottle_shelf",
+      "kind": "prop",
+      "path": "props/bottle_shelf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "dd0fca541df4427326d5328971ae3601a4c40852300fbf0d3ac2afaabed8ddfc",
+      "size": 636284
+    },
+    {
+      "id": "bread_basket",
+      "kind": "prop",
+      "path": "props/bread_basket.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b0d846d10e1a9733ddde2ce1e88ceef7adf51091bd439e321d44d05e2ba30c2d",
+      "size": 781060
+    },
+    {
+      "id": "bread_display_case",
+      "kind": "prop",
+      "path": "props/bread_display_case.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "60bccb97008102908add48ffebf22e0cf3008269c0000fd74489c385a1c55201",
+      "size": 774612
+    },
+    {
+      "id": "bread_oven",
+      "kind": "prop",
+      "path": "props/bread_oven.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "0c9998aa77161b55e5c3de1e090400a7410e3124f2169c3f911622ed3d2a863b",
+      "size": 601648
+    },
+    {
+      "id": "bread_plate",
+      "kind": "prop",
+      "path": "props/bread_plate.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "463f7ccc0df2e087657ddacdb2be436debb106360e82f91ad2d03dbe86d079a0",
+      "size": 690360
+    },
+    {
+      "id": "bread_shelf",
+      "kind": "prop",
+      "path": "props/bread_shelf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "c119c6802c28ff92918becdb2503ffac1b317b2c44a67e2e9a31f79e332dcfbd",
+      "size": 641128
+    },
+    {
+      "id": "brick_fireplace",
+      "kind": "prop",
+      "path": "props/brick_fireplace.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "57944e9de5a414022eadc1f336410fab94ce17d33b6a3563cc4466c2491b4797",
+      "size": 721128
+    },
+    {
+      "id": "candle_stand",
+      "kind": "prop",
+      "path": "props/candle_stand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7b5c9d78b54c1e41a02a0651d32a91de58353d32cfe81e3411956b1d342ee3cf",
+      "size": 706460
+    },
+    {
+      "id": "card_table",
+      "kind": "prop",
+      "path": "props/card_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7275ff112a38749dd79c677f171f89ec717307dbc24a0945e81a3970d6edfe82",
+      "size": 576148
+    },
+    {
+      "id": "chalkboard_easel",
+      "kind": "prop",
+      "path": "props/chalkboard_easel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "fabe01f67aea25c4fc9c15c4a58b29bb107dad85b8caa364c2b65a460d65992b",
+      "size": 586224
+    },
+    {
+      "id": "child_cot",
+      "kind": "prop",
+      "path": "props/child_cot.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1a164b78b1adf45dcd3d906606e9d4bd87305efd3dede69849add08bc35db312",
+      "size": 768180
+    },
+    {
+      "id": "church_pew",
+      "kind": "prop",
+      "path": "props/church_pew.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e36b56490cc903645a87e10986b4c7a893c2149668e90679a48bece7a1056594",
+      "size": 740744
+    },
+    {
+      "id": "coat_hook_board",
+      "kind": "prop",
+      "path": "props/coat_hook_board.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "754758b765471a8d91a038f86b71aac08c0cc3e0a290041aec728df852dbf4aa",
+      "size": 784748
+    },
+    {
+      "id": "coat_stand",
+      "kind": "prop",
+      "path": "props/coat_stand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "11d2698e7a30706db4fc3fb0d78b87899f9edfd1c8b5662202fdeebb5e2c61ea",
+      "size": 660452
+    },
+    {
+      "id": "cobweb_corner",
+      "kind": "prop",
+      "path": "props/cobweb_corner.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f61371250c24d941a331eba568231bc4289d0ea395d232738a94f496d40d6408",
+      "size": 784392
+    },
+    {
+      "id": "cold_storage_shelf",
+      "kind": "prop",
+      "path": "props/cold_storage_shelf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "5d67891fe98ddc3d6ff7f0316eb1311b31ef5f6274f049d4fec73de59a5053cd",
+      "size": 668504
+    },
+    {
+      "id": "company_desk",
+      "kind": "prop",
+      "path": "props/company_desk.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "c2451394b0c8d290393a38c6c79a155319cf664b2fdfff447fa8e4c5b9ba0832",
+      "size": 766508
+    },
+    {
+      "id": "cooling_rack",
+      "kind": "prop",
+      "path": "props/cooling_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "ce18fa686e9acdad6f50c4dc16e0d4f739c9426d92a8161b3bf88db595882f50",
+      "size": 802884
+    },
+    {
+      "id": "copper_still",
+      "kind": "prop",
+      "path": "props/copper_still.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1d394052b1f444fcde5571739f85d875ac87ad7ef94a68954437c3770f763b58",
+      "size": 624840
+    },
+    {
+      "id": "cottage_fireplace",
+      "kind": "prop",
+      "path": "props/cottage_fireplace.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "76c4d63bb03e44167db7fc30525ca05b0a469add41c358503b983b0810f46035",
+      "size": 656584
+    },
+    {
+      "id": "couche_proofing_rack",
+      "kind": "prop",
+      "path": "props/couche_proofing_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "bf8651fe4a2054ddd687d794aa6bf208d127311db53e181d231d146aecc4059f",
+      "size": 784912
+    },
+    {
+      "id": "dartboard",
+      "kind": "prop",
+      "path": "props/dartboard.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b599ede06002d933ef184f5675b7f6d37786aa815241089c7d0963cc4a4435dd",
+      "size": 638644
+    },
+    {
+      "id": "dead_loaf",
+      "kind": "prop",
+      "path": "props/dead_loaf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7c2e07370c641317a21a03399142371cb77663a677997d7c56cdc01b7243fa37",
+      "size": 732232
+    },
+    {
+      "id": "dining_table",
+      "kind": "prop",
+      "path": "props/dining_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "6bdcf84e04a8f7af12510c49b3290c8a4689c8f2683d72bb3805c13d57c14c18",
+      "size": 640600
+    },
+    {
+      "id": "dough_mixer",
+      "kind": "prop",
+      "path": "props/dough_mixer.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4b628f53e52efbeaa797a4e45f9bb5e3a81e170e6eac2c3ca770d954498f880e",
+      "size": 780420
+    },
+    {
+      "id": "dough_trough",
+      "kind": "prop",
+      "path": "props/dough_trough.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "898030b1eddd951a80d26753bac2ed41215572b9336aa90162b23231a9bda01b",
+      "size": 677652
+    },
+    {
+      "id": "draped_curtain_window",
+      "kind": "prop",
+      "path": "props/draped_curtain_window.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "0b0198babcc0b16e4e3e46361c1e79a5da39199e8e2ff3134e5f1aa0b3bebef9",
+      "size": 765388
+    },
+    {
+      "id": "dressing_table",
+      "kind": "prop",
+      "path": "props/dressing_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9c31e17eb198650819796a6bfa57885ca524bbbd7e8362a3f73a2d9d4bbf467a",
+      "size": 639200
+    },
+    {
+      "id": "drying_frame",
+      "kind": "prop",
+      "path": "props/drying_frame.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "6bf57a2b4501651938aa2e3d9335bd519b6eb9ae11897ab7502c6c46f98458be",
+      "size": 756272
+    },
+    {
+      "id": "feed_trough",
+      "kind": "prop",
+      "path": "props/feed_trough.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d5f75f2b69ca75f533db4d3719b2c4893593d3c31ffc6f901383e200f1368120",
+      "size": 606728
+    },
+    {
+      "id": "fisherman_dining_table",
+      "kind": "prop",
+      "path": "props/fisherman_dining_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "93339d28124e77bbd124a70be71cdab69d7f8f06187d4a7b6d66424f53d574a1",
+      "size": 623156
+    },
+    {
+      "id": "fishing_net",
+      "kind": "prop",
+      "path": "props/fishing_net.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "ed2af064be57085a890d1fd7cdd36cb731222ff3cd05fe2b13591aad36b59ae2",
+      "size": 633736
+    },
+    {
+      "id": "flour_bin",
+      "kind": "prop",
+      "path": "props/flour_bin.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "ed00e4fb4e0f6b350e807cf1c41fe52b86405df8ed2de061fdf90602ebe76761",
+      "size": 655040
+    },
+    {
+      "id": "flour_sacks",
+      "kind": "prop",
+      "path": "props/flour_sacks.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9a477ab9967f015f6ca99dec2f4e0cd73ea021e990a8eab38ab9ba4e4f3e7dfd",
+      "size": 677432
+    },
+    {
+      "id": "flower_stand",
+      "kind": "prop",
+      "path": "props/flower_stand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4ad685cc8143a2e9b17957630cdab6fa6eaca90ed875a59c70a98c2713bddbc9",
+      "size": 800436
+    },
+    {
+      "id": "framed_family_portrait",
+      "kind": "prop",
+      "path": "props/framed_family_portrait.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "08e736e427169162a90154218a82abf079679ce6ae4db8eddee97e9dc78d3497",
+      "size": 723688
+    },
+    {
+      "id": "gas_pocket_vent",
+      "kind": "prop",
+      "path": "props/gas_pocket_vent.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d50423c2466a02448bd2c13ea27173838b191681a72252b593aac44de9c0cbdd",
+      "size": 745604
+    },
+    {
+      "id": "glass_display_counter_case",
+      "kind": "prop",
+      "path": "props/glass_display_counter_case.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a03f285d1c66ccb05bf09a6ab0d5161a9e88a36217c36d247d027892cd7ca63b",
+      "size": 657068
+    },
+    {
+      "id": "goat_pen",
+      "kind": "prop",
+      "path": "props/goat_pen.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7072e23b7ff0b8e03f476d8413aa1d32eacb7aecbb16e1cd15344e76bc3d6163",
+      "size": 707440
+    },
+    {
+      "id": "grandfather_clock",
+      "kind": "prop",
+      "path": "props/grandfather_clock.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7a9a7eb132fd09783d33ff11f6d518d021d664d47c66a06397edf0bd4a4fd02a",
+      "size": 745480
+    },
+    {
+      "id": "hanging_bar_lamp",
+      "kind": "prop",
+      "path": "props/hanging_bar_lamp.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f16833efe0cfbdcd7dce589136feb0a3bbc65076f8eff99ceb237585c3df7b78",
+      "size": 768504
+    },
+    {
+      "id": "hanging_herb_rack",
+      "kind": "prop",
+      "path": "props/hanging_herb_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8160248c4a694aa69a6c1894835f778da7904e4e6aa3dc9fb0e49af9412717e3",
+      "size": 671720
+    },
+    {
+      "id": "harness_rack",
+      "kind": "prop",
+      "path": "props/harness_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b61336e66313be1afb3712af8f7ec29cdb5c5608be60ce2521298b20130412b2",
+      "size": 738288
+    },
+    {
+      "id": "hay_bale",
+      "kind": "prop",
+      "path": "props/hay_bale.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "86d1205ce95445dcf63faa2ed80103e17656f6b1fe1170365c3e545c90602c30",
+      "size": 860528
+    },
+    {
+      "id": "hidden_key_cache",
+      "kind": "prop",
+      "path": "props/hidden_key_cache.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7fa13bddd388cfd0dca2e3f43a83151774d7e14f35d5ddcd9fe111894d34b723",
+      "size": 677464
+    },
+    {
+      "id": "hymn_board",
+      "kind": "prop",
+      "path": "props/hymn_board.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "acf5191ac1d94c4c63b5d55e190310b45abc300190015b30aa2ab6010e1aedc6",
+      "size": 721024
+    },
+    {
+      "id": "inglenook_fireplace",
+      "kind": "prop",
+      "path": "props/inglenook_fireplace.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e80d7fe62d96a71a4bea86e082aeb3e24890575db782bd462fda993b67014fff",
+      "size": 918516
+    },
+    {
+      "id": "inn_bed",
+      "kind": "prop",
+      "path": "props/inn_bed.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4db5fdedd1ad2e353a833a49a50d2e82a72813a5c0f918db065b05bf69847955",
+      "size": 669600
+    },
+    {
+      "id": "iron_safe",
+      "kind": "prop",
+      "path": "props/iron_safe.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4e27371ea15c195b27349ce0954fcd5d245c6297139b8bbaf82af42b567d278d",
+      "size": 740356
+    },
+    {
+      "id": "jar_shelf",
+      "kind": "prop",
+      "path": "props/jar_shelf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b4a2cdb7b0a15f5831ce6793ebf4f78629a84e93aff9b5f850ae0ec32b053f3a",
+      "size": 704808
+    },
+    {
+      "id": "lamp_table",
+      "kind": "prop",
+      "path": "props/lamp_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "30fdb778996b766d65d6ea7ed71d111c502c3c9c3dd3023398c510bb6a2eca01",
+      "size": 680552
+    },
+    {
+      "id": "lantern_hook",
+      "kind": "prop",
+      "path": "props/lantern_hook.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1b272de25d7b3a6afa50bb0f0ffda071a66ffb57e09965899768f5c4c1854311",
+      "size": 747348
+    },
+    {
+      "id": "lectern",
+      "kind": "prop",
+      "path": "props/lectern.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a10e3f4cbbe3c1cce797228e7058fcf2837993e7a781e1f8c05137c21bfb6065",
+      "size": 718148
+    },
+    {
+      "id": "ledger_stand",
+      "kind": "prop",
+      "path": "props/ledger_stand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "41be1d7273c6e8d73f0aea761aec6e55c1d721be9ee7c996b9bd97a7e8d4b591",
+      "size": 677052
+    },
+    {
+      "id": "leech_jar",
+      "kind": "prop",
+      "path": "props/leech_jar.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "328ab3965d9fc8e4b3b0688643e9fc01f2459e1d4e5ccc796071799e6f7c0740",
+      "size": 622056
+    },
+    {
+      "id": "letter_box",
+      "kind": "prop",
+      "path": "props/letter_box.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e79cef55cf3521ea947d3143477106495d021e4c3af7dcba72dffb72160def40",
+      "size": 691576
+    },
+    {
+      "id": "linen_press",
+      "kind": "prop",
+      "path": "props/linen_press.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e38c6d867a55a9faaa429be4d20b8e4a8b461ed79072165044bcd238002ab6ec",
+      "size": 698216
+    },
+    {
+      "id": "locked_door",
+      "kind": "prop",
+      "path": "props/locked_door.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "20897b46e239ecb205c5055d263e4d438fddd9ee710eff9fede606d69261f251",
+      "size": 694888
+    },
+    {
+      "id": "log_basket",
+      "kind": "prop",
+      "path": "props/log_basket.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8299e6ec7c1bb492747833ce7c442a0ea708355e0708f0dc7727fbb1e939e041",
+      "size": 813888
+    },
+    {
+      "id": "memorial_plaque",
+      "kind": "prop",
+      "path": "props/memorial_plaque.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "42fb7436d9bacb2a369fe1c0f24b0c67cbbfc858452e6fb7a0c4f6a2d6038123",
+      "size": 701092
+    },
+    {
+      "id": "milk_churn",
+      "kind": "prop",
+      "path": "props/milk_churn.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "47a057841b21f9babd44b772b21de4cef3ab6dcd834044a3c9722f830ac8d0cf",
+      "size": 671644
+    },
+    {
+      "id": "mortar_pestle_table",
+      "kind": "prop",
+      "path": "props/mortar_pestle_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8ce9ceeac9c5550664c0b628992dc6b81f7a3de750e6dccfa534210141aca732",
+      "size": 687056
+    },
+    {
+      "id": "nightstand",
+      "kind": "prop",
+      "path": "props/nightstand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "59444d5325eafad4c99bd0b6268f248e03e6c3b9861a2a470ed0ebee07cb66b2",
+      "size": 691948
+    },
+    {
+      "id": "oil_barrel",
+      "kind": "prop",
+      "path": "props/oil_barrel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1bedd6f9132fa6db5e3522a60060a686b4336de7e75214ade877cebf635dc3c0",
+      "size": 668284
+    },
+    {
+      "id": "ossuary",
+      "kind": "prop",
+      "path": "props/ossuary.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "ee610e1035ac5c74e829329526391df4776b5d147e7e6e695bb844939d0a1ab1",
+      "size": 756376
+    },
+    {
+      "id": "photo_wall",
+      "kind": "prop",
+      "path": "props/photo_wall.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4ce87bf9e612ec32f6d3cd4ca204876e89e81169f871d776511882b7b71a35bc",
+      "size": 743672
+    },
+    {
+      "id": "plank_stack",
+      "kind": "prop",
+      "path": "props/plank_stack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "95304a8ec448144e58e014c97cab80a1cc1046eccb747ed96e6e0db24a287092",
+      "size": 728516
+    },
+    {
+      "id": "proofing_cabinet",
+      "kind": "prop",
+      "path": "props/proofing_cabinet.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "365892ae24e0d4a64984ee72a5a9757e25fab0fc943d030a3efcf18d88c47cb7",
+      "size": 707056
+    },
+    {
+      "id": "pulpit",
+      "kind": "prop",
+      "path": "props/pulpit.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7ea653968ff77640710db2d8447e8eece48381c0a967b5fa5508483fc861940d",
+      "size": 726420
+    },
+    {
+      "id": "refrigeration_compressor",
+      "kind": "prop",
+      "path": "props/refrigeration_compressor.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e8cab263c2492ceed009c1fc21feeae8df9e3484692a4e3bb3705cca7f543d61",
+      "size": 698736
+    },
+    {
+      "id": "rope_coil",
+      "kind": "prop",
+      "path": "props/rope_coil.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "50e86d43e0088b442b17653c0aa8f2665801f3a40c808a08a0d6c57cf7dcf5e3",
+      "size": 811660
+    },
+    {
+      "id": "sawdust_pile",
+      "kind": "prop",
+      "path": "props/sawdust_pile.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "42655c4cfb02d73c247dcfe7663ef4b28c0c5dec91ebeb3eddb302e1376a8221",
+      "size": 662804
+    },
+    {
+      "id": "scales",
+      "kind": "prop",
+      "path": "props/scales.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "42c325e330bfc9905ed424446030c93df3cfe6fbddbd33bebd6390a7929560b3",
+      "size": 656812
+    },
+    {
+      "id": "scarecrow",
+      "kind": "prop",
+      "path": "props/scarecrow.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "6f97561732071b2e457b3ba9b26b54d698f5dfd68615c2a76599bd5a71d32e23",
+      "size": 700628
+    },
+    {
+      "id": "settle_bench",
+      "kind": "prop",
+      "path": "props/settle_bench.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a2dc57a5e85733d57e9f3f47e5439f642083a763c7127318ce758d74d0f05905",
+      "size": 762008
+    },
+    {
+      "id": "shaping_table",
+      "kind": "prop",
+      "path": "props/shaping_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "a3ec6d81885525ba17afe8b3af871078d74629263a74d88a5297f28217d392d4",
+      "size": 750852
+    },
+    {
+      "id": "ship_wheel",
+      "kind": "prop",
+      "path": "props/ship_wheel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "d04479ebb67b8d4afadd7418fabc3c4597bfa9e21deaa89c9debc9246126e6eb",
+      "size": 636680
+    },
+    {
+      "id": "shop_counter_till",
+      "kind": "prop",
+      "path": "props/shop_counter_till.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9920928ca97e7fdbee04887fa6c0da02d544d2674f006c466d9494a65814a3cb",
+      "size": 754020
+    },
+    {
+      "id": "show_globe",
+      "kind": "prop",
+      "path": "props/show_globe.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "3bae935d1e4810e62c7ca61bfcc18f61713fefd108cac59e5aac6ae23ab9692a",
+      "size": 624916
+    },
+    {
+      "id": "shuttered_window",
+      "kind": "prop",
+      "path": "props/shuttered_window.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8cdf790121c50d92c42741e52e4b78d034c01196fdf04e96ffd8d6e79a576f7f",
+      "size": 690892
+    },
+    {
+      "id": "sideboard",
+      "kind": "prop",
+      "path": "props/sideboard.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "363247af394335b1a429494eb4d5f263d2614813ccd929af7d501fb46ca3294f",
+      "size": 723504
+    },
+    {
+      "id": "single_bed",
+      "kind": "prop",
+      "path": "props/single_bed.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "6874c188db49ca3bb2799799d9e2b6427e14ea74e10c7103776e6892ec87cd76",
+      "size": 755692
+    },
+    {
+      "id": "stained_glass_panel",
+      "kind": "prop",
+      "path": "props/stained_glass_panel.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "e2e0abd6359991c2507b12679720691ad998837d19f6531e881e25ee067e3ae5",
+      "size": 646036
+    },
+    {
+      "id": "stained_glass_saint",
+      "kind": "prop",
+      "path": "props/stained_glass_saint.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f887972ddab03efb1ad78d9a94ee0557090afab40ce6feee4e2b3d24ee086946",
+      "size": 690680
+    },
+    {
+      "id": "store_shelf",
+      "kind": "prop",
+      "path": "props/store_shelf.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "35fdaec59f8a9b6849c68d887f764aa96e4db40c224bfb422d9c62c6ee3c01bd",
+      "size": 811764
+    },
+    {
+      "id": "tall_vane_family_portrait",
+      "kind": "prop",
+      "path": "props/tall_vane_family_portrait.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "48bd63af75a50548b5a78eec3d6bfd697027fe032dc003b5f1b2449d401fa255",
+      "size": 740256
+    },
+    {
+      "id": "tea_table",
+      "kind": "prop",
+      "path": "props/tea_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "2b226d6a0c865315fdf4085709da83f1ae83f8222b99337b3281c0d4fe89f8ee",
+      "size": 646048
+    },
+    {
+      "id": "tide_chart",
+      "kind": "prop",
+      "path": "props/tide_chart.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "8a1bce34a887ca2a296569aa885cacd63dc2a5c759015894ebf8a07681714e49",
+      "size": 564124
+    },
+    {
+      "id": "tin_cabinet",
+      "kind": "prop",
+      "path": "props/tin_cabinet.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "7d06237e972e0c817cc2566ba123f79aca9bfa71aece9dd088538a85ad462544",
+      "size": 744560
+    },
+    {
+      "id": "tool_rack",
+      "kind": "prop",
+      "path": "props/tool_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "b79035d7684926f3e39b98cab635965c93bfdccd12b5c576f222d5633084fd1f",
+      "size": 691752
+    },
+    {
+      "id": "upright_piano",
+      "kind": "prop",
+      "path": "props/upright_piano.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9529cbe26a3d6cdff97d84ccd20aba8b17068639b415a0f0f7c145317ab55083",
+      "size": 790716
+    },
+    {
+      "id": "vestry_cot",
+      "kind": "prop",
+      "path": "props/vestry_cot.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4e91dac0622868cb7b4bc04460bed09764b16d02ed216c177917506bd921f997",
+      "size": 707900
+    },
+    {
+      "id": "votive_rack",
+      "kind": "prop",
+      "path": "props/votive_rack.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "64a7113f3a46f68e87e1c7c86350ddd7cbabe8e85941da69ce22136d0d1a8a71",
+      "size": 733892
+    },
+    {
+      "id": "wake_table",
+      "kind": "prop",
+      "path": "props/wake_table.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f1924df43b64ede200668c588c077cad518d64f75f2dc068b630b40ee6016d5c",
+      "size": 682452
+    },
+    {
+      "id": "wall_light_bracket",
+      "kind": "prop",
+      "path": "props/wall_light_bracket.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f9cfff0455df2d732810679dd376aca5c186ae910d9bdacd774363bf7dae20fb",
+      "size": 684384
+    },
+    {
+      "id": "wall_oil_lamp",
+      "kind": "prop",
+      "path": "props/wall_oil_lamp.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "f254a553172c9056d5e4e377d71cb18adeede48c4638dd61f10a5fd63b7c77c1",
+      "size": 797900
+    },
+    {
+      "id": "wall_shelf_bottles",
+      "kind": "prop",
+      "path": "props/wall_shelf_bottles.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9912ecd7f1d0f538a0bf4e278498c4a0228e089f216fab03d61717057f7c7188",
+      "size": 665140
+    },
+    {
+      "id": "wash_basin",
+      "kind": "prop",
+      "path": "props/wash_basin.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "1b0bb14731ce9180051746dc32ebd483b3b834cb48b3e58ae0270f73b3077769",
+      "size": 658792
+    },
+    {
+      "id": "washstand",
+      "kind": "prop",
+      "path": "props/washstand.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "6b67c70d572fbbda2f791c8e07402af34ad832f35e116a88dd82e5e9eb67a1d4",
+      "size": 665112
+    },
+    {
+      "id": "water_bucket",
+      "kind": "prop",
+      "path": "props/water_bucket.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "0dc361328e84b88bc1c5f46ebc85262fa4beb3e9b2b5f6347a2ea27e83264fc9",
+      "size": 789704
+    },
+    {
+      "id": "wine_cask",
+      "kind": "prop",
+      "path": "props/wine_cask.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "9b81ab4f74ca5fc8d127c2aaae300ebe10e27a83513e05985cea793bd11c99c5",
+      "size": 719544
+    },
+    {
+      "id": "wooden_stool",
+      "kind": "prop",
+      "path": "props/wooden_stool.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "bae411e0adcb0cb0a146e82c71a8703cbff75d31e1362dc9864fcf638f05f913",
+      "size": 593712
+    },
+    {
+      "id": "workbench",
+      "kind": "prop",
+      "path": "props/workbench.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "fe0746922d2e8a9d27d10e5869c8f51306622741f9b8564e48583c3ffd71c36f",
+      "size": 670936
+    },
+    {
+      "id": "woven_rug",
+      "kind": "prop",
+      "path": "props/woven_rug.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "4cb949465813f2eed6fb8dfc99d2efd5cead8a33c863560301459a063a903c01",
+      "size": 744788
+    },
+    {
+      "id": "writing_desk",
+      "kind": "prop",
+      "path": "props/writing_desk.glb",
+      "source": "meshy",
+      "release": "prop-models",
+      "sha256": "30807573983792baa28fa5d186c236f942067900b1a27c51e0f3d06974a14f06",
+      "size": 662940
+    }
+  ]
+}

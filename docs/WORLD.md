@@ -226,7 +226,9 @@ Black crepe on the manor door; stopped clock at 11:47; tide chart with the next 
 
 ### 4.9 V2 notes
 
-Keep every scene, portal, spawn and clue id; 1 tile = 1 m. Manor floors and the cellar become real volumes while `zoneId` keeps their visibility and Ledger scope; cottages, tavern, chapel and barn stay portal-loaded. One-way drops become ledges, the hollow log a crouch tunnel, the tide a water volume. Baked sprites are discarded for the original Blender meshes.
+Keep every scene, portal, spawn and clue id. The rules stay on the grid of 4.2 (1 tile = 1 m); the 3D view draws the HollowMere exterior at 1.5 m per tile and the interiors at 1 m per tile (`tools/blender/README.md`, `meshy_village_build.py`; `docs/map-revamp/interiors-plan.md`, Q1). Manor floors and the cellar become real volumes while `zoneId` keeps their visibility and Ledger scope; cottages, tavern, chapel and barn stay portal-loaded. One-way drops become ledges, the hollow log a crouch tunnel, the tide a water volume. Baked sprites are discarded for the original Blender meshes.
+
+V2 began on 2026-11-13 as `apps/walk`, a single-player first-person walk through a 3D HollowMere built from the owner's Meshy models (DECISIONS A610). The 3D view's scale, its rooms (one GLB each, A614) and its portals are set in `tools/blender/README.md`, `apps/walk/README.md` and `docs/map-revamp/interiors-plan.md`; its scene, portal and spawn ids are this section's.
 
 ### 4.10 Blackpine
 

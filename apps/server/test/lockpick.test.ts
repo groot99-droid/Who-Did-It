@@ -15,9 +15,17 @@ import { balanceOf } from '../src/sim/economy/purse';
 import { addStack, count } from '../src/sim/Inventory';
 import { onSim } from '../src/sim/events/bus';
 import { briefingLine } from '../src/sim/law/Briefing';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 import { fixSeeds } from './seedHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10 (D5; GDD 3.29): the lock-pick on the manor study door. The hold opens a mini-game that sends the picker the
 // pins and their set points; the trace it answers with is replayed on the server.
@@ -43,9 +51,9 @@ async function atDoor(picks: number, humans = 1): Promise<Party> {
 }
 
 async function pick(p: Party): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId: DOOR, on: true }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId: DOOR, on: true });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const starts = (p: Party) => p.humans[0]!.log.filter((m) => m.type === S2C.minigameStart);
@@ -55,9 +63,9 @@ const doorState = (p: Party) => p.room.state.scenes.get('manor_upper')!.propStat
 
 async function answer(p: Party, trace: LockAttempt[], waitS = 4): Promise<void> {
   advance(p, Math.round(waitS * TICK_RATE));
-  await send(p.humans[0]!, 'minigame.result', { taskId: DOOR, answer: { trace } }, 80);
+  await queued(p, p.humans[0]!, 'minigame.result', { taskId: DOOR, answer: { trace } });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const honest = (pub: LockpickPublic, tension = 0.3): LockAttempt[] =>

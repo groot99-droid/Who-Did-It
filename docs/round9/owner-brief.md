@@ -1,5 +1,7 @@
 # Round 9: the owner's brief (2026-10-24)
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-24. Current state: round 9 designed world mode from it (`docs/round9/`) and round 10 builds it, in part (`docs/round10/part2.md`).
+
 The owner wrote this after the first playtest of the round-8 build. It is kept here verbatim. DECISIONS A222 records it, and `docs/round9/` will hold the round-9 design notes built on it. Until those land in `GDD.md`, the GDD's rules stand.
 
 ## The owner's words, verbatim
