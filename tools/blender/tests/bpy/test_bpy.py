@@ -8,6 +8,7 @@ tests skip with that reason. They check the plumbing every render session stands
 imports, an orthographic frame at the isometric pitch comes out at the size asked with an alpha channel, and
 two runs write the same bytes."""
 
+import base64
 import hashlib
 import math
 import os
@@ -26,7 +27,7 @@ try:
 except ImportError:  # pragma: no cover
     bpy = None
 
-FIXTURE = os.path.join(HERE, "fixtures", "tiny.glb")
+FIXTURE = os.path.join(HERE, "fixtures", "tiny.glb.b64")
 SIZE = 128
 
 
@@ -80,7 +81,11 @@ def alpha_extremes(path: str) -> tuple[int, int]:
 
 def import_fixture() -> list:
     before = set(bpy.data.objects)
-    bpy.ops.import_scene.gltf(filepath=FIXTURE)
+    with open(FIXTURE) as f, tempfile.TemporaryDirectory() as tmp:
+        glb = os.path.join(tmp, "tiny.glb")
+        with open(glb, "wb") as out:
+            out.write(base64.b64decode(f.read()))
+        bpy.ops.import_scene.gltf(filepath=glb)
     return [o for o in bpy.data.objects if o not in before]
 
 
