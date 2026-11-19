@@ -50,6 +50,9 @@ importers:
       phaser:
         specifier: 4.2.1
         version: 4.2.1
+      three:
+        specifier: 0.186.1
+        version: 0.186.1
     devDependencies:
       '@playwright/test':
         specifier: ^1.64.0
@@ -57,6 +60,9 @@ importers:
       '@types/node':
         specifier: ^22.20.5
         version: 22.20.5
+      '@types/three':
+        specifier: 0.186.0
+        version: 0.186.0
       typescript:
         specifier: ~5.9.2
         version: 5.9.3
