@@ -4649,3 +4649,26 @@ started. The lanes since, and the paths each wrote, read from the merge history:
 | The orchestrator's design docs | `claude/elegant-archimedes-ybxzlj` (#542, #544, #546, #548) | `docs/map-revamp/**`, `docs/DECISIONS.md` A610 to A614 | merged |
 
 A new session still reads this file first and writes only inside the paths its brief names.
+
+## Round 11 (build, sprite world)
+
+The owner approved `docs/round11/round11-plan-v2.md` on 2026-11-19 with every default (A616). It replaces the plan of
+A236. The orchestrator is the Story mode session (`session_01M5mAcY1JPqjhPmoZ8CZDFp`). Paths and shared files are in
+`docs/round11/seams.md`; the prop and model indexes the sessions start from are in `docs/round11/handoff/`.
+
+| Session | Model | Compaction | Pull requests | Starts |
+|---|---|---|---|---|
+| **11D. Decisions** | Opus | 300k | S0 (Three.js in the client), H1 (where the models live) | 2026-11-19 |
+| **11T. Tooling** | Sonnet | 300k | T1, T3, T4, T5 | 2026-11-19 |
+| **11P. Props and tiles** | Sonnet | 300k | P1 (the prop list) | 2026-11-19 |
+| **11R. The renderer** | Opus, then Sonnet | 500k | R1 to R6 | after S0 |
+| **11F. Figure sprites** | Opus, then Sonnet | 500k, then 300k | F1, F2 to Fn | after T1 and H1 |
+
+Every pull request branch starts from `origin/claude/zen-turing-m1jnw0`. A session sets its compaction window in
+`.claude/settings.local.json` as its first action. Sessions open draft pull requests and report to the orchestrator;
+merges need the owner's word.
+
+### Round 11 log: the orchestrator
+
+- 2026-11-19: #551 merged the revised plan and A616. The models went to the owner for the `char-models` and
+  `prop-models` releases (H1); their hashes are in `handoff/models.lock.draft.json`. 11D, 11T and 11P started.
