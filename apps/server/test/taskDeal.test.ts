@@ -18,6 +18,8 @@ import {
   start,
   toWorld,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 7, 7M (GDD 3.5, A133): the task deal at match start. New file; no existing test is edited.
@@ -36,7 +38,6 @@ const TASK_IDS = Object.values(tasks.tasks).map((t) => t.id);
 const listOf = (p: PlayerState) => [...p.priv.tasks].map((t) => ({ id: t.id, done: t.done, fake: t.fake }));
 const factionOf = (party: Party, id: string): string =>
   roles.roles[party.room.state.players.get(id)!.priv.role.roleId]?.faction ?? '';
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 describe('taskPool', () => {
   it('holds every task of Hollowmere at every profile, the co-op one among them (PR 4)', () => {
@@ -184,9 +185,9 @@ describe('the bar', () => {
     const pump = scenes.overworld.props.find((q) => q.id === 'ov.pump')!;
     placeSeat(party, h.id, 'overworld', pump.x, pump.y);
     simOf(party.room).players.get(h.id)!.dead = true;
-    await send(h, 'act.hold', { action: 'task', targetId: 'fixPump', on: true }, 80);
+    await queued(party, h, 'act.hold', { action: 'task', targetId: 'fixPump', on: true });
     advance(party, 3);
-    await wait(80);
+    await flush(party);
     const opened = h.log.find((m) => m.type === S2C.minigameStart)?.payload as { kind: string } | undefined;
     expect(opened).toMatchObject({ kind: 'slide' });
   });
