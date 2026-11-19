@@ -44,7 +44,7 @@ export function kmeans(points: Lab[], k: number, rounds = 12): { centre: Lab; co
   );
   let counts: number[] = [];
   for (let r = 0; r < rounds; r++) {
-    const sums = centres.map(() => [0, 0, 0]);
+    const sums = centres.map((): [number, number, number] => [0, 0, 0]);
     counts = centres.map(() => 0);
     for (const p of points) {
       let best = 0;
