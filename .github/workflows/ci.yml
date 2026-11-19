@@ -17,6 +17,14 @@ jobs:
           node-version: 22
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
+      # ASSETS 6.6: warn (never fail) when a pull request adds more than 25 MB of binaries against its base.
+      - name: Art drop size
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git fetch --depth=1 origin "$BASE_SHA"
+          pnpm --filter @wdi/sprites exec tsx artDrop.ts "$BASE_SHA" | tee -a "$GITHUB_STEP_SUMMARY"
       - run: pnpm lint
       - run: pnpm typecheck
       # The server suite runs in its own job below: it is the long one (npc.md part 2, section 1).
