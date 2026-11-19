@@ -13,11 +13,15 @@ player meets is in `docs/GDD.md` and `packages/content/data/balance.json`; this 
 | `SCORECARD.md` | The fun-or-stop sheet for the M3 exit, one per M3 session, with the decision line |
 | `TEMPLATE.md` | One session's notes; copy it to `YYYY-MM-DD-<milestone>.md` |
 | `2026-xx-xx-m2.md` | The M2 playtest entry (a stub until that session is written up) |
-| `README.md` 8 and 9 | The M3b quick-mode evening and the M3c NPC session: who, the session plan and the script for each |
+| `README.md` 8 and 9 | The M3b quick-mode evening (the mode was removed in round 7, A115; kept as a record) and the M3c NPC session |
 
 One file per session, named `YYYY-MM-DD-<milestone>.md` (`2026-11-02-m3.md`; a second session the
 same day adds `-b`). The scorecard is filled in a copy too: `YYYY-MM-DD-m3-scorecard.md`, and for
 the later milestones `-m3b-scorecard.md` and `-m3c-scorecard.md` (`SCORECARD.md` 6 and 7).
+
+**Status, 2026-11-19.** No session file has been written here yet beyond the M2 stub. The owner's own playtests of the
+round-8 build are recorded in `docs/DECISIONS.md` (A168, A196, A222), and `docs/ROADMAP.md` 7.0 gives each milestone's
+status.
 
 ## 1. Owner prerequisites (before inviting anyone)
 

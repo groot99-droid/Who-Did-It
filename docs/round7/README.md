@@ -1,5 +1,7 @@
 # Round 7: the contract documents
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-23. Current state: round 7 landed with #128 (`6e5a91b`); its rules live in `docs/GDD.md` and `packages/content/data`. `docs/ROADMAP.md` 7.0 gives the round's status.
+
 What the round-7 sessions (7A to 7K, 7P, and 6N and 6P finishing round 6) build against, written by 6Z on
 2026-10-23 from the owner's requests of that morning and the staging in `docs/round6/bible-seams.md` 2.1. The
 rules and every number stay in `docs/GDD.md` and `packages/content/data`: these documents point at them and

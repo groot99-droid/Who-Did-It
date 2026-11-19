@@ -2,6 +2,10 @@
 
 Each session appends to its own section only. Newest line last.
 
+> **Status, 2026-11-19:** `claude/story-part2` merged into the base with #538 (2026-11-12), so every pull request
+> logged below as merged into `claude/story-part2` is on the base. Still waiting: R8's `story.json` entry, P5 and P6, on
+> the map revamp (`docs/map-revamp/interiors-plan.md`); player sign-in (`docs/accounts/plan.md`) is not built.
+
 ## S1. Story content
 
 - 2026-11-06 S1: schema `story.ts`, `validateStory.ts`, wired into `validate.ts`, tests and a one-chapter `story.json` (Baker) ready; seams addendum 1a in README. Chapters 2 and 3 and `script.md` next.

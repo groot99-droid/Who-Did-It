@@ -1,5 +1,7 @@
 # Round 9: the world-mode design round (design only, no code)
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-24. Current state: the design merged with #313 and round 10 builds it; what is left is `docs/round10/part2.md`. `docs/ROADMAP.md` 7.0 gives the round's status.
+
 ## Context
 
 The owner played the round-8 build and set a new direction: world mode. The brief is recorded verbatim in `docs/round9/owner-brief.md` (DECISIONS A222, draft PR #264).

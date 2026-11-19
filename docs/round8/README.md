@@ -1,5 +1,7 @@
 # Round 8: the contract documents
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-23. Current state: round 8 merged before round 9's design (#313); its rules live in `docs/GDD.md` and `packages/content/data`. `docs/ROADMAP.md` 7.0 gives the round's status.
+
 What the round-8 sessions (8A to 8H) build against, written by 6Z on 2026-10-23 from the owner's request of that
 evening (DECISIONS A134) and Book IV of the owner's Bible (`docs/round6/owner-brief.md`). The rules and every
 number stay in `docs/GDD.md` and `packages/content/data`: these documents point at them and never restate a rule

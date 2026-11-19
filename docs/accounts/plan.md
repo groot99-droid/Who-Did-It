@@ -9,6 +9,11 @@
 >
 > Source note: `docs/story/arc.md` and `docs/story/part2.md` are not on `claude/zen-turing-m1jnw0` yet; they were read
 > from `origin/claude/story-answers`. Section numbers cited below are theirs.
+>
+> **Status, 2026-11-19:** merged as a plan (#472, 2026-11-12). Nothing of it is built: there is no player sign-in, and
+> `apps/server/src/accounts/saves.ts` holds only the device save store (DECISIONS A577). Since it was written,
+> `docs/story/arc.md` and `part2.md` reached the base (#538), and achievements were built on the device (GDD 3.28, A440),
+> so the "nothing in code" row of section 1 no longer holds.
 
 ## 1. What exists today (verified in the tree at `2f70cb5b`)
 

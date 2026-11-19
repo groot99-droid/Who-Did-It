@@ -1,5 +1,7 @@
 # Round 11: the full Blender makeover (planning, design only)
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-29. Current state: the plan is approved (`docs/round11/round11-plan.md`, #374, A236) and its build has not started; round 11 is the Blender makeover only (A256). The 3D HollowMere from the owner's Meshy models (#539) and `apps/walk` (A610) are separate lanes.
+
 ## Context
 
 On 2026-10-29, while round 10 builds, the owner asked:
