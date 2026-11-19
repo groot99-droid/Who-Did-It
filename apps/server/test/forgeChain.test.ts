@@ -6,8 +6,16 @@ import { armourOf, capped, damageFactor } from '../src/sim/body/armour';
 import { applyEffect } from '../src/sim/body/effects';
 import { bodyOf } from '../src/sim/body/state';
 import { addStack, count, LAYOUT } from '../src/sim/Inventory';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  flush,
+  pauseClock,
+  placeSeat,
+  queued,
+  standardParty,
+  type Party,
+} from './npcHelpers';
 
 // Round 10 (S3; GDD 3.14, 3.22): the forge chain's data, the tier-2 wall and the tin armour.
 
@@ -72,9 +80,9 @@ describe('the tier-2 wall', () => {
     return p;
   }
   async function fell(p: Party): Promise<void> {
-    await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId: LOG, on: true }, 60);
+    await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId: LOG, on: true });
     advance(p, 1);
-    await sleep(80);
+    await flush(p);
   }
 
   it('refuses a plain axe NEED_TOOL and names the iron axe', async () => {

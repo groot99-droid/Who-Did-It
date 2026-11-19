@@ -9,13 +9,13 @@ import {
   advance,
   bootNpcServer,
   errors,
+  flush,
   pauseClock,
   placeSeat,
-  send,
+  queued,
   standardParty,
   type Party,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -50,9 +50,9 @@ function standBy(p: Party, kind: string | null) {
 }
 
 async function craft(p: Party, recipeId: string, on = true): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'craft', targetId: recipeId, on }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action: 'craft', targetId: recipeId, on });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const give = (seat: ReturnType<typeof standBy>['seat'], what: Record<string, number>) => {
@@ -96,7 +96,7 @@ describe('craft', () => {
     give(seat, { herb: 2, timber: 1 });
     await craft(p, 'snare');
     advance(p, 5);
-    await send(human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false }, 100);
+    await queued(p, human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, cast('snare') + 5);
     expect(count(seat, 'snare')).toBe(0);
     expect(count(seat, 'herb')).toBe(2);

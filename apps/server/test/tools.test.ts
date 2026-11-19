@@ -4,8 +4,16 @@ import { interactions, items, resources } from '@wdi/content';
 import { C2S, REFUSAL_REASONS, TICK_RATE, TILE_PX, type RefusalFrame } from '@wdi/shared';
 import { addStack, count } from '../src/sim/Inventory';
 import { wornOf } from '../src/sim/interact/resolve';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  flush,
+  pauseClock,
+  placeSeat,
+  queued,
+  standardParty,
+  type Party,
+} from './npcHelpers';
 
 // Round 10 (A11; docs/round9/logic-table.md 5.1 and 10, GDD 3.14): the tool walls on piles. Bare hands get nothing
 // from a lumber pile, a boulder or a nailed crate and the refusal names the tool; the tool lands the drops, wears,
@@ -87,9 +95,9 @@ async function at(w: { scene: Wall['scene']; at: [number, number] }): Promise<Pa
 }
 
 async function hold(p: Party, targetId: string): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const refusals = (p: Party): RefusalFrame[] =>
@@ -175,7 +183,7 @@ describe('nodes keep bare hands (R8)', () => {
     seat.priv.inventory.slots.clear();
     if (withAxe) addStack(seat, 'axe', 1);
     advance(p, 1);
-    await send(human, C2S.hold, { action: 'gather', targetId: found.node.id, on: true }, 60);
+    await queued(p, human, C2S.hold, { action: 'gather', targetId: found.node.id, on: true });
     for (let t = 1; t <= ticks(4); t++) {
       advance(p, 1);
       if (count(seat, 'timber') > 0) return t / TICK_RATE;
