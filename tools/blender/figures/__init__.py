@@ -119,14 +119,26 @@ def breath(k: int, frames: int = IDLE_FRAMES) -> float:
 
 
 def load_looks(path: str = LOOKS_JSON) -> set[str]:
-    """Every look id a figure may render under: the deck looks, the villager family and the extra figures."""
+    """Every look id a figure may render under: the deck looks that have a world character, the villager family and
+    the extra figures. A cover card (`bodyAtlas` null: the killer, the accomplice, the drifter) is never a world
+    character, so it is never a figure: an atlas under its id would tell every client a cover is in play (A49)."""
     with open(path, encoding="utf-8") as fh:
         data = json.load(fh)
-    return set(data["looks"]) | set(data.get("villagers", {})) | set(data.get("figures", {}))
+    deck = {k for k, v in data["looks"].items() if v.get("bodyAtlas")}
+    return deck | set(data.get("villagers", {})) | set(data.get("figures", {}))
+
+
+def cover_looks(path: str = LOOKS_JSON) -> set[str]:
+    """The deck looks with no world character (the cover cards)."""
+    with open(path, encoding="utf-8") as fh:
+        return {k for k, v in json.load(fh)["looks"].items() if not v.get("bodyAtlas")}
 
 
 def check_look(look: str, looks: set[str] | None = None) -> str:
-    """The look id, or ValueError when looks.json has no such look (a model without one is a named gap, F2)."""
+    """The look id, or ValueError when it is a cover card or looks.json has no such look (a model without a look id
+    is a named gap, F2)."""
+    if look in cover_looks():
+        raise ValueError(f"{look!r} is a cover card: it has no world character and is never rendered as a figure")
     looks = load_looks() if looks is None else looks
     if look not in looks:
         raise ValueError(f"no look {look!r} in looks.json; a model without a look id is a named gap")

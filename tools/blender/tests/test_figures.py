@@ -129,10 +129,18 @@ class Png(unittest.TestCase):
 class Looks(unittest.TestCase):
     def test_every_seat_and_villager_look_is_a_figure_look(self):
         looks = fg.load_looks()
-        for look in ("baker", "detective", "killer", "villager", "villagerlass", "constable"):
+        for look in ("baker", "detective", "villager", "villagerlass", "constable"):
             self.assertIn(look, looks)
             self.assertEqual(fg.check_look(look, looks), look)
             self.assertRegex(look, rc.BODY_RE)
+
+    def test_a_cover_card_is_never_a_figure(self):
+        covers = fg.cover_looks()
+        self.assertEqual(covers, {"killer", "accomplice", "drifter"})
+        self.assertFalse(covers & fg.load_looks())
+        for look in covers:
+            with self.assertRaisesRegex(ValueError, "cover card"):
+                fg.check_look(look)
 
     def test_a_model_without_a_look_is_a_gap(self):
         with self.assertRaises(ValueError):
