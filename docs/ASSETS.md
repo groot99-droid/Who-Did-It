@@ -252,3 +252,19 @@ Every rendered or generated image passes through `tools/sprites/pixel.ts` before
 - **One switch.** Nothing in the main mode is hand-fixed after the finish. Every asset is re-made by its script from its raw render, so flipping the switch is a re-run of the batch scripts and the pixel CLI, plus the manifest filters that `manifest.test.ts` checks against the switch.
 
 **Determinism.** The finish is deterministic, so unchanged inputs give byte-identical outputs. `tools/sprites/test/pixel.test.ts` covers alpha, snapping, the darkest tie, the outline, both settings of the switch and lossless WebP.
+
+### 6.12 Model releases (round 11, H1)
+
+The models behind the sprite world's renders (A615, A616) are GLBs, about 235 MB zipped. They are not in the repository
+or in LFS (6.6). They are release assets of this repository, as `walk-glb` holds the village: `char-models`
+(`char-models.zip`: the 40 characters, 13 Higgsfield and 27 Meshy) and `prop-models` (`prop-models.zip`: 132 props
+and 32 items, all Meshy).
+
+- **Pinned.** `tools/blender/models/models.lock.json` pins each zip and every GLB in it by sha256 and size.
+  `fetch_models.py` beside it fills the git-ignored `tools/blender/build/models/` and refuses any mismatch. Its README
+  gives the format.
+- **Licences.** The lock gives the licence per source: Higgsfield follows A17, and Meshy on the owner's plan is the
+  owner's to ship (A616 Q1).
+- **Masters and uploads.** The masters stay on the owner's laptop (CLAUDE.md, 6.10). Only the owner uploads; a changed
+  model is a new zip under the same tag, with a pull request that rewrites its lock rows.
+- **Credits.** Each shipped render's `CREDITS.md` row cites its model's lock `id` and source (and a Higgsfield model's ROSW catalog id).
