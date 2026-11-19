@@ -241,14 +241,13 @@ class FigureRig(unittest.TestCase):
                                  digest(os.path.join(self.dir, "body", name)), name)
 
     def test_a_render_lock_is_written(self):
-        try:
-            import render_lock
-        except ImportError:
-            self.skipTest("render_lock.py (T4) has not merged")
+        import render_lock
+
         with open(os.path.join(self.dir, render_lock.LOCK_NAME)) as fh:
             lock = json.load(fh)
         self.assertEqual(lock["atlas"], "char_villager")
         self.assertEqual(set(lock["frames"]), set(self.manifest["frames"]))
+        self.assertEqual(lock["blender"], bpy.app.version_string)
 
 
 @unittest.skipIf(bpy is None, "bpy is not installed (bash tools/blender/setup.sh)")

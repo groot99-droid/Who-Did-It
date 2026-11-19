@@ -36,6 +36,7 @@ sys.path.insert(0, HERE)
 import build_rig  # noqa: E402
 import figures as fg  # noqa: E402
 import rig_common as rc  # noqa: E402
+import render_lock as render_lock_mod  # noqa: E402
 
 CELL = rc.CELL_PX
 FEET_ROW = rc.FEET_ROW_PX
@@ -227,15 +228,11 @@ def touches_border(path: str) -> bool:
     return bool(alpha[0].any() or alpha[-1].any() or alpha[:, 0].any() or alpha[:, -1].any())
 
 
-def render_lock(out_root: str, look: str, model: str, flags: dict):
-    """The render lock of T4 (`render_lock.py`), once it has merged; until then None and no lock is written."""
-    try:
-        import render_lock
-    except ImportError:
-        return None
-    return render_lock.Lock(out_root, f"char_{look}", __file__, flags=flags, model=model,
-                            blender=bpy.app.version_string,
-                            sources=("rig_common.py", "build_rig.py", os.path.join("figures", "__init__.py")))
+def render_lock(out_root: str, look: str, model: str, glb: str, flags: dict) -> render_lock_mod.Lock:
+    """The figure's render lock (T4): every frame's hash covers this script, the rig code, the GLB and the flags."""
+    return render_lock_mod.Lock(out_root, f"char_{look}", __file__, flags=flags, master=glb, model=model,
+                                blender=bpy.app.version_string,
+                                sources=("rig_common.py", "build_rig.py", os.path.join("figures", "__init__.py")))
 
 
 def render_figure(args) -> dict:
@@ -283,7 +280,7 @@ def render_figure(args) -> dict:
     out_root = os.path.join(args.out, look)
     os.makedirs(os.path.join(out_root, "body"), exist_ok=True)
     flags = {"look": look, "anims": anims, "dirs": dirs, "forward": args.forward}
-    lock = render_lock(out_root, look, args.model, flags)
+    lock = render_lock(out_root, look, args.model, glb, flags)
     manifest = {"version": 1, "body": look, "cell": CELL, "fps": rc.OUTPUT_FPS, "style": "hd", "factor": 1,
                 "passes": ["body"], "frames": {},
                 "figure": {"model": args.model, "clip": action.name, "walk": walk, "heightM": round(height, 3),
@@ -307,8 +304,7 @@ def render_figure(args) -> dict:
                 entry["clipped"] = True
                 clipped.append(name)
             manifest["frames"][name] = entry
-            if lock is not None:
-                lock.record(name)
+            lock.record(name)
 
     if "walk" in anims:
         frames, _loop = fg.FIGURE_CLIPS["walk"]
@@ -331,8 +327,7 @@ def render_figure(args) -> dict:
     with open(os.path.join(out_root, "manifest.json"), "w") as fh:
         json.dump(manifest, fh, indent=2, sort_keys=True)
         fh.write("\n")
-    if lock is not None:
-        lock.write()
+    lock.write()
     secs = time.time() - t0
     n = len(manifest["frames"])
     print(f"render_figures: {args.model} as {look}: {n} frames in {secs:.1f} s ({secs / max(n, 1):.2f} s a frame), "
