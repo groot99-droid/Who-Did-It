@@ -15,7 +15,6 @@ import { townsfolkMemory } from '../src/sim/townsfolk/figures';
 import { isOnLine } from '../src/sim/Train';
 import { endMatch, evaluateWin } from '../src/sim/Win';
 import { type Party, advance, bootNpcServer, lobbyOf, pauseClock, flush } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 /** Round 10, C5 (GDD 3.8; world-mode.md 1.6, followup-4 2.2; seams.md row 18): Paint The Town Red. */
 
@@ -112,7 +111,7 @@ describe('the counts and the returns', () => {
     simOf(room).players.get(a)!.dead = false; // the train brought it back
     markDead(room, a, 'knife', k1);
     markDead(room, b, 'knife', k2);
-    await sleep(150);
+    await flush(party);
     expect(paintGameOver(room)).toEqual({
       target: Math.ceil(balance.paintTown.winUnique * npcIds.length),
       killers: [
