@@ -1,5 +1,7 @@
 # Round 10: world mode, the build
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-29. Current state: round 10 paused on 2026-10-30; the pull requests open then merged between 2026-11-07 and 2026-11-12, and the steps still to build are in `docs/round10/part2.md`. `docs/SESSIONS.md`, "After round 11's plan", lists the lanes since.
+
 ## Context
 
 Round 9 designed world mode and wrote no code (`docs/round9/README.md`). The owner approved it, answered the

@@ -6,12 +6,11 @@ Every roster, number and scene id that `docs/GDD.md` and `docs/WORLD.md` describ
 edit fails the first test, the server boot and the client build alike.
 
 ```ts
-import { deckFor, balanceFor, scenes, onubFor, abilities } from "@wdi/content";
+import { deckFor, balanceFor, scenes, abilities } from "@wdi/content";
 
 deckFor(7).cards;            // ["killer", "accomplice", "detective", ...] player count + 2 public cards
-balanceFor(7).killCooldownS;  // 35
+balanceFor(7).killCooldownS;  // the 7-player kill cooldown, read from balance.json
 scenes.tavern_bar.portals;    // [{ id: "tb.front", to: "overworld", toSpawn: "tavern_front", ... }]
-onubFor(6).deck;              // 9 loaves for 6 players
 ```
 
 ## Files
@@ -24,7 +23,8 @@ onubFor(6).deck;              // 9 loaves for 6 players
 | `abilities.json` | every verb with a number: role abilities, item uses, universal verbs | GDD 3.2-3.7 |
 | `items.json`, `clues.json`, `tasks.json` | items, clue types (frozen ids, sprite key `clue_<id>`), task templates | GDD 3.4, 3.5 |
 | `balance.json` | phases, the per-count table `byCount["4".."10"]`, noise, health, vision, meeting rules | GDD 3.3-3.9 |
-| `scenes/<id>.json` | the 15 scenes of WORLD 4.3 | WORLD 4.3-4.5 |
+| `maps/<id>.json`, `scenes/<id>.json` (with `<id>.nav.json`) | the maps and every scene of WORLD 4.3 and 4.10 | WORLD 4.3-4.5, 4.10 |
+| the other files of `data/` | looks, routines, cutscenes, music, M5b, the Bible's systems, economy, effects, interactions, laws, story, achievements and the rest, validated by `src/schemas/` | the GDD section in each record's `gddRef` |
 
 Rules of the data:
 

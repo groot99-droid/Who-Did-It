@@ -27,14 +27,14 @@
 ```
 Who-Did-It/
 ├─ package.json  pnpm-workspace.yaml  .nvmrc  .gitattributes  tsconfig.base.json  eslint.config.js
-├─ .github/workflows/ci.yml  pages.yml          # only two workflows
+├─ .github/workflows/ci.yml  pages.yml  soak.yml   # soak runs by hand and weekly, never on push (5.12)
 ├─ LICENSE (MIT, code)  LICENSE-ASSETS  CREDITS.md  LICENSES/
 ├─ apps/client/      # Phaser + Vite; base '/Who-Did-It/'; src/{main,net,scenes,view,ui,flags}
 ├─ apps/walk/        # V2 first step (A610): Vite + Three.js single-player walk-through of the 3D HollowMere GLB; base '/Who-Did-It/walk/'
 ├─ apps/server/      # Colyseus; src/{index,rooms/PartyRoom,rooms/handlers,sim/{Step,Commands,Collision,Visibility,Portals},services}
 ├─ packages/shared/  # @wdi/shared: schema/, protocol/, rules/, constants.ts, metrics.ts, version.ts
 ├─ packages/content/ # @wdi/content: data/{roles,traits,items,abilities,clues,tasks,balance,metrics}.json, scenes/*.json, zod validators
-├─ tools/            # grid/export.ts (ASCII grid -> tilemap + nav), tiled/export.ts (M6), sprites/{placeholder,pack,gen-anims}.ts, blender/{render_rig.blend,batch_render.py,palettize.py}, bots/swarm.ts
+├─ tools/            # grid/export.ts (ASCII grid -> tilemap + nav), sprites/{placeholder,pack,pixel,gen-anims}.ts, blender/{build_rig.py,batch_render.py,palettize.py,meshy_*.py}, bots/{swarm,soak,story}.ts, auto/run.ts (headless all-NPC matches); tiled/export.ts (M6) is not built
 ├─ assets/source/MANIFEST.md   # masters live outside the repo
 └─ docs/
 ```
@@ -180,7 +180,7 @@ Vitest (shared): property tests for roles, traits, votes, suspects, win checks, 
 
 ### 5.13 V2 migration path
 
-Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`.
+Stays: server, `@wdi/shared`, `@wdi/content`, lobby, CI, hosting. Changes: renderer (Three.js or Babylon.js), input gains `yaw` (field already reserved), `ISceneCollider` gets a capsule-vs-navmesh implementation, `Visibility.ts` gets a cone + occlusion predicate (the policy hook already exists), `zoneId` diverges from `sceneId` for merged volumes. Gate: V2 starts only when V1 rules tests are green and content JSON is frozen behind `schemaVersion`. The owner overrode the gate for one lane (DECISIONS A610): `apps/walk` is a single-player Three.js walk-through with no server, and the 2.5D and 3D modes of A613 share nothing on the wire yet.
 
 ### 5.13a Story mode (the engine)
 

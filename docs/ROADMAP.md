@@ -6,6 +6,25 @@
 
 Effort is in focused solo-dev days with AI coding sessions; code uses placeholders until M6. The order is M0 -> M1 -> M2 -> M3 (first playable, "fun or stop") -> M3b (quick mode) -> M3c (NPC fill) -> M5a (Living World) and ONUB v2 (round 5) -> M5b (resources, mobs, quests; round 6) -> M4 -> M5 -> M6 -> M7; the owner's round-5 brief (2026-10-17) pulled the living world ahead of deduction depth. M3b can be pulled ahead of M3 if the owner wants the quick mode as the first playtest: it needs no kills, clues or ghosts (see DECISIONS.md, open questions).
 
+### 7.0 Status (2026-11-19)
+
+Evidence is the merge history of the base branch `claude/zen-turing-m1jnw0` and the integration logs in `docs/SESSIONS.md`. No session of the milestones' playtest column is written up in `docs/PLAYTESTS/` yet (only the M2 stub); the owner's own playtests of the round-8 build are recorded in DECISIONS A168, A196 and A222.
+
+| Milestone | Status |
+|---|---|
+| M0, M1, M2 | Built and merged in rounds 1 and 2 (SESSIONS integration logs of 2026-10-10 and 2026-10-15). |
+| M3, M3c | Built and merged in rounds 3 and 4 (integration logs of 2026-10-16 and 2026-10-17). The fun-or-stop scorecard is not filed. |
+| M3b, ONUB v2 | Built in rounds 4 and 5, then removed in round 7 (DECISIONS A115). |
+| M5a | Built and merged in round 5 (landed at `a60d855`). |
+| M5b, M5c, M5d | Built and merged in round 6 (#81, `11168d1`). |
+| R7, R7b | Built and merged in round 7 (#128, `6e5a91b`). |
+| R8 | Built and merged in round 8 (SESSIONS Round 8). |
+| R9 | Design merged (#313, `72f1b69`). |
+| R10 | In part. Paused on 2026-10-30; the pull requests open at the pause merged between 2026-11-07 and 2026-11-12, and story mode's part 2 merged with #538. Still to build: `docs/round10/part2.md`, "Each session's remaining steps" (B6b, B6c, B7, W1a2 to W8, C6, C7, the final sweep 10Z and the rest). |
+| R11 | Re-scoped by A256: round 11 is the Blender makeover only, and its gameplay items move to round 10. Its plan is approved (`docs/round11/round11-plan.md`, #374, A236) and not started. Beside it, HollowMere was built in 3D from the owner's Meshy models (#539) and the V2 walk-through `apps/walk` began (#540, #541, #543; A610 to A614). |
+| R12 | Not started. |
+| M4, M5, M6, M7 | Not closed as milestones. Much of their scope landed in other rounds (round 10's evidence verbs, cover-up and hiding, DECISIONS A239, A555, A576, A578; M5b's wolves and lanterns; the round-5 and round-8 art; the Playwright suite), but no exit check has been run against these rows. |
+
 ### 7.1 Milestones
 
 | M | Goal | Deliverables | Definition of done | Days | Playtest |
@@ -90,7 +109,7 @@ The playtest kit lives in `docs/PLAYTESTS/`: `README.md` is the run sheet (owner
 
 ### 7.6 Workflow
 
-`main` is always deployable and protected by CI. One branch per milestone task (`m4a/clues-and-lenses`), one AI session per branch scoped to a single task prompt from `ROADMAP.md`, PRs under 400 lines with tests for rules changes and a GDD note when behaviour changes. Squash-merge; tag `v0.<milestone>.<n>` at milestone exit. `pnpm docs:balance` regenerates `BALANCE.md` from `balance.json` and the PR template has a "docs updated" checkbox; there is no CI grep gate, no changelog automation and no preview deployments until a second contributor exists. Sessions never upgrade dependencies.
+The default branch (`claude/zen-turing-m1jnw0`; there is no `main`) is always deployable and protected by CI. One branch per milestone task (`m4a/clues-and-lenses`), one AI session per branch scoped to a single task prompt from `ROADMAP.md`, PRs under 400 lines with tests for rules changes and a GDD note when behaviour changes. Squash-merge; tag `v0.<milestone>.<n>` at milestone exit. `pnpm docs:balance` (planned, not built: there is no such script and no `BALANCE.md`) would regenerate `BALANCE.md` from `balance.json`, beside a PR template with a "docs updated" checkbox (not built either); there is no CI grep gate, no changelog automation and no preview deployments until a second contributor exists. Sessions never upgrade dependencies.
 
 ### 7.7 Day 1 to Day 14
 
@@ -113,6 +132,6 @@ The playtest kit lives in `docs/PLAYTESTS/`: `README.md` is the run sheet (owner
 
 ### 7.8 V2 outline
 
-V2 is the sequel **"Who Did It Too?"**: first person will never be this game (owner, A168). It keeps the frozen ids, the shared server, the rules and the world data. The R8 and R9 work runs in the owner's build order: town moods, then the law, then evolutions and vendetta dilemmas, then the economy, then Port-au-Levain, then story mode. The owner rates them all equally, so this is sequencing, not priority. Each round's contract opens with an intent brief: what the round should feel like, what the owner likes, and what it must never do.
+V2 is the sequel **"Who Did It Too?"**: first person will never be this game (owner, A168). Since 2026-11-16 the owner's word is two modes of one game, 2.5D and 3D (A611, A613), and V2's first step is `apps/walk`, a single-player first-person walk-through with no server (A610, A614). It keeps the frozen ids, the shared server, the rules and the world data. The R8 and R9 work runs in the owner's build order: town moods, then the law, then evolutions and vendetta dilemmas, then the economy, then Port-au-Levain, then story mode. The owner rates them all equally, so this is sequencing, not priority. Each round's contract opens with an intent brief: what the round should feel like, what the owner likes, and what it must never do.
 
 After the V1 beta: (1) 3D `ISceneCollider` from Blender navmesh exports; (2) `input.move` uses `yaw`; (3) cone + occlusion visibility predicate; (4) Three.js or Babylon.js renderer loading the same GLB sources used for the sprite renders; (5) Medium, the Beast, bats, spatial audio, voice chat. Gate: V1 rules tests green and content JSON frozen behind `schemaVersion`.

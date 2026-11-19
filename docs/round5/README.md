@@ -1,5 +1,7 @@
 # Round 5: the contract documents
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-18. Current state: round 5 landed at `a60d855`; its ONUB v2 half was removed in round 7 (A115), and its rules live in `docs/GDD.md` and `packages/content/data`. `docs/ROADMAP.md` 7.0 gives the round's status.
+
 What the thirteen round-5 sessions (5A to 5M) build against, written before they started and edited to match the
 pre-seed that landed on top of 265bda9 (DECISIONS A50). The rules and every number stay in `docs/GDD.md` and
 `packages/content/data`: these documents point at them and never restate a rule differently.

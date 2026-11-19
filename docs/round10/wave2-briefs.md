@@ -1,5 +1,7 @@
 # Round 10, wave 2: the spawn briefs
 
+> **Status, 2026-11-19:** Historical record, kept as written on 2026-10-30. Current state: 10N's, 10K's, 10T's and 10M's merged steps are listed in `docs/round10/part2.md`, with what they still have to build; the sessions are archived.
+
 6Z spawned 10N, 10K, 10T and 10M on 2026-10-30 with these briefs (A276). Each session's brief is its part below
 followed by the common part at the end. They are kept here for part 2 (`part2.md`): a fresh session spawned in place
 of an archived one starts from its brief, its handoff in `part2.md` and the Round 10 log. `docs/SESSIONS.md`, "Round

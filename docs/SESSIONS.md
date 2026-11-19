@@ -4634,3 +4634,18 @@ docs/round11/README.md, then the documents and tools your part names." 6Z adds t
 - 2026-10-30: the owner said "for me round 11 is blender only really, every gameplay feature (except bosses) should
   be added" (A256). Round 11 stays the Blender makeover and nothing else, and its plan is unchanged. Any gameplay item
   a document had left for round 11 is built in round 10, from `docs/round10/scope.md`.
+
+## After round 11's plan (state on 2026-11-19)
+
+Round 10 stopped on 2026-10-30 and its sessions were archived (`docs/round10/part2.md`). Round 11's build has not
+started. The lanes since, and the paths each wrote, read from the merge history:
+
+| Lane | Branch, pull requests | Paths | State |
+|---|---|---|---|
+| Story mode, part 2 (orchestrator `session_01M5mAcY1JPqjhPmoZ8CZDFp`; contract `docs/story/`) | `claude/story-part2`, merged into the base by #538 (2026-11-12) | as `docs/story/README.md` "Seams" and `part2.md` "Workstreams" assign them: `apps/server/src/sim/story/**`, `sim/rite/**`, `apps/client/src/ui/story/**`, `apps/server/test/story/**`, `docs/story/**` | merged; R8, P5 and P6 wait on the map revamp (`docs/story/orchestrator-handoff.md`) |
+| Round 10, part 2 (the orchestrator, by the owner's delegation of 2026-11-12) | the round-10 session branches, merged 2026-11-07 to 2026-11-12 | each session's paths in the Round 10 section above | the steps still to build are in `part2.md`; no session is assigned |
+| The 3D HollowMere (the owner's local "Blender tools setup" session) | `753b563d` on the base, then `claude/blender-hollowmere-3d` (#539) | `tools/blender/meshy_*`, `meshy_looks/`, `meshy_views/` | building the interiors with the owner (A612, A614) |
+| W3D, the V2 walk-through | `claude/v2-walk` (#540, #541, #543) | `apps/walk/**`, the walk steps of `.github/workflows/pages.yml` | archived (A614): the viewer side of A614 has no owner |
+| The orchestrator's design docs | `claude/elegant-archimedes-ybxzlj` (#542, #544, #546, #548) | `docs/map-revamp/**`, `docs/DECISIONS.md` A610 to A614 | merged |
+
+A new session still reads this file first and writes only inside the paths its brief names.
