@@ -1,7 +1,7 @@
 {
  "about": "Who-Did-It 3D asset index. characters: rigged (see bones/clips), item and prop models are static, origin at the base centre, +Y up. Item and prop sizes are in model units and only relative within their own sheet: scale to real size in Blender. See INDEX.md.",
  "counts": {
-  "characters": 40,
+  "characters": 41,
   "items": 32,
   "props_main": 118,
   "props_duplicates": 6,
@@ -593,6 +593,21 @@
     1.118,
     1.7,
     0.645
+   ]
+  },
+  {
+   "id": "vicar",
+   "file": "characters/meshy_rigged/vicar.glb",
+   "source": "meshy",
+   "bones": 48,
+   "clips": [
+    "Running",
+    "Walking"
+   ],
+   "size_m": [
+    0.958,
+    1.7,
+    0.4
    ]
   }
  ],
@@ -3028,6 +3043,7 @@
   "Shadow_Pilgrim": "collier",
   "Shadowblade_Envoy": "heir",
   "Stoic_Matriarch": "medium",
+  "The_Arcane_Scholar": "vicar",
   "The_Bearded_Gentleman": "lord_vane",
   "The_Boneleaf_Elder": "mother_moll",
   "The_Dapper_Keymaster": "butler",

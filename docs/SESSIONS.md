@@ -4679,3 +4679,8 @@ merges need the owner's word.
 - 2026-11-19: R1 (#565, #566, #567), T4 (#559) and the P2 brief (#569) merged. 11P's row in `seams.md` takes the
   P2 paths of `tiles-brief.md` 6; Q-P5, Q-P7 and Q-P8 take 11P's defaults, Q-P6 (the sheets' licence) is with the
   owner.
+- 2026-11-19: F1 (#571), P2a (#575), P2b (#576), the 390w e2e fix (#570), the hitman flake (#574) and the seams fixes
+  (#573, #581, #584) merged. The owner answered the questionnaire (A619): the sheets are CC0, the look choices wait for
+  G, the Vicar's model joins `char-models`, mallory gets a look.
+- 2026-11-19: **grant (A619 (4)):** the test-only timing fixes #572, #579 and #580 may merge when green; no assertion
+  changes and no test is skipped. #572 merged. #547 is the orchestrator's to merge when ready and green.
