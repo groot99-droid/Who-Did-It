@@ -15,6 +15,16 @@
 //     Baked like the v1.2 rooms (wdi_baked): the room is KHR_materials_unlit with a COLOR_0 of 0.5 grey, and the
 //     room still holds a live KHR_lights_punctual lamp. Portal_wb.door at (3000, 0, -1.2), ahead of the spawn, leads to widow_parlour,
 //     which is not in the file (a door with no target).
+// And test/fixtures/walk-traverse.gltf, the traversal zones (src/traverse.ts): Area_cave, three rooms in a row along +X
+// whose only ways on are a crawl, a sidle and a climb (5 m walls all round, the rock between the rooms 3 m high):
+//   - Room A x -8..-2. A crawl tunnel x -2..4, 1.2 m wide and 1.0 m high; Trav_tunnel (crawl) over it, 0.2 m longer
+//     at each mouth and from 0.2 m under the floor up to the roof.
+//   - Room B x 4..10. A sidle fissure x 10..15, 0.45 m wide; Trav_fissure (sidle) over it, 0.2 m longer at each mouth.
+//   - Room C x 15..21. A climb face, the x = 21 side of a ledge block x 21..28, 4 m high; Trav_face (climb) on it, its
+//     z = 0 plane on the face and its +Z out of it (world -X), 3 m wide (z -1.5..1.5), from the floor to the ledge.
+//   - Spawns facing +X: Spawn_start (-6, 0, 0); Spawn_tunnel (1, 0, 0) in the tunnel, wdi_mode crawl; Spawn_hall
+//     (7, 0, 0); Spawn_fissure (12.5, 0, 0) in the fissure, wdi_mode sidle; Spawn_wall (18.5, 0, 0); Spawn_face
+//     (20.65, 1, 0) on the face, wdi_mode climb. Spawn_ledge (24, 4, 0) on the ledge faces -X, the edge.
 import { writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -246,4 +256,78 @@ write(
     },
   }),
   'Rooms fixture',
+);
+
+const caveFloor = box(-8, -0.2, -3, 28, 0, 3);
+const caveRock = mergeGeometries([
+  box(-8.3, -0.2, -3.3, 28.3, 5, -3), // north wall
+  box(-8.3, -0.2, 3, 28.3, 5, 3.3), // south wall
+  box(-8.3, -0.2, -3, -8, 5, 3), // west wall
+  box(28, -0.2, -3, 28.3, 5, 3), // east wall
+  box(-2, 0, -3, 4, 3, -0.6), // the tunnel's north side
+  box(-2, 0, 0.6, 4, 3, 3), // the tunnel's south side
+  box(-2, 1, -0.6, 4, 3, 0.6), // the tunnel's roof, 1.0 m up
+  box(10, 0, -3, 15, 3, -0.225), // the fissure's north side
+  box(10, 0, 0.225, 15, 3, 3), // the fissure's south side
+  box(21, 0, -3, 28, 4, 3), // the ledge block; its x = 21 side is the climb face
+]);
+const toEast = [0, -r, 0, r];
+const cave = (spawn, extra = {}) => ({ wdi_spawn: spawn, wdi_district: 'cave', ...extra });
+
+write(
+  'walk-traverse.gltf',
+  () => ({
+    meshes: [
+      addMesh('Cave floor', caveFloor, 1, true),
+      addMesh('Cave rock', caveRock, 3, true),
+      addMesh('HM_Collision', mergeGeometries([caveFloor, caveRock].map(plain)), null, false),
+    ],
+    nodes: [
+      { name: 'Area_cave', children: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+      { name: 'Cave floor', mesh: 0 },
+      { name: 'Cave rock', mesh: 1 },
+      {
+        name: 'Trav_tunnel',
+        translation: [1, 0.4, 0],
+        extras: { wdi_traverse: 'crawl', size: [6.4, 1.2, 1.2] },
+      },
+      {
+        name: 'Trav_fissure',
+        translation: [12.5, 0.9, 0],
+        extras: { wdi_traverse: 'sidle', size: [5.4, 2.2, 0.45] },
+      },
+      {
+        name: 'Trav_face',
+        translation: [21, 2, 0],
+        rotation: toEast,
+        extras: { wdi_traverse: 'climb', size: [3, 4, 1.2] },
+      },
+      { name: 'Spawn_start', translation: [-6, 0, 0], rotation: toEast, extras: cave('start') },
+      {
+        name: 'Spawn_tunnel',
+        translation: [1, 0, 0],
+        rotation: toEast,
+        extras: cave('tunnel', { wdi_mode: 'crawl' }),
+      },
+      { name: 'Spawn_hall', translation: [7, 0, 0], rotation: toEast, extras: cave('hall') },
+      {
+        name: 'Spawn_fissure',
+        translation: [12.5, 0, 0],
+        rotation: toEast,
+        extras: cave('fissure', { wdi_mode: 'sidle' }),
+      },
+      { name: 'Spawn_wall', translation: [18.5, 0, 0], rotation: toEast, extras: cave('wall') },
+      {
+        name: 'Spawn_face',
+        translation: [20.65, 1, 0],
+        rotation: toEast,
+        extras: cave('face', { wdi_mode: 'climb' }),
+      },
+      { name: 'Spawn_ledge', translation: [24, 4, 0], rotation: [0, r, 0, r], extras: cave('ledge') },
+      { name: 'HM_Collision', mesh: 2 },
+    ],
+    roots: [0, 13],
+    materials: [...MATERIALS, material('Rock', [0.4, 0.37, 0.34])],
+  }),
+  'Traverse fixture',
 );

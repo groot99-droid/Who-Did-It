@@ -13,7 +13,7 @@ import {
   WebGLRenderer,
 } from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { LOOK, RENDER, WALK } from './config';
+import { LOOK, RENDER } from './config';
 import { Hud } from './hud';
 import { Input } from './input';
 import { glbFromQuery, loadFile, loadUrl, makeLoader } from './load';
@@ -21,6 +21,7 @@ import { DEFAULT_EXPOSURE, defaultFog, defaultLights, exposureFromScene, makeSky
 import { Controller, wishFromInput } from './physics/controller';
 import { PortalTrigger, resolvePortal, type Portal } from './portals';
 import { pickSpawn, plainWords, type Spawn } from './spawn';
+import { MODE_HINT, ViewTurn } from './traverse';
 import { areaLook, buildWorld, nearestArea, showNearestArea, type World } from './world';
 
 const STICK_RADIUS = 60;
@@ -59,6 +60,8 @@ let indoor = false;
 let trigger: PortalTrigger | null = null;
 let travelling = false;
 let trip: { portal: string; spawn: string | null; fallback: boolean } | null = null;
+/** Turns and holds the view while sidling (traverse.ts). */
+const viewTurn = new ViewTurn();
 const INDOOR_BACKGROUND = new Color(0, 0, 0);
 const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
 
@@ -86,13 +89,21 @@ function disposeWorld(): void {
   scene.remove(...fallbackLights);
   world = null;
   controller = null;
+  hud.setMode(null);
 }
 
 function goTo(target: Spawn | null): void {
   if (!world || !controller) return;
   spawn = target;
   if (target) {
-    controller.place(target.position);
+    // A spawn's wdi_mode starts the walker in that mode (a seam inside a crawl delivers it crawling), when the
+    // spawn stands in a zone of that kind; any spawn in a crawl zone starts crawling.
+    const asked = world.spawnModes.get(target.id);
+    const started = controller.place(target.position, { mode: asked, yaw: target.yaw });
+    if (asked && started !== asked)
+      console.warn(
+        `Spawn_${target.id} asks for ${asked} but starts in ${started}: it stands in no ${asked} zone, or in a crawl zone.`,
+      );
     yaw = target.yaw;
   } else {
     // No spawn: the origin, dropped from above the world onto whatever is under it.
@@ -101,6 +112,8 @@ function goTo(target: Spawn | null): void {
     controller.place(new Vector3(0, ground ?? 0, 0));
     yaw = 0;
   }
+  // Arriving sideways faces the wall at once.
+  yaw = viewTurn.snap(yaw, controller.viewHold);
   pitch = 0;
   trigger?.disarm();
   hud.setSpawn(spawn?.id ?? null);
@@ -152,12 +165,12 @@ async function enter(gltf: GLTF): Promise<void> {
   scene.add(root);
   // Fog from the GLB's extras shows as a flat background; without it the look's fog and sky apply (updateArea).
   if (!world.hasSun) scene.add(...fallbackLights);
-  controller = new Controller(world.collider);
+  controller = new Controller(world.collider, {}, world.zones);
   trigger = new PortalTrigger(world.portals);
   area = undefined;
   goTo(pickSpawn(world.spawns, params.get('spawn')));
   hud.progress({ fraction: null, loaded: 0, label: 'Preparing shaders' });
-  camera.position.copy(controller.position).y += WALK.eyeHeight;
+  camera.position.copy(controller.position).y += controller.eyeHeight;
   await renderer.compileAsync(scene, camera);
   loadError = null;
   hud.ready(world.spawns, spawn?.id ?? null);
@@ -208,6 +221,8 @@ renderer.setAnimationLoop(() => {
   const frame = input.poll(dt);
   yaw -= frame.yaw;
   pitch = Math.max(-LOOK.maxPitch, Math.min(LOOK.maxPitch, pitch - frame.pitch));
+  // Sidling, the view turns to face the wall and stays within the hold's angle of it.
+  if (controller) yaw = viewTurn.apply(yaw, controller.viewHold, dt);
   if (controller && world && (areaClock += dt) > 0.5) {
     areaClock = 0;
     updateArea();
@@ -219,8 +234,9 @@ renderer.setAnimationLoop(() => {
       : wishFromInput(frame.forward, frame.strafe, yaw, frame.run);
     const fell = controller.update(dt, wish);
     if (fell) goTo(spawn);
-    eye.copy(controller.position).y += WALK.eyeHeight;
+    eye.copy(controller.position).y += controller.eyeHeight;
     camera.position.copy(eye);
+    hud.setMode(controller.mode === 'walk' ? null : MODE_HINT[controller.mode]);
     if (trigger && !travelling) {
       const portal = trigger.update(controller.position, frame.use);
       if (portal) travel(portal);
@@ -240,6 +256,10 @@ renderer.setAnimationLoop(() => {
       `${fps.toFixed(0)} fps · ${renderer.info.render.triangles} tris · ${renderer.info.render.calls} calls`,
       p
         ? `x ${p.x.toFixed(2)} y ${p.y.toFixed(2)} z ${p.z.toFixed(2)} ${controller?.onGround ? 'ground' : 'air'}`
+        : '',
+      controller && world
+        ? `mode ${controller.mode}${controller.zone ? ` (Trav_${controller.zone.id})` : ''}` +
+          ` · eye ${controller.eyeHeight.toFixed(2)} m · ${world.zones.length} zones`
         : '',
       world
         ? `collision: ${world.collisionSource}${world.collisionSource === 'HM_Collision' ? '' : ' (no HM_Collision)'}` +
@@ -267,6 +287,10 @@ if (debugOn) {
       position: controller ? controller.position.toArray() : null,
       onGround: controller?.onGround ?? false,
       yaw,
+      mode: controller?.mode ?? null,
+      zone: controller?.zone?.id ?? null,
+      eye: controller?.eyeHeight ?? null,
+      zones: world?.zones.map((z) => z.id) ?? [],
       area: area?.name ?? null,
       indoor,
       exposure: renderer.toneMappingExposure,

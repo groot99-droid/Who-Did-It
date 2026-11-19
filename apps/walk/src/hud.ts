@@ -32,6 +32,8 @@ export class Hud {
   private readonly fader = el('div', 'fade');
   private readonly door = el('button', 'door');
   private readonly notice = el('div', 'notice');
+  private readonly mode = el('div', 'mode');
+  private modeText: string | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
   onUse: (() => void) | null = null;
@@ -51,6 +53,7 @@ export class Hud {
     this.drop.hidden = true;
     this.door.hidden = true;
     this.notice.hidden = true;
+    this.mode.hidden = true;
     this.door.type = 'button';
     this.door.addEventListener('click', () => this.onUse?.());
     root.append(
@@ -63,6 +66,7 @@ export class Hud {
       this.fader,
       this.door,
       this.notice,
+      this.mode,
     );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
@@ -175,5 +179,13 @@ export class Hud {
 
   showDrop(on: boolean): void {
     this.drop.hidden = !on;
+  }
+
+  /** The traversal mode's word ("Crawling") for as long as it lasts; null hides it. */
+  setMode(text: string | null): void {
+    if (text === this.modeText) return;
+    this.modeText = text;
+    this.mode.hidden = text === null;
+    this.mode.textContent = text ?? '';
   }
 }

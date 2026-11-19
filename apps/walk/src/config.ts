@@ -38,6 +38,75 @@ export const WALK = {
   killDepth: 25,
 } as const;
 
+// The traversal modes (src/traverse.ts): a cave file's `Trav_<id>` zones put the walker into them by themselves; the
+// WALK values hold everywhere else.
+
+export const TRAVERSE = {
+  /** A crawl or sidle box counts this much longer at both ends of its X axis (the passage), metres: the walking
+   * body (radius 0.3 m) stops that far from a low or narrow mouth, and its feet must still reach the box. */
+  endMargin: 0.3,
+  /** Feet this close outside a box still count as inside it, metres (feet resting exactly on one of its faces). */
+  edge: 0.01,
+  /** Time for the eye to move between the walking and the crawling height, seconds. */
+  eyeSeconds: 0.3,
+} as const;
+
+export const CRAWL = {
+  /** Top of the body above the feet, metres. The solid part runs from the step height (0.35 m) to here: a sphere of
+   * radius 0.275 m, so a passage 1 m high is crawled and not walked. */
+  bodyHeight: 0.9,
+  /** Camera height above the feet, metres. */
+  eyeHeight: 0.55,
+  /** m/s; there is no running. */
+  speed: 0.6,
+  /** Standing up needs nothing within this height above the feet, metres. */
+  standRoom: 1.8,
+} as const;
+
+export const SIDLE = {
+  /** Body radius while walking sideways, metres; the height stays the walking one. */
+  radius: 0.18,
+  /** m/s along the passage; there is no running. */
+  speed: 0.5,
+  /** The view is held within this angle of the wall it faces, radians (60 degrees). */
+  viewHold: Math.PI / 3,
+  /** How fast the view turns to face that wall, radians per second (a quarter turn in about 0.3 s). */
+  turnRate: 5,
+  /** After walking into a sidle box through one of its sides (between its X ends), input across the passage moves
+   * the walker only outwards, away from the box's middle plane, and only once the feet are this far off it, metres:
+   * it backs out the way it came. Entered through an X end (or arriving), movement is only along the passage. */
+  sideOut: 0.001,
+} as const;
+
+export const CLIMB = {
+  /** Speed on the face, up, down and sideways, m/s. */
+  speed: 0.6,
+  /** The feet are held this far out from the face plane, metres. */
+  hold: 0.35,
+  /** How far in front of the face plane a walker at the foot attaches, and a walker stepping off the ledge is caught,
+   * metres. */
+  reach: 0.6,
+  /** How far the feet may be from the foot of the face (the bottom of its box) to attach, metres. Going down, a floor
+   * under the feet lets the walker go only within this far of the foot (rock higher up the face does not), and a
+   * walker with no floor under it lets go and falls this far below the foot. */
+  footBand: 0.5,
+  /** A walker falling past the face within this depth below its top is caught, metres. */
+  catchBand: 0.5,
+  /** The input must point within this angle of the face to attach, radians (60 degrees). */
+  attachAngle: Math.PI / 3,
+  /** The mantle at the top: how long it takes, seconds, and how far beyond the face plane it sets the feet down,
+   * metres. */
+  mantleSeconds: 0.5,
+  mantleReach: 0.8,
+  /** Rock on the ledge, or a drop behind a narrow ridge, shortens the mantle: the body is tested every `mantleStep`
+   * metres out from the edge, and the feet land as far out as it fits with ground under them, but no nearer the face
+   * plane than `mantleMinReach`. With no such room even for the crawling body the walker hangs at the top. */
+  mantleStep: 0.05,
+  mantleMinReach: 0.2,
+  /** The ledge is looked for down to this far below the top of the box, metres. */
+  ledgeDrop: 1,
+} as const;
+
 export const LOOK = {
   /** Radians per pixel of mouse movement. */
   mouse: 0.0022,

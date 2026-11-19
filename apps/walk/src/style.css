@@ -200,6 +200,21 @@ body {
   text-align: center;
 }
 
+/* The traversal mode (Crawling, Sideways, Climbing), above the door prompt. */
+.mode {
+  position: absolute;
+  left: 50%;
+  bottom: 116px;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+
 [hidden] {
   display: none !important;
 }
