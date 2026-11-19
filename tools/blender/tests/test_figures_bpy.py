@@ -244,6 +244,7 @@ class FigureRig(unittest.TestCase):
         fig = self.manifest["figure"]
         self.assertLessEqual(fig["heightM"], fg.MAX_HEIGHT_M + 1e-6)
         self.assertAlmostEqual(fig["heightM"], fig["modelHeightM"] * fig["scale"], places=2)
+        self.assertGreaterEqual(fig["headroomRows"], fg.HEADROOM_ROWS - 1e-3)
 
     def test_a_render_lock_is_written(self):
         import render_lock

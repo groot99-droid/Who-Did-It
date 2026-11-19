@@ -93,6 +93,13 @@ class Height(unittest.TestCase):
         with self.assertRaises(ValueError):
             fg.fit_scale(0.0)
 
+    def test_a_figure_nearing_the_cell_top_on_screen_is_shrunk_to_keep_its_headroom(self):
+        room = (rc.FEET_ROW_PX - fg.HEADROOM_ROWS) / rc.DISPLAY_PX_PER_M
+        self.assertEqual(fg.screen_fit_scale(room - 0.01), 1.0)
+        tall = room + 0.1
+        self.assertAlmostEqual(tall * fg.screen_fit_scale(tall) * rc.DISPLAY_PX_PER_M,
+                               rc.FEET_ROW_PX - fg.HEADROOM_ROWS, places=3)
+
     def test_the_cap_leaves_rows_above_the_crown(self):
         rows = fg.MAX_HEIGHT_M * rc.display_px_per_vertical_m()
         self.assertLess(rows, rc.FEET_ROW_PX - 4, "a few display rows for the bob and a lean")

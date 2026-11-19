@@ -170,6 +170,32 @@ def low_points(meshes) -> list[Vector]:
     return [p for p in pts if p.z < floor + (top - floor) / 8.0]
 
 
+def screen_top(scene, meshes, times: list[float]) -> float:
+    """The highest any evaluated vertex reaches along IsoCam's up axis, in metres from the feet, over these scene
+    times and the eight turntable directions (the turntable at rest; a direction turns the figure, so it turns the
+    up axis the other way)."""
+    import numpy as np
+
+    up = bpy.data.objects["IsoCam"].matrix_world.to_3x3() @ Vector((0.0, 1.0, 0.0))
+    ups = []
+    for i in range(len(rc.DIRECTIONS)):
+        u = Matrix.Rotation(-rc.turntable_z(i), 3, "Z") @ up
+        ups.append((u.x, u.y, u.z))
+    ups = np.array(ups)
+    dg = bpy.context.evaluated_depsgraph_get()
+    top = -math.inf
+    for t in times:
+        set_time(scene, t)
+        for o in meshes:
+            ev = o.evaluated_get(dg)
+            co = np.empty(len(ev.data.vertices) * 3, dtype=np.float64)
+            ev.data.vertices.foreach_get("co", co)
+            m = np.array(ev.matrix_world)
+            world = co.reshape(-1, 3) @ m[:3, :3].T + m[:3, 3]
+            top = max(top, float((world @ ups.T).max()))
+    return top
+
+
 def analyse_walk(scene, arm, meshes, action) -> dict:
     """The cycle (start, period in scene frames) and the standing time of the walk, from the pose itself, so any
     rig and any clip length works: the Higgsfield clips hold about three cycles, the Meshy ones one."""
@@ -276,7 +302,12 @@ def render_figure(args) -> dict:
     holder.rotation_euler.z = fg.FORWARD_TURN[args.forward]
     bpy.context.view_layer.update()
     model_height = max((o.matrix_world @ Vector(c)).z for o in meshes for c in o.bound_box) / rc.Z_SCALE
-    scale = fg.fit_scale(model_height)  # a hat or a tall model must not leave the cell (SPRITES 1, the 112 px cap)
+    # A tall model is shrunk to the height cap (SPRITES 1), then further if a hat or a lean still nears the cell's top
+    # in some pose and direction (the 112 px cap); a figure that fits keeps its size.
+    poses = fg.walk_times(walk["start"], walk["period"], fg.FIGURE_CLIPS["walk"][0]) + [walk["standing"]]
+    top = screen_top(scene, meshes, poses)
+    scale = min(fg.fit_scale(model_height), fg.screen_fit_scale(top, feet_row=rc.FEET_ROW_PX,
+                                                                px_per_m=rc.DISPLAY_PX_PER_M))
     holder.scale = (scale, scale, scale)
     bpy.context.view_layer.update()
     height = model_height * scale
@@ -289,6 +320,7 @@ def render_figure(args) -> dict:
                 "passes": ["body"], "frames": {},
                 "figure": {"model": args.model, "clip": action.name, "walk": walk, "heightM": round(height, 3),
                            "modelHeightM": round(model_height, 3), "scale": scale,
+                           "headroomRows": round(rc.FEET_ROW_PX - top * scale * rc.DISPLAY_PX_PER_M, 2),
                            "breathM": fg.BREATH_LIFT_M, "forward": args.forward}}
     clipped: list[str] = []
 

@@ -34,6 +34,11 @@ BREATH_LIFT_M = 0.016
 # taller model is shrunk to it whole; a shorter one keeps its height, so the deck's figures keep their differences.
 MAX_HEIGHT_M = 1.75
 
+# The least display rows between the figure's highest projected vertex and the cell's top, in any pose and direction
+# (probe_cap.py's limit): a hat brim's far end or a lean away from the camera lifts on screen by half its depth, which
+# the standing height alone does not see.
+HEADROOM_ROWS = 3.0
+
 # The sun (A616 Q4): CL3a's direction at the default heading, 25 degrees up, turned 45 degrees clockwise (seen from
 # above) from today's key (rig_common.KEY_LIGHT: camera azimuth 225, which is world azimuth 180).
 SUN_ELEVATION_DEG = 25.0
@@ -75,6 +80,14 @@ def fit_scale(height_m: float, max_height_m: float = MAX_HEIGHT_M) -> float:
     if height_m <= 0.0:
         raise ValueError("a figure has a height")
     return 1.0 if height_m <= max_height_m else round(max_height_m / height_m, 6)
+
+
+def screen_fit_scale(top_up_m: float, headroom_rows: float = HEADROOM_ROWS, feet_row: float = 112.0,
+                     px_per_m: float = 90.51) -> float:
+    """The uniform scale (about the feet) that keeps the highest projected point, `top_up_m` metres along the camera's
+    up axis from the feet, `headroom_rows` display rows under the cell's top: 1 when it already does."""
+    room = (feet_row - headroom_rows) / px_per_m
+    return 1.0 if top_up_m <= room else round(room / top_up_m, 6)
 
 
 def find_period(samples: list[list[float]], tolerance: float = PERIOD_TOLERANCE,
