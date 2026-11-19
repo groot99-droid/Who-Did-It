@@ -14,11 +14,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  queued,
+  flush,
 } from './npcHelpers';
 
 // Round 8, Session 8C (GDD 3.23; docs/round8/economy.md 2): coins on the ground. 8A's knockout and 8E's mugging call
@@ -54,13 +55,12 @@ async function world(): Promise<Party> {
   return party;
 }
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const me = (party: Party, h: Human): PlayerState => party.room.state.players.get(h.id)!;
 const hall = (party: Party) => party.room.state.scenes.get('manor_hall')!;
 async function pickUp(party: Party, h: Human, nodeId: string): Promise<void> {
-  await send(h, 'act.hold', { action: 'gather', targetId: nodeId, on: true }, 60);
+  await queued(party, h, 'act.hold', { action: 'gather', targetId: nodeId, on: true });
   advance(party, Math.round(balance.economy.coinPickupS * TICK_RATE) + 2);
-  await wait(60);
+  await flush(party);
 }
 const conserved = (party: Party) =>
   expect(runInvariants(party.room).filter((f) => f.name === 'scripConserved')).toEqual([]);

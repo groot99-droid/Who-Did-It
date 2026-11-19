@@ -12,11 +12,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  queued,
+  flush,
 } from './npcHelpers';
 
 // Round 8, Session 8C (GDD 3.23; docs/round8/economy.md 2): shops. 8J and 8K place the counters in the scenes, so
@@ -86,13 +87,12 @@ async function world(): Promise<{ party: Party; h: Human; me: PlayerState }> {
 
 const qty = (me: PlayerState, defId: string): number =>
   me.priv.inventory.slots.reduce((n, s) => (s.defId === defId ? n + s.qty : n), 0);
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Sends one message, then runs the steps that consume it. */
 async function act(party: Party, h: Human, type: string, payload: unknown): Promise<void> {
-  await send(h, type, payload, 60);
+  await queued(party, h, type, payload);
   advance(party, 2);
-  await wait(60);
+  await flush(party);
 }
 
 const holdShop = (party: Party, h: Human, shopId: string) =>

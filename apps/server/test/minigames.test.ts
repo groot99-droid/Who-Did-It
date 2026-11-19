@@ -22,12 +22,13 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   setRole,
   start,
   toWorld,
   type Human,
   type Party,
+  queued,
+  flush,
 } from './npcHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -79,21 +80,20 @@ const qty = (me: PlayerState, defId: string): number =>
   me.priv.inventory.slots.reduce((n, s) => (s.defId === defId ? n + s.qty : n), 0);
 const stand = (party: Party, h: Human, at: { scene: string; x: number; y: number }) =>
   placeSeat(party, h.id, at.scene as 'overworld', at.x, at.y);
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Opens the task's mini-game by holding at its node; returns the `minigameStart` the client received. */
 async function open(party: Party, h: Human, taskId: string) {
   const before = h.log.filter((m) => m.type === S2C.minigameStart).length;
-  await send(h, 'act.hold', { action: 'task', targetId: taskId, on: true }, 80);
+  await queued(party, h, 'act.hold', { action: 'task', targetId: taskId, on: true });
   advance(party, 3);
-  await wait(80);
+  await flush(party);
   return h.log.filter((m) => m.type === S2C.minigameStart).slice(before)[0]?.payload as
     { taskId: string; kind: string; public: unknown } | undefined;
 }
 async function answer(party: Party, h: Human, taskId: string, a: unknown): Promise<void> {
-  await send(h, 'minigame.result', { taskId, answer: a }, 80);
+  await queued(party, h, 'minigame.result', { taskId, answer: a });
   advance(party, 3);
-  await wait(80);
+  await flush(party);
 }
 const slideAnswer = (pub: unknown) => ({ slots: (pub as SlidePublic).order });
 const cratesAnswer = (pub: unknown) => {

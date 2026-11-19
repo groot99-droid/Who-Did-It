@@ -30,6 +30,7 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
+  queued,
   send,
   setRole,
   start,
@@ -82,7 +83,7 @@ describe('fists (GDD 3.22)', () => {
   it('strikes a seat in reach over the wire: the damage, the stamina, the cooldown, the public swing, body.hit', async () => {
     const party = await party4();
     const [a, c] = [me(party), other(party)];
-    await send(party.humans[0]!, C2S.ability, { abilityId: 'strike', targetId: handleOf(party, c) });
+    await queued(party, party.humans[0]!, C2S.ability, { abilityId: 'strike', targetId: handleOf(party, c) });
     advance(party, 1);
     const tick = party.room.state.tick; // the step that consumed the strike
     expect(body(party, c).hp).toBe(b.maxHp - b.damage.strike.dmg);
@@ -97,7 +98,7 @@ describe('fists (GDD 3.22)', () => {
       data: { target: c, by: a, source: 'strike', dmg: b.damage.strike.dmg, effects: [] },
     });
     // Again at once: the cooldown refuses it, and nothing moves.
-    await send(party.humans[0]!, C2S.ability, { abilityId: 'strike', targetId: handleOf(party, c) });
+    await queued(party, party.humans[0]!, C2S.ability, { abilityId: 'strike', targetId: handleOf(party, c) });
     advance(party, 1);
     expect(await until(() => errors(party.humans[0]!).length > 0)).toBe(true);
     expect(errors(party.humans[0]!)).toEqual([ErrorCode.cooldown]);
@@ -301,7 +302,10 @@ describe('the curing items (GDD 3.22)', () => {
     setRole(party.room, a, 'doctor');
     expect(addStack(seat(party, a), 'bandage', 1)).toBe(true);
     applyEffect(party.room, c, body(party, c), 'bleeding');
-    await send(party.humans[0]!, C2S.ability, { abilityId: 'bandage', targetId: handleOf(party, c) });
+    await queued(party, party.humans[0]!, C2S.ability, {
+      abilityId: 'bandage',
+      targetId: handleOf(party, c),
+    });
     advance(party, 1);
     expect(hasEffect(body(party, c), 'bleeding')).toBe(false);
     expect(await until(() => errors(party.humans[0]!).length > 0, 300)).toBe(false);

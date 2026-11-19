@@ -11,11 +11,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  queued,
+  flush,
 } from './npcHelpers';
 
 // Round 7, 7M (GDD 3.5, A133 (11)): the co-op hold of Shutter the windows. New file.
@@ -32,7 +33,6 @@ const SHUTTER = tasks.tasks.shutterWindows!;
 const NODE = SHUTTER.targets[0]!;
 const PROP = scenes[NODE.scene as 'overworld']!.props.find((q) => q.id === NODE.prop)!;
 const HOLD_TICKS = Math.round(SHUTTER.holdS * TICK_RATE);
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function world(): Promise<{ party: Party; a: Human; b: Human; pa: PlayerState; pb: PlayerState }> {
   const party = await lobbyOf(colyseus, 4);
@@ -55,9 +55,9 @@ function assign(me: PlayerState, fake = false, id = SHUTTER.id): void {
   me.priv.tasks.push(t);
 }
 async function hold(party: Party, h: Human, on = true): Promise<void> {
-  await send(h, 'act.hold', { action: 'task', targetId: SHUTTER.id, on }, 60);
+  await queued(party, h, 'act.hold', { action: 'task', targetId: SHUTTER.id, on });
   advance(party, 1);
-  await wait(40);
+  await flush(party);
 }
 const done = (me: PlayerState) => me.priv.tasks.some((t) => t.id === SHUTTER.id && t.done);
 const dones = (party: Party) => matchEvents(party.room).filter((e) => e.kind === 'taskDone');
@@ -79,12 +79,12 @@ describe('the co-op hold (GDD 3.5)', () => {
     assign(pb, true);
     await hold(party, a);
     advance(party, HOLD_TICKS + 5);
-    await wait(40);
+    await flush(party);
     expect(done(pa)).toBe(false);
     expect(heard(a).at(-1)).toMatchObject({ holders: 1, progress: 0 });
     await hold(party, b);
     advance(party, HOLD_TICKS);
-    await wait(60);
+    await flush(party);
     expect(done(pa)).toBe(true);
     expect(done(pb)).toBe(true);
     expect(party.room.state.taskBar).toBe(100);
@@ -115,13 +115,13 @@ describe('the co-op hold (GDD 3.5)', () => {
     advance(party, HOLD_TICKS / 2);
     await hold(party, b, false);
     advance(party, HOLD_TICKS);
-    await wait(40);
+    await flush(party);
     expect(done(pa)).toBe(false);
     expect(heard(a).at(-1)).toMatchObject({ holders: 1 });
     // Resumed, the hold needs only its other half: a count that had started over would still be short here.
     await hold(party, b);
     advance(party, HOLD_TICKS / 2 + 5);
-    await wait(40);
+    await flush(party);
     expect(done(pa)).toBe(true);
     // Round two: both let go half way, so the next hold begins from nothing.
     pa.priv.tasks.clear();
@@ -134,10 +134,10 @@ describe('the co-op hold (GDD 3.5)', () => {
     await hold(party, a);
     await hold(party, b);
     advance(party, HOLD_TICKS / 2);
-    await wait(40);
+    await flush(party);
     expect(done(pa)).toBe(false);
     advance(party, HOLD_TICKS / 2);
-    await wait(40);
+    await flush(party);
     expect(done(pa)).toBe(true);
   });
 
@@ -148,7 +148,7 @@ describe('the co-op hold (GDD 3.5)', () => {
     await hold(party, a);
     await hold(party, b);
     advance(party, HOLD_TICKS + 2);
-    await wait(60);
+    await flush(party);
     expect(done(pa)).toBe(true);
     expect(pb.priv.tasks).toHaveLength(0);
     expect(pb.priv.ledger).toHaveLength(0);

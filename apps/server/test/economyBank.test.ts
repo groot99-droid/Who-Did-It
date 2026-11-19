@@ -15,11 +15,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  queued,
+  flush,
 } from './npcHelpers';
 
 // Round 8, Session 8C (GDD 3.23; docs/round8/economy.md 2): the bank and the heist's take. 8J and 8K place the bank
@@ -64,11 +65,10 @@ async function world(): Promise<{ party: Party; h: Human; me: PlayerState }> {
   return { party, h, me: party.room.state.players.get(h.id)! };
 }
 
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 async function act(party: Party, h: Human, type: string, payload: unknown): Promise<void> {
-  await send(h, type, payload, 60);
+  await queued(party, h, type, payload);
   advance(party, 2);
-  await wait(60);
+  await flush(party);
 }
 const conserved = (party: Party) =>
   expect(runInvariants(party.room).filter((f) => f.name === 'scripConserved')).toEqual([]);
