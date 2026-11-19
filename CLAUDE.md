@@ -5,11 +5,13 @@
 A browser multiplayer hidden-role game for 4 to 10 players: a static Phaser client on
 GitHub Pages and an authoritative Colyseus server. V1 is isometric 2.5D (since round 5,
 DECISIONS A49) with pre-rendered and generated sprites; V2 is first-person 3D on the same
-server, rules and world data. The quick mode it once had was removed in round 7 (DECISIONS A115,
-`GDD.md` 3.11).
+server, rules and world data; its first step is `apps/walk`, a single-player first-person walk through
+the 3D HollowMere (DECISIONS A610), and the game now has two modes, 2.5D and 3D (A613). The quick mode
+it once had was removed in round 7 (DECISIONS A115, `GDD.md` 3.11).
 
-Implementation started 2026-10-10 in four parallel sessions; `docs/SESSIONS.md` says which paths
-each session owns. Until their PRs merge, `docs/` and the root scaffold are the whole project.
+Implementation started 2026-10-10 in four parallel sessions and has run in rounds since; `docs/SESSIONS.md`
+says which paths each session owns, round by round. Everything in the layout below is built and merged;
+`docs/ROADMAP.md` 7.1 gives each milestone's status.
 
 ## Read first
 
@@ -25,15 +27,17 @@ each session owns. Until their PRs merge, `docs/` and the root scaffold are the 
   branch and one session per milestone task, pull requests under 400 lines, tests for
   every rules change.
 
-## Planned layout
+## Layout
 
 ```
-apps/client/      Phaser + Vite client (base '/Who-Did-It/', hash routing), DOM overlay HUD
-apps/server/      Colyseus server: PartyRoom, sim/{Step,Commands,Collision,Visibility,Portals}
+apps/client/      Phaser + Vite client (base '/Who-Did-It/', hash routing), DOM overlay HUD, admin page, Studio
+apps/server/      Colyseus server: PartyRoom, AdminRoom, StudioRoom, sim/ (Step, Commands, Visibility, Portals, ...)
+apps/walk/        V2 first step (A610): Vite + Three.js first-person walk-through, base '/Who-Did-It/walk/'
 packages/shared/  @wdi/shared: schema (builder style, no decorators), protocol, pure rules, constants
-packages/content/ @wdi/content: roles, traits, items, abilities, clues, tasks, balance, scenes (JSON + zod)
-tools/            grid exporter, sprite packer, Blender render rig and batch script, bot swarm
-docs/             design, world, architecture, assets, roadmap, decisions, research
+packages/content/ @wdi/content: every rules record, balance, looks, maps, scenes, story (JSON + zod)
+tools/            grid exporter, sprite packer, Blender rig and 3D village build, bot swarm, auto runner
+assets/source/    MANIFEST.md (masters' paths and hashes), concepts, prompts, review sheets
+docs/             design, world, architecture, assets, roadmap, decisions, research, one folder per round
 ```
 
 Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade dependencies.
@@ -82,7 +86,8 @@ Versions are pinned in `docs/ARCHITECTURE.md` 5.1. Sessions never upgrade depend
   changing a mechanic, a screen or a dataset, the `udgt-consult` skill answers "why is it like this"
   from it (ROSW checked out beside this repo). It reads this repo and never writes it.
 - ROSW `writing-museum/` is a Three.js first-person viewer with doors, rooms, lights,
-  touch and gamepad input; it is the candidate seed for the V2 renderer.
+  touch and gamepad input. It was the candidate seed for the V2 renderer; V2's first step,
+  `apps/walk` (A610), is its own Three.js viewer and copies nothing from it.
 
 ## Compact instructions
 

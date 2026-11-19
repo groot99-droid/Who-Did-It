@@ -15,31 +15,36 @@ them) and Hello Neighbor (enterable houses, locked doors, hiding spots, wolves i
 **Playable now:** [https://groot99-droid.github.io/Who-Did-It/](https://groot99-droid.github.io/Who-Did-It/),
 served from GitHub Pages against the Railway server. The player manuals are in
 [`docs/guides/`](docs/guides/README.md) and beside the game at
-[`/Who-Did-It/help/`](https://groot99-droid.github.io/Who-Did-It/help/). Rounds 1 to 5 of the roadmap are merged
-and round 6 (gathering and crafting, creatures, quests, cutscenes, music, the admin auto-mode) is landing;
-`docs/ROADMAP.md` carries the milestones. Everything about the design lives in [`docs/`](docs/README.md).
+[`/Who-Did-It/help/`](https://groot99-droid.github.io/Who-Did-It/help/). Rounds 1 to 9 of the roadmap are merged;
+round 10 (world mode) and story mode's part 2 are merged in part, with what is left in
+[`docs/round10/part2.md`](docs/round10/part2.md). The first step of V2, a first-person walk through the 3D
+HollowMere, is served at [`/Who-Did-It/walk/`](https://groot99-droid.github.io/Who-Did-It/walk/).
+`docs/ROADMAP.md` 7.1 carries each milestone's status. Everything about the design lives in [`docs/`](docs/README.md).
 
 | Version | Rendering | Networking | Players | Art |
 |---|---|---|---|---|
-| **V1** (this repo first) | Top-down 2.5D in Phaser 4 with pre-rendered 3D sprites from Blender | Static client on GitHub Pages, authoritative Colyseus server (Render Free, then Railway) | 4-10 | Stylized toon-noir |
-| **V2** (later) | First-person 3D in the browser, same server, rules and world data | same | 4-10 | same |
+| **V1** (this repo first) | Isometric 2.5D in Phaser 4 with pre-rendered 3D sprites from Blender | Static client on GitHub Pages, authoritative Colyseus server (Render Free, then Railway) | 4-10 | Stylized toon-noir |
+| **V2** (started: `apps/walk`, single-player, A610) | First-person 3D in the browser, same server, rules and world data | same | 4-10 | 3D HD (A611) |
 
-## Planned layout
+## Layout
 
 ```
 apps/client/      Phaser + Vite client, deployed to GitHub Pages
 apps/server/      Colyseus authoritative game server
+apps/walk/        V2 first step: Three.js first-person walk-through, deployed beside the client at /walk/
 packages/shared/  schema, protocol, pure rules engine, constants
-packages/content/ roles, traits, items, clues, tasks, balance and scene data (JSON)
-tools/            Blender render rig and batch script, sprite packer, grid exporter, bot swarm
-docs/             game design, world bible, architecture, asset pipeline, roadmap, decisions
+packages/content/ roles, traits, items, clues, tasks, balance, maps, scenes and story data (JSON)
+tools/            Blender render rig and 3D village build, sprite packer, grid exporter, bot swarm, auto runner
+assets/source/    the masters' manifest, concepts, prompts and review sheets
+docs/             game design, world bible, architecture, asset pipeline, roadmap, decisions, round contracts
 ```
 
 ## Related repo
 
 Art masters, studio notes and the Higgsfield generations library live in the owner's ROSW repo,
 [Pipelines-Plugin](https://github.com/groot99-droid/Pipelines-Plugin); see `docs/ASSETS.md` 6.10.
-This repo's `.claude/settings.json` registers that marketplace and enables its `ui-design` plugin.
+This repo's `.claude/settings.json` registers that marketplace and enables its `ui-design` and `udgt` plugins;
+the game's teardown lives in ROSW `teardowns/who-did-it/`.
 
 ## Owner-only admin page (Railway variables)
 
@@ -60,9 +65,9 @@ Unset any one of them and the room and both routes disappear. Details: [Architec
 ## Documents
 
 - [Game design](docs/GDD.md), the only source of rules and numbers together with `balance.json`
-- [World bible](docs/WORLD.md), HollowMere and its 14 scenes
+- [World bible](docs/WORLD.md), HollowMere, BlackPine and their scenes
 - [Architecture](docs/ARCHITECTURE.md), lobby codes, role secrecy, netcode, deployment
 - [Asset pipeline](docs/ASSETS.md), Blender rig, Higgsfield, Adobe, licensing
-- [Roadmap](docs/ROADMAP.md), milestones M0-M7 and the first 14 days
+- [Roadmap](docs/ROADMAP.md), the milestones, their status and the first 14 days
 - [Decisions and open questions](docs/DECISIONS.md)
 - [Research log](docs/RESEARCH.md)
