@@ -21,7 +21,7 @@
 | [round8/](round8/README.md) | The round-8 contract documents: bodies, coin, motion and art, the teardown answers, the living world, the canon, and the seams of the round. |
 | [round9/](round9/README.md) | The round-9 design of world mode: the core loop, the full-screen phases, the logic table, the refusal reasons, the living world, emergent play, the owner's answers and follow-ups, the GDD map, the round-10 build plan and the admin Studio. |
 | [round10/](round10/README.md) | The round-10 contract: the sessions that build world mode, their models and compaction sizes, and the seams they share. Paused on 2026-10-30. The pull requests open at the pause merged between 2026-11-07 and 2026-11-12; the steps still to build (B6b, B6c, B7, W1a2 to W8 and the rest) are in [`part2.md`](round10/part2.md). |
-| [round11/](round11/README.md) | The round-11 plan, the full Blender makeover: the render pipeline, materials and budgets, the owner's answers and the approved plan. Design only; not built yet. |
+| [round11/](round11/README.md) | The round-11 plan, the full Blender makeover: the render pipeline, materials and budgets, the owner's answers and the approved plan. Design only; not built yet. A revised plan for the sprite world of A615, [`round11-plan-v2.md`](round11/round11-plan-v2.md), waits for the owner. |
 | [round12/sprite-world.md](round12/sprite-world.md) | The merged 2.5D look (A615): a sprite world with depth, steps S0 to S6. |
 | [story/](story/README.md) | Story mode: the part-1 contract, the arc, the script, the rite, the test plan, the orchestrator's handoff and the status log. Part 2 merged into the base with #538. |
 | [accounts/](accounts/plan.md) | The player-accounts plan (a plan, not code). |
