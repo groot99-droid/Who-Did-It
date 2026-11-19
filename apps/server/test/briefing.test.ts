@@ -57,7 +57,7 @@ const briefings = (party: Party, i: number): string[] =>
 const clue = (party: Party, kind: number, value: number, tx = 4) =>
   spawnClue(party.room, 'bakery', { kind, value, dir: 0, tx, ty: 4 })!;
 
-/** Steps past the briefing window and lets the messages arrive. */
+/** Steps past the briefing window and waits until its messages have reached every client. */
 async function pastWindow(party: Party): Promise<void> {
   advance(party, S(balance.law.briefingAfterS) + 2);
   await flush(party);

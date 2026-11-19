@@ -66,6 +66,8 @@ export function mountCraftGrid(deps: CraftGridDeps): CraftGrid {
     cells = Array.from({ length: n * n }, () => null);
     shown = '';
     api.update();
+    // The square grows by a row and a column: keep all of it on a phone's screen (UI.md 14.44).
+    root.scrollIntoView?.({ block: 'nearest' });
   };
   toggle.addEventListener('click', () => resize(size === 2 ? 3 : 2));
   out.addEventListener('click', () => {
