@@ -26,12 +26,24 @@ else
   fi
 fi
 
+# The wheel is cp313 only. A runner whose python3 is older (ubuntu-latest ships 3.12) gets 3.13 from uv.
+have_313() { "$1" -c 'import sys; sys.exit(0 if sys.version_info[:2] == (3, 13) else 1)' 2>/dev/null; }
+USE_UV=0
+if ! have_313 "$PY"; then
+  USE_UV=1
+  python3 -m pip install --quiet --user uv 2>/dev/null || python3 -m pip install --quiet uv
+  export PATH="$HOME/.local/bin:$PATH"
+fi
 if [ ! -x "$VENV/bin/python" ]; then
-  "$PY" -m venv "$VENV"
+  if [ "$USE_UV" -eq 1 ]; then uv venv --quiet --python 3.13 "$VENV"; else "$PY" -m venv "$VENV"; fi
 fi
 if ! "$VENV/bin/python" -c "import bpy,sys; sys.exit(0 if bpy.app.version_string.startswith('$BPY_VERSION') else 1)" 2>/dev/null; then
-  "$VENV/bin/python" -m pip install --quiet --upgrade pip
-  "$VENV/bin/python" -m pip install --quiet "bpy==$BPY_VERSION"
+  if [ "$USE_UV" -eq 1 ]; then
+    uv pip install --quiet --python "$VENV/bin/python" "bpy==$BPY_VERSION"
+  else
+    "$VENV/bin/python" -m pip install --quiet --upgrade pip
+    "$VENV/bin/python" -m pip install --quiet "bpy==$BPY_VERSION"
+  fi
 fi
 
 EGL_PLATFORM=surfaceless "$VENV/bin/python" -c "import bpy; print('bpy', bpy.app.version_string, 'ready in $VENV')"
