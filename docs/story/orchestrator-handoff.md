@@ -1,5 +1,9 @@
 # Story mode part 2: orchestrator handoff
 
+> **Status, 2026-11-19:** Kept as written on 2026-11-10 to 2026-11-12. Since then `claude/story-part2` merged into the base
+> with #538 (2026-11-12), so "nothing from `claude/story-part2` has gone to the production base" no longer holds; the round-10
+> pull requests it lists as open all merged by 2026-11-12, and #245 was closed. `docs/SESSIONS.md`, "After round 11's plan", has the lanes since.
+
 Written 2026-11-10 (updated 2026-11-12 after #521 and the finisher's third grant) by the orchestrator (session `session_01M5mAcY1JPqjhPmoZ8CZDFp`, "Story mode") so any later
 session can resume without the chat. It restates no rule or number: those stay in `docs/GDD.md` and
 `packages/content/data/balance.json`. Decisions the owner makes belong in `docs/DECISIONS.md`.

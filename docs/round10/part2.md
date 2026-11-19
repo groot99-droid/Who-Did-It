@@ -1,5 +1,10 @@
 # Round 10, part 2: what is left
 
+> **Status, 2026-11-19:** Every pull request in "Open pull requests and branches at the stop" merged between 2026-11-07
+> and 2026-11-12 (#245 was closed instead). S1b, the diff kept on #429, has not landed. "Each session's remaining steps" still
+> holds for the steps no pull request has built (B6b, B6c, B7, W1a2 to W8, C6, C7, 10Z and the rest); no session is
+> assigned to them.
+
 ## Why this file
 
 On 2026-10-30 the owner wrote to 6Z:
