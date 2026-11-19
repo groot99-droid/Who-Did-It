@@ -13,7 +13,7 @@ import {
   isTurned,
   onDeliveryArrival,
 } from '../src/sim/vendettas/arrival';
-import { vendettaOf } from '../src/sim/vendettas/state';
+import { setVendetta, vendettaOf } from '../src/sim/vendettas/state';
 import { openContract } from '../src/sim/vendettas/contract';
 import { type Party, bootNpcServer, lobbyOf, npcIdsOf, standardParty } from './npcHelpers';
 import { sleep } from './simHelpers';
@@ -101,6 +101,12 @@ describe('the turning (seams.md 3 row 20)', () => {
   it('turns an eligible human: own view only, the mark in its own Notebook, no public field moves', async () => {
     const party = await mainParty();
     const room = party.room;
+    // The deal is random: all three humans can draw a card the letter never turns (a cover, Cabal or Thief card) or a
+    // vendetta, and then a human draw falls back to an NPC seat (A350). Deal them a plain card and no vendetta.
+    for (const h of party.humans) {
+      room.state.players.get(h.id)!.priv.role.roleId = 'townsfolk';
+      setVendetta(room, h.id, null);
+    }
     await sleep(200);
     const before = publicRows(party);
     const seat = await turn(party, true);

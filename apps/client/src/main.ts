@@ -10,6 +10,7 @@ import { Intro } from './scenes/Intro';
 import { Meeting } from './scenes/Meeting';
 import { RoleReveal } from './scenes/RoleReveal';
 import { World } from './scenes/World';
+import { readRenderMode } from './flags';
 import './ui/theme/tokens.css';
 import './ui/theme/components.css';
 import './ui/styles.css';
@@ -20,6 +21,8 @@ const game = new Phaser.Game({
   width: 1280,
   height: 720,
   backgroundColor: '#14110f',
+  // Round 11, R1: with `?render=sprite` the World draws over the Three.js canvas laid under this one (A618).
+  transparent: readRenderMode(location.search) === 'sprite',
   pixelArt: false,
   scale: {
     mode: Phaser.Scale.FIT,
