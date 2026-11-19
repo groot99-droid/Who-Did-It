@@ -30,3 +30,15 @@ test('a default load fetches neither the sprite world nor Three.js', async ({ pa
   expect(await toWorld(page, '')).toEqual([]);
   await expect(page.locator('#game canvas')).toHaveCount(1);
 });
+
+test('the turn keys turn the sprite world, and the compass shows it (R2)', async ({ page }) => {
+  await toWorld(page, '&render=sprite');
+  const compass = page.locator('.wdi-compass');
+  await expect(compass).toBeVisible();
+  await expect(compass).toHaveAttribute('data-heading', '0');
+  await page.keyboard.press('Period');
+  await expect(compass).toHaveAttribute('data-heading', '1');
+  await page.keyboard.press('Comma');
+  await page.keyboard.press('Comma');
+  await expect(compass).toHaveAttribute('data-heading', '3');
+});
