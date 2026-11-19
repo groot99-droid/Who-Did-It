@@ -15,6 +15,12 @@ export interface Flags {
   studio: boolean;
 }
 
+/** Round 11 (A618): `?render=sprite` draws the world with the Three.js sprite world (`world3/`); Phaser until C1. */
+export type RenderMode = 'phaser' | 'sprite';
+
+export const readRenderMode = (search: string): RenderMode =>
+  new URLSearchParams(search).get('render') === 'sprite' ? 'sprite' : 'phaser';
+
 const CODE_RE = /^[A-Za-z0-9]{5}$/;
 
 export function normalizeCode(raw: string): string {

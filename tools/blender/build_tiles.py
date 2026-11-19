@@ -144,6 +144,7 @@ def main() -> None:
             objs = build(random.Random(f"{biome}:{v}"))
             render_to(scene, os.path.join(out, f"tiles_{biome}_{v}.png"))
             sc.clear(objs)
+    sc.write_png_lock(out, "tiles")
     print(f"tiles: {len(BIOMES)} sets x {VARIANTS} -> {out}")
 
 

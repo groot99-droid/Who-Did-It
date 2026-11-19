@@ -4672,3 +4672,7 @@ merges need the owner's word.
 
 - 2026-11-19: #551 merged the revised plan and A616. The models went to the owner for the `char-models` and
   `prop-models` releases (H1); their hashes are in `handoff/models.lock.draft.json`. 11D, 11T and 11P started.
+- 2026-11-19: H1 (#557), T3 (#558) and S0 (#554, A618) merged. 11R started (`session_01M5mAcXBBvqDojzhjDrA2Hw`), with its
+  row in `seams.md`.
+- 2026-11-19: T1 (#555), the Meshy CC0 answer (#561), P1 (#556) and the flake fixes (#562, #564) merged. 11F started
+  (`session_01M5mAcUfh6GJsoxRXNaUHaC`). 11D finished and was archived.
