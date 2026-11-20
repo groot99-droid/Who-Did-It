@@ -8,6 +8,7 @@ export const TOWNSFOLK_COPY = {
   'figure.villagerlass': 'Lass',
   'figure.villagerclerk': 'Clerk',
   'figure.constable': 'Constable',
+  'figure.mallory': 'Doc Mallory',
   'meeting.townsfolk.lost.one': 'The wolves took one of the townsfolk.',
   'meeting.townsfolk.lost.many': 'The wolves took {n} of the townsfolk.',
 } as const;
