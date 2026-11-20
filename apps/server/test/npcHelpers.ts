@@ -154,6 +154,18 @@ export async function queued(
     throw new Error(`queued: ${type} not queued`);
 }
 
+/**
+ * `queued` for `input.move`. The queue keeps only a client's newest move, in a map its `size` does not count, so
+ * `queued` never sees one. This sends the move and waits until the room holds it, so the next `advance` applies it.
+ * Paused clock only.
+ */
+export async function queuedMove(party: Party, h: Human, payload: unknown, ms = 5000): Promise<void> {
+  const moves = (party.room.commands as unknown as { moves: Map<string, unknown> }).moves;
+  const before = moves.get(h.id);
+  h.room.send(C2S.move, payload);
+  if (!(await until(() => moves.get(h.id) !== before, ms))) throw new Error('queuedMove: move not queued');
+}
+
 export const errors = (h: Human): number[] =>
   h.log.filter((m) => m.type === 'error').map((m) => (m.payload as { code: number }).code);
 

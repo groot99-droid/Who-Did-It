@@ -3,8 +3,16 @@ import type { ColyseusTestServer } from '@colyseus/testing';
 import { C2S, TICK_RATE, type RefusalFrame } from '@wdi/shared';
 import { addStack, count, take } from '../src/sim/Inventory';
 import { interactReady } from '../src/sim/interact/resolve';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 
 // Round 10 (D3; GDD 3.14 "The mill"): Logs become Timber only at a saw. The head saw gives two Timber for a log in
 // 4 s, a saw horse one in 8 s, and a seat with no log is refused NEED_ITEM.
@@ -31,9 +39,9 @@ async function at(spot: { x: number; y: number }, logs: number): Promise<Party> 
 }
 
 async function hold(p: Party, targetId: string): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const refusals = (p: Party): RefusalFrame[] =>

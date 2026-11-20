@@ -5,8 +5,16 @@ import { C2S, TICK_RATE, type SceneStateType } from '@wdi/shared';
 import { applyEffect, deriveEffects, hasEffect } from '../src/sim/body/effects';
 import { bodyOf } from '../src/sim/body/state';
 import { addStack, count } from '../src/sim/Inventory';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 
 // Round 10 (S2; GDD 3.14): berries are foraged bare-handed, the market buys them below any ask, and a stew cures
 // as food does.
@@ -39,9 +47,9 @@ describe('berries', () => {
     seat.priv.inventory.slots.clear();
     placeSeat(p, human.id, sceneKey as never, spot.x, spot.y);
     advance(p, 1);
-    await send(human, C2S.hold, { action: 'gather', targetId: id, on: true }, 60);
+    await queued(p, human, C2S.hold, { action: 'gather', targetId: id, on: true });
     advance(p, 1);
-    await sleep(80);
+    await flush(p);
     const res = resources.resources.berries!;
     advance(p, Math.round(res.gatherS * TICK_RATE));
     expect(count(seat, 'berries')).toBe(res.yield);
@@ -91,9 +99,9 @@ describe('stew', () => {
     applyEffect(p.room, id, body, 'weakened');
     deriveEffects(p.room, id, body);
     expect(hasEffect(body, 'famished')).toBe(true);
-    await send(p.humans[0]!, 'act.ability', { abilityId: 'eatStew' }, 60);
+    await queued(p, p.humans[0]!, 'act.ability', { abilityId: 'eatStew' });
     advance(p, 1);
-    await sleep(80);
+    await flush(p);
     expect(count(seat, 'stew')).toBe(0);
     expect(hasEffect(body, 'famished')).toBe(false);
     expect(hasEffect(body, 'weakened')).toBe(false);

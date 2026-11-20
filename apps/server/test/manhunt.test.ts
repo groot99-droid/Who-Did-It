@@ -8,6 +8,7 @@ import { emitSim } from '../src/sim/events/bus';
 import { isJailed } from '../src/sim/law/Jail';
 import { cuffedOf, handleCuffHold } from '../src/sim/law/Manhunt';
 import { handlePetitionOpen, handlePetitionSign } from '../src/sim/law/Petition';
+import { npcMemory } from '../src/sim/npc/memory';
 import { simOf } from '../src/sim/RoomSim';
 import { figuresOf } from '../src/sim/townsfolk/figures';
 import { sceneKey } from '../src/sim/World';
@@ -20,6 +21,7 @@ import {
   flush,
   holdPhase,
   lobbyOf,
+  npcSeats,
   pauseClock,
   placeSeat,
   send,
@@ -88,6 +90,22 @@ function disguise(party: Party, seat: string, as: string): void {
 }
 
 const cuffTicks = S(balance.law.cuffHoldS);
+
+/**
+ * No ambient bark reaches the square: every figure dies and the NPC seat waits in the bakery. An NPC seat or a figure
+ * barks at idle moments drawn on its own `barks:<id>` stream (GDD 3.5), which these rooms leave on crypto words, so
+ * whether one lands within earshot in a given window differs between two rooms, and a log compared across them saw
+ * a `bark` in one only (CI, 2026-11-19).
+ */
+function hushAmbient(party: Party): void {
+  for (const f of figuresOf(party.room).values()) f.dead = true;
+  for (const p of npcSeats(party.room)) {
+    const id = p.id;
+    placeSeat(party, id, 'bakery', 2, 2);
+    npcMemory(party.room).brain(id).pauseUntilTick = Number.POSITIVE_INFINITY;
+  }
+  advance(party, 1);
+}
 
 describe('the manhunt (GDD 3.31)', () => {
   it('opens on a passed warrant, the same row for every client; a cuff jails the seat until the morning train', async () => {
@@ -162,6 +180,7 @@ describe('the manhunt (GDD 3.31)', () => {
     const runs: string[][] = [];
     for (const impersonated of [false, true]) {
       const party = await world();
+      hushAmbient(party); // the two runs' logs are compared below
       const [a, b, c, d] = ids(party);
       warrant(party, d);
       placeSeat(party, a, 'overworld', 36, 22);

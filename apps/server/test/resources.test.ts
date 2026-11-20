@@ -14,11 +14,12 @@ import {
   errors,
   pauseClock,
   placeSeat,
-  send,
   standardParty,
   type Party,
+  flush,
+  queued,
+  queuedMove,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -139,9 +140,9 @@ async function atNode(p: Party, resource: string) {
 
 /** Sends the hold, lets the step consume it, and waits for any refusal to reach the client. */
 async function hold(p: Party, action: string, targetId: string, on = true): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action, targetId, on }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action, targetId, on });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 const castTicks = (s: number) => Math.round(s * TICK_RATE);
 
@@ -167,7 +168,7 @@ describe('gather', () => {
     const { seat, node, human, row } = await atNode(p, 'timber');
     await hold(p, 'gather', row.id);
     advance(p, 5);
-    await send(human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false }, 100);
+    await queuedMove(p, human, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, castTicks(resources.resources.timber!.gatherS) + 5);
     expect(count(seat, 'timber')).toBe(0);
     expect(node.active).toBe(true);
