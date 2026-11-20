@@ -82,3 +82,8 @@ The orchestrator put six questions to the owner in a doc ("Round 11: questions f
 With the options of the doc: Q1 A, the sheets are the owner's and CC0; Q2 B, wait for the look-gate stills; Q3 mallory
 A, add a mallory look; Q4 A, grant all three; Q5 B, the orchestrator merges #547 when it is ready and green. Q6: the
 orchestrator switched the three tasks off itself. The answers are A619.
+
+Asked whose look mallory is (proposed: Doc Mallory, the apothecary landmark NPC, a non-seat figure), the owner wrote,
+verbatim, on 2026-11-20:
+
+> yes for Mallory.
