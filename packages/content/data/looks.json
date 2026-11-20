@@ -254,6 +254,17 @@
       "notes": "The county's law, sent up the line (round 10, B1): an ink tunic buttoned to a high collar, slate trousers, ink boots, a domed ink helmet with a bone badge, a wood baton in a bone frog at the right hip. Never a card's look and never the villager family's. Interact: hands behind the back, the head bowed to read. Until its art lands the client draws the plain villager.",
       "ships": "V1",
       "gddRef": "3.17"
+    },
+    "mallory": {
+      "id": "mallory",
+      "name": "Doc Mallory",
+      "bodyAtlas": "char_mallory",
+      "overlayAtlas": "ovl_mallory",
+      "silhouette": "TBD",
+      "palette": { "base": "slate", "second": "bone", "accent": "lantern" },
+      "notes": "TBD",
+      "ships": "V1",
+      "gddRef": "3.17"
     }
   }
 }
