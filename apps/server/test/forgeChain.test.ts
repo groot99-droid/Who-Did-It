@@ -9,12 +9,12 @@ import { addStack, count, LAYOUT } from '../src/sim/Inventory';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (S3; GDD 3.14, 3.22): the forge chain's data, the tier-2 wall and the tin armour.

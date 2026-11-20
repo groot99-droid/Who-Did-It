@@ -137,14 +137,9 @@ export async function flush(party: Party, humans: Human[] = party.humans, ms = 5
   }
 }
 
-/** The newest pending `input.move` of each seat, which the queue keeps apart from `size` (`sim/Commands.ts`). */
-const movesOf = (room: PartyRoom): Map<string, unknown> =>
-  (room.commands as unknown as { moves: Map<string, unknown> }).moves;
-
 /**
- * Sends one command and waits until the room has queued it, so the next `advance` consumes it: a step command, a
- * lobby command (`lobbyCommands`) or an `input.move` (kept per seat, newest wins). Paused clock only: a running clock
- * can drain the queue before the check sees it.
+ * Sends one step command and waits until the room has queued it, so the next `advance` consumes it. Paused clock only:
+ * a running clock can drain the queue before the check sees it.
  */
 export async function queued(
   party: Party,
@@ -153,13 +148,22 @@ export async function queued(
   payload: unknown = {},
   ms = 5000,
 ): Promise<void> {
-  const pending = () => party.room.commands.size + party.room.lobbyCommands.size;
-  const before = pending();
-  const seat = h.id;
-  const move = movesOf(party.room).get(seat);
+  const before = party.room.commands.size;
   h.room.send(type, payload);
-  const landed = type === C2S.move ? () => movesOf(party.room).get(seat) !== move : () => pending() > before;
-  if (!(await until(landed, ms))) throw new Error(`queued: ${type} not queued`);
+  if (!(await until(() => party.room.commands.size > before, ms)))
+    throw new Error(`queued: ${type} not queued`);
+}
+
+/**
+ * `queued` for `input.move`. The queue keeps only a client's newest move, in a map its `size` does not count, so
+ * `queued` never sees one. This sends the move and waits until the room holds it, so the next `advance` applies it.
+ * Paused clock only.
+ */
+export async function queuedMove(party: Party, h: Human, payload: unknown, ms = 5000): Promise<void> {
+  const moves = (party.room.commands as unknown as { moves: Map<string, unknown> }).moves;
+  const before = moves.get(h.id);
+  h.room.send(C2S.move, payload);
+  if (!(await until(() => moves.get(h.id) !== before, ms))) throw new Error('queuedMove: move not queued');
 }
 
 export const errors = (h: Human): number[] =>

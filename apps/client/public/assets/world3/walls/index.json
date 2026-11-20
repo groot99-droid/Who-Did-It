@@ -1,0 +1,123 @@
+{
+  "tile": 64,
+  "surfaces": {
+    "plaster": {
+      "file": "plaster.png",
+      "source": "polyhaven:worn_mossy_plasterwall",
+      "md5": "f396a70667b8b383a7ebc207a6344481",
+      "licence": "CC0-1.0"
+    },
+    "brick": {
+      "file": "brick.png",
+      "source": "polyhaven:red_brick_03",
+      "md5": "d157c6d6dd774762b4269927a87fe9b5",
+      "licence": "CC0-1.0"
+    },
+    "stone_wall": {
+      "file": "stone_wall.png",
+      "source": "polyhaven:rock_wall_08",
+      "md5": "d75a5bea1a06474902c3af8cbfd5960b",
+      "licence": "CC0-1.0"
+    },
+    "wood_boards": {
+      "file": "wood_boards.png",
+      "source": "polyhaven:weathered_plank_siding",
+      "md5": "90f818fd61602ac7268ee89857e77396",
+      "licence": "CC0-1.0"
+    },
+    "clapboard": {
+      "file": "clapboard.png",
+      "source": "polyhaven:weathered_plank_siding",
+      "md5": "90f818fd61602ac7268ee89857e77396",
+      "licence": "CC0-1.0",
+      "tint": "#DCC4A1"
+    },
+    "logs": {
+      "file": "logs.png",
+      "source": "polyhaven:wood_trunk_wall",
+      "md5": "8b31fab9bb6645c17b9e58061331f780",
+      "licence": "CC0-1.0"
+    },
+    "shakes": {
+      "file": "shakes.png",
+      "source": "polyhaven:brown_planks_05",
+      "md5": "58cef42a08ff51b46311f3557ec329fa",
+      "licence": "CC0-1.0",
+      "tint": "#9A9083"
+    },
+    "slate_roof": {
+      "file": "slate_roof.png",
+      "source": "polyhaven:roof_slates_02",
+      "md5": "d7683ac63f6d46159790186f2e19919f",
+      "licence": "CC0-1.0"
+    },
+    "rock_face": {
+      "file": "rock_face.png",
+      "source": "polyhaven:rock_face",
+      "md5": "220c637db6056b45e7c0a17e6ed8514e",
+      "licence": "CC0-1.0"
+    }
+  },
+  "solids": {
+    "W": "stone_wall",
+    "X": "rock_face"
+  },
+  "buildings": {
+    "manor": {
+      "wall": "stone_wall",
+      "roof": "slate_roof"
+    },
+    "barn": {
+      "wall": "wood_boards",
+      "roof": "slate_roof"
+    },
+    "bakery": {
+      "wall": "plaster",
+      "roof": "slate_roof"
+    },
+    "apoth": {
+      "wall": "plaster",
+      "roof": "slate_roof"
+    },
+    "widow": {
+      "wall": "stone_wall",
+      "roof": "slate_roof"
+    },
+    "tavern": {
+      "wall": "plaster",
+      "roof": "slate_roof"
+    },
+    "chapel": {
+      "wall": "stone_wall",
+      "roof": "slate_roof"
+    },
+    "netloft": {
+      "wall": "wood_boards",
+      "roof": "slate_roof"
+    },
+    "mollHut": {
+      "wall": "logs",
+      "roof": "ground:moss"
+    },
+    "lodge": {
+      "wall": "logs",
+      "roof": "shakes"
+    },
+    "mill": {
+      "wall": "wood_boards",
+      "roof": "shakes"
+    },
+    "office": {
+      "wall": "clapboard",
+      "roof": "shakes"
+    },
+    "smithy": {
+      "wall": "stone_wall",
+      "roof": "shakes"
+    },
+    "woodshed": {
+      "wall": "logs",
+      "roof": "shakes"
+    }
+  }
+}

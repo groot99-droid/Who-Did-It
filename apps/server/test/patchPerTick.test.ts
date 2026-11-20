@@ -1,9 +1,16 @@
 import type { ColyseusTestServer } from '@colyseus/testing';
-import { C2S } from '@wdi/shared';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { INPUT_STALE_TICKS } from '../src/sim/constants';
 import { simOf } from '../src/sim/RoomSim';
-import { advance, bootNpcServer, flush, pauseClock, placeSeat, queued, standardParty } from './npcHelpers';
+import {
+  advance,
+  bootNpcServer,
+  flush,
+  pauseClock,
+  placeSeat,
+  queuedMove,
+  standardParty,
+} from './npcHelpers';
 import { sleep } from './simHelpers';
 
 // Round 10, x7 (A373): one patch per tick, sent by the fixed step; a quiet input lasts ten ticks.
@@ -38,7 +45,7 @@ describe('one patch per tick', () => {
     const human = p.humans[0]!;
     placeSeat(p, human.id, 'overworld', 30, 22);
     const me = simOf(p.room).players.get(human.id)!;
-    await queued(p, human, C2S.move, { seq: 1, dx: 0, dy: 1, sprint: false, sneak: false });
+    await queuedMove(p, human, { seq: 1, dx: 0, dy: 1, sprint: false, sneak: false });
     advance(p, 1); // the step takes the input: its tick is this one
     expect(me.input?.dy).toBe(1);
     expect(INPUT_STALE_TICKS).toBe(10);

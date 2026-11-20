@@ -9,12 +9,12 @@ import { mapScenesOf } from '../src/sim/MapSites';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (D4a; GDD 3.14): the bakery's parts, up to the Herb Bread, and its poison resistance.

@@ -12,12 +12,13 @@ import {
   advance,
   bootNpcServer,
   errors,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
+  queuedMove,
 } from './npcHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -167,7 +168,7 @@ describe('gather', () => {
     const { seat, node, human, row } = await atNode(p, 'timber');
     await hold(p, 'gather', row.id);
     advance(p, 5);
-    await queued(p, human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
+    await queuedMove(p, human, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, castTicks(resources.resources.timber!.gatherS) + 5);
     expect(count(seat, 'timber')).toBe(0);
     expect(node.active).toBe(true);
