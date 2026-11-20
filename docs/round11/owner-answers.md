@@ -65,3 +65,25 @@ The look gate shows them again in every style. Round 11 builds after round 10's 
 - **BU4.** The default names "your own Android". The owner has not yet said which phone it is.
 - **RN3.** The setup script is a setting that only the owner can change, on the environment's settings page. Until it
   changes, a session that renders installs `bpy` itself (README, "Sample renders").
+
+## The questionnaire of 2026-11-19 (evening)
+
+The orchestrator put six questions to the owner in a doc ("Round 11: questions for the owner"): Q1 the sheets' licence
+(Q-P6), Q2 the four proposed look choices, Q3 the figure gaps mallory and vicar, Q4 the grant for the timing PRs, Q5
+#547, Q6 three stale scheduled tasks. The owner wrote, verbatim:
+
+> q1. A
+> q2. B
+> q3. the vicar was the first charcter i uploaded, how did you lose it. for mallory A.
+> q4. A
+> q5. B
+> q6. i couldnt find them
+
+With the options of the doc: Q1 A, the sheets are the owner's and CC0; Q2 B, wait for the look-gate stills; Q3 mallory
+A, add a mallory look; Q4 A, grant all three; Q5 B, the orchestrator merges #547 when it is ready and green. Q6: the
+orchestrator switched the three tasks off itself. The answers are A619.
+
+Asked whose look mallory is (proposed: Doc Mallory, the apothecary landmark NPC, a non-seat figure), the owner wrote,
+verbatim, on 2026-11-20:
+
+> yes for Mallory.

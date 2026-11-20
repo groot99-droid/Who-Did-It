@@ -21,6 +21,7 @@ import {
   stateOf,
   toWorld,
   flush,
+  queued,
 } from './npcHelpers';
 
 /**
@@ -30,7 +31,6 @@ import {
  */
 
 const S = (s: number): number => Math.round(s * TICK_RATE);
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 let colyseus: ColyseusTestServer;
 let release: () => Promise<void>;
@@ -178,11 +178,15 @@ describe('petitions (GDD 3.31)', () => {
     const accused = accusedOf(party);
     const prints = entry(party, a, ClueKind.footprints, 1, NotebookStatus.verified);
     const felt = entry(party, a, ClueKind.felt, 2, NotebookStatus.verified);
-    await send(party.humans[0]!, 'petition.open', { accused, charge: 'assault', entries: [prints, felt] });
+    await queued(party, party.humans[0]!, 'petition.open', {
+      accused,
+      charge: 'assault',
+      entries: [prints, felt],
+    });
     advance(party, 1);
-    await sleep(150);
+    await flush(party);
     const id = row(party).id;
-    await send(party.humans[1]!, 'petition.sign', { id });
+    await queued(party, party.humans[1]!, 'petition.sign', { id });
     // Before the step consumes the sign, read every client's decoded row; then step and read again.
     const seen: string[] = [];
     for (const h of party.humans) seen.push(JSON.stringify(stateOf(h).petition));
@@ -201,7 +205,7 @@ describe('petitions (GDD 3.31)', () => {
     // Only the signer's own view knows it signed.
     expect(party.room.state.players.get(b)!.priv.petitionSigned).toBe(false); // the sign is not yet consumed
     advance(party, 1);
-    await sleep(150);
+    await flush(party);
     expect(warrantsOf(party.room)).toHaveLength(1); // consumed in step(): the one signature passed it
   });
 

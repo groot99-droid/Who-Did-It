@@ -16,8 +16,8 @@ import {
   pauseClock,
   start,
   toWorld,
+  queued,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10, x11 (A413; GDD 3.14): the Herb Bread's Resistant lasts until the next dawn, not a clock. Before the
 // fix it ran `effects.json`'s 780 s whatever the phase (`untilTick` set, and off after 15600 ticks of night).
@@ -52,8 +52,7 @@ vi.setConfig({ testTimeout: DAY_TIMEOUT_MS });
 async function eat(p: Party, h: Human): Promise<void> {
   const seat = p.room.state.players.get(h.id)!;
   addStack(seat, 'herbBread', 1);
-  h.room.send('act.ability', { abilityId: 'eatHerbBread' });
-  await sleep(60);
+  await queued(p, h, 'act.ability', { abilityId: 'eatHerbBread' });
   advance(p, 1);
   expect(count(seat, 'herbBread')).toBe(0);
   expect(hasEffect(bodyOf(p.room, h.id)!, 'resistant')).toBe(true);
