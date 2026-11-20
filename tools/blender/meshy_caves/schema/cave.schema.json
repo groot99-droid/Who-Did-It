@@ -1,0 +1,316 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cave.schema.json",
+  "title": "Cave section",
+  "description": "One section of the cave network for tools/blender/meshy_cave_core.py, in the village frame (x east, y north, z up), metres. The network (lattice, seed, geology, section list) is inline or a path to a network file. The core reads this schema with its own small reader (meshy_cave_core.schema_errors) and adds the design rules on top (profile limits, ramps, stairs, climbs, the lattice).",
+  "type": "object",
+  "required": ["format", "key", "network", "region", "nodes", "passages", "spawns"],
+  "additionalProperties": false,
+  "properties": {
+    "format": { "const": "cave-section/1" },
+    "key": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "name": { "type": "string" },
+    "notes": { "type": "string" },
+    "network": { "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/network" }] },
+    "geology": { "type": "string" },
+    "region": { "$ref": "#/$defs/region" },
+    "nodes": { "type": "object", "additionalProperties": { "$ref": "#/$defs/vec3" } },
+    "passages": { "type": "array", "items": { "$ref": "#/$defs/passage" } },
+    "chambers": { "type": "array", "items": { "$ref": "#/$defs/chamber" } },
+    "features": { "type": "array", "items": { "$ref": "#/$defs/feature" } },
+    "guards": { "type": "array", "items": { "$ref": "#/$defs/guard" } },
+    "bridges": { "type": "array", "items": { "$ref": "#/$defs/bridge" } },
+    "drops": { "type": "array", "items": { "$ref": "#/$defs/drop" } },
+    "spawns": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/spawn" } },
+    "portals": { "type": "array", "items": { "$ref": "#/$defs/portal" } },
+    "seams": { "type": "array", "items": { "$ref": "#/$defs/seam" } },
+    "openings": { "type": "array", "items": { "$ref": "#/$defs/opening" } },
+    "joins": {
+      "description": "Pairs of passage or chamber ids (this section's or a neighbour's) that are meant to meet although no node, end or footprint joins them. Any other two whose 0.3 m dilations overlap (under 0.6 m of rock between them) fail the build.",
+      "type": "array",
+      "items": { "type": "array", "items": { "$ref": "#/$defs/id" }, "minItems": 2, "maxItems": 2 }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "vec2": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+    "vec3": { "type": "array", "items": { "type": "number" }, "minItems": 3, "maxItems": 3 },
+    "point": {
+      "description": "A node id or a floor point [x, y, z].",
+      "oneOf": [{ "type": "string" }, { "$ref": "#/$defs/vec3" }]
+    },
+    "span": {
+      "description": "A number, or [start, end] interpolated along the passage.",
+      "oneOf": [
+        { "type": "number", "exclusiveMinimum": 0 },
+        {
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      ]
+    },
+    "network": {
+      "type": "object",
+      "required": ["format", "lattice", "seed"],
+      "additionalProperties": false,
+      "properties": {
+        "format": { "const": "cave-network/1" },
+        "scene": { "type": "string" },
+        "name": { "type": "string" },
+        "area_prefix": { "type": "string" },
+        "notes": { "type": "string" },
+        "lattice": {
+          "type": "object",
+          "required": ["origin", "cell"],
+          "additionalProperties": false,
+          "properties": {
+            "origin": { "$ref": "#/$defs/vec3" },
+            "cell": { "const": 0.125 },
+            "block": { "const": 32 }
+          }
+        },
+        "seed": { "type": "integer", "minimum": 0 },
+        "geology": { "type": "object", "additionalProperties": { "$ref": "#/$defs/geology" } },
+        "sections": { "type": "array", "items": { "$ref": "#/$defs/id" } },
+        "files": { "type": "object", "additionalProperties": { "type": "string" } }
+      }
+    },
+    "geology": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tint": { "type": "string", "pattern": "^#[0-9A-Fa-f]{6}$" },
+        "repeat_m": { "type": "number", "exclusiveMinimum": 0 },
+        "noise": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "bedding": {
+          "description": "[bed thickness m, ledge depth m]",
+          "type": "array",
+          "items": { "type": "number", "minimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "detail": { "type": "string" }
+      }
+    },
+    "region": {
+      "type": "object",
+      "required": ["boxes"],
+      "additionalProperties": false,
+      "properties": {
+        "boxes": {
+          "description": "Boxes [x0, y0, z0, x1, y1, z1] on the lattice; the section is their union. Each seam adds its overlap cell and stub.",
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 }
+        }
+      }
+    },
+    "passage": {
+      "type": "object",
+      "required": ["id", "from", "to", "profile", "width", "clear"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "from": { "$ref": "#/$defs/point" },
+        "to": { "$ref": "#/$defs/point" },
+        "via": { "type": "array", "items": { "$ref": "#/$defs/vec3" } },
+        "profile": {
+          "enum": ["tube", "canyon", "keyhole", "rift", "drift", "crawl", "fissure", "shaft", "climb_face"]
+        },
+        "width": { "$ref": "#/$defs/span" },
+        "clear": { "$ref": "#/$defs/span" },
+        "floor": {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["flat", "ramp", "stairs"] },
+            "riser": { "type": "number", "exclusiveMinimum": 0 },
+            "tread": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        },
+        "geology": { "type": "string" },
+        "noise": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "blend": { "type": "number", "minimum": 0, "maximum": 2 },
+        "walk": { "type": "boolean" },
+        "ledge_depth": { "type": "number", "exclusiveMinimum": 0 },
+        "approach": { "type": "number", "exclusiveMinimum": 0 },
+        "batter": { "type": "number", "minimum": 0 },
+        "lip": { "type": "number", "minimum": 0, "maximum": 0.4 },
+        "notes": { "type": "string" }
+      }
+    },
+    "chamber": {
+      "type": "object",
+      "required": ["id", "kind", "center", "size"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["hall", "dome", "breakdown", "lake", "pocket", "stope"] },
+        "center": { "$ref": "#/$defs/vec3" },
+        "size": {
+          "description": "[length along axis, width, height] m",
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "axis": { "$ref": "#/$defs/vec2" },
+        "geology": { "type": "string" },
+        "noise": { "type": "number", "minimum": 0, "maximum": 0.5 },
+        "blend": { "type": "number", "minimum": 0, "maximum": 2 },
+        "walk": { "type": "boolean" },
+        "basin_depth": { "type": "number", "minimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "feature": {
+      "type": "object",
+      "required": ["kind", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["stalactites", "stalagmite", "column", "breakdown", "flowstone"] },
+        "at": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 3
+        },
+        "count": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "radius": { "type": "number", "exclusiveMinimum": 0 },
+        "base_radius": { "type": "number", "exclusiveMinimum": 0 },
+        "length": {
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "height": { "type": "number", "exclusiveMinimum": 0 },
+        "size": {
+          "type": "array",
+          "items": { "type": "number", "exclusiveMinimum": 0 },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "axis": { "$ref": "#/$defs/vec2" },
+        "notes": { "type": "string" }
+      }
+    },
+    "guard": {
+      "description": "A collision fence along a line of plan points, from base_z up height metres.",
+      "type": "object",
+      "required": ["id", "line", "base_z"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "line": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/vec2" } },
+        "closed": { "type": "boolean" },
+        "base_z": { "type": "number" },
+        "height": { "type": "number", "minimum": 1.0 },
+        "thickness": { "type": "number", "exclusiveMinimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "bridge": {
+      "description": "A collision slab over a crack: plan box [x0, y0, x1, y1], top at top_z.",
+      "type": "object",
+      "required": ["id", "box", "top_z"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "box": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "top_z": { "type": "number" },
+        "thickness": { "type": "number", "exclusiveMinimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "drop": {
+      "description": "A deliberate fall: falls starting within radius of from are allowed (their way back is checked by the trap test).",
+      "type": "object",
+      "required": ["id", "from"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "from": { "$ref": "#/$defs/vec3" },
+        "to": { "$ref": "#/$defs/vec3" },
+        "radius": { "type": "number", "exclusiveMinimum": 0 },
+        "notes": { "type": "string" }
+      }
+    },
+    "spawn": {
+      "type": "object",
+      "required": ["id", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "at": { "$ref": "#/$defs/vec3" },
+        "yaw_deg": { "type": "number" },
+        "mode": { "enum": ["walk", "crawl", "sidle"] },
+        "notes": { "type": "string" }
+      }
+    },
+    "portal": {
+      "type": "object",
+      "required": ["id", "at"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "at": { "$ref": "#/$defs/vec3" },
+        "to": { "type": "string" },
+        "to_spawn": { "type": "string" },
+        "kind": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "seam": {
+      "description": "A seam on an axis plane: the section on the plane's + side meshes from the plane, the other side one cell past it (the overlap), plus stub_m on each side. window is [u0, z0, u1, z1], u along the plane (y for an x plane, x for a y plane).",
+      "type": "object",
+      "required": ["id", "neighbour", "plane", "window", "portal", "arrival"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "neighbour": { "type": "string" },
+        "side": { "enum": ["a", "b"] },
+        "kind": { "type": "string" },
+        "plane": {
+          "type": "object",
+          "required": ["axis", "at", "toward"],
+          "additionalProperties": false,
+          "properties": {
+            "axis": { "enum": ["x", "y"] },
+            "at": { "type": "number" },
+            "toward": { "enum": ["+", "-"] }
+          }
+        },
+        "window": { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        "stub_m": { "type": "number", "minimum": 0 },
+        "portal": { "$ref": "#/$defs/vec3" },
+        "arrival": {
+          "type": "object",
+          "required": ["at"],
+          "additionalProperties": false,
+          "properties": {
+            "at": { "$ref": "#/$defs/vec3" },
+            "mode": { "enum": ["walk", "crawl", "sidle", "climb"] },
+            "yaw_deg": { "type": "number" }
+          }
+        },
+        "notes": { "type": "string" }
+      }
+    },
+    "opening": {
+      "description": "A declared opening: mesh boundary edges inside this box [x0, y0, z0, x1, y1, z1] are allowed.",
+      "type": "object",
+      "required": ["id", "box"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "box": { "type": "array", "items": { "type": "number" }, "minItems": 6, "maxItems": 6 },
+        "notes": { "type": "string" }
+      }
+    }
+  }
+}
