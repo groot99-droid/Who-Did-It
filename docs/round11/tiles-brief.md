@@ -44,8 +44,7 @@ Out of scope: scene JSON, ids, server, wire, R1's code, prop sprites (P3), figur
 3. A drawn tile, as a named gap, for anything neither gives.
 
 A tile that is made from a source records the source in its manifest row. Licence rules are `docs/ASSETS.md` 6.5:
-CC0 by default; a CC-BY row needs a `CREDITS.md` row; the owner's sheets have no licence recorded yet
-(sprite-world 3), so P2 asks the owner for it (Q-P6) before merging a sheet-derived file.
+CC0 by default; a CC-BY row needs a `CREDITS.md` row; the owner's sheets are CC0, the owner's answer to Q-P6 (A619, `ASSETS.md` 6.5).
 
 ## 4. Where it lives
 
@@ -88,6 +87,7 @@ answers, 11P builds to section 2 and marks it _proposed_. 11P touches nothing un
 
 - **Q-P5.** Are `T`, `R`, `F`, `K` prop sprites, not box textures? Proposed: yes, one billboard each, drawn in P3.
 - **Q-P6.** What licence do the owner's pixel-art sheets carry, and may a tile derived from one ship? Proposed: the
-  owner states it once; until then P2 uses Poly Haven (CC0) and drawn tiles only.
+  owner states it once; until then P2 uses Poly Haven (CC0) and drawn tiles only. **Answered (A619):** the sheets
+  are the owner's own and CC0; a sheet-derived tile may ship.
 - **Q-P7.** Tile size 64 px and one wall texture per surface (section 2). Proposed: yes; R1 may ask for 128 px walls.
 - **Q-P8.** Is P2 one PR or P2a and P2b? Proposed: two, ground first, because the wall list depends on R1's boxes.

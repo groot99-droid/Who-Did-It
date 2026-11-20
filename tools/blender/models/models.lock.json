@@ -14,8 +14,8 @@
   "releases": {
     "char-models": {
       "asset": "char-models.zip",
-      "sha256": "5800aebd9b6f9cfd4e5d9aeac442b37f020b875f62fa64399f4277f092968197",
-      "size": 122896722
+      "sha256": "095ea319bdb51768c23a42865ab42b7ac99df22c94be5d3023375960595c4058",
+      "size": 126221678
     },
     "prop-models": {
       "asset": "prop-models.zip",
@@ -383,6 +383,15 @@
       "release": "char-models",
       "sha256": "d95acf4122259afdb71bf02d1177de87146d36bc1900b2973916be4148877a38",
       "size": 3203336
+    },
+    {
+      "id": "vicar",
+      "kind": "character",
+      "path": "characters/meshy_rigged/vicar.glb",
+      "source": "meshy",
+      "release": "char-models",
+      "sha256": "b787db21a29fb42bced541f371650d7cead9b3a088c451da3f2fb12e5915f1fe",
+      "size": 3703072
     },
     {
       "id": "account_book",

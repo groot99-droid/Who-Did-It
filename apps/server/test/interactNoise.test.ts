@@ -7,14 +7,14 @@ import { hiveOf } from '../src/sim/npc/hive';
 import {
   advance,
   bootNpcServer,
+  flush,
   pauseClock,
   placeSeat,
-  send,
   standardParty,
   type Human,
   type Party,
+  queued,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10, x2 (A253; GDD 3.7 and 3.14): an axe's chop and a pickaxe's smash sound at the tool walls. The pulse
 // reaches a seat within the key's radius in the same scene, never the seat that made it, and the NPC board hears it
@@ -83,13 +83,13 @@ describe('chop and smash sound (x2)', () => {
       const p = await party(w);
       const [worker, near, far] = p.humans as [Human, Human, Human];
       const mode = interactions.interactions[w.interaction]!.modes[0]!;
-      await send(worker, C2S.hold, { action: 'interact', targetId: w.prop, on: true }, 60);
+      await queued(p, worker, C2S.hold, { action: 'interact', targetId: w.prop, on: true });
       advance(p, 1);
       advance(p, ticks(mode.holdS!) - 2);
-      await sleep(80);
+      await flush(p);
       expect(pulses(near)).toEqual([]);
       advance(p, 2);
-      await sleep(120);
+      await flush(p);
       const heard = pulses(near);
       expect(heard).toHaveLength(1);
       expect(heard[0]).toEqual({

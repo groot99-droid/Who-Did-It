@@ -4,8 +4,16 @@ import { roles, scenes } from '@wdi/content';
 import { C2S, TILE_PX, type RefusalFrame, type SceneStateType } from '@wdi/shared';
 import { hubOf } from '../src/sim/MapSites';
 import { simOf } from '../src/sim/RoomSim';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 
 /**
  * The refusal words 10G's sweep left for 10X (A233): each test here failed before its fix. Every refusal still
@@ -31,9 +39,9 @@ async function party(): Promise<Party> {
 
 /** Sends one message, lets the step consume it and waits for the refusal to reach the client. */
 async function act(p: Party, type: string, payload: unknown): Promise<void> {
-  await send(p.humans[0]!, type, payload, 60);
+  await queued(p, p.humans[0]!, type, payload);
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 describe('refusal words (A233)', () => {

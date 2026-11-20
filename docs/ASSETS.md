@@ -124,6 +124,7 @@ The composition's reference images (`references`, cropped as listed) go in as `i
 - AI outputs: tool, feature and date per asset in `CREDITS.md`; paid, watermark-free plans only; the vendor's terms recorded as a dated link (a saved copy when practical) in `LICENSES/vendors/README.md` before the first asset from that vendor lands. **AI-generated images are open source: CC0 1.0** (owner decision A17), since the vendor claims no ownership of outputs and purely generated images carry little or no copyright of their own.
 - Generated rasters are build output, never hand-edited: the 8-bit and low-poly icon files of SPRITES 9.1 come from their SVG master through `tools/sprites/icons-build.ts` and carry the master's licence.
 - Root `LICENSE` (MIT, code) and `LICENSE-ASSETS`: hand-made original art (renders, vectors, audio) is **CC BY 4.0** (owner decision A19; legal code in `LICENSES/CC-BY-4.0.txt`). AI-generated images stay CC0 1.0 and third-party assets keep the licence in their `CREDITS.md` row.
+- The owner's pixel-art sheets (the source of small objects and tiles, A616 Q2 and `docs/round11/tiles-brief.md` 3) are the owner's own and are **CC0 1.0** in this repository (owner's answer, 2026-11-19, A619). A file derived from a sheet records the sheet in its manifest row and needs no `CREDITS.md` row beyond the owner credit.
 
 ### 6.6 Folder and LFS plan
 
@@ -257,7 +258,7 @@ Every rendered or generated image passes through `tools/sprites/pixel.ts` before
 
 The models behind the sprite world's renders (A615, A616) are GLBs, about 235 MB zipped. They are not in the repository
 or in LFS (6.6). They are release assets of this repository, as `walk-glb` holds the village: `char-models`
-(`char-models.zip`: the 40 characters, 13 Higgsfield and 27 Meshy) and `prop-models` (`prop-models.zip`: 132 props
+(`char-models.zip`: the 41 characters, 13 Higgsfield and 28 Meshy, the Vicar among them since A619) and `prop-models` (`prop-models.zip`: 132 props
 and 32 items, all Meshy).
 
 - **Pinned.** `tools/blender/models/models.lock.json` pins each zip and every GLB in it by sha256 and size.

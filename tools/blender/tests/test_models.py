@@ -70,10 +70,10 @@ class Lock(unittest.TestCase):  # the committed lock: every field well formed, t
 
     def test_counts(self):
         kinds = {k: sum(m["kind"] == k for m in self.lock["models"]) for k in fm.KINDS}
-        self.assertEqual(kinds, {"character": 40, "prop": 132, "item": 32})
+        self.assertEqual(kinds, {"character": 41, "prop": 132, "item": 32})
         chars = [m for m in self.lock["models"] if m["kind"] == "character"]
         self.assertEqual(sum(m["source"] == "higgsfield" for m in chars), 13)
-        self.assertEqual(sum(m["source"] == "meshy" for m in chars), 27)
+        self.assertEqual(sum(m["source"] == "meshy" for m in chars), 28)
         self.assertTrue(all(m["source"] == "meshy" for m in self.lock["models"] if m["kind"] != "character"))
 
 
