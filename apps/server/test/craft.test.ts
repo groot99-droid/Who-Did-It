@@ -12,9 +12,10 @@ import {
   flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  queued,
+  queuedMove,
 } from './npcHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -96,7 +97,7 @@ describe('craft', () => {
     give(seat, { herb: 2, timber: 1 });
     await craft(p, 'snare');
     advance(p, 5);
-    await queued(p, human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
+    await queuedMove(p, human, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, cast('snare') + 5);
     expect(count(seat, 'snare')).toBe(0);
     expect(count(seat, 'herb')).toBe(2);

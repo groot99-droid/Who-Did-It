@@ -56,9 +56,9 @@ function beside(p: Party, sceneId: 'forest' | 'bp_camp', tx: number, ty: number)
 }
 
 /**
- * Sends the hold, waits until the room has queued it, steps once, and waits until any refusal has reached the client.
- * (A fixed wait before the one step let the message land late under load, and every tick count after it drifted by
- * one; a loop of sleeps and steps waited on wall time too.)
+ * Sends the hold, waits until the room has queued it, steps once so that step consumes it, and waits for any refusal
+ * to reach the client. (A fixed wait before the one step let the message land late under load, and every tick count
+ * after it drifted by one; the queue check makes the step that takes the hold the same one every run.)
  */
 async function hold(p: Party, targetId: string): Promise<void> {
   await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId, on: true });

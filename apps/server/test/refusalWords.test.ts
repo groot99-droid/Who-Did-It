@@ -7,12 +7,12 @@ import { simOf } from '../src/sim/RoomSim';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 /**

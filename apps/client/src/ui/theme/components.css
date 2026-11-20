@@ -2538,7 +2538,8 @@ body.wdi-cutscene-slam .wdi-hud-chip {
   display: grid;
   gap: var(--wdi-space-2);
   margin: 0;
-  padding: 0;
+  /* Room for a row leaning in on hover (`--wdi-nudge`), so the lean never overflows the list at phone width. */
+  padding: 0 var(--wdi-nudge) 0 0;
   list-style: none;
 }
 

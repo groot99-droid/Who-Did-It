@@ -6,12 +6,12 @@ import { interactReady } from '../src/sim/interact/resolve';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (D3; GDD 3.14 "The mill"): Logs become Timber only at a saw. The head saw gives two Timber for a log in

@@ -21,6 +21,7 @@ import {
   toWorld,
   flush,
   queued,
+  queuedMove,
 } from './npcHelpers';
 
 // Round 10, A7b (GDD 3.32; docs/round9/world-mode.md 7.3, followup-4.md 2.11): what each bed restores at dawn, and
@@ -73,7 +74,7 @@ describe('what a night in bed restores', () => {
     body(p, a).stamina = 10;
     body(p, b).stamina = 10;
     applyEffect(p.room, a.id, body(p, a), 'slowed');
-    await queued(p, b, 'input.move', { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
+    await queuedMove(p, b, { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, 1);
     expect(isAsleep(p.room, b.id)).toBe(false);
     dawn(p);

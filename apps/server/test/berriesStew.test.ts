@@ -8,12 +8,12 @@ import { addStack, count } from '../src/sim/Inventory';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (S2; GDD 3.14): berries are foraged bare-handed, the market buys them below any ask, and a stew cures

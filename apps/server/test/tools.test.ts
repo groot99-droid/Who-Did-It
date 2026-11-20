@@ -7,12 +7,12 @@ import { wornOf } from '../src/sim/interact/resolve';
 import {
   advance,
   bootNpcServer,
-  flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 10 (A11; docs/round9/logic-table.md 5.1 and 10, GDD 3.14): the tool walls on piles. Bare hands get nothing

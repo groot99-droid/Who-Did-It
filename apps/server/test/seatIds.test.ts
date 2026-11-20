@@ -7,17 +7,8 @@ import { isNpcSeat } from '../src/sim/Npc';
 import { simOf } from '../src/sim/RoomSim';
 import { clientOf, seatOf } from '../src/sim/seatIds';
 import { resetToLobby } from '../src/sim/Win';
-import {
-  type Party,
-  advance,
-  bootNpcServer,
-  flush,
-  lobbyOf,
-  pauseClock,
-  queued,
-  stateOf,
-} from './npcHelpers';
 import { until } from './flowHelpers';
+import { type Party, advance, bootNpcServer, flush, lobbyOf, pauseClock, stateOf } from './npcHelpers';
 
 /** Round 10, W1a (seams.md 3 row 25, scope.md 2.1): the hidden seats, step 1: fresh seat ids at Start. */
 
@@ -89,7 +80,10 @@ describe('fresh seat ids at Start (row 25)', () => {
     const room = party.room;
     const h = party.humans[1]!;
     const seat = seatOf(room, { sessionId: h.room.sessionId });
-    await queued(party, h, C2S.roleReady, {});
+    // `roleReady` rides the lobby queue, which `queued` does not watch: wait for it to hold the command.
+    const held = room.lobbyCommands.size;
+    h.room.send(C2S.roleReady, {});
+    expect(await until(() => room.lobbyCommands.size > held)).toBe(true);
     advance(party, 1);
     // The card's Ready is private (GDD 3.17): it lands in the flow's set under the fresh seat, not the session id.
     expect(flowOf(room).cardReady.has(seat)).toBe(true);

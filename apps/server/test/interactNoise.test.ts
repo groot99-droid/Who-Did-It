@@ -10,10 +10,10 @@ import {
   flush,
   pauseClock,
   placeSeat,
-  queued,
   standardParty,
   type Human,
   type Party,
+  queued,
 } from './npcHelpers';
 
 // Round 10, x2 (A253; GDD 3.7 and 3.14): an axe's chop and a pickaxe's smash sound at the tool walls. The pulse
