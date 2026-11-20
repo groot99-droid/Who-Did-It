@@ -23,11 +23,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 // Round 7, 7M (GDD 3.5, A133 (8), (9), (10)): the pick-up of a task's deliverable at its source prop, the `taskDone` sim
@@ -49,7 +50,6 @@ const propOf = (sceneId: string, propId: string) => {
 };
 const BENCH = propOf(FIX.source!.scene, FIX.source!.prop);
 const PUMP = propOf(FIX.targets[0]!.scene, FIX.targets[0]!.prop);
-const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 async function world(): Promise<{ party: Party; h: Human; me: PlayerState }> {
   const party = await lobbyOf(colyseus, 4);
@@ -83,9 +83,9 @@ const qty = (me: PlayerState, defId: string): number =>
 const stand = (party: Party, h: Human, at: { scene: string; x: number; y: number }) =>
   placeSeat(party, h.id, at.scene as 'overworld', at.x, at.y);
 async function hold(party: Party, h: Human, taskId: string): Promise<void> {
-  await send(h, 'act.hold', { action: 'task', targetId: taskId, on: true }, 80);
+  await queued(party, h, 'act.hold', { action: 'task', targetId: taskId, on: true });
   advance(party, 3);
-  await wait(80);
+  await flush(party);
 }
 const opened = (h: Human) => h.log.filter((m) => m.type === S2C.minigameStart).length;
 
@@ -145,9 +145,9 @@ describe('the pick-up at a task source (GDD 3.5)', () => {
 /** Finishes the open puzzle by the Done control (GDD 3.16), once it has been open for its `assistS`. */
 async function finish(party: Party, h: Human, taskId: string): Promise<void> {
   advance(party, 20 * TICK_RATE + 1);
-  await send(h, 'minigame.result', { taskId, answer: { assist: true } }, 80);
+  await queued(party, h, 'minigame.result', { taskId, answer: { assist: true } });
   advance(party, 3);
-  await wait(80);
+  await flush(party);
 }
 const dones = (party: Party) => matchEvents(party.room).filter((e) => e.kind === 'taskDone');
 
@@ -209,7 +209,7 @@ describe('the taskBar invariant (A133 (10))', () => {
       data: { taskId: 'mendFence', fake: false },
     });
     advance(party, 2);
-    await wait(50);
+    await flush(party);
     expect(dones(party)).toHaveLength(1);
     expect(failing(party)).toEqual(['taskBar']);
   });

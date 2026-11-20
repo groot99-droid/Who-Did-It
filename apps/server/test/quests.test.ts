@@ -11,11 +11,12 @@ import {
   lobbyOf,
   pauseClock,
   placeSeat,
-  send,
   start,
   toWorld,
   type Human,
   type Party,
+  flush,
+  queued,
 } from './npcHelpers';
 
 let colyseus: ColyseusTestServer;
@@ -55,9 +56,9 @@ const qty = (me: PlayerState, defId: string): number =>
 const stand = (party: Party, h: Human, at: { scene: string; x: number; y: number }) =>
   placeSeat(party, h.id, at.scene as 'overworld', at.x, at.y);
 async function say(party: Party, h: Human, type: string, questId: string): Promise<void> {
-  await send(h, type, { questId }, 80);
+  await queued(party, h, type, { questId });
   advance(party, 3);
-  await new Promise((r) => setTimeout(r, 80)); // the refusal travels back over the socket
+  await flush(party);
 }
 
 describe('quest.accept', () => {

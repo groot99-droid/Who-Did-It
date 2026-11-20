@@ -1,0 +1,205 @@
+{
+  "tile": 64,
+  "variants": 4,
+  "themes": {
+    "harbour": {
+      "g": {
+        "name": "grass",
+        "file": "harbour/grass.png",
+        "source": "polyhaven:leafy_grass",
+        "md5": "0dbc071e91d6905edfcfbe8eb785a1ab",
+        "licence": "CC0-1.0"
+      },
+      "l": {
+        "name": "litter",
+        "file": "harbour/litter.png",
+        "source": "polyhaven:forest_leaves_02",
+        "md5": "13e9bfac07cb72ca143e153cc2f589a8",
+        "licence": "CC0-1.0"
+      },
+      "m": {
+        "name": "moss",
+        "file": "harbour/moss.png",
+        "source": "polyhaven:mossy_rock",
+        "md5": "a57fbbf55269eb64f8d40708fe3af26c",
+        "licence": "CC0-1.0"
+      },
+      "p": {
+        "name": "path",
+        "file": "harbour/path.png",
+        "source": "polyhaven:muddy_tracks",
+        "md5": "a0d904939720504810f60377c6463deb",
+        "licence": "CC0-1.0"
+      },
+      "d": {
+        "name": "earth",
+        "file": "harbour/earth.png",
+        "source": "polyhaven:mud_forest",
+        "md5": "d3ea8fc962bbf54d66fc5723cd0096c1",
+        "licence": "CC0-1.0"
+      },
+      "c": {
+        "name": "cobble",
+        "file": "harbour/cobble.png",
+        "source": "polyhaven:mossy_cobblestone",
+        "md5": "e400e051cac040e67d759dbd9a51ca3d",
+        "licence": "CC0-1.0"
+      },
+      "f": {
+        "name": "flags",
+        "file": "harbour/flags.png",
+        "source": "polyhaven:stone_floor",
+        "md5": "6dff94d7c1da0fd034ba714c249ec72f",
+        "licence": "CC0-1.0"
+      },
+      "w": {
+        "name": "planks",
+        "file": "harbour/planks.png",
+        "source": "polyhaven:old_wood_floor",
+        "md5": "ffaa68add0544811b30459e58cc9b4fd",
+        "licence": "CC0-1.0"
+      },
+      "r": {
+        "name": "rock",
+        "file": "harbour/rock.png",
+        "source": "polyhaven:rock_ground",
+        "md5": "5e897f7e2bcf857250bf74be878584b2",
+        "licence": "CC0-1.0"
+      },
+      "s": {
+        "name": "shingle",
+        "file": "harbour/shingle.png",
+        "source": "polyhaven:clean_pebbles",
+        "md5": "01c641abeb4d2e1659e280f69a8e6cc7",
+        "licence": "CC0-1.0"
+      },
+      "~": {
+        "name": "shallows",
+        "file": "harbour/shallows.png",
+        "source": "polyhaven:river_small_rocks",
+        "md5": "723ee7172c9d0e98d286473ef443033c",
+        "licence": "CC0-1.0"
+      },
+      "u": {
+        "name": "brush",
+        "file": "harbour/brush.png",
+        "source": "polyhaven:forest_floor",
+        "md5": "d67f308e4b8be6a65989e8dc76ec40fe",
+        "licence": "CC0-1.0"
+      },
+      "=": {
+        "name": "rails",
+        "file": "harbour/rails.png",
+        "source": "polyhaven:gravel",
+        "md5": "a4cbe2105f51b692057d70459c56b4a3",
+        "licence": "CC0-1.0"
+      },
+      "O": {
+        "name": "water",
+        "file": "harbour/water.png",
+        "source": "drawn",
+        "licence": "CC0-1.0"
+      }
+    },
+    "timber": {
+      "g": {
+        "name": "grass",
+        "file": "timber/grass.png",
+        "source": "polyhaven:withered_grass",
+        "md5": "a6e00946839a9ab1975457ae4a39823b",
+        "licence": "CC0-1.0"
+      },
+      "l": {
+        "name": "litter",
+        "file": "timber/litter.png",
+        "source": "polyhaven:forrest_ground_01",
+        "md5": "236e7d928f5e357a194fd92de189cbe4",
+        "licence": "CC0-1.0"
+      },
+      "m": {
+        "name": "moss",
+        "file": "timber/moss.png",
+        "source": "polyhaven:moss_wood",
+        "md5": "3de94c0b72a86b272335c3726dfc705b",
+        "licence": "CC0-1.0"
+      },
+      "p": {
+        "name": "path",
+        "file": "timber/path.png",
+        "source": "polyhaven:brown_mud_02",
+        "md5": "c3842f023e11a08c8cf521c947ce08c8",
+        "licence": "CC0-1.0"
+      },
+      "d": {
+        "name": "earth",
+        "file": "timber/earth.png",
+        "source": "polyhaven:forest_ground_04",
+        "md5": "6ad9df4d731a238299806f739a26af83",
+        "licence": "CC0-1.0"
+      },
+      "c": {
+        "name": "cobble",
+        "file": "timber/cobble.png",
+        "source": "polyhaven:rocky_trail",
+        "md5": "f515d1f026fe4a022d5c182f191d60dc",
+        "licence": "CC0-1.0"
+      },
+      "f": {
+        "name": "flags",
+        "file": "timber/flags.png",
+        "source": "polyhaven:slate_floor_02",
+        "md5": "5a59972c473632672d9761f5c998654a",
+        "licence": "CC0-1.0"
+      },
+      "w": {
+        "name": "planks",
+        "file": "timber/planks.png",
+        "source": "polyhaven:weathered_planks",
+        "md5": "5d7c9e7088bfa54490ba03ba15b660d8",
+        "licence": "CC0-1.0"
+      },
+      "r": {
+        "name": "rock",
+        "file": "timber/rock.png",
+        "source": "polyhaven:rocky_gravel",
+        "md5": "a1d5a23e5df0f2a43ec69d9a1b1c3f92",
+        "licence": "CC0-1.0"
+      },
+      "s": {
+        "name": "shingle",
+        "file": "timber/shingle.png",
+        "source": "polyhaven:gravel_floor",
+        "md5": "4f055e1545dcf41f347600fbb01d9ac2",
+        "licence": "CC0-1.0"
+      },
+      "~": {
+        "name": "shallows",
+        "file": "timber/shallows.png",
+        "source": "polyhaven:brown_mud_rocks_01",
+        "md5": "19e4d0066282bd8439bdc713310bbbe4",
+        "licence": "CC0-1.0"
+      },
+      "u": {
+        "name": "brush",
+        "file": "timber/brush.png",
+        "source": "polyhaven:forest_ground_05",
+        "md5": "7fcf121f5d2ac2ffe665d42d5fe69478",
+        "licence": "CC0-1.0"
+      },
+      "=": {
+        "name": "rails",
+        "file": "timber/rails.png",
+        "source": "polyhaven:gravel_stones",
+        "md5": "0e04ba65c86cbc55554877bad6a40354",
+        "licence": "CC0-1.0"
+      },
+      "O": {
+        "name": "water",
+        "file": "timber/water.png",
+        "source": "drawn",
+        "licence": "CC0-1.0"
+      }
+    }
+  },
+  "gaps": []
+}

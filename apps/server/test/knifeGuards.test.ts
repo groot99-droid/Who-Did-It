@@ -19,6 +19,7 @@ import {
   advance,
   allTownsfolk,
   bootNpcServer,
+  flush,
   holdPhase,
   lobbyOf,
   pauseClock,
@@ -27,7 +28,6 @@ import {
   start,
   toWorld,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 /** Round 10, C5c (GDD 3.8, 3.24): the Knife on a guard, in every mode; in Paint The Town Red the guards come back. */
 
@@ -112,14 +112,14 @@ describe('the Knife on a guard (GDD 3.24)', () => {
       Math.floor(a.y / TILE_PX),
     );
     knife(party, human, a);
-    await sleep(150);
+    await flush(party);
     expect(lastReason(party)).toBe('TOO_FAR');
     beside(party, human, a);
     knife(party, human, a);
     expect(a.dead).toBe(true);
     beside(party, human, b);
     knife(party, human, b);
-    await sleep(150);
+    await flush(party);
     expect(lastReason(party)).toBe('COOLDOWN');
     expect(b.dead).toBe(false);
   });

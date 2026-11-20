@@ -21,6 +21,7 @@ import {
   send,
   start,
   toWorld,
+  queued,
 } from './npcHelpers';
 
 // Round 10, K6b (GDD 3.5, 3.12 "Hidden seats"): an NPC seat sets the Snare it holds outdoors, buys one at a stall that
@@ -68,7 +69,7 @@ describe('NPC seats and snares (K6b)', () => {
     const { x, y } = openRun('forest', 6);
     placeSeat(party, human, 'forest', x, y);
     addStack(party.room.state.players.get(human)!, 'snare', 1);
-    await send(party.humans[0]!, 'act.ability', { abilityId: 'snare' }, 40);
+    await queued(party, party.humans[0]!, 'act.ability', { abilityId: 'snare' });
     advance(party, 3);
     expect(party.room.state.scenes.get('forest')!.snares.size).toBe(1);
     placeSeat(party, human, 'forest', x + 4, y);
