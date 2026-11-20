@@ -160,3 +160,15 @@ jobs:
         env:
           EGL_PLATFORM: surfaceless
         run: tools/blender/.venv/bin/python -m unittest discover -s tools/blender/tests/bpy -v
+      # The figure tests (round 11, 11F F1) sit beside the pure-Python tests rather than in tests/bpy/, skip without
+      # bpy, and take about 40 s. Run by file name with the same Blender python; absent until F1 merges.
+      - name: bpy figure tests
+        if: steps.paths.outputs.run == 'true'
+        env:
+          EGL_PLATFORM: surfaceless
+        run: |
+          if [ ! -f tools/blender/tests/test_figures_bpy.py ]; then
+            echo "tools/blender/tests/test_figures_bpy.py is not in this tree yet; nothing to run." | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          tools/blender/.venv/bin/python -m unittest discover -s tools/blender/tests -p test_figures_bpy.py -v
