@@ -6,8 +6,16 @@ import { applyEffect, hasEffect } from '../src/sim/body/effects';
 import { bodyOf } from '../src/sim/body/state';
 import { addStack, count } from '../src/sim/Inventory';
 import { mapScenesOf } from '../src/sim/MapSites';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+} from './npcHelpers';
 
 // Round 10 (D4a; GDD 3.14): the bakery's parts, up to the Herb Bread, and its poison resistance.
 
@@ -33,7 +41,7 @@ async function make(p: Party, recipeId: string): Promise<void> {
   const human = p.humans[0]!;
   placeSeat(p, human.id, sceneId, prop.x, prop.y);
   advance(p, 1);
-  await send(human, C2S.hold, { action: 'craft', targetId: recipeId, on: true }, 60);
+  await queued(p, human, C2S.hold, { action: 'craft', targetId: recipeId, on: true });
   advance(p, Math.round(recipes.recipes[recipeId]!.craftS * TICK_RATE) + 1);
 }
 
@@ -59,9 +67,9 @@ describe('the Herb Bread', () => {
     applyEffect(p.room, id, body, 'poisoned');
     const full = body.effects.get('poisoned')!.untilTick - p.room.state.tick;
     body.effects.clear();
-    await send(p.humans[0]!, 'act.ability', { abilityId: 'eatHerbBread' }, 60);
+    await queued(p, p.humans[0]!, 'act.ability', { abilityId: 'eatHerbBread' });
     advance(p, 1);
-    await sleep(80);
+    await flush(p);
     expect(count(seat, 'herbBread')).toBe(0);
     expect(hasEffect(body, 'resistant')).toBe(true);
     applyEffect(p.room, id, body, 'poisoned');

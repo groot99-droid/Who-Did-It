@@ -22,7 +22,7 @@ import { autoOf } from '../src/sim/auto/Auto';
 import { clockOf } from '../src/sim/auto/clock';
 import { until } from './flowHelpers';
 import { registerInvariant } from '../src/sim/auto/invariants';
-import { advance, lobbyOf, pauseClock, start, toWorld } from './npcHelpers';
+import { type Human, type Party, advance, flush, lobbyOf, pauseClock, start, toWorld } from './npcHelpers';
 import { sleep } from './simHelpers';
 
 vi.setConfig({ testTimeout: 40_000 });
@@ -60,6 +60,15 @@ async function joinError(run: () => Promise<unknown>) {
   throw new Error('join unexpectedly succeeded');
 }
 const GENERIC = { code: JOIN_ERROR_CODE, message: JOIN_ERROR_MESSAGE };
+
+/** The admin client as a party member, so `flush` can wait on it: it is a client of the room like any other. */
+function asParty(admin: Human['room'], room: AdminRoom): Party {
+  const human: Human = { room: admin, id: admin.sessionId, log: [] };
+  admin.onMessage('*', (type: string | number, payload: unknown) =>
+    human.log.push({ type: String(type), payload }),
+  );
+  return { humans: [human], room: room as unknown as PartyRoom };
+}
 
 describe('with the variables set', () => {
   let colyseus: ColyseusTestServer;
@@ -145,7 +154,7 @@ describe('with the variables set', () => {
     for (let i = 0; i < 4000 && room.state.phase !== Phase.grace; i++) advance({ humans: [], room }, 1);
     expect(room.state.phase).toBe(Phase.grace);
     advance({ humans: [], room }, 8);
-    await sleep(500);
+    await flush(asParty(admin, room)); // the room is paused: the steps above are every patch the admin is owed
 
     const state = admin.state as unknown as GameStateType;
     expect(state.players.size).toBe(room.state.players.size);

@@ -21,8 +21,8 @@ import {
   toWorld,
   flush,
   queued,
+  queuedMove,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10, A7 (GDD 3.32; docs/round9/world-mode.md 7.3): beds, who counts, the night skip and what wakes a sleeper.
 
@@ -139,8 +139,7 @@ describe('the night skip', () => {
     holdPhase(p, Phase.night, 200);
     await lieDown(p, a, priv(p, a).home);
     const at = { x: simOf(p.room).players.get(a.id)!.x, y: simOf(p.room).players.get(a.id)!.y };
-    a.room.send('input.move', { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
-    await sleep(60);
+    await queuedMove(p, a, { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, 2);
     expect(isAsleep(p.room, a.id)).toBe(false);
     expect(simOf(p.room).players.get(a.id)!.x).toBe(at.x); // the first press wakes, it does not walk

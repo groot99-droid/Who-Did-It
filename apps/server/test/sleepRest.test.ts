@@ -20,8 +20,9 @@ import {
   stateOf,
   toWorld,
   flush,
+  queued,
+  queuedMove,
 } from './npcHelpers';
-import { sleep } from './simHelpers';
 
 // Round 10, A7b (GDD 3.32; docs/round9/world-mode.md 7.3, followup-4.md 2.11): what each bed restores at dawn, and
 // Exhaustion for the last one awake.
@@ -52,8 +53,7 @@ const body = (p: Party, h: Human) => bodyOf(p.room, h.id)!;
 async function lieDown(p: Party, h: Human, scene: string, kind = 'bed'): Promise<void> {
   const bed = scenes[scene as SceneId].props.find((q) => q.kind === kind)!;
   placeSeat(p, h.id, scene as SceneId, bed.x, bed.y);
-  h.room.send('act.hold', { action: 'sleep', targetId: bed.id, on: true });
-  await sleep(60);
+  await queued(p, h, 'act.hold', { action: 'sleep', targetId: bed.id, on: true });
   advance(p, 1);
   expect(isAsleep(p.room, h.id), `${h.id} in ${bed.id}`).toBe(true);
 }
@@ -74,8 +74,7 @@ describe('what a night in bed restores', () => {
     body(p, a).stamina = 10;
     body(p, b).stamina = 10;
     applyEffect(p.room, a.id, body(p, a), 'slowed');
-    b.room.send('input.move', { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
-    await sleep(60);
+    await queuedMove(p, b, { seq: 9_000, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, 1);
     expect(isAsleep(p.room, b.id)).toBe(false);
     dawn(p);

@@ -127,7 +127,7 @@ The composition's reference images (`references`, cropped as listed) go in as `i
 
 ### 6.6 Folder and LFS plan
 
-Day 1 commits `.gitattributes` before any binary: LFS rules for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav` exist but nothing uses them yet, because the render rig is built from code (`tools/blender/build_rig.py`, 6.2) and no `.blend` is committed; every master (`.ai`, `.aep`, `.psd`, character `.blend`, source `.glb`) lives on the owner's laptop in the ROSW checkout under `studio/assets/who-did-it/<kind>/<slug>/` (git-ignored there, recorded by a studio note; see 6.10) and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. `ci.yml` checks out with `lfs: false`.
+Day 1 commits `.gitattributes` before any binary: LFS rules for `*.blend *.psd *.ai *.aep *.fbx *.glb *.wav` exist but nothing uses them yet, because the render rig is built from code (`tools/blender/build_rig.py`, 6.2) and no `.blend` is committed; every master (`.ai`, `.aep`, `.psd`, character `.blend`, source `.glb`) lives on the owner's laptop in the ROSW checkout under `studio/assets/who-did-it/<kind>/<slug>/` (git-ignored there, recorded by a studio note; see 6.10) and is listed in `assets/source/MANIFEST.md` with hash and date. Exports (`apps/client/public/assets/**`) are committed in plain git in batched "art drop" PRs; the deterministic packer keeps unchanged pages byte-identical; CI warns when a PR adds more than 25 MB of binaries. Every render writes a `render.lock.json` (`tools/blender/render_lock.py`: a sha256 a frame over the builder sources, the master, the material lock entries, the flags and the model's pinned hash), its copy is committed under `assets/source/renders/<unit>.lock.json`, and `tools/sprites/test/renders.test.ts` requires one for every shipped atlas, with the frames equal; a unit rendered before the writer is on the `renderLegacy.ts` allowlist, which only shrinks. `ci.yml` checks out with `lfs: false`.
 
 ### 6.7 V1 asset backlog
 
@@ -264,7 +264,7 @@ and 32 items, all Meshy).
   `fetch_models.py` beside it fills the git-ignored `tools/blender/build/models/` and refuses any mismatch. Its README
   gives the format.
 - **Licences.** The lock gives the licence per source: Higgsfield follows A17, and Meshy on the owner's plan is the
-  owner's to ship (A616 Q1).
+  owner's to ship (A616 Q1) and is CC0-1.0 (the owner's answer, 2026-11-19).
 - **Masters and uploads.** The masters stay on the owner's laptop (CLAUDE.md, 6.10). Only the owner uploads; a changed
   model is a new zip under the same tag, with a pull request that rewrites its lock rows.
 - **Credits.** Each shipped render's `CREDITS.md` row cites its model's lock `id` and source (and a Higgsfield model's ROSW catalog id).

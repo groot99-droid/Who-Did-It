@@ -6,8 +6,17 @@ import { handleHold } from '../src/sim/Hold';
 import { addStack, count } from '../src/sim/Inventory';
 import { wornOf } from '../src/sim/interact/resolve';
 import { simOf } from '../src/sim/RoomSim';
-import { advance, bootNpcServer, pauseClock, placeSeat, send, standardParty, type Party } from './npcHelpers';
-import { sleep } from './simHelpers';
+import {
+  advance,
+  bootNpcServer,
+  pauseClock,
+  placeSeat,
+  standardParty,
+  type Party,
+  flush,
+  queued,
+  queuedMove,
+} from './npcHelpers';
 
 // Round 10 (A10; docs/round9/logic-table.md 4, GDD 3.14): the logic table's resolver behind `act.hold {action:
 // 'interact'}`. interactions.json holds no interaction until A11, so the test registers a fixture wall: a test axe
@@ -73,9 +82,9 @@ async function atPile(): Promise<Party> {
 }
 
 async function hold(p: Party, on = true): Promise<void> {
-  await send(p.humans[0]!, C2S.hold, { action: 'interact', targetId: PILE, on }, 60);
+  await queued(p, p.humans[0]!, C2S.hold, { action: 'interact', targetId: PILE, on });
   advance(p, 1);
-  await sleep(80);
+  await flush(p);
 }
 
 const refusals = (p: Party): RefusalFrame[] =>
@@ -133,7 +142,7 @@ describe('the resolver', () => {
     const seat = p.room.state.players.get(human.id)!;
     addStack(seat, 'testAxe', 1);
     await hold(p);
-    await send(human, C2S.move, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false }, 100);
+    await queuedMove(p, human, { seq: 1, dx: 1, dy: 0, sprint: false, sneak: false });
     advance(p, ticks(HOLD_S) + 5);
     expect(count(seat, 'timber')).toBe(0);
     expect(stateOf(p)).toBeUndefined();

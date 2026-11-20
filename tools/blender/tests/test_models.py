@@ -43,6 +43,7 @@ class Lock(unittest.TestCase):  # the committed lock: every field well formed, t
             self.assertEqual(set(src), {"licence", "basis"}, name)
             self.assertIn(src["licence"], ("CC0-1.0", "CC-BY-4.0"), name)
             self.assertRegex(src["basis"], r"DECISIONS A\d+", name)
+            self.assertNotIn("proposed", src["basis"], name)
 
     def test_models(self):
         ids, paths = set(), set()
