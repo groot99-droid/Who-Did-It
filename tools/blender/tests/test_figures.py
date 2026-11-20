@@ -165,7 +165,7 @@ class Looks(unittest.TestCase):
 
     def test_a_model_without_a_look_is_a_gap(self):
         with self.assertRaises(ValueError):
-            fg.check_look("mallory")
+            fg.check_look("nobody")
         with self.assertRaises(ValueError):
             fg.check_look("ada_kerrow")
 
