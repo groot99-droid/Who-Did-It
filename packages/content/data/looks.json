@@ -260,9 +260,9 @@
       "name": "Doc Mallory",
       "bodyAtlas": "char_mallory",
       "overlayAtlas": "ovl_mallory",
-      "silhouette": "TBD",
-      "palette": { "base": "slate", "second": "bone", "accent": "lantern" },
-      "notes": "TBD",
+      "silhouette": "Dark hair tied back, a long bib apron to the shins over a full skirt, a satchel and a bunch of herbs at the right hip.",
+      "palette": { "base": "teal", "second": "bone", "accent": "wood" },
+      "notes": "Doc Mallory keeps the apothecary (apoth_shop, WORLD 1): a deep green-teal bib apron over a bone blouse with rolled, striped sleeves, a fog-brown skirt beneath, a wood belt with a leather satchel and a tied bunch of herbs, wood boots. A landmark figure, never a seat, never a card's look and never the villager family's; no portrait (owner, A619). Until its art is loaded the client draws the plain villager.",
       "ships": "V1",
       "gddRef": "3.17"
     }

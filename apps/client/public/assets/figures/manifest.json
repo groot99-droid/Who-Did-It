@@ -67,9 +67,33 @@
       "maps": []
     },
     {
+      "key": "fig_mallory",
+      "type": "multiatlas",
+      "url": "char_mallory.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
       "key": "fig_tinner",
       "type": "multiatlas",
       "url": "char_tinner.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_villager",
+      "type": "multiatlas",
+      "url": "char_villager.json",
+      "path": "",
+      "filter": "linear",
+      "maps": []
+    },
+    {
+      "key": "fig_villagerlass",
+      "type": "multiatlas",
+      "url": "char_villagerlass.json",
       "path": "",
       "filter": "linear",
       "maps": []
