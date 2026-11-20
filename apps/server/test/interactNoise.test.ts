@@ -7,13 +7,13 @@ import { hiveOf } from '../src/sim/npc/hive';
 import {
   advance,
   bootNpcServer,
+  flush,
   pauseClock,
   placeSeat,
   standardParty,
   type Human,
   type Party,
   queued,
-  flush,
 } from './npcHelpers';
 
 // Round 10, x2 (A253; GDD 3.7 and 3.14): an axe's chop and a pickaxe's smash sound at the tool walls. The pulse

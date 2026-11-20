@@ -19,6 +19,7 @@ import {
   advance,
   allTownsfolk,
   bootNpcServer,
+  flush,
   holdPhase,
   lobbyOf,
   pauseClock,
@@ -26,7 +27,6 @@ import {
   setRole,
   start,
   toWorld,
-  flush,
 } from './npcHelpers';
 
 /** Round 10, C5c (GDD 3.8, 3.24): the Knife on a guard, in every mode; in Paint The Town Red the guards come back. */

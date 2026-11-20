@@ -9,11 +9,11 @@ import {
   advance,
   bootNpcServer,
   errors,
+  flush,
   pauseClock,
   placeSeat,
   standardParty,
   type Party,
-  flush,
   queued,
   queuedMove,
 } from './npcHelpers';

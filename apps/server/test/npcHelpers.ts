@@ -137,9 +137,14 @@ export async function flush(party: Party, humans: Human[] = party.humans, ms = 5
   }
 }
 
+/** The newest pending `input.move` of each seat, which the queue keeps apart from `size` (`sim/Commands.ts`). */
+const movesOf = (room: PartyRoom): Map<string, unknown> =>
+  (room.commands as unknown as { moves: Map<string, unknown> }).moves;
+
 /**
- * Sends one step command and waits until the room has queued it, so the next `advance` consumes it. Paused clock only:
- * a running clock can drain the queue before the check sees it.
+ * Sends one command and waits until the room has queued it, so the next `advance` consumes it: a step command, a
+ * lobby command (`lobbyCommands`) or an `input.move` (kept per seat, newest wins). Paused clock only: a running clock
+ * can drain the queue before the check sees it.
  */
 export async function queued(
   party: Party,
@@ -148,10 +153,13 @@ export async function queued(
   payload: unknown = {},
   ms = 5000,
 ): Promise<void> {
-  const before = party.room.commands.size;
+  const pending = () => party.room.commands.size + party.room.lobbyCommands.size;
+  const before = pending();
+  const seat = h.id;
+  const move = movesOf(party.room).get(seat);
   h.room.send(type, payload);
-  if (!(await until(() => party.room.commands.size > before, ms)))
-    throw new Error(`queued: ${type} not queued`);
+  const landed = type === C2S.move ? () => movesOf(party.room).get(seat) !== move : () => pending() > before;
+  if (!(await until(landed, ms))) throw new Error(`queued: ${type} not queued`);
 }
 
 /**
