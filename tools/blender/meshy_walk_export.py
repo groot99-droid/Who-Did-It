@@ -532,6 +532,34 @@ DRACO = dict(export_draco_mesh_compression_enable=True, export_draco_mesh_compre
              export_draco_color_quantization=16)  # v1.2: the rooms' baked COLOR_0 (10 bits bands the dark corners)
 
 
+@contextlib.contextmanager
+def gltf_samplers_uncached():
+    """The glTF exporter's samplers read off each texture node every time (2026-11-21). The exporter (Khronos glTF
+    Blender I/O in Blender 5.2) gathers each material from a temporary inline copy of its node tree
+    (`InlineShaderNodes.from_material`), freed after that material, and caches `gather_sampler` on the image node,
+    which hashes and compares by its memory address. A later material's copy can reuse a freed node's address and then
+    gets that node's sampler: in the gated village `village_ground_A0_00`'s pool map (EXTEND: clamp) took the gate
+    atlas's repeat in some builds and kept its clamp in others, so two gated builds differed. Here the texture step
+    calls the uncached function (`__wrapped__`); equal samplers are still shared by value (the exporter's
+    `__sampler_by_value`), so a build whose nodes never met a stale entry writes the same bytes as before. Yields
+    whether the bypass is in place."""
+    try:
+        from io_scene_gltf2.blender.exp.material import texture as gltf_texture
+    except ImportError:
+        yield False
+        return
+    cached = getattr(gltf_texture, "gather_sampler", None)
+    raw = getattr(cached, "__wrapped__", None)
+    if raw is None:
+        yield False
+        return
+    gltf_texture.gather_sampler = raw
+    try:
+        yield True
+    finally:
+        gltf_texture.gather_sampler = cached
+
+
 # ================================================================ numpy helpers
 
 
@@ -5650,13 +5678,17 @@ def finalize(X: Export) -> dict:
         log(f"guard: {len(mats)} materials pass, {len(room_mats)} room materials (unlit)")
     with X.step("export"):
         os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
-        bpy.ops.export_scene.gltf(
-            filepath=os.path.abspath(args.out), export_format="GLB", use_active_scene=True, use_renderable=True,
-            export_apply=False, export_gpu_instances=True, export_extras=True, export_yup=True,
-            export_image_format="WEBP", export_image_quality=80, export_lights=True,
-            export_import_convert_lighting_mode="COMPAT", export_animations=False, export_cameras=False,
-            export_vertex_color="MATERIAL", export_all_vertex_colors=False,
-            export_active_vertex_color_when_no_material=False, export_tangents=False, **DRACO)
+        with gltf_samplers_uncached() as uncached:
+            if not uncached:
+                log("WARNING export: the glTF exporter's gather_sampler is not the cached one this script knows; "
+                    "a texture's sampler may vary from build to build")
+            bpy.ops.export_scene.gltf(
+                filepath=os.path.abspath(args.out), export_format="GLB", use_active_scene=True, use_renderable=True,
+                export_apply=False, export_gpu_instances=True, export_extras=True, export_yup=True,
+                export_image_format="WEBP", export_image_quality=80, export_lights=True,
+                export_import_convert_lighting_mode="COMPAT", export_animations=False, export_cameras=False,
+                export_vertex_color="MATERIAL", export_all_vertex_colors=False,
+                export_active_vertex_color_when_no_material=False, export_tangents=False, **DRACO)
         log("exported", args.out, os.path.getsize(args.out))
     if getattr(args, "gates", None) and getattr(args, "gates_journey", None):
         with X.step("gates journey file"):

@@ -151,5 +151,129 @@ class Cutting(unittest.TestCase):
         self.assertGreaterEqual(4.5 + (k["wall_face"] + k["wall_thick"]), 6.0)
 
 
+class OldRising(unittest.TestCase):
+    """The Old Rising's bowl: the trestle's base pressed into a hollow before the steps and made the walk's ground."""
+
+    def setUp(self):
+        self.g = {g["id"]: g for g in read(GATES)["gates"]}["rising"]
+        self.k = self.g["kit"]
+
+    def test_the_hollow_holds_the_steps_and_its_banks_are_walkable(self):
+        p = self.k["press"]
+        x0, y0, x1, y1 = p["box_m"]
+        st = mg.to_world(self.g, 0.0, self.k["landing"][0] - (self.k["steps"] - 1) * self.k["tread"], 0.0)
+        self.assertLess(x0, st[0] - 0.3)                   # a walker's body stands clear before the lowest riser
+        self.assertLessEqual(y0, -self.k["landing_half_w"] + 0.5)
+        self.assertGreaterEqual(y1, self.k["landing_half_w"] + 0.5)
+        self.assertLessEqual(math.degrees(math.atan(p["slope"])), 30.0)
+        self.assertEqual(mg.press_cap(p, 9.41, 192.0, 0.5), 9.41 - p["under_ground_m"])
+        self.assertAlmostEqual(mg.press_cap(p, 9.41, x0 - 2.0, 0.5), 9.41 - p["under_ground_m"] + 2.0 * p["slope"])
+        self.assertAlmostEqual(mg.press_cap(p, 9.41, x0 - 3.0, y1 + 4.0), 9.41 - p["under_ground_m"] + 5.0 * p["slope"])
+        self.assertNotIn("fade_m", p)
+
+    def test_the_walk_patch_covers_the_bowl_on_the_collision_grid(self):
+        w = self.k["walk_solid"]
+        self.assertEqual(w["object"], self.k["press"]["object"])
+        x0, y0, x1, y1 = w["patch_m"]
+        self.assertTrue(all(float(v).is_integer() for v in w["patch_m"]))
+        self.assertTrue(x0 < self.g["arrival"]["xy"][0] < x1 and y0 < self.g["arrival"]["xy"][1] < y1)
+        # its east edge under the landing's own box (between its front and the grille): no gap before the steps
+        self.assertGreaterEqual(x1, mg.to_world(self.g, 0.0, self.k["landing"][0], 0.0)[0])
+        self.assertLessEqual(x1, mg.to_world(self.g, 0.0, 0.0, 0.0)[0])
+        self.assertAlmostEqual(((x1 - x0) / w["step_m"]) % 1.0, 0.0)
+        self.assertAlmostEqual(((y1 - y0) / w["step_m"]) % 1.0, 0.0)
+        self.assertGreaterEqual(w["head_m"], 1.75)        # the walking body's height
+
+    def test_the_arrival_stands_in_the_patch_facing_the_ravine(self):
+        a = self.g["arrival"]
+        self.assertEqual(a["facing_deg"], 180.0)          # due west, down the ravine
+        self.assertLess(a["xy"][0], self.k["press"]["box_m"][0])
+
+
+class Ease(unittest.TestCase):
+    def grid(self, f, n=6):
+        return {(i, j): f(i, j) for i in range(n + 1) for j in range(n + 1)}
+
+    def test_a_bump_is_eased_by_at_most_ease(self):
+        H = self.grid(lambda i, j: 10.0 + (0.4 if (i, j) == (3, 3) else 0.0))
+        E = mg.ease_heights(H, 6, 6, 2, 0.3, 0.6)
+        self.assertGreaterEqual(E[(3, 3)], 10.4 - 0.3 - 1e-9)
+        self.assertLess(E[(3, 3)], 10.4)
+        self.assertTrue(all(abs(E[k] - H[k]) <= 0.3 + 1e-9 for k in H))
+
+    def test_a_wall_stays_and_its_neighbours_ignore_it(self):
+        H = self.grid(lambda i, j: 10.0 + (3.0 if (i, j) == (3, 3) else 0.0))
+        E = mg.ease_heights(H, 6, 6, 2, 0.3, 0.6)
+        self.assertEqual(E[(3, 3)], 13.0)
+        self.assertAlmostEqual(E[(2, 3)], 10.0)
+
+    def test_the_edge_stays(self):
+        H = self.grid(lambda i, j: 10.0 + 0.2 * ((i * 7 + j * 3) % 3))
+        E = mg.ease_heights(H, 6, 6, 3, 0.3, 0.6)
+        for k in H:
+            if k[0] in (0, 6) or k[1] in (0, 6):
+                self.assertEqual(E[k], H[k])
+
+    def test_no_passes_change_nothing(self):
+        H = self.grid(lambda i, j: 10.0 + 0.1 * i)
+        self.assertEqual(mg.ease_heights(H, 6, 6, 0, 0.3, 0.6), H)
+
+
+class Field(unittest.TestCase):
+    """The walk heightfield's pieces over the Old Rising's bowl (walk_solid_patch), without Blender."""
+
+    def test_a_timber_at_the_chest_blocks_the_column(self):
+        # the snow sheet 9.72 to 9.86 over the floor at 9.41, a timber 11.09 to 11.26 over it (measured at 183, -2)
+        ev = [(9.72, -1), (9.86, 1), (11.09, -1), (11.26, 1)]
+        self.assertEqual(mg.column_level(ev, 9.41, 0.4, 1.8), (9.86, True))
+
+    def test_a_stone_at_the_shin_is_stepped_onto_and_a_high_beam_is_walked_under(self):
+        ev = [(9.72, -1), (9.86, 1), (10.1, -1), (10.4, 1), (12.4, -1), (12.6, 1)]
+        self.assertEqual(mg.column_level(ev, 9.41, 0.4, 1.8), (10.4, False))
+        self.assertEqual(mg.column_level([], 9.41, 0.4, 1.8), (9.41, False))
+
+    def test_what_lies_under_the_ground_only_counts_for_the_inside(self):
+        # a block whose underside is under the ground: the walker stands on its top
+        self.assertEqual(mg.column_level([(9.0, -1), (10.0, 1)], 9.41, 0.4, 1.8), (10.0, False))
+
+    def test_the_field_is_its_triangles(self):
+        H = {(i, j): 10.0 + 0.5 * i + 0.25 * j for i in range(3) for j in range(3)}
+        z, tri = mg.hf_tri(H, 2, 2, 0.0, 0.0, 0.5, 0.3, 0.6)
+        self.assertAlmostEqual(z, 10.0 + 0.5 * 0.6 + 0.25 * 1.2)   # a plane stays the plane
+        self.assertEqual(len(tri), 3)
+        H[(1, 1)] = 14.0
+        z, tri = mg.hf_tri(H, 2, 2, 0.0, 0.0, 0.5, 0.45, 0.45)
+        self.assertIn((1, 1), tri)                                    # the nearest corner is in its triangle
+        self.assertAlmostEqual(mg.hf_tri(H, 2, 2, 0.0, 0.0, 0.5, 0.5, 0.5)[0], 14.0)
+
+    def test_the_feet_step_up_within_the_step_height(self):
+        self.assertAlmostEqual(mg.hf_feet(lambda x, y: 10.0 + (0.3 if x > 0.1 else 0.0), 0.0, 0.0, 0.35, 0.3), 10.3)
+        self.assertAlmostEqual(mg.hf_feet(lambda x, y: 10.0 + (0.5 if x > 0.1 else 0.0), 0.0, 0.0, 0.35, 0.3), 10.0)
+
+    def test_walls_are_vertical_and_only_on_the_outside(self):
+        H = {(i, j): 10.0 for i in range(5) for j in range(5)}
+        one = mg.wall_faces({(2, 2)}, H, 4, 4, 0.0, 0.0, 0.5, 3.0)
+        self.assertEqual(len(one), 4)
+        for q in one:
+            self.assertEqual({(p[0], p[1]) for p in q[:2]}, {(p[0], p[1]) for p in q[2:]})   # vertical
+            self.assertEqual(sorted({p[2] for p in q}), [9.7, 13.0])
+        self.assertEqual(len(mg.wall_faces({(2, 2), (2, 3)}, H, 4, 4, 0.0, 0.0, 0.5, 3.0)), 6)
+
+    def test_a_point_over_its_neighbourhood_rises(self):
+        H = {(i, j): 10.0 + (0.7 if (i, j) == (2, 2) else 0.0) for i in range(5) for j in range(5)}
+        self.assertEqual(mg.rises(H, 4, 4, 0.6), {(2, 2)})
+        self.assertEqual(mg.rises(H, 4, 4, 0.8), set())
+
+    def test_the_guard_matches_the_viewers_walker(self):
+        w = [x for x in mg.load_gates(GATES)["gates"] if x["id"] == "rising"][0]["kit"]["walk_solid"]
+        gd = w["guard"]
+        self.assertEqual((gd["step_height_m"], gd["body_radius_m"]), (0.35, 0.3))   # apps/walk/src/config.ts WALK
+        self.assertGreaterEqual(gd["to_m"], 1.75)                                    # the capsule's top
+        self.assertLessEqual(gd["from_m"], 0.45)                                      # the body check's lowest ray
+        self.assertGreaterEqual(gd["radius_m"], 0.2)
+        self.assertLessEqual(gd["grid_m"], 0.125)
+        self.assertGreater(w["over_m"], w["low_m"] + 1.75)
+
+
 if __name__ == "__main__":
     unittest.main()

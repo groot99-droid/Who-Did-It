@@ -18,7 +18,10 @@ village this step writes, for every gate of the data file (`meshy_gates/undermer
   vertices in the strip lowered to the cutting's floor, the collision's ground replaced inside a patch by the floor,
   the walls, the parapets and the headwall;
 - a gate's `kit.press` (the Old Rising's): a model whose own base stands over the walk's ground before the gate (the
-  broken trestle's snowy base over the pool) pressed under that ground in a box (press_model).
+  broken trestle's snowy base over the pool) planed under that ground in a box, with a smooth bank round it
+  (press_model); and its `kit.walk_solid`: that base, as pressed, made the walk's ground in a patch of the collision
+  (walk_solid_patch), so the walker stands on the snow it sees and does not wade through it, and the timbers over it
+  are vertical walls that no part of the model passes through the walker's body (walk_solid_guard).
 
 After the pieces the exporter's own texture fit (fit_textures) runs again, so the file stays under its texture budget.
 Without --gates nothing here runs and the exporter writes the same bytes as before. The functions above the Blender
@@ -979,11 +982,23 @@ def lower_render_ground(row: dict, log) -> dict:
     return out
 
 
+def press_cap(spec: dict, g: float, x: float, y: float) -> float:
+    """The press's cap over a point whose walk ground is `g`: `under_ground_m` under that ground inside `box_m`, then
+    rising `slope` metres a metre with the distance from the box (standard library; tests/test_gates.py)."""
+    x0, y0, x1, y1 = spec["box_m"]
+    d = math.hypot(max(x0 - x, 0.0, x - x1), max(y0 - y, 0.0, y - y1))
+    return g - float(spec["under_ground_m"]) + float(spec["slope"]) * d
+
+
 def press_model(spec: dict, ground_bvh, log) -> dict:
     """A model whose own base stands over the walk's ground (the broken trestle's snowy base over the Old Rising's
-    pool): inside `box_m`, with a linear fade `fade_m` wide round it, its vertices under `below_z` (fading out over
-    `fade_z` above it) go down under the ground the collision has there, by `under_ground_m`, their order kept (a
-    base's top stays over its bottom). The model's mesh must be its own (one user). Returns the count and the drop."""
+    pool) is planed by a cap (press_cap): under the ground the collision has there inside `box_m`, and round the box a
+    bank rising `slope` metres a metre, so the base opens into a hollow before the gate with smooth sides (2026-11-21:
+    the earlier linear fade pulled each vertex down by a share of its height and left stretched shards of snow beside
+    the steps). Each vertex under `below_z` (fading out over `fade_z` above it, so the timbers' upper parts stay) goes
+    down to the cap where it stands over it, its order kept (a base's top stays a few centimetres over its bottom);
+    the rest of the model is not touched, and where the bank has risen over the base nothing moves. The model's mesh
+    must be its own (one user). Returns the count and the drop."""
     o = bpy.data.objects.get(spec["object"])
     if o is None or o.type != "MESH":
         log("gates: press: no mesh", spec["object"])
@@ -991,8 +1006,7 @@ def press_model(spec: dict, ground_bvh, log) -> dict:
     me = o.data
     if me.users > 1:
         raise RuntimeError(f"gates: press: {o.name}'s mesh {me.name} has {me.users} users")
-    x0, y0, x1, y1 = spec["box_m"]
-    fade, bz, fz, under = float(spec["fade_m"]), float(spec["below_z"]), float(spec["fade_z"]), float(spec["under_ground_m"])
+    bz, fz = float(spec["below_z"]), float(spec["fade_z"])
     M = np.array(o.matrix_world)
     Mi = np.linalg.inv(M)
     co = np.empty(len(me.vertices) * 3)
@@ -1002,21 +1016,18 @@ def press_model(spec: dict, ground_bvh, log) -> dict:
     moved, drop = 0, 0.0
     for i in range(len(W)):
         x, y, z = W[i]
-        dx = max(x0 - x, 0.0, x - x1)
-        dy = max(y0 - y, 0.0, y - y1)
-        wxy = 1.0 - math.hypot(dx, dy) / fade
         wz = min(1.0, max(0.0, (bz + fz - z) / fz))
-        if wxy <= 0.0 or wz <= 0.0:
+        if wz <= 0.0:
             continue
         h = ground_bvh.ray_cast(Vector((x, y, z + 0.05)), Vector((0.0, 0.0, -1.0)), 40.0)
         if h[0] is None:
             continue
         g = float(h[0].z)
-        # the base's height over its own bottom (9.7 there) kept as a few centimetres under the ground
-        target = g - under - 0.05 * (1.0 - min(1.0, max(0.0, (z - g) / 1.8)))
+        # the base's height over its own bottom (9.7 there) kept as a few centimetres under the cap
+        target = press_cap(spec, g, x, y) - 0.05 * (1.0 - min(1.0, max(0.0, (z - g) / 1.8)))
         if target >= z:
             continue
-        nz = z + wxy * wz * (target - z)
+        nz = z + wz * (target - z)
         drop = max(drop, z - nz)
         W[i, 2] = nz
         moved += 1
@@ -1024,7 +1035,309 @@ def press_model(spec: dict, ground_bvh, log) -> dict:
     me.vertices.foreach_set("co", L.ravel())
     me.update()
     log("gates: pressed", o.name, moved, "vertices, at most", round(drop, 2), "m")
-    return dict(object=o.name, mesh=me.name, moved=moved, max_drop_m=round(drop, 2), box_m=spec["box_m"])
+    return dict(object=o.name, mesh=me.name, moved=moved, max_drop_m=round(drop, 2), box_m=spec["box_m"],
+                slope=float(spec["slope"]))
+
+
+def ease_heights(H: dict, nx: int, ny: int, passes: int, ease: float, rise: float) -> dict:
+    """The rubble's small bumps eased out of a walk heightfield `H` {(i, j): z} on an (nx + 1) x (ny + 1) grid: each
+    pass sets an inner point to the mean of its 3 x 3 neighbourhood, never more than `ease` metres from its own height,
+    except a point that stands more than `rise` over its neighbourhood's median (a timber, a pier, a boulder: it stays
+    a wall). The edge stays as it is (standard library; tests/test_gates.py)."""
+    raw = dict(H)
+    wall = rises(raw, nx, ny, rise)
+    for _ in range(passes):
+        nxt = dict(H)
+        for i in range(1, nx):
+            for j in range(1, ny):
+                if (i, j) in wall:
+                    continue
+                nb = [H[(i + a, j + b)] for a in (-1, 0, 1) for b in (-1, 0, 1) if (i + a, j + b) not in wall]
+                z = sum(nb) / len(nb)
+                nxt[(i, j)] = min(max(z, raw[(i, j)] - ease), raw[(i, j)] + ease)
+        H = nxt
+    return H
+
+
+def hf_tri(H: dict, nx: int, ny: int, x0: float, y0: float, step: float, x: float, y: float) -> tuple:
+    """The walk heightfield `H` {(i, j): z} as walk_solid_patch triangulates it (each cell cut along the diagonal of
+    the smaller difference): the height at (x, y), clamped into the patch, and the three corners of the triangle it
+    lies in (standard library; tests/test_gates.py)."""
+    fx = min(max((x - x0) / step, 0.0), float(nx))
+    fy = min(max((y - y0) / step, 0.0), float(ny))
+    i, j = min(int(fx), nx - 1), min(int(fy), ny - 1)
+    tx, ty = fx - i, fy - j
+    a, b, c, d = (i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1)
+    ha, hb, hc, hd = H[a], H[b], H[c], H[d]
+    if abs(ha - hc) <= abs(hb - hd):
+        if tx >= ty:
+            return ha + tx * (hb - ha) + ty * (hc - hb), (a, b, c)
+        return ha + ty * (hd - ha) + tx * (hc - hd), (a, c, d)
+    if tx + ty <= 1.0:
+        return ha + tx * (hb - ha) + ty * (hd - ha), (a, b, d)
+    return hc + (1.0 - tx) * (hd - hc) + (1.0 - ty) * (hb - hc), (b, c, d)
+
+
+def hf_feet(z_at, x: float, y: float, step_h: float, radius: float) -> float:
+    """Where the viewer's walker (apps/walk/src/physics/controller.ts, settle) has its feet with its centre at (x, y)
+    on a ground `z_at(x, y)`: on the highest of its five ground probes, 0.7 of its radius out, that lies within
+    `step_h` over the centre's ground (standard library; tests/test_gates.py)."""
+    g0 = z_at(x, y)
+    feet = g0
+    r7 = 0.7 * radius
+    for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        g = z_at(x + dx * r7, y + dy * r7)
+        if feet < g <= g0 + step_h:
+            feet = g
+    return feet
+
+
+def wall_faces(walls: set, H: dict, nx: int, ny: int, x0: float, y0: float, step: float, over: float) -> list:
+    """The walls of a walk heightfield `H` as vertical faces (standard library; tests/test_gates.py): each wall corner
+    (i, j) stands for the square of the field nearest it (its side `step`, centred on the corner), and every side of
+    such a square that no other wall square shares is a vertical quad from 0.3 m under the lowest corner round it to
+    `over` metres over the highest. Returns [(4 corners as (x, y, z)), ...], the quads wound outward."""
+    def around(i, j):
+        return [H[(a, b)] for a in range(max(0, i - 1), min(nx, i + 1) + 1)
+                for b in range(max(0, j - 1), min(ny, j + 1) + 1)]
+    out = []
+    h = 0.5 * step
+    for i, j in sorted(walls):
+        zs = around(i, j)
+        lo, hi = min(zs) - 0.3, max(zs) + over
+        cx, cy = x0 + i * step, y0 + j * step
+        for (di, dj), (ax, ay), (bx, by) in (((1, 0), (h, -h), (h, h)), ((-1, 0), (-h, h), (-h, -h)),
+                                             ((0, 1), (h, h), (-h, h)), ((0, -1), (-h, -h), (h, -h))):
+            if (i + di, j + dj) in walls:
+                continue
+            out.append(((cx + ax, cy + ay, lo), (cx + bx, cy + by, lo), (cx + bx, cy + by, hi), (cx + ax, cy + ay, hi)))
+    return out
+
+
+def walk_solid_guard(H: dict, nx: int, ny: int, x0: float, y0: float, step: float, bvh, spec: dict, log,
+                     walls0: frozenset = frozenset()) -> tuple:
+    """The body test of a walk heightfield `H` over a model (bvh), on a `grid_m` grid of walker centres over the whole
+    patch: wherever the model reaches into the walker's body (vertical rays from `from_m` to `to_m` over its feet,
+    hf_feet, at the centre and on rings `radius_m` and half that round it), the corner of the field nearest the centre
+    rises over it when the model's lowest point there is at most `raise_m` over `from_m` (a stone at the shin: the
+    walker steps onto it), at most `raise_cap_m` in all; else that corner becomes a wall (wall_faces: vertical faces
+    round its square, which the capsule cannot climb). Repeated round the raised corners until no centre fails. Every
+    centre is tested, the steep ones too: the viewer's capsule climbs a steep face of the field that is not vertical
+    (2026-11-21: the 0.5 m field's steep cells were meant as walls, and the walker stood with a timber at its chest in
+    9 of 16 straight walks from the Old Rising's arrival). `H` is changed in place; returns (the wall corners,
+    counts)."""
+    g = spec.get("guard") or {}
+    if not g:
+        return set(walls0), dict(wall_squares=len(walls0))
+    cell, rad = float(g["grid_m"]), float(g["radius_m"])
+    lo, hi = float(g["from_m"]), float(g["to_m"])
+    rise, cap = float(g["raise_m"]), float(g["raise_cap_m"])
+    step_h, body_r = float(g["step_height_m"]), float(g["body_radius_m"])
+    offs = [(0.0, 0.0)] + [(r * math.cos(k * math.pi / 4), r * math.sin(k * math.pi / 4))
+                           for r in (rad, 0.5 * rad) for k in range(8)]
+    up = Vector((0.0, 0.0, 1.0))
+    H0 = dict(H)
+
+    def z_at(x, y):
+        return hf_tri(H, nx, ny, x0, y0, step, x, y)[0]
+
+    mx, my = int(round(nx * step / cell)), int(round(ny * step / cell))
+    todo = {(u, v) for u in range(mx + 1) for v in range(my + 1)}
+    walls, raised, rounds, failed = set(walls0), set(), 0, 0
+    reach = int(math.ceil((step + body_r + rad) / cell)) + 1
+    while todo and rounds < 30:
+        rounds += 1
+        lift, wall = {}, set()
+        for u, v in sorted(todo):
+            x, y = x0 + u * cell, y0 + v * cell
+            k = (min(max(int(round((x - x0) / step)), 0), nx), min(max(int(round((y - y0) / step)), 0), ny))
+            if k in walls:
+                continue
+            feet = hf_feet(z_at, x, y, step_h, body_r)
+            hits = [h[0].z for h in (bvh.ray_cast(Vector((x + ox, y + oy, feet + lo)), up, hi - lo) for ox, oy in offs)
+                    if h[0] is not None]
+            if not hits:
+                continue
+            failed += 1
+            over = min(hits) - (feet + lo)
+            inner = 0 < k[0] < nx and 0 < k[1] < ny
+            if inner and over <= rise and H[k] + over + 0.02 - H0[k] <= cap:
+                lift[k] = max(lift.get(k, 0.0), over + 0.02)
+            else:
+                wall.add(k)
+        for k, dz in lift.items():
+            if k not in wall:
+                H[k] += dz
+                raised.add(k)
+        walls |= wall
+        changed = set(lift) | wall
+        todo = set()
+        for i, j in changed:
+            cu, cv = int(round(i * step / cell)), int(round(j * step / cell))
+            for u in range(max(0, cu - reach), min(mx, cu + reach) + 1):
+                for v in range(max(0, cv - reach), min(my, cv + reach) + 1):
+                    todo.add((u, v))
+        if not lift:
+            break
+    log(f"gates: walk-solid guard: {(mx + 1) * (my + 1)} centres, {failed} failing tests in {rounds} rounds,"
+        f" {len(raised)} corners raised, {len(walls)} squares walled")
+    return walls, dict(centres=(mx + 1) * (my + 1), failing_tests=failed, rounds=rounds, corners_raised=len(raised),
+                       wall_squares=len(walls))
+
+
+def column_level(events: list, g: float, low: float, head: float) -> tuple:
+    """Where a walker stands in one column over the ground `g`, from the model's faces met going up it (`events`,
+    [(z, +1 for a face whose normal points up, its top; -1 for one pointing down, its underside)], from under the
+    ground): on the ground, or on the top of the model resting on it (a face pointing down is the model's underside,
+    inside it until the next face pointing up), and on what rests on that, while its underside is at most `low` over
+    the level (a stone at the shin, stepped onto). Something whose underside is between `low` and `head` over the
+    level (a timber at the chest, a fallen deck) blocks the column: no walker stands there nor walks under it.
+    Returns (level, blocked) (standard library; tests/test_gates.py; 2026-11-21: the walk's level had been the top of
+    whatever stood less than 1.8 m over the snow, so the walker stood on the timbers over the bowl at chest height)."""
+    level, depth = g, 0
+    for z, n in events:
+        if z <= g + 1e-3:
+            depth = max(0, depth + (1 if n < 0 else -1))
+            continue
+        if depth == 0:
+            if n > 0:
+                continue                  # a stray top face with nothing under it
+            if z - level >= head:
+                return level, False
+            if z - level > low:
+                return level, True
+            depth = 1
+        else:
+            depth = max(0, depth + (1 if n < 0 else -1))
+            if depth == 0:
+                level = z
+    return level, False
+
+
+def model_column(bvh, x: float, y: float, z0: float) -> list:
+    """The model's faces met going up from `z0` at (x, y): [(z, +1 top / -1 underside)], for column_level."""
+    out, z = [], z0
+    for _ in range(64):
+        h = bvh.ray_cast(Vector((x, y, z)), Vector((0.0, 0.0, 1.0)), 60.0)
+        if h[0] is None:
+            break
+        out.append((float(h[0].z), 1 if h[1].z > 0 else -1))
+        z = float(h[0].z) + 1e-4
+    return out
+
+
+def rises(H: dict, nx: int, ny: int, rise: float) -> set:
+    """The inner points of a walk heightfield {(i, j): z} that stand more than `rise` over their 3 x 3 neighbourhood's
+    median (a timber, a pier, a boulder: walls; standard library; tests/test_gates.py)."""
+    out = set()
+    for i in range(1, nx):
+        for j in range(1, ny):
+            nb = sorted(H[(i + a, j + b)] for a in (-1, 0, 1) for b in (-1, 0, 1))
+            if H[(i, j)] - nb[4] > rise:
+                out.add((i, j))
+    return out
+
+
+def walk_solid_patch(coll, spec: dict, log) -> dict:
+    """A model's own base as the walk's ground (the Old Rising's bowl: the broken trestle's snow and rubble, as the
+    press left it). Inside `patch_m` (on the collision's own 1 m grid) the ground's faces are taken out (only faces
+    whose corners all lie on that grid: a rock's shell stays) and a heightfield put in on a `step_m` grid: the higher
+    of the collision's ground (bilinear in its grid, exactly it on the patch's edge) and where a walker stands over the
+    model (column_level: on the snow and on what rests on it within `low_m`; a timber or a deck between `low_m` and
+    `head_m` over it blocks), the highest of the samples `sample_m` apart round each point, at most `wall_m` over the
+    ground; its small bumps eased by at most `ease_m` (ease_heights). Walls are vertical faces round the squares of
+    the points that are blocked, stand more than `ease_rise_m` over their neighbourhood (rises), or fail the body test
+    (walk_solid_guard), `over_m` over the highest ground round them (wall_faces); the ground inside the walls' squares
+    is left out. Returns counts."""
+    o = bpy.data.objects.get(spec["object"])
+    if o is None or o.type != "MESH":
+        log("gates: walk-solid: no mesh", spec["object"])
+        return dict(object=spec["object"], added_tris=0)
+    x0, y0, x1, y1 = (float(v) for v in spec["patch_m"])
+    step, smp = float(spec["step_m"]), float(spec["sample_m"])
+    head, wall, low = float(spec["head_m"]), float(spec["wall_m"]), float(spec["low_m"])
+    mb = _mesh_bvh([o])
+    bm = bmesh.new()
+    bm.from_mesh(coll.data)
+    bm.verts.ensure_lookup_table()
+
+    def on_grid(v):
+        return (abs(v.co.x - round(v.co.x)) < 1e-4 and abs(v.co.y - round(v.co.y)) < 1e-4
+                and x0 - 1e-4 <= v.co.x <= x1 + 1e-4 and y0 - 1e-4 <= v.co.y <= y1 + 1e-4)
+    grid = {}
+    for v in bm.verts:
+        if on_grid(v):
+            grid.setdefault((int(round(v.co.x)), int(round(v.co.y))), v.co.z)
+    gone = [f for f in bm.faces if all(on_grid(v) for v in f.verts)]
+    n_gone = sum(len(f.verts) - 2 for f in gone)
+    bmesh.ops.delete(bm, geom=gone, context="FACES_ONLY")
+
+    def orig(x, y):
+        xa, ya = math.floor(x + 1e-9), math.floor(y + 1e-9)
+        xb, yb = min(xa + 1, int(x1)), min(ya + 1, int(y1))
+        tx, ty = x - xa, y - ya
+        z = [grid.get((a, b)) for a, b in ((xa, ya), (xb, ya), (xa, yb), (xb, yb))]
+        if any(v is None for v in z):
+            zz = [v for v in z if v is not None]
+            return sum(zz) / len(zz) if zz else 0.0
+        return z[0] * (1 - tx) * (1 - ty) + z[1] * tx * (1 - ty) + z[2] * (1 - tx) * ty + z[3] * tx * ty
+
+    nx = int(round((x1 - x0) / step))
+    ny = int(round((y1 - y0) / step))
+    xs = [x0 + i * step for i in range(nx + 1)]
+    ys = [y0 + j * step for j in range(ny + 1)]
+    offs = [k * smp for k in range(-int(round(step / 2 / smp)), int(round(step / 2 / smp)) + 1)]
+    H, blocked = {}, set()
+    for i, x in enumerate(xs):
+        for j, y in enumerate(ys):
+            g = orig(x, y)
+            if i in (0, nx) or j in (0, ny):
+                H[(i, j)] = g
+                continue
+            best = g
+            for ox in offs:
+                for oy in offs:
+                    gg = orig(min(max(x + ox, x0), x1), min(max(y + oy, y0), y1))
+                    lv, blk = column_level(model_column(mb, x + ox, y + oy, gg - 0.3), gg, low, head)
+                    if blk or lv > gg + wall:
+                        blocked.add((i, j))
+                    best = max(best, min(lv, gg + wall))
+            H[(i, j)] = best
+    rise = float(spec.get("ease_rise_m", 0.0))
+    standing = rises(H, nx, ny, rise) if rise > 0 else set()
+    H = ease_heights(H, nx, ny, int(spec.get("ease_passes", 0)), float(spec.get("ease_m", 0.0)), rise)
+    wall_sq, guard = walk_solid_guard(H, nx, ny, x0, y0, step, mb, spec, log, blocked | standing)
+    raised = sum(1 for (i, j), z in H.items() if z > orig(xs[i], ys[j]) + 0.02)
+    vid = {k: bm.verts.new((xs[k[0]], ys[k[1]], z)) for k, z in H.items()}
+    added = 0
+    inside = 0
+    for i in range(nx):
+        for j in range(ny):
+            if all(k in wall_sq for k in ((i, j), (i + 1, j), (i + 1, j + 1), (i, j + 1))):
+                inside += 2               # within the walls' squares: no walker reaches that ground
+                continue
+            a, b, c_, d = vid[(i, j)], vid[(i + 1, j)], vid[(i + 1, j + 1)], vid[(i, j + 1)]
+            # the diagonal along the smaller difference: a ridge or a post's corner stays where it stands
+            if abs(H[(i, j)] - H[(i + 1, j + 1)]) <= abs(H[(i + 1, j)] - H[(i, j + 1)]):
+                bm.faces.new((a, b, c_))
+                bm.faces.new((a, c_, d))
+            else:
+                bm.faces.new((a, b, d))
+                bm.faces.new((b, c_, d))
+            added += 2
+    bmesh.ops.delete(bm, geom=[v for v in vid.values() if not v.link_faces], context="VERTS")
+    # the guard's walls: vertical faces the capsule cannot climb (a steep face of the field it can)
+    for q in wall_faces(wall_sq, H, nx, ny, x0, y0, step, float(spec["over_m"])):
+        bm.faces.new([bm.verts.new(p) for p in q])
+        added += 2
+    bm.to_mesh(coll.data)
+    bm.free()
+    coll.data.update()
+    log(f"gates: walk-solid {o.name}: {n_gone} triangles out, {added} in, {raised} points raised,"
+        f" {len(blocked)} blocked, {len(standing)} standing, {len(wall_sq)} wall squares ({inside} triangles inside them left out)")
+    return dict(object=o.name, patch_m=spec["patch_m"], removed_tris=n_gone, added_tris=added, raised_points=raised,
+                blocked_points=len(blocked), standing_points=len(standing), wall_squares=len(wall_sq),
+                inside_walls_tris=inside, guard=guard)
 
 
 def collision_patch(coll, row: dict, kit: Kit, g: dict, log) -> dict:
@@ -1180,6 +1493,10 @@ def add_gates(X, path: str, env: dict) -> dict:
     for g in D["gates"]:
         if g.get("kit", {}).get("press"):
             rep.setdefault("pressed", {})[g["id"]] = press_model(g["kit"]["press"], coll_bvh0, log)
+    # ... and that base, as the press left it, the walk's ground round the gate (the walker no longer wades in it)
+    for g in D["gates"]:
+        if g.get("kit", {}).get("walk_solid"):
+            rep.setdefault("walk_solid", {})[g["id"]] = walk_solid_patch(coll, g["kit"]["walk_solid"], log)
     img, means, lows, pinks = _atlas(D["atlas"]["cells"], int(D["atlas"]["px"]), log)
     mat = _material(img)
     kits = []

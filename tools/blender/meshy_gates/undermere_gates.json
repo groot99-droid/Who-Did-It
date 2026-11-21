@@ -181,9 +181,9 @@
       },
       "arrival": {
         "node": "Spawn_overworld_mouth_rising",
-        "xy": [191.9, 0.5],
+        "xy": [184.0, -4.0],
         "design_xy": [192.3, 0.5],
-        "departure": "0.4 m further out, so that the walker's body (0.3 m) stands clear of the lowest step's riser at x 192.57",
+        "departure": "on the trestle's snow west of the hollow before the steps, at the open way out of it to the ravine: at the design's point, at the foot of the steps, the walker stood among the fallen timbers and saw them at eye height whichever way it faced; from here, facing west, it sees down the ravine and walks straight out to it on the snow, the fallen timbers behind it (2026-11-21: from (187.5, -2.0) a timber lay across the way at the chest 4 m on, and nearer the hollow a leaning timber stood before the eye)",
         "facing_deg": 180.0,
         "label": "At the Old Rising Gate"
       },
@@ -209,12 +209,37 @@
         "jamb_foot": -1.6,
         "press": {
           "object": "broken_trestle@0.001",
-          "box_m": [189.6, -3.5, 195.0, 4.0],
-          "fade_m": 1.2,
+          "box_m": [190.6, -3.0, 195.0, 3.8],
+          "slope": 0.5,
           "below_z": 11.6,
-          "fade_z": 0.4,
+          "fade_z": 1.6,
           "under_ground_m": 0.15,
-          "note": "the trestle model's own snowy base (9.7 to 11.2 m, measured) lies over the pool's floor (9.41) where the walk's ground is; in this box (with a fade round it) its vertices under below_z are pressed down under the ground the collision has there, so the steps and the landing show and the walker no longer stands in it"
+          "note": "the trestle model's own snowy base (9.7 to 11.2 m, measured) lies over the pool's floor (9.41) where the walk's ground is; its vertices under below_z go down to a cap: under the ground the collision has there inside this box, and a bank rising slope metres a metre round it, so the steps and the landing show in a hollow with smooth sides (the earlier linear fade left stretched shards of snow beside the steps)"
+        },
+        "walk_solid": {
+          "object": "broken_trestle@0.001",
+          "patch_m": [179, -18, 194, 18],
+          "step_m": 0.5,
+          "sample_m": 0.25,
+          "head_m": 1.8,
+          "low_m": 0.4,
+          "over_m": 3.0,
+          "wall_m": 3.0,
+          "ease_passes": 2,
+          "ease_m": 0.3,
+          "ease_rise_m": 0.6,
+          "guard": {
+            "grid_m": 0.125,
+            "radius_m": 0.25,
+            "from_m": 0.4,
+            "to_m": 1.75,
+            "raise_m": 0.3,
+            "raise_cap_m": 0.6,
+            "step_height_m": 0.35,
+            "body_radius_m": 0.3,
+            "note": "the body test of the field (walk_solid_guard), at every walker centre on a grid_m grid: where the trestle reaches into the body (from_m to to_m over the feet, within radius_m of the centre; the step height and the capsule radius are the viewer's, apps/walk/src/config.ts), the nearest corner of the field rises over it if it is a stone at the shin (at most raise_m over from_m, raise_cap_m in all), else the square round that corner becomes a wall: vertical faces from under its ground to over_m over the highest ground round it (the viewer's capsule climbs a steep face of the field that is not vertical)"
+          },
+          "note": "the bowl's floor (9.41) lies under the trestle's snow sheet (9.7 to 9.9) and its fallen timbers, and a bank about 1.1 m high closes it to the west: the walker waded through them and could not climb out. In this patch the walk's ground is the snow as pressed and what rests on it within low_m (stepped onto), its small bumps eased by at most ease_m, meeting the ravine's floor at its west side; a timber or a deck whose underside is between low_m and head_m over that ground (at the chest), a point standing ease_rise_m over its neighbourhood and every point failing the guard's body test are walls: vertical faces over_m over the ground round them (2026-11-21: the walk's level had been the top of whatever stood under 1.8 m over the snow, so the walker stood on chest-high timbers, and the steep cells meant as walls were climbed by the viewer's capsule)"
         }
       },
       "budget_tris": 600,

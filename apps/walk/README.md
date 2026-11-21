@@ -175,9 +175,13 @@ and `CLIMB` in `src/config.ts`.
   the box's -Z or +Z wall, whichever is nearer the heading, and is held within 60 degrees of it until the feet are
   0.3 m past either end of the box. Make the box as wide (Z) as the fissure; the walker lines up with it as with a
   door. A walker who sidled out through an end walks on anywhere in that box (its end margins included) until
-  it heads back in through that end within 30 degrees of the box's axis, or has stepped 0.15 m clear of the box: where
-  a fissure opens at an angle into walking space and the way on runs beside the box, it no longer sidles and walks by
-  turns (route 1's Ice Curtain switched 26 times there; `test/sidle-flicker.test.ts`).
+  it heads back in through that end within 30 degrees of the box's axis (`SIDLE.reentryAngle`), or has stepped 0.15 m
+  clear of the box (`SIDLE.reentryClear`): where a fissure opens at an angle into walking space and the way on runs
+  beside the box, it no longer sidles and walks by turns (route 1's Ice Curtain switched 26 times there;
+  `test/sidle-flicker.test.ts`). Heading back in also needs a line that stays within the box's width until it is
+  1 m in from that end (`SIDLE.reentryDepth`; the whole box if it is shorter): a heading inside the angle that leaves
+  the box's side sooner goes to an opening beside the passage, not into it (route 2's East Holing, where the way on
+  leaves the fissure through its open side about 1 m before the box's end, switched 62 times).
 - **Climb.** The face is the box's z = 0 plane (the node stands on the rock), the box runs from the floor at its foot
   (y = -sy/2) to the ledge (y = +sy/2), and sx is the climbable width. A walker on the floor at the foot (walking,
   crawling or sidling), within 0.6 m in front of the face and pushing within 60 degrees of it (with forward or
