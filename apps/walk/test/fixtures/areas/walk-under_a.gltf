@@ -1,0 +1,183 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "tools/blender/walk_areas/fixture/make-areas-fixture.mjs"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Walk fixture under_a",
+      "nodes": [7, 8]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Passage",
+      "mesh": 0
+    },
+    {
+      "name": "Spawn_undermere_mouth_east",
+      "translation": [22, -10, 10],
+      "rotation": [0, -0.707106781186547, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East cave mouth",
+        "wdi_district": "The Undermere",
+        "wdi_facing_deg": 0
+      }
+    },
+    {
+      "name": "Spawn_undermere_seam_a_b_a_1",
+      "translation": [30.35, -10, 10.6],
+      "rotation": [0, 0.707106781186548, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East passage, arrival 1",
+        "wdi_district": "The Undermere",
+        "wdi_facing_deg": 180,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Spawn_undermere_seam_a_b_a_2",
+      "translation": [30.35, -10, 9.4],
+      "rotation": [0, 0.707106781186548, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East passage, arrival 2",
+        "wdi_district": "The Undermere",
+        "wdi_facing_deg": 180,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Portal_um.east_out",
+      "translation": [20.5, -10, 10],
+      "extras": {
+        "to": "overworld",
+        "toSpawn": "mouth_east",
+        "kind": "cave_mouth",
+        "wdi_portal_id": "um.east_out"
+      }
+    },
+    {
+      "name": "Portal_seam_a_b_a_1",
+      "translation": [31.55, -10, 10.6],
+      "extras": {
+        "to": "undermere",
+        "toSpawn": "seam_a_b_b_1",
+        "kind": "gate",
+        "wdi_portal_id": "seam_a_b_a_1",
+        "wdi_seam": "a_b",
+        "wdi_seam_kind": "passage",
+        "wdi_width_m": 2.4
+      }
+    },
+    {
+      "name": "Portal_seam_a_b_a_2",
+      "translation": [31.55, -10, 9.4],
+      "extras": {
+        "to": "undermere",
+        "toSpawn": "seam_a_b_b_2",
+        "kind": "gate",
+        "wdi_portal_id": "seam_a_b_a_2",
+        "wdi_seam": "a_b",
+        "wdi_seam_kind": "passage",
+        "wdi_width_m": 2.4
+      }
+    },
+    {
+      "name": "Area_under_a",
+      "children": [0, 1, 2, 3, 4, 5, 6],
+      "extras": {
+        "wdi_area": "under_a",
+        "wdi_kind": "cave",
+        "wdi_scene": "undermere",
+        "wdi_name": "The Undermere, mouth passage",
+        "wdi_walk_region": [20, -11.2, 32, -8.8],
+        "wdi_indoor": true,
+        "wdi_baked": true,
+        "wdi_exposure": 4,
+        "fog_color": "#12141C",
+        "fog_density": 0.05
+      }
+    },
+    {
+      "name": "HM_Collision_under_a",
+      "mesh": 1,
+      "extras": {
+        "wdi_collision": true
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Passage",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "HM_Collision_under_a",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0
+          },
+          "indices": 1
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Baked",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1, 1, 1, 1]
+      },
+      "extensions": {
+        "KHR_materials_unlit": {}
+      }
+    }
+  ],
+  "extensionsUsed": ["KHR_materials_unlit"],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 144,
+      "type": "VEC3",
+      "min": [19.700000762939453, -10.199999809265137, 8.5],
+      "max": [32.29999923706055, -7.199999809265137, 11.5]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5123,
+      "count": 216,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1728,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1728,
+      "byteLength": 432,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 2160,
+      "uri": "data:application/octet-stream;base64,MzMBQjMzI8EAAAhBMzMBQgAAIMEAAAhBMzMBQgAAIMEAADhBMzMBQjMzI8EAADhBmpmdQTMzI8EAADhBmpmdQQAAIMEAADhBmpmdQQAAIMEAAAhBmpmdQTMzI8EAAAhBmpmdQQAAIMEAAAhBmpmdQQAAIMEAADhBMzMBQgAAIMEAADhBMzMBQgAAIMEAAAhBmpmdQTMzI8EAADhBmpmdQTMzI8EAAAhBMzMBQjMzI8EAAAhBMzMBQjMzI8EAADhBMzMBQjMzI8EAADhBMzMBQgAAIMEAADhBmpmdQQAAIMEAADhBmpmdQTMzI8EAADhBmpmdQTMzI8EAAAhBmpmdQQAAIMEAAAhBMzMBQgAAIMEAAAhBMzMBQjMzI8EAAAhBMzMBQs3M7MAAAAhBMzMBQmZm5sAAAAhBMzMBQmZm5sAAADhBMzMBQs3M7MAAADhBmpmdQc3M7MAAADhBmpmdQWZm5sAAADhBmpmdQWZm5sAAAAhBmpmdQc3M7MAAAAhBmpmdQWZm5sAAAAhBmpmdQWZm5sAAADhBMzMBQmZm5sAAADhBMzMBQmZm5sAAAAhBmpmdQc3M7MAAADhBmpmdQc3M7MAAAAhBMzMBQs3M7MAAAAhBMzMBQs3M7MAAADhBMzMBQs3M7MAAADhBMzMBQmZm5sAAADhBmpmdQWZm5sAAADhBmpmdQc3M7MAAADhBmpmdQc3M7MAAAAhBmpmdQWZm5sAAAAhBMzMBQmZm5sAAAAhBMzMBQs3M7MAAAAhBMzMBQgAAIMEzMzNBMzMBQs3M7MAzMzNBMzMBQs3M7MAAADhBMzMBQgAAIMEAADhBmpmdQQAAIMEAADhBmpmdQc3M7MAAADhBmpmdQc3M7MAzMzNBmpmdQQAAIMEzMzNBmpmdQc3M7MAzMzNBmpmdQc3M7MAAADhBMzMBQs3M7MAAADhBMzMBQs3M7MAzMzNBmpmdQQAAIMEAADhBmpmdQQAAIMEzMzNBMzMBQgAAIMEzMzNBMzMBQgAAIMEAADhBMzMBQgAAIMEAADhBMzMBQs3M7MAAADhBmpmdQc3M7MAAADhBmpmdQQAAIMEAADhBmpmdQQAAIMEzMzNBmpmdQc3M7MAzMzNBMzMBQs3M7MAzMzNBMzMBQgAAIMEzMzNBMzMBQgAAIMEAAAhBMzMBQs3M7MAAAAhBMzMBQs3M7MDNzAxBMzMBQgAAIMHNzAxBmpmdQQAAIMHNzAxBmpmdQc3M7MDNzAxBmpmdQc3M7MAAAAhBmpmdQQAAIMEAAAhBmpmdQc3M7MAAAAhBmpmdQc3M7MDNzAxBMzMBQs3M7MDNzAxBMzMBQs3M7MAAAAhBmpmdQQAAIMHNzAxBmpmdQQAAIMEAAAhBMzMBQgAAIMEAAAhBMzMBQgAAIMHNzAxBMzMBQgAAIMHNzAxBMzMBQs3M7MDNzAxBmpmdQc3M7MDNzAxBmpmdQQAAIMHNzAxBmpmdQQAAIMEAAAhBmpmdQc3M7MAAAAhBMzMBQs3M7MAAAAhBMzMBQgAAIMEAAAhBAACgQQAAIMHNzAxBAACgQc3M7MDNzAxBAACgQc3M7MAzMzNBAACgQQAAIMEzMzNBmpmdQQAAIMEzMzNBmpmdQc3M7MAzMzNBmpmdQc3M7MDNzAxBmpmdQQAAIMHNzAxBmpmdQc3M7MDNzAxBmpmdQc3M7MAzMzNBAACgQc3M7MAzMzNBAACgQc3M7MDNzAxBmpmdQQAAIMEzMzNBmpmdQQAAIMHNzAxBAACgQQAAIMHNzAxBAACgQQAAIMEzMzNBAACgQQAAIMEzMzNBAACgQc3M7MAzMzNBmpmdQc3M7MAzMzNBmpmdQQAAIMEzMzNBmpmdQQAAIMHNzAxBmpmdQc3M7MDNzAxBAACgQc3M7MDNzAxBAACgQQAAIMHNzAxBMzMBQgAAIMHNzAxBMzMBQs3M7MDNzAxBMzMBQs3M7MAzMzNBMzMBQgAAIMEzMzNBAAAAQgAAIMEzMzNBAAAAQs3M7MAzMzNBAAAAQs3M7MDNzAxBAAAAQgAAIMHNzAxBAAAAQs3M7MDNzAxBAAAAQs3M7MAzMzNBMzMBQs3M7MAzMzNBMzMBQs3M7MDNzAxBAAAAQgAAIMEzMzNBAAAAQgAAIMHNzAxBMzMBQgAAIMHNzAxBMzMBQgAAIMEzMzNBMzMBQgAAIMEzMzNBMzMBQs3M7MAzMzNBAAAAQs3M7MAzMzNBAAAAQgAAIMEzMzNBAAAAQgAAIMHNzAxBAAAAQs3M7MDNzAxBMzMBQs3M7MDNzAxBMzMBQgAAIMHNzAxBAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAeAB5AHoAeAB6AHsAfAB9AH4AfAB+AH8AgACBAIIAgACCAIMAhACFAIYAhACGAIcAiACJAIoAiACKAIsAjACNAI4AjACOAI8A"
+    }
+  ]
+}

@@ -33,6 +33,8 @@ export class Hud {
   private readonly door = el('button', 'door');
   private readonly notice = el('div', 'notice');
   private readonly mode = el('div', 'mode');
+  /** The loading hint of a crossing, above the ink. */
+  private readonly hold = el('div', 'loading');
   private modeText: string | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
@@ -54,6 +56,7 @@ export class Hud {
     this.door.hidden = true;
     this.notice.hidden = true;
     this.mode.hidden = true;
+    this.hold.hidden = true;
     this.door.type = 'button';
     this.door.addEventListener('click', () => this.onUse?.());
     root.append(
@@ -67,6 +70,7 @@ export class Hud {
       this.door,
       this.notice,
       this.mode,
+      this.hold,
     );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
@@ -153,14 +157,34 @@ export class Hud {
     if (id) this.select.value = id;
   }
 
-  /** Fades to black, runs `midway`, and fades back. */
-  async fade(midway: () => void, ms = 180): Promise<void> {
-    const wait = () => new Promise((r) => setTimeout(r, ms));
+  /** Fades to ink, runs `midway` (and waits for it), and fades back. */
+  async fade(midway: () => void | Promise<void>, ms = 180): Promise<void> {
+    await this.cover(ms);
+    try {
+      await midway();
+    } finally {
+      await this.uncover(ms);
+    }
+  }
+
+  /** Fades to ink over `ms` and stays there (a crossing; a page load that leaves the ink up until it is gone). */
+  async cover(ms = 180): Promise<void> {
+    this.fader.style.transitionDuration = `${ms}ms`;
     this.fader.classList.add('on');
-    await wait();
-    midway();
+    await new Promise((r) => setTimeout(r, ms));
+  }
+
+  /** Lifts the ink over `ms`. */
+  async uncover(ms = 180): Promise<void> {
+    this.fader.style.transitionDuration = `${ms}ms`;
     this.fader.classList.remove('on');
-    await wait();
+    await new Promise((r) => setTimeout(r, ms));
+  }
+
+  /** The loading hint above the ink during a crossing that takes a while; null hides it. */
+  loading(text: string | null): void {
+    this.hold.hidden = text === null;
+    this.hold.textContent = text ?? '';
   }
 
   /** A short line in the middle of the screen, gone after `ms`. */
@@ -169,6 +193,11 @@ export class Hud {
     this.notice.hidden = false;
     clearTimeout(this.noticeTimer);
     this.noticeTimer = setTimeout(() => (this.notice.hidden = true), ms);
+  }
+
+  /** The line `say` shows, while it shows; else null. */
+  get noticeText(): string | null {
+    return this.notice.hidden ? null : this.notice.textContent;
   }
 
   /** The door prompt near a portal: a button on touch, a key hint otherwise; null hides it. */

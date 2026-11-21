@@ -9,6 +9,26 @@ export const DEFAULT_GLB_URL: string | null = WALK_GLB_FILE
   ? `${import.meta.env.BASE_URL}${WALK_GLB_FILE}`
   : null;
 
+/** The index a build opens when the address names no world (docs/walk-areas.md, section 2): `VITE_WALK_INDEX`, a
+ * `walk-index.json` beside the page or a full address. It wins over `DEFAULT_GLB_URL`; `?glb=` wins over both. No
+ * deploy sets it yet, so it is null in every build today. */
+const WALK_INDEX_FILE: string | undefined = import.meta.env.VITE_WALK_INDEX;
+export const DEFAULT_INDEX_URL: string | null = WALK_INDEX_FILE
+  ? /^[a-z]+:/i.test(WALK_INDEX_FILE)
+    ? WALK_INDEX_FILE
+    : `${import.meta.env.BASE_URL}${WALK_INDEX_FILE}`
+  : null;
+
+/** Crossings between area files (an index world): the ink fade and the loading hint. */
+export const CROSSING = {
+  /** Each way of the fade to ink and back, milliseconds: about 0.4 s in all. */
+  fadeMs: 200,
+  /** The loading hint shows above the ink once a crossing has taken this long, milliseconds. */
+  hintAfterMs: 400,
+  /** The ink, `#12141C`: the fade, the indoor background, the page and the canvas before a world shows. */
+  ink: '#12141C',
+} as const;
+
 export const WALK = {
   /** Camera height above the feet, metres. */
   eyeHeight: 1.6,
@@ -76,6 +96,14 @@ export const SIDLE = {
    * the walker only outwards, away from the box's middle plane, and only once the feet are this far off it, metres:
    * it backs out the way it came. Entered through an X end (or arriving), movement is only along the passage. */
   sideOut: 0.001,
+  /** Hysteresis at a sidle box's X ends. A walker who sidled out through an end walks, and walks on in that box (its
+   * end margins included) unless it heads back into the passage through that end within this angle of its axis,
+   * radians (30 degrees): where a fissure opens at an angle into walking space, the way on leaves it beside the box,
+   * and a walker on that way no longer sidles and walks by turns (route 1, the Ice Curtain: 26 changes). */
+  reentryAngle: Math.PI / 6,
+  /** ... until the feet are this far clear of the box with its end margins, metres; from there it is entered as
+   * always, through an end or a side. */
+  reentryClear: 0.15,
 } as const;
 
 export const CLIMB = {

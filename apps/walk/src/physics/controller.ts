@@ -92,6 +92,10 @@ export class Controller {
   /** Sidling after walking into the box through one of its sides (a Z face), not through an X end: only then does
    * input across the passage move the walker, outwards, so that it can back out the way it came. */
   private sideEntry = false;
+  /** The sidle zone the walker last sidled out of through one of its X ends into walking, and that end (the sign of
+   * its local x), until the feet are `SIDLE.reentryClear` clear of the box: re-entering it needs input into the
+   * passage (headsIn). */
+  private leftEnd: { zone: TraverseZone; end: 1 | -1 } | null = null;
 
   constructor(
     private readonly collider: Collider,
@@ -145,6 +149,7 @@ export class Controller {
     this.narrow = false;
     this.caught = false;
     this.sideEntry = false;
+    this.leftEnd = null;
     this.eyeHeight = this.p.eyeHeight;
     if (arrival.yaw !== undefined) this.heading = arrival.yaw;
     this.position.copy(at);
@@ -284,8 +289,9 @@ export class Controller {
       const face = this.faceToClimb(wish);
       if (face) return this.attach(face);
     }
+    if (this.leftEnd && !this.nearBox(this.leftEnd.zone, at)) this.leftEnd = null;
     const own = this.mode === 'sidle' && this.zone && this.keepsSidle(this.zone, at) ? this.zone : null;
-    const sidle = own ?? this.zoneAt('sidle', at);
+    const sidle = own ?? this.sidleToEnter(at, wish);
     const crawl = this.zoneAt('crawl', at);
     if (crawl || this.mode === 'crawl') {
       // A crawl with the feet also in a sidle zone (a low passage opening straight into a fissure) crawls thin.
@@ -299,6 +305,11 @@ export class Controller {
   }
 
   private enter(mode: Mode, zone: TraverseZone | null): void {
+    if (mode === 'walk' && this.mode === 'sidle' && this.zone) {
+      // Sidled out through an X end (beyond its margin, as keepsSidle lets go only there): remember the zone.
+      const lx = this.zone.toLocal(this.position, LOCAL).x;
+      this.leftEnd = Math.abs(lx) > this.zone.half.x ? { zone: this.zone, end: lx > 0 ? 1 : -1 } : null;
+    }
     if (mode === 'sidle' && zone && (this.mode !== 'sidle' || zone !== this.zone)) {
       this.facing = this.wallFacing(zone);
       // Walked in between the box's X ends: it came through a side.
@@ -320,6 +331,29 @@ export class Controller {
     if (Math.abs(l.x) > h.x || Math.abs(l.y) > h.y + TRAVERSE.edge || Math.abs(l.z) > h.z + this.p.radius)
       return false;
     return !this.bodyFits(at, this.p.radius, this.p.bodyHeight);
+  }
+
+  /** The sidle zone the feet at `at` start sidling in: the first holding them (with its end margins), except the one
+   * just sidled out of through an end, which a walker re-enters only heading back into the passage through that end
+   * (headsIn). From sidling (a bend of two boxes) any zone is entered as before. */
+  private sidleToEnter(at: Vector3, wish: Wish): TraverseZone | null {
+    for (const zone of this.zones) {
+      if (zone.kind !== 'sidle' || !zone.contains(at, TRAVERSE.endMargin)) continue;
+      const left = this.leftEnd;
+      if (left?.zone === zone && this.mode === 'walk' && !headsIn(left.end, zone, wish)) continue;
+      return zone;
+    }
+    return null;
+  }
+
+  /** The feet are within `SIDLE.reentryClear` of the zone's box counted with its end margins. */
+  private nearBox(zone: TraverseZone, at: Vector3): boolean {
+    const l = zone.toLocal(at, LOCAL);
+    const h = zone.half;
+    const c = SIDLE.reentryClear;
+    return (
+      Math.abs(l.x) <= h.x + TRAVERSE.endMargin + c && Math.abs(l.y) <= h.y + c && Math.abs(l.z) <= h.z + c
+    );
   }
 
   /** A body of `radius` up to `top` above the feet at `at` touches no rock. */
@@ -573,6 +607,15 @@ export class Controller {
     const stepBy = (Math.abs(p.eyeHeight - CRAWL.eyeHeight) / TRAVERSE.eyeSeconds) * dt;
     this.eyeHeight = Math.abs(d) <= stepBy ? target : this.eyeHeight + Math.sign(d) * stepBy;
   }
+}
+
+/** Input into a sidle passage through its end `end` (the sign of that end's local x): within `SIDLE.reentryAngle`
+ * of the box's axis, towards its other end. */
+function headsIn(end: 1 | -1, zone: TraverseZone, wish: Wish): boolean {
+  const len = Math.hypot(wish.x, wish.z);
+  if (len < 1e-3) return false;
+  const inward = (-end * (wish.x * zone.flatX.x + wish.z * zone.flatX.z)) / len;
+  return inward >= Math.cos(SIDLE.reentryAngle) - 1e-9;
 }
 
 /**
