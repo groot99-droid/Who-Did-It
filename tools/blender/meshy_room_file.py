@@ -55,7 +55,7 @@ SPEC_KEYS = frozenset("model slug name scale tall size kmax lod extras dress doo
                       "wall drape head label finish anchors glow style opening surface mantel breast firebox beam "
                       "seats".split())
 OPENING_KEYS = frozenset("id kind portal prop side in at width height style knob sill head panes rod curtains swag "
-                         "curtain_colour outside foot flight".split())
+                         "curtain_colour outside foot flight hatch".split())
 LIGHT_KEYS = frozenset("id role anchor z group power color radius glow window pool name".split())
 ANCHOR_KEYS = frozenset("piece name offset at wall along out z".split())
 GLOW_KEYS = frozenset("shape size material at".split())
@@ -108,6 +108,15 @@ SHAFT_UP = 2.2            # a flight up's shaft rises this far over its top trea
 FLOOR_T = 0.25            # the floor's thickness under the boards: the collision slab's, the well's header
 STEP_MAX = 0.35           # a step the walker climbs (the viewer's stepHeight)
 RAIL_OUT = 0.07           # a balustrade's outer face past the well's edge (its string and handrail)
+# a trap hatch in the floor (G12, third part: tavern_back): a plank leaf in a frame lying on the boards, iron strap
+# hinges along its `hinge` edge and a ring pull at the other; boarded (shut, walked over) is built, open is later
+# (R-T1 to R-T3)
+HATCH_KEYS = frozenset("state size hinge".split())
+HATCH_STATES = ("boarded", "open")
+HATCH_BUILT = ("boarded",)
+HATCH_DEFAULTS = dict(state="boarded", size=[0.9, 0.9], hinge="E")
+HATCH_FRAME = 0.06        # the frame's width round the leaf
+HATCH_CLEAR = 0.3         # the frame's outer edge stands this far from every wall at least
 HEADROOM_MIN = 0.5        # the tread under the well's far edge stands this far under the floor's underside
 ARCH_W, CURTAIN_W = 0.095, 0.52                                # a door's architrave, a window's curtain, each side
 # the default numbers of an opening (the bedroom's own)
@@ -1104,6 +1113,48 @@ def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None,
     return done(out)
 
 
+def hatch_values(h, sc, foot, where: str = "the hatch", bag: Problems | None = None) -> dict | None:
+    """A floor hatch's numbers (G12, third part) with every default filled, in room metres: its `state` (boarded: shut,
+    walked over), the leaf's `size` [along x, along y] centred on the marker's `foot`, the `hinge` edge (a wall's
+    letter: the edge the hinges run along). Derived: the leaf's `box` [x0, y0, x1, y1] and the frame's `outer` box
+    (HATCH_FRAME round it). Holds R-T1 to R-T3. `sc` needs the room's x0, x1, y0, y1. With no `bag` it stops on a
+    problem; with one it adds to it."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+
+    def done(v):
+        if own:
+            bag.stop()
+        return v if len(bag) == n0 else None
+
+    if not isinstance(h, dict):
+        bag.append(f"{where}: hatch is an object (R-T1)")
+        return done(None)
+    _strict(h, HATCH_KEYS, f"{where}.hatch", "hatch", bag)
+    v = {k: h.get(k) if h.get(k) is not None else d for k, d in HATCH_DEFAULTS.items()}
+    if v["state"] not in HATCH_STATES:
+        bag.append(f'{where}: hatch.state is one of {", ".join(HATCH_STATES)} (R-T2)')
+    elif v["state"] not in HATCH_BUILT:
+        bag.append(f'{where}: hatch.state "{v["state"]}" is not built yet; the builder has: '
+                   f'{", ".join(HATCH_BUILT)} (R-T2)')
+    if not (_nums(v["size"], 2) and all(0.5 <= float(x) <= 1.5 for x in v["size"])):
+        bag.append(f"{where}: hatch.size is the leaf's [along x, along y], each 0.5 to 1.5 m (R-T2)")
+        return done(None)
+    if v["hinge"] not in SIDES:
+        bag.append(f'{where}: hatch.hinge is the edge its hinges run along: one of {", ".join(SIDES)} (R-T2)')
+    fx, fy = float(foot[0]), float(foot[1])
+    w, d = (float(x) for x in v["size"])
+    box = [round(fx - w / 2, 6), round(fy - d / 2, 6), round(fx + w / 2, 6), round(fy + d / 2, 6)]
+    F = HATCH_FRAME
+    outer = [round(box[0] - F, 6), round(box[1] - F, 6), round(box[2] + F, 6), round(box[3] + F, 6)]
+    gap = min(outer[0] - sc.x0, outer[1] - sc.y0, sc.x1 - outer[2], sc.y1 - outer[3])
+    if gap < HATCH_CLEAR - 1e-9:
+        bag.append(f"{where}: the hatch's frame {outer} stands {gap:.2f} m from a wall (the room x {sc.x0:g}..{sc.x1:g}, "
+                   f"y {sc.y0:g}..{sc.y1:g}): {HATCH_CLEAR:g} m at least, the leaf centred on its marker (R-T3)")
+    return done(dict(state=v["state"], size=[w, d], hinge=v["hinge"], box=box, outer=outer, frame=F))
+
+
 def _flight_up(f: dict, sc, where: str, bag: Problems, height) -> dict | None:
     """A flight up into the ceiling (G12, second part) with every default filled, in room metres: the `well` [x0, y0,
     x1, y1] is the hole in the ceiling and gives the flight its width across; treads `tread` deep and `riser` high rise
@@ -1257,10 +1308,17 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
         cx, cy = sc.centre(tx, ty)
         e = dict(id=oid, kind=kind, portal=o.get("portal"), prop=o.get("prop"), side=side, tile=[tx, ty],
                  inner=sc.border_side(tx, ty) is None)
+        if o.get("hatch") is not None and not (kind == "hatch" and side == "floor"):
+            bag.append(f"{where}: a hatch object is a hatch opening's in the floor (R-T1)")
+            continue
         if side == "floor":
             if o.get("at") is not None:
                 bag.append(f'{where}: a hatch or a drop in the floor has no "at" (R-O5b)')
             e.update(at=None, foot=list(o.get("foot") or (cx, cy)), cut=False)
+            if o.get("hatch") is not None:          # a visible trap hatch (G12, third part): the walker steps on it
+                hv = hatch_values(o["hatch"], sc, e["foot"], where, bag)
+                if hv is not None:
+                    e["hatch"] = hv
             out.append(e)
             continue
         centre_along = cx if side in ("N", "S") else cy
@@ -1840,6 +1898,10 @@ def explain(row: dict, spec: dict, shown: str) -> str:
                         + (", curtains" if e["curtains"] else "") + (", swag" if e["swag"] else ""))
         else:
             bits.append(f"marker at ({e['foot'][0]:g}, {e['foot'][1]:g})")
+            hv = e.get("hatch")
+            if hv:
+                bits.append(f"hatch {hv['state']}, leaf {hv['size'][0]:g} x {hv['size'][1]:g} m {hv['box']}, hinges "
+                            f"on its {hv['hinge']} edge")
             fl = e.get("flight")
             if fl and fl.get("up"):
                 bits.append(f"flight up toward {fl['dir']} from {fl['base']:g}: hole in the ceiling {fl['well']}, "

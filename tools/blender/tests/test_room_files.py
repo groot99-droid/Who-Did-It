@@ -1111,6 +1111,42 @@ class RoomFileV2(unittest.TestCase):
         stairs_["over"] = 1.0
         self.assertIn("flight.over is a flight up's (\"up\": true) (R-F9)", self.stops(data))
 
+    # -- G12, third part: a boarded trap hatch in the floor (the tavern's back room)
+    def back(self):
+        return raw(os.path.join(ROOMS_DIR, "tavern_back.json"))
+
+    def test_the_back_room_hatch_lies_on_its_marker(self):
+        _cfg, spec = self.read(self.back())
+        tr = next(e for e in spec["openings"] if e["id"] == "tk.trap")
+        hv = tr["hatch"]
+        self.assertEqual((tr["kind"], tr["side"], tr["foot"], tr["cut"]), ("hatch", "floor", [3.5, -1.5], False))
+        self.assertEqual((hv["state"], hv["size"], hv["hinge"]), ("boarded", [0.9, 0.9], "E"))
+        self.assertEqual(hv["box"], [3.05, -1.95, 3.95, -1.05])          # the leaf centred on the marker
+        self.assertEqual(hv["outer"], [2.99, -2.01, 4.01, -0.99])        # the frame round it
+        sc = rf.Scene(scene("tavern_back"))
+        dflt = rf.hatch_values({}, sc, (3.5, -1.5))
+        self.assertEqual((dflt["state"], dflt["size"], dflt["hinge"]), ("boarded", [0.9, 0.9], "E"))
+        self.assertNotIn("hatch", next(e for e in spec["openings"] if e["id"] == "tk.door"))
+
+    def test_hatch_rules(self):
+        def trap(d):
+            return next(o for o in d["openings"] if o["id"] == "tk.trap")
+
+        cases = [(lambda o: o.update(hatch=[0.9, 0.9]), "hatch is an object (R-T1)"),
+                 (lambda o: o["hatch"].update(state="open"), 'hatch.state "open" is not built yet'),
+                 (lambda o: o["hatch"].update(state="ajar"), "hatch.state is one of boarded, open (R-T2)"),
+                 (lambda o: o["hatch"].update(size=[0.3, 0.9]), "each 0.5 to 1.5 m (R-T2)"),
+                 (lambda o: o["hatch"].update(hinge="X"), "hatch.hinge is the edge its hinges run along"),
+                 (lambda o: o.update(foot=[4.5, -1.5]), "from a wall (the room x -5..5, y -4..4)"),
+                 (lambda o: o["hatch"].update(hinges="E"), 'the key "hinges" is not a hatch key')]
+        for change, said in cases:
+            data = self.back()
+            change(trap(data))
+            self.assertIn(said, self.stops(data), said)
+        data = self.back()
+        next(o for o in data["openings"] if o["id"] == "tk.door")["hatch"] = {}
+        self.assertIn("a hatch object is a hatch opening's in the floor (R-T1)", self.stops(data))
+
     def test_a_box_may_be_grey_or_wood(self):
         data = self.loft()
         beam = next(p for p in data["pieces"] if p["id"] == "al.beam_w")

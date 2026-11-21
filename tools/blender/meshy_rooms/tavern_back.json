@@ -1,0 +1,358 @@
+{
+  "room": "tavern_back",
+  "about": "Mrs Grieves's back room behind the tavern bar, her stores and card room, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 8 m inside (x -5..5, y -4..4), 2.7 m high. Every prop, spot, portal and night light of packages/content/data/scenes/tavern_back.json is named below. No window: the scene has none and no moon light, so the room is lit by the lamp over the card table. The trap hatch down to the cellar is a visible boarded hatch in the boards (decision D6, G12's third part). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Tavern back room",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the door to the bar",
+    "trap": "Beside the trap hatch"
+  },
+  "height": 2.7,
+  "height_note": "a low back room, the cottage's 2.7 m; the cellar lies 3 m below (the trap's elevationDelta)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.78, 0.92, 0.74]
+  },
+  "floor_note": "the scene's `w` boards (its material layer), the cottage's scan a little darker: a store room's worn floor",
+  "wall_colour": "#7A7262",
+  "wall_colour_note": "guess: a tavern's limewash gone drab with pipe smoke and lamp soot; never pink or lilac under the lamp",
+  "ceiling_colour": "#958B76",
+  "ceiling_colour_note": "limewash, smoked between the beams",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the door, the skirting, the beams, the hatch",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a store room has shelves where a picture rail would be",
+  "cornice": null,
+  "cornice_note": "and no cornice: the limewash meets the ceiling between the beams",
+  "openings": [
+    {
+      "id": "tk.door",
+      "kind": "door",
+      "portal": "tk.door",
+      "width": 0.9,
+      "height": 2.05,
+      "note": "the door through to the tavern bar in the north wall, tile (6,0): centred at x 0.5, the portal at its foot (0.5, 4.0); the door spawn stands 0.5 m inside it, (0.5, 3.5), by design. 2.05 m high under a 2.7 m ceiling. The knob is the default end (west)."
+    },
+    {
+      "id": "tk.trap",
+      "kind": "hatch",
+      "portal": "tk.trap",
+      "side": "floor",
+      "hatch": {
+        "state": "boarded",
+        "size": [0.9, 0.9],
+        "hinge": "E"
+      },
+      "hatch_note": "G12's third part (D6: visible stairs and hatches, the hatch boarded): a plank leaf 0.9 m square in a frame on the boards at the portal's tile (9,6), (3.5, -1.5), its strap hinges along the east edge and the ring pull at the west edge, by the spawn. Shut: the walker steps onto it and the portal takes them down to the cellar (its spawn trap).",
+      "note": "the trap hatch down to the cellar (tk.trap: to cellar, spawn trap). An inner tile two from the east wall: side floor, the marker at the tile's centre (3.5, -1.5), 1.0 m from its spawn (2.5, -1.5)."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": 4.0,
+  "exposure_note": "fixed, as the loft's: from the first 128-sample bake (2026-11-21) the pool's exposure came out 20.8 (one candle's small pool sets it) and the room read flat and lit as by day at any mix; at 4.0 the lamp lights the card table and the walls fall into the dark (variant vc of four; 2.5 was darker still)",
+  "lights": [
+    {
+      "id": "tk.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "tk.card_table"
+      },
+      "note": "the lamp on the card table: a candlestick with its flame stands in for the oil lamp (vintage_oil_lamp is a .blend, G8)"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the card table's lamp) and fill = 2, and the AO. No moon group: no window.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: its own light setting and the darker-room exposure lever.",
+    "settings": {
+      "back": {
+        "label": "the back room",
+        "mix": {
+          "candle": 1.3,
+          "fill": 0.05
+        },
+        "note": "from the first 128-sample bake (2026-11-21): the shop's guess (candle 1.0, fill 0.1) lit the room flat; the loft's low fill (0.05) and the lamp a little up (1.3), with the fixed exposure above"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a card room at night, lit by its one lamp",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "back",
+  "light_note": "the room's own light setting (look.settings.back; --light overrides)",
+  "pieces": [
+    {
+      "id": "tk.inn_bed",
+      "face": "S",
+      "place": ["wall", "N", "W"],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "-",
+          "cover": "blanket",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing south the model's -x end is the west end: the head in the corner"
+      },
+      "moved": "0.5 m east (D4): from the north-west corner along the north wall; along the west wall it stood through the wardrobe at (1,2), a hide spot that does not move",
+      "note": "the inn bed at its tile (1,1), the room's north-west corner: the day bed of the parlour, the cottage and the shop, with a wool blanket and one pillow"
+    },
+    {
+      "id": "tk.wardrobe",
+      "spot": true,
+      "face": "E",
+      "place": ["wall", "W", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "painted_wooden_cabinet_02",
+        "scale": 0.88,
+        "lod": 0.6
+      },
+      "note": "the hide wardrobe at its tile (1,2), against the west wall, its doors shut: a tall painted cupboard at 0.88 (0.88 m wide, 2.26 m high). The bedroom's GothicCabinet is 1.53 m wide at 2.1 m and stood through the inn bed in the corner; this one leaves 0.2 m to the bed's side."
+    },
+    {
+      "id": "tk.store_shelf_0",
+      "face": "S",
+      "place": ["wall", "N", -2.54],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "moved": "0.96 m east along the north wall (D4): at its tile (x -3.5) it stood through the inn bed along the north wall",
+      "note": "a store shelf at its tile (2,0): a plain open shelf at 0.85 (0.85 m wide, 1.77 m high); its stores have no model yet (G17)"
+    },
+    {
+      "id": "tk.store_shelf_b_0",
+      "face": "S",
+      "place": ["wall", "N", -1.66],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "moved": "0.84 m east along the north wall (D4), after the shelf beside it",
+      "note": "the second store shelf at its tile (3,0)"
+    },
+    {
+      "id": "tk.store_shelf_1",
+      "face": "S",
+      "place": ["wall", "N", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "note": "a store shelf at its tile (8,0), east of the door"
+    },
+    {
+      "id": "tk.store_shelf_b_1",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "note": "the second store shelf at its tile (9,0)"
+    },
+    {
+      "id": "tk.tin_crate",
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "oil_tin", "scale": 1.0, "at": [-0.22, null, 0.0], "lod": 0.5 },
+          { "slug": "oil_tin", "scale": 1.0, "at": [0.0, null, 0.0], "rot": 20.0, "lod": 0.5 },
+          { "slug": "oil_tin", "scale": 1.0, "at": [0.22, null, 0.0], "rot": -15.0, "lod": 0.5 }
+        ]
+      },
+      "note": "the tin crate at its tile (10,1), in the north-east corner against the north wall, three tins on it (the loft's and the shop's); its stencil is not built"
+    },
+    {
+      "id": "tk.card_table",
+      "face": "S",
+      "place": ["at", -0.5, 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "extras": ["flame"],
+        "lod": 0.7,
+        "dress": [
+          { "slug": "wooden_candlestick", "scale": 1.0, "at": [-0.2, null, 0.0], "lod": 0.02 },
+          { "slug": "brass_goblets", "scale": 0.8, "at": [0.18, null, 0.0], "lod": 0.4 }
+        ]
+      },
+      "note": "the card table at its tile (5,4), the lamp's tile: the cottage's plain deal table (the parlour's round table read salmon red here, and its scan has no grade), a candlestick and brass goblets on it; the cards have no model"
+    },
+    {
+      "id": "tk.stool_n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.5, 1.28],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 },
+      "note": "four stools round the card table (not in the scene's props), as the cottage's"
+    },
+    {
+      "id": "tk.stool_w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -1.33, 0.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tk.stool_e",
+      "decor": true,
+      "face": "W",
+      "place": ["at", 0.33, 0.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tk.stool_s",
+      "decor": true,
+      "face": "N",
+      "place": ["at", -0.5, -0.28],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tk.shop_black_market",
+      "face": "W",
+      "place": ["wall", "E", 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "treasure_chest",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "Mrs Grieves's black-market stall at its tile (10,3), against the east wall: a strapped chest (partial: the stall's cloth and its goods have no model)"
+    },
+    {
+      "id": "tk.dartboard",
+      "decor": true,
+      "face": "W",
+      "place": ["wall", "E", -0.3],
+      "rise": 1.5,
+      "spec": { "model": "ph", "slug": "dartboard", "scale": 1.0, "lod": 0.5 },
+      "note": "a dartboard on the east wall (not in the scene's props: the credits' tavern dartboard), its centre at 1.73 m"
+    },
+    {
+      "id": "tk.oil_barrel",
+      "face": "E",
+      "place": ["wall", "W", -2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 0.7,
+        "lod": 0.4
+      },
+      "note": "the oil barrel (a task source: keep it legible) at its tile (0,7), against the west wall: an oil cask at 0.7 (0.52 m across, 0.61 m high), smaller than the wine barrels, so the floor tile (1,7) beside it can be stood on (at 1.0 and 0.8 the no-bake builds' walk could not reach it)"
+    },
+    {
+      "id": "tk.barrel_0",
+      "face": "N",
+      "place": ["wall", "S", -4.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (1,8), against the south wall"
+    },
+    {
+      "id": "tk.barrel_1",
+      "face": "N",
+      "place": ["wall", "S", -3.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (2,8)"
+    },
+    {
+      "id": "tk.bottle_crate",
+      "face": "N",
+      "place": ["wall", "S", -2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "wooden_crate_01", "scale": 1.0, "at": [0.04, null, 0.0], "rot": 6.0, "lod": 0.5 }
+        ]
+      },
+      "note": "the bottle crates at their tile (3,8), two stacked (the bottles are a .blend, G8)"
+    },
+    {
+      "id": "tk.flour_sacks",
+      "face": "N",
+      "place": ["wall", "S", 0.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.6, 0.7],
+        "label": "Flour sacks: three filled hessian sacks slumped against the wall"
+      },
+      "note": "at their tile (6,8), against the south wall. No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "tk.crate_pile",
+      "spot": true,
+      "face": "W",
+      "place": ["wall", "E", -3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_02",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "wooden_crate_01", "scale": 1.0, "at": [0.08, null, 0.0], "rot": 8.0, "lod": 0.5 }
+        ]
+      },
+      "note": "the body spot's crate pile at its tile (10,8), in the south-east corner against the east wall: the cottage's pile"
+    },
+    {
+      "id": "tk.beam_w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -2.5, 0.0],
+      "rise": 2.48,
+      "spec": { "model": "box", "finish": "wood", "size": [7.98, 0.16, 0.22], "label": "Ceiling beam" },
+      "note": "two ceiling beams across the room's short span (the loft's tie beams, in the joinery's wood), 0.22 m deep under the ceiling"
+    },
+    {
+      "id": "tk.beam_e",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 2.5, 0.0],
+      "rise": 2.48,
+      "spec": { "model": "box", "finish": "wood", "size": [7.98, 0.16, 0.22], "label": "Ceiling beam" }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door and spawn_trap are the spawns' own views; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_door": [[0.5, 3.5, 1.6], [0.5, -4.0, 1.2], 70.0],
+    "spawn_trap": [[2.5, -1.5, 1.6], [-5.0, -1.0, 1.1], 70.0],
+    "north": [[0.0, -2.6, 1.6], [0.0, 4.0, 1.3], 70.0],
+    "east": [[-3.2, -0.3, 1.6], [5.0, 0.0, 1.2], 70.0],
+    "south": [[0.0, 2.6, 1.6], [0.0, -4.0, 1.1], 70.0],
+    "west": [[3.4, 0.2, 1.6], [-5.0, 0.3, 1.2], 70.0],
+    "cards": [[1.5, -1.0, 1.6], [-0.5, 0.5, 0.8], 70.0],
+    "trap": [[1.9, -0.3, 1.6], [3.5, -1.5, 0.0], 70.0]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "room": "tavern_back",
+  "about": "The tavern's back room as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "68 of the map's 70 walkable tiles can be stood on. (1,1) and (2,1) lie under the inn bed (a day bed along the north wall from the north-west corner: along the west wall it stood through the hide wardrobe at (1,2)). The same kind as the bedroom's, the parlour's, the cottage's, the loft's and the shop's tiles under their beds; listed for the owner (2026-11-21), not yet ruled on."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails."
+}

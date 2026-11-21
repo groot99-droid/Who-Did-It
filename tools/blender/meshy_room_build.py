@@ -845,6 +845,9 @@ SCAN_GRADE = {
     "wooden_stool_01": dict(toward=WALNUT, w=0.5, gain=0.9, hot=WOOD_HOT),
     "wooden_crate_01": dict(toward=WALNUT, w=0.55, gain=0.85, hot=WOOD_HOT),
     "wooden_crate_02": dict(toward=WALNUT, w=0.55, gain=0.85, hot=WOOD_HOT),
+    # the tavern's back room: the wardrobe's blue paint (teal is only ever a light) and the chest's red stripes, umber
+    "painted_wooden_cabinet_02": dict(toward=WALNUT, w=0.75, gain=0.8, hot=WOOD_HOT),
+    "treasure_chest": dict(toward=WALNUT, w=0.6, gain=0.85, hot=WOOD_HOT),
 }
 
 
@@ -1450,6 +1453,78 @@ def build_flight(fr: Frame, mt: dict, e: dict, fl: dict) -> dict:
         register(rail, "stairs", e["id"] + ":rail")
     return dict(id=e["id"], steps=len(steps), bottom=zb, newels=len(newels), rail=list(fl["rail"]),
                 box=list(fl["box"]))
+
+
+def build_hatches(fr: Frame, mt: dict) -> list:
+    """Every floor hatch's visible trap (G12, third part): its rows for the manifest (none in most rooms)."""
+    return [build_hatch(fr, mt, m, m["hatch"]) for m in fr.markers if m.get("hatch")]
+
+
+def build_hatch(fr: Frame, mt: dict, e: dict, hv: dict) -> dict:
+    """A boarded trap hatch lying on the boards (the loader's hatch_values): a frame of the joinery's wood round the
+    leaf, the leaf's planks laid along the hinge edge with dark gaps between them (an iron-dark underlay shows through),
+    two iron strap hinges from the hinge edge across the planks with their knuckles on the frame, and an iron ring pull
+    on its plate at the middle of the far edge. No hole: the floor runs on under it, and the walker steps on it to meet
+    the portal (no collision of its own: its 3.4 cm stand under the capsule's foot). One object, `Hatch_<id>`, of kind
+    `stairs` (baked like a piece)."""
+    x0, y0, x1, y1 = hv["box"]
+    F, h = hv["frame"], hv["hinge"]
+    wood, iron = mt["wood"], mt["iron"]
+    ZF, ZU, ZL, ZS = 0.016, 0.004, 0.024, 0.029      # the frame's top, the underlay's, the planks', the straps'
+    GAP, KN = 0.008, 0.034                           # a gap between planks; a knuckle's top
+    along_x = h in ("N", "S")                       # the hinge edge runs along x: the planks lie along x
+    b = Builder()
+    bb = b.box
+
+    def box(lo, hi, mat, vgrain=False):      # nothing of the hatch is seen from below: no bottom faces
+        bb(lo, hi, mat, vgrain=vgrain, skip=("bottom",))
+
+    # the frame round the leaf
+    box((x0 - F, y0 - F, 0.0), (x1 + F, y0, ZF), wood)
+    box((x0 - F, y1, 0.0), (x1 + F, y1 + F, ZF), wood)
+    box((x0 - F, y0, 0.0), (x0, y1, ZF), wood, vgrain=True)
+    box((x1, y0, 0.0), (x1 + F, y1, ZF), wood, vgrain=True)
+    # the underlay, then the planks along the hinge edge
+    box((x0, y0, 0.0), (x1, y1, ZU), iron)
+    c0, c1 = (y0, y1) if along_x else (x0, x1)       # across the planks
+    n = max(2, int(round((c1 - c0) / 0.15)))
+    pw = (c1 - c0 - (n - 1) * GAP) / n
+    for k in range(n):
+        a = c0 + k * (pw + GAP)
+        if along_x:
+            box((x0, a, ZU), (x1, a + pw, ZL), wood)
+        else:
+            box((a, y0, ZU), (a + pw, y1, ZL), wood, vgrain=True)
+    # the strap hinges: across the planks from the hinge edge, at a fifth of the edge from each end
+    e0, e1 = (x0, x1) if along_x else (y0, y1)       # along the hinge edge
+    depth = 0.45 * (c1 - c0)
+    SW = 0.05
+    for t in (0.2, 0.8):
+        m_ = e0 + t * (e1 - e0)
+        if h == "E":
+            box((x1 - depth, m_ - SW / 2, ZL), (x1, m_ + SW / 2, ZS), iron)
+            box((x1 - 0.02, m_ - 0.04, 0.0), (x1 + F, m_ + 0.04, KN), iron)
+        elif h == "W":
+            box((x0, m_ - SW / 2, ZL), (x0 + depth, m_ + SW / 2, ZS), iron)
+            box((x0 - F, m_ - 0.04, 0.0), (x0 + 0.02, m_ + 0.04, KN), iron)
+        elif h == "N":
+            box((m_ - SW / 2, y1 - depth, ZL), (m_ + SW / 2, y1, ZS), iron)
+            box((m_ - 0.04, y1 - 0.02, 0.0), (m_ + 0.04, y1 + F, KN), iron)
+        else:
+            box((m_ - SW / 2, y0, ZL), (m_ + SW / 2, y0 + depth, ZS), iron)
+            box((m_ - 0.04, y0 - F, 0.0), (m_ + 0.04, y0 + 0.02, KN), iron)
+    # the ring pull at the middle of the far edge, 0.1 m in: its plate and a square ring lying flat
+    mid = (e0 + e1) / 2
+    far = {"E": (x0 + 0.1, mid), "W": (x1 - 0.1, mid), "N": (mid, y0 + 0.1), "S": (mid, y1 - 0.1)}[h]
+    rx, ry = far
+    box((rx - 0.03, ry - 0.03, ZL), (rx + 0.03, ry + 0.03, ZL + 0.004), iron)
+    R, T_ = 0.05, 0.01
+    for (ax, ay, bx, by) in ((-R, -R, R, -R + T_), (-R, R - T_, R, R), (-R, -R + T_, -R + T_, R - T_),
+                             (R - T_, -R + T_, R, R - T_)):
+        box((rx + ax, ry + ay, ZL), (rx + bx, ry + by, ZL + 0.008), iron)
+    ob = b.build(nm("Hatch" + sfx(e["id"])))
+    register(ob, "stairs", e["id"] + ":hatch")
+    return dict(id=e["id"], state=hv["state"], planks=n, box=list(hv["box"]), outer=list(hv["outer"]))
 
 
 CEIL_T = 0.2        # a flight up's hole: the ceiling's depth at its edges, in the joinery's wood (its joists)
@@ -4747,6 +4822,7 @@ def obj_albedo(o) -> np.ndarray:
 
 OBJ_KIND: dict = {}         # object name -> what it is (register's `what`)
 FLIGHTS: list = []          # the stairs' flights as built (build_flights), for the manifest
+HATCHES: list = []          # the floor hatches as built (build_hatches), for the manifest
 NO_COLOR0: list = []        # the wdi_id of every registered mesh the bake leaves out on purpose
 
 
@@ -6039,6 +6115,7 @@ def blender_main(a) -> None:
         # each other wall that has a `sky` window
         doors, wins = build_doors(fr, mt), build_windows(fr, mt)
         FLIGHTS[:] = build_flights(fr, mt)      # the stairs' visible flights (G12): none in most rooms
+        HATCHES[:] = build_hatches(fr, mt)      # the floor hatches (G12, third part): none in most rooms
         mws = [w for o in moon_windows(fr) for w in wins if w["id"] == o["id"]]   # the moon-lit windows, as built
         win = mws[0] if mws else None
         # one Sun for the room: from moon.bearing, or moon.azimuth off the moon-lit wall (R-L9)
@@ -6320,7 +6397,9 @@ def blender_main(a) -> None:
                        portal=e.get("portal"), prop=e.get("prop"), outside=e.get("outside"),
                        foot=[round(float(v), 4) for v in e["foot"]] if e.get("foot") else None,
                        **({"flight": dict(e["flight"], built=next((f for f in FLIGHTS if f["id"] == e["id"]), None))}
-                          if e.get("flight") else {}))
+                          if e.get("flight") else {}),
+                       **({"hatch": dict(e["hatch"], built=next((h for h in HATCHES if h["id"] == e["id"]), None))}
+                          if e.get("hatch") else {}))
                   for e in SPEC["openings"]],
         sceneFlags={k: room.d[k] for k in ("dark", "silent", "entryNoise") if k in room.d},
         spawns=nodes["spawns"], portals=nodes["portals"],
