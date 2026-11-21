@@ -16,6 +16,7 @@
     "ao_rays": 16,
     "ao_reach_m": 6.0,
     "ao_floor": 0.35,
+    "green_margin": 0.03,
     "note": "Unlit pieces lit per vertex by the viewer's own light model (meshy_looks/final.json's moon and sky light, the village's kept lights, three's Lambert, no shadows, as apps/walk draws the lit village) plus the gate's lamp, painted in; no live light is added. COLOR_0 never shows under the ink at the village's exposure."
   },
   "atlas": {
@@ -95,8 +96,28 @@
         "arrival": "Spawn_undermere_mouth_cutting",
         "arrival_at": [30.0, 136.4, 0.42]
       },
-      "lamp": [0.98, -0.34, 2.2],
-      "kit": { "panel_ly": 0.05, "trim_w": 0.16, "trim_back": 0.45, "frost_fins": 10 },
+      "lamp": [0.98, -0.45, 2.2],
+      "kit": {
+        "panel_ly": 0.05,
+        "trim_back": 0.45,
+        "frost_fins": 10,
+        "face": {
+          "half_w": 3.3,
+          "ly": -0.1,
+          "bulge": 0.45,
+          "back": 0.9,
+          "top": 3.35,
+          "top_jag": 0.35,
+          "taper": 0.9,
+          "row_jag": 0.2,
+          "end_jag": 0.35,
+          "flat_m": 0.6,
+          "cols": [1.2, 1.9, 2.6],
+          "rows": [-0.35, 0.6, 1.5, 2.4],
+          "tint": [0.64, 0.68, 0.68],
+          "note": "the blasted face in front of the export's steep snow face (31.5 to 32.0 m east, measured), as wide as cliff:024's model (y 133.26 to 139.75, lx -3.24 to 3.25); lx of its column lines beside the slot, lz of its row lines"
+        }
+      },
       "budget_tris": 400,
       "sees": "a tall slot blasted in the cutting's rock face (cliff:024) behind a timber-and-iron railway grille; hoarfrost at its edges; ice on its floor; one small lamp"
     },
@@ -149,13 +170,20 @@
       "type": "arch",
       "mouth": [194.4, 0.5, 9.45],
       "kit_origin": [194.6, 0.5, 10.8],
-      "kit_origin_note": "the grille's line (x 194.6, y -1.75 to 2.75) stands on the ledge at the cliff's foot, 10.8 m (measured in the export blend: HM_Ground_B5_10_00 10.76 to 10.82 there), not at the design's 9.45; four rough steps climb the bank to its door",
+      "kit_origin_note": "the grille's line (x 194.6, y -1.75 to 2.75) stands on the ledge at the cliff's foot, 10.8 m (measured in the export blend: HM_Ground_B5_10_00 10.76 to 10.82 there), not at the design's 9.45; five stone steps climb from the pool's floor (9.41) to a landing at the grille's door, and the portal stands on that landing",
       "in_deg": 0.0,
       "opening": [4.5, 3.2],
-      "portal": { "node": "Portal_um.rising_in", "xy": [193.9, 0.5] },
+      "portal": {
+        "node": "Portal_um.rising_in",
+        "xy": [194.4, 0.5],
+        "design_xy": [193.9, 0.5],
+        "departure": "on the landing at the grille (10.83 m), 0.2 m in front of its plane: the design's point lies at the foot of the bank (9.41), 0.7 m in front of the grille and 1.4 m below it, where the walker reached it 1.7 m short of the arch"
+      },
       "arrival": {
         "node": "Spawn_overworld_mouth_rising",
-        "xy": [192.3, 0.5],
+        "xy": [191.9, 0.5],
+        "design_xy": [192.3, 0.5],
+        "departure": "0.4 m further out, so that the walker's body (0.3 m) stands clear of the lowest step's riser at x 192.57",
         "facing_deg": 180.0,
         "label": "At the Old Rising Gate"
       },
@@ -173,7 +201,21 @@
         "door_w": 0.8,
         "icicles": 12,
         "steps_from": 9.41,
-        "steps": 4
+        "steps": 5,
+        "step_half_w": 0.75,
+        "landing_half_w": 2.8,
+        "landing": [-0.75, -0.05],
+        "tread": 0.32,
+        "jamb_foot": -1.6,
+        "press": {
+          "object": "broken_trestle@0.001",
+          "box_m": [189.6, -3.5, 195.0, 4.0],
+          "fade_m": 1.2,
+          "below_z": 11.6,
+          "fade_z": 0.4,
+          "under_ground_m": 0.15,
+          "note": "the trestle model's own snowy base (9.7 to 11.2 m, measured) lies over the pool's floor (9.41) where the walk's ground is; in this box (with a fade round it) its vertices under below_z are pressed down under the ground the collision has there, so the steps and the landing show and the walker no longer stands in it"
+        }
       },
       "budget_tris": 600,
       "sees": "a broad resurgence arch at the foot of the ravine headwall (cliff:020) under the broken trestle; icicles at its lip; the grille across it with a narrow iron door in its middle"

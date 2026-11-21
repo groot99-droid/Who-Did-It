@@ -892,6 +892,14 @@ no limit of this kind. `walk_index.py` prints a note when a file is over one, an
 | Lights | 24 | none given | 8 | 24 | 2 |
 | Collision triangles | 150,000 | 10,000 | 60,000 | 148,000 | 2,952 |
 
+- With the cave gates (`hollowmere_walk_gates.glb`, the exporter's `--gates` run, 2026-11-21) the same estimate is
+  highest at two of the gates' arrivals: `Spawn_overworld_mouth_rising` 4,037,986 and `Spawn_overworld_mouth_adit`
+  3,802,901 (est.). Both face away from their gate down their only way out, the ravine and the cutting, which run due
+  west towards the village; the estimate counts everything in the frustum and nothing hides anything, so the cutting's
+  walls and the ravine's sides do not lower it. It falls under the 3,073,957 above only with the view turned 45 degrees
+  or more off the way out (to the south-west: 2,976,000 for the Adit at 225 degrees, 2,660,000 for the Old Rising at
+  230, est.), which leaves the way out at the edge of the view; in the Adit's cutting, 2 m wide, the view is then
+  its wall.
 - GPU texture memory is counted as RGBA8 with a full chain of smaller copies: width x height x 4 x 4/3 bytes, in MB
   of a million bytes (254.7 MB is 202 images; 60.4 MB is 34 images; both measured from the image headers).
 - 248 draw calls and 255 MB are also the numbers the exporter fits the unsplit village to today (`DRAW_BUDGET` and

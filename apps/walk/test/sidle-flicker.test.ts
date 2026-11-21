@@ -155,3 +155,109 @@ describe('the sidle/walk flicker where a fissure opens at an angle (the Ice Curt
     expect(c.mode).toBe('sidle');
   });
 });
+
+// The sidle/walk flicker of route 2 at the east end of the East Holing (the cave `under_domes`, zone `do_holing`): the
+// journey harness switched between sidling and walking 62 times there with this controller (measured on the real file,
+// 7 s at one spot). The box is 5.3 m long (half 2.65) and 0.84 m wide; the way on leaves the fissure through its open
+// north side, 1.0 m before the box's east end (the cave core's waypoint lies at local x 1.6, 0.5 m north of the middle
+// plane, just outside the box). A sidler cannot step out through a side, so it sidles on to the end, steps out of the
+// end margin and walks back towards that waypoint: 25 degrees off the passage's axis, inside the 30 degree re-entry
+// cone, so it sidled in again, the harness pushed it along the passage (east, the way it came in) and out, and so on,
+// creeping north 1 cm a switch until the angle opened past 30 degrees. The world below is that end, from boxes.
+const H2 = 2.65;
+function holing(): { collider: BvhCollider; zone: TraverseZone } {
+  const parts = [
+    box(-20, -0.2, -20, 20, 0, 20),
+    // The +Z (south) wall runs the whole box and on; the -Z (north) wall ends at local x 1.4, so the fissure opens to
+    // the north over the box's last 1.25 m; rock 1 m beyond the east end.
+    box(-H2 - 3, 0, 0.225, H2 + 1, 3, 3),
+    box(-H2 - 3, 0, -3, 1.4, 3, -0.225),
+    box(H2 + 1, 0, -0.225, H2 + 2, 3, 3),
+  ];
+  const merged = mergeGeometries(parts);
+  if (!merged) throw new Error('merge failed');
+  const zone = new TraverseZone(
+    'holing',
+    'sidle',
+    [2 * H2, 1.25, 0.84],
+    new Vector3(0, 0.625, 0),
+    new Quaternion(),
+  );
+  return { collider: new BvhCollider(merged), zone };
+}
+
+/** Route 2's harness steering: while sidling, along the passage towards the first waypoint at least 1.5 m away and
+ * 0.5 m along it, the sign chosen once a zone (a player keeps going the way they entered the fissure); otherwise
+ * straight at the next waypoint, reached within 0.35 m. */
+function drive2(c: Controller, wps: Point[], seconds: number): { modes: Mode[]; reached: number } {
+  const dt = 1 / 60;
+  const modes: Mode[] = [c.mode];
+  let i = 0;
+  let yaw: number;
+  let sign = 1;
+  let signZone: TraverseZone | null = null;
+  for (let f = 0; f < seconds / dt && i < wps.length; f++) {
+    const [bx, bz] = wps[i]!;
+    const dx = bx - c.position.x;
+    const dz = bz - c.position.z;
+    if (Math.hypot(dx, dz) < 0.35) {
+      i++;
+      continue;
+    }
+    if (c.mode === 'sidle' && c.zone) {
+      const ax = c.zone.flatX;
+      const along = (k: number) => (wps[k]![0] - c.position.x) * ax.x + (wps[k]![1] - c.position.z) * ax.z;
+      let j = i;
+      while (
+        j < wps.length - 1 &&
+        (Math.hypot(wps[j]![0] - c.position.x, wps[j]![1] - c.position.z) < 1.5 || Math.abs(along(j)) < 0.5)
+      )
+        j++;
+      if (signZone !== c.zone) {
+        signZone = c.zone;
+        const a = along(j);
+        if (Math.abs(a) > 0.05) sign = Math.sign(a);
+      }
+      yaw = Math.atan2(-ax.x * sign, -ax.z * sign);
+    } else yaw = Math.atan2(-dx, -dz);
+    c.update(dt, wishFromInput(1, 0, yaw, false));
+    if (modes[modes.length - 1] !== c.mode) modes.push(c.mode);
+  }
+  return { modes, reached: i };
+}
+
+// The cave core's path through the holing, as the harness walks it: along the fissure east, out at the opening beside
+// it (local x 1.6, 0.5 m north), and on north-east.
+const HOLING_PATH: Point[] = [
+  [-1, 0],
+  [0, 0],
+  [1, 0],
+  [1.6, -0.5],
+  [1.6, -1.5],
+  [2.2, -2.4],
+  [3, -3.1],
+];
+
+describe('the sidle/walk flicker where the way on leaves a fissure through its open side (the East Holing, route 2)', () => {
+  it('leaves the fissure once and walks to the opening beside it, with no switching back and forth', () => {
+    const { collider, zone } = holing();
+    const c = new Controller(collider, {}, [zone]);
+    expect(c.place(new Vector3(-2, 0, 0), { mode: 'sidle', yaw: Math.PI / 2 })).toBe('sidle');
+    const { modes, reached } = drive2(c, HOLING_PATH, 60);
+    // Before the fix (measured on this world): 55 changes, sidle, walk, sidle, walk ... walk. Now one, sidle to walk.
+    expect(modes).toEqual(['sidle', 'walk']);
+    expect(reached).toBe(HOLING_PATH.length);
+  });
+
+  it('a walker who stepped out of the end still sidles back in along the passage', () => {
+    const { collider, zone } = holing();
+    const c = new Controller(collider, {}, [zone]);
+    c.place(new Vector3(1, 0, 0), { mode: 'sidle', yaw: Math.PI / 2 });
+    const east = wishFromInput(1, 0, -Math.PI / 2, false);
+    const west = wishFromInput(1, 0, Math.PI / 2, false);
+    for (let f = 0; f < 600 && c.mode === 'sidle'; f++) c.update(1 / 60, east);
+    expect(c.mode).toBe('walk');
+    for (let f = 0; f < 240 && c.mode === 'walk'; f++) c.update(1 / 60, west);
+    expect(c.mode).toBe('sidle');
+  });
+});

@@ -16,7 +16,9 @@ village this step writes, for every gate of the data file (`meshy_gates/undermer
   `Spawn_overworld_mouth_<gate>`, on the ground found by the collision after the step's own edits;
 - the terrain edits the data file names (`terrain`, kind `channel`: the Adit Gate's cutting): the render ground's
   vertices in the strip lowered to the cutting's floor, the collision's ground replaced inside a patch by the floor,
-  the walls, the parapets and the headwall.
+  the walls, the parapets and the headwall;
+- a gate's `kit.press` (the Old Rising's): a model whose own base stands over the walk's ground before the gate (the
+  broken trestle's snowy base over the pool) pressed under that ground in a box (press_model).
 
 After the pieces the exporter's own texture fit (fit_textures) runs again, so the file stays under its texture budget.
 Without --gates nothing here runs and the exporter writes the same bytes as before. The functions above the Blender
@@ -396,21 +398,96 @@ def build_notch(kit: Kit, g: dict, ground):
     kit.lamp(g["lamp"])
 
 
+def _lumps(a: float, b: float, seed: float) -> float:
+    """A smooth, repeatable 0..1 field over a face (a, b in metres): the rock face's bulges and its broken top."""
+    return (0.5 + 0.25 * math.sin(1.9 * a + 0.7 * seed) * math.cos(1.3 * b + 1.3 * seed)
+            + 0.25 * math.sin(0.9 * a - 1.7 * b + seed))
+
+
 def build_slot(kit: Kit, g: dict, ground):
-    """The Cutting Gate: a slot in the face of cliff:024 (its render face 31.55 to 31.90 m east, measured): the ink
-    panel just in front of the face, frost-rimmed trims round it, a timber-and-iron railway grille, ice on its floor
-    and one small lamp on the right post."""
+    """The Cutting Gate: a slot blasted in the cutting's rock face (cliff:024, whose model the export's steep snow
+    face covers, its render face 31.55 to 31.90 m east and the snow face's 31.5 to 32.0, measured). The face is drawn
+    in front of that snow: a broken wall of the rock scan as wide as the cliff model, bulging out of its plane by up to
+    `face.bulge` metres away from the slot, its top ragged, its ends and top turned back into the slope (snow on the
+    top). The slot is cut in it with frost-rimmed reveals and a soffit, the ink panel at its back, a timber-and-iron
+    railway grille in front, ice on its floor and one small lamp on the right. The face is a wall in the collision."""
     w, h = g["opening"]
     k = g["kit"]
     hw = w / 2
-    tw, tb = k["trim_w"], k["trim_back"]
+    tb = k["trim_back"]
     py = k["panel_ly"]
+    fc = k["face"]
+    W, ly0, bulge, back = fc["half_w"], fc["ly"], fc["bulge"], fc["back"]
     frost = (1.25, 1.32, 1.4)
+    tint = tuple(fc.get("tint", (1.0, 1.0, 1.0)))
+    xs_side = list(fc["cols"])                   # |lx| of the column lines beside the slot, from the slot outwards
+    zs = list(fc["rows"])                        # lz of the row lines, from below the snow up to under the top
+
+    taper, jz = float(fc.get("taper", 0.0)), float(fc.get("row_jag", 0.0))
+    flat = float(fc.get("flat_m", 0.4))           # the bulges grow over this far from the slot's edges (the lamp)
+
+    def top(lx):
+        # ragged, and lower towards the ends, where the face goes under the snow of the slope
+        end = max(0.0, abs(lx) - (W - 1.2)) / 1.2
+        return fc["top"] + fc["top_jag"] * (_lumps(lx, 0.0, 3.0) - 0.5) * 2.0 - taper * end
+
+    def face_ly(lx, lz):
+        # flat at the slot's edges (its reveals meet it there), bulging further out
+        f = min(1.0, max(0.0, max(abs(lx) - hw, lz - h) / flat))
+        return ly0 - bulge * f * _lumps(lx, lz, 1.0 if lx < 0 else 2.0)
+
+    ends = float(fc.get("end_jag", 0.0))
+
+    def P(lx, lz):
+        if abs(abs(lx) - W) < 1e-6:
+            # the ends wander in and out with the height: a broken edge, not a cut one
+            lx = math.copysign(W + ends * (_lumps(lz, lx, 5.0) - 0.5) * 2.0, lx)
+        return (lx, face_ly(lx, lz), lz)
+
+    def row_z(lx, j):
+        # the inner row lines wander (the beds of the rock), the lowest stays under the snow
+        z = zs[j]
+        if 0 < j and abs(lx) > hw + 1e-6:
+            z += jz * (_lumps(lx, float(j), 4.0) - 0.5) * 2.0
+        return z
+
     kit.grid((-hw, py, -0.1), (1, 0, 0), (0, 0, 1), w, h + 0.1, "white", step=0.65, kind="panel")
+    # the face beside the slot, column by column (its top ragged), and over the slot
     for sx in (-1, 1):
-        x0, x1 = (-hw - tw, -hw) if sx < 0 else (hw, hw + tw)
-        kit.box((x0, -0.04, -0.1), (x1, tb, h), "rock", frost, skip=("+y", "-z", "+z"), step=1.0)
-    kit.box((-hw - tw, -0.06, h), (hw + tw, tb, h + 0.22), "rock", frost, skip=("+y",), step=1.0)
+        cols = [sx * hw] + [sx * c for c in xs_side] + [sx * W]
+        for i in range(len(cols) - 1):
+            xa, xb = (cols[i], cols[i + 1]) if sx > 0 else (cols[i + 1], cols[i])
+            za = [row_z(xa, j) for j in range(len(zs))] + [top(xa)]
+            zb = [row_z(xb, j) for j in range(len(zs))] + [top(xb)]
+            for j in range(len(zs)):
+                q = [P(xa, za[j]), P(xb, zb[j]), P(xb, zb[j + 1]), P(xa, za[j + 1])]
+                kit.quad(q, "rock", tint, st=[(p[0], p[2]) for p in q])
+    over = [-hw, 0.0, hw]
+    for i in range(len(over) - 1):
+        xa, xb = over[i], over[i + 1]
+        q = [P(xa, h), P(xb, h), P(xb, top(xb)), P(xa, top(xa))]
+        kit.quad(q, "rock", tint, st=[(p[0], p[2]) for p in q])
+    # the top turned back into the slope, with snow on it, and the two ends
+    tops = sorted(set([-W, W, -hw, hw, 0.0] + [c for c in xs_side] + [-c for c in xs_side]))
+    for xa, xb in zip(tops, tops[1:]):
+        ta, tb_ = top(xa), top(xb)
+        pa, pb = P(xa, ta), P(xb, tb_)
+        q = [pa, pb, (pb[0], back, tb_), (pa[0], back, ta)]
+        kit.quad(q, "snow", (1.0, 1.0, 1.0), st=[(p[0], p[1]) for p in q])
+    for sx in (-1, 1):
+        zz = [row_z(sx * W, j) for j in range(len(zs))] + [top(sx * W)]
+        for j in range(len(zs)):
+            a0, a1 = P(sx * W, zz[j]), P(sx * W, zz[j + 1])
+            b0, b1 = (a0[0], back, zz[j]), (a1[0], back, zz[j + 1])
+            q = [b0, a0, a1, b1]
+            if sx > 0:
+                q = [a0, b0, b1, a1]
+            kit.quad(q, "rock", tint, st=[(p[1], p[2]) for p in q])
+    # the slot's reveals and soffit, frost on their edges
+    la = tb - ly0
+    kit.grid((-hw, ly0, -0.1), (0, 1, 0), (0, 0, 1), la, h + 0.1, "rock", frost, step=1.0)
+    kit.grid((hw, tb, -0.1), (0, -1, 0), (0, 0, 1), la, h + 0.1, "rock", frost, step=1.0)
+    kit.grid((-hw, tb, h), (1, 0, 0), (0, -1, 0), w, la, "rock", frost, step=1.0)
     # timber posts and head beam, iron bars between
     for sx in (-1, 1):
         x = sx * (hw + 0.02)
@@ -422,22 +499,28 @@ def build_slot(kit: Kit, g: dict, ground):
     for z in (0.18, 1.35, h - 0.1):
         kit.bar_h(-hw, hw, -0.11, z, t=0.045, d=0.02)
     kit.coll_boxes.append(((-hw - 0.08, -0.2, -0.3), (hw + 0.08, 0.06, h + 0.22)))
-    # hoarfrost fins on the trims' inner edges and ice on the floor
+    # the face as a wall either side of the slot (the walker stays out of its bulges' reach)
+    lo_z, hi_z = zs[0], fc["top"] - fc["top_jag"]
+    kit.coll_boxes.append(((-W, ly0 - 0.02, lo_z), (-hw - 0.08, back, hi_z)))
+    kit.coll_boxes.append(((hw + 0.08, ly0 - 0.02, lo_z), (W, back, hi_z)))
+    # hoarfrost fins on the reveals' front edges and ice on the floor
     rng = np.random.default_rng(24)
     for i in range(k.get("frost_fins", 0)):
         sx = -1 if i % 2 == 0 else 1
         z = 0.25 + (h - 0.5) * (i // 2) / max(1, k["frost_fins"] // 2 - 1)
         x = sx * hw
         d = -sx * float(rng.uniform(0.05, 0.1))
-        kit.quad([(x, -0.03, z), (x + d, -0.01, z + 0.05), (x + d, -0.01, z + 0.14), (x, -0.03, z + 0.2)], "snow",
-                 (1.1, 1.12, 1.15), st=[(0, 0), (0.1, 0.05), (0.1, 0.14), (0, 0.2)])
+        kit.quad([(x, ly0 + 0.01, z), (x + d, ly0 + 0.03, z + 0.05), (x + d, ly0 + 0.03, z + 0.14),
+                  (x, ly0 + 0.01, z + 0.2)], "snow", (1.1, 1.12, 1.15), st=[(0, 0), (0.1, 0.05), (0.1, 0.14), (0, 0.2)])
     kit.box((-hw, -0.22, -0.06), (hw, py, 0.0), "ice", skip=("-z", "+y", "-x", "+x"), step=10.0)
     kit.lamp(g["lamp"])
 
 
 def build_arch(kit: Kit, g: dict, ground):
-    """The Old Rising Gate: a broad arch of limestone blocks at the cliff's foot, the ink panel arched under it, a
-    grille across it with a narrow iron door at its middle, an icicle fringe, rough steps up the bank."""
+    """The Old Rising Gate: a broad arch of limestone blocks at the cliff's foot (its jambs down to `jamb_foot`, under
+    the pool's floor), the ink panel arched under it, a grille across it with a narrow iron door at its middle, an
+    icicle fringe, a stone landing across its foot at the grille and stone steps from the pool's floor up to it, every
+    riser the same (the portal stands on the landing; `press` clears the trestle's base off the steps)."""
     w, h = g["opening"]
     k = g["kit"]
     hw = w / 2
@@ -451,9 +534,10 @@ def build_arch(kit: Kit, g: dict, ground):
 
     kit.grid((-hw, 0.05, -0.05), (1, 0, 0), (0, 0, 1), w, h + 0.05, "white", step=0.75, kind="panel",
              top_fn=lambda s: top(s) + 0.05)
+    foot = float(k.get("jamb_foot", -0.3))
     for sx in (-1, 1):
         x0, x1 = (-hw - jw, -hw) if sx < 0 else (hw, hw + jw)
-        kit.box((x0, -0.35, -0.3), (x1, 1.2, spring + 0.2), "rock", skip=("+y", "-z"), step=1.2, collide=True)
+        kit.box((x0, -0.35, foot), (x1, 1.2, spring + 0.2), "rock", skip=("+y", "-z"), step=1.2, collide=True)
     # the arch ring: blocks round the curve, each a box turned to the curve's normal
     nb = 7
     for i in range(nb):
@@ -489,14 +573,25 @@ def build_arch(kit: Kit, g: dict, ground):
         a = math.pi * (i + 0.5) / k["icicles"]
         x, z = -hw * math.cos(a), spring + rise * math.sin(a)
         kit.icicle(x, -0.3, z + 0.02, float(rng.uniform(0.15, 0.55)), r=0.04)
-    # rough steps up the bank from the walk's ground to the ledge
+    # stone steps from the pool's floor up to a landing at the grille's door: the landing a hair over the ledge, then
+    # `steps` - 1 treads of `tread` metres down to the floor, every riser the same; each a block from its front to the
+    # next one's, snow on its tread, its sides and front in the rock
     z_lo = k["steps_from"] - kit.O[2]
-    ns = k["steps"]
-    for i in range(ns):
-        ztop = z_lo + (i + 1) * (-z_lo) / ns
-        y0 = -0.65 + 0.15 * i
-        kit.box((-dw - 0.25, y0, z_lo - 0.2), (dw + 0.25, -0.05, ztop), "rock", (0.85, 0.85, 0.85),
-                skip=("-z", "+y"), step=10.0, collide=True)
+    ns = int(k["steps"])
+    sw = float(k.get("step_half_w", dw + 0.25))
+    l0, l1 = k.get("landing", [-0.65, -0.05])
+    tread = float(k.get("tread", 0.15))
+    land = 0.03
+    rise = (land - z_lo) / ns
+    stone = (0.85, 0.85, 0.85)
+    lw = float(k.get("landing_half_w", sw))
+    kit.box((-lw, l0, z_lo - 0.3), (lw, l1, land), "rock", stone, skip=("-z", "+y"), step=10.0, collide=True,
+            top="snow")
+    for i in range(1, ns):
+        kit.box((-sw, l0 - i * tread, z_lo - 0.3), (sw, l0 - (i - 1) * tread, land - i * rise), "rock", stone,
+                skip=("-z", "+y"), step=10.0, collide=True, top="snow")
+    kit.steps = dict(risers=ns, riser_m=round(rise, 3), tread_m=tread, landing_z=round(float(kit.O[2]) + land, 3),
+                     foot_ly=round(l0 - (ns - 1) * tread, 3), half_w=sw, landing_half_w=lw)
     kit.lamp(g["lamp"])
 
 
@@ -681,12 +776,14 @@ def guard_texels(L: np.ndarray, ratio: np.ndarray) -> np.ndarray:
     return L
 
 
-def guard_light(c: np.ndarray, alb: np.ndarray) -> np.ndarray:
+def guard_light(c: np.ndarray, alb: np.ndarray, margin: float = 0.0) -> np.ndarray:
     """No lilac or magenta and no teal cast: what the eye gets (albedo x light) keeps its green between its red and its
-    blue (the cave builder's guard_display), the light changed to suit."""
+    blue (the cave builder's guard_display), the light changed to suit; with `margin`, at least that share over the
+    lesser of the two where there is room (a green level with them leaves the scan's texels and the tone map half on
+    the lilac side)."""
     d = c * alb
     lo, hi = np.minimum(d[:, 0], d[:, 2]), np.maximum(d[:, 0], d[:, 2])
-    g = np.clip(d[:, 1], lo, hi)
+    g = np.clip(d[:, 1], np.minimum(lo * (1.0 + margin), hi), hi)
     c = c.copy()
     c[:, 1] = g / np.maximum(alb[:, 1], 1e-6)
     return c
@@ -882,6 +979,54 @@ def lower_render_ground(row: dict, log) -> dict:
     return out
 
 
+def press_model(spec: dict, ground_bvh, log) -> dict:
+    """A model whose own base stands over the walk's ground (the broken trestle's snowy base over the Old Rising's
+    pool): inside `box_m`, with a linear fade `fade_m` wide round it, its vertices under `below_z` (fading out over
+    `fade_z` above it) go down under the ground the collision has there, by `under_ground_m`, their order kept (a
+    base's top stays over its bottom). The model's mesh must be its own (one user). Returns the count and the drop."""
+    o = bpy.data.objects.get(spec["object"])
+    if o is None or o.type != "MESH":
+        log("gates: press: no mesh", spec["object"])
+        return dict(object=spec["object"], moved=0)
+    me = o.data
+    if me.users > 1:
+        raise RuntimeError(f"gates: press: {o.name}'s mesh {me.name} has {me.users} users")
+    x0, y0, x1, y1 = spec["box_m"]
+    fade, bz, fz, under = float(spec["fade_m"]), float(spec["below_z"]), float(spec["fade_z"]), float(spec["under_ground_m"])
+    M = np.array(o.matrix_world)
+    Mi = np.linalg.inv(M)
+    co = np.empty(len(me.vertices) * 3)
+    me.vertices.foreach_get("co", co)
+    co = co.reshape(-1, 3)
+    W = co @ M[:3, :3].T + M[:3, 3]
+    moved, drop = 0, 0.0
+    for i in range(len(W)):
+        x, y, z = W[i]
+        dx = max(x0 - x, 0.0, x - x1)
+        dy = max(y0 - y, 0.0, y - y1)
+        wxy = 1.0 - math.hypot(dx, dy) / fade
+        wz = min(1.0, max(0.0, (bz + fz - z) / fz))
+        if wxy <= 0.0 or wz <= 0.0:
+            continue
+        h = ground_bvh.ray_cast(Vector((x, y, z + 0.05)), Vector((0.0, 0.0, -1.0)), 40.0)
+        if h[0] is None:
+            continue
+        g = float(h[0].z)
+        # the base's height over its own bottom (9.7 there) kept as a few centimetres under the ground
+        target = g - under - 0.05 * (1.0 - min(1.0, max(0.0, (z - g) / 1.8)))
+        if target >= z:
+            continue
+        nz = z + wxy * wz * (target - z)
+        drop = max(drop, z - nz)
+        W[i, 2] = nz
+        moved += 1
+    L = (np.c_[W, np.ones(len(W))] @ Mi.T)[:, :3]
+    me.vertices.foreach_set("co", L.ravel())
+    me.update()
+    log("gates: pressed", o.name, moved, "vertices, at most", round(drop, 2), "m")
+    return dict(object=o.name, mesh=me.name, moved=moved, max_drop_m=round(drop, 2), box_m=spec["box_m"])
+
+
 def collision_patch(coll, row: dict, kit: Kit, g: dict, log) -> dict:
     """Inside the row's collision_patch_m (on the collision's own 1 m grid) the collision's faces are taken out and a
     heightfield put in: the original ground outside the walls (bilinear in the 1 m grid, so its edges meet the faces
@@ -1031,6 +1176,10 @@ def add_gates(X, path: str, env: dict) -> dict:
         grounds[g["id"]] = _ground_fn(rg if rg is not None else coll_bvh0)
     for t in D.get("terrain", []):
         rep["terrain"][t["key"]] = dict(render=lower_render_ground(t, log), slope_deg=round(channel_slope_deg(t), 2))
+    # a model's base pressed under the walk's ground where a gate's approach crosses it (the collision as it was)
+    for g in D["gates"]:
+        if g.get("kit", {}).get("press"):
+            rep.setdefault("pressed", {})[g["id"]] = press_model(g["kit"]["press"], coll_bvh0, log)
     img, means, lows, pinks = _atlas(D["atlas"]["cells"], int(D["atlas"]["px"]), log)
     mat = _material(img)
     kits = []
@@ -1050,6 +1199,8 @@ def add_gates(X, path: str, env: dict) -> dict:
             row = terrain[g["kit"]["cutting"]]
             info["cutting"] = build_adit(kit, g, ground, row, coll_bvh0)
             info["collision_patch"] = collision_patch(coll, row, kit, g, log)
+        if getattr(kit, "steps", None):
+            info["steps"] = kit.steps
         kits.append((g, kit, info))
     # the kits' collision: boxes in their frames, into HM_Collision
     bm = bmesh.new()
@@ -1103,7 +1254,7 @@ def add_gates(X, path: str, env: dict) -> dict:
         C = light_at(P, N, Lk, lights + [lamp], ao) * T
         # the ink floor on the cell's darkest texels, then the lilac guards (the mean surface and the pinkest texels)
         C = np.maximum(C, ink_lin / np.maximum(cell_low, 1e-4))
-        C = guard_light(C, cell_alb)
+        C = guard_light(C, cell_alb, float(lk.get("green_margin", 0.0)))
         C = guard_texels(C, cell_pink)
         offs = np.cumsum([0] + [len(p) for p in kit.P])
         for qi, kd in enumerate(kit.K):

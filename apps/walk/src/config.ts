@@ -101,6 +101,11 @@ export const SIDLE = {
    * radians (30 degrees): where a fissure opens at an angle into walking space, the way on leaves it beside the box,
    * and a walker on that way no longer sidles and walks by turns (route 1, the Ice Curtain: 26 changes). */
   reentryAngle: Math.PI / 6,
+  /** ... and on a line that stays within the box's width until it is this far in from that end, metres (the whole
+   * box if it is shorter): a heading inside the angle that leaves the box's side sooner goes to an opening beside the
+   * passage, not into it (route 2, the East Holing, where the way on leaves the fissure through its open side 1 m
+   * before the box's end: 62 changes). */
+  reentryDepth: 1,
   /** ... until the feet are this far clear of the box with its end margins, metres; from there it is entered as
    * always, through an end or a side. */
   reentryClear: 0.15,

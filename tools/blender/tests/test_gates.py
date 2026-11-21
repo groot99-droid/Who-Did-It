@@ -52,8 +52,14 @@ class DataFile(unittest.TestCase):
             dg = design[g["id"]]
             self.assertEqual(g["cave_area"], dg["cave_area"])
             self.assertEqual(g["mouth"], dg["mouth"])
-            self.assertEqual(g["portal"]["xy"], dg["village_side"]["portal"]["at"][:2])
-            self.assertEqual(g["arrival"]["xy"], dg["village_side"]["arrival"]["at"][:2])
+            # a point may depart from the design's only with the design's own point and a reason beside it
+            for k in ("portal", "arrival"):
+                at = dg["village_side"][k]["at"][:2]
+                if "design_xy" in g[k]:
+                    self.assertEqual(g[k]["design_xy"], at, (g["id"], k))
+                    self.assertTrue(g[k].get("departure"), (g["id"], k))
+                else:
+                    self.assertEqual(g[k]["xy"], at, (g["id"], k))
             self.assertEqual(g["arrival"]["facing_deg"], dg["village_side"]["arrival"]["facing_deg"])
             self.assertEqual(g["cave_side"]["portal_at"], dg["cave_side"]["portal"]["at"])
             self.assertEqual(g["cave_side"]["arrival_at"], dg["cave_side"]["arrival"]["at"])

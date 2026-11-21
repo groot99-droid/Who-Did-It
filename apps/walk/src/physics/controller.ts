@@ -340,7 +340,7 @@ export class Controller {
     for (const zone of this.zones) {
       if (zone.kind !== 'sidle' || !zone.contains(at, TRAVERSE.endMargin)) continue;
       const left = this.leftEnd;
-      if (left?.zone === zone && this.mode === 'walk' && !headsIn(left.end, zone, wish)) continue;
+      if (left?.zone === zone && this.mode === 'walk' && !headsIn(left.end, zone, wish, at)) continue;
       return zone;
     }
     return null;
@@ -609,13 +609,23 @@ export class Controller {
   }
 }
 
-/** Input into a sidle passage through its end `end` (the sign of that end's local x): within `SIDLE.reentryAngle`
- * of the box's axis, towards its other end. */
-function headsIn(end: 1 | -1, zone: TraverseZone, wish: Wish): boolean {
+/** Input into a sidle passage through its end `end` (the sign of that end's local x) from the feet at `at`: within
+ * `SIDLE.reentryAngle` of the box's axis, towards its other end, and on a line that stays within the box's width until
+ * it is `SIDLE.reentryDepth` metres in from that end (or at the far end of a shorter box). A heading inside the angle
+ * that leaves the box's side sooner goes past the passage, to an opening beside it, not into it. */
+function headsIn(end: 1 | -1, zone: TraverseZone, wish: Wish, at: Vector3): boolean {
   const len = Math.hypot(wish.x, wish.z);
   if (len < 1e-3) return false;
-  const inward = (-end * (wish.x * zone.flatX.x + wish.z * zone.flatX.z)) / len;
-  return inward >= Math.cos(SIDLE.reentryAngle) - 1e-9;
+  const dx = (wish.x * zone.flatX.x + wish.z * zone.flatX.z) / len;
+  const inward = -end * dx;
+  if (inward < Math.cos(SIDLE.reentryAngle) - 1e-9) return false;
+  const l = zone.toLocal(at, LOCAL);
+  const h = zone.half;
+  // How far the line runs along the axis to the depth, then where it is across the passage there.
+  const run = end * l.x - Math.max(h.x - SIDLE.reentryDepth, -h.x);
+  if (run <= 0) return true;
+  const dz = (wish.x * zone.flatZ.x + wish.z * zone.flatZ.z) / len;
+  return Math.abs(l.z + (dz * run) / inward) <= h.z + TRAVERSE.edge;
 }
 
 /**
