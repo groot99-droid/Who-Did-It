@@ -174,6 +174,17 @@ class CaveBuildTest(unittest.TestCase):
         self.assertEqual(G[2, 1], 0.7)   # warm: as it was
         self.assertEqual(cb.lilac_share(G), 0.0)
         self.assertGreater(cb.lilac_share(np.array([[0.5, 0.3, 0.5]])), 0.0)
+        # a pink texel (red 1.3 x its green, blue 1.05 x) under a warm and moon mix: lilac until the texel guard
+        q = np.array([[1.3, 1.05], [1.3, 1.05]])
+        L = np.array([[0.40, 0.45, 0.60], [0.21, 0.39, 1.0]])
+        tex = np.array([1.3, 1.0, 1.05])
+        self.assertGreater(cb.lilac_share(L[:1] * tex), 0.0)
+        Lg = cb.guard_texels(L, q)
+        self.assertEqual(cb.lilac_share(Lg * tex), 0.0)
+        np.testing.assert_allclose(Lg[1], L[1])                      # pure moonlight is left as it is
+        self.assertAlmostEqual(Lg[0, 1], L[0, 1])                     # the green is kept,
+        self.assertLess(Lg[0, 2], L[0, 2])                            # the blue comes down
+        self.assertLessEqual(Lg[0, 1], max(Lg[0, 0], Lg[0, 2]) + 1e-12)   # and the light never turns green
 
     def test_budgets(self):
         b = cb.budgets({"file_mb": 3.1, "triangles_loaded": 1600000, "draw_calls": 44, "texture_gpu_mb": None})
@@ -187,6 +198,80 @@ class CaveBuildTest(unittest.TestCase):
         w = cb.seam_width(sec, sm)
         self.assertGreater(w, 1.2)    # the Lake Arch: a crawl 1.5 m wide
         self.assertLess(w, 1.8)
+
+    def test_gate_iron_reads_dark_and_warm(self):
+        """The grille's light: never under the ink, never over the cap however hot the lamp beside it, warm where
+        the lamp gives the light and grey (not the sky's blue) where it does not."""
+        import meshy_room_build as rb
+        lk = self.look
+        ink_t = 21.35 / 255.0
+        L = np.array([[0.0, 0.0, 0.0], [0.02, 0.02, 0.02], [5.0, 3.0, 1.0], [400.0, 250.0, 90.0], [0.2, 0.3, 0.9]])
+        share = np.array([0.0, 0.0, 1.0, 1.0, 0.0])
+        col = cb.iron_display(L, share, 33.6, lk, ink_t, rb.agx, rb.solve_display, rb.lum)
+        d = rb.agx(col * lk["wdi_exposure"])
+        luma = rb.lum(d)
+        self.assertTrue(np.all(luma >= ink_t - 1e-3))
+        self.assertTrue(np.all(luma <= lk["iron_display"]["cap"] + 1e-3))
+        self.assertGreater(d[3, 0], d[3, 2] + 0.03)                 # lamp-lit: warm
+        self.assertLessEqual(d[4, 2], d[4, 0] + 1e-6)               # sky-lit: the iron's grey, not blue
+        self.assertEqual(cb.lilac_share(d), 0.0)
+        glass = rb.agx(np.array([lk["lamp"]["glass_emit"]]) * lk["wdi_exposure"])[0]
+        self.assertGreater(glass[0], glass[2] + 0.2)                 # the lamp's glass reads warm, not grey
+
+    def test_mouth_frame_both_gates(self):
+        sw = cb.mouth_frame([-59.5, -22.1, -0.6, -55.5, -18.1, 3.4], [-57.5, -19.65, -0.1],
+                            [[-58.4, -20.1], [-56.6, -20.1]])
+        self.assertEqual((sw["axis"], sw["sign"]), (1, -1.0))     # the Swallow faces south (-y)
+        self.assertAlmostEqual(sw["plane"], -22.3)
+        cu = cb.mouth_frame([30.0, 134.5, -0.05, 34.5, 138.5, 3.95], [31.55, 136.5, 0.45],
+                            [[32.0, 135.8], [32.0, 137.2]])
+        self.assertEqual((cu["axis"], cu["sign"]), (0, 1.0))      # the Cutting faces east (+x)
+        self.assertAlmostEqual(cu["plane"], 34.7)
+        self.assertEqual(cu["u"], (131.5, 141.5))
+
+    def test_mouth_kit_and_its_boxes(self):
+        kits = self.look["kits"]
+        self.assertEqual(cb.mouth_kit_name(kits, {"type": "notch"}), "mouth")
+        self.assertEqual(cb.mouth_kit_name(kits, {"type": "cliff_slot"}), "mouth_cliff_slot")
+        self.assertEqual(cb.mouth_kit_name(kits, None), "mouth")
+        b = [-59.5, -22.1, -0.6, -55.5, -18.1, 3.4]
+        sw = cb.mouth_frame(b, [-57.5, -19.65, -0.1], [[-58.4, -20.1], [-56.6, -20.1]])
+        # the Swallow's: as before, now that the mouth faces along its own axis
+        self.assertEqual(cb.mouth_kit_boxes(b, sw),
+                         [b[0] - 1.0, b[1] - 0.5, b[2] - 0.5, b[3] + 1.0, b[4] + 2.5, b[5] + 0.5])
+        cbx = [30.0, 134.5, -0.05, 34.5, 138.5, 3.95]
+        cu = cb.mouth_frame(cbx, [31.55, 136.5, 0.45], [[32.0, 135.8], [32.0, 137.2]])
+        self.assertEqual(cb.mouth_kit_boxes(cbx, cu), [27.5, 133.5, -0.55, 35.0, 139.5, 4.45])  # into the cave: -x
+
+    def test_outcrop_strips_cover_the_rock_only(self):
+        us, zs = np.arange(0.0, 3.01, 0.125), np.arange(0.0, 2.01, 0.125)
+        rock = np.ones((len(us) - 1, len(zs) - 1), bool)
+        rock[8:12, 4:10] = False                                    # the hole
+        q = cb.outcrop_strips(rock, us, zs)
+        area = sum((u1 - u0) * (z1 - z0) for u0, u1, z0, z1 in q)
+        self.assertAlmostEqual(area, rock.sum() * 0.125 ** 2)
+        self.assertTrue(all(u1 - u0 <= 8 * 0.125 + 1e-9 for u0, u1, _, _ in q))
+        self.assertLess(len(q), rock.sum() / 4)
+        V = np.array([[0, 0, 0], [1, 0, 0], [1, 0, 1]], float)
+        F = cb.facing(V, [(0, 1, 2)], (0, 1, 0))
+        n = np.cross(V[F[0, 1]] - V[F[0, 0]], V[F[0, 2]] - V[F[0, 0]])
+        self.assertGreater(n[1], 0)
+
+    def test_colour_kept_when_a_channel_passes_one(self):
+        c0 = np.array([[3.0, 2.0, 1.0], [0.2, 0.3, 0.4], [0.5, 0.8, 1.6]])
+        out, f, n = cb.unit_colour(c0)
+        self.assertEqual(n, 2)
+        self.assertTrue(np.all(out <= 1.0 + 1e-12))
+        np.testing.assert_allclose(out[1], c0[1])                      # under 1: untouched
+        np.testing.assert_allclose(out[0] / out[0].max(), c0[0] / c0[0].max())   # the hue is kept, not clipped
+        np.testing.assert_allclose(out, c0 * f[:, None])
+
+    def test_timber_has_its_own_hot_cap(self):
+        k_t, m_t = cb.hot_of("um_ice_timber", self.look)
+        k_r, m_r = cb.hot_of("um_ice_chunk_10_14_3", self.look)
+        self.assertEqual((k_r, m_r), (self.look["hot"]["knee"], self.look["hot"]["max"]))
+        self.assertLess(m_t, m_r)
+        self.assertLess(k_t, m_t)
 
 
 if __name__ == "__main__":

@@ -18,7 +18,10 @@
     "colour": "#FFB457",
     "watts": 30.0,
     "radius_m": 0.05,
-    "glass_display": "#FFD9A0"
+    "glass_display": "#FFD9A0",
+    "glass_emit": [1.0, 0.2, 0.0],
+    "iron_emit": [0.01504, 0.01074, 0.0075],
+    "about_emit": "COLOR_0-free emitters (linear, at most 1): the glass shows #F0B481 and the lamp's iron cap, base and bracket #382C22 through the viewer's exposure and AgX (route 1: the P0 glass at glass_display read as a flat grey box)"
   },
   "sky": {
     "colour": "#7FA8FF",
@@ -57,7 +60,9 @@
   },
   "hot": {
     "knee": 0.62,
-    "max": 0.8
+    "max": 0.8,
+    "timber": { "knee": 0.3, "max": 0.38 },
+    "about": "display luminance over knee is eased towards max; timber (the guards' rails and the gates' railway timbers, creosoted) has its own lower knee and max, as the grille has its iron cap (route 1 fix: the Cutting Gate's centre post 0.3 m under the lamp read as a cream bar)"
   },
   "cycles": {
     "samples": 384,
@@ -71,9 +76,17 @@
     "flowstone": { "wall": "seaside_rock", "floor": "seaside_rock" },
     "default": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
     "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
+    "ice": { "wall": "snow_02", "floor": "snow_03" },
+    "mouth_cliff_slot": { "wall": "rock_wall_08", "floor": "snow_03" },
     "snow": "snow_02",
     "timber": "weathered_planks"
   },
   "iron": "#2D2C2A",
+  "iron_display": {
+    "cap": 0.3,
+    "warm": 0.5,
+    "ink_margin": 1.12,
+    "about": "a gate's grille: display luminance held between ink_margin x the ink and cap, its hue the iron's grey warmed towards the lamp's colour by up to warm where the lamp gives the light (route 1: the P0 bars read cream in a saturated blue frame)"
+  },
   "floor_normal_z": 0.7
 }

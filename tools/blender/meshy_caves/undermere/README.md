@@ -8,6 +8,7 @@ Rising Gate in the East Hills) and 30 forced moves (8 crawls, 7 sidles, 15 climb
   All 16 pass `python tools/blender/meshy_cave_core.py validate tools/blender/meshy_caves/undermere/<key>.json`.
 - `design.json` is the full network design they were written from: geology, seams, routes, gates, guards, costs.
 
-The owner accepted the design's five calls on 2026-11-20. `swallow` and `gallery` build clean (closed shells, no traps,
-every forced move mandatory) and are built in Blender by `../../meshy_cave_build.py`; the other sections still need
-the same fixes (the Spar Maze's wall-walking falls among them).
+The owner accepted the design's five calls on 2026-11-20. Route 1, from the Swallow Gate to the Cutting Gate, builds
+clean (closed shells, no traps, no undesigned reach, no unguarded drops, every forced move mandatory): `swallow`,
+`gallery`, `well`, `north` and `ice`, built in Blender by `../../meshy_cave_build.py`. The other eleven sections still
+need the same fixes (the Spar Maze's wall-walking falls among them).

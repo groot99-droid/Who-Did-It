@@ -122,12 +122,17 @@ def walk_region(sec_d: dict, points: list) -> list:
 
 
 def seam_width(sec, sm: dict) -> float:
-    """The passage's width where the seam wall closes it: the air across the plane at 0.5 m over the portal's floor
-    (or at half the window's height when that is lower), from the core's field."""
+    """The passage's width where the seam wall closes it: the air across the plane at 0.5 m over the floor on the
+    plane (or at half the window's height when that is lower), from the core's field. Everything it reads is the
+    seam's own (the plane, the window, the portal's place along the plane), so both files of a seam measure the
+    same width, also on a ramp, where their portals stand at different heights."""
     ax = 0 if sm["plane"]["axis"] == "x" else 1
     at = float(sm["plane"]["at"])
     u0, z0, u1, z1 = (float(v) for v in sm["window"])
-    pz = float(sm["portal"][2])
+    pu_ = float(sm["portal"][1 - ax])
+    q = (at, pu_) if ax == 0 else (pu_, at)
+    fl, _ = sec.column(q[0], q[1], z0 + 0.3, zlo=z0 - 1.0, zhi=z1 + 1.0)
+    pz = round(fl, 2) if fl is not None else float(sm["portal"][2])
     zz = min(pz + 0.5, 0.5 * (z0 + z1))
     us = np.arange(u0, u1 + 1e-9, 0.01)
     P = np.zeros((len(us), 3))
@@ -273,9 +278,10 @@ def fill_points(sec_d: dict, look: dict) -> list:
 
 
 def face_materials(V: np.ndarray, F: np.ndarray, geo: np.ndarray, geo_names: list, kits: dict, floor_nz: float,
-                   mouth_boxes: list) -> tuple:
-    """Each face's material key, '<kit>_<wall|floor>': its geology's kit, the mouth kit inside a gate's mouth boxes,
-    floor where the face looks up more than floor_nz. Returns (keys list, per-face index array)."""
+                   mouth_boxes: list, mouth_kit: str = "mouth") -> tuple:
+    """Each face's material key, '<kit>_<wall|floor>': its geology's kit, the mouth kit (`mouth_kit`) inside a
+    gate's mouth boxes, floor where the face looks up more than floor_nz. Returns (keys list, per-face index
+    array)."""
     a, b, c = V[F[:, 0]], V[F[:, 1]], V[F[:, 2]]
     n = np.cross(b - a, c - a)
     nz = n[:, 2] / np.maximum(np.linalg.norm(n, axis=1), 1e-12)
@@ -284,7 +290,7 @@ def face_materials(V: np.ndarray, F: np.ndarray, geo: np.ndarray, geo_names: lis
     cen = (a + b + c) / 3.0
     for bx in mouth_boxes:
         m = np.all((cen >= np.array(bx[:3])) & (cen <= np.array(bx[3:])), axis=1)
-        kit = np.where(m, "mouth", kit)
+        kit = np.where(m, mouth_kit, kit)
     key = np.char.add(np.char.add(kit.astype(str), "_"), np.where(floor, "floor", "wall"))
     # a kit whose wall and floor are the same scan is one material
     same = {k for k, v in kits.items() if isinstance(v, dict) and v.get("wall") == v.get("floor")}
@@ -321,6 +327,24 @@ def guard_display(L: np.ndarray) -> np.ndarray:
     return L
 
 
+def guard_texels(L: np.ndarray, ratio: np.ndarray | None) -> np.ndarray:
+    """The lilac guard for the texels under a light (N x 3, linear): `ratio` (N x 2) is each vertex's pinkest and
+    bluest surface (red over green and blue over green of its kit's texels at the 98th percentile, its tint in).
+    Where such a texel would show lilac (red and blue both over green), the light's blue comes down to the green the
+    texel can take (and its red up to its green, so the light never turns green), so the light leans warm rather
+    than lilac (route 1 fix: the Cutting Gate's lamp and the moon together turned the slot's pinker texels lilac).
+    Pure moonlight on these kits is left as it is."""
+    L = np.array(L, dtype=np.float64)
+    if ratio is None:
+        return L
+    q = np.asarray(ratio, dtype=np.float64)
+    bad = (q[:, 0] * L[:, 0] > L[:, 1]) & (q[:, 1] * L[:, 2] > L[:, 1])
+    if bad.any():
+        L[bad, 2] = L[bad, 1] / np.maximum(q[bad, 1], 1e-9)
+        L[bad, 0] = np.maximum(L[bad, 0], L[bad, 1])   # and green stays under red: no green or teal cast either
+    return L
+
+
 def lilac_share(rgb_display: np.ndarray, margin: float = 0.004) -> float:
     """The share of display colours (0..1 sRGB) that read lilac or magenta: green under both red and blue."""
     d = np.asarray(rgb_display, dtype=np.float64)
@@ -339,6 +363,98 @@ def budgets(stats: dict) -> dict:
         if k in stats and stats[k] is not None:
             out[k] = {"value": stats[k], "target": lim, "ok": stats[k] <= lim}
     return out
+
+
+def iron_display(L: np.ndarray, lamp_share: np.ndarray, k: float, look: dict, ink_t: float, agx, solve, lum):
+    """A gate's iron (N x 3 COLOR_0, linear): dark iron under its light. The plain light (iron's albedo x the baked
+    light x the grade) sets each vertex's display luminance, held between just over the ink and the look's cap, so
+    the bars never read pale beside the lamp; the hue is the iron's grey, warmed towards the lamp's colour as far as
+    the lamp gives the light (the sky's blue is not carried: the bars read iron, not lit paint). agx, solve and lum
+    are meshy_room_build's (the viewer's AgX, the solve for a display luminance, the luminance)."""
+    we = float(look["wdi_exposure"])
+    cfg = look.get("iron_display", {})
+    cap, warm_max = float(cfg.get("cap", 0.3)), float(cfg.get("warm", 0.5))
+    base = hex_lin(look["iron"])
+    L = np.asarray(L, dtype=np.float64).reshape(-1, 3)
+    nat = lum(agx(we * k * L * base[None, :]))
+    t = np.clip(nat, ink_t * float(cfg.get("ink_margin", 1.12)), cap)
+    warm = hex_lin(look["lamp"]["colour"])
+    warm = warm / max(float(lum(warm[None, :])[0]), 1e-9)
+    grey = base / max(float(lum(base[None, :])[0]), 1e-9)
+    s = np.clip(np.asarray(lamp_share, dtype=np.float64).reshape(-1), 0.0, 1.0) * warm_max
+    hue = (1.0 - s)[:, None] * grey[None, :] + s[:, None] * warm[None, :]
+    sc = solve(hue * we, t)
+    return hue * sc[:, None]
+
+
+def facing(V: np.ndarray, F: np.ndarray, normal) -> np.ndarray:
+    """Faces F (M x 3) wound so their normals point along `normal`."""
+    V, F = np.asarray(V, dtype=np.float64), np.asarray(F, dtype=np.int64).copy()
+    n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+    flip = n @ np.asarray(normal, dtype=np.float64) < 0
+    F[flip] = F[flip][:, ::-1]
+    return F
+
+
+def mouth_frame(box, portal, grille) -> dict:
+    """A gate mouth's frame in plan: `out` the unit vector from the cave towards the world outside (from the portal
+    through the grille), the axis the mouth faces along (0 for x, 1 for y), the outcrop's plane coordinate on that
+    axis (0.2 m past the mouth box's outer face) and the u axis across the mouth with its range (the box plus 3 m)."""
+    (ax_, ay_), (bx_, by_) = grille
+    gmid = np.array([0.5 * (ax_ + bx_), 0.5 * (ay_ + by_)])
+    out = gmid - np.asarray(portal[:2], dtype=np.float64)
+    out /= max(float(np.linalg.norm(out)), 1e-9)
+    ax = 0 if abs(out[0]) >= abs(out[1]) else 1
+    sign = 1.0 if out[ax] > 0 else -1.0
+    plane = float(box[3 + ax] if sign > 0 else box[ax]) + 0.2 * sign
+    ua = 1 - ax
+    return {"out": out, "axis": ax, "sign": sign, "plane": plane, "u_axis": ua,
+            "u": (float(box[ua]) - 3.0, float(box[3 + ua]) + 3.0)}
+
+
+def mouth_kit_name(kits: dict, design_gate: dict | None) -> str:
+    """The kit of a gate's mouth: `mouth_<gate type>` when the look has one (the Cutting Gate's slot is frosted
+    quarried rock, not the Swallow's mossy knoll), else `mouth`."""
+    t = (design_gate or {}).get("type")
+    return f"mouth_{t}" if t and f"mouth_{t}" in kits else "mouth"
+
+
+def mouth_kit_boxes(box, frame: dict | None) -> list:
+    """The box where a mouth's faces take the mouth kit: the opening's box, 1 m wider across the mouth, 0.5 m
+    further out and up and down, and 2.5 m further into the cave (along the mouth's own axis)."""
+    b = [float(v) for v in box]
+    if frame is None:   # no gate: as the Swallow's (into the cave along +y)
+        return [b[0] - 1.0, b[1] - 0.5, b[2] - 0.5, b[3] + 1.0, b[4] + 2.5, b[5] + 0.5]
+    ax, ua, sg = frame["axis"], frame["u_axis"], frame["sign"]
+    lo, hi = [b[0], b[1], b[2] - 0.5], [b[3], b[4], b[5] + 0.5]
+    lo[ua] -= 1.0
+    hi[ua] += 1.0
+    if sg > 0:   # the world outside lies on +: out 0.5 m there, in 2.5 m on -
+        hi[ax] += 0.5
+        lo[ax] -= 2.5
+    else:
+        lo[ax] -= 0.5
+        hi[ax] += 2.5
+    return lo + hi
+
+
+def outcrop_strips(rock: np.ndarray, us: np.ndarray, zs: np.ndarray, max_run: int = 8) -> list:
+    """The outcrop face's quads, merged along u: rock[i, j] says the cell (us[i]..us[i+1], zs[j]..zs[j+1]) is rock
+    at all four corners. Runs of rock cells in a row become one quad, at most max_run cells long (so its light is
+    sampled about every metre). Returns [(u0, u1, z0, z1)]."""
+    quads = []
+    for j in range(len(zs) - 1):
+        i = 0
+        n = len(us) - 1
+        while i < n:
+            if not rock[i, j]:
+                i += 1
+                continue
+            i0 = i
+            while i < n and rock[i, j] and i - i0 < max_run:
+                i += 1
+            quads.append((float(us[i0]), float(us[i]), float(zs[j]), float(zs[j + 1])))
+    return quads
 
 
 # ================================================================ Blender
@@ -418,6 +534,10 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45) -> dict
     y2 = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
     dark = lin[np.argsort(y2)[: max(1, len(y2) // 1000)]].mean(0)
     mean = lin.mean(0)
+    rel = lin / np.maximum(mean, 1e-6)[None, :]   # the texel as the file shows it (texture x 1/mean)
+    lit = y2 > np.percentile(y2, 5)
+    q = rel[lit] / np.maximum(rel[lit, 1:2], 1e-6)
+    ratio = np.array([np.percentile(q[:, 0], 98), np.percentile(q[:, 2], 98)])
     tex_dir = os.path.join(out_dir, "textures")
     os.makedirs(tex_dir, exist_ok=True)
     path = os.path.join(tex_dir, f"cave_{slug}.png")
@@ -431,7 +551,7 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45) -> dict
     out.file_format = "PNG"
     out.save()
     out.pack()
-    return {"image": out, "mean": mean, "dark": dark, "ref_luma": ref, "path": path}
+    return {"image": out, "mean": mean, "dark": dark, "ref_luma": ref, "path": path, "ratio": ratio}
 
 
 def flat_material(name: str, colour_lin, emit: bool = False):
@@ -531,7 +651,7 @@ def rock_materials(keys: list, look: dict, out_dir: str) -> list:
         m = bpy.data.materials.new(f"cave_{key}")
         m.use_nodes = True
         bake_tree(m)
-        MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", **{k: scans[slug][k] for k in ("image", "mean", "dark")}}
+        MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", **{k: scans[slug][k] for k in ("image", "mean", "dark", "ratio")}}
         mats.append(m)
     return mats
 
@@ -550,7 +670,7 @@ def clear_scene() -> None:
         new_collection(name)
 
 
-def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list) -> tuple:
+def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list, mouth_kit: str = "mouth") -> tuple:
     """The shell's chunks: one mesh each, vertices split where two materials meet (the tint factor is per
     material), the core's UVs per face corner, the tint (linear albedo) as a point attribute for the bake."""
     Vq = z["shell_verts_q"]
@@ -558,7 +678,7 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list) -> tu
     F = z["shell_faces"].astype(np.int64)
     geo_names = json.loads(str(z["geology"]))
     keys, fidx = face_materials(V, F, z["shell_face_geo"].astype(np.int64), geo_names, look["kits"],
-                                float(look["floor_normal_z"]), mouth_boxes)
+                                float(look["floor_normal_z"]), mouth_boxes, mouth_kit)
     mats = rock_materials(keys, look, out_dir)
     owner = first_chunk(z["chunk_offsets"], z["chunk_faces"], len(F))
     tint_lin = srgb_to_lin(np.clip(z["shell_tint"].astype(np.float64), 0.0, 1.0))
@@ -594,6 +714,7 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list) -> tu
 TEXFAC: dict = {}     # object name -> per-vertex 1 / scan mean (linear), so texture x COLOR_0 averages to the albedo
 DARK: dict = {}       # object name -> per-vertex darkest kept texel x the factor x the albedo (linear)
 MEANALB: dict = {}    # object name -> per-vertex albedo (linear)
+RATIO: dict = {}      # object name -> per-vertex pinkest and bluest texel (red / green, blue / green; tint in)
 BAKE_ONLY: list = []  # occluders and helpers that never reach the GLB
 EXPORT_ONLY: list = []  # drawn in the GLB, hidden from the bake (the vista's night backdrop)
 
@@ -642,7 +763,7 @@ def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: s
         m.use_nodes = True
         bake_tree(m)
         MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", "image": sc["image"], "mean": sc["mean"],
-                        "dark": sc["dark"]}
+                        "dark": sc["dark"], "ratio": sc["ratio"]}
     md = MATS[f"cave_{key}"]
     ob = mesh_object(name, V, F, "cave", uvs=box_uvs(np.asarray(V, float), np.asarray(F), repeat), mats=[md["mat"]])
     alb = np.tile(hex_lin(albedo_hex), (len(ob.data.vertices), 1))
@@ -727,53 +848,75 @@ def gate_piece(sec, look: dict, out_dir: str, design_gate: dict | None) -> dict:
     MATS[iron.name] = {"mat": iron, "kind": "flat", "colour": hex_lin(look["iron"])}
     grille = mesh_object(f"um_{sec.key}_grille", V, F, "cave", mats=[iron])
     set_point_colour(grille, TINT_ATTR, np.tile(hex_lin(look["iron"]), (len(grille.data.vertices), 1)))
-    # the lamp: a housing on the cave side above the grille, its glass an emitter at its display colour
+    # the lamp: a glass on the cave side above the grille, lit (an emitter at the look's lamp glass colour), under
+    # an iron cap, on an iron base and a bracket back to the grille's top rail; the bake's lamp stands inside it
     lamp_at = np.array([gmid[0] + 0.25 * inward[0], gmid[1] + 0.25 * inward[1], gz + 2.05])
-    hv, hf = box_mesh(tuple(lamp_at), 0.09, 0.09, 0.12, along[0], along[1])
-    glass_c = hex_lin(look["lamp"]["glass_display"])
+    hv, hf = box_mesh(tuple(lamp_at), 0.07, 0.07, 0.09, along[0], along[1])
+    glass_c = np.array(look["lamp"]["glass_emit"], float)
     glass = flat_material("cave_lamp_glass", glass_c, emit=False)
-    MATS[glass.name] = {"mat": glass, "kind": "emit", "display": glass_c}
+    MATS[glass.name] = {"mat": glass, "kind": "emit_raw", "colour": glass_c}
     housing = mesh_object(f"um_{sec.key}_lamp", hv, hf, "cave", mats=[glass])
-    EXPORT_ONLY.append(housing)   # the bake's lamp stands inside it: drawn in the GLB, hidden from the bake
-    # the outcrop face: a grid on the opening's plane, with holes where the shell's air meets it
+    EXPORT_ONLY.append(housing)   # drawn in the GLB, hidden from the bake
+    ip = [box_mesh((lamp_at[0], lamp_at[1], lamp_at[2] + 0.115), 0.1, 0.1, 0.025, along[0], along[1]),
+          box_mesh((lamp_at[0], lamp_at[1], lamp_at[2] + 0.155), 0.05, 0.05, 0.02, along[0], along[1]),
+          box_mesh((lamp_at[0], lamp_at[1], lamp_at[2] - 0.105), 0.085, 0.085, 0.015, along[0], along[1]),
+          box_mesh((gmid[0] + 0.125 * inward[0], gmid[1] + 0.125 * inward[1], gz + 1.95), 0.015, 0.125, 0.015,
+                   along[0], along[1]),
+          box_mesh((lamp_at[0], lamp_at[1], 0.5 * (gz + 1.95 + lamp_at[2] - 0.12)), 0.015, 0.015,
+                   0.5 * (lamp_at[2] - 0.12 - gz - 1.95) + 0.015, along[0], along[1])]
+    iv, if_ = merge(ip)
+    iron_c = np.array(look["lamp"]["iron_emit"], float)
+    lamp_iron = flat_material("cave_lamp_iron", iron_c, emit=False)
+    MATS[lamp_iron.name] = {"mat": lamp_iron, "kind": "emit_raw", "colour": iron_c}
+    lamp_frame = mesh_object(f"um_{sec.key}_lamp_iron", iv, if_, "cave", mats=[lamp_iron])
+    EXPORT_ONLY.append(lamp_frame)
+    # the outcrop face: on the mouth box's outer face, with holes where the shell's air meets it; rows of rock
+    # cells merged into quads up to 1 m long (it closes the mouth to the bake's sky but round its opening)
     ob_ = op["box"]
-    yface = float(ob_[1])
-    xs = np.arange(ob_[0] - 3.0, ob_[3] + 3.0 + 1e-9, 0.125)
+    fr = mouth_frame(ob_, pa, gx)
+    ax, ua, plane = fr["axis"], fr["u_axis"], fr["plane"]
+    us = np.arange(fr["u"][0], fr["u"][1] + 1e-9, 0.125)
     zs = np.arange(ob_[2] - 1.5, ob_[5] + 3.0 + 1e-9, 0.125)
-    Xg, Zg = np.meshgrid(xs, zs, indexing="ij")
-    P = np.stack([Xg.ravel(), np.full(Xg.size, yface - 0.2), Zg.ravel()], 1)
-    air = (sec.field_points(P) > 0).reshape(Xg.shape)
-    quads = []
-    for i in range(len(xs) - 1):
-        for j in range(len(zs) - 1):
-            if not (air[i, j] or air[i + 1, j] or air[i, j + 1] or air[i + 1, j + 1]):
-                quads.append((i, j))
+    Ug, Zg = np.meshgrid(us, zs, indexing="ij")
+    P = np.zeros((Ug.size, 3))
+    P[:, ax] = plane + 0.2 * fr["sign"]
+    P[:, ua] = Ug.ravel()
+    P[:, 2] = Zg.ravel()
+    air = (sec.field_points(P) > 0).reshape(Ug.shape)
+    rock = ~(air[:-1, :-1] | air[1:, :-1] | air[:-1, 1:] | air[1:, 1:])
     Vo, Fo = [], []
-    for i, j in quads:
-        b = len(Vo)
-        Vo += [(xs[i], yface - 0.2, zs[j]), (xs[i + 1], yface - 0.2, zs[j]), (xs[i + 1], yface - 0.2, zs[j + 1]),
-               (xs[i], yface - 0.2, zs[j + 1])]
-        Fo += [(b, b + 1, b + 2), (b, b + 2, b + 3)]   # facing -y, out of the knoll
-    out = {"grille": grille, "lamp_housing": housing, "lamp_at": lamp_at.tolist(), "plug": None}
+
+    def pt(u, z, w=plane):
+        q = [0.0, 0.0, z]
+        q[ax], q[ua] = w, u
+        return q
+
+    for u0, u1, z0, z1 in outcrop_strips(rock, us, zs):
+        b_ = len(Vo)
+        Vo += [pt(u0, z0), pt(u1, z0), pt(u1, z1), pt(u0, z1)]
+        Fo += [(b_, b_ + 1, b_ + 2), (b_, b_ + 2, b_ + 3)]
+    outn = np.array([fr["out"][0], fr["out"][1], 0.0])
+    out = {"grille": grille, "lamp_housing": housing, "lamp_iron": lamp_frame, "lamp_at": lamp_at.tolist(),
+           "plug": None}
     if Vo:
-        out["outcrop"] = textured(f"um_{sec.key}_outcrop", np.array(Vo), np.array(Fo), look["kits"]["mouth"]["wall"],
+        Vo = np.array(Vo)
+        mk = look["kits"][mouth_kit_name(look["kits"], design_gate)]
+        out["outcrop"] = textured(f"um_{sec.key}_outcrop", Vo, facing(Vo, Fo, outn), mk["wall"],
                                   "#6E6A60", look, out_dir, repeat=2.0)
-    # the vista: snow ground in front of the knoll and a backdrop of night sky
+    # the vista: snow ground in front of the face and a backdrop of night sky
     g0 = float(ob_[2]) + 0.1
-    sv, sf = [], []
     R = 40.0
-    cx = 0.5 * (ob_[0] + ob_[3])
-    for i, (x0, x1) in enumerate(((cx - R, cx + R),)):
-        sv = [(x0, yface - 0.2, g0), (x1, yface - 0.2, g0), (x1, yface - R, g0 - 1.5), (x0, yface - R, g0 - 1.5)]
-        sf = [(0, 2, 1), (0, 3, 2)]
-    snow = textured(f"um_{sec.key}_vista_snow", np.array(sv), np.array(sf), look["kits"]["snow"], look["sky"]["snow"],
-                    look, out_dir, repeat=3.0)
+    cu = 0.5 * (ob_[ua] + ob_[3 + ua])
+    far = plane + fr["sign"] * R
+    sv = np.array([pt(cu - R, g0), pt(cu + R, g0), pt(cu + R, g0 - 1.5, far), pt(cu - R, g0 - 1.5, far)])
+    snow = textured(f"um_{sec.key}_vista_snow", sv, facing(sv, [(0, 1, 2), (0, 2, 3)], (0, 0, 1)),
+                    look["kits"]["snow"], look["sky"]["snow"], look, out_dir, repeat=3.0)
     bd = hex_lin(look["sky"]["backdrop_display"])
     back = flat_material("cave_vista_sky", bd)
     MATS[back.name] = {"mat": back, "kind": "emit", "display": bd}
-    bv = [(cx - R, yface - R, g0 - 2.0), (cx + R, yface - R, g0 - 2.0), (cx + R, yface - R, g0 + 30.0),
-          (cx - R, yface - R, g0 + 30.0)]
-    sky = mesh_object(f"um_{sec.key}_vista_sky", np.array(bv), np.array([(0, 1, 2), (0, 2, 3)]), "cave", mats=[back])
+    bv = np.array([pt(cu - R, g0 - 2.0, far), pt(cu + R, g0 - 2.0, far), pt(cu + R, g0 + 30.0, far),
+                   pt(cu - R, g0 + 30.0, far)])
+    sky = mesh_object(f"um_{sec.key}_vista_sky", bv, facing(bv, [(0, 1, 2), (0, 2, 3)], -outn), "cave", mats=[back])
     EXPORT_ONLY.append(sky)   # the world's sky lights the bake; the backdrop is drawn only in the GLB
     out.update(snow=snow, sky=sky)
     # the collision plug just behind the grille (away from the cave side)
@@ -963,6 +1106,50 @@ def lamp_pool_E(objs: list, L: dict, lamp_at, look: dict) -> float | None:
     return float(R.solve_display((Ls[i] * As[i])[None, :], lp["display"])[0])
 
 
+def lamp_weight(objs: list, groups: dict, lamp_at, look: dict, E: float) -> float:
+    """The factor (at most 1) on a gate's lamp group so its pool shows no brighter than the look's lamp_pool display
+    at the network's E: the largest w with lamp_pool_E(w x lamp + sky + fill) >= E. 1 when there is no lamp or the
+    pool is already at or under it (the Swallow's, which set E)."""
+    if lamp_at is None:
+        return 1.0
+
+    def pool_E(w: float):
+        L = {o.name: sum((w if gg == "lamp" else 1.0) * np.asarray(v, np.float64) for gg, v in groups[o.name].items()
+                         if gg != "ao") for o in objs}
+        return lamp_pool_E(objs, L, lamp_at, look)
+
+    e1 = pool_E(1.0)
+    if e1 is None or e1 >= E:
+        return 1.0
+    lo, hi = -8.0, 0.0   # log2 w: lo dim enough, hi too bright
+    if (pool_E(2.0 ** lo) or 0.0) < E:
+        return 2.0 ** lo
+    for _ in range(24):
+        mid = 0.5 * (lo + hi)
+        if (pool_E(2.0 ** mid) or 0.0) >= E:
+            lo = mid
+        else:
+            hi = mid
+    return float(2.0 ** lo)
+
+
+def unit_colour(c0: np.ndarray) -> tuple:
+    """COLOR_0 rows scaled down, hue kept, where a channel passes 1 (the glTF export clips each channel at 1, which
+    turned blue-lit snow and lamp-lit wood cream). Returns the rows, the per-row factor and how many were scaled."""
+    c0 = np.asarray(c0, dtype=np.float64)
+    m = c0.max(axis=1) if len(c0) else np.zeros(0)
+    f = np.where(m > 1.0, 1.0 / np.maximum(m, 1e-12), 1.0)
+    return c0 * f[:, None], f, int((f < 1.0).sum())
+
+
+def hot_of(name: str, look: dict) -> tuple:
+    """(knee, max) of the display easing for a piece: timber has its own (look hot.timber), the rest the look's."""
+    h = look["hot"]
+    if name.endswith("_timber") and "timber" in h:
+        return float(h["timber"]["knee"]), float(h["timber"]["max"])
+    return float(h["knee"]), float(h["max"])
+
+
 def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_bake: bool) -> dict:
     """The cave's post bake: denoise, the groups by weight, AO, the ink floor on the display (meshy_room_build's
     solve_display through three r186's AgX), lilac and teal guards, highlights eased; COLOR_0 = k x light x the
@@ -973,16 +1160,16 @@ def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_ba
     il = look["ink_lift"]
     ink_t = (float(R.lum(np.array(INK, float))) + float(il["margin_luma"])) / 255.0
     form, form_ao, fg = float(il["form"]), float(il["form_ao"]), float(il["form_gamma"])
-    hot_knee, hot_max = float(look["hot"]["knee"]), float(look["hot"]["max"])
     fl_n = hex_lin(look["fill"]["colour"])
     fl_n = fl_n / R.lum(fl_n)
     wts = look["weights"]
     aoc = look["ao"]
     rep = {"E": E, "k": k, "wdi_exposure": we, "ink_target_luma": round(ink_t * 255, 2), "vertices": 0,
-           "below_floor": 0, "hot_eased": 0, "max_color0": 0.0}
+           "below_floor": 0, "hot_eased": 0, "max_color0": 0.0, "color0_scaled": 0}
     for o in objs:
         if o.name not in TEXFAC:
             continue
+        hot_knee, hot_max = hot_of(o.name, look)
         gs = groups[o.name]
         L = sum(float(wts.get(g, 1.0)) * np.asarray(v, np.float64) for g, v in gs.items() if g != "ao")
         if not isinstance(L, np.ndarray):
@@ -1000,7 +1187,7 @@ def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_ba
         Lf = R.solve_display(E * dark * fl_n[None, :], ink_t)
         m = 1.0 + form * ((1.0 - form_ao) + form_ao * open_sky ** fg)
         L2 = np.sqrt((chroma * have[:, None]) ** 2 + (fl_n[None, :] * (Lf * m)[:, None]) ** 2)
-        L2 = guard_display(L2)
+        L2 = guard_texels(guard_display(L2), RATIO.get(o.name))
         low = R.lum(R.agx(E * dark * L2)) < ink_t - 2e-4
         if low.any():
             L2[low] *= R.solve_display(E * dark[low] * L2[low], ink_t, lo=1.0, hi=64.0, iters=30)[:, None]
@@ -1015,9 +1202,12 @@ def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_ba
         rep["below_floor"] += int((have < Lf).sum())
         DISP.append(R.lum(R.agx(E * alb * L2)))
         RAWD.append(R.lum(R.agx(E * alb * np.maximum(L, 1e-12))))
-        c0 = (L2 * k * TEXFAC[o.name] * MEANALB[o.name]).astype(np.float32)   # texture x COLOR_0 ~ k L albedo
+        c0 = L2 * k * TEXFAC[o.name] * MEANALB[o.name]   # texture x COLOR_0 ~ k L albedo
         rep["max_color0"] = max(rep["max_color0"], float(c0.max()))
-        R.write_attr(o, c0)
+        c0, f, n_ = unit_colour(c0)
+        rep["color0_scaled"] += n_
+        L2 = L2 * f[:, None]   # the light as the file will show it
+        R.write_attr(o, c0.astype(np.float32))
         LIGHT_OUT[o.name] = L2
     rep["below_floor_share"] = round(rep["below_floor"] / max(rep["vertices"], 1), 4)
     if DISP:
@@ -1075,10 +1265,11 @@ def seam_dump(path: str, objs: list, planes: list, reach: float = 12.0) -> int:
     return int(len(K))
 
 
-def stitch(objs: list, planes: list, dumps: list, k: float) -> dict:
+def stitch(objs: list, planes: list, dumps: list, k: float, E: float | None = None, ink_t: float | None = None) -> dict:
     """Blends each file's graded light with its neighbour's (their seam_dump) across every built seam, the same way
     in both files, and writes COLOR_0 again. Vertices the neighbour does not have (where its stub is clipped, or past
-    its region) keep their own light."""
+    its region) keep their own light. With E and ink_t the blend keeps the grade's floors: the lilac and teal guards,
+    and the darkest texel at the ink (the neighbour's light was graded for its own scans, which can be paler)."""
     table = {}
     for path in dumps:
         z = np.load(path)
@@ -1108,8 +1299,18 @@ def stitch(objs: list, planes: list, dumps: list, k: float) -> dict:
                     rep["matched"] += 1
                     changed = True
         if changed:
-            LIGHT_OUT[o.name] = L2
-            _rb().write_attr(o, (L2 * k * TEXFAC[o.name] * MEANALB[o.name]).astype(np.float32))
+            if E is not None and ink_t is not None:
+                R = _rb()
+                L2 = guard_texels(guard_display(L2), RATIO.get(o.name))
+                dark = DARK[o.name]
+                low = R.lum(R.agx(E * dark * L2)) < ink_t - 2e-4
+                if low.any():
+                    L2[low] *= R.solve_display(E * dark[low] * L2[low], ink_t, lo=1.0, hi=64.0, iters=30)[:, None]
+                rep["refloored"] = rep.get("refloored", 0) + int(low.sum())
+            c0, f, n_ = unit_colour(L2 * k * TEXFAC[o.name] * MEANALB[o.name])
+            rep["color0_scaled"] = rep.get("color0_scaled", 0) + n_
+            LIGHT_OUT[o.name] = L2 * f[:, None]
+            _rb().write_attr(o, c0.astype(np.float32))
     return rep
 
 
@@ -1143,6 +1344,7 @@ def finish_attrs(objs: list) -> None:
         a.data.foreach_get("color", c)
         alb = c.reshape(-1, 4)[:, :3].astype(np.float64)
         rows = np.zeros((len(alb), 3))
+        q = np.ones((len(alb), 2))
         loops = np.empty(len(o.data.loops), np.int32)
         o.data.loops.foreach_get("vertex_index", loops)
         pm = np.empty(len(o.data.polygons), np.int32)
@@ -1156,8 +1358,12 @@ def finish_attrs(objs: list) -> None:
             if md is None or not sel.any():
                 continue
             rows[sel] = md["dark"] / np.maximum(md["mean"], 1e-4)
+            if "ratio" in md:
+                q[sel] = md["ratio"][None, :]
         MEANALB[o.name] = alb
         DARK[o.name] = rows * alb
+        g_ = np.maximum(alb[:, 1], 1e-6)
+        RATIO[o.name] = q * np.stack([alb[:, 0] / g_, alb[:, 2] / g_], axis=1)
 
 
 def to_export(objs: list, look: dict) -> None:
@@ -1170,6 +1376,8 @@ def to_export(objs: list, look: dict) -> None:
             unlit_tree(m, image=None, colour=(0.0, 0.0, 0.0))
         elif md["kind"] == "emit":
             unlit_tree(m, image=None, colour=np.minimum(md["display"] / we, 1.0))
+        elif md["kind"] == "emit_raw":
+            unlit_tree(m, image=None, colour=np.minimum(md["colour"], 1.0))
     for o in objs:
         me = o.data
         if TINT_ATTR in me.color_attributes:
@@ -1238,11 +1446,17 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
         d = np.array([-math.sin(yaw), math.cos(yaw), -0.12])
         e = np.array(s["at"]) + np.array([0, 0, eye])
         views.append((s["id"], e, e + 5 * d))
+    mouth_sp = [s for s in nodes["spawns"] if s["id"].startswith(f"{SCENE}_mouth_")]
     for p in nodes["portals"]:
-        # from 3 m inside, looking at the portal (a gate's grille and vista, a seam's crossing)
+        # from 3 m inside, looking at the portal (a gate's grille and vista, a seam's crossing); a gate's from the
+        # side of its arrival in the cave, so the grille is seen from inside
         q = np.array(p["at"], float)
         best = None
-        for ang in range(0, 360, 15):
+        angs = list(range(0, 360, 15))
+        if p["extras"].get("kind") == "cave_mouth" and mouth_sp:
+            w = np.array(mouth_sp[0]["at"], float)[:2] - q[:2]
+            angs.sort(key=lambda a_: -(math.cos(math.radians(a_)) * w[0] + math.sin(math.radians(a_)) * w[1]))
+        for ang in angs:
             dv = np.array([math.cos(math.radians(ang)), math.sin(math.radians(ang)), 0.0])
             P = q[None, :] + np.outer(np.linspace(0.3, 3.0, 10), dv) + np.array([0, 0, 0.5])
             if np.all(sec.field_points(P) > 0.15):
@@ -1383,14 +1597,17 @@ def main(argv) -> int:
     rb.P = ""
     gate_d = design_gate(sec.d)
     mouth_boxes = [o["box"] for o in sec.d.get("openings", []) if o["id"].startswith("mouth_")]
-    mouth_boxes = [[b[0] - 1.0, b[1] - 0.5, b[2] - 0.5, b[3] + 1.0, b[4] + 2.5, b[5] + 0.5] for b in mouth_boxes]
-    objs, keys = build_shell(z, sec, look, a.out, mouth_boxes)
+    mports = [p for p in (sec.d.get("portals") or []) if p.get("kind") == "cave_mouth"]
+    frame = mouth_frame(mouth_boxes[0], mports[0]["at"], gate_d["grille"]) if (mouth_boxes and mports and gate_d) \
+        else None
+    mouth_boxes = [mouth_kit_boxes(b, frame) for b in mouth_boxes]
+    objs, keys = build_shell(z, sec, look, a.out, mouth_boxes, mouth_kit_name(look["kits"], gate_d))
     objs += guard_pieces(z, sec, look, a.out)
     gate = gate_piece(sec, look, a.out, gate_d)
     for k_ in ("outcrop", "snow"):
         if gate.get(k_) is not None:
             objs.append(gate[k_])
-    others = [gate[k_] for k_ in ("grille", "lamp_housing") if gate.get(k_) is not None]
+    others = [gate[k_] for k_ in ("grille", "lamp_housing", "lamp_iron") if gate.get(k_) is not None]
     caps(sec, {o["id"] for o in sec.d.get("openings", []) if o["id"].startswith("mouth_")})
     area_ob = bpy.data.objects.new(f"Area_{aid}", None)
     COL["nodes"].objects.link(area_ob)
@@ -1431,8 +1648,16 @@ def main(argv) -> int:
         rb.save_raw(raw_path, bake_objs, g, samples, t_bake, meta)
         ao = {n: d.pop("ao") for n, d in g.items()}
         log(f"bake: {t_bake:.1f} s at {samples} samples on {meta['device']}")
-    summed = {o.name: sum(np.asarray(v, np.float64) for gg, v in g[o.name].items()) for o in bake_objs}
     E = a.E if a.E is not None else look.get("E")
+    w_lamp = 1.0
+    if E is not None and gate.get("lamp_at") is not None and not a.no_bake:
+        w_lamp = lamp_weight(bake_objs, g, gate.get("lamp_at"), look, float(E))
+        if w_lamp < 1.0:
+            for n_ in g:
+                if "lamp" in g[n_]:
+                    g[n_]["lamp"] = np.asarray(g[n_]["lamp"], np.float64) * w_lamp
+        log(f"lamp: group weight {w_lamp:.4g} (its pool at the look's display at E)")
+    summed = {o.name: sum(np.asarray(v, np.float64) for gg, v in g[o.name].items()) for o in bake_objs}
     E_pool = lamp_pool_E(bake_objs, summed, gate.get("lamp_at"), look)
     if E is None:
         E = E_pool if E_pool is not None else float(look["wdi_exposure"])
@@ -1443,17 +1668,22 @@ def main(argv) -> int:
         if o.name.endswith("_grille"):
             Lg = summed[o.name] if o.name in summed else np.zeros((len(o.data.vertices), 3))
             ink_t = gr["ink_target_luma"] / 255.0
-            base = np.tile(hex_lin(look["iron"]), (len(Lg), 1))
-            Lf = rb.solve_display(float(E) * base, ink_t)
-            L2 = np.sqrt(Lg ** 2 + Lf[:, None] ** 2)
-            rb.write_attr(o, (guard_display(guard_display(L2) * base) * gr["k"]).astype(np.float32))
+            lamp = np.asarray(g[o.name]["lamp"], np.float64) if "lamp" in g.get(o.name, {}) else np.zeros_like(Lg)
+            share = rb.lum(lamp) / np.maximum(rb.lum(Lg), 1e-12)
+            col = iron_display(Lg, share, gr["k"], look, ink_t, rb.agx, rb.solve_display, rb.lum)
+            rb.write_attr(o, col.astype(np.float32))
             MATS["cave_iron"]["kind"] = "vc"
+            we_ = float(look["wdi_exposure"])
+            gr["iron"] = {"display_luma_max": round(float(rb.lum(rb.agx(col * we_)).max()), 4),
+                          "display_luma_min": round(float(rb.lum(rb.agx(col * we_)).min()), 4),
+                          "lamp_share_mean": round(float(np.clip(share, 0, 1).mean()), 3)}
     planes = seam_planes(sec.d, built)
     if planes:
         n_dump = seam_dump(os.path.join(a.out, f"{aid}_seam_light.npz"), bake_objs, planes)
         log(f"seam light: {n_dump} vertices near the built seams written for the neighbour's stitch")
     if a.stitch:
-        st = stitch(bake_objs, planes, [p for p in a.stitch.split(",") if p], gr["k"])
+        st = stitch(bake_objs, planes, [p for p in a.stitch.split(",") if p], gr["k"], float(E),
+                    gr["ink_target_luma"] / 255.0)
         gr["stitch"] = st
         log(f"stitch: {st}")
     lk = look_report(bake_objs, look, float(E))
@@ -1466,8 +1696,9 @@ def main(argv) -> int:
                      "closed_seams": nodes["closed_seams"], "problems": nodes["problems"]},
            "light": {"mode": "raw" if a.raw else ("none" if a.no_bake else "bake"), "samples": samples,
                      "bake_seconds": round(t_bake, 1), "group_seconds": secs,
-                     "device": rb._CYCLES_DEVICE.get("used", "CPU"), "grade": gr, "look": lk,
-                     "E_lamp_pool": E_pool},
+                     "device": (rb.RAW_META.get("device") or "unknown") if a.raw
+                     else rb._CYCLES_DEVICE.get("used", "CPU"), "grade": gr, "look": lk,
+                     "E_lamp_pool": E_pool, "lamp_weight": round(w_lamp, 5)},
            "materials": sorted({md.get("scan", name) for name, md in MATS.items()}),
            "collision_triangles": coll_tris, "extras": nodes["extras"]}
     if a.glb:

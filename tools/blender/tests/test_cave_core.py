@@ -606,6 +606,19 @@ class CaveCoreTest(unittest.TestCase):
             slope = (H / a) * math.sqrt((1 - r) / (1 + r)) / r
             self.assertGreaterEqual(slope + 1e-6, min(core.TUBE_FLOOR_SLOPE, (H / a) * math.sqrt(0.2) * 1.5))
 
+    def test_rift_collision_wall_upright_and_inside_the_shell(self):
+        """A rift widens from its floor to mid height, so its shell's lower walls face up; the walker's field is the
+        upright wall through the floor's edge, never more air than the shell's and with no shelf anywhere."""
+        for W, H in ((1.6, 4.0), (1.4, 3.0), (2.2, 6.0)):
+            d = np.linspace(0.0, 0.5 * W + 0.3, 400)[:, None]
+            v = np.linspace(0.02, H - 0.45, 120)[None, :]
+            vis = core.prof_wall("rift", d, v, W, H)
+            col = core.prof_wall("rift", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            edge = (col > 0).sum(axis=0)  # how far the air reaches at each height, in samples
+            self.assertLessEqual(int(edge.max() - edge.min()), 1)  # upright: the same reach at every height
+            self.assertLess(float(core.prof_wall("rift", 0.5 * W * 0.85 + 0.01, 0.5 * H, W, H, collision=True)), 0)
+
     def test_lower_wall_noise_left_out_of_the_walkers_field(self):
         rng = np.random.default_rng(3)
         n = rng.uniform(-1.0, 1.0, 5000)

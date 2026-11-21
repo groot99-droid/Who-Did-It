@@ -29,7 +29,7 @@
   "passages": [
     {
       "id": "ic_slot_1",
-      "from": [32.0, 136.5, 0.45],
+      "from": [35.0, 136.5, 0.45],
       "to": [28.0, 136.0, 0.4],
       "profile": "rift",
       "width": 1.4,
@@ -38,7 +38,8 @@
         "kind": "ramp"
       },
       "geology": "ice",
-      "notes": "the Cutting Slot (leg 1 of 2)"
+      "notes": "the Cutting Slot (leg 1 of 2) (route 1: it runs on through the grille to the mouth box's face, so the cutting is seen through the grille)",
+      "via": [[32.0, 136.5, 0.45]]
     },
     {
       "id": "ic_slot_2",
@@ -71,12 +72,12 @@
       "to": [23.6, 133.4, -2.4],
       "profile": "rift",
       "width": 1.6,
-      "clear": 4.0,
+      "clear": [2.3, 4.0],
       "floor": {
         "kind": "flat"
       },
       "geology": "ice",
-      "notes": "the Ice Rift (leg 1 of 7)"
+      "notes": "the Ice Rift (leg 1 of 7) (route 1: 2.3 m clear at the Ice Steps' foot, so its end does not cut a notch through the steps' ledge)"
     },
     {
       "id": "ic_rift_2",
@@ -270,8 +271,8 @@
   "openings": [
     {
       "id": "mouth_cutting",
-      "box": [30.0, 134.5, -0.05, 34.0, 138.5, 3.95],
-      "notes": "the gate's mouth (the vista beyond)"
+      "box": [30.0, 134.5, -0.05, 34.5, 138.5, 3.95],
+      "notes": "the gate's mouth (the vista beyond) (route 1: to the region's face at x 34.5, where the slot runs out)"
     }
   ],
   "joins": [
@@ -338,5 +339,18 @@
     ["ic_rift_7", "ic_steps_face"],
     ["ic_slot_1", "ic_steps_face"],
     ["ic_slot_2", "ic_steps_face"]
+  ],
+  "guards": [
+    {
+      "id": "cutting_grille_timbers",
+      "line": [
+        [32.08, 135.74],
+        [32.08, 137.26]
+      ],
+      "base_z": 0.45,
+      "height": 2.25,
+      "thickness": 0.1,
+      "notes": "route 1: the railway's timbers bolted across the Cutting Slot behind the Company's iron grille (posts and two rails); with the grille's collision plug they close the slot"
+    }
   ]
 }

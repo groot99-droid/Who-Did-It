@@ -95,6 +95,8 @@ guarantee of construction.
 - The collision field also differs from the shell on walls: a tube gets an upright cylinder wall through the edge of
   its floor, and lower walls leave out the noise push and the bedding steps, so a walker cannot climb a curved wall or
   a bump. The hidden wall lies at most 0.25 m inside the rock you see.
+- A rift's walls lean out from its floor to mid height; its collision wall is upright through the floor's edge all
+  the way up (at most 0.075 of its width inside the rock you see), so a walker cannot stand on the leaning foot.
 
 ### Rock between passages
 
@@ -211,7 +213,7 @@ The flood reports:
   degrees. Bridge or fence any crack that a walker should not fall into;
 - a body that lands where it does not fit is pushed out, as the viewer's capsule is, into a column within two cells
   where it fits, on that floor or one within a step below it; only with none does it wedge;
-- undesigned reach: a reached place outside every walkable passage and chamber;
+- undesigned reach: a reached place outside every walkable passage and chamber (a bridge's deck counts as walkable);
 - unguarded drops: a fall over 0.35 m that is not declared, not caught by a climb, and not walked straight back from;
 - per passage, whether it can be crossed from one end to the other with its zones, and bypassed without them. A
   passage that cannot be bypassed is mandatory. The result is reported on each of its zones, with `passage` and

@@ -47,7 +47,7 @@
       "detail": "brown_mud_02 / dry_river_pebbles"
     },
     "ice": {
-      "tint": "#BFD8E2",
+      "tint": "#C9D3DB",
       "repeat_m": 1.5,
       "noise": 0.04,
       "bedding": [0.6, 0.0],

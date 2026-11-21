@@ -711,7 +711,14 @@ def prof_wall(profile, d, v, W, H, collision=False):
         hw = 0.5 * W * (1.0 - 0.3 * np.clip(v / H, 0.0, 1.0))
         return smin(hw - d, H - v, 0.3)
     if profile == "rift":
-        hw = 0.5 * W * (0.85 + 0.15 * (1.0 - np.abs(2.0 * np.clip(v / H, 0.0, 1.0) - 1.0)))
+        u = np.clip(v / H, 0.0, 1.0)
+        hw = 0.5 * W * (0.85 + 0.15 * (1.0 - np.abs(2.0 * u - 1.0)))
+        if collision:
+            # The rift widens from its floor to mid height, so its lower walls lean out and face up: the viewer's
+            # ground rays stood a walker 1.1 m up the Ice Rift's wall on them. The walker meets the upright wall
+            # through the floor's edge instead, all the way up (at most 0.075 W inside the rock you see; a wall
+            # that met the shell above mid height would leave a shelf there).
+            hw = 0.5 * W * 0.85
         return smin(hw - d, H - v, 0.4)
     if profile == "keyhole":
         a, b = 0.5 * W, 0.35 * H
@@ -2952,6 +2959,10 @@ def run_flood(sec, grid, zones, report_zones=True):
     for p in sec.prims:
         if hasattr(p, "designed"):
             designed |= p.designed(rx, ry, rz)
+    for br in d.get("bridges", []):  # a bridge's deck is walked by design (over a crack or a shaft)
+        x0, y0, x1, y1 = br["box"]
+        designed |= ((rx >= x0 - 0.5) & (rx <= x1 + 0.5) & (ry >= y0 - 0.5) & (ry <= y1 + 0.5)
+                     & (np.abs(rz - br["top_z"]) <= 0.6))
     und = rs[~designed]
     # drops over 0.35 m: guarded (no edge), caught by a climb, or declared. A fall whose start the walker walks
     # straight back to (a perch on a wall's foot, a probe ray resting on the fillet) is not a drop.
