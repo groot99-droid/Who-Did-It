@@ -316,9 +316,134 @@ class CaveBuildTest(unittest.TestCase):
             mid = np.array([0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])])
             self.assertLess(np.min(np.hypot(C[:, 0] - mid[0], C[:, 1] - mid[1])), 1e-6)
             self.assertAlmostEqual(V[:, 2].max(), base + h, places=6)
-            self.assertAlmostEqual(V[:, 2].min(), base, places=6)
+            self.assertLessEqual(V[:, 2].min(), base - 0.05 + 1e-6)   # every post 0.05 m into what holds it
         # a section without a lake gets none
         self.assertEqual(cb.lake_rails(self.secs["swallow"][0]), [])
+
+    def test_posts_stand_on_the_floor(self):
+        """A rail's post reaches down to the floor under it (route 2: posts floated where the floor fell away), as far
+        as POST_REACH, never rises off its base, and goes 0.05 m into what holds it."""
+        sec, _w = core.load_section(os.path.join(UNDERMERE, "bottom.json"))
+        for c in sec.own:
+            if isinstance(c, core.Chamber) and c.kind == "lake":
+                base = float(c.c[2])
+                for x, y in c.basin_ring():
+                    foot = cb.post_foot(sec, x, y, base)
+                    self.assertLessEqual(foot, base)
+                    self.assertGreaterEqual(foot, base - cb.POST_REACH - 1e-9)
+                    P = np.array([[x, y, foot - 0.03], [x, y, foot + 0.03]])
+                    f = sec.field_points(P)
+                    if foot < base:
+                        self.assertLessEqual(f[0], 0.0)    # rock just under the foot,
+                        self.assertGreater(f[1], 0.0)      # air just over it
+                    V, _F = cb.post_box(sec, x, y, base, 1.0, 1.0, 0.0)
+                    self.assertAlmostEqual(V[:, 2].max(), base + 1.0, places=6)
+                    self.assertAlmostEqual(V[:, 2].min(), foot - 0.05, places=6)
+
+    def test_no_post_floats(self):
+        """Route 3's check: on every thin guard of every section, each post's foot is held: some column of its 0.1 m
+        foot has rock within 0.03 m under the foot, or the foot is on a bridge's deck. A post set into a lip or
+        an overhang stands at its base (the Levels' engine collar: the old scan took the rock above the foot for a
+        floor); the Domes' Cataract kerbs run on the lip itself (their posts stood 2.9 m over the dome's floor)."""
+        offs = ((0.0, 0.0), (0.05, 0.0), (-0.05, 0.0), (0.0, 0.05), (0.0, -0.05))
+        n = 0
+        for key in ("gallery", "ice", "north", "levels", "adit", "domes"):
+            sec, _w = core.load_section(os.path.join(UNDERMERE, key + ".json"))
+            decks = [(b["box"], b["top_z"]) for b in sec.d.get("bridges", [])]
+            for gd in sec.d.get("guards", []):
+                if float(gd.get("thickness", 0.12)) >= 0.15:
+                    continue
+                base = float(gd["base_z"])
+                for a, b in zip(gd["line"][:-1], gd["line"][1:]):
+                    m = max(1, int(math.ceil(math.hypot(b[0] - a[0], b[1] - a[1]) / 1.2)))
+                    for i in range(m + 1):
+                        x, y = a[0] + i / m * (b[0] - a[0]), a[1] + i / m * (b[1] - a[1])
+                        foot = cb.post_foot(sec, x, y, base)
+                        held = any(x0 - 0.05 <= x <= x1 + 0.05 and y0 - 0.05 <= y <= y1 + 0.05
+                                   and abs(t - foot) < 1e-6 for (x0, y0, x1, y1), t in decks)
+                        P = np.array([[x + dx, y + dy, foot - 0.03] for dx, dy in offs])
+                        held = held or bool((sec.field_points(P) <= 0.0).any())
+                        self.assertTrue(held, (key, gd["id"], i, x, y, base, foot))
+                        n += 1
+        self.assertGreater(n, 50)
+        # the Domes' Cataract kerbs: every post at the ledge's level, none reaching down to the dome's floor
+        sec, _w = core.load_section(os.path.join(UNDERMERE, "domes.json"))
+        for gd in sec.d["guards"]:
+            if "cataract" in gd["id"]:
+                for x, y in gd["line"]:
+                    self.assertEqual(cb.post_foot(sec, x, y, float(gd["base_z"])), float(gd["base_z"]))
+
+    def test_water_keeps_its_hue(self):
+        """The shell's light is taken as a grey of its luminance, so a green-leaning light cannot turn WATER teal."""
+        L = np.array([[0.02, 0.05, 0.03], [1.0, 0.5, 0.25], [0.0, 0.0, 0.0]])
+        g = cb.water_grey(L)
+        np.testing.assert_allclose(g[:, 0], g[:, 1])
+        np.testing.assert_allclose(g[:, 1], g[:, 2])
+        np.testing.assert_allclose(g[:, 0], 0.2126 * L[:, 0] + 0.7152 * L[:, 1] + 0.0722 * L[:, 2])
+        w = cb.hex_lin(cb.WATER) * g[0]
+        self.assertTrue(w[2] > w[1] > w[0])
+
+    def test_timber_and_water_colours(self):
+        """The timber is warm (red over green over blue, darker than route 2's), the water a dark blue-grey: neither
+        teal nor lilac."""
+        tb, old = cb.hex_lin(cb.TIMBER), cb.hex_lin("#6B5440")
+        self.assertTrue(tb[0] > tb[1] > tb[2])
+        self.assertGreater(tb[0] / tb[1], old[0] / old[1])
+        self.assertLess(float(tb.sum()), float(old.sum()))
+        w = cb.hex_lin(cb.WATER)
+        self.assertTrue(w[2] > w[1] > w[0])
+        self.assertEqual(cb.lilac_share(np.array([w, w * 3.0])), 0.0)
+        self.assertFalse(w[1] > w[0] and w[1] > w[2])   # not teal
+        self.assertLess(float(w.sum()), float(cb.hex_lin("#9A958A").sum()) / 4)   # far darker than the rock
+        self.assertLess(cb.WATER_MAX, self.look["hot"]["knee"])
+
+    def test_water_surfaces(self):
+        """A stream lies along its passage at its depth over the floor line on the side given; a pool fills its basin
+        at its level inside the rail's ring; every triangle faces up; water is never a contract node."""
+        sec, _w = core.load_section(os.path.join(UNDERMERE, "river.json"))
+        surf = {s["id"]: s for s in cb.water_surfaces(sec)}
+        self.assertEqual(set(surf), {"ri_stream"})
+        s = surf["ri_stream"]
+        V, F = s["V"], s["F"]
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        self.assertTrue(np.all(n[:, 2] > 0))
+        p = [q for q in sec.own if q.id == "ri_canyon"][0]
+        self.assertAlmostEqual(V[:, 2].max(), p.P[:, 2].max() + 0.25, places=6)
+        self.assertAlmostEqual(V[:, 2].min(), p.P[:, 2].min() + 0.25, places=6)
+        # south of the centre line where the canyon runs east, and within its half width plus 0.3 m
+        east = [(a, b) for a, b in zip(p.P[:-1], p.P[1:]) if b[0] - a[0] > 3 * abs(b[1] - a[1])]
+        self.assertTrue(east)
+        a, b = east[0]
+        sel = (V[:, 0] > a[0] + 0.5) & (V[:, 0] < b[0] - 0.5)
+        yc = a[1] + (b[1] - a[1]) * (V[sel, 0] - a[0]) / (b[0] - a[0])
+        self.assertTrue(np.all(V[sel, 1] < yc + 1e-6))
+        self.assertTrue(np.all(V[sel, 1] > yc - 2.0 - 0.3 - 0.05))
+        area = 0.5 * float(np.abs(n[:, 2]).sum())
+        self.assertGreater(area, 0.9 * 1.6 * 80.0)
+        sec, _w = core.load_section(os.path.join(UNDERMERE, "rising.json"))
+        pool = cb.water_surfaces(sec)
+        self.assertEqual([q["id"] for q in pool], ["rs_sump_pool"])
+        V = pool[0]["V"]
+        self.assertTrue(np.allclose(V[:, 2], 9.3))
+        c = [q for q in sec.own if q.id == "rs_basin_water"][0]
+        rx, ry = 0.3 * c.sx + 0.6, 0.3 * c.sy + 0.6
+        self.assertTrue(np.all(((V[:, 0] - c.c[0]) / rx) ** 2 + ((V[:, 1] - c.c[1]) / ry) ** 2 <= 2.0))
+        self.assertGreater(len(pool[0]["F"]), 20)
+        self.assertEqual(cb.water_surfaces(self.secs["swallow"][0]), [])
+        bad = json.loads(json.dumps(sec.d))
+        bad["water"][0]["chamber"] = "rs_basin"
+        errs, _w = core.validate(bad, sec.net)
+        self.assertTrue(any("not a lake chamber" in e for e in errs), errs)
+
+    def test_water_light_from_the_shell_beside_it(self):
+        P = np.array([[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [0.6, 0.0, 0.0]])
+        L = np.array([[1.0, 0.5, 0.25], [0.0, 1.0, 0.0], [1.0, 0.5, 0.25]])
+        Vw = np.array([[0.3, 0.0, 0.2], [10.0, 0.5, 0.0], [5.0, 0.0, 0.0], [12.5, 0.0, 0.0]])
+        Lw = cb.water_light(Vw, P, L)
+        np.testing.assert_allclose(Lw[0], [1.0, 0.5, 0.25])
+        np.testing.assert_allclose(Lw[1], [0.0, 1.0, 0.0])
+        np.testing.assert_allclose(Lw[2], [0.0, 0.0, 0.0])    # nothing within 3 m
+        np.testing.assert_allclose(Lw[3], [0.0, 1.0, 0.0])    # the nearest, 2.5 m off
 
 
 if __name__ == "__main__":

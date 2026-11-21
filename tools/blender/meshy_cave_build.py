@@ -69,6 +69,13 @@ GRILLE_H = {"arch": 3.0}  # metres: a grille's bar height by gate type (else 2.1
 ATTR = "wdi_light"
 TINT_ATTR = "wdi_tint"
 INK = (0x12, 0x14, 0x1C)
+# the rails', the portal frames' and the trestle's timber albedo. Route 2's #6B5440 read lilac beside the orange rock
+# (its red barely over its green, grey-violet against a warm wall); this is darker and warmer, red over green over blue
+TIMBER = "#5A3E27"
+WATER = "#1E2A31"     # standing and running water, unlit like the rock: a dark blue-grey, blue over green over red
+WATER_MAX = 0.22      # the water's display luminance is eased under this (route 3's first stills: a lit stream read
+                      # as a pale painted strip at 0.45, the Bottom's lake as a white disc)
+WATER_STEP = 0.25     # metres between a water surface's grid lines
 
 
 def log(*a) -> None:
@@ -805,6 +812,45 @@ def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: s
     return ob
 
 
+POST_REACH = 3.5  # how far down a rail's post may reach for the floor under it
+
+
+def post_foot(sec, x: float, y: float, base: float, reach: float = POST_REACH) -> float:
+    """Where a rail's post stands: on the highest floor under its 0.1 m foot (the centre and the four 0.05 m offsets),
+    within reach below the rail's base. A column whose rock starts at the base (the post is set into a lip, a wall
+    or an overhang) or that lies on a bridge's deck at the base stands the post at the base; else the column's floor
+    is the first rock below the base, or a deck's top. Route 2's check: posts floated where the floor fell away into
+    a basin; route 3's: they floated 2.9 m over the Cataract Gallery's undercut floor, and a post whose column met
+    an overhang above its foot was taken for standing on it. With no floor within reach the post keeps its base."""
+    decks = [(b_["box"], float(b_["top_z"])) for b_ in sec.d.get("bridges", [])]
+    zs = base - 0.025 * np.arange(int(round(reach / 0.025)) + 1)
+    best = None
+    for dx, dy in ((0.0, 0.0), (0.05, 0.0), (-0.05, 0.0), (0.0, 0.05), (0.0, -0.05)):
+        px, py = x + dx, y + dy
+        top = [t for (x0, y0, x1, y1), t in decks if x0 - 1e-6 <= px <= x1 + 1e-6 and y0 - 1e-6 <= py <= y1 + 1e-6
+               and base - reach <= t <= base + 0.01]
+        if top and max(top) >= base - 0.01:
+            return base
+        f = sec.field_points(np.stack([np.full(len(zs), px), np.full(len(zs), py), zs], 1))
+        if len(f) and f[0] <= 0.0:
+            return base
+        rock = np.nonzero(f <= 0.0)[0]
+        cand = ([float(zs[rock[0]])] if len(rock) else []) + top
+        if cand:
+            z = max(cand)
+            best = z if best is None else max(best, z)
+    if best is None or best >= base - 0.01:   # within a centimetre: it stands on it
+        return base
+    return best
+
+
+def post_box(sec, x: float, y: float, base: float, h: float, ux: float, uy: float):
+    """A post 0.1 m square from 0.05 m into the floor under it (post_foot; at the base too, so a lip or a deck the
+    shell's mesh meets a little lower still holds it) to the rail's top."""
+    lo = post_foot(sec, x, y, base) - 0.05
+    return box_mesh((x, y, 0.5 * (lo + base + h)), 0.05, 0.05, 0.5 * (base + h - lo), ux, uy)
+
+
 def lake_rails(sec) -> list:
     """The timber rail round each lake's basin, on the ring of the core's automatic basin guard (core.guard_segments:
     from the lake's floor level, 1 m high, 0.12 m thick), so the walker sees what stops them: two bars along every
@@ -832,11 +878,216 @@ def lake_rails(sec) -> list:
         for a, b, L, ux, uy in segs:
             while k < n and k * step <= run + L + 1e-9:
                 t = (k * step - run) / L
-                parts.append(box_mesh((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base + 0.5 * h),
-                                      0.05, 0.05, 0.5 * h, ux, uy))
+                parts.append(post_box(sec, a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base, h, ux, uy))
                 k += 1
             run += L
     return parts
+
+
+def water_surfaces(sec, step: float = WATER_STEP) -> list:
+    """The section's water (its "water" list) as flat surfaces: [{id, kind, level, V, F}], triangles facing up.
+
+    - A stream ({"along": passage, "depth", "width", "side": "left", "right" or "all"}) runs along a walking passage
+      at depth above its floor line, against the wall on that side of the centre line (as you walk from its first
+      point), width metres wide plus 0.3 m into the wall (hidden in the rock), so the walker wades along its edge.
+    - A lake or pool ({"chamber": a lake chamber, "level"}) fills the chamber's basin at the level, inside the ring
+      of its rail.
+
+    A quad is kept where a corner is in the shell field's air just above the surface (and, for a stream, the rock
+    under it is within 1 m, so it never spans a shaft), so the water ends on the rock it lies in. No collision: the
+    walker's floor is the rock under a stream, and a basin's rail keeps them off a lake."""
+    out = []
+    prims = {p.id: p for p in sec.own}
+    for w in sec.d.get("water", []):
+        if "along" in w:
+            p = prims[w["along"]]
+            S = p.S
+            s = np.unique(np.concatenate([np.arange(0.0, S, step), [S]]))
+            seg = np.clip(np.searchsorted(p.cum, s, side="right") - 1, 0, len(p.A) - 1)
+            f = (s - p.cum[seg]) / np.maximum(p.L[seg], 1e-9)
+            P = p.A[seg] + (p.B[seg] - p.A[seg]) * f[:, None]
+            T = (p.B[seg] - p.A[seg])[:, :2] / np.maximum(p.L[seg], 1e-9)[:, None]
+            Nl = np.stack([-T[:, 1], T[:, 0]], 1)
+            hw = 0.5 * (p.w[0] + (p.w[1] - p.w[0]) * s / max(S, 1e-9))
+            side = w.get("side", "all")
+            if side == "all":
+                o0, o1 = -hw - 0.3, hw + 0.3
+            else:
+                wid = float(w.get("width", 1.0))
+                sg = 1.0 if side == "left" else -1.0
+                o0, o1 = sg * (hw - wid), sg * (hw + 0.3)
+            m = int(math.ceil(float(np.max(np.abs(o1 - o0))) / step)) + 1
+            g = np.linspace(0.0, 1.0, m)
+            off = o0[:, None] + (o1 - o0)[:, None] * g[None, :]
+            X = P[:, None, 0] + Nl[:, None, 0] * off
+            Y = P[:, None, 1] + Nl[:, None, 1] * off
+            Z = np.repeat((P[:, 2] + float(w.get("depth", 0.25)))[:, None], m, axis=1)
+            level = None
+        else:
+            c = prims[w["chamber"]]
+            level = float(w["level"])
+            rx, ry = 0.3 * c.sx + 0.6, 0.3 * c.sy + 0.6
+            us = np.arange(-rx, rx + step * 0.5, step)
+            vs = np.arange(-ry, ry + step * 0.5, step)
+            U, Vv = np.meshgrid(us, vs, indexing="ij")
+            ux, uy = c.u
+            X = c.c[0] + U * ux - Vv * uy
+            Y = c.c[1] + U * uy + Vv * ux
+            Z = np.full(X.shape, level)
+        n0, n1 = X.shape
+        G = np.stack([X, Y, Z], -1).reshape(-1, 3)
+        air = sec.field_points(G + np.array([0.0, 0.0, 0.02])) > 0.0
+        below = np.zeros(len(G), bool)
+        for dz in (0.25, 0.5, 0.75, 1.0):
+            below |= sec.field_points(G - np.array([0.0, 0.0, dz])) <= 0.0
+        ok = ((air & below) if level is None else air).reshape(n0, n1)
+        q = ok[:-1, :-1] | ok[1:, :-1] | ok[:-1, 1:] | ok[1:, 1:]
+        ii, jj = np.nonzero(q)
+        if not len(ii):
+            continue
+        idx = np.arange(n0 * n1).reshape(n0, n1)
+        a, b_, c_, d_ = idx[ii, jj], idx[ii + 1, jj], idx[ii + 1, jj + 1], idx[ii, jj + 1]
+        F = np.concatenate([np.stack([a, b_, c_], 1), np.stack([a, c_, d_], 1)])
+        e1, e2 = G[F[:, 1]] - G[F[:, 0]], G[F[:, 2]] - G[F[:, 0]]
+        up = (e1[:, 0] * e2[:, 1] - e1[:, 1] * e2[:, 0]) >= 0.0
+        F[~up] = F[~up][:, ::-1]
+        used, inv = np.unique(F.ravel(), return_inverse=True)
+        out.append({"id": w["id"], "kind": w.get("kind", "stream"), "level": level, "V": G[used],
+                    "F": inv.reshape(-1, 3)})
+    return out
+
+
+def water_light(Vw: np.ndarray, P: np.ndarray, L: np.ndarray, radius: float = 1.25) -> np.ndarray:
+    """The light on a water surface from the baked shell beside it: per water vertex, the inverse-square mean of the
+    graded light of the shell vertices within radius (the floor under a stream, a basin's walls at its level), so
+    the water is lit by the same bake as the rock and needs none of its own. A vertex with none in reach takes the
+    nearest one's light within 3 m (else none)."""
+    out = np.zeros((len(Vw), 3))
+    if not len(Vw) or not len(P):
+        return out
+    lo, hi = Vw.min(0) - 3.0, Vw.max(0) + 3.0
+    keep = np.all((P >= lo) & (P <= hi), axis=1)
+    P, L = P[keep], L[keep]
+    if not len(P):
+        return out
+    cell = radius
+    key = np.floor(P / cell).astype(np.int64)
+    order = np.lexsort((key[:, 2], key[:, 1], key[:, 0]))
+    key, P, L = key[order], P[order], L[order]
+    uk, start, cnt = np.unique(key, axis=0, return_index=True, return_counts=True)
+    table = {tuple(k): (s, s + c) for k, s, c in zip(uk.tolist(), start.tolist(), cnt.tolist())}
+    for i, v in enumerate(Vw):
+        k0 = np.floor(v / cell).astype(np.int64)
+        rows = []
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for dz in (-1, 0, 1):
+                    r = table.get((int(k0[0] + dx), int(k0[1] + dy), int(k0[2] + dz)))
+                    if r:
+                        rows.append(np.arange(*r))
+        if rows:
+            j = np.concatenate(rows)
+            d2 = ((P[j] - v) ** 2).sum(1)
+            near = d2 <= radius * radius
+            if near.any():
+                wgt = 1.0 / np.maximum(d2[near], 0.01)
+                out[i] = (L[j][near] * wgt[:, None]).sum(0) / wgt.sum()
+                continue
+        d2 = ((P - v) ** 2).sum(1)
+        j = int(np.argmin(d2))
+        if d2[j] <= 9.0:
+            out[i] = L[j]
+    return out
+
+
+def water_grey(Lw: np.ndarray) -> np.ndarray:
+    """The shell's light on the water as a grey of the same luminance (Rec. 709), so the water keeps WATER's own hue:
+    route 3's check found the Bottom's lake teal-green (hue 157 to 171 degrees) under the green-leaning light of
+    its flooded rock, where WATER's hue is about 200."""
+    Lw = np.asarray(Lw, np.float64).reshape(-1, 3)
+    y = 0.2126 * Lw[:, 0] + 0.7152 * Lw[:, 1] + 0.0722 * Lw[:, 2]
+    return np.repeat(y[:, None], 3, axis=1)
+
+
+def water_colour(Lw: np.ndarray, look: dict, E: float, k: float) -> tuple:
+    """COLOR_0 for water (no texture: the colour is the light's grey (water_grey) times WATER, times k as the rock's
+    is), its display held at or over the ink floor; returns (rows, report)."""
+    R = _rb()
+    alb = np.tile(hex_lin(WATER), (len(Lw), 1))
+    ink_t = (float(R.lum(np.array(INK, float))) + float(look["ink_lift"]["margin_luma"])) / 255.0
+    L2 = guard_display(np.maximum(water_grey(Lw), 1e-9))
+    low = R.lum(R.agx(E * alb * L2)) < ink_t
+    if low.any():
+        L2[low] *= R.solve_display(E * alb[low] * L2[low], ink_t, lo=1.0, hi=4096.0, iters=40)[:, None]
+    d = R.lum(R.agx(E * alb * L2))
+    # every vertex's display d eased to d / (1 + d / WATER_MAX): about d where the water is dim, never over the cap,
+    # and still brighter where the light is (a cap alone left a lit stream one flat grey), kept over the ink
+    want = np.maximum(d / (1.0 + d / WATER_MAX), ink_t)
+    hot = want < d - 1e-6
+    if hot.any():
+        L2[hot] *= R.solve_display(E * alb[hot] * L2[hot], want[hot], lo=1e-4, hi=1.0, iters=40)[:, None]
+    c0, _f, _n = unit_colour(L2 * k * alb)
+    disp = R.agx(E * alb * L2)
+    rep = {"vertices": int(len(c0)), "display_luma": {f"p{q}": round(float(np.percentile(R.lum(disp), q)), 4)
+                                                      for q in (5, 50, 95)} if len(c0) else {},
+           "under_ink": int((R.lum(disp) < ink_t - 2e-4).sum()), "lilac_share": round(lilac_share(disp), 6),
+           "lifted_to_ink": int(low.sum()), "eased": int(hot.sum())}
+    return c0, rep
+
+
+def water_tree(m) -> None:
+    """The water's export tree: an emission of its COLOR_0 alone (no texture), the unlit shape the glTF exporter
+    writes as KHR_materials_unlit (as the grille's iron)."""
+    nt = m.node_tree
+    nt.nodes.clear()
+    o_ = nt.nodes.new("ShaderNodeOutputMaterial")
+    em = nt.nodes.new("ShaderNodeEmission")
+    lp = nt.nodes.new("ShaderNodeLightPath")
+    mx = nt.nodes.new("ShaderNodeMixShader")
+    vc = nt.nodes.new("ShaderNodeVertexColor")
+    vc.layer_name = ATTR
+    nt.links.new(vc.outputs["Color"], em.inputs["Color"])
+    nt.links.new(lp.outputs["Is Camera Ray"], mx.inputs[0])
+    nt.links.new(nt.nodes.new("ShaderNodeBsdfTransparent").outputs[0], mx.inputs[1])
+    nt.links.new(em.outputs[0], mx.inputs[2])
+    nt.links.new(mx.outputs[0], o_.inputs["Surface"])
+
+
+def water_objects(sec, look: dict, E: float, k: float, objs: list) -> tuple:
+    """The section's water as meshes, lit from the graded shell beside them (water_light over LIGHT_OUT): (objects,
+    report). Not baked, not stitched, not in the collision."""
+    surf = water_surfaces(sec)
+    if not surf:
+        return [], {}
+    Ps, Ls = [], []
+    for o in objs:
+        if o.name not in LIGHT_OUT or o.name.endswith(("_timber", "_kerbs")):
+            continue
+        co = np.empty(len(o.data.vertices) * 3, np.float32)
+        o.data.vertices.foreach_get("co", co)
+        Ps.append(co.reshape(-1, 3).astype(np.float64))
+        Ls.append(LIGHT_OUT[o.name])
+    P = np.concatenate(Ps) if Ps else np.zeros((0, 3))
+    L = np.concatenate(Ls) if Ls else np.zeros((0, 3))
+    if "cave_water" not in MATS:
+        m = bpy.data.materials.new("cave_water")
+        m.use_nodes = True
+        MATS["cave_water"] = {"mat": m, "scan": "water", "kind": "water"}
+    mat = MATS["cave_water"]["mat"]
+    obs, rep = [], {}
+    for s in surf:
+        ob = mesh_object(f"um_{sec.key}_water_{s['id']}", s["V"], s["F"], "cave", mats=[mat])
+        c0, r = water_colour(water_light(s["V"], P, L), look, E, k)
+        me = ob.data
+        a = me.color_attributes.new(ATTR, "FLOAT_COLOR", "POINT")
+        rgba = np.ones((len(me.vertices), 4), np.float32)
+        rgba[:, :3] = c0
+        a.data.foreach_set("color", rgba.ravel())
+        area = float(np.abs(np.cross(s["V"][s["F"][:, 1]] - s["V"][s["F"][:, 0]],
+                                     s["V"][s["F"][:, 2]] - s["V"][s["F"][:, 0]])[:, 2]).sum() * 0.5)
+        rep[s["id"]] = dict(r, kind=s["kind"], triangles=int(len(s["F"])), area_m2=round(area, 1))
+        obs.append(ob)
+    return obs, rep
 
 
 def guard_pieces(z: dict, sec, look: dict, out_dir: str) -> list:
@@ -861,8 +1112,8 @@ def guard_pieces(z: dict, sec, look: dict, out_dir: str) -> list:
                 n = max(1, int(math.ceil(L / 1.2)))
                 for i in range(n + 1):
                     t = i / n
-                    rail_parts.append(box_mesh((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base + 0.5 * h),
-                                               0.05, 0.05, 0.5 * h, ux, uy))
+                    rail_parts.append(post_box(sec, a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base, h,
+                                               ux, uy))
     rail_parts += lake_rails(sec)
     for br in sec.d.get("bridges", []):
         x0, y0, x1, y1 = br["box"]
@@ -877,7 +1128,7 @@ def guard_pieces(z: dict, sec, look: dict, out_dir: str) -> list:
         out.append(textured(f"um_{sec.key}_kerbs", V, F, kit["wall"], "#8E887A", look, out_dir))
     if rail_parts or deck_parts:
         V, F = merge(rail_parts + deck_parts)
-        out.append(textured(f"um_{sec.key}_timber", V, F, kits["timber"], "#6B5440", look, out_dir, repeat=1.2))
+        out.append(textured(f"um_{sec.key}_timber", V, F, kits["timber"], TIMBER, look, out_dir, repeat=1.2))
     return out
 
 
@@ -1091,7 +1342,7 @@ def gate_extras(sec, look: dict, out_dir: str, gate_d: dict, fr: dict, gz: float
                                   inward[0], inward[1]))
         coll += posts
         V, F = merge(posts + caps_)
-        objs.append(textured(f"um_{sec.key}_portal_timber", V, F, kits["timber"], "#6B5440", look, out_dir,
+        objs.append(textured(f"um_{sec.key}_portal_timber", V, F, kits["timber"], TIMBER, look, out_dir,
                              repeat=1.2))
         # the cutting's dry-stone walls with their parapets, from the headwall's face out to the trail
         land = float(cut.get("landing_m", 2.5))
@@ -1170,7 +1421,7 @@ def gate_extras(sec, look: dict, out_dir: str, gate_d: dict, fr: dict, gz: float
         tp.append(box_mesh(tuple(g2 - 8.0 * inw + 1.6 * alo + np.array([0, 0, deck - gz - 0.8])), 2.4, 0.12, 0.15,
                            -inward[0] * 0.9, -inward[1] * 0.9 + 0.1))
         V, F = merge(tp)
-        objs.append(textured(f"um_{sec.key}_vista_trestle_timber", V, F, kits["timber"], "#6B5440", look, out_dir,
+        objs.append(textured(f"um_{sec.key}_vista_trestle_timber", V, F, kits["timber"], TIMBER, look, out_dir,
                              repeat=1.2))
     return objs, coll
 
@@ -1658,6 +1909,8 @@ def to_export(objs: list, look: dict) -> None:
             unlit_tree(m, image=None, colour=np.minimum(md["display"] / we, 1.0))
         elif md["kind"] == "emit_raw":
             unlit_tree(m, image=None, colour=np.minimum(md["colour"], 1.0))
+        elif md["kind"] == "water":
+            water_tree(m)
     for o in objs:
         me = o.data
         if TINT_ATTR in me.color_attributes:
@@ -2003,6 +2256,10 @@ def main(argv) -> int:
         log(f"stitch: {st}")
     lk = look_report(bake_objs, look, float(E))
     log(f"look: {lk}")
+    water, wrep = water_objects(sec, look, float(E), gr["k"], bake_objs)
+    if water:
+        lk["water"] = wrep
+        log(f"water: {wrep}")
     # 4. export
     out = {"section": sec.key, "area": aid, "core": {"geometry_md5": report["geometry_md5"], "ok": report["ok"],
                                                      "problems": report["problems"]},
@@ -2017,7 +2274,7 @@ def main(argv) -> int:
            "materials": sorted({md.get("scan", name) for name, md in MATS.items()}),
            "collision_triangles": coll_tris, "extras": nodes["extras"]}
     if a.glb:
-        to_export(bake_objs + others, look)
+        to_export(bake_objs + others + water, look)
         if "cave_iron" in MATS:
             unlit_iron = MATS["cave_iron"]["mat"]
             nt = unlit_iron.node_tree
@@ -2034,7 +2291,7 @@ def main(argv) -> int:
             nt.links.new(em.outputs[0], mx.inputs[2])
             nt.links.new(mx.outputs[0], o_.inputs["Surface"])
         glb = os.path.join(a.out, f"walk-{aid}.glb")
-        export(glb, bake_objs + others, area_ob, coll_ob)
+        export(glb, bake_objs + others + water, area_ob, coll_ob)
         out["glb"] = {"file": os.path.basename(glb), "bytes": os.path.getsize(glb),
                       "md5": file_md5(glb)}
         log(f"glb: {glb} ({os.path.getsize(glb) / 2 ** 20:.2f} MiB)")

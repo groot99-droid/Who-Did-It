@@ -235,32 +235,34 @@
     {
       "id": "kerb_cataract_gallery",
       "line": [
-        [192.61, 35.047],
+        [193.4, 34.1],
         [194.171, 33.095]
       ],
       "base_z": 10.4,
       "height": 1.0,
-      "notes": "a flowstone kerb on the Cataract Gallery's dome side, 0.5 to 3.0 m past the Cataract Steps' top: the Great Dome's roof undercuts the gallery's floor there (3 unguarded drops in the round-5 build)"
+      "notes": "a flowstone kerb on the Cataract Gallery's dome side, 0.5 to 3.0 m past the Cataract Steps' top: the Great Dome's roof undercuts the gallery's floor there (3 unguarded drops in the round-5 build). Route 3: it ends where it meets the lip, 0.1 m in (it ran on 1.3 m out over the dome, and its posts stood in the air 2.9 m over the dome's floor)"
     },
     {
       "id": "rim_cataract_n",
       "line": [
-        [193.94, 36.92],
+        [194.22, 36.92],
         [194.97, 37.01]
       ],
       "base_z": 10.4,
       "height": 1.0,
-      "notes": "route 2: a flowstone rim on the ledge's north edge beyond the Cataract Steps' face, where the ledge turns back along the dome's wall: the viewer's walker stepped off there and fell 2.9 m outside the climb zone"
+      "notes": "route 2: a flowstone rim on the ledge's north edge beyond the Cataract Steps' face, where the ledge turns back along the dome's wall: the viewer's walker stepped off there and fell 2.9 m outside the climb zone. Route 3: it starts on the lip, 0.08 m in (0.2 m out before, its post in the air)"
     },
     {
       "id": "kerb_cataract_lip",
       "line": [
-        [193.2, 34.4],
-        [193.62, 35.0]
+        [193.4, 34.1],
+        [193.56, 34.4],
+        [193.74, 34.75],
+        [193.84, 35.0]
       ],
       "base_z": 10.4,
       "height": 1.0,
-      "notes": "route 2: a flowstone kerb on the ledge's edge 1.2 to 1.4 m behind the Cataract Steps' face line, where the Great Dome's wall undercuts the ledge (1 unguarded drop of 2.9 m in the core's flood)"
+      "notes": "route 2: a flowstone kerb on the ledge's edge 1.2 to 1.4 m behind the Cataract Steps' face line, where the Great Dome's wall undercuts the ledge (1 unguarded drop of 2.9 m in the core's flood). Route 3: along the lip itself, 0.08 to 0.1 m in, from the gallery kerb's end (it stood 0.14 to 0.28 m out over the dome, its posts in the air)"
     }
   ],
   "spawns": [

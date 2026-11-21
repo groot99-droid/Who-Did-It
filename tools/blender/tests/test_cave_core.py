@@ -74,6 +74,36 @@ def seam_pair(profile):
     return net, section("sa", 0, 20, 14.0, 8.0, "+"), section("sb", 20, 40, 26.0, 32.0, "-")
 
 
+def two_ways(alternatives):
+    """A section with two rooms joined two ways, a fissure to the south and a crawl to the north, each on its own a
+    way round the other; with alternatives, the two are declared alternatives."""
+    net = {"format": "cave-network/1", "scene": "undermere", "name": "two ways", "area_prefix": "under_",
+           "lattice": {"origin": [-128, -64, -96], "cell": 0.125, "block": 32}, "seed": 5,
+           "geology": {"limestone": {"tint": "#9A958A", "repeat_m": 1.5, "noise": 0.12, "bedding": [0.6, 0.04]}},
+           "sections": ["alt"]}
+
+    def tube(i, a, b):
+        return {"id": i, "from": a, "to": b, "profile": "tube", "width": 2.2, "clear": 2.6, "floor": {"kind": "flat"}}
+
+    sec = {"format": "cave-section/1", "key": "alt", "network": net, "geology": "limestone",
+           "region": {"boxes": [[0, 0, -16, 30, 20, -2]]}, "nodes": {},
+           "passages": [tube("t1", [5, 10, -10], [9, 4, -10]),
+                        {"id": "squeeze", "from": [9, 4, -10], "to": [21, 4, -10], "profile": "fissure", "width": 0.48,
+                         "clear": 2.3, "floor": {"kind": "flat"}, "noise": 0.0, "blend": 0.0},
+                        tube("t2", [21, 4, -10], [25, 10, -10]),
+                        tube("t3", [5, 10, -10], [9, 16, -10]),
+                        {"id": "crawl", "from": [9, 16, -10], "to": [21, 16, -10], "profile": "crawl", "width": 1.2,
+                         "clear": 1.1, "floor": {"kind": "flat"}},
+                        tube("t4", [21, 16, -10], [25, 10, -10])],
+           "chambers": [{"id": "room_a", "kind": "hall", "center": [5, 10, -10], "size": [5.0, 5.0, 3.0]},
+                        {"id": "room_b", "kind": "hall", "center": [25, 10, -10], "size": [5.0, 5.0, 3.0]}],
+           "spawns": [{"id": "a", "at": [5, 10, -10]}, {"id": "b", "at": [25, 10, -10]}],
+           "joins": [["t1", "t3"], ["t2", "t4"]]}
+    if alternatives:
+        sec["passages"][1]["alternatives"] = ["crawl"]
+    return sec
+
+
 class Crack(core.Prim if core else object):
     """A straight slot `width` wide and 1.5 m deep across the example hall's floor (a test-only primitive)."""
     cls, blend, walk, core = 1, 0.0, False, None
@@ -618,6 +648,46 @@ class CaveCoreTest(unittest.TestCase):
             edge = (col > 0).sum(axis=0)  # how far the air reaches at each height, in samples
             self.assertLessEqual(int(edge.max() - edge.min()), 1)  # upright: the same reach at every height
             self.assertLess(float(core.prof_wall("rift", 0.5 * W * 0.85 + 0.01, 0.5 * H, W, H, collision=True)), 0)
+
+    def test_keyhole_collision_has_no_shoulders(self):
+        """A keyhole's tube is a bowl each side of its slot about 1 m up (the Spar Maze's walker ran along them and
+        fell back into the slot): the walker's field is the slot's upright wall up to the tube's centre and the tube
+        above it, never more air than the shell's."""
+        for W, H in ((2.2, 3.0), (1.4, 2.4), (2.0, 3.0)):
+            a, b = 0.5 * W, 0.35 * H
+            vc, hs = H - b, max(0.45, 0.22 * W)
+            d = np.linspace(0.0, a + 0.4, 400)[:, None]
+            v = np.linspace(0.02, H, 200)[None, :]
+            vis = core.prof_wall("keyhole", d, v, W, H)
+            col = core.prof_wall("keyhole", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            band = (v[0] > 0.3) & (v[0] < vc - 0.05)
+            reach = d[:, 0][np.argmax(~(col[:, band] > 0), axis=0) - 1]
+            self.assertTrue(np.all(reach <= hs + 1e-9))                       # no shoulder below the centre
+            self.assertTrue(np.any(vis[:, band][d[:, 0] > hs + 0.1] > 0))     # though the shell has its bowls
+            hi = v[0] > vc + 0.25
+            self.assertTrue(np.array_equal(col[:, hi] > 0, vis[:, hi] > 0))      # the tube itself above it
+            self.assertGreater(float(core.prof_wall("keyhole", 0.5 * (hs + a), vc + 0.3, W, H, collision=True)), 0)
+
+    def test_declared_alternatives_are_mandatory_as_a_pair(self):
+        """Two forced moves each a way round the other: undeclared, both are bypassable; declared alternatives, the
+        walker must make one or the other, so both are mandatory, and each lists the other."""
+        res = {}
+        for alt in (False, True):
+            path = self.write(f"two_ways_{int(alt)}.json", two_ways(alt))
+            rep = core.build(path, None, write=False, log=quiet)["report"]
+            res[alt] = {z["passage"]: z for z in rep["flood"]["zones"]}
+            self.assertEqual(rep["flood"]["traps"], 0)
+        for pid in ("squeeze", "crawl"):
+            self.assertTrue(res[False][pid]["traversable"])
+            self.assertTrue(res[False][pid]["bypassable"], pid)
+            self.assertTrue(res[True][pid]["mandatory"], pid)
+        self.assertEqual(res[True]["squeeze"]["alternatives"], ["crawl"])
+        self.assertEqual(res[True]["crawl"]["alternatives"], ["squeeze"])
+        bad = two_ways(True)
+        bad["passages"][1]["alternatives"] = ["t3"]
+        errs, _w = core.validate(bad, bad["network"])
+        self.assertTrue(any("alternatives are crawls" in e for e in errs), errs)
 
     def test_lower_wall_noise_left_out_of_the_walkers_field(self):
         rng = np.random.default_rng(3)

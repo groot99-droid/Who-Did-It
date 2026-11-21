@@ -75,7 +75,7 @@
       "detail": "tiger_rock / quarry_wall_02"
     },
     "flooded": {
-      "tint": "#55606A",
+      "tint": "#5C5B60",
       "repeat_m": 2.0,
       "noise": 0.1,
       "bedding": [0.6, 0.04],

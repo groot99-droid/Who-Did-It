@@ -162,6 +162,15 @@
       "notes": "the gate's mouth (the vista beyond)"
     }
   ],
+  "water": [
+    {
+      "id": "rs_sump_pool",
+      "kind": "pool",
+      "chamber": "rs_basin_water",
+      "level": 9.3,
+      "notes": "the deep sump pool, black, the rising's source, 0.3 m under the hall's floor (the design's rs_sump_pool)"
+    }
+  ],
   "joins": [
     ["do_gour", "rs_gour"],
     ["rs_arch", "rs_link"],

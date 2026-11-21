@@ -122,7 +122,8 @@
       "geology": "gypsum",
       "ledge_depth": 2.0,
       "approach": 6.25,
-      "notes": "the Giant's Coffin"
+      "notes": "the Giant's Coffin",
+      "alternatives": ["wh_wringer"]
     },
     {
       "id": "wh_coffin_foot",
@@ -140,7 +141,7 @@
     {
       "id": "wh_coffin_ridge_1",
       "from": [56.0, 6.5, -14.85],
-      "to": [61.0, 6.0, -14.95],
+      "to": [58.0, 6.0, -14.9],
       "profile": "tube",
       "width": 3.0,
       "clear": 3.0,
@@ -148,12 +149,12 @@
         "kind": "ramp"
       },
       "geology": "gypsum",
-      "notes": "the Coffin's back (leg 1 of 2)"
+      "notes": "the Coffin's back (leg 1 of 3) (route 3: shortened so the block stair stays between rock walls)"
     },
     {
       "id": "wh_coffin_ridge_2",
-      "from": [61.0, 6.0, -14.95],
-      "to": [69.0, 6.0, -18.55],
+      "from": [58.0, 6.0, -14.9],
+      "to": [63.6, 6.0, -18.55],
       "profile": "tube",
       "width": 3.0,
       "clear": 3.0,
@@ -163,7 +164,20 @@
         "tread": 0.34
       },
       "geology": "gypsum",
-      "notes": "the Coffin's back (leg 2 of 2)"
+      "notes": "the Coffin's back (leg 2 of 3) (route 3: the stair ends at 63.6, before the east gallery's round end at 64, whose 2.5 m drop it fell off on both sides)"
+    },
+    {
+      "id": "wh_coffin_tail",
+      "from": [63.6, 6.0, -18.55],
+      "to": [69.0, 6.0, -18.55],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "gypsum",
+      "notes": "the Coffin's back (leg 3 of 3): the stair's foot into the east gallery (route 3)"
     },
     {
       "id": "wh_wringer",
@@ -176,10 +190,11 @@
         "kind": "flat"
       },
       "geology": "gypsum",
-      "notes": "the Wringer",
+      "notes": "the Wringer (route 3: declared the Giant's Coffin climb's alternative; of the two the walker makes one)",
       "via": [[61.0, 13.6, -18.85]],
       "noise": 0.0,
-      "blend": 0.0
+      "blend": 0.0,
+      "alternatives": ["wh_coffin_face"]
     },
     {
       "id": "wh_wringer_w",
@@ -210,7 +225,7 @@
     {
       "id": "wh_trunk2",
       "from": [69.0, 6.0, -18.55],
-      "to": [94.0, 6.0, -17.8],
+      "to": [92.5, 6.0, -17.85],
       "profile": "tube",
       "width": 10.0,
       "clear": 7.0,
@@ -218,7 +233,7 @@
         "kind": "ramp"
       },
       "geology": "gypsum",
-      "notes": "the White Gallery (east)",
+      "notes": "the White Gallery (east) (route 3: its end moved 1.5 m west, so its round end stays inside x 99, the seam white_levels' plane, where it broke out of the shell)",
       "via": [
         [78.0, 7.0, -18.3],
         [88.0, 6.0, -18.0]
@@ -226,7 +241,7 @@
     },
     {
       "id": "wh_holing_1",
-      "from": [94.0, 6.0, -17.8],
+      "from": [92.5, 6.0, -17.85],
       "to": [95.5, 9.5, -17.75],
       "profile": "drift",
       "width": 2.0,
@@ -438,6 +453,12 @@
     ["lv_second_5r", "wh_holing_2"],
     ["lv_second_5r", "wh_trunk2"],
     ["lv_second_5r", "wh_holing_2r"],
-    ["wh_holing_2r", "wh_holing_1"]
+    ["wh_holing_2r", "wh_holing_1"],
+    ["wh_coffin_tail", "wh_coffin_ridge_2"],
+    ["wh_coffin_tail", "wh_trunk2"],
+    ["wh_coffin_tail", "wh_wringer_e"],
+    ["wh_coffin_tail", "wh_coffin_ridge_1"],
+    ["wh_coffin_tail", "wh_coffin_face"],
+    ["wh_coffin_tail", "wh_wringer"]
   ]
 }

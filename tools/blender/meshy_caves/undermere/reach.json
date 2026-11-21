@@ -177,6 +177,17 @@
     }
   ],
   "openings": [],
+  "water": [
+    {
+      "id": "re_stream",
+      "kind": "stream",
+      "along": "re_canyon",
+      "side": "right",
+      "width": 2.0,
+      "depth": 0.25,
+      "notes": "the river's east half, on the floor's lower (south) half, 0.25 m deep; it falls past the ledge behind the Cascade (the design's re_stream)"
+    }
+  ],
   "joins": [
     ["bo_cascade_face", "re_canyon"],
     ["bo_cascade_face", "re_ledge"],

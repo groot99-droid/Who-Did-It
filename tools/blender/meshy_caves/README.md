@@ -64,6 +64,7 @@ section. It holds:
 | `seams`         | See below                                                                                                                                                                                                                                                                   |
 | `openings`      | Boxes where the mesh may stay open, such as a mouth                                                                                                                                                                                                                         |
 | `joins`         | Pairs of passage or chamber ids meant to meet where nothing else joins them (see below)                                                                                                                                                                                     |
+| `water`         | Streams along walking passages and lakes in lake chambers, drawn by the builder (see below)                                                                                                                                                                                 |
 
 ### Profiles and the clear core
 
@@ -97,6 +98,41 @@ guarantee of construction.
   a bump. The hidden wall lies at most 0.25 m inside the rock you see.
 - A rift's walls lean out from its floor to mid height; its collision wall is upright through the floor's edge all
   the way up (at most 0.075 of its width inside the rock you see), so a walker cannot stand on the leaning foot.
+- A keyhole's tube is a bowl on each side of its slot, about 1 m above the floor (its shoulders). Its collision is
+  the slot's upright wall up to the tube's centre and the tube above it, so a walker never stands on a shoulder (the
+  Spar Maze's flood found 1,429 states on them and 40 falls off them where keyholes met on ramps). The hidden wall
+  lies up to the tube's half width less the slot's behind the bowl you see, where no body fits.
+
+### Alternatives
+
+A forced move may have declared `alternatives` (other crawls, fissures or climb faces of the same section): the
+walker must make one of them, as at the White Gallery's Giant's Coffin (a climb) and the Wringer (a squeeze). Each is
+checked as mandatory with its alternatives' zones taken away too; a climb's alternative also loses the falls off its
+ledge, as in the viewer a walker who steps off the top meets the face and climbs down it. The zone's result lists
+its `alternatives`. Validation refuses an alternative that is not another crawl, fissure or climb face of the section.
+
+### Water
+
+A section's `water` is drawn by the builder (`meshy_cave_build.water_surfaces`), with no collision:
+
+- a stream (`along` a walking passage, `depth` over its floor line, `width`, `side` `left`, `right` or `all` as you
+  walk from the passage's first point) lies against the wall on that side, 0.3 m into it, kept where it lies in the
+  air with rock within 1 m under it;
+- a lake or pool (`chamber`, a lake chamber, and `level`, between the basin's bottom and the chamber's floor) fills
+  the basin inside its rail's ring.
+
+The water is unlit like the rock and lit by the same bake: each vertex takes the inverse-square mean of the graded
+light of the shell vertices within 1.25 m (`water_light`), as a grey of its luminance (`water_grey`, so a green-leaning
+rock light cannot turn it teal), times a dark blue-grey albedo, held at or over the ink floor. A section rebuilt from a
+saved bake (`--raw`) gets its water without baking again.
+
+### Rails
+
+A guard thinner than 0.15 m is drawn as a timber rail: two bars and a post about every 1.2 m (`post_box`). A post
+goes 0.05 m into what holds it: the floor under its 0.1 m foot (the highest of five columns), as far as 3.5 m down
+(`post_foot`), or the base itself where a column's rock starts there (a lip, a wall, an overhang) or a bridge's deck
+lies at it. So a rail's line belongs on the lip it guards, not out over the drop: the builder's test
+(`test_no_post_floats`) holds every post of every thin guard to rock within 0.03 m under its foot.
 
 ### Rock between passages
 

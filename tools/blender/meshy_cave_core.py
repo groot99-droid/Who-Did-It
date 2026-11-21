@@ -496,6 +496,29 @@ def validate(sec, net, sec_path=None):
                 errs.append(f"{kind}: id {o['id']!r} used twice")
             ids.add(o["id"])
     resolved, fissures = [], []
+    pids = {p["id"]: p for p in sec.get("passages", [])}
+    chams = {c["id"]: c for c in sec.get("chambers", [])}
+    for w in sec.get("water", []):
+        # water is drawn by the builder (meshy_cave_build.water_surfaces): along a walking passage, or in a lake's basin
+        where = f"water {w['id']}"
+        if ("along" in w) == ("chamber" in w):
+            errs.append(f"{where}: give either along (a stream) or chamber (a lake's basin)")
+        elif "along" in w and (w["along"] not in pids or pids[w["along"]]["profile"] not in WALK_PROFILES):
+            errs.append(f"{where}: along {w['along']!r} is not a walking passage of this section")
+        elif "chamber" in w and (chams.get(w["chamber"], {}).get("kind") != "lake" or "level" not in w):
+            errs.append(f"{where}: chamber {w['chamber']!r} is not a lake chamber of this section, or no level")
+        elif "chamber" in w:
+            c = chams[w["chamber"]]
+            if not (c["center"][2] - c.get("basin_depth", 1.2) < w["level"] < c["center"][2]):
+                errs.append(f"{where}: the level lies in the basin, under the chamber's floor and over its bottom")
+    for p in sec.get("passages", []):
+        for alt in p.get("alternatives", []):
+            # declared alternatives: forced moves of which the walker must make one (the White Gallery's Giant's
+            # Coffin climb or its Wringer squeeze). Each is checked as mandatory with the other's zones taken away too
+            if alt not in pids or alt == p["id"]:
+                errs.append(f"passage {p['id']}: alternative {alt!r} is not another passage of this section")
+            elif pids[alt]["profile"] not in ("crawl", "fissure", "climb_face") or                     p["profile"] not in ("crawl", "fissure", "climb_face"):
+                errs.append(f"passage {p['id']}: alternatives are crawls, fissures or climb faces ({alt!r})")
     for p in sec.get("passages", []):
         w = p["width"] if isinstance(p["width"], list) else [p["width"]]
         h = p["clear"] if isinstance(p["clear"], list) else [p["clear"]]
@@ -724,7 +747,16 @@ def prof_wall(profile, d, v, W, H, collision=False):
         a, b = 0.5 * W, 0.35 * H
         vc = H - b
         tube = np.minimum(a, b) * (1.0 - np.sqrt((d / a) ** 2 + ((v - vc) / b) ** 2))
-        slot = smin(np.maximum(0.45, 0.22 * W) - d, vc + 0.2 - v, 0.15)
+        hs = np.maximum(0.45, 0.22 * W)
+        if collision:
+            # The tube's lower half is a bowl on each side of the slot, about 1 m above the floor: the shoulders.
+            # Where two keyholes meet on ramps, or a keyhole opens off a fissure, the viewer's ground rays found the
+            # bowls and the walker ran along them and fell 1 m back into the slot (the Spar Maze: 40 falls, 1,429
+            # states off the routes). The walker meets the slot's upright wall up to the tube's centre instead, and
+            # the tube only above it, so the shoulders are never stood on (they lie up to a - hs behind the bowl you
+            # see, where no body fits).
+            return np.maximum(np.minimum(tube, v - vc), smin(hs - d, vc + 0.1 - v, 0.15))
+        slot = smin(hs - d, vc + 0.2 - v, 0.15)
         return np.maximum(tube, slot)
     if profile == "drift":
         hw = 0.5 * W
@@ -3214,6 +3246,37 @@ def zone_ends(fl, zn):
     return ends[0], ends[1]
 
 
+def alternatives(d, pid):
+    """The passages declared alternatives of passage pid (either way round): its bypass test takes their zones away
+    too, so of a pair the walker must make one move or the other."""
+    out = set()
+    for p in d.get("passages", []):
+        if p["id"] == pid:
+            out |= set(p.get("alternatives", []))
+        elif pid in p.get("alternatives", []):
+            out.add(p["id"])
+    out.discard(pid)
+    return out
+
+
+def without_graph(fl, kept, alt_climbs):
+    """The walk graph with only the kept zones. A declared alternative that is a climb also loses the falls off its
+    ledge: in the viewer a walker who steps off the top meets the face and climbs down it (the face catches the
+    fall), so with the face's zone taken away that fall is the climb itself, not a way round the other move."""
+    src, dst, fall = fl.edges(kept)
+    if alt_climbs:
+        drop = np.zeros(len(src), bool)
+        fe = np.nonzero((fall > STEP + 1e-6) & (src < fl.N))[0]
+        if len(fe):
+            x, y, z, _ = fl.pos(src[fe])
+            for c in alt_climbs:
+                lx, ly, lz = c.local(x, y, z)
+                drop[fe] |= ((np.abs(lx) <= c.half[0] + 0.6) & (lz >= -1.5) & (lz <= 0.6)
+                             & (ly >= c.half[1] - 0.6))
+        src, dst = src[~drop], dst[~drop]
+    return fl.csr(src, dst, fl.N + 1)
+
+
 def zone_check(fl, zn, zones, full, reached=None):
     """For a zone or a passage's chain of zones. Traversable: from each end of the chain to the other with every
     zone. Bypassable: from the walking states at one end to the other without the chain's zones. An end beyond a seam
@@ -3224,7 +3287,9 @@ def zone_check(fl, zn, zones, full, reached=None):
     zn = chain[0]
     a, b = zone_ends(fl, chain)
     seams = [seam_beyond(fl.sec, *p) for p in zone_end_points(chain)]
-    without = fl.graphs([z for z in zones if all(z is not c for c in chain)])[0]
+    alts = alternatives(fl.sec.d, zn.source)
+    without = without_graph(fl, [z for z in zones if all(z is not c for c in chain) and z.source not in alts],
+                            [z for z in zones if z.source in alts and z.kind == "climb"])
 
     walk_n = fl.K * fl.g.NP  # walking states come first in the id space
 
@@ -3296,6 +3361,7 @@ def zone_check(fl, zn, zones, full, reached=None):
             "ends_found": [bool(a), bool(b)], "traversable": bool(trav),
             "bypassable": bool(byp), "mandatory": bool(trav and not byp),
             "segments_walked_round": skipped, "walked_in": [round(v, 2) for v in deep],
+            "alternatives": sorted(alts),
             "seam_ends": [sm["id"] if sm is not None else None for sm in seams]}
 
 

@@ -565,6 +565,16 @@
       "notes": "route 2: an ink window on the shaft box's south face at the collar, where the adit's Shaft Collar drive runs on beyond this file (Vane's Adit draws it)"
     }
   ],
+  "water": [
+    {
+      "id": "lv_wet_water",
+      "kind": "stream",
+      "along": "lv_wet",
+      "side": "all",
+      "depth": 0.2,
+      "notes": "the wet level's water over its whole floor, 0.2 m deep, running to the Engine Shaft's sump (the design's lv_wet_water)"
+    }
+  ],
   "joins": [
     ["lv_incline_1", "lv_incline_3"],
     ["lv_incline_1", "lv_incline_4"],
