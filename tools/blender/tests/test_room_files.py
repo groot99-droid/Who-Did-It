@@ -956,7 +956,7 @@ class RoomFileV2(unittest.TestCase):
 
     def test_hearth_rules(self):
         cases = [(lambda h: h["spec"].update(style="grate"),
-                  "hearth style 'grate' is not one of surround, stone, inglenook, stove (R-H1)"),
+                  "hearth style 'grate' is not one of surround, stone, inglenook, stove, oven (R-H1)"),
                  (lambda h: h["spec"].update(style="stove"), 'hearth style "stove" is not built yet'),
                  (lambda h: h["spec"].update(size=[1.7, 0.42]), "a hearth's size is [w, d, h]"),
                  (lambda h: h["spec"]["mantel"].update(z=0.9),
@@ -1199,6 +1199,65 @@ class RoomFileV2(unittest.TestCase):
         data = raw(PARLOUR)
         next(p for p in data["pieces"] if p["id"] == "wp.fireplace_e")["spec"]["seats"] = {"width": 0.3}
         self.assertIn("beam and seats are an inglenook's (R-H6)", self.stops(data))
+
+    # -- G16: the bread oven (Crumb's oven room), a hearth style of its own
+    def oven_room(self):
+        return raw(os.path.join(ROOMS_DIR, "crumb_oven.json"))
+
+    def test_the_crumb_oven_reads_with_its_mouth_dome_and_flue(self):
+        cfg, spec = self.read(self.oven_room())
+        p = next(q for q in cfg["pieces"] if q["id"] == "co.brick_oven")
+        hv = rf.hearth_values(p["spec"], cfg["height"])
+        self.assertEqual((hv["style"], hv["surface"], hv["opening"], hv["oven"]["sill"]), ("oven", "stone", [0.56, 0.4], 0.8))
+        # the ledge before the body at the sill; the body from its back to 0.2 m in front of it
+        self.assertEqual((hv["body"]["y0"], hv["body"]["y1"]), (-0.8, 1.0))
+        self.assertEqual((hv["shelf"]["y0"], hv["shelf"]["y1"], hv["shelf"]["z0"], hv["shelf"]["z1"]), (-1.0, -0.8, 0.72, 0.8))
+        # the chamber 0.25 m short of the back, its floor the sill; the dome before the flue, the flue to the ceiling
+        fb = hv["firebox"]
+        self.assertEqual((fb["depth"], fb["z0"], fb["z1"]), (1.55, 0.8, 1.2))
+        self.assertEqual((hv["breast"]["y0"], hv["breast"]["z0"], hv["breast"]["z1"]), (0.5, 1.35, 3.0))
+        dm = hv["oven"]["dome"]
+        self.assertEqual((round(dm["y0"], 3), round(dm["y1"], 3), dm["z0"], dm["z1"]), (-0.74, 0.44, 1.35, 1.85))
+        # the fire just inside the mouth, over the coals raked to the chamber's front
+        self.assertEqual(hv["anchors"]["fire"], (0.0, -0.72, 0.98))
+        self.assertEqual((hv["glow"]["size"], hv["glow"]["at"]), ([0.392, 0.5, 0.08], [[0.0, -0.52, 0.812]]))
+        self.assertIn("co.brick_oven", spec["hosts"])
+        self.assertEqual(spec["groups"], ["candle", "fire", "fill"])
+        # the defaults: a mouth of 0.35 w (at most 0.6) by 0.4 on a 0.8 m sill, a 0.5 m dome, no flue
+        hv = rf.hearth_values({"model": "hearth", "style": "oven", "size": [1.6, 1.6, 1.4], "surface": "stone"}, 3.0)
+        self.assertEqual((hv["opening"], hv["oven"]["sill"], hv["oven"]["dome"]["z1"], hv["breast"]),
+                         ([0.56, 0.4], 0.8, 1.9, None))
+        self.assertEqual((hv["oven"]["ledge"], hv["firebox"]["depth"]),
+                         ({"depth": 0.2, "thickness": 0.08, "width": 1.06}, 1.15))
+        hv = rf.hearth_values({"model": "hearth", "style": "oven", "size": [1.6, 1.6, 1.4], "surface": "stone",
+                               "dome": False}, 3.0)
+        self.assertIsNone(hv["oven"]["dome"])
+
+    def test_oven_rules(self):
+        def oven(d):
+            return next(p for p in d["pieces"] if p["id"] == "co.brick_oven")
+
+        cases = [(lambda h: h["spec"].update(opening=[1.6, 0.4]), "needs 0.25 m of masonry each side of it (R-H9)"),
+                 (lambda h: h["spec"].update(sill=1.0), "the mouth's top (1.4 m) leaves under 0.15 m of masonry"),
+                 (lambda h: h["spec"]["dome"].update(height=1.8), "the dome's top (3.15 m) is over the 3 m ceiling"),
+                 (lambda h: h["spec"]["breast"].update(depth=1.6), "leaves 0.3 m of the body's top before it"),
+                 (lambda h: h["spec"]["ledge"].update(width=0.3), "the ledge is 0.3 m wide: at least the mouth's"),
+                 (lambda h: h["spec"]["ledge"].update(depth=1.5), "leaves the oven's body 0.50 m deep, under 0.6 m"),
+                 (lambda h: h["spec"]["firebox"].update(depth=1.75), "the oven's chamber is over 0 and at most"),
+                 (lambda h: h["spec"].update(anchors={"fire": [0.0, -0.72, 0.5]}), "is not in its chamber"),
+                 (lambda h: h["spec"].update(mantel={"z": 1.2}), "an oven has no mantel (R-H8)"),
+                 (lambda h: h["spec"].update(dome=1), 'dome is {"height": m}, or false for none'),
+                 (lambda h: h["spec"]["dome"].update(width=1.0), 'the key "width" is not a dome key'),
+                 (lambda h: h["spec"]["ledge"].update(height=0.1), 'the key "height" is not a ledge key'),
+                 (lambda h: h["spec"].update(surface="brick"), 'surface "brick" waits for G11')]
+        for change, said in cases:
+            data = self.oven_room()
+            change(oven(data))
+            self.assertIn(said, self.stops(data), said)
+        # sill, dome and ledge are an oven's only
+        data = raw(PARLOUR)
+        next(p for p in data["pieces"] if p["id"] == "wp.fireplace_e")["spec"]["sill"] = 0.8
+        self.assertIn("sill is an oven's (R-H8)", self.stops(data))
 
 
 class GateDigest(unittest.TestCase):

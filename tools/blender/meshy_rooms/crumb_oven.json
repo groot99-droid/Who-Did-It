@@ -1,0 +1,274 @@
+{
+  "room": "crumb_oven",
+  "about": "Le Four à Pain, Crumb's oven room behind the bakery, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 8 m inside (x -5..5, y -4..4), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/crumb_oven.json is named below. No window: the scene has none and no moon light, so the room is lit by the oven's fire, its main light, and by the one bulb on its iron arm on the north wall. The oven is box-built (G16, the hearth style `oven`); grey boxes stand in for the pieces that have no model yet (decision D2): the peel rack and the flour sacks. A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Crumb's oven room",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the door to the bakery"
+  },
+  "height": 3.0,
+  "height_note": "the bakery family's 3.0 m (the mixing and proofing rooms')",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.95, 0.93, 0.88]
+  },
+  "floor_note": "the scene's `f` flagstones (its material layer), as the mixing room's: the flagstone scan (stone_floor) is not in the local cache and nothing is downloaded, so the cached set-stone scan (rock_wall_08, the stone_wall role) stands in, enlarged to stones about 0.5 m long (the floor's UVs repeat every 3.0 x zoom m)",
+  "wall_colour": "#7A7262",
+  "wall_colour_note": "the proofing room's floured limewash a step darker (#827A69 read cream where the oven's light falls on the south and side walls in the first 128-sample bake, 2026-11-21); the bakery family's walls (the brick scan is not cached, D8: brick only if cheap); never pink or lilac",
+  "ceiling_colour": "#968D77",
+  "ceiling_colour_note": "limewash smoked by the oven, a step darker than the mixing room's",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the door, the skirting",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a work room: no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "co.door",
+      "kind": "door",
+      "portal": "co.door",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door back into the bakery in the south wall, tile (5,9): centred at x -0.5, the portal at its foot (-0.5, -4.0); the door spawn stands 0.5 m inside it, (-0.5, -3.5), by design. The knob is the default end (east)."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": 1.0,
+  "exposure_note": "fixed. The first 128-sample bake (2026-11-21) at 1.3 with the fire at 2.0 lit the room flat from the fill and the bulb, the fire's pool weak (its 90th percentile 0.009 against the bulb's 0.07); with the fire at 5 and 8 (tried from that saved bake) the oven's light came out of its mouth as a warm fan over the floor and the south wall, which then read cream: 1.0 with the fire at 4 and greyer walls for the second bake",
+  "lights": [
+    {
+      "id": "co.lt_oven",
+      "role": "fire",
+      "anchor": {
+        "piece": "co.brick_oven",
+        "name": "fire"
+      },
+      "note": "the oven's fire, always lit: the oven's own anchor, 8 cm inside its mouth over the coals raked to the front of the chamber, so its light comes out into the room (a light deep in the chamber would light only the soot)"
+    },
+    {
+      "id": "co.lt_bulb",
+      "role": "lamp",
+      "anchor": {
+        "piece": "co.wall_bulb",
+        "name": "flame"
+      },
+      "glow": false,
+      "note": "the bulb at its tile (3,0), on the north wall: the light 7 cm under the rim of its iron sconce's shade (the proofing room's)"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the wall bulb), fire (the oven) and fill = 3, and the AO. No moon group: no window. No glow mesh on the bulb (`glow: false`): it sits inside its shade, as the proofing room's; the oven's coals are its own glow (firebox.glow).",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the fire role, the coals, its own light setting and the darker-room exposure lever.",
+    "lights": {
+      "fire": {
+        "color": "#FFB457",
+        "power": 80.0,
+        "radius": 0.12
+      }
+    },
+    "lights_note": "the tavern bar's fire role (the parlour's, a size up): a first guess, for the first 128-sample bake to set through the fire group's weight",
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the coals as the parlour's and the tavern's hearths",
+    "settings": {
+      "oven": {
+        "label": "the oven room",
+        "mix": {
+          "candle": 1.0,
+          "fire": 4.0,
+          "fill": 0.03
+        },
+        "note": "the fire as the room's main light: 2.0 (the first guess) left it weaker than the one bulb, 5 and 8 (tried from the first bake) made it the main light; 4 with the exposure at 1.0. The bulb at the look's lamp power, the fill as the mixing and proofing rooms'"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a work room at night, lit by its fire and one bulb",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "oven",
+  "light_note": "the room's own light setting (look.settings.oven; --light overrides)",
+  "pieces": [
+    {
+      "id": "co.brick_oven",
+      "face": "S",
+      "place": ["wall", "N", 1.0],
+      "spec": {
+        "model": "hearth",
+        "style": "oven",
+        "size": [2.0, 2.0, 1.35],
+        "surface": "stone",
+        "surface_note": "the oven's own default is brick, which waits for G11's fetch: the cottage's and the tavern's stone",
+        "opening": [0.56, 0.4],
+        "sill": 0.8,
+        "ledge": { "depth": 0.2, "thickness": 0.08, "width": 1.06 },
+        "dome": { "height": 0.5 },
+        "breast": { "width": 0.7, "depth": 0.5, "to": "ceiling" },
+        "breast_note": "the flue, behind the dome against the north wall, up to the ceiling",
+        "firebox": { "glow": { "shape": "box", "material": "coal" } }
+      },
+      "note": "G16, built with this room: the brick dome oven on its 2 x 2 footprint, tiles (6,1) to (7,2) (x 0..2, y 2..4), against the north wall. A masonry body 1.35 m high with the mouth (0.56 x 0.4 m) on a 0.8 m sill over a stone ledge, a sooted chamber 1.55 m deep behind it with the coals raked to its front, a low dome on the body's top and the flue behind it to the ceiling. The plan's brick oven is a Tier 1 hero (no model); the brick scan is not cached, so it is the cottage's stone"
+    },
+    {
+      "id": "co.peel_rack",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "rise": 0.4,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.12, 1.6],
+        "label": "Peel rack: a wall rail hung with the long wooden bread peels"
+      },
+      "note": "at its tile (2,0), on the north wall: a flat rack from 0.4 to 2.0 m. No model (a grey box, the plan's peel rack)"
+    },
+    {
+      "id": "co.wall_bulb",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "rise": 1.9,
+      "spec": {
+        "model": "ph",
+        "slug": "industrial_wall_sconce",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, -0.057, 0.0]
+        }
+      },
+      "note": "the bulb's iron arm at its tile (3,0), on the north wall beside the peels: Poly Haven's industrial wall sconce (a single bracket, D7), its back plate from 1.9 m, the shade's rim at 1.97 m; the flame anchor under the bulb's centre, 7 cm under the rim (the proofing room's)"
+    },
+    {
+      "id": "co.bread_shelf",
+      "face": "S",
+      "place": ["wall", "N", -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.9,
+        "lod": 0.5
+      },
+      "note": "a shelf of the morning's loaves at its tile (4,0), on the north wall west of the oven: a plain open shelf at 0.9 (0.9 m wide, 1.87 m high); the loaves wait for G17"
+    },
+    {
+      "id": "co.bread_shelf_b",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.9,
+        "lod": 0.5
+      },
+      "note": "the second loaf shelf at its tile (9,0), on the north wall east of the oven"
+    },
+    {
+      "id": "co.log_basket_0",
+      "face": "S",
+      "place": ["at", -4.5, 3.5],
+      "spec": { "model": "ph", "slug": "wicker_basket_02", "scale": 1.4, "lod": 0.25 },
+      "note": "a basket of split logs at its tile (1,1), in the north-west corner (the tavern's wicker basket at 1.4; the logs have no model)"
+    },
+    {
+      "id": "co.log_basket_1",
+      "face": "W",
+      "place": ["at", 2.5, 2.5],
+      "spec": { "model": "ph", "slug": "wicker_basket_02", "scale": 1.4, "lod": 0.25 },
+      "note": "the second log basket at its tile (8,2), beside the oven's east side"
+    },
+    {
+      "id": "co.cooling_rack_0",
+      "face": "W",
+      "place": ["wall", "E", 3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "a cooling rack at its tile (10,1), against the east wall: Poly Haven's worn metal rack (0.92 x 0.6 x 1.9 m), the proofing room's; its loaves wait for G17"
+    },
+    {
+      "id": "co.cooling_rack_1",
+      "face": "W",
+      "place": ["wall", "E", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the second cooling rack at its tile (10,2), against the east wall"
+    },
+    {
+      "id": "co.bread_rack",
+      "spot": true,
+      "face": "E",
+      "place": ["wall", "W", 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the hide spot at its tile (1,3), against the west wall: the bread rack, a tall open shelf at 1.0 (1.0 m wide, 2.08 m high) to stand behind; its loaves wait for G17"
+    },
+    {
+      "id": "co.flour_sacks",
+      "face": "E",
+      "place": ["wall", "W", -1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "the sack of farine at its tile (1,6), against the west wall. No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "co.water_bucket",
+      "face": "E",
+      "place": ["wall", "W", -2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the dousing bucket at its tile (1,7), against the west wall"
+    },
+    {
+      "id": "co.wood_box",
+      "spot": true,
+      "face": "W",
+      "place": ["wall", "E", -2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_02",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the body spot at its tile (10,7), against the east wall: the wood box, the cottage's big plank crate (wooden_crate_02)"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the spawn's own view; the others look at one corner or piece each.",
+  "views": {
+    "spawn_door": [[-0.5, -3.5, 1.6], [-0.5, 4.0, 1.3], 70.0],
+    "oven": [[-1.2, -0.8, 1.6], [1.0, 2.2, 1.0], 70.0],
+    "mouth": [[0.7, 0.7, 1.6], [1.0, 2.3, 0.95], 70.0],
+    "west": [[1.6, -1.0, 1.6], [-5.0, 1.0, 0.8], 70.0],
+    "east": [[-2.6, -0.6, 1.6], [5.0, 2.0, 1.0], 70.0],
+    "south": [[0.6, 1.2, 1.6], [-0.5, -4.0, 1.1], 70.0],
+    "peels": [[-1.2, -0.6, 1.6], [-3.0, 4.0, 1.4], 70.0],
+    "wood_box": [[1.4, -1.2, 1.6], [4.5, -2.6, 0.5], 70.0]
+  }
+}

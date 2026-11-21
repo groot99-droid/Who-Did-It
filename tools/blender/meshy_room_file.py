@@ -53,7 +53,7 @@ PIECE_KEYS = frozenset("id spot key face place spec sheets cloth dress_lod lift 
                        "name".split())
 SPEC_KEYS = frozenset("model slug name scale tall size kmax lod extras dress doors mirror bed centre drop sheets rot "
                       "wall drape head label finish anchors glow style opening surface mantel breast firebox beam "
-                      "seats".split())
+                      "seats sill dome ledge".split())
 OPENING_KEYS = frozenset("id kind portal prop side in at width height style knob sill head panes rod curtains swag "
                          "curtain_colour outside foot flight hatch".split())
 LIGHT_KEYS = frozenset("id role anchor z group power color radius glow window pool name".split())
@@ -71,11 +71,12 @@ MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")     # R-P5: the build
 BOX_FINISHES = ("grey", "wood")
 BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")   # what the builder builds today
 # the hearth (G6, room_file_v2 section 6): its styles (R-H1), the three built (the surround and the stone hearth
-# first, the inglenook with the tavern bar; the stove is later), each style's default surface, the surfaces the builder has (brick waits for G11's fetch), the
+# first, the inglenook with the tavern bar, the bread oven with Crumb's oven room (G16); the stove is later), each style's
+# default surface, the surfaces the builder has (brick waits for G11's fetch), the
 # mirrors whose glass and cloth the builder knows (R-H3) and their height at scale 1 (R-H5)
-HEARTH_STYLES = ("surround", "stone", "inglenook", "stove")
-HEARTH_BUILT = ("surround", "stone", "inglenook")
-HEARTH_SURFACE = {"surround": "marble", "stone": "stone", "inglenook": "brick", "stove": "iron"}
+HEARTH_STYLES = ("surround", "stone", "inglenook", "stove", "oven")
+HEARTH_BUILT = ("surround", "stone", "inglenook", "oven")
+HEARTH_SURFACE = {"surround": "marble", "stone": "stone", "inglenook": "brick", "stove": "iron", "oven": "brick"}
 SURFACES = ("marble", "stone", "brick", "iron")
 SURFACES_BUILT = ("marble", "stone", "iron")
 MIRROR_H = {"ornate_mirror_01": 0.744}
@@ -91,6 +92,18 @@ INGLE_SEATS = dict(width=0.34, height=0.45)
 INGLE_JAMB = 0.25         # each cheek of an inglenook's mouth, by default
 INGLE_BACK = 0.1          # the masonry behind an inglenook's recess, by default
 INGLE_FIRE_MIN = 0.5      # the fire's room between the seats, at least
+# a bread oven (G16, Crumb's oven room): a masonry body with its mouth raised on a sill over a stone ledge, a sooted
+# chamber behind the mouth with the fire in its front, a low dome on the body's top and the flue (its `breast`) behind
+# the dome (R-H8, R-H9)
+OVEN_KEYS = ("sill", "dome", "ledge")
+DOME_KEYS = frozenset(("height",))
+LEDGE_KEYS = frozenset("depth thickness width".split())
+OVEN_SILL = 0.8           # the mouth's floor (the oven's deck), by default
+OVEN_DOME = dict(height=0.5)
+OVEN_LEDGE = dict(depth=0.2, thickness=0.08)
+OVEN_JAMB = 0.25          # the masonry each side of the mouth, at least
+OVEN_CROWN = 0.15         # the masonry over the mouth, at least
+OVEN_BACK = 0.25          # the masonry behind the chamber, by default
 DRESS_KEYS = frozenset("slug scale at lod rot cloth model size label".split())
 # a bed object (G7, section 7): its keys, the kinds built (cot, iron and pallet are G20's), the pillows each holds
 BED_KEYS = frozenset("kind axis head cover pillows mattress colour".split())
@@ -347,7 +360,8 @@ def key_rules(row: dict, bag: Problems) -> None:
             _strict(sp.get("bed"), BED_KEYS, where + ".spec.bed", "bed", bag)
             if sp.get("model") == "hearth":
                 for k, keys in (("mantel", MANTEL_KEYS), ("breast", BREAST_KEYS), ("firebox", FIREBOX_KEYS),
-                                ("beam", BEAM_KEYS), ("seats", SEATS_KEYS)):
+                                ("beam", BEAM_KEYS), ("seats", SEATS_KEYS), ("dome", DOME_KEYS),
+                                ("ledge", LEDGE_KEYS)):
                     _strict(sp.get(k), keys, f"{where}.spec.{k}", k, bag)
                 if isinstance(sp.get("firebox"), dict):
                     _strict(sp["firebox"].get("glow"), GLOW_KEYS, where + ".spec.firebox.glow", "glow", bag)
@@ -525,6 +539,10 @@ def hearth_values(spec: dict, height=None, where: str = "the hearth", bag: Probl
         bag.append(f'{where}: surface "{surface}" waits for G11\'s fetch; the builder has {", ".join(SURFACES_BUILT)}')
     if spec.get("glow") is not None:
         bag.append(f"{where}: a hearth's glow is its firebox's (spec.firebox.glow), not spec.glow")
+    if style != "oven" and any(spec.get(k) is not None for k in OVEN_KEYS):
+        bag.append(f"{where}: {', '.join(k for k in OVEN_KEYS if spec.get(k) is not None)} is an oven's (R-H8)")
+    if style == "oven":
+        return done(_oven_values(spec, height, where, bag, w, d, h, surface))
     ingle = style == "inglenook"
     if not ingle and (spec.get("beam") is not None or spec.get("seats") is not None):
         bag.append(f"{where}: beam and seats are an inglenook's (R-H6)")
@@ -676,6 +694,114 @@ def hearth_values(spec: dict, height=None, where: str = "the hearth", bag: Probl
     return done(dict(style=style, surface=surface, size=[w, d, h], opening=[ow, oh], body=dict(
         x0=-half, x1=half, y0=yf, y1=yb), shelf=shelf, mantel=m, firebox=firebox, breast=breast, glow=glow,
         anchors=anchors, dress=dress, beam=beam, seats=seats))
+
+
+def _oven_values(spec: dict, height, where: str, bag: Problems, w: float, d: float, h: float, surface: str):
+    """A bread oven's numbers (G16), in hearth_values' frame and dict: `size` is [w, d, h], `h` the masonry body's top
+    (the dome stands on it); the ledge is the oven's `shelf` (a stone shelf at the sill, in front of the body: its
+    `mantel` numbers), the chamber its `firebox` (z from the sill), the flue its `breast` (from the body's top), and
+    `oven` the sill, the dome and the ledge. R-H8: no mantel, dress, beam or seats on an oven; R-H9: the mouth with
+    0.25 m of masonry each side and 0.15 m over it, the ledge and the chamber in the body, the dome under the ceiling
+    and in front of the flue, the fire anchor in the chamber."""
+    for k in ("mantel", "dress", "beam", "seats"):
+        if spec.get(k) not in (None, [], ()):
+            bag.append(f"{where}: an oven has no {k} (R-H8)")
+    sill = spec.get("sill", OVEN_SILL)
+    led = dict(OVEN_LEDGE, **{k: v for k, v in (spec.get("ledge") or {}).items() if v is not None})
+    op = spec.get("opening")
+    if op is None:
+        op = (round(min(0.6, 0.35 * w), 3), 0.4)
+    if not (_num(sill) and sill > 0 and _nums(op, 2) and all(v > 0 for v in op)):
+        bag.append(f"{where}: an oven's sill is metres over 0 and its opening [w, h] in metres, the mouth (R-H9)")
+        return None
+    sill, (ow, oh) = float(sill), (float(v) for v in op)
+    led.setdefault("width", round(ow + 0.5, 3))
+    if not all(_num(led[k]) and led[k] > 0 for k in ("depth", "thickness", "width")):
+        bag.append(f"{where}: the ledge's depth, thickness and width are metres over 0 (R-H9)")
+        return None
+    ld, lt, lw = float(led["depth"]), float(led["thickness"]), float(led["width"])
+    yb, yf = d / 2, -d / 2 + ld                     # the body, from the wall out to its front; the ledge before it
+    if yb - yf < 0.6:
+        bag.append(f"{where}: the ledge ({ld:g} m) leaves the oven's body {yb - yf:.2f} m deep, under 0.6 m (R-H9)")
+        return None
+    if ow > w - 2 * OVEN_JAMB + 1e-9:
+        bag.append(f"{where}: the mouth is {ow:g} m wide: an oven's {w:g} m body needs {OVEN_JAMB:g} m of masonry "
+                   f"each side of it (R-H9)")
+    if sill + oh > h - OVEN_CROWN + 1e-9:
+        bag.append(f"{where}: the mouth's top ({sill + oh:g} m) leaves under {OVEN_CROWN:g} m of masonry under the "
+                   f"body's top ({h:g} m) (R-H9)")
+    if lw < ow or lw > w + 1e-9 or lt >= sill:
+        bag.append(f"{where}: the ledge is {lw:g} m wide: at least the mouth's {ow:g} m and at most the oven's {w:g} m, "
+                   f"and thinner than the sill's {sill:g} m (R-H9)")
+    shelf = dict(x0=-lw / 2, x1=lw / 2, y0=-d / 2, y1=yf, z0=round(sill - lt, 4), z1=sill)
+    fb = spec.get("firebox") or {}
+    fd = fb.get("depth")
+    if fd is None:
+        fd = round(yb - yf - OVEN_BACK, 3)
+    if not (_num(fd) and 0 < fd <= yb - yf - 0.1):
+        bag.append(f"{where}: the oven's chamber is over 0 and at most the body's {yb - yf - 0.1:.2f} m deep less 0.1 m "
+                   f"of back (R-H9)")
+        return None
+    fd = float(fd)
+    firebox = dict(x0=-ow / 2, x1=ow / 2, y0=yf, y1=yf + fd, z0=sill, z1=round(sill + oh, 4), depth=fd,
+                   cy=round(yf + fd / 2, 4))
+    breast = None
+    b = spec.get("breast")
+    if b:
+        to = b.get("to", "ceiling")
+        top = height if to == "ceiling" else to
+        bwid, bdep = b.get("width", round(min(0.7, w - 0.4), 3)), b.get("depth", 0.5)
+        if not (_num(top) and _num(bwid) and _num(bdep) and bwid > 0 and bdep > 0):
+            bag.append(f'{where}: the flue is {{"width": m, "depth": m, "to": "ceiling" or m}} (R-H9)')
+            return None
+        if top <= h or (_num(height) and top > height):
+            bag.append(f"{where}: the flue's top ({top:g} m) is over the body's top ({h:g} m) and at most the ceiling "
+                       f"(R-H9)")
+        if bwid > w or bdep > yb - yf - 0.3:
+            bag.append(f"{where}: the flue ({bwid:g} x {bdep:g} m) is at most the oven's {w:g} m wide and leaves 0.3 m of "
+                       f"the body's top before it for the dome (R-H9)")
+        breast = dict(x0=-bwid / 2, x1=bwid / 2, y0=yb - bdep, y1=yb, z0=h, z1=float(top), width=float(bwid),
+                      depth=float(bdep))
+    dv = spec.get("dome")
+    dome = None
+    if dv is not False:
+        if dv is not None and not isinstance(dv, dict):
+            bag.append(f'{where}: dome is {{"height": m}}, or false for none (R-H9)')
+            return None
+        dome = dict(OVEN_DOME, **{k: v for k, v in (dv or {}).items() if v is not None})
+        if not (_num(dome["height"]) and dome["height"] > 0):
+            bag.append(f"{where}: the dome's height is metres over 0 (R-H9)")
+            return None
+        if _num(height) and h + float(dome["height"]) > height:
+            bag.append(f"{where}: the dome's top ({h + float(dome['height']):g} m) is over the {height:g} m ceiling "
+                       f"(R-H9)")
+        # on the body's top, from its front to the flue's front (or the back), 6 cm in from every edge
+        dome.update(x0=-w / 2 + 0.06, x1=w / 2 - 0.06, y0=yf + 0.06,
+                    y1=(breast["y0"] if breast is not None else yb) - 0.06, z0=h, z1=round(h + float(dome["height"]), 4))
+    gsz = [round(0.7 * ow, 3), round(min(0.5, 0.6 * fd), 3), 0.08]
+    g = fb.get("glow", dict(shape="box", material="coal"))
+    glow = None
+    if g:
+        glow = dict(g)
+        if glow.get("shape") == "box" and "size" not in glow:
+            glow["size"] = gsz
+        elif glow.get("shape") in GLOW_DEFAULT_SIZE and "size" not in glow:
+            glow["size"] = GLOW_DEFAULT_SIZE[glow["shape"]](ow, fd)
+        # the fire in the chamber's front, raked toward the mouth so its light comes out into the room
+        glow.setdefault("at", [[0.0, round(yf + 0.03 + gsz[1] / 2, 4), round(sill + 0.012, 4)]])
+    anchors = dict(spec.get("anchors") or {})
+    anchors.setdefault("fire", (0.0, round(yf + 0.08, 4), round(sill + 0.45 * oh, 4)))
+    fa = anchors["fire"]
+    if not _nums(fa, 3):
+        bag.append(f"{where}: anchors.fire is [x, y, z] in the piece's frame")
+    elif not (abs(fa[0]) < ow / 2 and yf <= fa[1] <= yf + fd and sill < fa[2] < sill + oh):
+        bag.append(f"{where}: its fire anchor [{', '.join(f'{v:g}' for v in fa)}] is not in its chamber (x within "
+                   f"{ow / 2:g}, y {yf:g} to {yf + fd:g}, z {sill:g} to {sill + oh:g}) (R-H9)")
+    m = dict(z=sill, depth=ld, overhang=0.0, thickness=lt)
+    return dict(style="oven", surface=surface, size=[w, d, h], opening=[ow, oh], body=dict(
+        x0=-w / 2, x1=w / 2, y0=yf, y1=yb), shelf=shelf, mantel=m, firebox=firebox, breast=breast, glow=glow,
+        anchors=anchors, dress=[], beam=None, seats=None, oven=dict(sill=sill, dome=dome, ledge=dict(
+            depth=ld, thickness=lt, width=lw)))
 
 
 def bed_values(piece: dict, spec: dict, where: str = "the bed", bag: Problems | None = None) -> dict | None:

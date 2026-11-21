@@ -2833,6 +2833,8 @@ def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
     world: `fire` and any of `spec.anchors`, the manifest's `made`)."""
     pid = piece["id"]
     hv = rf.hearth_values(spec, fr.H, f"piece {pid}")   # the file passed these rules already (derive)
+    if hv["style"] == "oven":
+        return build_oven(fr, piece, name, mt, hv)
     w, d, _h = hv["size"]
     body, sh, fb, br = hv["body"], hv["shelf"], hv["firebox"], hv["breast"]
     surf = hearth_mat(mt, hv["surface"])
@@ -2946,6 +2948,81 @@ def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
         made.update(beam=hv["beam"], seats=hv["seats"], fireWidth=fb["fire_w"])
     log(f"hearth {pid}: {hv['style']} in {hv['surface']}, opening {ow:g} x {oh:g} m, mantel {z0:.2f}..{z1:.2f} m, "
         f"breast to {br['z1'] if br else 'none'}, fire at {made['fire']}, dress {[r['slug'] for r in rows]}")
+    return ob, box, info, made
+
+
+def build_oven(fr: Frame, piece: dict, name: str, mt: dict, hv: dict):
+    """A bread oven (G16: hearth style `oven`, Crumb's oven room), box-built in the room's own materials in the hearth's
+    frame (x along its width, its back against the wall at +d/2, its front -y): the masonry body to its top `h` with
+    the mouth raised on its sill (a jamb each side, the block under the sill, the crown over the mouth), the chamber
+    behind the mouth lined in soot (cheeks, back, roof and deck), the stone ledge before the mouth at the sill's height,
+    a low dome on the body's top (a half ellipsoid, 24 x 6 facets, from the front to the flue) and the flue up to the
+    ceiling behind it (the hearth's `breast`). No grate, mantel or dress. The coals' glow is built with the lights'
+    glows (build_glows), split from this piece, as a hearth's. Returns what build_hearth returns."""
+    pid = piece["id"]
+    w, d, h = hv["size"]
+    surf = hearth_mat(mt, hv["surface"])
+    soot = hearth_soot()
+    ow, oh = hv["opening"]
+    ov, fb, br, sh = hv["oven"], hv["firebox"], hv["breast"], hv["shelf"]
+    sill = ov["sill"]
+    top = sill + oh
+    yf, yb, fy1 = hv["body"]["y0"], hv["body"]["y1"], fb["y1"]
+    xa, xb = -ow / 2, ow / 2
+    b = Builder()
+    # the body: no faces against the wall, the floor or a neighbour (the chamber's own faces are its lining)
+    b.box((-w / 2, yf, 0.0), (xa, yb, h), surf, skip=("bottom", "N", "E"))
+    b.box((xb, yf, 0.0), (w / 2, yb, h), surf, skip=("bottom", "N", "W"))
+    b.box((xa, yf, 0.0), (xb, yb, sill), surf, skip=("bottom", "N", "W", "E", "top"))
+    b.box((xa, yf, top), (xb, yb, h), surf, skip=("bottom", "N", "W", "E"))
+    # the chamber's lining (its normals into the chamber) and its deck
+    sq = [(0, 0), (1, 0), (1, 1), (0, 1)]
+    b.face([(xa, yf, sill), (xa, fy1, sill), (xa, fy1, top), (xa, yf, top)], sq, soot)
+    b.face([(xb, fy1, sill), (xb, yf, sill), (xb, yf, top), (xb, fy1, top)], sq, soot)
+    b.face([(xa, fy1, sill), (xb, fy1, sill), (xb, fy1, top), (xa, fy1, top)], sq, soot)
+    b.face([(xa, yf, top), (xa, fy1, top), (xb, fy1, top), (xb, yf, top)], sq, soot)
+    b.box((xa, yf, sill), (xb, fy1, sill + 0.012), soot, skip=("bottom",))
+    # the ledge before the mouth, its top level with the deck's floor
+    b.box((sh["x0"], sh["y0"], sh["z0"]), (sh["x1"], sh["y1"], sh["z1"]), surf, skip=("N",))
+    dm = ov["dome"]
+    if dm is not None:          # the dome: rings from its foot on the body's top to a point at its crown
+        cx, cy = (dm["x0"] + dm["x1"]) / 2, (dm["y0"] + dm["y1"]) / 2
+        ax, ay, az = (dm["x1"] - dm["x0"]) / 2, (dm["y1"] - dm["y0"]) / 2, dm["z1"] - dm["z0"]
+        nu, nv = 24, 6
+        rr = (ax + ay) / 2
+
+        def pt(i, j):
+            th, ph = 2 * math.pi * i / nu, (math.pi / 2) * j / nv
+            return (cx + ax * math.cos(ph) * math.cos(th), cy + ay * math.cos(ph) * math.sin(th),
+                    dm["z0"] + az * math.sin(ph))
+
+        def uv(i, j):           # metres round the foot and up the side
+            return (2 * math.pi * rr * i / nu, (math.pi / 2) * (rr + az) / 2 * j / nv)
+
+        for j in range(nv):
+            for i in range(nu):
+                if j == nv - 1:
+                    b.face([pt(i, j), pt(i + 1, j), pt(0, nv)], [uv(i, j), uv(i + 1, j), uv(i + 0.5, nv)], surf)
+                else:
+                    b.face([pt(i, j), pt(i + 1, j), pt(i + 1, j + 1), pt(i, j + 1)],
+                           [uv(i, j), uv(i + 1, j), uv(i + 1, j + 1), uv(i, j + 1)], surf)
+    if br is not None:          # the flue behind the dome
+        top_skip = ("bottom", "N") + (("top",) if br["z1"] >= fr.H - 1e-6 else ())
+        b.box((br["x0"], br["y0"], h), (br["x1"], br["y1"], br["z1"] - (0.001 if br["z1"] >= fr.H - 1e-6 else 0.0)),
+              surf, skip=top_skip)
+    ob = b.build(name)
+    zs = [v.co.z for v in ob.data.vertices]
+    lo, hi = Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, max(zs) if zs else h))
+    box = place_piece(fr, piece, ob, lo, hi)
+    info = {k_: piece_point(pid, v_) for k_, v_ in hv["anchors"].items()}
+    made = dict(style="oven", surface=hv["surface"], opening=hv["opening"], sill=sill,
+                ledge=[round(sh["z0"], 3), round(sh["z1"], 3)],
+                firebox=dict(y=[round(fb["y0"], 3), round(fb["y1"], 3)], depth=fb["depth"], z=[sill, round(top, 3)]),
+                domeTop=round(dm["z1"], 3) if dm is not None else None,
+                breastTop=round(br["z1"], 3) if br else None, dress=[], mirrorGlassFaces=0,
+                fire=[round(float(v), 3) for v in info["fire"]])
+    log(f"oven {pid}: in {hv['surface']}, mouth {ow:g} x {oh:g} m on a {sill:g} m sill, chamber {fb['depth']:g} m, "
+        f"dome to {made['domeTop']}, flue to {made['breastTop']}, fire at {made['fire']}")
     return ob, box, info, made
 
 
