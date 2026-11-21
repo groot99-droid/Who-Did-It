@@ -1,0 +1,261 @@
+{
+  "room": "crumb_mixing",
+  "about": "Le Pétrin, Crumb's mixing room behind the bakery, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 7 m inside (x -5..5, y -3.5..3.5), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/crumb_mixing.json is named below. No window: the scene has none and no moon light, so the room is lit by the one lamp hung over the shaping tables. Grey boxes stand in for the pieces that have no model yet (decision D2): the dough mixer, the four sack piles and the recipe slate. A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Crumb's mixing room",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the door to the bakery"
+  },
+  "height": 3.0,
+  "height_note": "the bakery family's 3.0 m (the scope's 3.0 m, the widow's rooms')",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.95, 0.93, 0.88]
+  },
+  "floor_note": "the scene's `f` flagstones (its material layer; the owner's picture shows a flagstone floor). The flagstone scan (stone_floor) is not in the local cache and nothing is downloaded, so the cached set-stone scan of the stone hearths (rock_wall_08, the stone_wall role) stands in, enlarged to stones about 0.5 m long (the floor's UVs repeat every 3.0 x zoom m); G11 swaps in the real flagstones when the scan is fetched",
+  "wall_colour": "#877D68",
+  "wall_colour_note": "a warm limewash dusted with flour. The owner's picture has red brick walls; the brick scan (red_brick_03) is not cached and the shell builds plaster walls only, so the walls stay plaster (the plan's default D8: brick only if cheap); a sandy ochre a step greyer after the second bake (#8E8169 read orange under the lamp), never pink or lilac",
+  "ceiling_colour": "#A0977F",
+  "ceiling_colour_note": "limewash, floured and smoked by the bakery's ovens",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the door, the skirting",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a work room: no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "cm.door",
+      "kind": "door",
+      "portal": "cm.door",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door back into the bakery in the south wall, tile (6,8): centred at x 0.5, the portal at its foot (0.5, -3.5); the door spawn stands 0.5 m inside it, (0.5, -3.0), by design. The knob is the default end (east)."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": 1.6,
+  "exposure_note": "fixed, as the back room's and the loft's. From the second 128-sample bake (2026-11-21): at 4.0 the room read flat and bright, as by day; of four tries from that saved bake (2.5, 1.6 and 1.0 with the fill at 0.03 or 0.02, and 1.6 with the lamp at 1.0 and no fill) 1.6 keeps the lamp's pool on the tables and lets the walls and corners fall dark while the sacks and the trunk still read (variant vb); 1.0 lost the corners",
+  "lights": [
+    {
+      "id": "cm.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "at": [-1.0, 0.0, 1.56]
+      },
+      "note": "the lamp at its tile (5,4), hung over the two shaping tables between them: the light just under the glass globe of the hanging lamp (cm.pendant, its rim at 1.635 m), 0.76 m over the table tops. Not inside the globe: there (1.86 m, the first 128-sample bake, 2026-11-21) the model's glass and shade held all the light in and the room baked dark (the pool's 90th percentile 7e-05). No glow mesh: a sphere round the bulb cut into the model's bulb and hung in the air (r7_extra); the globe's underside, lit from 8 cm, reads as the lit glass"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the hanging lamp) and fill = 2, and the AO. No moon group: no window.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: its own light setting and the darker-room exposure lever.",
+    "settings": {
+      "mixing": {
+        "label": "the mixing room",
+        "mix": {
+          "candle": 1.3,
+          "fill": 0.03
+        },
+        "note": "the back room's lamp (1.3) with the fill a step lower (0.05 to 0.03), from the second 128-sample bake (variant vb)"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a work room at night, lit by its one lamp",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "mixing",
+  "light_note": "the room's own light setting (look.settings.mixing; --light overrides)",
+  "pieces": [
+    {
+      "id": "cm.mixer",
+      "face": "S",
+      "place": ["at", 1.0, 2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.7, 1.4, 1.2],
+        "label": "Dough mixer (le pétrin): a hand-cranked kneading trough or the picture's steel-bowl mixer, the owner's choice"
+      },
+      "note": "the hero piece on its 2 x 2 footprint, tiles (6,1) to (7,2) (x 0..2, y 1.5..3.5). No model (a grey box, the plan's pétrin, Tier 1); the scene says a dough mixer, A221 a hand-cranked kneading trough, the owner's picture a steel-bowl mixer"
+    },
+    {
+      "id": "cm.chalkboard",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "rise": 1.2,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.03, 0.6],
+        "label": "Recipe slate 'Le Pétrin' (the writing waits for G18)"
+      },
+      "note": "at its tile (3,0), on the north wall: a flat panel"
+    },
+    {
+      "id": "cm.shelf",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.9,
+        "lod": 0.5
+      },
+      "note": "the shelf of tins at its tile (9,0), on the north wall: a plain open shelf at 0.9 (0.9 m wide, 1.87 m high); its tins and jars wait for G17"
+    },
+    {
+      "id": "cm.flour_sacks_0",
+      "face": "E",
+      "place": ["wall", "W", 3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,1), against the west wall. No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "cm.flour_sacks",
+      "spot": true,
+      "face": "E",
+      "place": ["wall", "W", 2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.7, 0.9],
+        "label": "Flour sacks (the hide spot): a taller pile of sacks to crouch behind"
+      },
+      "note": "the hide spot at its tile (1,2), between the piles, against the west wall: a pile a little taller and deeper than the others. No model (a grey box)."
+    },
+    {
+      "id": "cm.flour_sacks_1",
+      "face": "E",
+      "place": ["wall", "W", 1.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,3)"
+    },
+    {
+      "id": "cm.flour_sacks_2",
+      "face": "E",
+      "place": ["wall", "W", 0.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,4)"
+    },
+    {
+      "id": "cm.water_bucket",
+      "face": "S",
+      "place": ["at", 2.5, 3.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the water bucket at its tile (8,1), beside the mixer, against the north wall: one bucket (a second one in front of it left a 5.1 cm wall of air round its handle, cc_geom no_invisible_walls_over_5cm, so it was taken out)"
+    },
+    {
+      "id": "cm.dough_trough",
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "planter_box_03",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the old kneading trough at its tile (10,1), in the north-east corner against the north wall: a wooden box on legs (Poly Haven's planter box, 0.91 x 0.66 x 0.85 m), as the scope names it"
+    },
+    {
+      "id": "cm.barrel",
+      "face": "W",
+      "place": ["wall", "E", 2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the flour barrel at its tile (10,2), against the east wall"
+    },
+    {
+      "id": "cm.shaping_table_0",
+      "face": "S",
+      "place": ["at", -1.57, 0.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "lod": 0.7,
+        "dress": [
+          { "slug": "wooden_cutting_board", "scale": 1.0, "at": [0.1, null, 0.0], "rot": 8.0, "lod": 0.4 }
+        ]
+      },
+      "moved": "0.07 m west (D4): two 1.13 m tables a tile apart overlap by 0.13 m; side by side they make the scope's 2.26 m bench",
+      "note": "a shaping table at its tile (4,4), under the lamp: the cottage's plain deal table, a cutting board on it"
+    },
+    {
+      "id": "cm.shaping_table_1",
+      "face": "S",
+      "place": ["at", -0.43, 0.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "lod": 0.7
+      },
+      "moved": "0.07 m east (D4), after the table beside it",
+      "note": "the second shaping table at its tile (5,4), the lamp's tile"
+    },
+    {
+      "id": "cm.pendant",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -1.0, 0.0],
+      "rise": 1.635,
+      "spec": {
+        "model": "ph",
+        "slug": "hanging_industrial_lamp",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the lamp's fitting (not a scene prop of its own): Poly Haven's hanging lamp, 1.36 m from its ceiling rose to the shade's rim, hung from the ceiling over the gap between the tables (its rim 1.64 m off the floor, its rose 1 cm under the ceiling)"
+    },
+    {
+      "id": "cm.trunk",
+      "spot": true,
+      "key": "trunk",
+      "face": "N",
+      "place": ["wall", "S", 4.5],
+      "spec": {
+        "lod": 0.5
+      },
+      "note": "the body spot's trunk at its tile (10,7), in the south-east corner against the south wall: the owner's Meshy chest (kit_chest, 0.9 m, its own texture kept), the bedroom's blanket chest"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the spawn's own view; the others look at one corner or piece each.",
+  "views": {
+    "spawn_door": [[0.5, -3.0, 1.6], [0.5, 3.5, 1.3], 70.0],
+    "mixer": [[-1.2, 0.9, 1.6], [1.2, 2.6, 0.8], 70.0],
+    "tables": [[0.9, -1.9, 1.6], [-1.0, 0.0, 0.9], 70.0],
+    "west": [[2.4, -0.6, 1.6], [-5.0, 1.6, 0.9], 70.0],
+    "east": [[-3.0, -0.6, 1.6], [5.0, 1.0, 1.1], 70.0],
+    "south": [[-0.5, 2.4, 1.6], [0.5, -3.5, 1.1], 70.0],
+    "trough": [[2.4, 0.4, 1.6], [4.5, 3.0, 0.8], 70.0],
+    "trunk": [[2.0, -1.4, 1.6], [4.5, -3.2, 0.5], 70.0]
+  }
+}
