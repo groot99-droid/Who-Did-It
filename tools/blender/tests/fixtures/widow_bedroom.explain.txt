@@ -1,0 +1,41 @@
+tools/blender/meshy_rooms/widow_bedroom.json: room widow_bedroom, path legacy (node names legacy; rules v2)
+openings:
+  [0] door wb.door, tile (3, 8), S wall at -2.5, 0.9 x 2.15 m, knob E, foot (-2.5, -3.5)
+  [1] window wb.draped_window, tile (5, 0), N wall at -0.5, 0.9 m, sill 0.75, head 2.3, outside snow, curtains, swag
+lights (night):
+  wb.lt_candle: role lamp, group candle, anchor piece wb.candle flame, pool
+  wb.lt_moon: role moon, group moon, window wb.draped_window
+  wb.lt_window: dropped (a day and dusk light: the walk is night)
+bake groups: candle, moon, fill
+exposure from: wb.lt_candle; flame hosts: wb.candle
+scene props and spots:
+  wb.bed: piece wb.bed
+  wb.blanket_chest: piece wb.blanket_chest
+  wb.candle: piece wb.candle
+  wb.draped_window: opening wb.draped_window
+  wb.dressing_table: piece wb.dressing_table
+  wb.linen_press: piece wb.linen_press
+  wb.photos: piece wb.photos
+  wb.rug: piece wb.rug
+  wb.under_bed: underBed wb.bed
+  wb.wardrobe: piece wb.wardrobe
+  wb.wardrobe_body: piece wb.wardrobe_body
+  wb.washstand: piece wb.washstand
+under-bed spots: wb.under_bed -> wb.bed
+pieces (reference point; a null taken from the scene):
+  wb.wardrobe: ref (-4.5, 3)
+  wb.wardrobe_body: ref (4.5, 3)
+  wb.linen_press: ref (4.5, 1)
+  wb.dressing_table: ref (-2.5, 3)
+  wb.washstand: ref (0.5, 3)
+  wb.candle: ref (1.5, 1)
+  wb.bed: ref (3.5, 1)
+  wb.blanket_chest: ref (2.5, 0)
+  wb.rug: ref (-0.5, -1)
+  wb.photos: ref (2.5, 4)
+  wb.decor.armchair: no reference point (decor)
+  wb.decor.nightstand: no reference point (decor)
+  wb.decor.settle: no reference point (decor)
+shown to the owner when moved: spots wb.wardrobe, wb.under_bed, wb.wardrobe_body; task pieces wb.candle
+planned node names: 26, unique after three.js
+not built yet: nothing

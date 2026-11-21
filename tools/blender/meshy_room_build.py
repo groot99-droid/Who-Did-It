@@ -93,6 +93,7 @@ FINAL_LOOK = os.path.join(HERE, "meshy_looks", "final.json")
 FP_LOOK = os.path.join(HERE, "meshy_looks", "interior_fp.json")
 sys.path.insert(0, HERE)
 import meshy_interior_build as mib  # noqa: E402  (the scene parser, the prop table, the Poly Haven piece builders)
+import meshy_room_file as rf  # noqa: E402  (the room files' loader and rules: plain Python)
 
 ATTR = "wdi_light"          # the baked light: a POINT-domain FLOAT_COLOR attribute, exported as COLOR_0
 INK = (0x12, 0x14, 0x1C)    # palette ink: the darkest value of any pixel (never black)
@@ -126,106 +127,21 @@ DRACO = dict(export_draco_mesh_compression_enable=True, export_draco_mesh_compre
 # degrees (the viewer's EYE and VFOV as numbers). `layout` names the arrangement that `pieces` and `views` hold;
 # `layouts` holds the others as overrides by piece id and by view name (apply_layout). A key named `note`, or
 # `<key>_note` beside `<key>`, is a comment: it never reaches the builder.
-ROOMS_DIR = os.path.join(HERE, "meshy_rooms")
-ROOM_KEYS = ("district", "spawn_labels", "height", "wall_t", "floor", "wall_colour", "ceiling_colour", "paint_colour",
-             "wood_colour", "skirting", "picture_rail", "cornice", "door", "window", "outside", "moon", "pieces",
-             "views")       # what the builder reads without a default
+ROOMS_DIR = rf.ROOMS_DIR    # tests rebind it: the wrappers below read it at call time
+ROOM_KEYS = rf.ROOM_KEYS    # what the builder reads without a default (door, window, outside, moon: legacy path only)
+is_note, apply_layout, from_root = rf.is_note, rf.apply_layout, rf.from_root
+_room_object, _room_value = rf._room_object, rf._room_value
+SPEC: dict = {}             # the room's derived reading (meshy_room_file.derive): never written into CFG
 
 
 def room_path(scene_id: str) -> str:
-    return os.path.join(ROOMS_DIR, f"{scene_id}.json")
+    return rf.room_path(scene_id, ROOMS_DIR)
 
 
-def from_root(path: str) -> str:
-    """A path as a message and the manifest give it: from the repo root, with forward slashes."""
-    try:
-        path = os.path.relpath(path, ROOT)
-    except ValueError:      # another drive
-        pass
-    return path.replace("\\", "/")
-
-
-def is_note(key: str, obj: dict) -> bool:
-    """A comment in a room file: a key named `note`, or `<key>_note` beside `<key>` in the same object."""
-    return key == "note" or (key.endswith("_note") and key[:-5] in obj)
-
-
-def _room_object(pairs: list) -> dict:
-    """A JSON object of a room file. A key that stands twice stops the load: JSON would keep the last one and say
-    nothing."""
-    out = {}
-    for k, v in pairs:
-        if k in out:
-            raise ValueError(f'the key "{k}" stands twice in one object')
-        out[k] = v
-    return out
-
-
-def _room_value(x, where: str):
-    """A room file's value as the builder uses it: every note dropped, an array a tuple (as the table had them)."""
-    if isinstance(x, dict):
-        out = {}
-        for k, v in x.items():
-            if is_note(k, x):
-                if not isinstance(v, str):
-                    raise SystemExit(f"meshy_room_build: {where}: `{k}` is a comment and must be text")
-                continue
-            out[k] = _room_value(v, where)
-        return out
-    if isinstance(x, list):
-        return tuple(_room_value(v, where) for v in x)
-    return x
-
-
-def load_room(scene_id: str) -> dict:
-    """The per-room choices of `scene_id` from its file, as the table's row was: the file's own `room` and `about`
-    and every note left out, arrays as tuples, `pieces` a list. Stops with a plain message when the file is missing,
-    is not JSON, gives a key twice, names another room or lacks a key the builder reads."""
-    path = room_path(scene_id)
-    shown = from_root(path)
-    if not os.path.isfile(path):
-        raise SystemExit(f"meshy_room_build: no room file for {scene_id}: {shown} is missing (each first-person room "
-                         f"has its own file in {os.path.dirname(shown)}/)")
-    with open(path, encoding="utf-8") as fh:
-        try:
-            data = json.load(fh, object_pairs_hook=_room_object)
-        except ValueError as err:
-            raise SystemExit(f"meshy_room_build: {shown} cannot be read: {err}")
-    if not isinstance(data, dict) or data.get("room") != scene_id:
-        named = data.get("room") if isinstance(data, dict) else None
-        raise SystemExit(f"meshy_room_build: {shown} is not {scene_id}'s room file: its `room` is {named!r}")
-    row = _room_value(data, shown)
-    del row["room"]
-    row.pop("about", None)
-    missing = [k for k in ROOM_KEYS if k not in row]
-    if missing:
-        raise SystemExit(f"meshy_room_build: {shown} lacks {', '.join(missing)}")
-    row["pieces"] = list(row["pieces"])
-    return row
-
-
-def apply_layout(cfg: dict, name: str | None) -> str:
-    """Make `cfg` (a copy of a room's row, load_room) the named arrangement: the file's own when `name` is None or
-    its `layout`; otherwise that layout's piece overrides (a piece's keys replaced whole) and views. Returns the
-    name."""
-    own = cfg.get("layout", "default")
-    name = name or own
-    cfg["pieces"] = [dict(p) for p in cfg["pieces"]]
-    cfg["views"] = dict(cfg["views"])
-    if name != own:
-        lay = (cfg.get("layouts") or {}).get(name)
-        if lay is None:
-            raise SystemExit(f"meshy_room_build: no layout {name!r} (the room file has {own!r} and "
-                             f"{sorted(cfg.get('layouts') or {})})")
-        ids = {p["id"] for p in cfg["pieces"]}
-        for pid in lay.get("pieces", {}):
-            if pid not in ids:
-                raise SystemExit(f"meshy_room_build: layout {name!r} names a piece the room file has not: {pid}")
-        for p in cfg["pieces"]:
-            p.update(lay.get("pieces", {}).get(p["id"], {}))
-        cfg["views"].update(lay.get("views", {}))
-    cfg["layout"] = name
-    return name
+def load_room(scene_id: str, path: str | None = None) -> dict:
+    """The per-room choices of `scene_id` from its file (meshy_room_file.load_room: notes dropped, arrays as tuples,
+    `pieces` a list, the keys held to the rules), from `path` or from ROOMS_DIR as it stands now."""
+    return rf.load_room(scene_id, rooms_dir=ROOMS_DIR, path=path)
 
 
 def lin1(c: float) -> float:
@@ -243,33 +159,21 @@ def file_md5(path: str) -> str:
         return hashlib.md5(fh.read()).hexdigest()
 
 
-BAKE_LOOK_DROP = ("settings", "ink_lift", "hot", "exposure", "ink", "view", "name", "about")
+BAKE_LOOK_DROP, BAKE_ROOM_DROP = rf.BAKE_LOOK_DROP, rf.BAKE_ROOM_DROP
+bake_look_md5, bake_room_md5 = rf.bake_look_md5, rf.bake_room_md5    # what a saved bake records of the data
 
 
-def bake_look_md5(look: dict) -> str:
-    """The md5 of the look file's bake-relevant part: the lamps, the bake's own settings, the night outside, the
-    emitters and the cloths' colours, and the AO's distance and samples. A later --raw run tunes the rest (the light
-    settings, the ink floor, the highlights, the AO's strength) on a saved bake without changing it, so a saved bake
-    and the build made from it agree on this md5 while their whole-file md5s may differ."""
-    import hashlib
-    part = {k: v for k, v in look.items() if k not in BAKE_LOOK_DROP}
-    if isinstance(part.get("ao"), dict):
-        part["ao"] = {k: part["ao"].get(k) for k in ("distance_m", "samples")}
-    return hashlib.md5(json.dumps(part, sort_keys=True).encode()).hexdigest()
+def shown_argv(argv: list) -> list:
+    """The builder's arguments as the manifest records them: every path from the repo root, a path outside the repo
+    as its file name only (a scratch folder's absolute path would carry the local user's folders)."""
+    out, take = [], False
+    for x in argv:
+        out.append(from_root(x) if take else x)
+        take = x in PATH_ARGS
+    return out
 
 
-BAKE_ROOM_DROP = ("district", "spawn_labels", "views", "layout", "layouts", "exposure")
-
-
-def bake_room_md5(cfg: dict) -> str:
-    """The md5 of a room's bake-relevant part: its row with the layout applied (apply_layout; before the look's
-    defaults are merged into it), without the labels, the stills' views, the exposure override, the layout's name
-    (recorded and compared apart) and the table of the other layouts. It is taken from the data, not from the file:
-    a note, a view or a layout that is not built can change, and the file can be laid out anew, while a saved bake
-    and the build made from it still agree on it."""
-    import hashlib
-    part = {k: v for k, v in cfg.items() if k not in BAKE_ROOM_DROP}
-    return hashlib.md5(json.dumps(part, sort_keys=True).encode()).hexdigest()
+PATH_ARGS = ("--out", "--raw", "--save-raw", "--room-file", "--look", "--rig-print")
 
 
 # ---------------------------------------------------------------- three.js r186's AgX (the viewer's tone mapping)
@@ -1936,6 +1840,8 @@ def _cone(b: Builder, P, u, d, z0, r0, r1, h, mat, n=10) -> None:
 # ---------------------------------------------------------------- furniture (the round-3 kit at real size)
 
 PIECES: dict = {}           # id -> dict(obj, body box in world, ...)
+MODEL_OF: dict = {}         # id -> the model its builder is building (place_piece: `rise` for all but the photos)
+GREY = "#808080"            # a grey box's flat mid-grey (M_grey, made the first time a box is built)
 
 
 def spec_for(piece: dict) -> dict:
@@ -2015,6 +1921,10 @@ def place_piece(fr: Frame, piece: dict, ob, lo: Vector, hi: Vector) -> tuple:
         else:
             tx = ob_box[3] + gap - bx0
             ty = along - (by0 + by1) / 2
+    rise = float(piece.get("rise") or 0.0) if MODEL_OF.get(piece.get("id")) != "photos" else 0.0
+    if rise:    # a wall-hung piece (a letter box, a frame): lifted off the floor
+        ob.matrix_world = Matrix.Translation((tx, ty, rise)) @ R @ ob.matrix_world
+        return (bx0 + tx, by0 + ty, lo.z + rise, bx1 + tx, by1 + ty, hi.z + rise)
     ob.matrix_world = Matrix.Translation((tx, ty, 0.0)) @ R @ ob.matrix_world
     return (bx0 + tx, by0 + ty, lo.z, bx1 + tx, by1 + ty, hi.z)
 
@@ -2100,10 +2010,20 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
     anchors = {}
     for piece in CFG["pieces"]:
         pid = piece["id"]
+        res = (SPEC.get("pieces") or {}).get(pid) or {}
+        if res.get("fromScene"):    # a run's or a footprint prop's null, taken from the scene (R-P6): CFG keeps it
+            piece = dict(piece, place=tuple(res["place"]))
+            if res.get("size"):
+                piece["spec"] = dict(piece["spec"], size=tuple(res["size"]))
         spec = spec_for(piece)
         model = spec.get("model")
         name = nm(pid.replace(".", "_"))
-        if model == "rug":
+        MODEL_OF[pid] = model
+        if model == "box":
+            ob, box, info = build_box(fr, piece, spec, name)
+            for k_, v_ in info.items():
+                anchors.setdefault(f"{pid}:{k_}", v_)
+        elif model == "rug":
             ob, box = build_rug(fr, piece, spec, name)
         elif model == "photos":
             ob, box = build_photos(fr, piece, name)
@@ -2121,6 +2041,7 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
         else:
             raise SystemExit(f"meshy_room_build: no first-person builder for {pid} (model {model})")
         PIECES[pid] = dict(obj=ob, box=box, spec=spec, piece=piece)
+        piece_rules(fr, pid, box)
         tile = next(((p["x"], p["y"]) for p in fr.room.props if p["id"] == pid), None) or \
             next(((s["x"], s["y"]) for s in fr.room.spots if s["id"] == pid), None)
         register(ob, "piece", pid, tile=tile, model=model, slug=spec.get("slug") or spec.get("name"), box=box)
@@ -2128,6 +2049,59 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
             f"[{', '.join(f'{v:.2f}' for v in box)}] size {box[3] - box[0]:.2f} x {box[4] - box[1]:.2f} x "
             f"{box[5] - box[2]:.2f}")
     return anchors
+
+
+def build_box(fr: Frame, piece: dict, spec: dict, name: str):
+    """A grey box (room file v2, G5): a piece with no model yet, at its real size ([w, d, h]: w along its front, d
+    deep, h high), in one flat mid-grey (M_grey), labelled (`wdi_label`, `wdi_grey`), baked and split like any piece;
+    its collision comes from the same raster. Returns the box and its anchors in the world (an oven's fire, a bar's
+    lamp: `spec.anchors`, in the piece's frame before its face turn)."""
+    w, d, h = (float(v) for v in spec["size"])
+    key = nm("M_grey")
+    mat = MATS[key] if key in MATS else RMat("M_grey", None, hex_lin(GREY), rough=0.8, albedo=hex_lin(GREY),
+                                             note="grey boxes: pieces with no model yet")
+    b = Builder()
+    b.box((-w / 2, -d / 2, 0.0), (w / 2, d / 2, h), mat)
+    ob = b.build(name)
+    ob["wdi_grey"] = True
+    ob["wdi_label"] = str(spec["label"])
+    box = place_piece(fr, piece, ob, Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, h)))
+    info = {k: tuple(ob.matrix_world @ Vector(tuple(v))) for k, v in (spec.get("anchors") or {}).items()}
+    return ob, box, info
+
+
+def piece_rules(fr: Frame, pid: str, box) -> None:
+    """The build's rules on a placed piece: inside the room (R-P8, both paths) and, on the v2 path, within 1.0 m of its
+    reference point unless its `moved` says why (R-P7, the owner's ruling D4: up to 1 m, logged)."""
+    tol = 0.001
+    p = PIECES[pid]["piece"]
+    out = [f"x {box[0]:.2f}" if box[0] < fr.x0 - tol else "", f"x {box[3]:.2f}" if box[3] > fr.x1 + tol else "",
+           f"y {box[1]:.2f}" if box[1] < fr.y0 - tol else "", f"y {box[4]:.2f}" if box[4] > fr.y1 + tol else "",
+           f"z {box[5]:.2f}" if box[5] > fr.H + tol else ""]
+    out = [o for o in out if o]
+    if out:
+        raise SystemExit(f"meshy_room_build: piece {pid} reaches {', '.join(out)}: the room is x {fr.x0:g}..{fr.x1:g}, "
+                         f"y {fr.y0:g}..{fr.y1:g}, z 0..{fr.H:g} (R-P8)")
+    ref = ((SPEC.get("pieces") or {}).get(pid) or {}).get("ref")
+    if ref is None:
+        return
+    d = math.hypot((box[0] + box[3]) / 2 - ref[0], (box[1] + box[4]) / 2 - ref[1])
+    if p.get("moved"):
+        log(f"piece {pid} stands {d:.2f} m from its reference point ({ref[0]:g}, {ref[1]:g}): moved, {p['moved']}")
+    if SPEC.get("schema") == "v2" and d > rf.MOVE_LIMIT and not p.get("moved"):
+        raise SystemExit(f"meshy_room_build: piece {pid} stands {d:.2f} m from its reference point ({ref[0]:g}, "
+                         f"{ref[1]:g}): name why in \"moved\", or stand it within {rf.MOVE_LIMIT:g} m (R-P7)")
+
+
+def from_ref(pid: str) -> dict:
+    """A piece's reference point (meshy_room_file: its footprint's centre, else the centroid of its own tile and its
+    `covers`) and its distance from it, for the manifest."""
+    ref = ((SPEC.get("pieces") or {}).get(pid) or {}).get("ref")
+    if ref is None:
+        return {}
+    b = PIECES[pid]["box"]
+    return dict(refXY=[round(ref[0], 3), round(ref[1], 3)],
+                fromRefM=round(math.hypot((b[0] + b[3]) / 2 - ref[0], (b[1] + b[4]) / 2 - ref[1]), 3))
 
 
 def build_cabinet(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
@@ -4306,6 +4280,14 @@ def collision(fr: Frame, door: dict | None) -> tuple:
     return ob, boxes
 
 
+def boxes_sha1(boxes: list) -> str:
+    """The collision boxes' sha1 (each name and its six numbers to 0.1 mm): the regression gate's manifest digest
+    compares it, as the box count alone would not see a box that moved."""
+    import hashlib
+    rows = [[n, [round(float(v), 4) for v in b]] for n, b in boxes]
+    return hashlib.sha1(json.dumps(rows, separators=(",", ":")).encode()).hexdigest()
+
+
 def walk_check(fr: Frame, boxes: list, spawn_xy, portal_xy) -> dict:
     """Can the player (capsule r 0.3, 0.35 to 1.75 m) reach the door and the walkable tiles from the spawn? A 2 cm
     grid of the floor, the boxes that reach into the capsule's height grown by its radius, a flood fill from the
@@ -4419,7 +4401,12 @@ def spot_rows(fr: Frame, walk: dict) -> list:
     for s in fr.room.spots:
         pid = s["id"] if s["id"] in PIECES else None
         if pid is None and s.get("variant") == "underBed":
-            pid = next((k for k, v in PIECES.items() if v["spec"].get("bed")), None)
+            # the loader's map (meshy_room_file: the bed beside the spot or the bed that covers it; on the legacy path
+            # the first bed piece, as before)
+            pid = (SPEC.get("underBed") or {}).get(s["id"])
+        if pid is None:
+            pid = next((c["id"] for c in [(SPEC.get("coverage") or {}).get(s["id"]) or {}] if c.get("by") == "covers"),
+                       None)
         if pid is None:
             continue
         b = PIECES[pid]["box"]
@@ -4853,37 +4840,58 @@ def glb_facts(path: str) -> dict:
 # ================================================================ entry
 
 
+_RAN: list = []             # blender_main runs once a process: the module's tables (P, CFG, MATS, OBJS, PIECES ...)
+
+
 def blender_main(a) -> None:
-    global P, CFG, TEX_DIR
+    global P, CFG, TEX_DIR, SPEC
+    if _RAN:
+        raise SystemExit("meshy_room_build: blender_main runs once a Blender process (its tables are the room's)")
+    _RAN.append(1)
     t_start = time.time()
     _load()
     bpy.ops.wm.read_factory_settings(use_empty=True)
     sc = bpy.context.scene
     room = mib.Room(a.scene)
-    row = load_room(room.id)
+    room_file = os.path.abspath(a.room_file) if a.room_file else room_path(room.id)
+    row = load_room(room.id, path=room_file)
     CFG = dict(row)
     layout = apply_layout(CFG, a.layout)
-    with open(FP_LOOK, encoding="utf-8") as fh:
+    # the derived reading (openings, lights, groups, coverage, the pieces' places from the scene): a separate dict,
+    # so nothing derived reaches CFG, whose md5 a saved bake records
+    SPEC = rf.derive(CFG, room.d, shown=from_root(room_file))
+    if SPEC["pending"]:
+        raise SystemExit(f"meshy_room_build: {from_root(room_file)} needs what this builder does not build yet:\n  "
+                         + "\n  ".join(SPEC["pending"]))
+    look_file = os.path.abspath(a.look) if a.look else FP_LOOK
+    with open(look_file, encoding="utf-8") as fh:
         look = json.load(fh)
     # What made the outputs, each input by its own md5: this script (the shared code: no room's data stands in it,
-    # so adding a room does not change it), the room's own file, the look file and the kit. scriptMd5, roomMd5,
-    # lookMd5 and kitMd5 are the files as saved; roomBakeMd5 and lookBakeMd5 are taken from the data that reaches
-    # the bake (bake_room_md5, bake_look_md5)
-    src = dict(script=os.path.relpath(os.path.abspath(__file__), ROOT).replace("\\", "/"),
-               scriptMd5=file_md5(os.path.abspath(__file__)),
-               room=from_root(room_path(room.id)), roomMd5=file_md5(room_path(room.id)),
+    # so adding a room does not change it), the room's own file, the look file, the kit and the room files' loader.
+    # scriptMd5, roomMd5, lookMd5, kitMd5 and loaderMd5 are the files as saved with their line ends made LF (a
+    # Windows working tree and git then agree; a saved bake's md5 agrees with either form: rawAgrees);
+    # roomBakeMd5 and lookBakeMd5 are taken from the data that reaches the bake (bake_room_md5, bake_look_md5)
+    kit_file, loader_file = os.path.join(HERE, "meshy_interior_build.py"), os.path.abspath(rf.__file__)
+    files = dict(script=os.path.abspath(__file__), room=room_file, look=look_file, kit=kit_file)
+    forms = {k: rf.text_md5_forms(f) for k, f in files.items()}
+    src = dict(script=from_root(files["script"]), scriptMd5=forms["script"][0],
+               room=from_root(room_file), roomMd5=forms["room"][0],
                roomBakeMd5=bake_room_md5(CFG),
-               look=os.path.relpath(FP_LOOK, ROOT).replace("\\", "/"), lookMd5=file_md5(FP_LOOK),
+               look=from_root(look_file), lookMd5=forms["look"][0],
                lookBakeMd5=bake_look_md5(look),
-               kit="tools/blender/meshy_interior_build.py", kitMd5=file_md5(os.path.join(HERE, "meshy_interior_build.py")),
-               layout=layout, argv=sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else [])
+               kit=from_root(kit_file), kitMd5=forms["kit"][0],
+               loader=from_root(loader_file), loaderMd5=rf.text_md5(loader_file),
+               roomSchema=SPEC["schema"], layout=layout,
+               argv=shown_argv(sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []),
+               blender=bpy.app.version_string)
     log("source", json.dumps(src))
     CFG["look"] = look
     # the light setting: weights on the look's candle, moon and fill (the look's `settings`)
     sets = {k: v for k, v in (look.get("settings") or {}).items() if isinstance(v, dict)}
     light = a.light or (look.get("settings") or {}).get("default")
     if light and light not in sets:
-        raise SystemExit(f"meshy_room_build: no light setting {light!r} in {FP_LOOK} (it has {sorted(sets)})")
+        raise SystemExit(f"meshy_room_build: no light setting {light!r} in {from_root(look_file)} (it has "
+                         f"{sorted(sets)})")
     setting_w = {g: float(((sets.get(light) or {}).get("mix") or {}).get(g, 1.0)) for g in BAKE_GROUPS}
     CFG["light"], CFG["light_weights"] = light, dict(setting_w)
     CFG["candle"] = {**look["lights"]["lamp"], **CFG.get("candle", {})}
@@ -4951,6 +4959,12 @@ def blender_main(a) -> None:
     log(f"bake targets {len(targets)}, edges split adding {added} vertices")
     prepare_attrs(targets)
     rig = bake_rig(fr, win, flame, moon)
+    if a.rig_print:     # the rig's fingerprint (room_checks/rig_print.py): what the gate cannot see of a bake
+        sys.path.insert(0, os.path.join(HERE, "room_checks"))
+        import rig_print
+        rig_print.write(a.rig_print, rig, sc)
+        if a.rig_stop:
+            return
     hide = [r["obj"] for r in OBJS if r["what"] in ("sky", "emit")]
     outside_names = {r["obj"].name for r in OBJS if r["what"] == "outside"}
     bake_s = 0.0
@@ -4975,12 +4989,19 @@ def blender_main(a) -> None:
         # and `script` covered it): roomBake and roomWhole are null for it, not known, and the note below is written.
         # None of the answers proves the geometry: load_raw has compared every mesh's vertices with the bake's own
         # by then, and room_checks/regress.sh compares the whole GLB with its golden md5.
-        def room_agrees(key: str):
-            return None if RAW_META.get(key) is None else RAW_META.get(key) == src[key]
+        # A file's md5 agrees when the saved one is its LF or its CRLF form (a bake saved on a Windows working tree
+        # recorded the CRLF bytes)
+        def file_agrees(key: str, form: str):
+            return RAW_META.get(key) in forms[form]
 
-        same = dict(script=RAW_META.get("scriptMd5") == src["scriptMd5"], kit=RAW_META.get("kitMd5") == src["kitMd5"],
+        def room_agrees(key: str):
+            if RAW_META.get(key) is None:
+                return None
+            return file_agrees(key, "room") if key == "roomMd5" else RAW_META.get(key) == src[key]
+
+        same = dict(script=file_agrees("scriptMd5", "script"), kit=file_agrees("kitMd5", "kit"),
                     layout=RAW_META.get("layout") == layout, lookBake=RAW_META.get("lookBakeMd5") == src["lookBakeMd5"],
-                    lookWhole=RAW_META.get("lookMd5") == src["lookMd5"], roomBake=room_agrees("roomBakeMd5"),
+                    lookWhole=file_agrees("lookMd5", "look"), roomBake=room_agrees("roomBakeMd5"),
                     roomWhole=room_agrees("roomMd5"))
         src["rawAgrees"] = same
         log("the raw bake agrees with this build on", json.dumps(same))
@@ -5158,11 +5179,17 @@ def blender_main(a) -> None:
                      centre=[round((p["box"][0] + p["box"][3]) / 2, 3), round((p["box"][1] + p["box"][4]) / 2, 3)],
                      face=p["piece"].get("face"), place=list(p["piece"]["place"]), spec={k: v for k, v in p["spec"].items()
                                                                                        if k not in ("dress",)},
-                     **from_tile(fr, pid),
+                     **from_tile(fr, pid), **from_ref(pid),
                      **({"rise": p["piece"]["rise"]} if p["piece"].get("rise") else {}),
-                     **({"decor": True} if p["piece"].get("decor") else {}))
+                     **({"decor": True} if p["piece"].get("decor") else {}),
+                     **({"covers": list(p["piece"]["covers"])} if p["piece"].get("covers") else {}),
+                     **({"moved": p["piece"]["moved"]} if p["piece"].get("moved") else {}))
                 for pid, p in PIECES.items()],
-        collision=dict(name=coll_ob.name, boxes=len(boxes), triangles=len(boxes) * 12),
+        greyBoxes=[dict(id=pid, label=p["spec"].get("label"), size=[round(float(v), 3) for v in p["spec"]["size"]],
+                        box=[round(v, 3) for v in p["box"]]) for pid, p in PIECES.items()
+                   if p["spec"].get("model") == "box"],
+        coverage=SPEC.get("coverage"), skip=SPEC.get("skip"),
+        collision=dict(name=coll_ob.name, boxes=len(boxes), triangles=len(boxes) * 12, boxesSha1=boxes_sha1(boxes)),
         walk={k: v for k, v in walk.items() if not k.startswith("_")}, checks=checks, notes=NOTES,
         polyHaven=dict(models=sorted({p["spec"].get("slug") for p in PIECES.values() if p["spec"].get("slug")} |
                                      {d["slug"] for p in PIECES.values() for d in p["spec"].get("dress", ())} |
@@ -5188,6 +5215,9 @@ def blender_main(a) -> None:
         manifest["previews"] = [os.path.basename(p) for p in previews(fr, out_dir, ex, a.preview_res, coll_ob)]
         plan_render(fr, out_dir, ex, coll_ob, boxes, nodes, walk)
         manifest["plan"] = f"{room.id}_plan.png"
+    manifest["needsOwner"] = rf.needs_owner(SPEC, manifest["pieces"], spots)
+    if CFG.get("export") is not None:      # reserved for the exporter: copied, read by no builder
+        manifest["export"] = CFG["export"]
     manifest["seconds"] = round(time.time() - t_start, 1)
     with open(os.path.join(out_dir, f"{room.id}.json"), "w", encoding="utf-8") as fh:
         json.dump(manifest, fh, indent=1, default=lambda o: list(o) if hasattr(o, "__iter__") else str(o))
@@ -5216,6 +5246,11 @@ def parse(argv: list[str]):
     p.add_argument("--glb", action="store_true", help="export <id>.glb (the room alone at the origin)")
     p.add_argument("--preview", action="store_true", help="render the views and the plan")
     p.add_argument("--preview-res", type=int, default=1920, help="preview width (height 9/16 of it)")
+    p.add_argument("--room-file", help="build from this room file instead of meshy_rooms/<id>.json (its `room` is "
+                                       "still the scene's id): a scratch room, no repo file edited")
+    p.add_argument("--look", help="build with this look file instead of meshy_looks/interior_fp.json (a scratch look)")
+    p.add_argument("--rig-print", help="write the bake rig's fingerprint to this JSON file (room_checks/rig_print.py)")
+    p.add_argument("--rig-stop", action="store_true", help="with --rig-print: stop once the fingerprint is written")
     p.add_argument("--step", help="plain Python: plan (the overlay on the plan render)")
     return p.parse_args(argv)
 

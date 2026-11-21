@@ -20,6 +20,7 @@ BUILT = os.path.join(BLENDER, "build", "rooms")             # the finished rooms
 sys.path.insert(0, BLENDER)
 sys.path.insert(0, os.path.join(BLENDER, "room_checks"))
 import regress  # noqa: E402  (standard library only)
+import meshy_room_file as rf  # noqa: E402  (standard library only)
 
 try:
     import meshy_room_build as mrb  # noqa: E402
@@ -374,6 +375,487 @@ class Loader(unittest.TestCase):
         self.assertNotEqual(base, md5(lambda c: c.update(wall_colour="#000000")))
         self.assertNotEqual(base, md5(lambda c: c["pieces"][0].update(face="S")))
         self.assertNotEqual(base, md5(layout="mapped"))
+
+
+# ---------------------------------------------------------------- room file v2: meshy_room_file (standard library)
+
+FIXTURES = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fixtures")
+PARLOUR = os.path.join(FIXTURES, "widow_parlour.v2.json")
+BED_NORTH_MD5, MAPPED_MD5 = "db685d9053b69283a6d56d372dc269d4", "21f73be1809e29ae39544f61d2b2ceeb"
+LOOK_MD5 = "3acc7a8b6eb250f8d62d5970117abec3"
+
+
+def scene(rid):
+    return rf.load_scene(rid)
+
+
+def raw(path):
+    with open(path, encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+class RoomFileV2(unittest.TestCase):
+    """The loader and the derived reading (room_file_v2.md): each rule's message on a small change to a real file
+    (the bedroom's or the parlour fixture's), written to a scratch folder and read with --room-file's path."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def write(self, data, name="room.json"):
+        path = os.path.join(self.tmp.name, name)
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(data, fh)
+        return path
+
+    def bedroom(self):
+        return raw(os.path.join(ROOMS_DIR, "widow_bedroom.json"))
+
+    def read(self, data, rid=None, layout=None, sc=None, tasks=frozenset()):
+        rid = rid or data["room"]
+        row = rf.load_room(rid, path=self.write(data))
+        cfg = dict(row)
+        rf.apply_layout(cfg, layout)
+        return cfg, rf.derive(cfg, sc or scene(rid), shown="room.json", tasks=None if tasks is None else set(tasks))
+
+    def stops(self, data, sc=None):
+        with self.assertRaises(SystemExit) as caught:
+            self.read(data, sc=sc)
+        return str(caught.exception)
+
+    # -- the bedroom reads as section 8 of the design says, and its bake md5s do not move
+    def test_the_bedroom_reads_as_the_legacy_path(self):
+        cfg, spec = self.read(self.bedroom())
+        self.assertEqual((spec["schema"], spec["names"], spec["pending"]), ("legacy", "legacy", []))
+        door, win = spec["openings"]
+        self.assertEqual((door["kind"], door["id"], door["side"], door["at"], door["knob"]), ("door", "wb.door", "S", -2.5, "E"))
+        self.assertEqual((door["width"], door["height"], door["foot"]), (0.9, 2.15, [-2.5, -3.5]))
+        self.assertEqual((win["kind"], win["id"], win["side"], win["at"], win["outside"]), ("window", "wb.draped_window", "N", -0.5, "snow"))
+        lights = {r["id"]: r for r in spec["lights"]}
+        self.assertEqual(sorted(lights), ["wb.lt_candle", "wb.lt_moon"])
+        self.assertEqual((lights["wb.lt_candle"]["role"], lights["wb.lt_candle"]["group"]), ("lamp", "candle"))
+        self.assertEqual(lights["wb.lt_candle"]["anchor"], {"piece": "wb.candle", "name": "flame"})
+        self.assertEqual((lights["wb.lt_moon"]["group"], lights["wb.lt_moon"]["window"]), ("moon", "wb.draped_window"))
+        self.assertEqual([d["id"] for d in spec["lightsDropped"]], ["wb.lt_window"])
+        self.assertEqual(spec["groups"], ["candle", "moon", "fill"])
+        self.assertEqual((spec["exposureFrom"], spec["hosts"]), (["wb.lt_candle"], ["wb.candle"]))
+        self.assertEqual(spec["underBed"], {"wb.under_bed": "wb.bed"})
+        self.assertEqual(spec["coverage"]["wb.draped_window"], {"by": "opening", "id": "wb.draped_window"})
+        self.assertEqual(len(spec["coverage"]), 12)        # 9 props and 3 spots, every one named
+        self.assertEqual(len(spec["plannedNames"]), 26)
+        self.assertNotIn("openings", cfg)                  # nothing derived reaches the row
+
+    def test_the_bedroom_explains_itself_as_its_snapshot(self):
+        cfg, spec = self.read(self.bedroom(), tasks=None)       # the game's own tasks.json
+        with open(os.path.join(FIXTURES, "widow_bedroom.explain.txt"), encoding="utf-8") as fh:
+            want = fh.read()
+        self.assertEqual(rf.explain(cfg, spec, "tools/blender/meshy_rooms/widow_bedroom.json"), want)
+
+    def test_the_bake_md5s_hold_and_the_droppable_keys_leave_them(self):
+        row = rf.load_room("widow_bedroom")
+
+        def md5(layout=None, change=None):
+            cfg = dict(row)
+            rf.apply_layout(cfg, layout)
+            if change:
+                change(cfg)
+            return rf.bake_room_md5(cfg)
+
+        self.assertEqual(md5(), BED_NORTH_MD5)
+        self.assertEqual(md5("mapped"), MAPPED_MD5)
+        for key, value in (("light", "midway"), ("exposure_from", ("wb.lt_candle",)), ("skip", {"x": "y"}),
+                           ("look", {"lights": {}})):
+            self.assertEqual(md5(change=lambda c: c.update({key: value})), BED_NORTH_MD5, key)
+
+        def moved(c):
+            c["pieces"][0] = dict(c["pieces"][0], moved="0.3 m along the wall")
+
+        def label(c):
+            c["pieces"][0] = dict(c["pieces"][0], spec=dict(c["pieces"][0]["spec"], label="a label"))
+        self.assertEqual(md5(change=moved), BED_NORTH_MD5)
+        self.assertEqual(md5(change=label), BED_NORTH_MD5)
+        self.assertNotEqual(md5(change=lambda c: c["pieces"][0].update(covers=("wb.rug",))), BED_NORTH_MD5)
+        self.assertNotEqual(md5(change=lambda c: c["pieces"][0].update(name="wb.other")), BED_NORTH_MD5)
+
+    def test_the_look_md5_is_the_saved_bakes(self):
+        self.assertEqual(rf.bake_look_md5(raw(os.path.join(BLENDER, "meshy_looks", "interior_fp.json"))), LOOK_MD5)
+
+    def test_the_parlour_fixture_reads_as_v2(self):
+        data = raw(PARLOUR)
+        cfg, spec = self.read(data)
+        self.assertEqual(spec["schema"], "v2")
+        self.assertEqual([(e["id"], e["side"], e["at"]) for e in spec["openings"]],
+                         [("wp.door", "E", 0.0), ("wp.bedroom", "N", -4.5), ("wp.draped_window_0", "N", -2.5),
+                          ("wp.draped_window_1", "N", 3.5)])
+        self.assertEqual([e["outside"] for e in spec["openings"][2:]], ["snow", "sky"])
+        self.assertEqual(spec["groups"], ["candle", "fire", "moon", "fill"])
+        self.assertEqual({r["id"]: r["group"] for r in spec["lights"]},
+                         {"wp.lt_lamp": "candle", "wp.lt_lamp_chair": "candle", "wp.lt_fire": "fire", "wp.lt_moon": "moon"})
+        self.assertEqual(len(spec["plannedNames"]), 44)
+        self.assertEqual(len(spec["coverage"]), 19)       # 17 props and 2 spots
+        self.assertEqual(len(spec["pending"]), 4)         # openings, look, the day bed, the hearth: not built yet
+        self.assertEqual(spec["pieces"]["wp.letter_box"]["ref"], [6.5, 5.0])
+
+    # -- R0: the whole file
+    def test_strict_keys_at_the_top_and_inside(self):
+        data = self.bedroom()
+        data["skiting"] = 0.2
+        self.assertIn('the key "skiting" is not a room file key (did you mean "skirting"?) (R0.1)', self.stops(data))
+        data = self.bedroom()
+        data["pieces"][3]["rize"] = 0.1
+        self.assertIn('pieces[3] (wb.dressing_table): the key "rize" is not a piece key (did you mean "rise"?)',
+                      self.stops(data))
+        data = self.bedroom()
+        data["pieces"][0]["spec"]["tal"] = 2.0
+        self.assertIn('the key "tal" is not a spec key (did you mean "tall"?)', self.stops(data))
+        data = self.bedroom()
+        data["moon"]["azimut"] = 3.0
+        self.assertIn('moon: the key "azimut" is not a moon key', self.stops(data))
+        data = self.bedroom()
+        data["window"]["sil"] = 0.7
+        self.assertIn('window: the key "sil" is not a opening key', self.stops(data))
+
+    def test_a_comment_without_its_key(self):
+        data = raw(PARLOUR)
+        data["look"]["look_note"] = "a stray comment"
+        self.assertIn('look.look_note: a comment is "note", or "<key>_note" beside "<key>"; "look" is not in this '
+                      'object (R0.7)', self.stops(data))
+        data = self.bedroom()
+        data["pieces"][0]["placement_note"] = "x"
+        self.assertIn("placement_note", self.stops(data))
+
+    def test_the_openings_one_way(self):
+        data = self.bedroom()
+        data["openings"] = []
+        self.assertIn("give the openings one way", self.stops(data))
+        data = self.bedroom()
+        del data["window"]
+        self.assertIn("lacks window", self.stops(data))     # a legacy file without its pair is a file that lacks one
+        data = self.bedroom()
+        data["lights"] = []
+        self.assertIn("the legacy light rig", self.stops(data))
+
+    def test_no_lilac_or_magenta(self):
+        data = self.bedroom()
+        data["wall_colour"] = "#8A6FA8"
+        self.assertIn("wall_colour #8A6FA8 is lilac or magenta", self.stops(data))
+        data = self.bedroom()
+        data["window"]["curtain_colour"] = "#C040A0"
+        self.assertIn("window.curtain_colour #C040A0 is lilac or magenta", self.stops(data))
+        self.assertFalse(rf.lilac("#4A5264"))       # the bedroom's slate curtains
+        self.assertFalse(rf.lilac("#7FA8FF"))       # the moon
+
+    def test_the_scene_names_the_spawns_and_the_district(self):
+        data = self.bedroom()
+        data["spawn_labels"] = {"door": "By the door", "window": "By the window"}
+        self.assertIn("spawn_labels names 'window', which the scene has not", self.stops(data))
+        data["spawn_labels"] = {}
+        self.assertIn("spawn_labels lacks 'door'", self.stops(data))
+        data = self.bedroom()
+        data["district"] = "Widow Vane's parlour"
+        self.assertIn("is not the scene's name \"Widow's bedroom\"", self.stops(data))
+
+    def test_names_unique_after_threejs(self):
+        data = self.bedroom()
+        data["pieces"] += [dict(id="wb.decor.x", decor=True, name="wb.p:q", place=["at", 0.0, 0.0],
+                                spec=dict(model="box", size=[0.3, 0.3, 0.3], label="a box")),
+                           dict(id="wb.decor.y", decor=True, name="wb.pq", place=["at", 1.0, 0.0],
+                                spec=dict(model="box", size=[0.3, 0.3, 0.3], label="a box"))]
+        self.assertIn("read the same in three.js", self.stops(data))
+        self.assertEqual(rf.three_name("a.b [c]:d/e f"), "ab_cde_f")
+        data = self.bedroom()
+        data["pieces"].append(dict(id="wb.decor_a.b", decor=True, place=["at", 0, 0],
+                                   spec=dict(model="box", size=[0.3, 0.3, 0.3], label="a box")))
+        data["pieces"].append(dict(id="wb.decor_ab", decor=True, place=["at", 1, 0],
+                                   spec=dict(model="box", size=[0.3, 0.3, 0.3], label="a box")))
+        self.assertIn('the ids "wb.decor_a.b" and "wb.decor_ab" read the same in three.js (R-P1)', self.stops(data))
+
+    # -- R-P: pieces, grey boxes, the coverage rule
+    def test_every_scene_prop_is_named(self):
+        data = self.bedroom()
+        data["pieces"] = [p for p in data["pieces"] if p["id"] != "wb.rug"]
+        said = self.stops(data)
+        self.assertIn("the scene's prop wb.rug has no piece: add one (a grey box", said)
+        data["skip"] = {"wb.rug": "a floor decal, G19"}
+        cfg, spec = self.read(data)
+        self.assertEqual(spec["coverage"]["wb.rug"], {"by": "skip", "reason": "a floor decal, G19"})
+        data["skip"] = {"wb.nothing": "x"}
+        self.assertIn("skip names wb.nothing, which is not in the scene (R-P2c)", self.stops(data))
+
+    def test_a_piece_not_in_the_scene_says_decor(self):
+        data = self.bedroom()
+        data["pieces"].append(dict(id="wb.birdcage", place=["at", 0.0, 0.0],
+                                   spec=dict(model="box", size=[0.4, 0.4, 1.6], label="Birdcage")))
+        self.assertIn('piece wb.birdcage is not in the scene: a piece of the first person\'s own says "decor": true',
+                      self.stops(data))
+
+    def test_covers_name_scene_ids(self):
+        data = self.bedroom()
+        data["pieces"][0]["covers"] = ["wb.cupboard"]
+        self.assertIn("piece wb.wardrobe: covers wb.cupboard, which is not in the scene (R-P2c)", self.stops(data))
+
+    def test_a_grey_box_has_a_size_and_a_label(self):
+        data = self.bedroom()
+        data["pieces"][9]["spec"] = {"model": "box", "size": [1.1, 0.03]}
+        self.assertIn('piece wb.photos: a grey box needs "size": [w, d, h]', self.stops(data))
+        data["pieces"][9]["spec"] = {"model": "box", "size": [1.1, 0.03, 2.9], "label": "Photographs"}
+        self.assertIn("piece wb.photos is 3.18 m tall under a 3 m ceiling (R-P3b)", self.stops(data))
+        data["pieces"][9]["spec"] = {"model": "oven"}
+        self.assertIn('piece wb.photos: no first-person builder for model "oven"', self.stops(data))
+
+    def test_place_forms(self):
+        data = self.bedroom()
+        data["pieces"][4]["place"] = ["wal", "N", 0.9]
+        self.assertIn('piece wb.washstand: place [\'wal\', \'N\', 0.9]: the forms are', self.stops(data))
+        data = self.bedroom()
+        data["pieces"][7]["place"] = ["beside", "wb.rug", "S", 2.0]   # the rug stands later in the list
+        self.assertIn("`beside` names a piece that stands earlier in the list", self.stops(data))
+
+    def test_a_null_place_is_for_a_run_or_a_footprint_prop(self):
+        data = self.bedroom()
+        data["pieces"][4]["place"] = ["wall", "N", None]
+        self.assertIn("piece wb.washstand: place or size has a null: only a piece with \"covers\" or a footprint prop",
+                      self.stops(data))
+
+    def test_a_run_takes_its_length_and_place_from_its_covers(self):
+        data = self.bedroom()
+        data["pieces"] = [p for p in data["pieces"] if p["id"] != "wb.washstand"]
+        run = next(p for p in data["pieces"] if p["id"] == "wb.dressing_table")
+        run.update(covers=["wb.washstand"], place=["wall", "N", None])
+        run["spec"] = {"model": "box", "size": [None, 0.5, 1.0], "label": "Dressing table and washstand (a run)"}
+        run.pop("cloth", None)
+        run.pop("dress_lod", None)
+        run.pop("key", None)
+        cfg, spec = self.read(data)
+        res = spec["pieces"]["wb.dressing_table"]
+        self.assertEqual((res["place"], res["size"], res["ref"]), (["wall", "N", -1.0], [4.0, 0.5, 1.0], [-1.0, 3.0]))
+        self.assertEqual(spec["coverage"]["wb.washstand"], {"by": "covers", "id": "wb.dressing_table"})
+        self.assertEqual(run["place"], ["wall", "N", None])     # the file's own data is not changed
+        self.assertEqual(cfg["pieces"][3]["place"], ("wall", "N", None))
+        run["face"] = "E"                                       # its width now runs along y: the row does not fit
+        self.assertIn("do not run along its width", self.stops(data))
+
+    def test_an_under_bed_spot_has_its_bed(self):
+        sc = scene("widow_bedroom")
+        sc["props"] = [dict(p, x=2, y=6) if p["id"] == "wb.bed" else p for p in sc["props"]]   # the bed moved away
+        self.assertIn("spot wb.under_bed (underBed) has no bed prop beside it", self.stops(self.bedroom(), sc=sc))
+        data = self.bedroom()
+        next(p for p in data["pieces"] if p["id"] == "wb.bed")["covers"] = ["wb.under_bed"]
+        cfg, spec = self.read(data, sc=sc)
+        self.assertEqual(spec["underBed"], {"wb.under_bed": "wb.bed"})
+
+    def test_needs_owner_lists_the_spots_and_task_pieces_moved_first(self):
+        cfg, spec = self.read(self.bedroom())
+        spec["taskPieces"] = ["wb.candle"]
+        rows = [dict(id="wb.candle", fromRefM=1.781), dict(id="wb.bed", fromRefM=1.846),
+                dict(id="wb.wardrobe", fromRefM=0.287, moved="0.3 m along the wall"),
+                dict(id="wb.wardrobe_body", fromRefM=0.287)]
+        out = rf.needs_owner(spec, rows, [dict(id="wb.under_bed", piece="wb.bed", fromTileM=1.512)])
+        self.assertEqual([r["id"] for r in out], ["wb.wardrobe", "wb.candle", "wb.under_bed", "wb.wardrobe_body"])
+        by = {r["id"]: r for r in out}
+        self.assertEqual((by["wb.under_bed"]["piece"], by["wb.under_bed"]["fromM"]), ("wb.bed", 1.512))
+        self.assertEqual([r["id"] for r in out if r["show"]], ["wb.wardrobe", "wb.candle", "wb.under_bed"])
+
+    # -- openings and lights on the v2 path (the parlour fixture)
+    def test_opening_rules(self):
+        cases = [(lambda d: d["openings"][1].update(knob="N"), 'knob "N" on the N wall: the ends are "E" and "W"'),
+                 (lambda d: d["openings"][0].update(portal="wp.dor"), 'portal "wp.dor" is not in the scene'),
+                 (lambda d: d["openings"].pop(1), "the scene's portal wp.bedroom has no opening"),
+                 (lambda d: d["openings"].pop(2), "the scene's window prop wp.draped_window_0 has no opening"),
+                 (lambda d: d["openings"][1].update(at=-5.1), '"at" -5.1 is 0.60 m from its tile\'s centre'),
+                 (lambda d: d["openings"][1].update({"in": "wp.wall"}), '"in": wall-pieces are not built yet (G21)'),
+                 (lambda d: d["openings"][2].update(style="shutters"), 'style "shutters" is not built yet (G14)'),
+                 (lambda d: d["openings"][3].update(at=-1.6), "overlap on the N wall"),
+                 (lambda d: d["openings"][0].update(kind="gate"), 'kind "gate" is not one of door, window'),
+                 (lambda d: d["openings"][3].update(outside="snow"), "snow windows on the N walls" if False else None)]
+        for change, said in cases:
+            data = raw(PARLOUR)
+            change(data)
+            if said is None:
+                self.read(data)         # two snow windows on one wall are allowed
+                continue
+            self.assertIn(said, self.stops(data), said)
+
+    def test_light_rules(self):
+        data = raw(PARLOUR)
+        data["lights"].append({"id": "wp.lt_window", "role": "lamp"})
+        self.assertIn("wp.lt_window is a day and dusk light: a night room does not build it", self.stops(data))
+        data, sc = raw(PARLOUR), scene("widow_parlour")
+        for i, g in enumerate(("a", "b", "c")):
+            data["lights"][i]["group"] = g
+        sc["lights"] += [dict(id="wp.lt_x", kind="lamp", x=5, y=5), dict(id="wp.lt_y", kind="lamp", x=6, y=5)]
+        data["lights"] += [{"id": "wp.lt_x", "group": "d", "anchor": {"at": [0.0, 0.0, 1.0]}},
+                           {"id": "wp.lt_y", "anchor": {"wall": "S", "along": 0.0, "z": 1.8}}]
+        self.assertIn("the room bakes 7 light groups (candle, a, b, c, d, moon, fill): at most 5",
+                      self.stops(data, sc=sc))
+        data = raw(PARLOUR)
+        data["exposure_from"] = ["wp.lt_moon"]
+        self.assertIn("exposure_from: wp.lt_moon is a moon light; its pool cannot set the exposure", self.stops(data))
+        data = raw(PARLOUR)
+        data["lights"][0]["anchor"] = {"piece": "wp.rug"}
+        self.assertIn('piece wp.rug has no anchor "flame"', self.stops(data))
+        data = raw(PARLOUR)
+        data["lights"][3]["window"] = "wp.draped_window_9"
+        self.assertIn('its window "wp.draped_window_9" is not a window opening of this file (R-L5)', self.stops(data))
+
+    def test_the_trims(self):
+        data = raw(PARLOUR)
+        data["skirting"] = 0
+        self.assertIn("skirting 0: give a height in metres, or null", self.stops(data))
+        data = raw(PARLOUR)
+        data["height"], data["cornice"] = 2.7, 0.3
+        self.assertIn("picture_rail 2.5 m and cornice 0.3 m do not fit under a ceiling of 2.7 m (R-S1)",
+                      self.stops(data))
+
+    # -- md5s over LF text, paths in the manifest
+    def test_text_md5_is_the_lf_form_and_either_form_agrees(self):
+        a, b = os.path.join(self.tmp.name, "lf.txt"), os.path.join(self.tmp.name, "crlf.txt")
+        with open(a, "wb") as fh:
+            fh.write(b"one\ntwo\n")
+        with open(b, "wb") as fh:
+            fh.write(b"one\r\ntwo\r\n")
+        self.assertEqual(rf.text_md5(a), rf.text_md5(b))
+        self.assertEqual(rf.text_md5(a), hashlib.md5(b"one\ntwo\n").hexdigest())
+        self.assertEqual(rf.text_md5_forms(b), (hashlib.md5(b"one\ntwo\n").hexdigest(),
+                                                hashlib.md5(b"one\r\ntwo\r\n").hexdigest()))
+
+    def test_paths_are_shown_from_the_repo_root_or_by_name(self):
+        self.assertEqual(rf.from_root(os.path.join(ROOMS_DIR, "widow_bedroom.json")),
+                         "tools/blender/meshy_rooms/widow_bedroom.json")
+        self.assertEqual(rf.from_root(os.path.join(self.tmp.name, "scratch", "room.json")), "room.json")
+
+    def test_the_command_line_explains(self):
+        done = subprocess.run([sys.executable, os.path.join(BLENDER, "meshy_room_file.py"), "widow_parlour",
+                               "--room-file", PARLOUR, "--explain"], capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("path v2", done.stdout)
+        self.assertIn("bake groups: candle, fire, moon, fill", done.stdout)
+
+
+class GateDigest(unittest.TestCase):
+    """The manifest digest and the bake gate's arithmetic in regress.py, on stand-in manifests."""
+
+    def manifest(self, **change):
+        m = dict(light=dict(numbers={"farWall": 0.391}), walk={"r0.30": {"tilesReached": 62}}, spots=[{"id": "s"}],
+                 exposure=dict(E=5.0121, k=0.79557, wdi_exposure=6.3, bakeSeconds=1.0),
+                 collision=dict(boxes=40, boxesSha1="ab"), pieces=[dict(id="p", box=[0, 0, 0, 1, 1, 1], slug="x")],
+                 source=dict(roomBakeMd5="r", lookBakeMd5="l", blender="5.2.1 LTS"))
+        m.update(change)
+        return m
+
+    def test_the_digest_sees_its_parts_and_nothing_else(self):
+        base = regress.manifest_digest(self.manifest())
+        self.assertEqual(sorted(base["parts"]), sorted(regress.DIGEST_PARTS))
+        same = regress.manifest_digest(self.manifest(notes=["x"], built="another day",
+                                                     exposure=dict(E=5.0121, k=0.79557, wdi_exposure=6.3,
+                                                                   bakeSeconds=9.0)))
+        self.assertEqual(same, base)
+        moved = regress.manifest_digest(self.manifest(pieces=[dict(id="p", box=[0, 0, 0, 1, 1, 1.01])]))
+        self.assertNotEqual(moved["sha1"], base["sha1"])
+        off, parts = regress.extras_differ(dict(manifestDigest=base, roomBakeMd5="r"),
+                                           regress.manifest_extras(self.manifest(
+                                               pieces=[dict(id="p", box=[0, 0, 0, 1, 1, 1.01])])))
+        self.assertEqual((off, parts), (["manifestDigest"], ["pieces"]))
+
+    def test_the_verdict_fails_a_glb_match_whose_numbers_moved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = os.path.join(tmp, "rebuild")
+            os.makedirs(folder)
+            glb = tiny_glb(os.path.join(folder, "test_room.glb"), "Khronos glTF Blender I/O v5.2.40")
+            m = self.manifest(scene="test_room", layout="bed_north", counts=dict(vertices=8, triangles=12))
+            m["light"]["setting"] = "midway"
+            with open(os.path.join(folder, "test_room.json"), "w", encoding="utf-8") as fh:
+                json.dump(m, fh)
+            row = dict(glbMd5=md5_of(glb), glbBytes=os.path.getsize(glb), generator=regress.generator(glb),
+                       light="midway", layout="bed_north", vertices=8, triangles=12, raw="x.npz",
+                       recorded="2026-11-21", **regress.manifest_extras(m))
+            golden = os.path.join(tmp, "golden.json")
+            with open(golden, "w", encoding="utf-8") as fh:
+                json.dump({"rooms": {"test_room": row}}, fh)
+            done = subprocess.run([sys.executable, REGRESS, "verdict", "test_room", "--out", folder, "--golden", golden],
+                                  capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0, done.stdout + done.stderr)
+            m["walk"] = {"r0.30": {"tilesReached": 61}}
+            with open(os.path.join(folder, "test_room.json"), "w", encoding="utf-8") as fh:
+                json.dump(m, fh)
+            done = subprocess.run([sys.executable, REGRESS, "verdict", "test_room", "--out", folder, "--golden", golden],
+                                  capture_output=True, text=True)
+            self.assertEqual(done.returncode, 1, done.stdout)
+            self.assertIn("MISMATCH in the manifest", done.stdout)
+            self.assertIn("the digest's walk", done.stdout)
+
+    def test_stamp_adds_the_numbers_to_a_matching_row_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = os.path.join(tmp, "rebuild")
+            os.makedirs(folder)
+            glb = tiny_glb(os.path.join(folder, "test_room.glb"), "Khronos glTF Blender I/O v5.2.40")
+            with open(os.path.join(folder, "test_room.json"), "w", encoding="utf-8") as fh:
+                json.dump(self.manifest(), fh)
+            row = dict(glbMd5=md5_of(glb), glbBytes=os.path.getsize(glb), generator=regress.generator(glb),
+                       light="midway", layout="bed_north", vertices=8, triangles=12, raw="x.npz", recorded="2026-11-21")
+            golden = os.path.join(tmp, "golden.json")
+            with open(golden, "w", encoding="utf-8") as fh:
+                json.dump({"rooms": {"test_room": dict(row, glbMd5="0" * 32)}}, fh)
+            args = [sys.executable, REGRESS, "stamp", "test_room", "--out", folder, "--golden", golden, "--raw", glb]
+            done = subprocess.run(args, capture_output=True, text=True)
+            self.assertEqual(done.returncode, 1, done.stderr)       # not the golden GLB: nothing written
+            self.assertIn("is not the golden GLB", done.stderr)
+            with open(golden, "w", encoding="utf-8") as fh:
+                json.dump({"rooms": {"test_room": row}}, fh)
+            done = subprocess.run(args, capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            with open(golden, encoding="utf-8") as fh:
+                got = json.load(fh)["rooms"]["test_room"]
+            self.assertEqual(got["manifestDigest"], regress.manifest_digest(self.manifest()))
+            self.assertEqual((got["roomBakeMd5"], got["lookBakeMd5"], got["blender"]), ("r", "l", "5.2.1 LTS"))
+            self.assertEqual(got["glbMd5"], row["glbMd5"])
+
+    def test_the_repo_row_has_the_bake_gate_and_the_digest(self):
+        row = read("golden.json")["rooms"]["widow_bedroom"]
+        self.assertEqual(row["roomBakeMd5"], BED_NORTH_MD5)
+        self.assertEqual(row["lookBakeMd5"], LOOK_MD5)
+        self.assertEqual(sorted(row["manifestDigest"]["parts"]), sorted(regress.DIGEST_PARTS))
+        self.assertEqual(row["bake1spp"]["samples"], 1)
+        for k in ("candle", "moon", "fill", "ao", "co"):
+            self.assertRegex(row["bake1spp"][k], r"^[0-9a-f]{40}$")
+        self.assertRegex(row["rig"]["sha1"], r"^[0-9a-f]{40}$")
+
+
+@unittest.skipIf(mrb is None, "numpy is not installed, so meshy_room_build cannot be imported")
+class BuilderV2(unittest.TestCase):
+    def test_the_builder_keeps_its_names_as_the_loaders(self):
+        self.assertIs(mrb.bake_room_md5, rf.bake_room_md5)
+        self.assertIs(mrb.bake_look_md5, rf.bake_look_md5)
+        self.assertEqual(mrb.ROOM_KEYS, rf.ROOM_KEYS)
+        for k in ("exposure_from", "light", "skip", "look"):
+            self.assertIn(k, mrb.BAKE_ROOM_DROP)
+
+    def test_the_manifest_argv_carries_no_local_folder(self):
+        outside = os.path.join(tempfile.gettempdir(), "someone", "scratch", "out")
+        argv = ["--scene", "widow_bedroom", "--out", outside, "--raw",
+                os.path.join(BUILT, "widow_bedroom_raw_groups.npz"), "--room-file", os.path.join(outside, "r.json")]
+        self.assertEqual(mrb.shown_argv(argv), ["--scene", "widow_bedroom", "--out", "out", "--raw",
+                                                "tools/blender/build/rooms/widow_bedroom_raw_groups.npz",
+                                                "--room-file", "r.json"])
+
+    def test_a_bake_is_hashed_by_group(self):
+        import numpy as np
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "b.npz")
+            np.savez(path, **{"meta|samples": np.array(1), "a|candle": np.ones((2, 3), np.float32),
+                              "a|co": np.zeros((2, 3), np.float32), "a|mat": np.array(["m", "m"]),
+                              "b|candle": np.ones((1, 3), np.float32), "a|ao": np.ones(2, np.float32)})
+            got = regress.bake_arrays(path)
+            self.assertEqual((got["meshes"], got["samples"]), (2, 1))
+            self.assertEqual(sorted(k for k in got if k not in ("meshes", "samples")), ["ao", "candle", "co"])
+            np.savez(path, **{"meta|samples": np.array(1), "a|candle": np.ones((2, 3), np.float32) * 1.0000001,
+                              "a|co": np.zeros((2, 3), np.float32), "b|candle": np.ones((1, 3), np.float32),
+                              "a|ao": np.ones(2, np.float32)})
+            other = regress.bake_arrays(path)
+            self.assertNotEqual(got["candle"], other["candle"])
+            self.assertEqual(got["co"], other["co"])
 
 
 if __name__ == "__main__":

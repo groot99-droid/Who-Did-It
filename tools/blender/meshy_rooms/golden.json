@@ -12,7 +12,43 @@
       "raw": "widow_bedroom_raw_groups.npz",
       "rawMd5": "8f212f7d41c9308df71a94ce519afabb",
       "recorded": "2026-11-16",
-      "note": "The build judged READY by the independent check of 2026-11-16."
+      "note": "The build judged READY by the independent check of 2026-11-16.",
+      "bake1spp": {
+        "candle": "412c9e4ec7fa012b5233fd56bf0e5297edb968a1",
+        "moon": "88786fc95f077edadf5bf07d217c6849949e7d98",
+        "fill": "3f44c00d29a961c7442b94ec5f3feb2d5ae81afc",
+        "ao": "9c414d74b67c56a36b33efd7e2c46aea9f324bb0",
+        "co": "27c768d1b97b941b7398ebddfeb4682d0ce035f2",
+        "meshes": 42,
+        "samples": 1,
+        "recorded": "2026-11-21"
+      },
+      "rig": {
+        "sha1": "9587d8eff9ec6960f9133235abdc41d56ec2ae3f",
+        "parts": {
+          "lights": "762bfa69eddddd02cd36912c77b3da2c50ce06c0",
+          "order": "9eb265c794f4bec5d5a633ac18b0810ab3485837",
+          "world": "bfff4e183b3326680f72fafd06e1060393fa6935",
+          "tight": "9788ca9ae01def53cd59fe3670c1e77a6dc29ddf"
+        },
+        "lights": 3,
+        "recorded": "2026-11-21"
+      },
+      "manifestDigest": {
+        "sha1": "d92c3086e11c3965278d00c885710975016c46ce",
+        "parts": {
+          "lightNumbers": "50f9ec9d671f02961ba9ee625e1e03be0eec04ed",
+          "walk": "640e05bd61dd4f22089892449fb5e9df8f3395f7",
+          "spots": "2c7bab95dc47c3440382b21d88f110e7ca10de7e",
+          "exposure": "a315aa7c611488c5826518715fdf06e9129c216c",
+          "collision": "fd0e1b897f41783fe0c87287fb4fc284aac54a3f",
+          "pieces": "d804883fbf8d8bd55d0a3210a49596518eb23b65"
+        }
+      },
+      "roomBakeMd5": "db685d9053b69283a6d56d372dc269d4",
+      "lookBakeMd5": "3acc7a8b6eb250f8d62d5970117abec3",
+      "blender": "5.2.1 LTS",
+      "extrasRecorded": "2026-11-21"
     }
   }
 }

@@ -47,6 +47,14 @@ GOLDEN = os.path.join(ROOT, "tools", "blender", "meshy_rooms", "golden.json")
 PLAN = ("room", "light", "layout", "raw", "out", "golden")
 # what a golden row says of its GLB besides md5
 FIELDS = ("light", "layout", "vertices", "triangles", "glbBytes", "generator")
+# what a row may say of the rebuild's manifest besides (`stamp` writes them; the verdict compares each one the row has):
+# the digest of the numbers the GLB's md5 does not carry, the md5s of the room's and the look's data that reach the
+# bake, and the Blender that built it
+EXTRAS = ("manifestDigest", "roomBakeMd5", "lookBakeMd5", "blender")
+# the parts of the manifest the digest holds (manifest_digest)
+DIGEST_PARTS = ("lightNumbers", "walk", "spots", "exposure", "collision", "pieces")
+# the arrays of a saved bake whose one-sample values `bake` compares: the groups, the AO and the vertices
+BAKE_KEYS = ("candle", "moon", "fill", "ao", "co")
 PLAIN = re.compile(r"[A-Za-z0-9_.-]+")      # a light setting's or a layout's name, as the builder's arguments take it
 shown = roomcfg.shown
 
@@ -280,6 +288,78 @@ def glb_differences(got, golden, limit=12):
     return lines
 
 
+# ---------------------------------------------------------------- the manifest's numbers, a saved bake's arrays
+
+
+def _sha1(x):
+    return hashlib.sha1(json.dumps(x, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def manifest_digest(m):
+    """The digest of a build's numbers that its GLB's md5 does not carry (implementation plan, S0): the light numbers
+    (what the look file's setting notes quote), the walk check, the spots, the exposure (E, k and wdi_exposure), the
+    collision (its boxes' count and their sha1) and every piece's box. {"sha1": all, "parts": {part: sha1}}."""
+    ex = m.get("exposure") or {}
+    col = m.get("collision") or {}
+    parts = dict(lightNumbers=(m.get("light") or {}).get("numbers"), walk=m.get("walk"), spots=m.get("spots"),
+                 exposure={k: ex.get(k) for k in ("E", "k", "wdi_exposure")},
+                 collision={k: col.get(k) for k in ("boxes", "boxesSha1")},
+                 pieces={p.get("id"): p.get("box") for p in m.get("pieces") or []})
+    each = {k: _sha1(parts[k]) for k in DIGEST_PARTS}
+    return dict(sha1=_sha1(each), parts=each)
+
+
+def manifest_extras(m):
+    """What `stamp` writes into a golden row from a rebuild's manifest (EXTRAS)."""
+    src = m.get("source") or {}
+    return dict(manifestDigest=manifest_digest(m), roomBakeMd5=src.get("roomBakeMd5"),
+                lookBakeMd5=src.get("lookBakeMd5"), blender=src.get("blender"))
+
+
+def extras_differ(row, got):
+    """The EXTRAS the row has whose value the rebuild does not share, and the digest's parts that differ."""
+    off, parts = [], []
+    for k in EXTRAS:
+        if k not in row:
+            continue
+        if k == "manifestDigest":
+            a, b = (got.get(k) or {}), (row.get(k) or {})
+            if a.get("sha1") != b.get("sha1"):
+                off.append(k)
+                parts = [p for p in DIGEST_PARTS if (a.get("parts") or {}).get(p) != (b.get("parts") or {}).get(p)]
+        elif got.get(k) != row[k]:
+            off.append(k)
+    return off, parts
+
+
+def bake_arrays(npz):
+    """A saved bake's arrays (meshy_room_build.save_raw) as one sha1 per group (BAKE_KEYS): each mesh's array bytes in
+    the order of the mesh names, the name and shape with them, so a renamed or a reshaped mesh changes it too. Needs
+    numpy."""
+    import numpy as np
+    z = np.load(npz)
+    by = {}
+    for key in sorted(z.files):
+        if key.startswith("meta|") or "|" not in key:
+            continue
+        mesh, g = key.rsplit("|", 1)
+        if g in BAKE_KEYS:
+            by.setdefault(g, []).append((mesh, z[key]))
+    out = {}
+    for g in BAKE_KEYS:
+        if g not in by:
+            continue
+        h = hashlib.sha1()
+        for mesh, arr in by[g]:
+            a = np.ascontiguousarray(arr, dtype=np.float32)
+            h.update(mesh.encode() + b"\0" + str(a.shape).encode() + b"\0" + a.tobytes())
+        out[g] = h.hexdigest()
+    meta = {k.split("|", 1)[1]: str(z[k]) for k in z.files if k.startswith("meta|")}
+    out["meshes"] = len({m for rows in by.values() for m, _a in rows})
+    out["samples"] = int(meta.get("samples", "0") or 0)
+    return out
+
+
 # ---------------------------------------------------------------- plan, verdict, record
 
 
@@ -342,7 +422,12 @@ def verdict(a):
         raw_md5 = (src.get("raw") or {}).get("fileMd5")        # the bake the build says it was made from
         res.update(built=got, rawMd5=raw_md5, source={k: src.get(k) for k in (
             "scriptMd5", "roomMd5", "roomBakeMd5", "lookMd5", "lookBakeMd5", "kitMd5", "rawAgrees")})
+        extras = manifest_extras(m)
+        res["extras"] = extras
         off = [k for k in FIELDS if got[k] != row[k]]
+        off_x, parts_x = extras_differ(row, extras)
+        off += off_x
+        res["digestPartsThatDiffer"] = parts_x
         same = got["glbMd5"] == row["glbMd5"]
         # another glTF exporter (another Blender build) writes other bytes for the same room: the md5 cannot match
         other_blender = not same and got["generator"] is not None and got["generator"] != row["generator"]
@@ -359,8 +444,21 @@ def verdict(a):
             say.append(f"  glb md5    {got['glbMd5']}  ({got['glbBytes']:,} bytes; golden {when})")
             say.append(f"  built      light {got['light']}, layout {got['layout']}, {num(got['vertices'])} vertices, "
                        f"{num(got['triangles'])} triangles")
+            have = [k for k in EXTRAS if k in row]
+            if have:
+                say.append(f"  manifest   {', '.join(have)} as the row has them (digest "
+                           f"{(extras['manifestDigest'] or {}).get('sha1')})")
+            else:
+                say.append("  manifest   the row has no digest of the manifest's numbers: regress.py stamp writes it")
         else:
-            if same:
+            if same and off_x and not [k for k in off if k not in off_x]:
+                say.append(f"regress {a.room}: MISMATCH in the manifest. The rebuilt GLB has the golden md5, but the "
+                           f"build's {', '.join(off_x)} differ from the row's: the change moved what the GLB does not "
+                           "carry" + (f" (the digest's {', '.join(parts_x)})" if parts_x else "") + ".")
+                for k in off_x:
+                    if k != "manifestDigest":
+                        say.append(f"  {k:<10} {extras.get(k)}  (golden {row.get(k)})")
+            elif same:
                 say.append(f"regress {a.room}: MISMATCH in the golden row. The rebuilt GLB has the golden md5, but "
                            f"the row's {', '.join(off)} do not describe it: write the row again from the build "
                            "(regress.py record --replace).")
@@ -451,20 +549,121 @@ def record(a):
         stop(2, f"{shown(manifest)} lacks light.setting, layout or counts: not a manifest of meshy_room_build.py")
     if a.note:
         row["note"] = a.note
+    row.update({k: v for k, v in manifest_extras(m).items() if v is not None})
     old = rows.get(a.room)
     if old and not a.replace:
         if old.get("glbMd5") == row["glbMd5"]:
             stop(2, f"{a.room}'s golden row already holds this GLB (md5 {row['glbMd5']}); nothing written")
         stop(2, f"{a.room} already has a golden row (glb md5 {old.get('glbMd5')}, recorded {old.get('recorded')}). "
                 "It is replaced only when the room was changed on purpose and has passed its checks again: --replace")
+    for k in ("bake1spp", "rig"):     # the bake gate's rows stay: they describe the room's bake, not its GLB
+        if old and k in old and k not in row:
+            row[k] = old[k]
     rows[a.room] = row
-    with open(a.golden, "w", encoding="utf-8", newline="\n") as fh:
-        json.dump(gold, fh, indent=2, ensure_ascii=False)
-        fh.write("\n")
+    write_golden(a.golden, gold)
     print(f"regress: {a.room}'s golden row written to {shown(a.golden)}: glb md5 {row['glbMd5']} ({row['generator']}), "
           f"light {row['light']}, layout {row['layout']}, {row['vertices']:,} vertices, {row['triangles']:,} "
           f"triangles, saved bake {row['raw']} (md5 {row['rawMd5']}). Now run: bash "
           f"tools/blender/room_checks/regress.sh {a.room}")
+
+
+def write_golden(path, gold):
+    with open(path, "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(gold, fh, indent=2, ensure_ascii=False)
+        fh.write("\n")
+
+
+def stamp(a):
+    """Add the manifest's EXTRAS to a room's golden row from a rebuild in --out whose GLB is the golden one: the GLB's
+    fields are not touched, so a row written before the digest existed gains it without being recorded again."""
+    gold = load_golden(a.golden)
+    row = golden_row(gold, a.room, a.golden)
+    _raw, out = paths(a, row)
+    glb, manifest = os.path.join(out, a.room + ".glb"), os.path.join(out, a.room + ".json")
+    for p in (glb, manifest):
+        if not os.path.isfile(p):
+            stop(2, "no such file: " + shown(p) + " (run regress.sh first)")
+    if file_md5(glb) != row["glbMd5"]:
+        stop(1, f"{shown(glb)} is not the golden GLB (md5 {file_md5(glb)}, golden {row['glbMd5']}): only a rebuild "
+                "that matches gives the row its manifest's numbers")
+    with open(manifest, encoding="utf-8") as fh:
+        m = json.load(fh)
+    ex = manifest_extras(m)
+    had = [k for k in EXTRAS if k in row]
+    if [k for k in had if row.get(k) != ex.get(k)] and not a.replace:
+        stop(2, f"{a.room}'s row already has {', '.join(had)} and the rebuild's differ; --replace only when that "
+                "change was made on purpose")
+    row.update({k: v for k, v in ex.items() if v is not None})
+    row["extrasRecorded"] = time.strftime("%Y-%m-%d")
+    write_golden(a.golden, gold)
+    print(f"regress: {a.room}'s golden row now holds the manifest digest {ex['manifestDigest']['sha1']}, roomBakeMd5 "
+          f"{ex['roomBakeMd5']}, lookBakeMd5 {ex['lookBakeMd5']}, Blender {ex['blender']}")
+
+
+def bake(a):
+    """The one-sample group bake gate (regress_bake.sh): each group's arrays of the saved bake in --out and the rig's
+    fingerprint against the row's `bake1spp` and `rig`. With --record (two runs, run1 and run2, in --out) the row gets
+    them only when the two runs agree bit for bit."""
+    gold = load_golden(a.golden)
+    row = golden_row(gold, a.room, a.golden)
+    runs = ["run1", "run2"] if a.record else ["."]
+    got = []
+    for d in runs:
+        folder = os.path.join(a.out, d)
+        npz, rig = os.path.join(folder, a.room + "_bake1.npz"), os.path.join(folder, "rig.json")
+        for p in (npz, rig):
+            if not os.path.isfile(p):
+                stop(1, "no such file: " + shown(p) + " (the build did not finish: see the build.log beside it)")
+        with open(rig, encoding="utf-8") as fh:
+            fp = json.load(fh)
+        got.append(dict(bake1spp=bake_arrays(npz), rig=dict(sha1=fp["sha1"], parts=fp["parts"],
+                                                            lights=len(fp.get("lights") or []))))
+    res = dict(room=a.room, runs=got)
+    say = []
+    if a.record:
+        if got[0] != got[1]:
+            diff = sorted(k for k in BAKE_KEYS if got[0]["bake1spp"].get(k) != got[1]["bake1spp"].get(k))
+            rd = got[0]["rig"] != got[1]["rig"]
+            say.append(f"regress bake {a.room}: the two runs DIFFER ({', '.join(diff) or 'no group'}"
+                       f"{', the rig' if rd else ''}): one sample is not bit-deterministic here, so nothing was "
+                       "recorded. The fallback is the rig's fingerprint and a 16-sample pair compared by its noise "
+                       "(implementation plan, S0)")
+            res["verdict"] = "differ"
+        elif (row.get("bake1spp") or row.get("rig")) and not a.replace:
+            stop(2, f"{a.room}'s row already has bake1spp or rig: --replace only when the bake was changed on purpose")
+        else:
+            row["bake1spp"] = dict(got[0]["bake1spp"], recorded=time.strftime("%Y-%m-%d"))
+            row["rig"] = dict(got[0]["rig"], recorded=time.strftime("%Y-%m-%d"))
+            write_golden(a.golden, gold)
+            say.append(f"regress bake {a.room}: the two runs agree bit for bit; the row's bake1spp and rig are "
+                       f"written (rig {got[0]['rig']['sha1']})")
+            res["verdict"] = "recorded"
+    else:
+        want_b, want_r = row.get("bake1spp"), row.get("rig")
+        if not want_b or not want_r:
+            stop(2, f"{a.room}'s golden row has no bake1spp or rig: regress_bake.sh {a.room} --record writes them")
+        g = got[0]
+        off = [k for k in BAKE_KEYS if k in want_b and g["bake1spp"].get(k) != want_b[k]]
+        rig_off = [k for k in want_r.get("parts", {}) if g["rig"]["parts"].get(k) != want_r["parts"][k]]
+        res.update(groupsThatDiffer=off, rigPartsThatDiffer=rig_off)
+        if not off and not rig_off and g["rig"]["sha1"] == want_r["sha1"]:
+            res["verdict"] = "match"
+            say.append(f"regress bake {a.room}: MATCH. The rig's fingerprint and the one-sample bake's "
+                       f"{', '.join(k for k in BAKE_KEYS if k in want_b)} are the golden ones, bit for bit.")
+        else:
+            res["verdict"] = "mismatch"
+            say.append(f"regress bake {a.room}: MISMATCH. " + "; ".join(
+                x for x in (f"the arrays {', '.join(off)} differ" if off else "",
+                            f"the rig's {', '.join(rig_off) or 'fingerprint'} differ" if rig_off or not off else "")
+                if x) + ".")
+            say.append("  A step that changes the rig or the bake says how its change is proven (implementation "
+                       "plan, section 4); for any other step this is a change that should not have reached the bake.")
+    os.makedirs(a.out, exist_ok=True)
+    with open(os.path.join(a.out, "regress_bake.json"), "w", encoding="utf-8", newline="\n") as fh:
+        json.dump(res, fh, indent=1)
+        fh.write("\n")
+    sys.stdout.write("\n".join(say) + "\n")
+    sys.exit(0 if res["verdict"] in ("match", "recorded") else 1)
 
 
 def rooms(a):
@@ -475,7 +674,7 @@ def rooms(a):
 def main():
     ap = argparse.ArgumentParser(prog="regress.py", description="The room regression gate; see the file's head.")
     sub = ap.add_subparsers(dest="step", required=True)
-    for name in ("plan", "verdict", "record", "rooms"):
+    for name in ("plan", "verdict", "record", "rooms", "stamp", "bake"):
         p = sub.add_parser(name)
         p.add_argument("--golden")
         if name == "rooms":
@@ -484,6 +683,10 @@ def main():
         p.add_argument("--raw")
         if name != "record":
             p.add_argument("--out")
+        if name in ("stamp", "bake"):
+            p.add_argument("--replace", action="store_true")
+        if name == "bake":
+            p.add_argument("--record", action="store_true")
         if name == "verdict":
             p.add_argument("--build-exit", type=int, default=0)
             p.add_argument("--seconds", type=float)
@@ -496,7 +699,11 @@ def main():
     if a.step != "rooms" and not re.fullmatch(r"[A-Za-z0-9_]+", a.room):
         ap.error("the room id is a scene id (letters, digits, _): " + a.room)
     a.golden = os.path.abspath(a.golden) if a.golden else GOLDEN
-    {"plan": plan, "verdict": verdict, "record": record, "rooms": rooms}[a.step](a)
+    if a.step == "bake":
+        if not a.out:
+            ap.error("bake needs --out (regress_bake.sh's folder)")
+        a.out = os.path.abspath(a.out)
+    {"plan": plan, "verdict": verdict, "record": record, "rooms": rooms, "stamp": stamp, "bake": bake}[a.step](a)
 
 
 if __name__ == "__main__":
