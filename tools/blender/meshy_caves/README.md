@@ -92,6 +92,9 @@ guarantee of construction.
 - Stairs need risers of at most 0.25 m (they fail from 0.35), treads of at least 0.28 m and a width of at least
   1.0 m.
 - The collision under stairs is the ramp through the treads' mid points.
+- The collision field also differs from the shell on walls: a tube gets an upright cylinder wall through the edge of
+  its floor, and lower walls leave out the noise push and the bedding steps, so a walker cannot climb a curved wall or
+  a bump. The hidden wall lies at most 0.25 m inside the rock you see.
 
 ### Rock between passages
 
@@ -154,8 +157,9 @@ a `Trav_<id>` node with these fields:
   plus its noise and bedding), at the plane and at the stub's end; validation refuses a window that does not. On a
   ramp, take the floor's height where the passage crosses the plane.
 - The section on the plane's - side meshes one cell past the plane, and the section on its + side starts at the
-  plane. Their overlap is that one cell, plus `stub_m` on each side.
-- The core adds a collision wall on the plane, over the window.
+  plane. Their overlap is that one cell, plus `stub_m` on each side. A stub is clipped to its window's prism plus
+  0.25 m, so its end closes on the window and leaves no open edges.
+- The core adds a collision wall just beyond the plane, over the window; the contract's wall rays meet it at 0.45 m.
 - An arrival records its `mode`: `walk`, `crawl`, `sidle`, or `climb` for the top or the foot of a face. The core
   checks that a crawl or sidle arrival stands in a zone of its kind, that a climb arrival hangs on a face, and that a
   walking arrival stands in no crawl or sidle zone.

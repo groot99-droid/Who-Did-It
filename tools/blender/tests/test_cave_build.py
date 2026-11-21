@@ -1,0 +1,193 @@
+"""Tests of the cave builder's plain-Python parts (meshy_cave_build.py), without Blender: the contract's nodes for the
+Undermere's first two sections (names, extras, the seam rows only towards built neighbours, the arrivals' distances
+and modes), the traversal zones' frames as the viewer reads them, the fill lights, the face split by kit and surface,
+the chunks, the lilac and teal guards, the budgets and the look file. numpy only."""
+
+import json
+import math
+import os
+import sys
+import unittest
+
+BLENDER = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+UNDERMERE = os.path.join(BLENDER, "meshy_caves", "undermere")
+sys.path.insert(0, BLENDER)
+
+try:
+    import numpy as np
+    import meshy_cave_build as cb
+    import meshy_cave_core as core
+except ImportError:  # no numpy here
+    np = cb = core = None
+
+
+def gltf(v):
+    """A Blender vector in glTF's axes (the exporter's Y up: x, z, -y)."""
+    return np.array([v[0], v[2], -v[1]])
+
+
+@unittest.skipIf(cb is None, "numpy is not installed")
+class CaveBuildTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.look = cb.load_look()
+        cls.secs = {}
+        for key in ("swallow", "gallery"):
+            sec, _w = core.load_section(os.path.join(UNDERMERE, f"{key}.json"))
+            cls.secs[key] = (sec, [z.out() for z in core.make_zones(sec)])
+
+    def nodes(self, key, built):
+        sec, zones = self.secs[key]
+        return cb.contract_nodes(sec.d, sec.net, zones, set(built), self.look)
+
+    def test_look_is_the_networks(self):
+        lk = self.look
+        self.assertEqual(lk["wdi_exposure"], 2.378414230005442)
+        self.assertIs(lk["wdi_baked"], True)
+        self.assertIs(lk["wdi_indoor"], True)
+        self.assertEqual(lk["fog_color_srgb"].upper(), "#12141C")
+        self.assertGreater(lk["fog_density"], 0)
+        with open(os.path.join(UNDERMERE, "design.json"), encoding="utf-8") as fh:
+            design = json.load(fh)["look"]
+        for k in ("wdi_exposure", "fog_color", "fog_density"):
+            self.assertEqual(lk[k], design[k])
+        text = json.dumps(lk).lower()
+        for word in cb.BANNED:
+            self.assertNotIn(word, text)
+        # teal is never a light colour baked onto rock (the owner has not approved it)
+        for part in ("lamp", "fill", "sky"):
+            c = cb.hex_lin(lk[part]["colour"])
+            self.assertFalse(c[1] > c[0] and c[1] > c[2], part)
+        cache = os.path.join(BLENDER, ".cache", "materials")
+        if os.path.isdir(cache):
+            for kit, v in lk["kits"].items():
+                for slug in (v.values() if isinstance(v, dict) else [v]):
+                    self.assertTrue(os.path.isdir(os.path.join(cache, slug)), f"{kit}: {slug} is not a locked scan")
+
+    def test_swallow_nodes(self):
+        n = self.nodes("swallow", ["gallery"])
+        self.assertEqual(n["area"], "under_swallow")
+        ex = n["extras"]
+        self.assertEqual((ex["wdi_kind"], ex["wdi_scene"]), ("cave", "undermere"))
+        self.assertIs(ex["wdi_indoor"], True)
+        self.assertIs(ex["wdi_baked"], True)
+        self.assertEqual(ex["wdi_exposure"], self.look["wdi_exposure"])
+        names = {p["name"]: p for p in n["portals"]}
+        self.assertIn("Portal_um.swallow_out", names)
+        self.assertEqual(names["Portal_um.swallow_out"]["extras"],
+                         {"to": "overworld", "toSpawn": "mouth_swallow", "kind": "cave_mouth",
+                          "wdi_portal_id": "um.swallow_out"})
+        seam = names["Portal_seam_swallow_gallery_a_1"]["extras"]
+        self.assertEqual((seam["to"], seam["toSpawn"], seam["kind"], seam["wdi_seam"], seam["wdi_seam_kind"]),
+                         ("undermere", "seam_swallow_gallery_b_1", "gate", "swallow_gallery", "arch"))
+        spawns = {s["name"]: s for s in n["spawns"]}
+        self.assertIn("Spawn_undermere_mouth_swallow", spawns)
+        arr = spawns["Spawn_undermere_seam_swallow_gallery_a_1"]["extras"]
+        self.assertIs(arr["wdi_picker"], False)
+        self.assertEqual(arr["wdi_mode"], "crawl")
+        # the seams to sections not built stay closed walls, with no portal row
+        self.assertEqual(sorted(c["id"] for c in n["closed_seams"]), ["swallow_killas", "swallow_river"])
+        self.assertFalse(any("killas" in p["name"] or "river" in p["name"] for p in n["portals"]))
+        self.assertEqual(n["problems"], [])
+        x0, y0, x1, y1 = ex["wdi_walk_region"]
+        for p in n["spawns"] + n["portals"]:
+            self.assertTrue(x0 <= p["at"][0] <= x1 and y0 <= p["at"][1] <= y1, p["name"])
+        zn = {z["name"]: z for z in n["zones"]}
+        self.assertEqual(zn["Trav_sw_lakearch"]["extras"]["wdi_traverse"], "crawl")
+        self.assertEqual(zn["Trav_sw_lip_face"]["extras"]["wdi_traverse"], "climb")
+
+    def test_gallery_nodes_and_unbuilt_neighbour(self):
+        n = self.nodes("gallery", [])
+        self.assertEqual([p["name"] for p in n["portals"]], [])
+        self.assertEqual(len(n["closed_seams"]), 2)
+        n = self.nodes("gallery", ["swallow"])
+        self.assertEqual([p["name"] for p in n["portals"]], ["Portal_seam_swallow_gallery_b_1"])
+        self.assertEqual(n["portals"][0]["extras"]["toSpawn"], "seam_swallow_gallery_a_1")
+        self.assertEqual(n["problems"], [])
+
+    def test_seam_rows_face_each_other(self):
+        a = {p["name"]: p for p in self.nodes("swallow", ["gallery"])["portals"]}["Portal_seam_swallow_gallery_a_1"]
+        b = {p["name"]: p for p in self.nodes("gallery", ["swallow"])["portals"]}["Portal_seam_swallow_gallery_b_1"]
+        self.assertAlmostEqual(math.dist(a["at"], b["at"]), 0.9, places=6)
+        sa = {s["id"]: s for s in self.nodes("swallow", ["gallery"])["spawns"]}["undermere_seam_swallow_gallery_a_1"]
+        # the arrival stands 1.65 m inside the wall, 2.1 m beyond the other file's portal
+        self.assertAlmostEqual(math.dist(sa["at"], b["at"]), 2.1, places=6)
+        self.assertAlmostEqual(abs(sa["at"][0] - (-52.5)), 1.65, places=6)
+
+    def test_arrival_too_near_a_portal_is_a_problem(self):
+        sec, zones = self.secs["swallow"]
+        d = json.loads(json.dumps(sec.d))
+        d["seams"][1]["arrival"]["at"][0] = -53.9    # 0.95 m from its own row
+        n = cb.contract_nodes(d, sec.net, zones, {"gallery"}, self.look)
+        self.assertTrue(any("Spawn_undermere_seam_swallow_gallery_a_1" in p for p in n["problems"]))
+
+    def test_banned_and_repeated_names(self):
+        self.assertTrue(cb.name_problems(["um_x_Torch_lamp"]))
+        self.assertTrue(cb.name_problems(["Spawn_a", "Spawn_a"]))
+        self.assertEqual(cb.name_problems(["Area_under_swallow", "Trav_sw_lakearch"]), [])
+
+    def test_zone_frame_as_the_viewer_reads_it(self):
+        for z in self.secs["swallow"][1] + self.secs["gallery"][1]:
+            B = np.array(cb.zone_basis(z))
+            self.assertTrue(np.allclose(B.T @ B, np.eye(3), atol=1e-9))
+            self.assertAlmostEqual(float(np.linalg.det(B)), 1.0, places=9)
+            # glTF local X along the passage, Y up, Z along axis_z (out of a climb face)
+            self.assertTrue(np.allclose(gltf(B[:, 0]), gltf(z["axis_x"]), atol=2e-6))
+            self.assertTrue(np.allclose(gltf(B[:, 2]), [0, 1, 0]))
+            self.assertTrue(np.allclose(gltf(-B[:, 1]), gltf(z["axis_z"]), atol=2e-6))
+
+    def test_fill_lights(self):
+        f = self.look["fill"]
+        pts = cb.fill_points(self.secs["swallow"][0].d, self.look)
+        ids = [p["id"] for p in pts]
+        self.assertIn("fill_sw_clayhall", ids)
+        for p in pts:
+            self.assertGreaterEqual(p["watts"], f["min_watts"])
+            self.assertLessEqual(p["watts"], f["max_watts"])
+        self.assertFalse(any(i.startswith("fill_sw_gullet") for i in ids))   # 2.2 m wide: under the passages' minimum
+        gal = [p["id"] for p in cb.fill_points(self.secs["gallery"][0].d, self.look)]
+        self.assertTrue(any(i.startswith("fill_ga_trunk_1") for i in gal))
+        self.assertFalse(any(i.startswith("fill_bottomless_pit") for i in gal))
+
+    def test_face_materials_split_by_kit_and_surface(self):
+        V = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [10, 10, 0], [11, 10, 0], [10, 11, 0]], float)
+        F = np.array([[0, 1, 2], [0, 3, 1], [4, 5, 6]])
+        geo = np.array([0, 0, 1])
+        keys, idx = cb.face_materials(V, F, geo, ["limestone", "lakeclay"], self.look["kits"], 0.7, [])
+        self.assertEqual([keys[i] for i in idx], ["limestone_floor", "limestone_wall", "lakeclay_wall"])
+        keys, idx = cb.face_materials(V, F, geo, ["limestone", "lakeclay"], self.look["kits"], 0.7,
+                                      [[9, 9, -1, 12, 12, 1]])
+        self.assertEqual(keys[idx[2]], "mouth_wall")
+        self.assertEqual(cb.scan_of("limestone_wall", self.look["kits"]), self.look["kits"]["limestone"]["wall"])
+
+    def test_each_face_in_one_chunk(self):
+        off = np.array([0, 3, 6])
+        faces = np.array([0, 1, 2, 2, 3, 4])
+        own = cb.first_chunk(off, faces, 5)
+        self.assertEqual(own.tolist(), [0, 0, 0, 1, 1])
+
+    def test_lilac_and_teal_guards(self):
+        L = np.array([[1.0, 0.2, 0.8], [0.2, 1.0, 0.6], [1.0, 0.7, 0.4]])
+        G = cb.guard_display(L)
+        self.assertEqual(G[0, 1], 0.8)   # lilac: green up to the lesser of red and blue
+        self.assertEqual(G[1, 1], 0.6)   # teal: green down to the greater of red and blue
+        self.assertEqual(G[2, 1], 0.7)   # warm: as it was
+        self.assertEqual(cb.lilac_share(G), 0.0)
+        self.assertGreater(cb.lilac_share(np.array([[0.5, 0.3, 0.5]])), 0.0)
+
+    def test_budgets(self):
+        b = cb.budgets({"file_mb": 3.1, "triangles_loaded": 1600000, "draw_calls": 44, "texture_gpu_mb": None})
+        self.assertTrue(b["file_mb"]["ok"])
+        self.assertFalse(b["triangles_loaded"]["ok"])
+        self.assertNotIn("texture_gpu_mb", b)
+
+    def test_seam_width_measured_in_the_field(self):
+        sec = self.secs["swallow"][0]
+        sm = [s for s in sec.d["seams"] if s["id"] == "swallow_gallery"][0]
+        w = cb.seam_width(sec, sm)
+        self.assertGreater(w, 1.2)    # the Lake Arch: a crawl 1.5 m wide
+        self.assertLess(w, 1.8)
+
+
+if __name__ == "__main__":
+    unittest.main()

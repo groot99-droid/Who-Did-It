@@ -1,0 +1,79 @@
+{
+  "about": "The caves' look (the Undermere, first person): one look for every cave file, read by meshy_cave_build.py. The exposure, the fog and wdi_baked are the network's and go into every cave's Area extras exactly as written here (contract docs/walk-areas.md, world.cave_look). Colours are sRGB hex. Light kinds: a lamp only at a gate (lamp group), the night sky through a mouth (sky group), dim fill lights in the chambers and the wide passages (fill group), and AO.",
+  "status": "P0 prototype (2026-11-21): not frozen. E, the scene exposure the light is graded at, is the Swallow's lamp pool at its first full bake (384 samples, 2026-11-21): every cave is graded at it, so the light matches across seams",
+  "wdi_exposure": 2.378414230005442,
+  "wdi_indoor": true,
+  "wdi_baked": true,
+  "fog_color": [0.006, 0.007, 0.0116],
+  "fog_color_srgb": "#12141C",
+  "fog_density": 0.02,
+  "ink": "#12141C",
+  "E": 79.95282180445103,
+  "lamp_pool": {
+    "radius_m": 4.0,
+    "percentile": 90,
+    "display": 0.55
+  },
+  "lamp": {
+    "colour": "#FFB457",
+    "watts": 30.0,
+    "radius_m": 0.05,
+    "glass_display": "#FFD9A0"
+  },
+  "sky": {
+    "colour": "#7FA8FF",
+    "strength": 0.06,
+    "snow": "#C8D2E6",
+    "backdrop_display": "#1A2336"
+  },
+  "fill": {
+    "colour": "#C9C2B4",
+    "watts_per_m2": 0.06,
+    "passage_step_m": 10.0,
+    "passage_min_width_m": 3.0,
+    "min_watts": 2.0,
+    "max_watts": 40.0,
+    "height_frac": 0.6,
+    "radius_m": 1.0
+  },
+  "weights": {
+    "lamp": 1.0,
+    "sky": 1.0,
+    "fill": 1.0
+  },
+  "ao": {
+    "distance_m": 1.2,
+    "samples": 64,
+    "strength": 0.55,
+    "gamma": 1.0
+  },
+  "ink_lift": {
+    "margin_luma": 1.2,
+    "dark_percentile": 0.5,
+    "texture_lift": 0.45,
+    "form": 0.5,
+    "form_ao": 1.0,
+    "form_gamma": 1.0
+  },
+  "hot": {
+    "knee": 0.62,
+    "max": 0.8
+  },
+  "cycles": {
+    "samples": 384,
+    "draft_samples": 32
+  },
+  "kits": {
+    "limestone": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
+    "lakeclay": { "wall": "brown_mud_02", "floor": "brown_mud_02" },
+    "slate": { "wall": "rock_face", "floor": "rock_face" },
+    "breakdown": { "wall": "rock_ground", "floor": "rock_ground" },
+    "flowstone": { "wall": "seaside_rock", "floor": "seaside_rock" },
+    "default": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
+    "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
+    "snow": "snow_02",
+    "timber": "weathered_planks"
+  },
+  "iron": "#2D2C2A",
+  "floor_normal_z": 0.7
+}

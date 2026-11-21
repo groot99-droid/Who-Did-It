@@ -544,6 +544,78 @@ class CaveCoreTest(unittest.TestCase):
         seam = rb["report"]["seams"][0]
         self.assertEqual((seam["arrival_mode"], seam["overlap_faces"]), ("walk", len(ob)))
 
+    def test_seam_stub_clipped_to_its_window(self):
+        """A stub that runs into a room wider than the seam's window: the stub's air is clipped to the window's
+        prism, so the shell closes inside the stub's box instead of being cut open by its sides; the overlap cell at
+        the plane is still meshed identically by both sections."""
+        net = dict(self.ex["network"])
+        net["sections"] = ["example", "example_b"]
+        self.write("network.json", net)
+        a = dict(self.ex)
+        a["network"] = "network.json"
+        a["seams"] = [dict(a["seams"][0], stub_m=5.0)]
+        b = neighbour_b()
+        b["passages"][0]["to"] = [24.5, 33.0, -14.0]
+        b["nodes"]["e"] = [24.5, 33.0, -14.0]
+        b["chambers"] = [{"id": "north_room", "kind": "hall", "center": [24.5, 34.5, -14.0], "size": [7.0, 3.0, 2.6]}]
+        b["spawns"] = [{"id": "north_room", "at": [24.5, 34.5, -14.0]}]
+        pa = self.write("example.json", a)
+        pb = self.write("example_b.json", b)
+        ra = core.build(pa, None, write=False, flood=False, log=quiet)
+        self.assertTrue(ra["sec"].stub_clips)
+        self.assertEqual(ra["report"]["shell"]["boundary_edges_outside_openings"], 0)
+        sec = ra["sec"]
+        # inside the stub's box, past the overlap cell, the field is never above the window's prism
+        P = np.array([[x, y, -13.0] for x in np.arange(21.5, 27.6, 0.25) for y in (31.0, 33.0, 34.5)])
+        f = sec.field_points(P)
+        prism = np.minimum(np.minimum(P[:, 0] - (22.5 - core.STUB_CLIP), (26.5 + core.STUB_CLIP) - P[:, 0]),
+                           np.minimum(P[:, 2] - (-14.5 - core.STUB_CLIP), (-11.0 + core.STUB_CLIP) - P[:, 2]))
+        inside = (P[:, 0] > 22.0) & (P[:, 0] < 27.0)
+        self.assertTrue(np.all(f[inside] <= prism[inside] + 1e-9))
+        rb_ = core.build(pb, None, write=False, flood=False, log=quiet)
+        gy = int(round((30.0 - net["lattice"]["origin"][1]) / net["lattice"]["cell"]))
+
+        def overlap(r):
+            sel = r["cells"][:, 1] == gy
+            return sorted(tuple(sorted(tuple(int(v) for v in q) for q in t)) for t in r["Vq"][r["F"][sel]])
+
+        self.assertGreater(len(overlap(ra)), 50)
+        self.assertEqual(overlap(ra), overlap(rb_))
+
+    def test_tube_collision_wall_upright_and_inside_the_shell(self):
+        """The walker's field of a tube is the upright cylinder through the floor's edge wherever the ellipse lies
+        outside it: never more air than the shell's, upright from the floor up to twice the ellipse's centre, and
+        equal to the shell's above that."""
+        for W, H in ((14.0, 9.0), (2.6, 2.8), (3.0, 3.4)):
+            a = 0.5 * W
+            r = float(core.tube_centre_ratio(a, H))
+            b = H / (1.0 + r)
+            vc = r * b
+            d0 = a * math.sqrt(1.0 - (vc / b) ** 2)
+            d = np.linspace(0.0, a + 0.5, 300)[:, None]
+            v = np.linspace(0.0, H, 200)[None, :]
+            vis = core.prof_wall("tube", d, v, W, H)
+            col = core.prof_wall("tube", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            for vv in (0.05, 0.5 * vc, vc, 1.9 * vc):
+                self.assertGreater(float(core.prof_wall("tube", d0 - 0.01, vv, W, H, collision=True)), 0.0)
+                self.assertLess(float(core.prof_wall("tube", d0 + 0.01, vv, W, H, collision=True)), 0.0)
+            hi = v[0] > 2.0 * vc + 1e-6
+            self.assertTrue(np.array_equal(col[:, hi] > 0, vis[:, hi] > 0))   # the same surface above 2 vc
+            # the wall meets the floor at least TUBE_FLOOR_SLOPE steep in the shell itself
+            slope = (H / a) * math.sqrt((1 - r) / (1 + r)) / r
+            self.assertGreaterEqual(slope + 1e-6, min(core.TUBE_FLOOR_SLOPE, (H / a) * math.sqrt(0.2) * 1.5))
+
+    def test_lower_wall_noise_left_out_of_the_walkers_field(self):
+        rng = np.random.default_rng(3)
+        n = rng.uniform(-1.0, 1.0, 5000)
+        v = rng.uniform(-0.5, 4.0, 5000)
+        vis = core.noise_term(n, v, 0.12)
+        col = core.noise_term(n, v, 0.12, collision=True)
+        self.assertTrue(np.all(col <= vis + 1e-12))       # the walker never meets rock beyond the shell
+        self.assertTrue(np.all(col[v < 1.8] == 0.0))       # no lumps or bedding steps on the lower wall
+        self.assertTrue(np.allclose(col[v > 2.6], vis[v > 2.6]))
+
     # ---- budgets and files
 
     def test_budgets_reported(self):

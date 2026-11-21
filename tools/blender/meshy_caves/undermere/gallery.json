@@ -104,17 +104,19 @@
     },
     {
       "id": "ga_star",
-      "from": [-37.0, 2.0, -16.9],
-      "to": [-38.5, 14.5, -14.9],
+      "from": [-38.5, 6.5, -16.9],
+      "to": [-40.25, 12.45, -14.9],
       "profile": "tube",
       "width": 5.0,
       "clear": 4.5,
       "floor": {
-        "kind": "ramp"
+        "kind": "stairs",
+        "riser": 0.2,
+        "tread": 0.3
       },
       "geology": "limestone",
-      "notes": "the Star Passage",
-      "via": [[-38.0, 11.0, -15.8]]
+      "notes": "the Star Passage: it leaves the Great Gallery at the floor and climbs to the Star Chamber by breakdown steps",
+      "via": [[-40.5, 9.0, -16.9]]
     },
     {
       "id": "ga_jump",
@@ -260,9 +262,9 @@
   "drops": [
     {
       "id": "the_jump",
-      "from": [-30.5, 11.0, -14.8],
-      "to": [-30.5, 11.0, -17.3],
-      "radius": 1.0,
+      "from": [-31.5, 12.3, -14.8],
+      "to": [-31.0, 11.4, -17.3],
+      "radius": 1.6,
       "notes": "the Jump"
     }
   ],

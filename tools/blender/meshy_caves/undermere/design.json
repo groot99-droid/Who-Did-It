@@ -990,14 +990,15 @@
           "role": "side",
           "geology": "limestone",
           "points": [
-            [-37.0, 2.0, -16.9],
-            [-38.0, 11.0, -15.8],
-            [-38.5, 14.5, -14.9]
+            [-38.5, 6.5, -16.9],
+            [-40.5, 9.0, -16.9],
+            [-40.25, 12.45, -14.9]
           ],
           "width": 5.0,
           "clear": 4.5,
-          "floor": "ramp",
-          "plan_m": 12.6
+          "floor": "stairs",
+          "plan_m": 6.6,
+          "build_note": "P0 build (2026-11-21): it leaves the Great Gallery at the floor and climbs to the Star Chamber by breakdown steps (riser 0.2, tread 0.3). The ramp it replaced ran 1 m above the Gallery's floor along the Gallery's wall and was reached only by walking up the wall's curve, which the walker's collision no longer allows"
         },
         {
           "id": "ga_jump",
@@ -7612,8 +7613,9 @@
       "id": "the_jump",
       "section": "under_gallery",
       "name": "the Jump",
-      "top": [-30.5, 11.0, -14.8],
-      "bottom": [-30.5, 11.0, -17.3],
+      "top": [-31.5, 12.3, -14.8],
+      "bottom": [-31.0, 11.4, -17.3],
+      "build_note": "P0 build (2026-11-21): the drop starts at the Jump ledge's lip, where the Great Gallery's wall cuts the ledge (radius 1.6 m: the whole 2.5 m lip), not at the ledge passage's end inside the Gallery's air",
       "height_m": 2.5,
       "why": "an overhanging lip of dry flowstone, not climbable",
       "way_back": "up the Star Passage to the Jump ledge (about 22 m)"
