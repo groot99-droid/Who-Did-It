@@ -497,10 +497,9 @@ class RoomFileV2(unittest.TestCase):
                          {"wp.lt_lamp": "candle", "wp.lt_lamp_chair": "candle", "wp.lt_fire": "fire", "wp.lt_moon": "moon"})
         self.assertEqual(len(spec["plannedNames"]), 44)
         self.assertEqual(len(spec["coverage"]), 19)       # 17 props and 2 spots
-        # not built yet: the day bed (G7) and the hearth (G6); the openings (G3), the look override (G9) and every
-        # light (G4) are built
-        self.assertEqual(len(spec["pending"]), 2)
-        self.assertFalse([p for p in spec["pending"] if "light" in p])
+        # everything is built: the openings (G3), the look override (G9), every light (G4), the hearth (G6) and the
+        # day bed (G7)
+        self.assertEqual(spec["pending"], [])
         self.assertEqual(spec["pieces"]["wp.letter_box"]["ref"], [6.5, 5.0])
 
     # -- R0: the whole file
@@ -896,6 +895,107 @@ class RoomFileV2(unittest.TestCase):
         self.assertEqual(rf.emit_cap(shown, ["M_flame", "M_fire"]), 9.0)
         self.assertEqual(rf.emit_cap(shown, ["M_glass"]), 0.04)
         self.assertEqual(rf.emit_cap(shown, []), 1.0)
+
+    # -- G6: the hearth (room_file_v2, section 6)
+    def hearth(self, data):
+        return next(p for p in data["pieces"] if p["id"] == "wp.fireplace_e")
+
+    def test_the_parlour_hearth_reads_with_its_defaults(self):
+        cfg, spec = self.read(raw(PARLOUR))
+        p = next(q for q in cfg["pieces"] if q["id"] == "wp.fireplace_e")
+        hv = rf.hearth_values(p["spec"], cfg["height"])
+        self.assertEqual((hv["style"], hv["surface"], hv["opening"]), ("surround", "marble", [0.72, 0.85]))
+        # the body stands 0.36 m out of the wall (the mantel overhangs it 6 cm); the shelf is 0.3 m deep from the front
+        self.assertEqual((hv["body"]["y0"], hv["body"]["y1"]), (-0.15, 0.21))
+        self.assertEqual((hv["shelf"]["y0"], round(hv["shelf"]["y1"], 4), hv["shelf"]["z0"]), (-0.21, 0.09, 1.18))
+        self.assertEqual((hv["firebox"]["y0"], hv["firebox"]["y1"], hv["firebox"]["cy"]), (-0.15, 0.15, 0.0))
+        self.assertEqual((round(hv["breast"]["y0"], 4), hv["breast"]["z1"]), (-0.01, 3.0))     # to the ceiling
+        # the coals by default: a box on the firebox's floor; the fire anchor the file's own
+        self.assertEqual(hv["glow"], {"shape": "box", "material": "coal", "size": [0.504, 0.18, 0.08],
+                                      "at": [[0.0, 0.0, 0.02]]})
+        self.assertEqual(tuple(hv["anchors"]["fire"]), (0.0, 0.0, 0.32))
+        self.assertEqual([(d["slug"], d["cloth"]) for d in hv["dress"]],
+                         [("ornate_mirror_01", True), ("mantel_clock_01", False)])
+        # the hearth gives the fire light its anchor (R-L3), and it is the fire's host (coupling 28)
+        self.assertIn("wp.fireplace_e", spec["hosts"])
+        self.assertEqual(next(r for r in spec["lights"] if r["id"] == "wp.lt_fire")["anchor"],
+                         {"piece": "wp.fireplace_e", "name": "fire"})
+        # its coals are a piece glow, whose material the room's look must have; M_coal stays under the flame's cap
+        look = rf.merge_look(raw(os.path.join(BLENDER, "meshy_looks", "interior_fp.json")), cfg["look"])
+        self.assertEqual(list(rf.piece_glows(cfg, look)), ["wp.fireplace_e"])
+        self.assertEqual(rf.emit_cap(look["emit_display"], ["M_flame", "M_coal"]), 6.0)
+        bare = dict(look, emit_display={k: v for k, v in look["emit_display"].items() if k != "M_coal"})
+        with self.assertRaises(SystemExit) as cm:
+            rf.piece_glows(cfg, bare)
+        self.assertIn("the look has no emit_display entry M_coal", str(cm.exception))
+
+    def test_a_default_hearth_and_a_stone_one(self):
+        hv = rf.hearth_values({"model": "hearth", "style": "surround", "size": [1.6, 0.4, 1.2]}, 3.0)
+        self.assertEqual((hv["opening"], hv["mantel"]["thickness"], hv["breast"]), ([0.72, 0.798], 0.06, None))
+        self.assertEqual(tuple(hv["anchors"]["fire"]), (0.0, hv["firebox"]["cy"], 0.32))
+        hv = rf.hearth_values({"model": "hearth", "style": "stone", "size": [1.8, 0.5, 1.4],
+                               "breast": {"width": 1.4, "to": 2.6}}, 2.7)
+        self.assertEqual((hv["surface"], hv["opening"], hv["mantel"]["thickness"]), ("stone", [0.9, 0.936], 0.1))
+        self.assertEqual((hv["breast"]["z1"], hv["breast"]["depth"]), (2.6, 0.3))
+
+    def test_hearth_rules(self):
+        cases = [(lambda h: h["spec"].update(style="grate"),
+                  "hearth style 'grate' is not one of surround, stone, inglenook, stove (R-H1)"),
+                 (lambda h: h["spec"].update(style="inglenook"),
+                  'hearth style "inglenook" is not built yet (it comes with the tavern)'),
+                 (lambda h: h["spec"].update(size=[1.7, 0.42]), "a hearth's size is [w, d, h]"),
+                 (lambda h: h["spec"]["mantel"].update(z=0.9),
+                  "the mantel at 0.83 m is lower than the opening's top (0.85 m) (R-H2)"),
+                 (lambda h: h["spec"]["breast"].update(to=1.2), "the mantel at 1.25 m is not under the breast's top"),
+                 (lambda h: h["spec"]["dress"][1].update(cloth=True),
+                  'dress[1] has "cloth" but mantel_clock_01 is not a mirror (R-H3)'),
+                 (lambda h: h["spec"]["breast"].update(to=2.1),
+                  "the mirror's top (2.34 m) is over the breast, which stops at 2.10 m (R-H5)"),
+                 (lambda h: h["spec"].pop("breast"), "is a mirror and the hearth has no breast to hang it on (R-H5)"),
+                 (lambda h: h["spec"].update(surface="brick"), 'surface "brick" waits for G11'),
+                 (lambda h: h["spec"]["anchors"].update(fire=[0.0, 0.3, 0.32]), "is not in its firebox"),
+                 (lambda h: h["spec"]["firebox"].update(depth=0.4), "the firebox's depth is over 0 and at most"),
+                 (lambda h: h["spec"]["mantel"].update(thikness=0.1), 'the key "thikness" is not a mantel key'),
+                 (lambda h: h["spec"]["dress"][0].update(scal=1.0), 'the key "scal" is not a dress key'),
+                 (lambda h: h["spec"].update(glow={"shape": "box"}), "a hearth's glow is its firebox's")]
+        for change, said in cases:
+            data = raw(PARLOUR)
+            change(self.hearth(data))
+            self.assertIn(said, self.stops(data), said)
+        # a fire light on a piece that is no hearth and declares no fire (R-H4 is R-L3)
+        data = raw(PARLOUR)
+        data["lights"][2]["anchor"] = {"piece": "wp.rug", "name": "fire"}
+        self.assertIn('piece wp.rug has no anchor "fire"', self.stops(data))
+
+    # -- G7: the day bed (room_file_v2, section 7)
+    def bed(self, data):
+        return next(p for p in data["pieces"] if p["id"] == "wp.bed")
+
+    def test_the_parlour_day_bed_reads_with_its_defaults(self):
+        cfg, _spec = self.read(raw(PARLOUR))
+        p = next(q for q in cfg["pieces"] if q["id"] == "wp.bed")
+        self.assertEqual(rf.bed_values(p, p["spec"]), dict(kind="day", axis="x", head="-", cover="coverlet",
+                                                           pillows=1, mattress=None, colour=None))
+        sp = dict(p["spec"], bed={"kind": "day"})
+        self.assertEqual(rf.bed_values(p, sp)["cover"], "blanket")              # a day bed's cover by default
+        self.assertEqual(rf.bed_values(p, dict(sp, bed={}))["pillows"], 2)       # an object with no kind: gothic
+
+    def test_bed_rules(self):
+        cases = [(lambda b: b["spec"]["bed"].update(kind="cot"),
+                  'bed.kind "cot" is not built yet (G20); the builder has gothic and day (R-B1)'),
+                 (lambda b: b["spec"]["bed"].update(pillows=4), "4 pillows do not fit a day bed (at most 3) (R-B2)"),
+                 (lambda b: b.update(lift=0.1), '"lift" is for the gothic bed\'s posts (R-B3)'),
+                 (lambda b: b["spec"].update(bed={"kind": "gothic", "pillows": 1}),
+                  "a gothic bed is today's, number for number"),
+                 (lambda b: b["spec"]["bed"].update(colour="#5A6B4A"), "bed.colour is the blanket's tint"),
+                 (lambda b: b["spec"]["bed"].update(cover="blanket", colour="#8A6FA8"), "is lilac or magenta"),
+                 (lambda b: b["spec"]["bed"].update(mattress=[0.4, 0.1, 0.0, 1.0, 0.4]), "bed.mattress is [x0, x1"),
+                 (lambda b: b["spec"]["bed"].update(axis="z"), 'bed.axis is "x" or "y"'),
+                 (lambda b: b["spec"]["bed"].update(pilows=1), 'the key "pilows" is not a bed key')]
+        for change, said in cases:
+            data = raw(PARLOUR)
+            change(self.bed(data))
+            self.assertIn(said, self.stops(data), said)
 
 
 class GateDigest(unittest.TestCase):

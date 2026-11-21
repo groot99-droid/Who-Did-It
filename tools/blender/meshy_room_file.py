@@ -67,7 +67,25 @@ LOOK_NOT_OVERRIDABLE = frozenset(("ink", "view", "bake"))     # R-K2
 DATA_MAPS = ("spawn_labels", "views", "layouts", "skip", "emit_display", "doors", "dress_lod", "anchors")
 
 MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")     # R-P5: the builders' models
-BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box")         # what the builder builds today (the hearth is G6)
+BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")   # what the builder builds today
+# the hearth (G6, room_file_v2 section 6): its styles (R-H1), the two built first (the inglenook and the stove come
+# with the tavern), each style's default surface, the surfaces the builder has (brick waits for G11's fetch), the
+# mirrors whose glass and cloth the builder knows (R-H3) and their height at scale 1 (R-H5)
+HEARTH_STYLES = ("surround", "stone", "inglenook", "stove")
+HEARTH_BUILT = ("surround", "stone")
+HEARTH_SURFACE = {"surround": "marble", "stone": "stone", "inglenook": "brick", "stove": "iron"}
+SURFACES = ("marble", "stone", "brick", "iron")
+SURFACES_BUILT = ("marble", "stone", "iron")
+MIRROR_H = {"ornate_mirror_01": 0.744}
+MANTEL_KEYS = frozenset("z depth overhang thickness".split())
+BREAST_KEYS = frozenset("width depth to".split())
+FIREBOX_KEYS = frozenset("depth glow".split())
+DRESS_KEYS = frozenset("slug scale at lod rot cloth model size label".split())
+# a bed object (G7, section 7): its keys, the kinds built (cot, iron and pallet are G20's), the pillows each holds
+BED_KEYS = frozenset("kind axis head cover pillows mattress colour".split())
+BED_BUILT = ("gothic", "day")
+BED_PILLOWS = {"gothic": 2, "day": 3}
+BED_COVERS = ("coverlet", "blanket", "none")
 KINDS = ("door", "window", "stairs", "hatch", "drop")          # R-O1
 MARKERS = ("stairs", "hatch", "drop")
 SIDES = ("N", "E", "S", "W")
@@ -260,7 +278,11 @@ def _colours(row: dict) -> list:
     for i, lt in enumerate(row.get("lights") or ()):
         if isinstance(lt, dict):
             out.append((f"lights[{i}].color", lt.get("color")))
-    lk = (row.get("look") or {}) if isinstance(row.get("look"), dict) else {}
+    for p in row.get("pieces") or ():
+        bed = ((p.get("spec") or {}) if isinstance(p, dict) and isinstance(p.get("spec"), dict) else {}).get("bed")
+        if isinstance(bed, dict):
+            out.append((f"piece {p.get('id')}: bed.colour", bed.get("colour")))
+    lk =(row.get("look") or {}) if isinstance(row.get("look"), dict) else {}
     for role, v in (lk.get("lights") or {}).items():
         if isinstance(v, dict):
             out.append((f"look.lights.{role}.color", v.get("color")))
@@ -285,7 +307,16 @@ def key_rules(row: dict, bag: Problems) -> None:
         _strict(p, PIECE_KEYS, where, "piece", bag)
         _strict(p.get("spec"), SPEC_KEYS, where + ".spec", "spec", bag)
         if isinstance(p.get("spec"), dict):
-            _strict(p["spec"].get("glow"), GLOW_KEYS, where + ".spec.glow", "glow", bag)
+            sp = p["spec"]
+            _strict(sp.get("glow"), GLOW_KEYS, where + ".spec.glow", "glow", bag)
+            _strict(sp.get("bed"), BED_KEYS, where + ".spec.bed", "bed", bag)
+            if sp.get("model") == "hearth":
+                for k, keys in (("mantel", MANTEL_KEYS), ("breast", BREAST_KEYS), ("firebox", FIREBOX_KEYS)):
+                    _strict(sp.get(k), keys, f"{where}.spec.{k}", k, bag)
+                if isinstance(sp.get("firebox"), dict):
+                    _strict(sp["firebox"].get("glow"), GLOW_KEYS, where + ".spec.firebox.glow", "glow", bag)
+                for j, d in enumerate(sp.get("dress") or ()):
+                    _strict(d, DRESS_KEYS, f"{where}.spec.dress[{j}]", "dress", bag)
     for name, lay in (row.get("layouts") or {}).items() if isinstance(row.get("layouts"), dict) else ():
         for pid, over in ((lay or {}).get("pieces") or {}).items():
             _strict(over, PIECE_KEYS, f"layouts.{name}.pieces.{pid}", "piece", bag)
@@ -372,6 +403,10 @@ def value_rules(row: dict, bag: Problems) -> None:
                            f"ceiling (R-P3b)")
             if spec.get("finish", "grey") != "grey":
                 bag.append(f'{where}: finish "{spec["finish"]}" is not built yet (G15 to G19); a box is "grey"')
+        if model == "hearth":
+            hearth_values(spec, row.get("height"), where, bag)
+        if isinstance(spec.get("bed"), dict):
+            bed_values(p, spec, where, bag)
         if "covers" in p and not (isinstance(p["covers"], (list, tuple)) and all(isinstance(c, str) for c in p["covers"])):
             bag.append(f"{where}: covers is a list of scene ids")
         if "moved" in p and not (isinstance(p["moved"], str) and p["moved"].strip()):
@@ -404,6 +439,211 @@ def _place_rule(p: dict, earlier: dict, where: str, bag: Problems) -> None:
             bag.append(f"{where}: place beside {pl[1]}: `beside` names a piece that stands earlier in the list (R-P4)")
         return
     bag.append(f"{where}: place {list(pl)}: the forms are {forms} (R-P4)")
+
+
+# ---------------------------------------------------------------- the hearth (G6) and the bed object (G7)
+
+
+def _nums(v, n: int) -> bool:
+    return isinstance(v, (list, tuple)) and len(v) == n and all(_num(x) for x in v)
+
+
+GLOW_DEFAULT_SIZE = {"sphere": lambda ow, fd: [0.12], "cone": lambda ow, fd: [round(0.3 * ow, 3), 0.2],
+                     "box": lambda ow, fd: [round(0.7 * ow, 3), round(0.6 * fd, 3), 0.08],
+                     "card": lambda ow, fd: [round(0.6 * ow, 3), 0.25]}
+
+
+def hearth_values(spec: dict, height=None, where: str = "the hearth", bag: Problems | None = None) -> dict | None:
+    """A hearth's numbers with every default filled (room_file_v2 section 6), in the piece's frame: x along its width
+    (centred), y toward its back (the wall at +d/2, its front at -d/2), z up from the floor. Holds R-H1 to R-H3 and
+    R-H5 (R-H4 is the lights' R-L3: a hearth always gives `fire`), and that the fire anchor stands in the firebox.
+    With no `bag` it stops on a problem (the builder's call); with one it adds to it (value_rules)."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+
+    def done(v):
+        if own:
+            bag.stop()
+        return v if len(bag) == n0 else None
+
+    style = spec.get("style")
+    if style not in HEARTH_STYLES:
+        bag.append(f'{where}: hearth style {style!r} is not one of {", ".join(HEARTH_STYLES)} (R-H1)')
+        return done(None)
+    if style not in HEARTH_BUILT:
+        bag.append(f'{where}: hearth style "{style}" is not built yet (it comes with the tavern); the builder has '
+                   f'{", ".join(HEARTH_BUILT)} (R-H1)')
+        return done(None)
+    size = spec.get("size")
+    if not (_nums(size, 3) and all(v > 0 for v in size)):
+        bag.append(f"{where}: a hearth's size is [w, d, h] in metres: its width along the wall, its depth out of it and "
+                   f"the mantel's height (R-H2)")
+        return done(None)
+    w, d, h = (float(v) for v in size)
+    surface = spec.get("surface") or HEARTH_SURFACE[style]
+    if surface not in SURFACES:
+        bag.append(f'{where}: surface {surface!r} is not one of {", ".join(SURFACES)}')
+    elif surface not in SURFACES_BUILT:
+        bag.append(f'{where}: surface "{surface}" waits for G11\'s fetch; the builder has {", ".join(SURFACES_BUILT)}')
+    if spec.get("glow") is not None:
+        bag.append(f"{where}: a hearth's glow is its firebox's (spec.firebox.glow), not spec.glow")
+    mdef = dict(z=h, depth=min(0.3, d), overhang=0.05, thickness=0.06) if style == "surround" else \
+        dict(z=h, depth=min(0.24, d), overhang=0.04, thickness=0.1)
+    m = dict(mdef, **{k: v for k, v in (spec.get("mantel") or {}).items() if v is not None})
+    if not all(_num(m[k]) for k in ("z", "depth", "overhang", "thickness")) or min(
+            m["z"], m["depth"], m["thickness"]) <= 0 or m["overhang"] < 0:
+        bag.append(f"{where}: the mantel's z, depth and thickness are metres over 0, its overhang 0 or more (R-H2)")
+        return done(None)
+    z1, z0 = float(m["z"]), float(m["z"]) - float(m["thickness"])
+    ovh = float(m["overhang"])
+    yb, yf = d / 2, -d / 2 + ovh                    # the body: from the wall out to its front face
+    half = w / 2 - ovh                              # the body's half width (the shelf overhangs it)
+    if half <= 0.1 or yb - yf <= 0.1:
+        bag.append(f"{where}: the mantel's {ovh:g} m overhang leaves no body under it (R-H2)")
+        return done(None)
+    shelf = dict(x0=-w / 2, x1=w / 2, y0=-d / 2, y1=min(-d / 2 + float(m["depth"]), d / 2), z0=z0, z1=z1)
+    if float(m["depth"]) <= ovh:
+        bag.append(f"{where}: the mantel is {m['depth']:g} m deep and overhangs {ovh:g} m: it would stand on nothing "
+                   f"(R-H2)")
+    op = spec.get("opening")
+    if op is None:
+        op = (round(min(0.8, 0.45 * w), 3), round(min(0.9, 0.7 * z0), 3)) if style == "surround" else \
+            (round(0.5 * w, 3), round(0.72 * z0, 3))
+    if not (_nums(op, 2) and all(v > 0 for v in op)):
+        bag.append(f"{where}: opening is [w, h] in metres, the firebox's mouth (R-H2)")
+        return done(None)
+    ow, oh = (float(v) for v in op)
+    if z0 < oh:
+        bag.append(f"{where}: the mantel at {z0:g} m is lower than the opening's top ({oh:g} m) (R-H2)")
+    if ow > 2 * half - 0.1:
+        bag.append(f"{where}: the opening is {ow:g} m wide: the jambs need 5 cm each of the body's {2 * half:g} m (R-H2)")
+    if _num(height) and z1 > height:
+        bag.append(f"{where}: the mantel at {z1:g} m is over the {height:g} m ceiling (R-H2)")
+    fb = spec.get("firebox") or {}
+    fd = fb.get("depth")
+    fd = min(0.3, yb - yf - 0.04) if fd is None else fd
+    if not (_num(fd) and 0 < fd <= yb - yf - 0.02):
+        bag.append(f"{where}: the firebox's depth is over 0 and at most the body's {yb - yf - 0.02:.2f} m less 2 cm of "
+                   f"back (R-H2)")
+        return done(None)
+    fd = float(fd)
+    firebox = dict(x0=-ow / 2, x1=ow / 2, y0=yf, y1=yf + fd, z1=oh, depth=fd, cy=round(yf + fd / 2, 4))
+    breast = None
+    b = spec.get("breast")
+    if b:
+        to = b.get("to", "ceiling")
+        top = height if to == "ceiling" else to
+        bwid = b.get("width", 2 * half)
+        bdep = b.get("depth", min(0.3, yb - yf))
+        if not (_num(top) and _num(bwid) and _num(bdep) and bwid > 0 and bdep > 0):
+            bag.append(f'{where}: the breast is {{"width": m, "depth": m, "to": "ceiling" or m}} (R-H2)')
+            return done(None)
+        if top <= z1:
+            bag.append(f"{where}: the mantel at {z1:g} m is not under the breast's top ({top:g} m) (R-H2)")
+        if _num(height) and top > height:
+            bag.append(f"{where}: the breast's top ({top:g} m) is over the {height:g} m ceiling (R-H2)")
+        if bwid > w:
+            bag.append(f"{where}: the breast is {bwid:g} m wide, wider than the hearth's {w:g} m (R-H2)")
+        if bdep > d - 0.02:
+            bag.append(f"{where}: the breast is {bdep:g} m deep: it stands behind the mantel's front, at most "
+                       f"{d - 0.02:.2f} m (R-H2)")
+        breast = dict(x0=-bwid / 2, x1=bwid / 2, y0=yb - bdep, y1=yb, z0=z1, z1=float(top), width=float(bwid),
+                      depth=float(bdep))
+    g = fb.get("glow", dict(shape="box", material="coal"))
+    glow = None
+    if g:
+        glow = dict(g)
+        if glow.get("shape") in GLOW_DEFAULT_SIZE and "size" not in glow:
+            glow["size"] = GLOW_DEFAULT_SIZE[glow["shape"]](ow, fd)
+        glow.setdefault("at", [[0.0, firebox["cy"], 0.02]])
+    anchors = dict(spec.get("anchors") or {})
+    anchors.setdefault("fire", (0.0, firebox["cy"], 0.32))
+    fa = anchors["fire"]
+    if not _nums(fa, 3):
+        bag.append(f"{where}: anchors.fire is [x, y, z] in the piece's frame")
+    elif not (abs(fa[0]) < ow / 2 and yf <= fa[1] <= yf + fd and 0 < fa[2] < oh):
+        bag.append(f"{where}: its fire anchor [{', '.join(f'{v:g}' for v in fa)}] is not in its firebox (x within "
+                   f"{ow / 2:g}, y {yf:g} to {yf + fd:g}, z 0 to {oh:g})")
+    dress = []
+    for j, r in enumerate(spec.get("dress") or ()):
+        at = r.get("at", (0.0, 0.0, 0.0))
+        if not _nums(at, 3):
+            bag.append(f"{where}: dress[{j}]'s at is [x, y in from the back, z over the mantel's top]")
+            continue
+        if r.get("model") == "box":
+            sz = r.get("size")
+            if not (_nums(sz, 3) and all(v > 0 for v in sz)) or not (isinstance(r.get("label"), str)
+                                                                       and len(r["label"].strip()) >= 3):
+                bag.append(f'{where}: dress[{j}] is a grey box: "size": [w, d, h] and a "label" of 3 characters or more')
+                continue
+            dress.append(dict(model="box", size=[float(v) for v in sz], at=[float(v) for v in at], label=r["label"]))
+            continue
+        if r.get("model") not in (None, "ph") or not isinstance(r.get("slug"), str):
+            bag.append(f"{where}: dress[{j}] is a Poly Haven model (\"slug\") or a labelled box (\"model\": \"box\")")
+            continue
+        k = r.get("scale", 1.0)
+        if not (_num(k) and k > 0):
+            bag.append(f"{where}: dress[{j}]'s scale is a number over 0")
+            continue
+        if r.get("cloth") and r["slug"] not in MIRROR_H:
+            bag.append(f'{where}: dress[{j}] has "cloth" but {r["slug"]} is not a mirror (R-H3)')
+        if r["slug"] in MIRROR_H:
+            mtop = z1 + float(at[2]) + MIRROR_H[r["slug"]] * float(k)
+            if breast is None:
+                bag.append(f"{where}: dress[{j}] {r['slug']} is a mirror and the hearth has no breast to hang it on "
+                           f"(R-H5)")
+            elif mtop > breast["z1"] + 1e-6:
+                bag.append(f"{where}: the mirror's top ({mtop:.2f} m) is over the breast, which stops at "
+                           f"{breast['z1']:.2f} m (R-H5)")
+        dress.append(dict(slug=r["slug"], scale=float(k), at=[float(v) for v in at], rot=float(r.get("rot", 0.0)),
+                          lod=r.get("lod"), cloth=bool(r.get("cloth"))))
+    return done(dict(style=style, surface=surface, size=[w, d, h], opening=[ow, oh], body=dict(
+        x0=-half, x1=half, y0=yf, y1=yb), shelf=shelf, mantel=m, firebox=firebox, breast=breast, glow=glow,
+        anchors=anchors, dress=dress))
+
+
+def bed_values(piece: dict, spec: dict, where: str = "the bed", bag: Problems | None = None) -> dict | None:
+    """A bed object's choices with every default filled (room_file_v2 section 7), held to R-B1 to R-B3. `spec.bed:
+    true` is not one (the Gothic bed's path, untouched). With no `bag` it stops on a problem."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+    b = spec.get("bed")
+    kind = b.get("kind", "gothic")
+    if kind not in BED_BUILT:
+        bag.append(f'{where}: bed.kind "{kind}" is not built yet (G20); the builder has {" and ".join(BED_BUILT)} '
+                   f'(R-B1)')
+    elif kind == "gothic" and [k for k in b if k != "kind"]:
+        bag.append(f"{where}: a gothic bed is today's, number for number: {', '.join(k for k in b if k != 'kind')} "
+                   f"is for a day bed (R-B1)")
+    if spec.get("model") != "ph" or not spec.get("slug"):
+        bag.append(f'{where}: a bed stands on a Poly Haven model ("model": "ph" and its "slug")')
+    v = dict(kind=kind, axis=b.get("axis", "y"), head=b.get("head", "+"),
+             cover=b.get("cover", "coverlet" if kind == "gothic" else "blanket"),
+             pillows=b.get("pillows", 2 if kind == "gothic" else 1), mattress=b.get("mattress"), colour=b.get("colour"))
+    if v["axis"] not in ("x", "y"):
+        bag.append(f'{where}: bed.axis is "x" or "y", the model\'s long axis')
+    if v["head"] not in ("+", "-"):
+        bag.append(f'{where}: bed.head is "+" or "-", the end of the long axis at the head')
+    if v["cover"] not in BED_COVERS:
+        bag.append(f'{where}: bed.cover is one of {", ".join(BED_COVERS)}')
+    n = v["pillows"]
+    if not (isinstance(n, int) and not isinstance(n, bool) and n >= 0):
+        bag.append(f"{where}: bed.pillows is a whole number")
+    elif kind in BED_PILLOWS and n > BED_PILLOWS[kind]:
+        bag.append(f"{where}: {n} pillows do not fit a {kind} bed (at most {BED_PILLOWS[kind]}) (R-B2)")
+    mm = v["mattress"]
+    if mm is not None and not (_nums(mm, 5) and mm[0] < mm[1] and mm[2] < mm[3] and mm[4] > 0):
+        bag.append(f"{where}: bed.mattress is [x0, x1, y0, y1, z] in the model's own metres (x0 < x1, y0 < y1), or "
+                   f"null to probe it")
+    if v["colour"] is not None and v["cover"] != "blanket":
+        bag.append(f"{where}: bed.colour is the blanket's tint; a coverlet is the damask's own scan")
+    if kind != "gothic" and piece.get("lift"):
+        bag.append(f'{where}: "lift" is for the gothic bed\'s posts (R-B3)')
+    if own:
+        bag.stop()
+    return v if len(bag) == n0 else None
 
 
 def load_room(scene_id: str, rooms_dir: str | None = None, path: str | None = None) -> dict:
@@ -1231,13 +1471,7 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
         under = {s: first_bed for s in under}
     tasks = task_ids() if tasks is None else tasks
     task_pieces = sorted({r["id"] for r in sc.props if r["id"] in tasks or r.get("kind") in ("keyCache", "lockedDoor")})
-    pending = []
-    for p in row["pieces"]:
-        spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
-        if spec.get("model") == "hearth":
-            pending.append(f"piece {p['id']}: the hearth waits for G6 (S6)")
-        if isinstance(spec.get("bed"), dict):
-            pending.append(f"piece {p['id']}: a bed object (a day bed) waits for G7 (S7)")
+    pending = []        # what this builder cannot build yet (none since G6 and G7: kept for the steps after)
     return dict(
         room=sc.id, schema="legacy" if legacy else "v2", names="legacy" if legacy else "v2", rules=SCHEMA,
         openings=openings, lights=lights, lightsDropped=dropped, groups=groups, exposureFrom=ef, hosts=hosts,
@@ -1319,13 +1553,19 @@ def _glow_rule(g, where: str, emit: dict, bag: Problems, need_at: bool = False) 
 
 
 def piece_glows(row: dict, look: dict, shown: str = "") -> dict:
-    """The light-less glows the pieces declare (`spec.glow`, its `at` required): {piece id: glow}."""
+    """The light-less glows the pieces declare (`spec.glow`, its `at` required, and a hearth's `firebox.glow`, its
+    coals by default): {piece id: glow}."""
     bag = Problems(shown or "the room file")
     emit = (look or {}).get("emit_display") or {}
     out = {}
     for p in row.get("pieces") or ():
         spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
-        if spec.get("glow") is not None:
+        if spec.get("model") == "hearth":       # the coals in its firebox (G6), their size and place filled
+            hv = hearth_values(spec, row.get("height"), f"piece {p['id']}")
+            if hv["glow"]:
+                _glow_rule(hv["glow"], f"piece {p['id']}: its firebox", emit, bag, need_at=True)
+                out[p["id"]] = hv["glow"]
+        elif spec.get("glow") is not None:
             _glow_rule(spec["glow"], f"piece {p['id']}", emit, bag, need_at=True)
             out[p["id"]] = spec["glow"]
     bag.stop()

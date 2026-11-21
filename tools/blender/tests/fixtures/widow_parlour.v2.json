@@ -141,6 +141,10 @@
         "radius": 0.12
       }
     },
+    "emit_display": {
+      "M_coal": [2.0, 0.8, 0.12]
+    },
+    "emit_display_note": "the hearth's coals (G6), under the candle flame's 6.0, the emit cap of k",
     "note": "G9: the room's override of meshy_looks/interior_fp.json. The look file has no `fire` role yet: this one is a first guess (the lamp is 38 W, radius 0.04), to be tuned with --sweep on the first group bake. Nothing else of the look is changed."
   },
   "light": "midway",
@@ -230,9 +234,12 @@
         "lod": 0.7,
         "bed": {
           "kind": "day",
+          "axis": "x",
+          "head": "-",
           "cover": "coverlet",
           "pillows": 1
-        }
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing west, the model's -x end is the north end"
       },
       "note": "G7: a day bed lies north to south along the east wall, its head at the north end, its front to the west. The scene's table row would give the carved double bed (GothicBed_01); this piece names its own model. Pale country wood next to the dark carved set: grade it."
     },
@@ -288,7 +295,8 @@
         },
         "breast": {
           "width": 1.45,
-          "depth": 0.3,
+          "depth": 0.22,
+          "depth_note": "0.22 m: the mantel shelf before it is 0.2 m deep, room for the clock (0.13 m)",
           "to": "ceiling"
         },
         "firebox": {
@@ -311,7 +319,7 @@
           {
             "slug": "mantel_clock_01",
             "scale": 1.0,
-            "at": [-0.45, 0.08, 0.0],
+            "at": [-0.45, 0.02, 0.0],
             "lod": 0.5
           }
         ]

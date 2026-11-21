@@ -2076,6 +2076,7 @@ def _cone(b: Builder, P, u, d, z0, r0, r1, h, mat, n=10) -> None:
 
 PIECES: dict = {}           # id -> dict(obj, body box in world, ...)
 MODEL_OF: dict = {}         # id -> the model its builder is building (place_piece: `rise` for all but the photos)
+MADE: dict = {}             # id -> what a hearth or a day bed built (the manifest's `made`: a v2 piece's numbers)
 GREY = "#808080"            # a grey box's flat mid-grey (M_grey, made the first time a box is built)
 
 
@@ -2412,16 +2413,17 @@ def build_glows(mt: dict, lights: list) -> list:
 
 
 TEXTURE_MATS = (("wall_plaster", ("M_wall", "M_ceiling", "M_paint")), ("joinery", ("M_wood", "M_outside_wall")),
-                ("linen", ("M_linen",)), ("coverlet", ("M_coverlet",)), ("snow", ("M_snow",)))
+                ("linen", ("M_linen",)), ("coverlet", ("M_coverlet",)), ("snow", ("M_snow",)),
+                ("stone_wall", ("M_stone_wall",)))
 
 
 def texture_roles(used: set, floor_role: str, rug: bool) -> list:
     """The texture roles a room used, from the room materials its meshes keep (`used`: names without the room's
-    prefix): the floor's, the plaster, the joinery, the linen, the curtains' wool (M_curtain, M_curtain_<n>), the
-    coverlet, the snow, and the rug's carpet."""
+    prefix): the floor's, the plaster, the joinery, the linen, the curtains' and a day bed's blanket's wool
+    (M_curtain, M_curtain_<n>, M_blanket), the coverlet, the snow, a stone hearth's stone, and the rug's carpet."""
     out = [floor_role]
     out += [role for role, mats in TEXTURE_MATS if any(m in used for m in mats)]
-    if any(m == "M_curtain" or m.startswith("M_curtain_") for m in used):
+    if any(m in ("M_curtain", "M_blanket") or m.startswith("M_curtain_") for m in used):
         out.append("wool")
     if rug:
         out.append("carpet")
@@ -2452,6 +2454,14 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
             ob, box = build_photos(fr, piece, name)
         elif model == "meshy":
             ob, box = build_meshy(fr, piece, spec, name)
+        elif model == "hearth":
+            ob, box, info, made = build_hearth(fr, piece, spec, name, mt)
+            for k_, v_ in info.items():
+                anchors.setdefault(f"{pid}:{k_}", v_)
+            MADE[pid] = made
+        elif model == "ph" and isinstance(spec.get("bed"), dict) and spec["bed"].get("kind", "gothic") != "gothic":
+            ob, box, made = build_day_bed(fr, piece, spec, name, mt)     # a bed object (G7): {"kind": "day", ...}
+            MADE[pid] = made
         elif model == "ph" and spec.get("bed"):
             ob, box, extra = build_bed(fr, piece, spec, name, mt)
             anchors.update(extra)
@@ -2496,6 +2506,150 @@ def build_box(fr: Frame, piece: dict, spec: dict, name: str):
     box = place_piece(fr, piece, ob, Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, h)))
     info = {k: tuple(ob.matrix_world @ Vector(tuple(v))) for k, v in (spec.get("anchors") or {}).items()}
     return ob, box, info
+
+
+def hearth_mat(mt: dict, surface: str):
+    """A hearth's surface: M_marble (the washstand's slab, made here when no washstand made it), M_stone_wall (the
+    cached `stone_wall` scan, rock_wall_08, tiled every 0.5 m) or M_iron."""
+    if surface == "iron":
+        return mt["iron"]
+    if surface == "marble":
+        key = nm("M_marble")
+        return MATS[key] if key in MATS else RMat("M_marble", None, hex_lin("#C8C2B6"), rough=0.3,
+                                                  albedo=hex_lin("#C8C2B6"))
+    key = nm("M_stone_wall")
+    if key in MATS:
+        return MATS[key]
+    img = scan_image("T_stone_wall", mib.mr.texture_path("stone_wall", "diff", res="1k"), 512)
+    f = (0.92, 0.9, 0.86)
+    return RMat("M_stone_wall", img, f, rough=0.95, albedo=tuple(scan_mean(img) * np.array(f)),
+                note="a stone hearth: the stone_wall role's scan")
+
+
+def hearth_soot():
+    """The firebox's lining: a dull sooty brown-black, lighter than the ink (#12141C)."""
+    key = nm("M_soot")
+    return MATS[key] if key in MATS else RMat("M_soot", None, hex_lin("#2B2522"), rough=0.95, albedo=hex_lin("#2B2522"),
+                                              note="a hearth's firebox lining")
+
+
+def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
+    """A hearth (room file v2, G6: styles `surround` and `stone`), box-built in the room's own materials in the piece's
+    frame (x along its width, its back against the wall at +d/2, its front -y): the body with the firebox's mouth
+    (two jambs and the frieze over the mouth), the firebox lined in soot with an iron grate in it, the mantel shelf
+    (marble on a surround, a timber shelf and a timber lintel over the mouth on a stone hearth), the chimney breast
+    above the mantel, and the `dress` over the mantel: each Poly Haven model through ph_object (a mirror with
+    "cloth" hung in plain matte black cloth by mirror_cloths and its glass blackened by mirror_glass_to_cloth, both
+    unchanged), each labelled box a grey box of its own. The coals' glow is built with the lights' glows
+    (build_glows, from meshy_room_file.piece_glows), split from this piece. Returns (object, box, its anchors in the
+    world: `fire` and any of `spec.anchors`, the manifest's `made`)."""
+    pid = piece["id"]
+    hv = rf.hearth_values(spec, fr.H, f"piece {pid}")   # the file passed these rules already (derive)
+    w, d, _h = hv["size"]
+    body, sh, fb, br = hv["body"], hv["shelf"], hv["firebox"], hv["breast"]
+    surf = hearth_mat(mt, hv["surface"])
+    stone = hv["style"] == "stone"
+    shelf_mat = mt["wood"] if stone else surf
+    soot = hearth_soot()
+    ow, oh = hv["opening"]
+    z0, z1 = sh["z0"], sh["z1"]
+    bx0, bx1, yf, yb = body["x0"], body["x1"], body["y0"], body["y1"]
+    fy1 = fb["y1"]
+    b = Builder()
+    # the body: two jambs, the frieze over the mouth, the block behind the firebox; no faces against the wall, the
+    # floor or a neighbour (the firebox's own faces are its lining)
+    b.box((bx0, yf, 0.0), (-ow / 2, yb, z0), surf, skip=("bottom", "N", "E"))
+    b.box((ow / 2, yf, 0.0), (bx1, yb, z0), surf, skip=("bottom", "N", "W"))
+    b.box((-ow / 2, yf, oh), (ow / 2, yb, z0), surf, skip=("bottom", "N", "W", "E"))
+    b.box((-ow / 2, fy1, 0.0), (ow / 2, yb, oh), surf, skip=("bottom", "N", "W", "E", "S", "top"))
+    if sh["y1"] < yb - 1e-6:    # behind a shallow shelf the body rises to its top, so no slot shows under the breast
+        b.box((bx0, sh["y1"], z0), (bx1, yb, z1), surf, skip=("bottom", "N", "S"))
+    # the firebox's lining (its normals into the recess), the hearth floor and the grate
+    xa, xb, ya, yc = -ow / 2, ow / 2, yf, fy1
+    b.face([(xa, ya, 0.0), (xa, yc, 0.0), (xa, yc, oh), (xa, ya, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
+    b.face([(xb, yc, 0.0), (xb, ya, 0.0), (xb, ya, oh), (xb, yc, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
+    b.face([(xa, yc, 0.0), (xb, yc, 0.0), (xb, yc, oh), (xa, yc, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
+    b.face([(xa, ya, oh), (xa, yc, oh), (xb, yc, oh), (xb, ya, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
+    b.box((xa, ya, 0.0), (xb, yc, 0.012), soot, skip=("bottom",))
+    gx, gy = 0.36 * ow, fb["cy"] - 0.6 * fb["depth"] / 2 - 0.02
+    for x_ in (-gx, gx):                                        # the grate's two legs and its front bar
+        b.box((x_ - 0.012, gy - 0.012, 0.012), (x_ + 0.012, gy + 0.012, 0.15), mt["iron"])
+    b.box((-gx - 0.012, gy - 0.012, 0.10), (gx + 0.012, gy + 0.012, 0.125), mt["iron"])
+    # the mantel shelf, overhanging the body at the front and both ends
+    b.box((sh["x0"], sh["y0"], z0), (sh["x1"], sh["y1"], z1), shelf_mat, skip=("N",) if sh["y1"] >= yb - 1e-6 else ())
+    if stone:   # the timber lintel over the mouth, proud of the stone by up to 3 cm
+        lz = min(0.16, z0 - oh)
+        if lz >= 0.05:
+            b.box((-ow / 2 - 0.12, yf - min(0.03, yf - sh["y0"]), oh), (ow / 2 + 0.12, yf + 0.12, oh + lz), mt["wood"])
+    if br is not None:
+        top_skip = ("bottom", "N") + (("top",) if br["z1"] >= fr.H - 1e-6 else ())
+        b.box((br["x0"], br["y0"], z1), (br["x1"], br["y1"], br["z1"] - (0.001 if br["z1"] >= fr.H - 1e-6 else 0.0)),
+              surf, skip=top_skip)
+    ob = b.build(name)
+    # the dress over the mantel: each model's back `at[1]` in front of the breast (where it stands before the breast)
+    # or of the shelf's back, its base `at[2]` over the shelf's top, centred on `at[0]`
+    rows, parts, greys = [], [], []
+    for j, r in enumerate(hv["dress"]):
+        x, yin, zup = r["at"]
+        back = br["y0"] if br is not None and br["x0"] <= x <= br["x1"] else sh["y1"]
+        if r.get("model") == "box":
+            gw, gd, gh = r["size"]
+            gb = Builder()
+            key = nm("M_grey")
+            gm = MATS[key] if key in MATS else RMat("M_grey", None, hex_lin(GREY), rough=0.8, albedo=hex_lin(GREY),
+                                                    note="grey boxes: pieces with no model yet")
+            gb.box((x - gw / 2, back - yin - gd, z1 + zup), (x + gw / 2, back - yin, z1 + zup + gh), gm)
+            g_ob = gb.build(f"{name}_dress{j}")
+            g_ob["wdi_grey"] = True
+            g_ob["wdi_label"] = str(r["label"])
+            greys.append(g_ob)
+            continue
+        d_ob, lo_d, hi_d = ph_object(f"{name}_dress{j}", r["slug"], r["scale"], lod=r.get("lod"))
+        R = Matrix.Rotation(math.radians(r["rot"]), 4, "Z")
+        cs = [R @ Vector((cx, cy, 0.0)) for cx in (lo_d.x, hi_d.x) for cy in (lo_d.y, hi_d.y)]
+        cx0, cx1 = min(c.x for c in cs), max(c.x for c in cs)
+        cy0, cy1 = min(c.y for c in cs), max(c.y for c in cs)
+        t = Vector((x - (cx0 + cx1) / 2, back - yin - cy1, z1 + zup - lo_d.z))
+        d_ob.matrix_world = Matrix.Translation(t) @ R
+        swap_ph_materials(d_ob)
+        foot = (cx0 + t.x, cy0 + t.y, cx1 + t.x, cy1 + t.y)
+        if r["slug"] not in rf.MIRROR_H and (foot[0] < sh["x0"] - 0.01 or foot[2] > sh["x1"] + 0.01
+                                             or foot[1] < sh["y0"] - 0.01):
+            raise SystemExit(f"meshy_room_build: piece {pid}: dress[{j}] {r['slug']} stands off the mantel shelf "
+                             f"(its foot x {foot[0]:.2f}..{foot[2]:.2f}, y {foot[1]:.2f}..{foot[3]:.2f}; the shelf x "
+                             f"{sh['x0']:.2f}..{sh['x1']:.2f}, front y {sh['y0']:.2f}): move its at")
+        parts.append(d_ob)
+        rows.append(dict(slug=r["slug"], k=r["scale"], at=[round(v, 4) for v in t], rot=r["rot"], cloth=r["cloth"],
+                         dims=[round(cx1 - cx0, 3), round(cy1 - cy0, 3), round(hi_d.z - lo_d.z, 3)]))
+    if parts:
+        ob = _join([ob] + parts, name)
+    cloth, n_glass = None, 0
+    hung = [r for r in rows if r["cloth"]]
+    if hung:
+        cloth = mirror_cloths(name + "_cloth", hung, Vector((0.0, 0.0, 0.0)), mt)
+        n_glass = mirror_glass_to_cloth(ob, hung, Vector((0.0, 0.0, 0.0)), mt["black"].mat)
+        log(f"{pid}: {n_glass} mirror glass faces in the black cloth's material")
+        if not n_glass:
+            NOTES.append(f"{pid}: no mirror glass faces found to blacken")
+    zs = [v.co.z for v in ob.data.vertices]
+    lo, hi = Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, max(zs) if zs else z1))
+    box = place_piece(fr, piece, ob, lo, hi)
+    for o_ in greys:
+        o_.matrix_world = ob.matrix_world @ o_.matrix_world
+        register(o_, "piece", pid + ":" + o_.name.rsplit("_", 1)[-1])
+    if cloth is not None:
+        cloth.matrix_world = ob.matrix_world @ cloth.matrix_world
+        register(cloth, "cloth", pid + ":cloth")
+    info = {k_: piece_point(pid, v_) for k_, v_ in hv["anchors"].items()}
+    made = dict(style=hv["style"], surface=hv["surface"], opening=hv["opening"],
+                firebox=dict(y=[round(fb["y0"], 3), round(fb["y1"], 3)], depth=fb["depth"]),
+                mantel=[round(z0, 3), round(z1, 3)], breastTop=round(br["z1"], 3) if br else None,
+                dress=[dict(slug=r["slug"], at=r["at"], dims=r["dims"], cloth=r["cloth"]) for r in rows] +
+                [dict(box=o_.get("wdi_label")) for o_ in greys], mirrorGlassFaces=n_glass,
+                fire=[round(float(v), 3) for v in info["fire"]])
+    log(f"hearth {pid}: {hv['style']} in {hv['surface']}, opening {ow:g} x {oh:g} m, mantel {z0:.2f}..{z1:.2f} m, "
+        f"breast to {br['z1'] if br else 'none'}, fire at {made['fire']}, dress {[r['slug'] for r in rows]}")
+    return ob, box, info, made
 
 
 def piece_rules(fr: Frame, pid: str, box) -> None:
@@ -2933,13 +3087,134 @@ def build_bed(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
     return ob, box, {}
 
 
+# a day bed's tuned numbers (G7): the pillows' depth and the half width they may take, how far under the mattress's
+# top the cover hangs, where its top run ends (nearly at the head: no turned-down sheet on a day bed) and how much
+# over the mattress a surface may stand and still be the mattress (a back rail stands higher)
+DAY_BED = dict(pillow_depth=0.40, pillow_x=0.30, hem_drop=0.22, turn=0.97, rail=0.18)
+BED_TURN = {("x", "+"): 90.0, ("x", "-"): -90.0, ("y", "+"): 0.0, ("y", "-"): 180.0}
+
+
+def blanket_mat(mt: dict, colour: str | None):
+    """A day bed's plain wool blanket, in `colour` (the look's linen by default)."""
+    key = nm("M_blanket")
+    if key in MATS:
+        return MATS[key]
+    cc = hex_lin(colour or CFG["look"]["linen"])
+    return RMat("M_blanket", mt.get("wool"), tuple(min(1.0, v / 0.8) for v in cc), rough=0.95, kind="cloth", albedo=cc,
+                note="a day bed's blanket")
+
+
+def build_day_bed(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
+    """A day bed (room file v2, G7: `spec.bed` an object of kind `day`): its Poly Haven model at its scale, made up
+    with the same cover and pillows as the Gothic bed (`coverlet`, `pillows`, their keywords set to DAY_BED), built in
+    the bed's own frame: the model turned so its long axis (`bed.axis`) is y and its head (`bed.head`) +y, which
+    those two assume, then turned back, so the piece's `face` is the model's own front. The mattress is probed by
+    ray (its top along the centre line; along y, the run under the ends' height; across, the run round the centre
+    line no higher than DAY_BED["rail"] over the top, which leaves out a back rail), or given (`bed.mattress`, in
+    the model's own metres). Returns (object, box, the manifest's `made`)."""
+    pid = piece["id"]
+    bv = rf.bed_values(piece, spec, f"piece {pid}")
+    k = float(spec.get("scale", 1.0))
+    ob, lo, hi = ph_object(name, spec["slug"], k, lod=spec.get("lod"))
+    swap_ph_materials(ob)
+    me = ob.data
+    long_x = (hi.x - lo.x) > (hi.y - lo.y)
+    if long_x != (bv["axis"] == "x"):
+        raise SystemExit(f"meshy_room_build: piece {pid}: {spec['slug']} is {hi.x - lo.x:.2f} m along x and "
+                         f"{hi.y - lo.y:.2f} m along y: its long axis is {'x' if long_x else 'y'}; say so in bed.axis")
+    T = Matrix.Rotation(math.radians(BED_TURN[(bv["axis"], bv["head"])]), 4, "Z")
+    verts = [T @ v.co for v in me.vertices]
+    bvh = BVHTree.FromPolygons(verts, [tuple(p.vertices) for p in me.polygons])
+    cs = [T @ Vector((x, y, 0.0)) for x in (lo.x, hi.x) for y in (lo.y, hi.y)]
+    X0, X1 = min(c.x for c in cs), max(c.x for c in cs)
+    Y0, Y1 = min(c.y for c in cs), max(c.y for c in cs)
+
+    def top0(x, y):
+        h_ = bvh.ray_cast(Vector((x, y, hi.z + 1.0)), Vector((0, 0, -1)))
+        return h_[0].z if h_[0] is not None else None
+
+    rail = DAY_BED["rail"]
+    if bv["mattress"] is not None:
+        mx0, mx1, my0, my1, flat = (float(v) for v in bv["mattress"])
+        mc = [T @ Vector((x, y, 0.0)) for x in (mx0, mx1) for y in (my0, my1)]
+        xa, xb = min(c.x for c in mc), max(c.x for c in mc)
+        y_foot, y_head = min(c.y for c in mc), max(c.y for c in mc)
+        how = "given"
+    else:
+        ys = np.linspace(Y0 + 0.02, Y1 - 0.02, 80)
+        tops = [top0(0.0, float(y)) for y in ys]
+        if not [t for t in tops if t is not None]:
+            raise SystemExit(f"meshy_room_build: piece {pid}: no mattress found along {spec['slug']}'s centre line: "
+                             f"give bed.mattress")
+        flat = float(np.median([t for t in tops if t is not None]))
+        inner = [y for y, t in zip(ys, tops) if t is not None and t < flat + rail]
+        y_foot, y_head = min(inner) + 0.02, max(inner) - 0.02
+        xs_ = np.linspace(X0 + 0.01, X1 - 0.01, 81)
+        ok = [t is not None and flat - 0.05 < t < flat + rail for t in (top0(float(x), (y_foot + y_head) / 2)
+                                                                        for x in xs_)]
+        i0 = int(np.argmin(np.abs(xs_)))
+        if not ok[i0]:
+            raise SystemExit(f"meshy_room_build: piece {pid}: the probe found no mattress at {spec['slug']}'s centre: "
+                             f"give bed.mattress")
+        a_, b_ = i0, i0
+        while a_ > 0 and ok[a_ - 1]:
+            a_ -= 1
+        while b_ < len(ok) - 1 and ok[b_ + 1]:
+            b_ += 1
+        xa, xb = float(xs_[a_]), float(xs_[b_])
+        how = "probed"
+    xc, half = (xa + xb) / 2, (xb - xa) / 2
+    log(f"day bed {pid}: mattress {how}: top {flat:.3f} m, x {xa:.2f}..{xb:.2f}, y {y_foot:.2f}..{y_head:.2f} in the "
+        f"bed's frame (its head +y)")
+
+    def top(x, y):
+        return top0(x + xc, y)
+
+    parts = []
+    cov = None
+    if bv["cover"] != "none":
+        cmat = mt["coverlet"] if bv["cover"] == "coverlet" else blanket_mat(mt, bv["colour"])
+        cov = coverlet(name + "_coverlet", top, flat, half, half, y_foot, y_head, 0.0, mt, mat=cmat,
+                       hem=max(flat - DAY_BED["hem_drop"], 0.08), turn=DAY_BED["turn"], sheet=False)
+        parts.append(cov)
+    # the bedding the pillows rest in: the model's own surfaces and the cover, in the bed's frame shifted by -xc
+    P_, T_ = world_tris(ob)
+    R3 = np.array(T.to_3x3())
+    P_ = P_ @ R3.T - np.array([xc, 0.0, 0.0])
+    geo = [P_[T_]] + ([world_tris(cov)[0][world_tris(cov)[1]]] if cov is not None else [])
+    bed_tris = np.concatenate(geo)
+    z_cap = flat + 0.30
+    bvh2 = BVHTree.FromPolygons([tuple(map(float, p)) for p in bed_tris.reshape(-1, 3)],
+                                [(3 * i, 3 * i + 1, 3 * i + 2) for i in range(len(bed_tris))])
+
+    def bedding(x, y):
+        h_ = bvh2.ray_cast(Vector((x, y, z_cap)), Vector((0, 0, -1)))
+        return h_[0].z if h_[0] is not None else None
+
+    parts.append(pillows(name + "_pillows", bedding, bed_tris, flat, half, y_head, z_cap, mt, count=bv["pillows"],
+                         depth=DAY_BED["pillow_depth"], x_max=DAY_BED["pillow_x"]))
+    back = T.inverted() @ Matrix.Translation((xc, 0.0, 0.0))     # the bed's frame back to the model's
+    box = place_piece(fr, piece, ob, lo, hi)
+    for p in parts:
+        if p is not None:
+            p.matrix_world = ob.matrix_world @ back @ p.matrix_world
+            register(p, "cloth", pid + ":" + p.name.rsplit("_", 1)[-1])
+    made = dict(kind=bv["kind"], axis=bv["axis"], head=bv["head"], cover=bv["cover"], pillows=bv["pillows"],
+                mattress=dict(how=how, top=round(flat, 3), x=[round(xa, 3), round(xb, 3)],
+                              y=[round(y_foot, 3), round(y_head, 3)]))
+    return ob, box, made
+
+
 def coverlet(name: str, top, flat: float, x_mat: float, x_rail: float, y_foot: float, y_head: float, lift: float,
-             mt: dict):
+             mt: dict, mat=None, hem: float | None = None, turn: float = 0.66, sheet: bool = True):
     """The coverlet: over the mattress from the foot board to the turn-down, rounding the mattress edge and the side
-    rail, hanging in folds to a hem 30 cm off the floor; the sheet turned down over its head end."""
+    rail, hanging in folds to a hem 30 cm off the floor; the sheet turned down over its head end. The keywords are
+    a day bed's (G7): its cover's material (the damask M_coverlet by default), the hem's height (`lift` + 8 cm by
+    default), the turn-down's place along the bed (0.66) and whether the sheet is turned down over it."""
     b = Builder()
-    y_turn = y_foot + (y_head - y_foot) * 0.66
-    hem = lift + 0.08
+    cmat = mt["coverlet"] if mat is None else mat
+    y_turn = y_foot + (y_head - y_foot) * turn
+    hem = lift + 0.08 if hem is None else hem
     xh = x_rail + 0.028
     # the top runs from the foot to the turn-down; the sides hang on to the head board, so the candle beside the
     # head lights no floor under the bed (the under-bed hide reads dark from every side)
@@ -2980,9 +3255,11 @@ def coverlet(name: str, top, flat: float, x_mat: float, x_rail: float, y_foot: f
                 if half > 0:
                     q = q[::-1]
                 arcs = [(abs(p[0]) + max(0.0, flat - p[2])) for p in q]
-                b.face(q, [(p[1] / 0.253, a / 0.384) for p, a in zip(q, arcs)], mt["coverlet"])
+                b.face(q, [(p[1] / 0.253, a / 0.384) for p, a in zip(q, arcs)], cmat)
     cov = b.build(name, smooth=True)
     _orient_from_axis(cov, flat - 0.25)
+    if not sheet:
+        return cov
     # the turned-down sheet: a band lying over the coverlet's head end, its fold rolled toward the pillows
     s = Builder()
     y0, y1 = y_turn - 0.20, y_turn + 0.015
@@ -3295,15 +3572,24 @@ PILLOW_STATS: list = []     # each pillow's own measure of how it sits (the mani
 
 
 def pillows(name: str, bedding, bed_tris: np.ndarray, flat: float, x_mat: float, y_head: float, z_cap: float,
-            mt: dict):
+            mt: dict, count: int = 2, depth: float = 0.47, x_max: float = 0.565, gap: float = 0.012):
     """Two soft pillows side by side at the head board, each resting in the bedding (soft_pillow): over the bed
-    model's own scanned pillows and sheet, 2.5 mm clear of them everywhere they can be, nothing poking through."""
+    model's own scanned pillows and sheet, 2.5 mm clear of them everywhere they can be, nothing poking through. The
+    keywords are a day bed's (G7): how many side by side (none: no object), their depth along the bed, the half
+    width they may take and half the gap between two."""
+    if count < 1:
+        return None
     b = Builder()
-    x_in, x_out = 0.012, min(0.565, x_mat * 0.95)
+    x_in, x_out = gap, min(x_max, x_mat * 0.95)
     y_b = y_head - 0.02
-    y_f = y_b - 0.47
+    y_f = y_b - depth
     PILLOW_STATS.clear()
-    for k, (xa, xb) in enumerate(((-x_out, -x_in), (x_in, x_out))):
+    if count == 2:
+        spans = ((-x_out, -x_in), (x_in, x_out))
+    else:
+        pw = (2 * x_out - (count - 1) * 2 * x_in) / count
+        spans = tuple((-x_out + i * (pw + 2 * x_in), -x_out + i * (pw + 2 * x_in) + pw) for i in range(count))
+    for k, (xa, xb) in enumerate(spans):
         r = soft_pillow(bedding, bed_tris, xa, xb, y_f, y_b, seed=k, z_cap=z_cap)
         for f, uv in zip(r["faces"], r["uvs"]):
             b.face([r["verts"][i] for i in f], uv, mt["linen"])
@@ -5848,7 +6134,8 @@ def blender_main(a) -> None:
                      **({"rise": p["piece"]["rise"]} if p["piece"].get("rise") else {}),
                      **({"decor": True} if p["piece"].get("decor") else {}),
                      **({"covers": list(p["piece"]["covers"])} if p["piece"].get("covers") else {}),
-                     **({"moved": p["piece"]["moved"]} if p["piece"].get("moved") else {}))
+                     **({"moved": p["piece"]["moved"]} if p["piece"].get("moved") else {}),
+                     **({"made": MADE[pid]} if pid in MADE else {}))
                 for pid, p in PIECES.items()],
         greyBoxes=[dict(id=pid, label=p["spec"].get("label"), size=[round(float(v), 3) for v in p["spec"]["size"]],
                         box=[round(v, 3) for v in p["box"]]) for pid, p in PIECES.items()
@@ -5858,7 +6145,7 @@ def blender_main(a) -> None:
         walk={k: v for k, v in walk.items() if not k.startswith("_")}, checks=checks, notes=NOTES,
         # the Poly Haven models and textures this room used (its credits: coupling 24 of the implementation plan)
         polyHaven=dict(models=sorted({p["spec"].get("slug") for p in PIECES.values() if p["spec"].get("slug")} |
-                                     {d["slug"] for p in PIECES.values() for d in p["spec"].get("dress", ())} |
+                                     {d["slug"] for p in PIECES.values() for d in p["spec"].get("dress", ()) if d.get("slug")} |
                                      ({ph[0] for ph in PHOTOS} if any(p["spec"].get("model") == "photos"
                                                                       for p in PIECES.values()) else set())),
                        textures=sorted({mib.mr.role(r).slug for r in texture_roles(
