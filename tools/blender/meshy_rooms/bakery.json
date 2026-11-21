@@ -1,0 +1,585 @@
+{
+  "room": "bakery",
+  "about": "Crumb's Ovens, the bakery's shop and bakehouse, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 16 x 9 m inside (x -8..8, y -4.5..4.5), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/bakery.json is named below, built, covered or skipped. Five doors: the street door in the south wall and the four station doors in the north wall (the oven, mixing, proofing and cold rooms). No window: the scene has no window prop and no moon light. Lit by the oven's fire in the north-west corner (G16's oven, Crumb's oven room's style), the lamp on the table by the oven, the lamp on the shop counter and the lamp on the shaping table. The removed quick mode's pieces (the wake table and its plates, the dead loaves, the ledger) and the cot are skipped (the plan's Reference E, decision D8). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Crumb's Ovens",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "Inside the street door",
+    "oven_room": "By the door to the oven room",
+    "mixing_room": "By the door to the mixing room",
+    "proofing_room": "By the door to the proofing room",
+    "cold_room": "By the door to the cold room"
+  },
+  "height": 3.0,
+  "height_note": "the bakery family's 3.0 m (the oven, mixing and proofing rooms')",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.84, 0.95, 0.76]
+  },
+  "floor_note": "the scene's `w` boards (its material layer), the apothecary shop's; the `f` flagged hearth before the oven and the `P` paving by the walls are not built (G11's floor by tile letter)",
+  "wall_colour": "#7A7262",
+  "wall_colour_note": "the family's floury limewash, the oven room's (#807866 read cream under the oven and the lamps in the first 128-sample bake, 2026-11-21) (the brick scan is not cached, D8: brick only if cheap); never pink or lilac",
+  "ceiling_colour": "#9A917C",
+  "ceiling_colour_note": "limewash, smoked a little by the oven",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the doors, the skirting, the counter",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting, the family's",
+  "picture_rail": null,
+  "picture_rail_note": "a shop's walls carry shelves and racks, no rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "bk.door",
+      "kind": "door",
+      "portal": "bk.door",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the street door (bk.door: to overworld, spawn bakery) in the south wall, tile (8,10): centred at x -0.5, the portal at its foot (-0.5, -4.5); the door spawn stands 0.5 m inside it, (-0.5, -4.0), by design"
+    },
+    {
+      "id": "bk.oven_room",
+      "kind": "door",
+      "portal": "bk.oven_room",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door to the oven room (bk.oven_room: to crumb_oven, spawn door) in the north wall, tile (5,0): centred at x -3.5, the portal at (-3.5, 4.5); its spawn stands 0.5 m inside it, (-3.5, 4.0)"
+    },
+    {
+      "id": "bk.mixing_room",
+      "kind": "door",
+      "portal": "bk.mixing_room",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door to the mixing room (to crumb_mixing) in the north wall, tile (8,0): x -0.5"
+    },
+    {
+      "id": "bk.proofing_room",
+      "kind": "door",
+      "portal": "bk.proofing_room",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door to the proofing room (to crumb_proofing) in the north wall, tile (11,0): x 2.5"
+    },
+    {
+      "id": "bk.cold_room",
+      "kind": "door",
+      "portal": "bk.cold_room",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door to the cold room (to crumb_cold) in the north wall, tile (14,0): x 5.5. A plain panel door like the others: the cold room's steel door is its own side (G13)"
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light, and the plan's default skips the shop window (Reference E)",
+  "lights": [
+    {
+      "id": "bk.lt_oven",
+      "role": "fire",
+      "anchor": {
+        "piece": "bk.oven",
+        "name": "fire"
+      },
+      "note": "the oven's fire, always lit: the oven's own anchor just inside its mouth over the coals raked to the front of the chamber (the oven room's lesson: a light deep in the chamber lights only the soot)"
+    },
+    {
+      "id": "bk.lt_lamp_table",
+      "role": "lamp",
+      "anchor": {
+        "piece": "bk.lamp_table"
+      },
+      "note": "the lamp on the table by the oven, tile (5,5): the round-3 candle stand's flame stands in for the oil lamp (vintage_oil_lamp is a .blend, G8)"
+    },
+    {
+      "id": "bk.lt_lamp_counter",
+      "role": "lamp",
+      "anchor": {
+        "piece": "bk.shop_counter",
+        "name": "flame"
+      },
+      "glow": { "shape": "cone", "size": [0.012, 0.035], "material": "flame", "at": [[0.0, 0.0, -0.043]] },
+      "glow_note": "the default flame cone, set down 4.3 cm onto the candle's tip: the light stands 4 cm over the tip (the counter's flame anchor), and the cone at the light hung in the air (r7_extra nothing_floats, the final bake's check)",
+      "note": "Tamsin's lamp on the shop counter, tile (13,7): a candlestick on the counter (bk.counter_candle under the flame) stands in for the oil lamp"
+    },
+    {
+      "id": "bk.lt_shaping",
+      "role": "lamp",
+      "anchor": {
+        "piece": "bk.shaping_table"
+      },
+      "note": "the lamp on the shaping table, tile (15,3): the candlestick that is the table's first dress piece"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the three lamps), fire (the oven) and fill = 3, and the AO. No moon group: no window.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the fire role, the coals, its own light setting and the darker-room exposure lever.",
+    "lights": {
+      "fire": {
+        "color": "#FFB457",
+        "power": 80.0,
+        "radius": 0.12
+      }
+    },
+    "lights_note": "the oven room's fire role (the tavern bar's): a first guess, for the first 128-sample bake to set through the fire group's weight",
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the coals as the oven room's",
+    "settings": {
+      "shop": {
+        "label": "the shop",
+        "mix": {
+          "candle": 1.2,
+          "fire": 5.0,
+          "fill": 0.02
+        },
+        "note": "the first guess (fire 3.0, fill 0.03) lit the room flat in the first 128-sample bake: the oven as the room's main light (5, the oven room's 4 a step up for a room twice its size), the lamps as the tavern bar's (1.2), the fill as the tavern bar's (0.02)"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a shop at night, lit by its oven and its lamps",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "exposure": 0.8,
+  "exposure_note": "fixed. The first 128-sample bake (2026-11-21) chose E 2.67 from the four pools and the shop read flat and lit as by day; from that saved bake 1.5 and 1.0 (variants va, vb, the fire at 4) still lit the far walls cream: 0.8 with the fire at 5 and the fill at 0.02, as the tavern bar, for the second bake",
+  "light": "shop",
+  "light_note": "the room's own light setting (look.settings.shop; --light overrides)",
+  "skip": {
+    "bk.wake_table": "the removed quick mode's Wake Table (GDD 3.11, A115; the scene notes keep it frozen): the plan's default skips the quick-mode leftovers (Reference E, D8)",
+    "bk.plate_0": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_1": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_2": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_3": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_4": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_5": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_6": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_7": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_8": "a plate of the quick mode's wake table (D8)",
+    "bk.plate_9": "a plate of the quick mode's wake table (D8)",
+    "bk.deadloaf_0": "one of the dead's three loaves on the oven's ledge, a quick-mode piece (D8)",
+    "bk.deadloaf_1": "one of the dead's three loaves on the oven's ledge, a quick-mode piece (D8)",
+    "bk.deadloaf_2": "one of the dead's three loaves on the oven's ledge, a quick-mode piece (D8)",
+    "bk.ledger": "the quick mode's ledger on the counter's stone end (D8); the counter end is built (bk.counter_end)",
+    "bk.bed": "the cot: the plan's default skips it (Reference E, D8); an iron cot would wait for G20"
+  },
+  "pieces": [
+    {
+      "id": "bk.oven",
+      "face": "S",
+      "place": ["wall", "N", -6.55],
+      "spec": {
+        "model": "hearth",
+        "style": "oven",
+        "size": [2.8, 2.0, 1.4],
+        "surface": "stone",
+        "surface_note": "the oven's own default is brick, which waits for G11's fetch: the oven room's stone",
+        "opening": [0.6, 0.42],
+        "sill": 0.8,
+        "ledge": { "depth": 0.2, "thickness": 0.08, "width": 1.1 },
+        "dome": { "height": 0.5 },
+        "breast": { "width": 0.7, "depth": 0.5, "to": "ceiling" },
+        "breast_note": "the flue, behind the dome against the north wall, up to the ceiling",
+        "firebox": { "glow": { "shape": "box", "material": "coal" } }
+      },
+      "note": "G16 reused (the oven room's style): the shop's bread oven in the north-west corner on its tiles (1,1) to (3,2) (x -8..-5, y 2.5..4.5), its mouth facing south into the shop. A masonry body 1.4 m high with the mouth (0.6 x 0.42 m) on a 0.8 m sill over a stone ledge, the sooted chamber with the coals at its front, a low dome and the flue to the ceiling. 2.8 m wide, 5 cm clear of the west wall. The plan's brick oven is a Tier 1 hero (no model)"
+    },
+    {
+      "id": "bk.log_basket",
+      "face": "E",
+      "place": ["wall", "W", 2.0],
+      "spec": { "model": "ph", "slug": "wicker_basket_02", "scale": 1.4, "lod": 0.25 },
+      "note": "the log basket at its tile (1,3), against the west wall beside the oven (the oven room's wicker basket at 1.4; the logs have no model)"
+    },
+    {
+      "id": "bk.peel_rack_0",
+      "face": "S",
+      "place": ["wall", "N", -4.5],
+      "rise": 0.4,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.12, 1.6],
+        "label": "Peel rack: a wall rail hung with the long wooden bread peels"
+      },
+      "note": "at its tile (4,0), on the north wall between the oven and the oven-room door: a flat rack from 0.4 to 2.0 m. No model (a grey box, the plan's peel rack)"
+    },
+    {
+      "id": "bk.chalkboard",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "rise": 1.3,
+      "spec": {
+        "model": "box",
+        "size": [0.7, 0.03, 0.6],
+        "label": "Price slate: the day's loaves and their prices (the writing waits for G18)"
+      },
+      "note": "at its tile (6,0), on the north wall between the oven-room and mixing-room doors: a flat panel"
+    },
+    {
+      "id": "bk.bread_shelf_0",
+      "face": "S",
+      "place": ["wall", "N", -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.12, null, -0.489], "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.1, null, -0.728], "rot": 180.0, "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.05, null, -0.967], "rot": 8.0, "lod": 0.3 }
+        ]
+      },
+      "note": "the day's bake on the back wall at its tile (7,0): a plain open shelf at 0.85 (0.85 m wide, 1.77 m high) with rolls on three of its boards (Poly Haven's hamburger buns stand in for the loaves; the boards' tops at 1.279, 1.040 and 0.801 m, measured from the model)"
+    },
+    {
+      "id": "bk.bread_shelf_b_0",
+      "face": "S",
+      "place": ["wall", "N", 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.08, null, -0.489], "rot": 180.0, "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.1, null, -0.728], "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.12, null, -0.967], "rot": 172.0, "lod": 0.3 }
+        ]
+      },
+      "note": "a loaf shelf at its tile (9,0), between the mixing-room and proofing-room doors"
+    },
+    {
+      "id": "bk.bread_shelf_1",
+      "face": "S",
+      "place": ["wall", "N", 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.08, null, -0.489], "rot": 6.0, "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.1, null, -0.967], "rot": 180.0, "lod": 0.3 }
+        ]
+      },
+      "note": "a loaf shelf at its tile (10,0), beside the last one; one board stands empty (the morning's sold)"
+    },
+    {
+      "id": "bk.clock",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.32, 2.0],
+        "label": "Longcase clock (a grey box until the .blend model can be built, G8)"
+      },
+      "note": "at its tile (12,0), on the north wall between the proofing-room and cold-room doors: the parlour's longcase clock box"
+    },
+    {
+      "id": "bk.bread_shelf_b_1",
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.85,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.1, null, -0.728], "rot": 180.0, "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.1, null, -0.967], "lod": 0.3 }
+        ]
+      },
+      "note": "a loaf shelf at its tile (13,0), west of the cold-room door"
+    },
+    {
+      "id": "bk.behind_counter",
+      "spot": true,
+      "face": "S",
+      "place": ["at", 6.5, 3.25],
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.9, 0.4, 0.95],
+        "label": "Back counter: a plank counter in the corner by the cold-room door, the hide behind it"
+      },
+      "note": "the hide spot behindCounter at its tile (15,1): a low plank counter standing free across the tile's south edge, its front to the shop, so the hide is the floor between it and the north wall (1.05 m deep, by the flour sacks). G15's counter as a box in the joinery's wood"
+    },
+    {
+      "id": "bk.flour_sacks_0",
+      "face": "W",
+      "place": ["wall", "E", 4.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (16,1), in the north-east corner beside the hide. No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "bk.hq_ovens",
+      "face": "S",
+      "place": ["at", 4.5, 2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.7, 1.3],
+        "label": "HQ station: Crumb's ovens, the Baker's station"
+      },
+      "note": "the headquarters station (economy.json hq.stations.crumbOvens) at its own tile (13,3), the west end of the stub of racks and the shaping table that closes the baker's corner. An HQ-tier prop as a grey box (the apothecary's surgery's rule)"
+    },
+    {
+      "id": "bk.cooling_rack_2",
+      "face": "S",
+      "place": ["at", 5.5, 2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.18, null, -0.978], "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.18, null, -1.468], "rot": 180.0, "lod": 0.3 }
+        ]
+      },
+      "note": "a cooling rack at its tile (14,3), in the stub: Poly Haven's worn metal rack (0.92 x 0.6 x 1.9 m), the oven room's, with rolls on two of its shelves (their tops at 0.92 and 0.43 m, measured by the no-bake build's check: the 1.16 and 0.66 m levels read from the model are its rails, and rolls set there floated 0.23 m)"
+    },
+    {
+      "id": "bk.shaping_table",
+      "face": "S",
+      "place": ["at", 6.5, 2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 0.85,
+        "extras": ["flame"],
+        "lod": 0.7,
+        "dress": [
+          { "slug": "wooden_candlestick", "scale": 1.0, "at": [-0.32, null, 0.0], "lod": 0.02 },
+          { "slug": "wooden_cutting_board", "scale": 1.0, "at": [0.1, null, 0.0], "rot": 8.0, "lod": 0.4 }
+        ]
+      },
+      "note": "the shaping table at its tile (15,3), in the stub under the shaping lamp: the mixing room's plain deal table at 0.85 (0.96 x 0.6 m), a candlestick (the lamp's flame) and a board on it"
+    },
+    {
+      "id": "bk.barrel_0",
+      "face": "W",
+      "place": ["wall", "E", 2.0],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (16,3), the east end of the stub, against the east wall"
+    },
+    {
+      "id": "bk.cooling_rack_0",
+      "face": "S",
+      "place": ["at", 4.5, 1.0],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.15, null, -0.978], "rot": 180.0, "lod": 0.3 },
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [-0.2, null, -1.468], "lod": 0.3 }
+        ]
+      },
+      "note": "a cooling rack at its tile (13,4), south of the HQ ovens"
+    },
+    {
+      "id": "bk.cooling_rack_1",
+      "face": "S",
+      "place": ["at", 2.5, 1.0],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [{ "slug": "hamburger_buns", "scale": 1.0, "at": [0.0, null, -0.978], "lod": 0.3 }]
+      },
+      "note": "a cooling rack at its tile (11,4), by the space where the scene's wake table stood"
+    },
+    {
+      "id": "bk.bread_basket_0",
+      "face": "S",
+      "place": ["at", 2.5, 0.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wicker_basket_01",
+        "scale": 1.5,
+        "lod": 0.25,
+        "dress": [{ "slug": "hamburger_buns", "scale": 1.0, "at": [0.0, null, -0.155], "lod": 0.3 }]
+      },
+      "note": "a bread basket at its tile (11,5), below the cooling rack: Poly Haven's wicker basket 01 at 1.5 (0.57 x 0.44 x 0.18 m) with rolls in it (coverage.py's row: wicker_basket_01 and hamburger_buns)"
+    },
+    {
+      "id": "bk.flour_sacks_1",
+      "face": "S",
+      "place": ["at", -3.5, 1.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped together"
+      },
+      "note": "at its tile (5,4), free-standing south of the oven-room door, beside the lamp table. No model (a grey box)."
+    },
+    {
+      "id": "bk.lamp_table",
+      "key": "candle",
+      "face": "S",
+      "place": ["at", -3.5, 0.0],
+      "spec": { "scale": 1.0, "lod": 0.5 },
+      "note": "the lamp table at its tile (5,5): the bedroom's candle stand (side_table_tall_01 and a wooden candlestick with its flame), the flame of bk.lt_lamp_table"
+    },
+    {
+      "id": "bk.settle",
+      "face": "E",
+      "place": ["wall", "W", 0.0],
+      "spec": { "model": "ph", "slug": "painted_wooden_bench", "scale": 1.0, "lod": 0.5 },
+      "note": "the settle for the queue at its tile (1,5), against the west wall: the parlour's and the tavern's painted bench"
+    },
+    {
+      "id": "bk.flour_sacks",
+      "face": "E",
+      "place": ["wall", "W", -3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.5, 0.7],
+        "label": "Flour sacks (FARINE): the sacks you fetch the flour from (a task source: keep it legible)"
+      },
+      "note": "the task node Fetch the flour (tasks.json: bk.flour_sacks) at its tile (0,8), in the west wall's row: against the west wall at y -3.0, its tile's centre 0.5 m behind the wall face; 0.5 m deep, so the floor tile (1,8) before it can be stood on (0.6 m deep, the no-bake build's walk could not reach it). No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "bk.bread_basket_1",
+      "face": "E",
+      "place": ["at", -7.6, -4.1],
+      "spec": {
+        "model": "ph",
+        "slug": "wicker_basket_01",
+        "scale": 1.5,
+        "lod": 0.25,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.0, null, -0.155], "rot": 30.0, "lod": 0.3 }
+        ]
+      },
+      "note": "a bread basket at its tile (1,9), in the south-west corner"
+    },
+    {
+      "id": "bk.barrel",
+      "face": "N",
+      "place": ["wall", "S", -6.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "the store corner's barrel at its tile (2,9), against the south wall"
+    },
+    {
+      "id": "bk.rug",
+      "key": "rug",
+      "face": "N",
+      "place": ["at", -0.5, -3.0],
+      "spec": { "size": [1.6, 1.0] },
+      "note": "the rug inside the street door at its tile (8,8)"
+    },
+    {
+      "id": "bk.bread_case_0",
+      "face": "S",
+      "place": ["at", 3.5, -2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.97, 0.6, 1.0],
+        "label": "Glazed bread case: the day's loaves behind glass (its glazing waits for G15)"
+      },
+      "note": "the counter line across the south of the shop, tiles (12,7) to (16,7), free-standing at y -2.0 with its front to the street door: the first glazed case, at its tile (12,7). Five boxes 0.97 m wide, 3 cm apart"
+    },
+    {
+      "id": "bk.shop_counter",
+      "face": "S",
+      "place": ["at", 4.5, -2.0],
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.97, 0.6, 0.95],
+        "label": "Tamsin's shop counter",
+        "anchors": { "flame": [0.25, 0.0, 1.215] }
+      },
+      "note": "the shop counter at its tile (13,7), between the first two cases, in the joinery's wood (G15's counter as a box). The counter lamp's flame stands 4 cm over the candle's tip: at the tip (1.172 m, the first 128-sample bake, 2026-11-21) the candle shaded it and its pool came out a tenth of the other lamps' (p90 0.003 against 0.027)"
+    },
+    {
+      "id": "bk.counter_candle",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 4.75, -2.0],
+      "rise": 0.952,
+      "spec": { "model": "ph", "slug": "wooden_candlestick", "scale": 1.0, "lod": 0.02 },
+      "note": "the candlestick on the counter, under bk.lt_lamp_counter's flame (the apothecary's), 2 mm over the counter's top: set on it, its base met the top (r7_extra counts touching as cutting in)"
+    },
+    {
+      "id": "bk.bread_case_1",
+      "face": "S",
+      "place": ["at", 5.5, -2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.97, 0.6, 1.0],
+        "label": "Glazed bread case: the day's loaves behind glass (its glazing waits for G15)"
+      },
+      "note": "the second case at its tile (14,7)"
+    },
+    {
+      "id": "bk.counter_end",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 6.5, -2.0],
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.97, 0.6, 0.95],
+        "label": "Counter end: the counter's plank top over its stone end"
+      },
+      "note": "the counter line's tile (15,7), where the scene's ledger lies (skipped, D8): the counter goes on so the line stays closed, as the scene's tiles have it"
+    },
+    {
+      "id": "bk.bread_case_2",
+      "face": "S",
+      "place": ["at", 7.5, -2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.97, 0.6, 1.0],
+        "label": "Glazed bread case: the day's loaves behind glass (its glazing waits for G15)"
+      },
+      "note": "the third case at its tile (16,7), against the east wall's end of the line"
+    },
+    {
+      "id": "bk.basin",
+      "key": "washstand",
+      "face": "W",
+      "place": ["wall", "E", 0.0],
+      "spec": { "lod": 0.6 },
+      "note": "the Blood-wash basin at its tile (17,5), in the east wall's row: the bedroom's washstand (a chest of drawers with a marble top, a brass basin and a jug) against the east wall on the baker's side of the counter, as the apothecary's basin"
+    },
+    {
+      "id": "bk.bread_basket_2",
+      "face": "W",
+      "place": ["at", 7.6, -4.1],
+      "spec": {
+        "model": "ph",
+        "slug": "wicker_basket_01",
+        "scale": 1.5,
+        "lod": 0.25,
+        "dress": [
+          { "slug": "hamburger_buns", "scale": 1.0, "at": [0.0, null, -0.155], "rot": 150.0, "lod": 0.3 }
+        ]
+      },
+      "note": "a bread basket at its tile (16,9), in the south-east corner"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the street door spawn's own view; the others look at one corner or piece each.",
+  "views": {
+    "spawn_door": [[-0.5, -4.0, 1.6], [-0.5, 4.5, 1.3], 70.0],
+    "oven": [[-3.6, -1.2, 1.6], [-6.5, 2.5, 1.0], 70.0],
+    "north_wall": [[0.5, -1.0, 1.6], [0.5, 4.5, 1.4], 70.0],
+    "counter": [[1.8, -3.7, 1.6], [5.5, -2.0, 1.0], 70.0],
+    "behind_counter": [[3.5, 0.0, 1.6], [6.8, 3.9, 0.8], 70.0],
+    "east": [[2.6, -0.9, 1.6], [8.0, 0.3, 1.0], 70.0],
+    "west": [[-1.5, -1.5, 1.6], [-8.0, -1.0, 1.0], 70.0],
+    "south": [[1.0, 3.0, 1.6], [-0.5, -4.5, 1.1], 70.0]
+  }
+}
