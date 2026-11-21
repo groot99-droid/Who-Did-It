@@ -115,7 +115,7 @@ MARKERS = ("stairs", "hatch", "drop")
 SIDES = ("N", "E", "S", "W")
 KNOB_ENDS = {"N": "EW", "S": "EW", "E": "NS", "W": "NS"}       # R-O2b: the ends of an opening seen from inside
 KNOB_DEFAULT = {"S": "E", "E": "N", "N": "W", "W": "S"}        # the end at the higher wall coordinate s
-DOOR_STYLES, WINDOW_STYLES = ("panel",), ("sash",)             # R-O8: what the builder has
+DOOR_STYLES, WINDOW_STYLES = ("panel", "steel"), ("sash",)    # R-O8: what the builder has (steel: G13, crumb_cold)
 # a visible flight down from a stairs marker (G12, first part: apoth_loft): a well cut in the floor, steps descending
 # from its head edge toward `dir` and on under the floor for `under` metres, a lined shaft, a balustrade on the open
 # edges (R-F1 to R-F8)

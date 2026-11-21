@@ -1727,7 +1727,10 @@ def build_doors(fr: Frame, mt: dict) -> list:
 
 def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dict:
     """A door: lining, stops, threshold, architrave and a closed four-panel leaf with a brass knob, a key escutcheon
-    and hinges; returns where the portal goes (the doorway's foot on the wall face)."""
+    and hinges; returns where the portal goes (the doorway's foot on the wall face). A door of style `steel` is
+    steel_door's."""
+    if (o.get("spec") or {}).get("style", "panel") == "steel":
+        return steel_door(fr, mt, o, knob_right, suffix)
     side, T = o["side"], fr.T
     sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
     z1 = o["z1"]
@@ -1808,6 +1811,100 @@ def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dic
             cbox(ks - 0.029, ks + 0.029, -0.05, f_room + 0.07 + 0.024 + 0.002, kz - 0.029, kz + 0.029)]
     return dict(id=o["id"], side=side, sa=sa, sb=sb, foot=fr.point(side, (sa + sb) / 2, 0.0, 0.0), portal=o["portal"],
                 knob=fr.point(side, ks, f_room + 0.09, kz), collision=coll)
+
+
+STEEL = "#74767A"   # a steel door's sheet (G13, crumb_cold): galvanised grey, green above red, so never lilac
+
+
+def steel_door(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dict:
+    """A cold-room door (G13, crumb_cold): a pressed-steel lining, stops and sill plate, a flat steel face frame in
+    place of the architrave, and a thick insulated leaf clad in sheet steel: a riveted border band 4 mm proud, a tall
+    kick plate and a middle rib, two iron strap hinges with their knuckles at the hinge edge, and a lever latch on a
+    back plate with its keeper on the frame. Node names as door_one's (Door_<id>, DoorKnob_<id>); M_steel is made on
+    first use, so a room without a steel door builds exactly as before."""
+    side, T = o["side"], fr.T
+    sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
+    z1 = o["z1"]
+    iron = mt["iron"]
+    steel = MATS[nm("M_steel")] if nm("M_steel") in MATS else \
+        RMat("M_steel", None, hex_lin(STEEL), rough=0.45, albedo=hex_lin(STEEL))
+    b = Builder()
+    lt, fw, fp = 0.03, 0.07, 0.012     # the lining; the face frame's width and projection
+    wall_box(b, fr, side, sa, sa + lt, -T, 0.0, 0.0, z1, steel)
+    wall_box(b, fr, side, sb - lt, sb, -T, 0.0, 0.0, z1, steel)
+    wall_box(b, fr, side, sa, sb, -T, 0.0, z1 - lt, z1, steel)
+    so0, so1 = -0.12, -0.10       # the stops, behind the leaf
+    wall_box(b, fr, side, sa + lt, sa + lt + 0.02, so0, so1, 0.0, z1 - lt, steel)
+    wall_box(b, fr, side, sb - lt - 0.02, sb - lt, so0, so1, 0.0, z1 - lt, steel)
+    wall_box(b, fr, side, sa + lt, sb - lt, so0, so1, z1 - lt - 0.02, z1 - lt, steel)
+    wall_box(b, fr, side, sa + lt, sb - lt, -T, 0.0, -0.03, 0.008, steel)      # the sill plate under the leaf
+    wall_box(b, fr, side, sa - fw, sa + 0.004, 0.0, fp, 0.0, z1 + fw, steel)    # the face frame: two legs, a head
+    wall_box(b, fr, side, sb - 0.004, sb + fw, 0.0, fp, 0.0, z1 + fw, steel)
+    wall_box(b, fr, side, sa + 0.004, sb - 0.004, 0.0, fp, z1 - 0.004, z1 + fw, steel)
+    # the leaf: 9 cm thick, its room face 1 cm back from the wall face, 2 mm clear of the lining
+    la, lb = sa + lt + 0.002, sb - lt - 0.002
+    lz0, lz1 = 0.010, z1 - lt - 0.002
+    f_room, f_back, band = -0.01, -0.10, 0.004
+    wall_box(b, fr, side, la, lb, f_back, f_room, lz0, lz1, steel)
+    bw, kick = 0.06, 0.25
+    mid = lz0 + 1.30
+    for s0, s1, za, zb in ((la, lb, lz1 - bw, lz1), (la, lb, lz0, lz0 + kick), (la, la + bw, lz0 + kick, lz1 - bw),
+                           (lb - bw, lb, lz0 + kick, lz1 - bw), (la + bw, lb - bw, mid - 0.03, mid + 0.03)):
+        wall_box(b, fr, side, s0, s1, f_room, f_room + band, za, zb, steel)
+    mb = wb.MB()
+    # rivets along the border band, every 20 cm or so
+    rv = []
+    n_s = max(2, int(round((lb - la - bw) / 0.2)))
+    n_z = max(2, int(round((lz1 - bw / 2 - lz0 - kick) / 0.2)))
+    for i in range(n_s + 1):
+        s_ = la + bw / 2 + (lb - la - bw) * i / n_s
+        rv += [(s_, lz1 - bw / 2), (s_, lz0 + kick - bw / 2)]
+    for j in range(1, n_z):
+        z_ = lz0 + kick - bw / 2 + (lz1 - bw / 2 - (lz0 + kick - bw / 2)) * j / n_z
+        rv += [(la + bw / 2, z_), (lb - bw / 2, z_)]
+    for s_, z_ in rv:
+        M = Matrix.Translation(Vector(fr.point(side, s_, f_room + band, z_))) @ face_rot(side)
+        mb.box(0.014, 0.014, 0.005, M=M, mat=steel.mat, base=True)
+    # two iron strap hinges from the hinge edge across the leaf, their knuckles at the edge
+    hs, dir_ = (la, 1.0) if knob_right else (lb, -1.0)
+    for hz in (lz0 + 0.40, lz1 - 0.40):
+        s_c = hs + dir_ * 0.24
+        M = Matrix.Translation(Vector(fr.point(side, s_c, f_room, hz))) @ face_rot(side)   # on the leaf, over the band
+        mb.box(0.46, 0.065, 0.012, M=M, mat=iron.mat, base=True) if side in ("N", "S") else \
+            mb.box(0.065, 0.46, 0.012, M=M, mat=iron.mat, base=True)
+        kn = Matrix.Translation(Vector(fr.point(side, hs - dir_ * 0.004, f_room + 0.006, hz - 0.08)))
+        mb.cyl(0.018, 0.018, 0.16, n=12, M=kn, mat=iron.mat)
+    # the lever latch: a back plate, a boss and a lever toward the hinge side; the keeper on the frame
+    ks = (lb - 0.09) if knob_right else (la + 0.09)
+    kz = lz0 + 1.0
+    M = Matrix.Translation(Vector(fr.point(side, ks, f_room + band, kz))) @ face_rot(side)
+    pz0, pz1 = kz - 0.13, kz + 0.13
+    wall_box(b, fr, side, ks - 0.035, ks + 0.035, f_room + band, f_room + band + 0.012, pz0, pz1, iron)
+    mb.cyl(0.022, 0.022, 0.05, n=14, M=M @ Matrix.Translation((0.0, 0.0, 0.012)), mat=iron.mat)
+    o_l = f_room + band + 0.012 + 0.05
+    pa_, pb_ = Vector(fr.point(side, ks, o_l, kz)), Vector(fr.point(side, ks - dir_ * 0.22, o_l, kz))
+    mb.tube([pa_, pb_], 0.014, n=10, mat=iron.mat)
+    ke = sb + 0.035 if knob_right else sa - 0.035
+    wall_box(b, fr, side, ke - 0.025, ke + 0.025, fp, fp + 0.035, kz - 0.07, kz + 0.07, iron)
+    door = b.build(nm("Door" + suffix))
+    register(door, "door", o["id"])
+    hw = mb.build(nm("DoorKnob" + suffix), col="room")
+    if hw is not None:
+        uv_box(hw, 0.2)
+        register(hw, "door", o["id"] + ":furniture")
+
+    def cbox(s0, s1, o0, o1, z0, z1_):
+        pts = [np.array(fr.point(side, s_, o_, z_)) for s_ in (s0, s1) for o_ in (o0, o1) for z_ in (z0, z1_)]
+        return tuple(round(float(v), 4) for v in (*np.min(pts, 0), *np.max(pts, 0)))
+
+    # what stands proud of the wall's face, for the collision (as door_one's): the face frame's legs with the keeper,
+    # and the latch with its lever (the capsule's side meets it, nothing can be stepped on)
+    lo_s, hi_s = sorted((ks, ks - dir_ * 0.22))
+    coll = [cbox(sa - fw, sa + 0.008, -0.05, fp + 0.04, 0.0, z1 + fw),
+            cbox(sb - 0.008, sb + fw, -0.05, fp + 0.04, 0.0, z1 + fw),
+            cbox(lo_s - 0.036, hi_s + 0.036, -0.05, o_l + 0.016, pz0, pz1)]
+    return dict(id=o["id"], side=side, sa=sa, sb=sb, foot=fr.point(side, (sa + sb) / 2, 0.0, 0.0), portal=o["portal"],
+                knob=fr.point(side, ks, o_l, kz), collision=coll)
 
 
 # ---------------------------------------------------------------- the window

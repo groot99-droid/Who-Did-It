@@ -1259,6 +1259,37 @@ class RoomFileV2(unittest.TestCase):
         next(p for p in data["pieces"] if p["id"] == "wp.fireplace_e")["spec"]["sill"] = 0.8
         self.assertIn("sill is an oven's (R-H8)", self.stops(data))
 
+    # -- G13, first part: the steel door (Crumb's cold room), and the cold role of a `moon` lamp
+    def cold_room(self):
+        return raw(os.path.join(ROOMS_DIR, "crumb_cold.json"))
+
+    def test_the_crumb_cold_reads_with_its_steel_door_and_cold_bulb(self):
+        cfg, spec = self.read(self.cold_room())
+        (door,) = spec["openings"]
+        self.assertEqual((door["id"], door["side"], door["at"], door["knob"], door["style"], door["foot"]),
+                         ("cf.door", "E", -2.0, "N", "steel", [5.0, -2.0]))
+        (lt,) = spec["lights"]
+        self.assertEqual((lt["id"], lt["role"], lt["group"], lt["anchor"]["piece"]),
+                         ("cf.lt_lamp", "cold", "candle", "cf.wall_bulb"))
+        self.assertEqual(spec["groups"], ["candle", "fill"])
+        (v,) = rf.light_values(spec["lights"], cfg["look"])
+        self.assertEqual((v["color"], v["power"], v["glow"]), ("#7FA8FF", 38.0, None))
+
+    def test_door_styles(self):
+        self.assertEqual(rf.DOOR_STYLES, ("panel", "steel"))
+        data = self.cold_room()
+        data["openings"][0]["style"] = "double"
+        self.assertIn('style "double" is not built yet (G13); the builder has: panel, steel (R-O8)', self.stops(data))
+        # the parlour's doors are panel doors still: no style given reads as panel
+        cfg, spec = self.read(raw(PARLOUR))
+        self.assertEqual({o["style"] for o in spec["openings"] if o["kind"] == "door"}, {"panel"})
+
+    @unittest.skipIf(mrb is None, "numpy is not here")
+    def test_the_steel_is_never_lilac(self):
+        r, g, b = (int(mrb.STEEL[i:i + 2], 16) for i in (1, 3, 5))
+        self.assertGreaterEqual(g, r)       # green at least red: a blue light turns it blue-grey, not lilac
+        self.assertLess(max(r, g, b) - min(r, g, b), 12)      # a near-neutral grey
+
 
 class GateDigest(unittest.TestCase):
     """The manifest digest and the bake gate's arithmetic in regress.py, on stand-in manifests."""
