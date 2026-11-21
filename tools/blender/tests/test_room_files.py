@@ -737,6 +737,22 @@ class RoomFileV2(unittest.TestCase):
         self.assertIn("path v2", done.stdout)
         self.assertIn("bake groups: candle, fire, moon, fill", done.stdout)
 
+    def test_the_cottage_is_windowless_and_its_nets_pass_the_word_scan(self):
+        # the fisher's cottage (room 2): no window and no moon, so three groups; the scene's fc.rope is built as fc.nets
+        done = subprocess.run([sys.executable, os.path.join(BLENDER, "meshy_room_file.py"), "cottage_fisher",
+                               "--explain"], capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("bake groups: candle, fire, fill\n", done.stdout)
+        self.assertIn("fc.rope: covers fc.nets", done.stdout)
+        self.assertIn("not built yet: nothing", done.stdout)
+        data = raw(os.path.join(ROOMS_DIR, "cottage_fisher.json"))
+        self.assertEqual([o["kind"] for o in data["openings"]], ["door"])
+        ids = [p["id"] for p in data["pieces"]] + [r["id"] for r in data["lights"]]
+        for word in ("rope", "torch", "sconce", "crepe", "gallows", "noose"):
+            self.assertFalse([i for i in ids if word in i.lower()], word)
+        labels = [p["spec"].get("label", "") for p in data["pieces"]]
+        self.assertFalse([t for t in labels if "rope" in t.lower() or "sconce" in t.lower()])
+
     # -- G4: the lights (room_file_v2, section 3)
     def test_every_night_light_is_built_with_its_values(self):
         cfg, spec = self.read(self.bedroom())

@@ -840,6 +840,11 @@ SCAN_GRADE = {
     "painted_wooden_bench": dict(toward=WALNUT, w=0.7, gain=0.8),     # its barn-red paint, a mourning brown
     # her chair's pale upholstery in the curtains' slate (it was the brightest thing in its dim corner, a pale mauve)
     "Armchair_01": dict(toward=SLATE, w=0.6, gain=0.55),
+    # the fisher's cottage: its pale pine table, stools and crates read salmon under the fire; a plain umber deal
+    "wooden_table_02": dict(toward=WALNUT, w=0.75, gain=0.7, hot=WOOD_HOT),
+    "wooden_stool_01": dict(toward=WALNUT, w=0.5, gain=0.9, hot=WOOD_HOT),
+    "wooden_crate_01": dict(toward=WALNUT, w=0.55, gain=0.85, hot=WOOD_HOT),
+    "wooden_crate_02": dict(toward=WALNUT, w=0.55, gain=0.85, hot=WOOD_HOT),
 }
 
 

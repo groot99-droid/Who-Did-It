@@ -1,0 +1,325 @@
+{
+  "room": "cottage_fisher",
+  "about": "The fisher's cottage, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 7 m inside (x -5..5, y -3.5..3.5), 2.7 m high. Every prop, spot, portal and night light of packages/content/data/scenes/cottage_fisher.json is named below. The scene is a greybox with no material layer, so the walls, the floor and the trims are this file's own design (decision 12 of the builder base: proposed here, for Story mode). No window: the scene has none and no moon light, so the room is lit by its hearth and the lamp on the table. Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "The fisher's cottage",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the door"
+  },
+  "height": 2.7,
+  "height_note": "the plan's 2.7 m for the cottage (m2_plan Reference E): a low fisher's room",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.8, 0.95, 0.76]
+  },
+  "floor_note": "boards, the bedroom's scan a little greyer and more worn (the scene has no material layer: new design)",
+  "wall_colour": "#8C8571",
+  "wall_colour_note": "guess: a smoked limewash, warm grey-drab; never pink or lilac under the fire",
+  "ceiling_colour": "#C9C1AE",
+  "ceiling_colour_note": "limewash darkened by the hearth's smoke",
+  "paint_colour": "#B9AE94",
+  "wood_colour": "#43301F",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a fisher's cottage has no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice: the limewash meets the ceiling",
+  "openings": [
+    {
+      "id": "fc.door",
+      "kind": "door",
+      "portal": "fc.door",
+      "width": 0.9,
+      "height": 2.0,
+      "note": "the door onto the quay lane in the south wall: the scene puts the portal on tile (5,8), so the doorway is centred at x -0.5 and the portal stands at its foot, (-0.5, -3.5); the door spawn stands 0.5 m inside it, (-0.5, -3.0), by design. 2.0 m high: a cottage door under a 2.7 m ceiling. The knob is the default end (east)."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light (the exterior fisher_cottage has a window beside its door; a decor window would be a later call for the owner)",
+  "exposure": null,
+  "lights": [
+    {
+      "id": "fc.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "fc.dining_table"
+      },
+      "note": "the lamp on the table: a candlestick with its flame stands in for the fisher's wooden lantern (wooden_lantern_01 is a .blend, G8)"
+    },
+    {
+      "id": "fc.lt_hearth",
+      "role": "fire",
+      "anchor": {
+        "piece": "fc.fireplace_e",
+        "name": "fire"
+      },
+      "note": "the hearth's fire: the firebox's own anchor"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the lamp), fire, fill = 3, and the AO. No moon group: no window.",
+  "look": {
+    "lights": {
+      "fire": {
+        "color": "#FFB457",
+        "power": 60.0,
+        "radius": 0.12
+      }
+    },
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the hearth's coals as the parlour's (G6)",
+    "note": "G9: the room's override of meshy_looks/interior_fp.json. The fire role is the parlour's (60 W, radius 0.12), kept in the room's block until it is promoted into the look file.",
+    "settings": {
+      "cottage": {
+        "label": "the cottage",
+        "mix": {
+          "candle": 1.2,
+          "fire": 2.5,
+          "fill": 0.06
+        },
+        "note": "from the first 128-sample bake (2026-11-21): at the parlour's mix the fill panel lit the room flat and E came out 11.7 (both pools are small: the fire sits in its firebox); fill 0.06, fire 2.5 (150 W in effect), lamp 1.2, with the darker exposure below, gave E 1.72 and a fire-lit room (variant va of three)"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a fisher's room at night, lit by its fire",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "cottage",
+  "light_note": "the room's own light setting (look.settings.cottage; --light overrides)",
+  "pieces": [
+    {
+      "id": "fc.wardrobe",
+      "spot": true,
+      "key": "wardrobe",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "lod": 0.6
+      },
+      "note": "the hide spot: the kit's wardrobe (GothicCabinet_01, doors shut), as the parlour's pantry, at its own tile (2,1), x -3.5 on the north wall. Grand for a fisherman: a plainer press is a call for the owner (a hide spot is not changed here)."
+    },
+    {
+      "id": "fc.spade",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", -2.42],
+      "spec": {
+        "model": "ph",
+        "slug": "rusted_spade_01",
+        "scale": 1.0,
+        "lod": 0.3
+      },
+      "note": "the tool rack's spade (the survey's rusted_spade_01), stood against the north wall between the wardrobe and the rack"
+    },
+    {
+      "id": "fc.tool_rack",
+      "face": "S",
+      "place": ["wall", "N", -1.5],
+      "spec": {
+        "model": "box",
+        "size": [1.2, 0.22, 1.9],
+        "label": "Tool rack: a peg rail with two oars, a boat-hook gaff and cork floats"
+      },
+      "note": "at its tile (4,0), x -1.5 on the north wall. The oars, gaff and floats have no model (a grey box until credits or a box build, G17)."
+    },
+    {
+      "id": "fc.nets",
+      "decor": true,
+      "covers": ["fc.rope"],
+      "face": "S",
+      "place": ["wall", "N", 1.5],
+      "rise": 0.3,
+      "spec": {
+        "model": "box",
+        "size": [1.4, 0.12, 1.6],
+        "label": "Fishing nets with cork floats and a coiled line, hung on wall pegs"
+      },
+      "note": "the scene's fc.rope (the nets on the wall, decision D7: the nets stay): its node and id are fc.nets so that the names pass the word scan; it covers fc.rope at its tile (7,0), x 1.5 on the north wall, hung 0.3 m off the floor"
+    },
+    {
+      "id": "fc.basket",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", 2.75],
+      "spec": {
+        "model": "ph",
+        "slug": "wicker_basket_02",
+        "scale": 1.3,
+        "lod": 0.25
+      },
+      "note": "a fish basket on the floor beside the nets"
+    },
+    {
+      "id": "fc.fireplace_e",
+      "face": "E",
+      "place": ["wall", "W", 1.0],
+      "spec": {
+        "model": "hearth",
+        "style": "stone",
+        "size": [1.5, 0.6, 1.3],
+        "opening": [0.85, 0.85],
+        "surface": "stone",
+        "breast": {
+          "width": 1.2,
+          "depth": 0.35,
+          "to": "ceiling"
+        },
+        "firebox": {
+          "depth": 0.4,
+          "glow": {
+            "shape": "box",
+            "material": "coal"
+          }
+        },
+        "anchors": {
+          "fire": [0.0, 0.0, 0.32]
+        },
+        "dress": [
+          {
+            "slug": "metal_jug",
+            "scale": 1.0,
+            "at": [-0.4, 0.0, 0.0],
+            "lod": 0.5
+          },
+          {
+            "slug": "jug_01",
+            "scale": 1.0,
+            "at": [0.38, 0.0, 0.0],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "G6, style stone: a rough stone hearth from the cached stone_wall scan with a timber shelf and lintel, a chimney breast to the ceiling, a firebox with a coal glow; two jugs on the shelf. The scene's fireplace_e on the west wall at y 1.0 (tile (0,3), on the wall's row). No mirror: a fisher's hearth (the black cloth is the widow's)."
+    },
+    {
+      "id": "fc.cot",
+      "face": "E",
+      "place": ["wall", "W", -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "+",
+          "cover": "blanket",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing east, the model's +x end is the north end: the head toward the hearth"
+      },
+      "note": "G7: the cot as the parlour's day bed, north to south along the west wall at its tile (1,5), y -1.0, its head at the north end by the fire, a wool blanket",
+      "moved": "0.5 m south along the west wall (D4): at its tile (y -1.0) the bed's head left 0.26 m to the hearth, and the floor tile between them, (1,4), could not be stood on (the first no-bake build's walk)"
+    },
+    {
+      "id": "fc.dining_table",
+      "place": ["at", -0.5, 1.0],
+      "face": "S",
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 0.94,
+        "extras": ["flame"],
+        "lod": 1.0,
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [-0.2, null, 0.0],
+            "lod": 0.02
+          },
+          {
+            "slug": "wooden_cutting_board",
+            "scale": 1.0,
+            "at": [0.22, null, 0.0],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the survey's wooden_table_02 at 0.94, at its own tile (5,3), (-0.5, 1.0). The first dress piece carries the flame of fc.lt_lamp: a candlestick stands in for the wooden lantern (a .blend, G8)."
+    },
+    {
+      "id": "fc.stool_n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.5, 1.78],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_stool_01",
+        "scale": 1.0,
+        "lod": 0.35
+      },
+      "note": "a stool at the table's north side"
+    },
+    {
+      "id": "fc.stool_s",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.75, 0.22],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_stool_01",
+        "scale": 1.0,
+        "lod": 0.35
+      },
+      "note": "and one pulled out at its south side"
+    },
+    {
+      "id": "fc.crate_pile",
+      "spot": true,
+      "face": "W",
+      "place": ["at", 2.5, 0.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_02",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "wooden_crate_01",
+            "scale": 1.0,
+            "at": [0.08, null, 0.0],
+            "rot": 8.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the body spot: the survey's crates (wooden_crate_02 with wooden_crate_01 on it), at its own tile (8,4), (2.5, 0.0), long side north to south"
+    },
+    {
+      "id": "fc.bucket",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -3.88, -2.36],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "a bucket at the cot's foot. It stands here on purpose: without it the walker met a 5.3 cm wall of air off the day bed's foot (cc_geom no_invisible_walls_over_5cm: the collision raster takes the model's splayed foot below the eye's probe heights); the bucket keeps the capsule off that corner"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the spawn's own view; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_door": [[-0.5, -3.0, 1.6], [-0.5, 3.5, 1.3], 70.0],
+    "north": [[0.0, -2.2, 1.6], [0.0, 3.5, 1.3], 70.0],
+    "east": [[-3.0, -0.3, 1.6], [5.0, 0.0, 1.2], 70.0],
+    "south": [[0.0, 2.4, 1.6], [0.0, -3.5, 1.2], 70.0],
+    "west": [[3.4, 0.0, 1.6], [-5.0, 0.0, 1.2], 70.0],
+    "hearth": [[-2.6, 0.2, 1.6], [-5.0, 1.0, 1.0], 70.0],
+    "table": [[1.6, -1.4, 1.6], [-0.5, 1.0, 0.8], 70.0],
+    "nets": [[0.4, 0.6, 1.6], [1.5, 3.5, 1.2], 70.0]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "room": "cottage_fisher",
+  "about": "The fisher's cottage as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "65 of the map's 67 walkable tiles can be stood on. (1,5) and (1,6) lie under the cot (a day bed), north to south along the west wall where the scene puts it, moved 0.5 m south so the tile between it and the hearth can be stood on. The same kind as the bedroom's and the parlour's tiles under their beds; listed for the owner (2026-11-21), not yet ruled on."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails."
+}

@@ -1,0 +1,11 @@
+{
+  "room": "widow_parlour",
+  "about": "The widow's parlour as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the judged failures.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "113 of the map's 115 walkable tiles can be stood on. (14,1) and (14,2) lie under the day bed, which lies north to south along the east wall where the scene puts it. The same kind as the bedroom's tiles under its bed; the owner accepted it as a known failure (2026-11-21)."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails."
+}
