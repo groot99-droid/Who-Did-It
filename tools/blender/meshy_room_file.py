@@ -97,8 +97,14 @@ DOOR_STYLES, WINDOW_STYLES = ("panel",), ("sash",)             # R-O8: what the 
 # a visible flight down from a stairs marker (G12, first part: apoth_loft): a well cut in the floor, steps descending
 # from its head edge toward `dir` and on under the floor for `under` metres, a lined shaft, a balustrade on the open
 # edges (R-F1 to R-F8)
-FLIGHT_KEYS = frozenset("well dir riser tread under rail rail_h".split())
+FLIGHT_KEYS = frozenset("well dir riser tread under rail rail_h up base over".split())
 FLIGHT_DEFAULTS = dict(riser=0.22, tread=0.22, under=1.0, rail_h=0.9)
+# a flight up (G12, second part: apoth_shop): `up` true, `well` the hole in the ceiling, steps rising from `base` (the
+# first riser's line, default the wall opposite `dir`) toward `dir`, through the hole and on above the ceiling for
+# `over` metres into a lined shaft; the open sides closed by a stepped string down to the floor (R-F9 to R-F12)
+FLIGHT_UP_DEFAULTS = dict(riser=0.22, tread=0.22, over=1.0)
+HEAD_CLEAR = 2.0          # under the ceiling, a tread of a flight up stands this far under it at least (R-F11)
+SHAFT_UP = 2.2            # a flight up's shaft rises this far over its top tread, to its cap
 FLOOR_T = 0.25            # the floor's thickness under the boards: the collision slab's, the well's header
 STEP_MAX = 0.35           # a step the walker climbs (the viewer's stepHeight)
 RAIL_OUT = 0.07           # a balustrade's outer face past the well's edge (its string and handrail)
@@ -1005,7 +1011,7 @@ def anchor_names(spec: dict) -> set:
 # ---------------------------------------------------------------- the derived reading
 
 
-def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None) -> dict | None:
+def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None, height=None) -> dict | None:
     """A stairs opening's visible flight (G12, first part) with every default filled, in room metres: the `well`
     [x0, y0, x1, y1] cut in the floor; `dir` the wall the flight descends toward (its head is the well's opposite
     edge); treads `tread` deep and `riser` high from the head edge, on under the floor past the well's far edge for
@@ -1013,7 +1019,8 @@ def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None)
     wall). Derived: `head` (the head edge's coordinate), `length` (the well along dir), the `steps` [u0, u1, top z]
     (u from the head edge), the shaft's `bottom`, the walls the well touches (`on_wall`) and the collision box `box`
     [x0, y0, 0, x1, y1, rail_h] (the well and the balustrade's width). Holds R-F2 to R-F7. `sc` needs the room's x0,
-    x1, y0, y1. With no `bag` it stops on a problem; with one it adds to it."""
+    x1, y0, y1. With no `bag` it stops on a problem; with one it adds to it. A flight with `up` true is read by
+    _flight_up (R-F9 to R-F12), which needs the room's `height`."""
     own = bag is None
     bag = Problems("the room file") if own else bag
     n0 = len(bag)
@@ -1027,6 +1034,14 @@ def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None)
         bag.append(f"{where}: flight is an object (R-F2)")
         return done(None)
     _strict(f, FLIGHT_KEYS, f"{where}.flight", "flight", bag)
+    if f.get("up") is not None and not isinstance(f.get("up"), bool):
+        bag.append(f"{where}: flight.up is true (a flight up into the ceiling) or false (R-F9)")
+        return done(None)
+    if f.get("up"):
+        return done(_flight_up(f, sc, where, bag, height))
+    for k in ("base", "over"):
+        if f.get(k) is not None:
+            bag.append(f'{where}: flight.{k} is a flight up\'s ("up": true) (R-F9)')
     w = f.get("well")
     if not (_nums(w, 4) and w[0] < w[2] and w[1] < w[3]):
         bag.append(f"{where}: flight.well is [x0, y0, x1, y1] in metres, x0 < x1 and y0 < y1 (R-F3)")
@@ -1087,6 +1102,97 @@ def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None)
                on_wall=on_wall, box=[round(bx[0], 6), round(bx[1], 6), 0.0, round(bx[2], 6), round(bx[3], 6),
                                      float(v["rail_h"])])
     return done(out)
+
+
+def _flight_up(f: dict, sc, where: str, bag: Problems, height) -> dict | None:
+    """A flight up into the ceiling (G12, second part) with every default filled, in room metres: the `well` [x0, y0,
+    x1, y1] is the hole in the ceiling and gives the flight its width across; treads `tread` deep and `riser` high rise
+    from `base` (the first riser's line on `dir`'s axis; default the wall opposite `dir`) toward `dir`, through the
+    hole and on above the ceiling for `over` metres past its far edge. Derived: `head` (= base), `near` and `far` (the
+    hole's edges as u from the base), `length` (= far: the flight's run under the ceiling), the `steps` [u0, u1, top
+    z], `top` (the shaft's cap), `on_wall`, an empty `rail` and the collision box `box` [x0, y0, 0, x1, y1, height]
+    over the flight's run under the ceiling (its base to the hole's far edge). Holds R-F9 to R-F12 (with R-F3, R-F4
+    and R-F6 as a flight down reads them)."""
+    n0 = len(bag)
+    e = 1e-6
+    if not _num(height) or height <= 0:
+        bag.append(f"{where}: a flight up needs the room's height (R-F9)")
+        return None
+    H = float(height)
+    w = f.get("well")
+    if not (_nums(w, 4) and w[0] < w[2] and w[1] < w[3]):
+        bag.append(f"{where}: flight.well is the hole in the ceiling, [x0, y0, x1, y1] in metres, x0 < x1 and y0 < y1 "
+                   f"(R-F3)")
+        return None
+    x0, y0, x1, y1 = (float(v) for v in w)
+    if x0 < sc.x0 - e or x1 > sc.x1 + e or y0 < sc.y0 - e or y1 > sc.y1 + e:
+        bag.append(f"{where}: the well {[x0, y0, x1, y1]} reaches out of the room (x {sc.x0:g}..{sc.x1:g}, "
+                   f"y {sc.y0:g}..{sc.y1:g}) (R-F3)")
+    if min(x1 - x0, y1 - y0) < 0.6 - e:
+        bag.append(f"{where}: the well is {x1 - x0:.2f} x {y1 - y0:.2f} m: 0.6 m each way at least (R-F3)")
+    d = f.get("dir")
+    if d not in SIDES:
+        bag.append(f'{where}: flight.dir is the wall the flight rises toward: one of {", ".join(SIDES)} (R-F4)')
+        return None
+    if f.get("under") is not None or f.get("rail") is not None or f.get("rail_h") is not None:
+        bag.append(f"{where}: a flight up has no under, rail or rail_h (a string closes its open sides) (R-F9)")
+    v = {k: f.get(k, dv) for k, dv in FLIGHT_UP_DEFAULTS.items()}
+    sg = 1.0 if d in ("N", "E") else -1.0
+    base = f.get("base", {"N": sc.y0, "S": sc.y1, "E": sc.x0, "W": sc.x1}[d])
+    if not _num(base):
+        bag.append(f"{where}: flight.base is the first riser's line, in metres on the {d} wall's axis (R-F10)")
+        return None
+    base = float(base)
+    if not (_num(v["riser"]) and 0.0 < v["riser"] <= STEP_MAX + e):
+        bag.append(f"{where}: flight.riser is a step's height, over 0 and at most {STEP_MAX:g} m (R-F4)")
+    if not (_num(v["tread"]) and 0.12 - e <= v["tread"] <= 0.45 + e):
+        bag.append(f"{where}: flight.tread is a step's depth, 0.12 to 0.45 m (R-F4)")
+    if not (_num(v["over"]) and 0.0 <= v["over"] <= 3.0 + e):
+        bag.append(f"{where}: flight.over is the metres the flight runs on above the ceiling, 0 to 3 (R-F4)")
+    if len(bag) > n0:
+        return None
+    lo_a, hi_a = (sc.y0, sc.y1) if d in ("N", "S") else (sc.x0, sc.x1)
+    if not (lo_a - e <= base <= hi_a + e):
+        bag.append(f"{where}: flight.base {base:g} is out of the room ({lo_a:g}..{hi_a:g}) (R-F10)")
+        return None
+    lo_d, hi_d = (y0, y1) if d in ("N", "S") else (x0, x1)
+    near, far = sorted(((lo_d - base) * sg, (hi_d - base) * sg))
+    if near < -e:
+        bag.append(f"{where}: the well starts {-near:.2f} m behind the flight's base: the hole lies along the flight, "
+                   f"from its base toward {d} (R-F10)")
+        return None
+    riser, tread, over = float(v["riser"]), float(v["tread"]), float(v["over"])
+    run = far + over
+    room_end = {"N": sc.y1, "S": sc.y0, "E": sc.x1, "W": sc.x0}[d]
+    if abs(room_end - base) < run - e:
+        bag.append(f"{where}: the flight runs {run:.2f} m from its base, past the {d} wall (it has "
+                   f"{abs(room_end - base):.2f} m) (R-F6)")
+    n = max(1, int(math.ceil(run / tread - 1e-9)))
+    steps = [[round((i - 1) * tread, 6), round(min(i * tread, run), 6), round(i * riser, 6)] for i in range(1, n + 1)]
+    low = [s_ for s_ in steps if s_[0] < near - e and H - s_[2] < HEAD_CLEAR - e]
+    if low:
+        bag.append(f"{where}: the tread at {low[0][0]:.2f} m from the base stands {H - low[0][2]:.2f} m under the "
+                   f"ceiling, short of the hole: {HEAD_CLEAR:g} m at least (start the hole nearer the base) (R-F11)")
+    through = [s_ for s_ in steps if s_[1] > far + e and s_[2] < H - e]
+    if through:
+        bag.append(f"{where}: the tread at {through[0][0]:.2f} m from the base runs past the hole's far edge at "
+                   f"{through[0][2]:.2f} m, under the ceiling ({H:g} m): a longer hole or a steeper flight (R-F12)")
+    if steps[-1][2] < H + e:
+        bag.append(f"{where}: the flight's top tread stands at {steps[-1][2]:.2f} m: it must rise over the ceiling "
+                   f"({H:g} m) (R-F12)")
+    if len(bag) > n0:
+        return None
+    on_wall = [s for s, ok in (("W", abs(x0 - sc.x0) < e), ("E", abs(x1 - sc.x1) < e), ("S", abs(y0 - sc.y0) < e),
+                               ("N", abs(y1 - sc.y1) < e)) if ok]
+    end = base + sg * far
+    if d in ("N", "S"):
+        bx = [x0, min(base, end), x1, max(base, end)]
+    else:
+        bx = [min(base, end), y0, max(base, end), y1]
+    return dict(up=True, well=[x0, y0, x1, y1], dir=d, riser=riser, tread=tread, over=over, base=base, head=base,
+                near=round(near, 6), far=round(far, 6), length=round(far, 6), steps=steps,
+                top=round(steps[-1][2] + SHAFT_UP, 6), on_wall=on_wall, rail=[],
+                box=[round(bx[0], 6), round(bx[1], 6), 0.0, round(bx[2], 6), round(bx[3], 6), H])
 
 
 def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
@@ -1203,10 +1309,11 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
             fy = at if side in ("E", "W") else (sc.y1 if side == "N" else sc.y0)
             e["foot"] = [fx, fy]
         if o.get("flight") is not None and kind == "stairs":
-            fv = flight_values(o["flight"], sc, where, bag)
+            fv = flight_values(o["flight"], sc, where, bag, height=row.get("height"))
             if fv is not None:
                 e["flight"] = fv
-                x0, y0, x1, y1 = fv["well"]
+                b_ = fv["box"]          # a flight up: the walker meets the portal at the flight's foot (R-F8)
+                x0, y0, x1, y1 = (b_[0], b_[1], b_[3], b_[4]) if fv.get("up") else fv["well"]
                 fx, fy = e["foot"][:2]
                 gap = math.hypot(max(x0 - fx, 0.0, fx - x1), max(y0 - fy, 0.0, fy - y1))
                 if gap > 1.0 + 1e-9:
@@ -1734,7 +1841,11 @@ def explain(row: dict, spec: dict, shown: str) -> str:
         else:
             bits.append(f"marker at ({e['foot'][0]:g}, {e['foot'][1]:g})")
             fl = e.get("flight")
-            if fl:
+            if fl and fl.get("up"):
+                bits.append(f"flight up toward {fl['dir']} from {fl['base']:g}: hole in the ceiling {fl['well']}, "
+                            f"{len(fl['steps'])} steps of {fl['riser']:g} x {fl['tread']:g} m to "
+                            f"{fl['steps'][-1][2]:g} m, shaft to {fl['top']:g} m")
+            elif fl:
                 bits.append(f"flight down toward {fl['dir']}: well {fl['well']}, {len(fl['steps'])} steps of "
                             f"{fl['riser']:g} x {fl['tread']:g} m to {fl['steps'][-1][2]:g} m, rail "
                             f"{''.join(fl['rail']) or 'none'}")

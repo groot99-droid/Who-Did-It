@@ -481,8 +481,9 @@ for WO in F.windows:
         sill, top = wop["z"]
         if F.legacy:                                       # the bedroom's strips, as they were
             zz = np.concatenate([np.arange(0.6, 0.9001, 0.005), np.arange(2.2, 2.4001, 0.005)])
-        else:                                              # at its sill and its head
-            zz = np.concatenate([np.arange(sill - 0.15, sill + 0.1501, 0.005), np.arange(top - 0.1, top + 0.1001, 0.005)])
+        else:                                              # at its sill and its head: up to the architrave's top
+            # (0.095 m over the head), above which a window with no curtains shows the wall, as it should
+            zz = np.concatenate([np.arange(sill - 0.15, sill + 0.1501, 0.005), np.arange(top - 0.1, top + 0.0901, 0.005)])
         win_strip = first_hits(side, 1.0, wx, zz)
         R["windows"][WO["id"]]["first_hits"] = win_strip
         wall_strip_w = [r["z"] for r in win_strip if any(f.endswith("_Wall_" + side) for f in r["first"])]
@@ -777,7 +778,8 @@ st = dict(rays=0, col_miss=0, col_beyond_inner_faces=0, col_max_beyond_m=0.0, vi
           vis_out_elsewhere=0)
 col_bad, vis_bad = [], []
 FAN_Z = [min(z, CEIL - 0.1) for z in (0.3, 1.0, 1.6, 2.4)]   # 0.1 m under a low ceiling (the loft's 2.4 m)
-SHAFTS = [o["shaft"] for o in F.openings if o.get("shaft")]    # a stairs flight's shaft under the floor (G12)
+SHAFTS = [o["shaft"] for o in F.openings if o.get("shaft")]    # a stairs flight's shaft, under the floor or over
+# the ceiling (G12): [x0, y0, x1, y1, z0, z1]
 for (x, y) in FAN:
     for z in FAN_Z:
         o = Vector((x, y, z))
@@ -809,8 +811,8 @@ for (x, y) in FAN:
                 p = g[0]
                 if FX0 - 0.31 <= p.x <= FX1 + 0.31 and FY0 - 0.31 <= p.y <= FY1 + 0.31 and -0.31 <= p.z <= CEIL + 0.31:
                     continue
-                if any(s[0] - 0.05 <= p.x <= s[2] + 0.05 and s[1] - 0.05 <= p.y <= s[3] + 0.05 and s[4] - 0.05 <= p.z <= 0.0
-                       for s in SHAFTS):                   # down the stairs' shaft, which is closed
+                if any(s[0] - 0.05 <= p.x <= s[2] + 0.05 and s[1] - 0.05 <= p.y <= s[3] + 0.05
+                       and s[4] - 0.05 <= p.z <= s[5] + 0.05 for s in SHAFTS):   # up or down a stairs shaft (closed)
                     continue
                 ok = False
                 for side, win in WOPS:                     # out through a window's cut

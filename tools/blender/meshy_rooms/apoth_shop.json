@@ -1,0 +1,696 @@
+{
+  "room": "apoth_shop",
+  "about": "Mallory's apothecary shop, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 16 x 9 m inside (x -8..8, y -4.5..4.5), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/apoth_shop.json is named below. The stairs up to the loft are a visible flight along the east wall into a hole in the ceiling (decision D6, G12's second part). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Mallory Apothecary",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the shop door",
+    "stairs": "At the foot of the stairs"
+  },
+  "height": 3.0,
+  "height_note": "the parlour's 3.0 m: the loft above is 3 m up (the scene's elevationDelta)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.84, 0.95, 0.76]
+  },
+  "floor_note": "the scene's `w` boards (its material layer), a step warmer than the loft's; the `f` flagstone patches by the still and at the door are not built (G11)",
+  "wall_colour": "#7D7562",
+  "wall_colour_note": "guess: a shop's limewash gone drab with the still's smoke; never pink or lilac under the teal globe and the moon",
+  "ceiling_colour": "#9C927E",
+  "paint_colour": "#B3A88F",
+  "wood_colour": "#3E2C1E",
+  "wood_colour_note": "the joinery: the door, the window, the skirting, the stair, the shutters, the counter",
+  "skirting": 0.15,
+  "picture_rail": null,
+  "picture_rail_note": "a shop has shelves where a picture rail would be",
+  "cornice": null,
+  "openings": [
+    {
+      "id": "as.door",
+      "kind": "door",
+      "portal": "as.door",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the shop door in the south wall, tile (4,10): centred at x -4.5, the portal at its foot (-4.5, -4.5); the door spawn stands 0.5 m inside it, (-4.5, -4.0), by design"
+    },
+    {
+      "id": "as.window",
+      "kind": "window",
+      "prop": "as.window",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "curtains": false,
+      "curtains_note": "a shop window has shutters, not curtains: the two leaves stand open against the wall either side (as.shutter_w, as.shutter_e)",
+      "outside": "snow",
+      "note": "the shop's one window, on the street, tile (6,0): x -2.5 in the north wall. The moon's window (the scene's as.lt_moon stands on its tile)."
+    },
+    {
+      "id": "as.stairs",
+      "kind": "stairs",
+      "portal": "as.stairs",
+      "side": "E",
+      "flight": {
+        "up": true,
+        "well": [7.1, 2.03, 8.0, 3.74],
+        "dir": "S",
+        "base": 4.5,
+        "riser": 0.22,
+        "tread": 0.19,
+        "over": 1.0
+      },
+      "flight_note": "G12's second part (D6: visible stairs): a flight 0.9 m wide along the east wall, its first riser on the north wall, rising south a little steeper than the loft's flight (0.22 m risers, 0.19 m treads) through a hole in the ceiling (y 2.03..3.74) and on 1.0 m above it into the dark (the loft's stairs). The hole starts where a tread stands 2.0 m under the ceiling; its far edge is where the treads pass the ceiling. The flight ends at y 2.03, so the walker still reaches tile (16,3) beside the surgery (at 0.2 m treads it ended at 1.9 and the first no-bake build's walk could not reach (16,3)); tile (16,2) is under the flight.",
+      "note": "the stairs up to the loft (as.stairs: to apoth_loft, spawn stairs). The portal's tile (16,1) is the north-east corner, an inner tile; its spawn stands west of it, so the side is E. The marker at the tile's centre (7.5, 4.0) is on the flight's foot, 1.0 m from the spawn."
+    }
+  ],
+  "outside": {
+    "ground": -0.3,
+    "ground_note": "a ground-floor view, as the parlour's",
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    },
+    "note": "the parlour's night (the same village, the same Meshy models): its windows are in the north wall too"
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "the parlour's and the bedroom's"
+  },
+  "exposure": null,
+  "lights": [
+    {
+      "id": "as.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "as.mortar_table"
+      },
+      "note": "the lamp over the mortar table: a candlestick with its flame stands in for the oil lamp (vintage_oil_lamp is a .blend, G8)"
+    },
+    {
+      "id": "as.lt_shelf",
+      "role": "teal",
+      "anchor": {
+        "piece": "as.show_globe",
+        "name": "flame"
+      },
+      "glow": {
+        "shape": "sphere",
+        "size": [0.14],
+        "material": "teal"
+      },
+      "note": "the green show globe: teal as emitted light only (the owner's rule); a globe of green glass glowing on a tall stand, beside the window, as the loft's lamp"
+    },
+    {
+      "id": "as.lt_counter",
+      "role": "lamp",
+      "anchor": {
+        "piece": "as.shop_counter",
+        "name": "flame"
+      },
+      "note": "the candle on the counter (as.counter_candle under the flame)"
+    },
+    {
+      "id": "as.lt_bench",
+      "role": "lamp",
+      "anchor": {
+        "piece": "as.bench"
+      },
+      "note": "the candle on the bench by the east wall, over the Wrench"
+    },
+    {
+      "id": "as.lt_still",
+      "role": "fire",
+      "anchor": {
+        "piece": "as.still",
+        "name": "fire"
+      },
+      "glow": {
+        "shape": "box",
+        "size": [0.3, 0.03, 0.14],
+        "material": "coal",
+        "at": [[0.0, 0.0, -0.15]]
+      },
+      "note": "the fire in the still's stove: a coal glow at the foot of the stove's front, its ash-pit door (it stands on the boards: a glow hung on the grey box's face failed r7_extra's nothing_floats), the light just over it"
+    },
+    {
+      "id": "as.lt_moon",
+      "role": "moon",
+      "window": "as.window"
+    }
+  ],
+  "lights_note": "as.lt_window is the scene's day and dusk window light: a night room does not build it. Bake groups: candle (three lamps and the teal globe), fire, moon, fill = 4.",
+  "look": {
+    "lights": {
+      "teal": {
+        "color": "#2EC4B6",
+        "power": 40.0,
+        "radius": 0.06
+      },
+      "fire": {
+        "color": "#FFB457",
+        "power": 40.0,
+        "radius": 0.08
+      }
+    },
+    "emit_display": {
+      "M_teal": [0.05, 0.7, 0.6],
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the globe's green glass as the loft's lamp; the stove's coals as the parlour's hearth",
+    "note": "G9: the room's override of meshy_looks/interior_fp.json. The teal role is the loft's, the fire role the parlour's at a stove's smaller size (40 W, radius 0.08).",
+    "settings": {
+      "shop": {
+        "label": "the shop",
+        "mix": {
+          "candle": 1.0,
+          "fire": 1.5,
+          "moon": 3.0,
+          "fill": 0.1
+        },
+        "note": "a first guess from the parlour (moon 3.0) and the cottage (a low fill), for the first 128-sample bake to set"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a shop at night, lit by its lamps",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "shop",
+  "light_note": "the room's own light setting (look.settings.shop; --light overrides)",
+  "pieces": [
+    {
+      "id": "as.jar_shelf_0",
+      "face": "S",
+      "place": ["wall", "N", -7.46],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.95,
+        "lod": 0.5
+      },
+      "note": "a jar shelf at its tile (1,0), in the north-west corner: a plain open shelf (Shelf_01); the jars have no model yet (G8, G17)"
+    },
+    {
+      "id": "as.jar_shelf_b_0",
+      "face": "S",
+      "place": ["wall", "N", -6.48],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.95,
+        "lod": 0.5
+      },
+      "note": "the second jar shelf at its tile (2,0), 0.02 m east of its centre: at -6.5 the two shelves' sides touched (r7_extra)"
+    },
+    {
+      "id": "as.herb_rack_0",
+      "face": "S",
+      "place": ["wall", "N", -5.5],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.18, 1.1],
+        "label": "Herb rack: a wall rail hung with drying herb bundles"
+      },
+      "note": "at its tile (3,0), hung 0.9 m off the boards, as the loft's. No model of herb bundles (G17)."
+    },
+    {
+      "id": "as.shelf",
+      "face": "S",
+      "place": ["wall", "N", -4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 0.7,
+        "lod": 0.5
+      },
+      "note": "the NOT FOR SALE shelf with one empty slot, at its tile (4,0): a worn bookcase at 0.7 (0.96 m wide); its card and its bottles are dress for a later task"
+    },
+    {
+      "id": "as.show_globe",
+      "face": "S",
+      "place": ["at", -3.5, 4.0],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, 0.0, 0.92]
+        }
+      },
+      "note": "the show globe at its own tile (5,1), beside the window: the loft lamp's tall stand with the globe of green glass on it (the light's glow, 0.14 m); a real carboy has no model yet (Tier 2)"
+    },
+    {
+      "id": "as.shutter_w",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", -3.285],
+      "rise": 0.78,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.42, 0.03, 1.5],
+        "label": "Window shutter, folded open"
+      },
+      "note": "the window's two shutter leaves (G14's shutters as boxes, D6: shutters open), standing open against the wall 0.03 m clear of the architrave, in the joinery's wood"
+    },
+    {
+      "id": "as.shutter_e",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", -1.715],
+      "rise": 0.78,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.42, 0.03, 1.5],
+        "label": "Window shutter, folded open"
+      }
+    },
+    {
+      "id": "as.jar_shelf_1",
+      "face": "S",
+      "place": ["wall", "N", -1.05],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.8,
+        "lod": 0.5
+      },
+      "moved": "0.45 m east along the north wall (D4): at its tile (x -1.5) it stood through the window's open east shutter",
+      "note": "a jar shelf at its tile (7,0), at 0.8 (0.8 m wide)"
+    },
+    {
+      "id": "as.basin",
+      "key": "washstand",
+      "face": "S",
+      "place": ["wall", "N", -0.1],
+      "spec": {
+        "lod": 0.6
+      },
+      "moved": "0.4 m east along the north wall (D4), after the jar shelf moved for the shutter",
+      "note": "the basin (Blood wash) at its tile (8,0): the bedroom's washstand, a chest of drawers with a marble top, a brass basin and a jug"
+    },
+    {
+      "id": "as.jar_shelf_b_1",
+      "face": "S",
+      "place": ["wall", "N", 0.82],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.8,
+        "lod": 0.5
+      },
+      "moved": "0.32 m east along the north wall (D4), after the basin",
+      "note": "a jar shelf at its tile (9,0), at 0.8"
+    },
+    {
+      "id": "as.apoth_drawers_0",
+      "covers": ["as.apoth_drawers_1"],
+      "face": "S",
+      "place": ["wall", "N", 2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_wooden_drawer_01",
+        "scale": 0.75,
+        "lod": 0.6
+      },
+      "note": "the drawer wall, the two tiles (10,1) and (11,1) against the north wall: a chest of small wooden drawers at 0.75 (1.29 m wide)"
+    },
+    {
+      "id": "as.herb_rack_1",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.18, 1.1],
+        "label": "Herb rack: a wall rail hung with drying herb bundles"
+      },
+      "note": "at its tile (12,0), hung 0.9 m off the boards"
+    },
+    {
+      "id": "as.jar_shelf_2",
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.95,
+        "lod": 0.5
+      },
+      "note": "a jar shelf at its tile (13,0)"
+    },
+    {
+      "id": "as.still",
+      "face": "S",
+      "place": ["at", 5.5, 3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.7, 1.7],
+        "label": "Copper still on its iron stove: a pot still, its swan neck run to a worm tub",
+        "anchors": {
+          "fire": [0.0, -0.36, 0.15]
+        }
+      },
+      "note": "at its own tile (14,2), by the stairs, its stove door to the south. No model (a grey box; the plan's copper still, Tier 2). The fire's anchor is 0.01 m in front of the box, so the light is outside it."
+    },
+    {
+      "id": "as.mortar_table",
+      "face": "S",
+      "place": ["at", 2.5, 2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "lod": 0.6,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [-0.38, null, 0.0],
+            "lod": 0.02
+          },
+          {
+            "slug": "brass_pot_02",
+            "scale": 1.0,
+            "at": [0.12, null, 0.0],
+            "lod": 0.5
+          },
+          {
+            "slug": "jug_01",
+            "scale": 1.0,
+            "at": [0.38, null, 0.0],
+            "rot": 30.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the mortar table at its own tile (11,3), under its lamp: a plain table with a brass bowl and a jug (no mortar model); the first dress piece carries the flame of as.lt_lamp"
+    },
+    {
+      "id": "as.shop_counter",
+      "covers": ["as.behind_counter"],
+      "face": "S",
+      "place": ["at", 3.5, -1.0],
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.96, 0.6, 0.95],
+        "label": "The shop counter (8C's shop)",
+        "anchors": {
+          "flame": [0.25, 0.0, 1.17]
+        }
+      },
+      "note": "the counter at its own tile (12,6), between the glazed cases, in the joinery's wood (G15's counter as a box); the hide behind it (as.behind_counter, tile (12,5)) is the free floor north of it"
+    },
+    {
+      "id": "as.counter_candle",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.75, -1.0],
+      "rise": 0.95,
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_candlestick",
+        "scale": 1.0,
+        "lod": 0.02
+      },
+      "note": "the candlestick on the counter, under as.lt_counter's flame"
+    },
+    {
+      "id": "as.counter_case_0",
+      "covers": ["as.counter_case_b_0"],
+      "face": "S",
+      "place": ["at", 2.0, -1.0],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Glazed case of remedies (two bays)"
+      },
+      "note": "the two cases west of the counter, tiles (10,6) and (11,6), as one grey box (G15's glazed case)"
+    },
+    {
+      "id": "as.counter_case_1",
+      "covers": ["as.counter_case_b_1"],
+      "face": "S",
+      "place": ["at", 5.0, -1.0],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Glazed case of remedies (two bays)"
+      },
+      "note": "the two cases east of the counter, tiles (13,6) and (14,6)"
+    },
+    {
+      "id": "as.leech_jar",
+      "face": "S",
+      "place": ["at", 0.5, -2.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_stool_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "antique_ceramic_vase_01",
+            "scale": 0.8,
+            "at": [0.0, null, 0.0],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the leech jar at its own tile (9,7): a lidded stoneware jar on a stool (a glass jar has no model)"
+    },
+    {
+      "id": "as.flour_sacks",
+      "face": "E",
+      "place": ["wall", "W", 2.3],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.6, 0.7],
+        "label": "Flour sacks: three filled hessian sacks slumped against the wall"
+      },
+      "moved": "0.3 m north along the west wall (D4): the day bed, the barrel and the settle share the wall with them",
+      "note": "at its tile (1,3). No sack model (a grey box; the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "as.barrel",
+      "face": "E",
+      "place": ["wall", "W", 1.32],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "moved": "0.32 m north along the west wall (D4), to clear the day bed",
+      "note": "at its tile (1,4)"
+    },
+    {
+      "id": "as.bed",
+      "face": "E",
+      "place": ["wall", "W", -0.12],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "-",
+          "cover": "coverlet",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing east, the model's -x end is the south end: the head toward the settle. With the head north the collision at its foot stood 5.3 cm from the bed's open end, where the walker comes (cc_geom no_invisible_walls_over_5cm); turned, that end faces the barrel"
+      },
+      "note": "G7: the scene's bed at (1,5), a day bed for the sick along the west wall, north to south, a coverlet and one pillow (the parlour's, the cottage's and the loft's day bed). 0.12 m south of its tile's centre."
+    },
+    {
+      "id": "as.bed_stool",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -6.9, -0.82],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_stool_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "jug_01",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "a stool by the sick bed's head with a water jug (not in the scene). Without it the walker could stand by the bed's head where its collision reached 5.3 cm past the bed (cc_geom no_invisible_walls_over_5cm, 5 cm the limit; head north or south, blanket or coverlet, the same)"
+    },
+    {
+      "id": "as.settle",
+      "face": "E",
+      "place": ["wall", "W", -1.75],
+      "spec": {
+        "model": "ph",
+        "slug": "painted_wooden_bench",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "moved": "0.75 m south along the west wall (D4): at its tile (y -1.0) it stood through the day bed's foot",
+      "note": "the settle for the waiting at its tile (1,6): the parlour's painted bench"
+    },
+    {
+      "id": "as.bottle_crate_1",
+      "face": "N",
+      "place": ["wall", "S", -7.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "wooden_crate_01",
+            "scale": 1.0,
+            "at": [0.04, null, 0.0],
+            "rot": 6.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "a crate of bottles at its tile (1,9), in the south-west corner: two crates stacked, as the loft's (the bottles are a .blend, G8)"
+    },
+    {
+      "id": "as.coat_stand",
+      "face": "N",
+      "place": ["wall", "S", -6.5],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.5, 1.8],
+        "label": "Coat stand (bentwood; Mallory's shawl and apron)"
+      },
+      "note": "at its tile (2,9). No model (a grey box; the plan's coat stand, Tier 2)."
+    },
+    {
+      "id": "as.rug",
+      "key": "rug",
+      "place": ["at", -4.5, -3.0],
+      "spec": {
+        "size": [2.2, 1.5]
+      },
+      "note": "the rug inside the door at its tile (4,8)"
+    },
+    {
+      "id": "as.tin_crate",
+      "face": "N",
+      "place": ["wall", "S", 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [-0.22, null, 0.0],
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "rot": 20.0,
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.22, null, 0.0],
+            "rot": -15.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the tin crate at its tile (9,9): a crate with three tins on its lid, as the loft's"
+    },
+    {
+      "id": "as.hq_surgery",
+      "face": "W",
+      "place": ["wall", "E", 0.8],
+      "moved": "0.2 m south along the east wall (D4): at its tile the walker could not reach tile (16,3), between it and the stairs (the builder's walk at r 0.30)",
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 1.0],
+        "label": "HQ station: the surgery counter, where the Doctor sells bandages"
+      },
+      "note": "the headquarters station at its own tile (16,4), against the east wall south of the stairs. An HQ-tier prop as a grey box (D6)."
+    },
+    {
+      "id": "as.bench",
+      "face": "W",
+      "place": ["wall", "E", -3.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "lod": 0.6,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [-0.4, null, 0.0],
+            "lod": 0.02
+          },
+          {
+            "slug": "adjustable_wrench",
+            "scale": 1.0,
+            "at": [0.1, null, 0.0],
+            "rot": 30.0,
+            "lod": 0.8
+          }
+        ]
+      },
+      "note": "the bench by the east wall at its own tile (16,8), a task source: the Wrench (adjustable_wrench) lies on it by the candle of as.lt_bench. Keep the wrench legible."
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door and spawn_stairs are the spawns' own views; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_door": [[-4.5, -4.0, 1.6], [-3.0, 4.5, 1.3], 70.0],
+    "spawn_stairs": [[6.5, 4.0, 1.6], [-2.0, 0.0, 1.1], 70.0],
+    "north": [[-1.0, -3.0, 1.6], [-1.0, 4.5, 1.4], 70.0],
+    "east": [[-3.0, 0.0, 1.6], [8.0, 0.5, 1.2], 70.0],
+    "south": [[0.0, 3.0, 1.6], [0.0, -4.5, 1.0], 70.0],
+    "west": [[4.0, 0.5, 1.6], [-8.0, 0.5, 1.0], 70.0],
+    "counter": [[1.0, -3.4, 1.6], [3.5, -0.8, 0.9], 70.0],
+    "stairs": [[6.4, 3.95, 1.6], [7.55, 2.3, 2.3], 70.0]
+  }
+}

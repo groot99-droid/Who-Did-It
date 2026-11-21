@@ -1295,7 +1295,8 @@ def build_shell(fr: Frame, mt: dict) -> None:
     x0, x1, y0, y1 = fr.x0, fr.x1, fr.y0, fr.y1
     rep = 3.0 * CFG["floor"]["zoom"]      # old_wood_floor is a 3 m scan: the boards enlarged to about 16 cm
     b = Builder()
-    wells = [m["flight"]["well"] for m in fr.markers if m.get("flight")]
+    wells = [m["flight"]["well"] for m in fr.markers if m.get("flight") and not m["flight"].get("up")]
+    holes = [m["flight"]["well"] for m in fr.markers if m.get("flight") and m["flight"].get("up")]
     if not wells:
         b.quad_grid((x0, y0, 0.0), (x1 - x0, 0, 0), (0, y1 - y0, 0), grid_count(x1 - x0, step),
                     grid_count(y1 - y0, step), mt["floor"], uv_fn=lambda p: (p[1] / rep, p[0] / rep))
@@ -1312,8 +1313,20 @@ def build_shell(fr: Frame, mt: dict) -> None:
                     uv_fn=lambda p: (p[1] / rep, p[0] / rep), skip=in_well, us=us, vs=vs)
     register(b.build(nm("Floor")), "shell", "floor")
     b = Builder()
-    b.quad_grid((x0, y0, H), (0, y1 - y0, 0), (x1 - x0, 0, 0), grid_count(y1 - y0, 0.1), grid_count(x1 - x0, 0.1),
-                mt["ceiling"], uv_fn=lambda p: (p[0] / 3.0, p[1] / 3.0))
+    if not holes:
+        b.quad_grid((x0, y0, H), (0, y1 - y0, 0), (x1 - x0, 0, 0), grid_count(y1 - y0, 0.1),
+                    grid_count(x1 - x0, 0.1), mt["ceiling"], uv_fn=lambda p: (p[0] / 3.0, p[1] / 3.0))
+    else:
+        # a flight up's hole (G12): the ceiling grid's lines (y first, then x) run through its edges, its quads left out
+        cu = grid_levels(y1 - y0, 0.1, [v - y0 for w in holes for v in (w[1], w[3])])
+        cv = grid_levels(x1 - x0, 0.1, [v - x0 for w in holes for v in (w[0], w[2])])
+
+        def in_hole(i, j, cu=cu, cv=cv):
+            ym, xm = y0 + (cu[i] + cu[i + 1]) / 2 * (y1 - y0), x0 + (cv[j] + cv[j + 1]) / 2 * (x1 - x0)
+            return any(w[0] < xm < w[2] and w[1] < ym < w[3] for w in holes)
+
+        b.quad_grid((x0, y0, H), (0, y1 - y0, 0), (x1 - x0, 0, 0), 0, 0, mt["ceiling"],
+                    uv_fn=lambda p: (p[0] / 3.0, p[1] / 3.0), skip=in_hole, us=cu, vs=cv)
     register(b.build(nm("Ceiling")), "shell", "ceiling")
     for side in ("S", "E", "N", "W"):
         (ox, oy), (dx, dy), _n, L = fr.wall_frame(side)
@@ -1363,7 +1376,9 @@ def build_flight(fr: Frame, mt: dict, e: dict, fl: dict) -> dict:
     with the floor's thickness (rf.FLOOR_T) in the joinery's wood at its edges and over the run under the floor; a
     balustrade on the well's open edges (a string on the boards, newels, balusters, a handrail). Two objects,
     `Stairs_<id>` and `StairRail_<id>`, of kind `stairs` (baked like a piece, out of the shell's exposure measures);
-    the collision is the loader's one box over the well and the rail (collision())."""
+    the collision is the loader's one box over the well and the rail (collision()). A flight up is build_flight_up's."""
+    if fl.get("up"):
+        return build_flight_up(fr, mt, e, fl)
     x0, y0, x1, y1 = fl["well"]
     d, head, L = fl["dir"], fl["head"], fl["length"]
     steps, zb, FT = fl["steps"], fl["bottom"], rf.FLOOR_T
@@ -1435,6 +1450,76 @@ def build_flight(fr: Frame, mt: dict, e: dict, fl: dict) -> dict:
         register(rail, "stairs", e["id"] + ":rail")
     return dict(id=e["id"], steps=len(steps), bottom=zb, newels=len(newels), rail=list(fl["rail"]),
                 box=list(fl["box"]))
+
+
+CEIL_T = 0.2        # a flight up's hole: the ceiling's depth at its edges, in the joinery's wood (its joists)
+
+
+def build_flight_up(fr: Frame, mt: dict, e: dict, fl: dict) -> dict:
+    """A flight up into a hole in the ceiling (G12, second part; the loader's _flight_up): a tread and a riser a step
+    from the base toward `dir`, under the ceiling, through the hole and on above it for `over` metres into the dark;
+    each open side closed down to the floor by a stepped string in the joinery's wood, and the flight's end under the
+    hole's far edge by a plaster panel (the space under the stairs is shut); above the ceiling a shaft lined in the
+    wall's plaster with the ceiling's depth (CEIL_T) in wood at the hole's edges, a floor over the ceiling past the
+    hole and a cap at `top`. One object, `Stairs_<id>`, of kind `stairs`; the collision is the loader's one box over
+    the flight's run under the ceiling, floor to ceiling (collision())."""
+    x0, y0, x1, y1 = fl["well"]
+    d, base, near, far = fl["dir"], fl["base"], fl["near"], fl["far"]
+    steps, H, zt = fl["steps"], fr.H, fl["top"]
+    run = steps[-1][1]
+    LT, e_ = 0.03, 1e-6
+    along_x = d in ("E", "W")
+    sg = 1.0 if d in ("N", "E") else -1.0
+    a0, a1 = (y0, y1) if along_x else (x0, x1)
+    lo_side, hi_side = ("S", "N") if along_x else ("W", "E")
+    wood, plaster = mt["wood"], mt["wall"]
+
+    def W(u, c, z):                 # (u from the base, across, z) -> world
+        return (base + sg * u, c, z) if along_x else (c, base + sg * u, z)
+
+    def box(b, u0, u1, c0, c1, z0, z1, mat, vgrain=False):
+        p_, q_ = W(u0, c0, z0), W(u1, c1, z1)
+        b.box(tuple(min(v) for v in zip(p_, q_)), tuple(max(v) for v in zip(p_, q_)), mat, vgrain=vgrain)
+
+    o_ = W(0.0, 0.0, 0.0)
+    f_ = W(1.0, 0.0, 0.0)
+    nu = (f_[0] - o_[0], f_[1] - o_[1], 0.0)                         # +u in the world
+    back = (-nu[0], -nu[1], 0.0)
+    across = (0.0, 1.0, 0.0) if along_x else (1.0, 0.0, 0.0)
+    uv_t = (0, 1)
+    uv_r = (1, 2) if along_x else (0, 2)
+    uv_s = (0, 2) if along_x else (1, 2)
+    base_wall = {"N": fr.y0, "S": fr.y1, "E": fr.x0, "W": fr.x1}[d]
+    b = Builder()
+    prev = 0.0
+    for i, (u0, u1, top) in enumerate(steps):
+        _quad(b, [W(u0, a0, top), W(u1, a0, top), W(u1, a1, top), W(u0, a1, top)], (0, 0, 1), wood, uv_t)
+        if not (i == 0 and abs(base - base_wall) < e_):             # the first riser on a wall is the wall
+            _quad(b, [W(u0, a0, prev), W(u0, a1, prev), W(u0, a1, top), W(u0, a0, top)], back, wood, uv_r)
+        prev = top
+        if u0 < far - e_:           # the strings: each open side shut from the floor to the tread, under the ceiling
+            ua, zb_ = min(u1, far), min(top, H)
+            for c, side, sgn in ((a0, lo_side, -1.0), (a1, hi_side, 1.0)):
+                if side in fl["on_wall"]:
+                    continue
+                out = (sgn * across[0], sgn * across[1], 0.0)
+                _quad(b, [W(u0, c, 0.0), W(ua, c, 0.0), W(ua, c, zb_), W(u0, c, zb_)], out, wood, uv_s)
+    # the end of the run under the ceiling: from the floor to the tread that ends at the hole's far edge
+    under_top = max([t for (u0, u1, t) in steps if u1 <= far + e_] or [0.0])
+    _quad(b, [W(far, a0, 0.0), W(far, a1, 0.0), W(far, a1, under_top), W(far, a0, under_top)], nu, plaster, uv_r)
+    # the shaft above the ceiling
+    box(b, near - LT, near, a0 - LT, a1 + LT, H, H + CEIL_T, wood)                # the hole's head edge, its joists
+    box(b, near - LT, near, a0 - LT, a1 + LT, H + CEIL_T, zt, plaster)
+    for c0, c1 in ((a0 - LT, a0), (a1, a1 + LT)):                                 # the two side walls
+        box(b, near, far, c0, c1, H, H + CEIL_T, wood)
+        box(b, near, run + LT, c0, c1, H + CEIL_T, zt, plaster)
+        box(b, far, run + LT, c0, c1, H, H + CEIL_T, plaster)
+    box(b, run, run + LT, a0, a1, H, zt, plaster)                                 # the end of the run, in the dark
+    box(b, far, run, a0, a1, H + 0.005, H + 0.035, plaster)                       # the floor over the ceiling
+    box(b, near - LT, run + LT, a0 - LT, a1 + LT, zt, zt + 0.03, plaster)         # the cap
+    ob = b.build(nm("Stairs" + sfx(e["id"])))
+    register(ob, "stairs", e["id"] + ":flight")
+    return dict(id=e["id"], up=True, steps=len(steps), top=zt, rail=[], box=list(fl["box"]))
 
 
 def trims(fr: Frame, mt: dict) -> None:
@@ -4111,9 +4196,12 @@ def bake_rig(fr: Frame, holes: list, lights: list, moon: Vector) -> list:
     # the light-tight box
     b = Builder()
     pad, z0, z1 = fr.T + 0.04, -0.3, fr.H + 0.3
-    shafts = [m["flight"]["bottom"] for m in fr.markers if m.get("flight")]
+    shafts = [m["flight"]["bottom"] for m in fr.markers if m.get("flight") and not m["flight"].get("up")]
     if shafts:      # a stairs shaft (G12): the box's floor under its own
         z0 = min(z0, min(shafts) - 0.3)
+    ups = [m["flight"]["top"] for m in fr.markers if m.get("flight") and m["flight"].get("up")]
+    if ups:         # a flight up's shaft: the box's lid over its cap
+        z1 = max(z1, max(ups) + 0.3)
     X0, X1, Y0, Y1 = fr.x0 - pad, fr.x1 + pad, fr.y0 - pad, fr.y1 + pad
     dark = RMat("M_bake_dark", None, (0.0, 0.0, 0.0), rough=1.0)
     b.box((X0, Y0, z0 - 0.02), (X1, Y1, z0), dark)

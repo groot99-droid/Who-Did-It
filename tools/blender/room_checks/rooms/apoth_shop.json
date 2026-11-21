@@ -1,0 +1,11 @@
+{
+  "room": "apoth_shop",
+  "about": "Mallory's apothecary shop as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "121 of the map's 123 walkable tiles can be stood on. (1,5) lies under the day bed (the scene's bed, north to south along the west wall), the same kind as the bedroom's, the parlour's, the cottage's and the loft's tiles under their beds. (16,2) lies under the visible stairs up to the loft (D6: a flight 0.9 m wide along the east wall from the stairs portal's tile (16,1)), furniture of the same kind over a walkable tile. Listed for the owner (2026-11-21), not yet ruled on."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails."
+}

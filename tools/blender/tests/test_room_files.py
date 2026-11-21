@@ -1061,6 +1061,56 @@ class RoomFileV2(unittest.TestCase):
         data["openings"][0]["flight"] = {"well": [5.0, -0.5, 6.0, 0.5], "dir": "W"}
         return data
 
+    # -- G12, second part: a flight up into a hole in the ceiling (the apothecary's shop)
+    def shop(self):
+        return raw(os.path.join(ROOMS_DIR, "apoth_shop.json"))
+
+    def test_the_shop_flight_rises_through_its_hole(self):
+        _cfg, spec = self.read(self.shop())
+        st = next(e for e in spec["openings"] if e["id"] == "as.stairs")
+        fl = st["flight"]
+        self.assertEqual((st["kind"], st["side"], st["foot"], st["cut"]), ("stairs", "E", [7.5, 4.0], False))
+        self.assertEqual((fl["up"], fl["dir"], fl["base"], fl["on_wall"], fl["rail"]), (True, "S", 4.5, ["E"], []))
+        self.assertAlmostEqual(fl["near"], 0.76)
+        self.assertAlmostEqual(fl["far"], 2.47)
+        self.assertEqual(len(fl["steps"]), 19)                  # 2.47 m to the far edge and 1.0 m over, at 0.19 m
+        self.assertEqual(fl["steps"][0], [0.0, 0.19, 0.22])
+        self.assertAlmostEqual(fl["steps"][-1][2], 4.18)
+        self.assertAlmostEqual(fl["top"], 6.38)
+        self.assertEqual(fl["box"], [7.1, 2.03, 0.0, 8.0, 4.5, 3.0])  # the run under the ceiling, floor to ceiling
+        under = [s_ for s_ in fl["steps"] if s_[0] < fl["near"]]
+        self.assertTrue(all(3.0 - s_[2] >= 2.0 for s_ in under))   # head room short of the hole
+        self.assertTrue(all(s_[2] >= 3.0 for s_ in fl["steps"] if s_[1] > fl["far"] + 1e-6))
+        sc = rf.Scene(scene("apoth_shop"))
+        dflt = rf.flight_values({"up": True, "well": [7.1, 1.64, 8.0, 3.62], "dir": "S"}, sc, height=3.0)
+        self.assertEqual((dflt["base"], dflt["riser"], dflt["tread"], dflt["over"]), (4.5, 0.22, 0.22, 1.0))
+        down = rf.flight_values({"well": [-5.0, 2.5, -4.05, 3.5], "dir": "S"}, rf.Scene(scene("apoth_loft")))
+        self.assertNotIn("up", down)                            # a flight down reads as before
+
+    def test_flight_up_rules(self):
+        def stairs(d):
+            return next(o for o in d["openings"] if o["id"] == "as.stairs")["flight"]
+
+        cases = [(lambda f: f.update(up="yes"), "flight.up is true (a flight up into the ceiling) or false (R-F9)"),
+                 (lambda f: f.update(rail=["W"]), "a flight up has no under, rail or rail_h"),
+                 (lambda f: f.update(well=[7.1, 2.03, 8.0, 4.8]), "reaches out of the room"),
+                 (lambda f: f.update(base=5.0), "flight.base 5 is out of the room (-4.5..4.5) (R-F10)"),
+                 (lambda f: f.update(base=3.0), "behind the flight's base"),
+                 (lambda f: f.update(well=[7.1, 2.03, 8.0, 3.0]), "short of the hole: 2 m at least (start the hole nearer the base) (R-F11)"),
+                 (lambda f: f.update(well=[7.1, 2.6, 8.0, 3.74]), "under the ceiling (3 m): a longer hole or a steeper "
+                                                                  "flight (R-F12)"),
+                 (lambda f: f.update(over=0.0, riser=0.05, well=[7.1, -4.0, 8.0, 3.74]), "must rise over the ceiling"),
+                 (lambda f: f.update(over=9.0), "flight.over is the metres the flight runs on above the ceiling"),
+                 (lambda f: f.update(dir="N"), "behind the flight's base")]
+        for change, said in cases:
+            data = self.shop()
+            change(stairs(data))
+            self.assertIn(said, self.stops(data), said)
+        data = self.loft()
+        stairs_ = next(o for o in data["openings"] if o["id"] == "al.stairs")["flight"]
+        stairs_["over"] = 1.0
+        self.assertIn("flight.over is a flight up's (\"up\": true) (R-F9)", self.stops(data))
+
     def test_a_box_may_be_grey_or_wood(self):
         data = self.loft()
         beam = next(p for p in data["pieces"] if p["id"] == "al.beam_w")

@@ -187,7 +187,9 @@ class Facts:
     def _opening(self, e):
         o = dict(id=e["id"], kind=e["kind"], side=e["side"], a=e.get("a"), b=e.get("b"), z0=e.get("z0"),
                  z1=e.get("z1"), portal=e.get("portal"), style=e.get("style"), eyes=None,
-                 well=(e.get("flight") or {}).get("well"), shaft=self._shaft(e.get("flight")))
+                 well=None if (e.get("flight") or {}).get("up") else (e.get("flight") or {}).get("well"),
+                 hole=(e.get("flight") or {}).get("well") if (e.get("flight") or {}).get("up") else None,
+                 shaft=self._shaft(e.get("flight")))
         if o["side"] not in SIDES or o["a"] is None or o["z1"] is None:
             return o                                       # a hatch in the floor, a marker: no wall scan
         lo, hi = self.span(o["side"])
@@ -212,18 +214,21 @@ class Facts:
 
     @staticmethod
     def _shaft(fl):
-        """A stairs flight's shaft (G12) as [x0, y0, x1, y1, bottom z]: its well run on under the floor along `dir`
-        to the end of its steps; None for no flight (the manifest's opening row carries the loader's flight)."""
+        """A stairs flight's shaft (G12) as [x0, y0, x1, y1, z0, z1]: a flight down's well run on under the floor
+        along `dir` to the end of its steps, from its bottom to the floor (z 0); a flight up's hole in the ceiling run
+        on along `dir` to the end of its steps, from the ceiling (the flight's collision box's top) to its cap; None
+        for no flight (the manifest's opening row carries the loader's flight)."""
         if not fl:
             return None
         x0, y0, x1, y1 = fl["well"]
         run, d = fl["steps"][-1][1], fl["dir"]
         end = fl["head"] + (run if d in ("N", "E") else -run)
+        z0, z1 = (fl["box"][5], fl["top"]) if fl.get("up") else (fl["bottom"], 0.0)
         if d in ("N", "S"):
             y0, y1 = min(y0, y1, end), max(y0, y1, end)
         else:
             x0, x1 = min(x0, x1, end), max(x0, x1, end)
-        return [x0, y0, x1, y1, fl["bottom"]]
+        return [x0, y0, x1, y1, z0, z1]
 
     def _legacy_openings(self, A):
         """A manifest written before G2b: the check file's door and window (the bedroom's; its door is the scene's
