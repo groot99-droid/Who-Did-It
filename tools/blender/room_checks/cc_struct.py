@@ -1,9 +1,11 @@
 """Room check 1 (the contract): the structure of a first-person room GLB, from its JSON. No Blender.
 
 Usage: python cc_struct.py <roomId> [--glb F] [--scene F] [--manifest F] [--out DIR] [--config F]   (roomcfg.py)
-Read-only. Frames: Blender room metres (x east, y north, z up) = glTF (x, -z, y). The manifest (the builder's
-<roomId>.json) is read only for the lights' Blender watts, to test the COMPAT conversion (W / 4 pi). The room file
-gives how many lights the room exports, the file's size window and the ids that carry no COLOR_0 on purpose.
+Read-only. Frames: Blender room metres (x east, y north, z up) = glTF (x, -z, y). What it knows of the room comes from
+the builder's manifest (<roomId>.json: the room's bounds, its openings, the spawns and portals as placed, the lights it
+exports with their Blender watts for the COMPAT conversion W / 4 pi, the ids that carry no COLOR_0 on purpose) and the
+scene (`roomcfg.Facts`). The check file is optional: its size window, when it has one, replaces the shared gate (6 MB,
+248 primitives, 64 MB of texture memory), and it stands in for a manifest written before G2b.
 Writes <out>/cc_struct.json.
 """
 import json
@@ -18,7 +20,8 @@ import roomcfg  # noqa: E402
 
 ARGS = roomcfg.parse()
 GLB, SCENE, REPORT = ARGS.glb, ARGS.scene, ARGS.manifest
-ROOM = roomcfg.load(ARGS.config)
+F = roomcfg.Facts(ARGS)
+ROOM = F.cfg
 os.makedirs(ARGS.out, exist_ok=True)
 OUT = os.path.join(ARGS.out, "cc_struct.json")
 raw = open(GLB, "rb").read()
@@ -32,10 +35,10 @@ while off + 8 <= len(raw):
 J = json.loads(raw[CH[0][1]:CH[0][1] + CH[0][2]])
 BIN0 = CH[1][1]
 scene = json.load(open(SCENE, encoding="utf-8"))
-rep = json.load(open(REPORT, encoding="utf-8"))
+rep = F.man
 SID, PFX = scene["id"], scene["prefix"]
 WT, HT = scene["size"]["w"], scene["size"]["h"]
-FX0, FX1, FY0, FY1 = -(WT - 2) / 2, (WT - 2) / 2, -(HT - 2) / 2, (HT - 2) / 2
+FX0, FX1, FY0, FY1 = F.fx0, F.fx1, F.fy0, F.fy1
 R = {"file": roomcfg.shown(GLB), "checks": {}}
 FAILS = []
 
@@ -170,9 +173,10 @@ for nm, s in SPAWNS.items():
     fwd_g = apply(M, [0, 0, -1], 0.0)                  # the node's -Z in glTF world (what the viewer looks along)
     f = to_b(fwd_g)
     yaw = math.atan2(-fwd_g[0], -fwd_g[2])             # spawn.ts yawFromDirection
-    want = (FX0 + s["x"] - 0.5, FY1 - s["y"] + 0.5)
+    placed = next((m_ for m_ in rep.get("spawns", []) if m_.get("name") == nm), None)
+    want = tuple(placed["local"][:2]) if placed and placed.get("local") else (FX0 + s["x"] - 0.5, FY1 - s["y"] + 0.5)
     face = {"n": (0, 1), "s": (0, -1), "e": (1, 0), "w": (-1, 0)}[s["facing"]]
-    into = (0.0 - p[0], 0.0 - p[1])
+    into = ((FX0 + FX1) / 2 - p[0], (FY0 + FY1) / 2 - p[1])
     ex = nodes[i].get("extras", {})
     e = dict(name=nm, blender=r4(p), forward_blender=r4(f), viewer_yaw_rad=round(yaw, 6), tile=[s["x"], s["y"]],
              tile_centre=list(want), extras=ex, under_area=i in desc,
@@ -197,10 +201,21 @@ for nm, po in PORTALS.items():
         continue
     p = to_b(apply(world_m(i), [0, 0, 0]))
     ex = nodes[i].get("extras", {})
-    cx = FX0 + po["x"] - 0.5
-    on_face = (abs(p[1] - FY0) if po["y"] == HT - 1 else abs(p[1] - FY1) if po["y"] == 0 else
-               abs(p[0] - FX0) if po["x"] == 0 else abs(p[0] - FX1))
-    along = abs(p[0] - cx) if po["y"] in (0, HT - 1) else abs(p[1] - (FY1 - po["y"] + 0.5))
+    mp = next((m_ for m_ in rep.get("portals", []) if m_.get("name") == nm), {})
+    op = next((o for o in F.openings if o["id"] == (mp.get("opening") or po["id"]) and o.get("a") is not None), None)
+    if mp.get("placed") in (None, "door_foot") and op is not None and op["side"] in "NESW":
+        # at the foot of its door: on the wall's inner face, at the opening's centre
+        on_face = abs(F.depth(op["side"], p))
+        along = abs(F.along(op["side"], p) - (op["a"] + op["b"]) / 2)
+    elif mp.get("local"):
+        # a marker (stairs, hatch, drop) or a tile centre: where the manifest says it stands
+        on_face = 0.0
+        along = math.hypot(p[0] - mp["local"][0], p[1] - mp["local"][1])
+    else:
+        cx = FX0 + po["x"] - 0.5
+        on_face = (abs(p[1] - FY0) if po["y"] == HT - 1 else abs(p[1] - FY1) if po["y"] == 0 else
+                   abs(p[0] - FX0) if po["x"] == 0 else abs(p[0] - FX1))
+        along = abs(p[0] - cx) if po["y"] in (0, HT - 1) else abs(p[1] - (FY1 - po["y"] + 0.5))
     three_name = re.sub(r"[\[\]\.:/]", "", re.sub(r"\s", "_", nm))   # PropertyBinding.sanitizeNodeName
     R["portals"].append(dict(name=nm, blender=r4(p), extras=ex, three_name=three_name, three_id=three_name[len("Portal_"):]))
     check(f"portal_{po['id']}", ex.get("to") == po["to"] and ex.get("toSpawn") == po["toSpawn"] and ex.get("kind") == po["kind"]
@@ -249,12 +264,16 @@ for i, n in enumerate(nodes):
         e["compat_match"] = abs(L.get("intensity", 1.0) - w / (4 * math.pi)) < 1e-3 * max(1.0, w / (4 * math.pi))
         light_ok &= e["compat_match"]
     if L["type"] == "spot":
-        # where the axis crosses the window's inner face (y = FY1: the north wall, the bedroom's) and the wall's outer
-        # face, and lands on the floor; for the record, not a pass or fail
-        for lab, yy in (("inner_face", FY1), ("outer_face", FY1 + 0.30)):
-            if abs(d[1]) > 1e-9:
-                t = (yy - p[1]) / d[1]
-                e[f"axis_at_{lab}"] = r4([p[0] + t * d[0], yy, p[2] + t * d[2]])
+        # where the axis crosses its window's inner face and the wall's outer face (the north wall when the manifest
+        # names no window), and lands on the floor; for the record, not a pass or fail
+        wid = rep_l.get(L.get("name"), {}).get("window")
+        side = next((o["side"] for o in F.openings if o["id"] == wid), "N") if wid else "N"
+        ax = 0 if side in "EW" else 1
+        for lab, off in (("inner_face", 0.0), ("outer_face", 0.30)):
+            ww = F.plane(side) + off * (1 if side in "NE" else -1)
+            if abs(d[ax]) > 1e-9:
+                t = (ww - p[ax]) / d[ax]
+                e[f"axis_at_{lab}"] = r4([p[0] + t * d[0], p[1] + t * d[1], p[2] + t * d[2]])
         if d[2] < 0:
             t = -p[2] / d[2]
             e["axis_on_floor"] = r4([p[0] + t * d[0], p[1] + t * d[1], 0.0])
@@ -263,9 +282,19 @@ for i, n in enumerate(nodes):
     R["lights"].append(e)
 types = sorted(l["type"] for l in LT)
 names_l = [l.get("name", "") for l in LT]
-check("lights_candle_and_moon_compat", len(LT) == ROOM["lights"]["exported"] and "directional" not in types
-      and light_ok and all(x["under_area"] for x in R["lights"]) and all(x.startswith(SID + "_") for x in names_l),
-      types=types, names=names_l,
+# the lights the manifest says the room exports (a manifest without them: the check file's count)
+want_l = sorted(rep_l) if rep_l else None
+n_want = len(want_l) if want_l is not None else ROOM["lights"]["exported"]
+# each exported light's scene id (a v2 export's wdi_light_id) is one of the scene's night lights, once
+night = {x["id"] for x in scene.get("lights", []) if "night" in (x.get("phases") or ["night"])}
+lids = [x["extras"].get("wdi_light_id") for x in R["lights"] if (x.get("extras") or {}).get("wdi_light_id")]
+kinds = sorted(r.get("kind") or "" for r in rep_l.values())
+check("lights_candle_and_moon_compat" if kinds in (["lamp", "moon"], []) else "lights_as_the_manifest_compat",
+      len(LT) == n_want and (want_l is None or sorted(names_l) == want_l) and "directional" not in types
+      and light_ok and all(x["under_area"] for x in R["lights"]) and all(x.startswith(SID + "_") for x in names_l)
+      and all(lid in night for lid in lids) and len(set(lids)) == len(lids),
+      types=types, names=names_l, manifest_names=want_l, scene_ids=lids,
+      not_scene_night_lights=sorted(set(lids) - night),
       intensities=[(x["light"], x["intensity"], x.get("blender_W"), x.get("W_over_4pi")) for x in R["lights"]],
       note="COMPAT: candela = W / 4 pi (the README); no directional light, which would make main.ts drop the village moon")
 
@@ -312,7 +341,7 @@ for i, n in enumerate(nodes):
                          uv=("TEXCOORD_0" in at), what=n.get("extras", {}).get("wdi_what"), wid=n.get("extras", {}).get("wdi_id")))
 R["primitives"] = rows
 no_c = [r for r in rows if r["color0"] is None]
-DELIBERATE = set(ROOM["no_color0"])
+DELIBERATE = set(F.no_color0)
 undeliberate = [r["node"] for r in no_c if r["node"] != COLN and r["wid"] not in DELIBERATE]
 badfmt = [r["node"] for r in rows if r["color0"] is not None and r["color0"] != [5126, "VEC3", False]]
 check("color0_on_every_room_primitive", not undeliberate and not badfmt and all(set(r["attrs"]) == set(r["draco_attrs"]) for r in rows),
@@ -360,10 +389,18 @@ check("images_webp_sized", all(x["mime"] == "image/webp" and x["size"] for x in 
       and all(max(x["size"][:2]) <= 2048 for x in imgs) and used_src == set(range(len(imgs))),
       images=len(imgs), textures=len(tex), sizes=sorted({f"{x['size'][0]}x{x['size'][1]}" for x in imgs}),
       image_bytes=img_bytes, unused_images=sorted(set(range(len(imgs))) - used_src))
-SIZE = ROOM["glb_bytes"]
-check(f"file_size_{roomcfg.tag(SIZE['min'] / 1e6)}_to_{roomcfg.tag(SIZE['max'] / 1e6)}_MB",
-      SIZE["min"] <= len(raw) <= SIZE["max"],
-      **{k: R["totals"][k] for k in ("bytes", "MB", "MiB", "image_bytes", "triangles_room")})
+# the texture memory a viewer holds: RGBA8 and its mip chain (4/3) for every image
+R["totals"]["texture_memory_MB"] = round(sum(x["size"][0] * x["size"][1] for x in imgs if x["size"]) * 4 * 4 / 3 / 1e6, 2)
+if ROOM.get("glb_bytes"):          # the room's own window (the bedroom's)
+    SIZE = ROOM["glb_bytes"]
+    check(f"file_size_{roomcfg.tag(SIZE['min'] / 1e6)}_to_{roomcfg.tag(SIZE['max'] / 1e6)}_MB",
+          SIZE["min"] <= len(raw) <= SIZE["max"],
+          **{k: R["totals"][k] for k in ("bytes", "MB", "MiB", "image_bytes", "triangles_room")})
+else:                              # the shared room gate
+    check("size_under_6_MB_248_primitives_64_MB_textures", len(raw) <= 6e6 and len(rows) <= 248
+          and R["totals"]["texture_memory_MB"] <= 64,
+          **{k: R["totals"][k] for k in ("bytes", "MB", "primitives", "texture_memory_MB", "image_bytes",
+                                         "triangles_room")})
 
 # ------------------------------------------------------------------------------------------- names (a plain append)
 pre = SID + "_"

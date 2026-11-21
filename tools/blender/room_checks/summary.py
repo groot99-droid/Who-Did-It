@@ -21,8 +21,8 @@ import roomcfg  # noqa: E402
 
 SCRIPTS = (
     ("cc_struct", "the GLB's structure against the walk contract"),
-    ("cc_geom", "the shell, the door and the window, collision, reach, ray fans, the bake data"),
-    ("cc_cracks", "see-through scans at the door, the window and the room's edges"),
+    ("cc_geom", "the shell, the doors and the windows, collision, reach, ray fans, the bake data"),
+    ("cc_cracks", "see-through scans at the doors, the windows and the room's edges"),
     ("cc_display", "what the viewer shows at every visible vertex, against ink"),
     ("cc_blend", "the .blend, built for a plain append"),
     ("r7_extra", "climbing, the eye, pockets, the approach to spots and props, the flame, names, pieces"),
@@ -87,7 +87,8 @@ def counts(name, d):
                     visible_vertices=pick(d, "color0", "visible_vertices"),
                     visible_black_vertices=pick(d, "color0", "visible_black_vertices"))
     if name == "cc_cracks":
-        return {k: dict(rays=pick(d, k, "rays"), void=pick(d, k, "void")) for k in ("door", "window", "room_edges")}
+        # door, window and room_edges; door:<id> and window:<id> in a room with more than one
+        return {k: dict(rays=v.get("rays"), void=v.get("void")) for k, v in d.items() if isinstance(v, dict) and "rays" in v}
     if name == "cc_display":
         c = {k: d.get(k) for k in ("exposure", "ink_luma", "vertices", "visible", "visible_interior")}
         for lab in ("own_texel", "dark_texel_p3", "dark_texel_p1"):
@@ -119,7 +120,7 @@ def main():
             fh.write(f"{md5(A.glb)} *{roomcfg.shown(A.glb)}\n")
         return 0
 
-    room = roomcfg.load(A.config)
+    room = roomcfg.optional(A.config)                       # optional: a room with no judged failures has none
     known = {k["check"] for k in room.get("known_fails", [])}
     steps = {}
     tsv = os.path.join(A.out, "steps.tsv")

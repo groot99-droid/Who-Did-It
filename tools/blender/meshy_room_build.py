@@ -4543,6 +4543,7 @@ def obj_albedo(o) -> np.ndarray:
 
 
 OBJ_KIND: dict = {}         # object name -> what it is (register's `what`)
+NO_COLOR0: list = []        # the wdi_id of every registered mesh the bake leaves out on purpose
 
 
 def flame_hosts() -> set:
@@ -5868,6 +5869,9 @@ def blender_main(a) -> None:
     if unbaked:   # these would export without COLOR_0 and show unlit (full albedo) in the viewer
         log("WARNING meshes left out of the bake:", unbaked)
         NOTES.append(f"meshes left out of the bake (no COLOR_0): {unbaked}")
+    # the ids of the meshes that carry no COLOR_0 on purpose (emitters, glass, the sky): the checks' noColor0 (G2b)
+    NO_COLOR0[:] = sorted({r["id"] for r in OBJS if r["obj"] is not None and r["obj"].type == "MESH"
+                           and r["obj"] not in targets and r["obj"].name not in unbaked})
     added = seam_added = 0
     for o in targets:
         seam_added += split_material_seams(o)
@@ -6141,6 +6145,7 @@ def blender_main(a) -> None:
                         box=[round(v, 3) for v in p["box"]]) for pid, p in PIECES.items()
                    if p["spec"].get("model") == "box"],
         coverage=SPEC.get("coverage"), skip=SPEC.get("skip"),
+        noColor0=list(NO_COLOR0),
         collision=dict(name=coll_ob.name, boxes=len(boxes), triangles=len(boxes) * 12, boxesSha1=boxes_sha1(boxes)),
         walk={k: v for k, v in walk.items() if not k.startswith("_")}, checks=checks, notes=NOTES,
         # the Poly Haven models and textures this room used (its credits: coupling 24 of the implementation plan)
@@ -6164,7 +6169,7 @@ def blender_main(a) -> None:
     log("saved", blend, os.path.getsize(blend))
     if a.glb:
         size = export_glb(glb)
-        manifest["glb"] = dict(path=os.path.relpath(glb, ROOT), **glb_facts(glb))
+        manifest["glb"] = dict(path=from_root(glb), **glb_facts(glb))
         log("exported", glb, size)
     if a.preview:
         manifest["previews"] = [os.path.basename(p) for p in previews(fr, out_dir, ex, a.preview_res, coll_ob)]

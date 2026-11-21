@@ -11,17 +11,16 @@ Frames: Blender room metres (x east, y north, z up) = glTF (x, -z, y); the area'
 The viewer's walker (apps/walk/src/physics on origin/claude/v2-walk): feet on the ground; a capsule of radius 0.30 whose
 axis runs from 0.65 to 1.45 m above the feet (stepHeight + radius .. bodyHeight - radius); five ground rays (centre and
 +-0.21 m) from 0.35 m above the feet, 0.70 m down (stepHeight + snapDown); push-out from HM_Collision_room_<id> only.
-The room's check file (rooms/<roomId>.json) gives the ceiling's height, the door's size and wall, and the window's wall
-and the part of it searched for the cut. Still the bedroom's own in this script:
-  the first spawn and the first portal only;
-  the door in the south wall and the window in the north wall (`roomcfg.need_walls` stops any other check file);
-  the door's scans, sized for its 0.9 x 2.15 m door in a 0.30 m wall: the wall's cut searched 0.8 m either side of the
-  door's centre and up to 2.6 m, the leaf 0.6 m either side and up to 2.4 m, the joinery taken from the door's
-  vertices within the wall's 0.30 m, the strip across the head 2.0 to 2.2 m up and 0.43 m either side;
-  the window's strips at its sill and its head, 0.6 to 0.9 m and 2.2 to 2.4 m up;
-  the ids lit_window and moon_disc counted as outside;
-  shell boxes wider than 9 m as the floor and ceiling, the origins of the wall rays (inside a 10 x 7 m room), the
-  curtains and the swag as one piece.
+What it knows of the room comes from the builder's manifest and the scene (`roomcfg.Facts`, G2b): the room's bounds
+and ceiling, every door and window opening with its wall and span, every spawn and portal. Each door and each window
+is scanned on its own wall: the wall's cut searched round the opening (a door 0.35 m either side and 0.45 m over its
+head, a window 0.65 m either side, never past half the gap to a neighbour), the door's leaf 0.6 m either side, its
+joinery from the door's vertices within the wall's 0.30 m, the strip across its head and the window's strips at its sill
+and head. A room with one door and one window keeps the bedroom's check names; another names one check per opening
+(`<name>:<opening id>`). The flood fills from every spawn; every portal must fire. The floor and ceiling boxes are the
+shell boxes as wide as the room; the wall rays start at a quarter, a half and three quarters of each wall; the
+curtains and the swag of one window are one piece. A manifest written before G2b (no `openings`) reads the check file's
+door and window, as the bedroom's did. The ids lit_window and moon_disc are counted as outside.
 --quick is a coarse run (10 cm cells, 12 fan points, 24 eyes); walls_closed_collision_fans wants 20 fan points, so a
 quick run always fails it.
 Writes <out>/cc_geom.json, cc_reach.png, cc_grid.npz, cc_vertices.npz. cc_cracks.py and r7_extra.py run this file's
@@ -48,7 +47,8 @@ import roomcfg  # noqa: E402
 ARGS = roomcfg.parse()
 GLB, SCENE, OUTD = ARGS.glb, ARGS.scene, ARGS.out
 QUICK = ARGS.quick
-ROOM = roomcfg.load(ARGS.config)
+F = roomcfg.Facts(ARGS)
+ROOM = F.cfg
 os.makedirs(OUTD, exist_ok=True)
 T0 = time.time()
 R = {"file": roomcfg.shown(GLB), "quick": QUICK, "checks": {}}
@@ -74,9 +74,9 @@ scene = json.load(open(SCENE, encoding="utf-8"))
 SID = scene["id"]
 PFX = scene["prefix"]
 WT, HT = scene["size"]["w"], scene["size"]["h"]
-FX0, FX1 = -(WT - 2) / 2.0, (WT - 2) / 2.0     # interior floor, 1 m per tile, origin at the floor centre
-FY0, FY1 = -(HT - 2) / 2.0, (HT - 2) / 2.0
-CEIL = float(ROOM["ceiling_m"])
+FX0, FX1 = F.fx0, F.fx1                          # interior floor, 1 m per tile, origin at the floor centre
+FY0, FY1 = F.fy0, F.fy1
+CEIL = F.ceil
 RADIUS, STEP, BODY, SNAP, EYE = 0.30, 0.35, 1.75, 0.35, 1.6
 AX0, AX1 = STEP + RADIUS, BODY - RADIUS          # 0.65 .. 1.45 above the feet
 
@@ -276,9 +276,10 @@ for root, tris in sorted(comp.items(), key=lambda kv: min(kv[1])):
 
 def kind_of(b):
     mn, mx = b["min"], b["max"]
-    if mx[2] <= 0.001 and mx[0] - mn[0] > 9:
+    wide = mx[0] - mn[0] > 0.9 * (FX1 - FX0) and mx[1] - mn[1] > 0.9 * (FY1 - FY0)    # as wide as the room
+    if mx[2] <= 0.001 and wide:
         return "floor"
-    if mn[2] >= CEIL - 0.001 and mx[0] - mn[0] > 9:
+    if mn[2] >= CEIL - 0.001 and wide:
         return "ceiling"
     if mn[0] < FX0 - 0.01 or mx[0] > FX1 + 0.01 or mn[1] < FY0 - 0.01 or mx[1] > FY1 + 0.01:
         return "wall"
@@ -314,8 +315,6 @@ def pts(name):
     return np.concatenate([x["P"] for x in byname[name]])
 
 
-roomcfg.need_walls(ROOM, "cc_geom.py")
-DOOR, WINDOW = ROOM["door"], ROOM["window"]
 fl = byname[f"{SID}_Floor"][0]
 fP, fT = fl["P"], fl["T"]
 farea = 0.5 * np.linalg.norm(np.cross(fP[fT[:, 1]] - fP[fT[:, 0]], fP[fT[:, 2]] - fP[fT[:, 0]]), axis=1).sum()
@@ -337,36 +336,39 @@ check("ceiling_at_" + f"{CEIL:.1f}".replace(".", "_"),
 walls = {s: byname[f"{SID}_Wall_{s}"] for s in "NESW"}
 BV_W, _, _, _ = bvh_of(sum(walls.values(), []))
 spans, cspans = {}, {}
+MX, MY = (FX0 + FX1) / 2, (FY0 + FY1) / 2
 for lab, d in (("E", (1, 0, 0)), ("W", (-1, 0, 0)), ("N", (0, 1, 0)), ("S", (0, -1, 0))):
     vals, cvals = [], []
     for z in (0.5, 1.0, 1.6, 2.4):
-        for s in (-0.7, 0.0, 0.7):
-            o = (0, s * 3, z) if lab in "EW" else (s * 4.2, 0, z)
+        for f in (0.25, 0.5, 0.75):                    # a quarter, a half and three quarters along the room
+            o = (MX, FY0 + f * (FY1 - FY0), z) if lab in "EW" else (FX0 + f * (FX1 - FX0), MY, z)
             h = ray(BV_W, o, d)
             hc = ray(BV_C, o, d)
             if h:
-                vals.append(abs(h[0].x) if lab in "EW" else abs(h[0].y))
+                vals.append(abs(h[0].x - MX) if lab in "EW" else abs(h[0].y - MY))
             if hc and OWN_C[hc[2]]:
-                cvals.append(abs(hc[0].x) if lab in "EW" else abs(hc[0].y))
+                cvals.append(abs(hc[0].x - MX) if lab in "EW" else abs(hc[0].y - MY))
     spans[lab] = r4([min(vals), max(vals)]) if vals else None
     cspans[lab] = r4([min(cvals), max(cvals)]) if cvals else None
 R["wall_faces"] = dict(visible=spans, collision_first_hit=cspans)
 check("inner_walls_on_tile_boundaries",
       all(spans[s] and abs(spans[s][0] - e) < 0.003 and abs(spans[s][1] - e) < 0.003
-          for s, e in (("E", FX1), ("W", -FX0), ("N", FY1), ("S", -FY0))),
-      visible_wall_faces_from_origin=spans, expected={"E": FX1, "W": -FX0, "N": FY1, "S": -FY0})
+          for s, e in (("E", FX1 - MX), ("W", MX - FX0), ("N", FY1 - MY), ("S", MY - FY0))),
+      visible_wall_faces_from_the_room_centre=spans,
+      expected={"E": FX1 - MX, "W": MX - FX0, "N": FY1 - MY, "S": MY - FY0})
 
 
-def opening(prims, plane, axis_y, inward, u0, u1, z0, z1, step):
-    """The hole in a wall: a grid over the wall plane, rays perpendicular to it from inside; cells with no face hit."""
+def opening(prims, side, u0, u1, z0, z1, step):
+    """The hole in side's wall: a grid over the wall plane, rays perpendicular to it from inside; cells with no face
+    hit."""
     b, _, _, _ = bvh_of(prims)
     us = np.arange(u0, u1 + 1e-9, step)
     zs = np.arange(z0, z1 + 1e-9, step)
     hole = np.zeros((len(zs), len(us)), bool)
+    out_ = Vector(F.outward(side))
     for a_, z in enumerate(zs):
         for b_, u in enumerate(us):
-            o = (u, plane + inward * 0.4, z)
-            hole[a_, b_] = b.ray_cast(Vector(o), Vector((0, -inward, 0)), 0.8)[0] is None
+            hole[a_, b_] = b.ray_cast(Vector(F.point(side, u, 0.4, z)), out_, 0.8)[0] is None
     if not hole.any():
         return None
     ii, jj = np.nonzero(hole)
@@ -377,85 +379,115 @@ def opening(prims, plane, axis_y, inward, u0, u1, z0, z1, step):
                 cells=int(hole.sum()), full=int(hole.size), step=step)
 
 
-door = scene["portals"][0]
-DCX, _ = tile_centre(door["x"], door["y"])
-st_o = 0.01 if QUICK else 0.0025
-dop = opening(walls[DOOR["wall"]], FY0, True, +1, DCX - 0.8, DCX + 0.8, 0.0025, 2.6, st_o)
-R["door_rough_opening_in_Wall_" + DOOR["wall"]] = dop
-door_parts = [x for x in PR if x["wid"].startswith(door["id"])]
-BV_D, OWN_D, VD, _ = bvh_of(door_parts)
-# the leaf, seen from the room: rays toward -y over the doorway; hits behind the wall's face are the leaf (and stops)
-us = np.arange(DCX - 0.6, DCX + 0.6 + 1e-9, 0.005)
-zs = np.arange(0.005, 2.4, 0.005)
-leaf_y = []
-leaf_cells = []
-for z in zs:
-    for u in us:
-        h = BV_D.ray_cast(Vector((u, FY0 + 0.3, z)), Vector((0, -1, 0)), 0.8)
-        if h[0] is not None and h[0].y < FY0 - 0.012:
-            leaf_cells.append((u, z))
-            leaf_y.append(h[0].y)
-leaf = None
-if leaf_cells:
-    L = np.array(leaf_cells)
-    LY = np.array(leaf_y)
-    deep = LY < np.median(LY) + 0.004                       # the leaf's face (the stops sit a little deeper or shallower)
-    leaf = dict(face_y=round(float(np.median(LY)), 4), u=r4([L[deep, 0].min(), L[deep, 0].max()]),
-                z=r4([L[deep, 1].min(), L[deep, 1].max()]),
-                width=round(float(L[deep, 0].max() - L[deep, 0].min() + 0.005), 3),
-                height=round(float(L[deep, 1].max() - L[deep, 1].min() + 0.005), 3))
-# the clear passage: the lining's inner faces at the leaf's face (just in front of it) and the head above it
-clear_w = []
-for z in np.arange(0.1, 2.0, 0.05):
-    a = ray(BV_D, (DCX, FY0 - 0.02, z), (1, 0, 0), 1.0)
-    b = ray(BV_D, (DCX, FY0 - 0.02, z), (-1, 0, 0), 1.0)
-    if a and b:
-        clear_w.append(a[0].x - b[0].x)
-head = ray(BV_D, (DCX, FY0 - 0.02, 1.0), (0, 0, 1), 3.0)
-# the joinery's own opening: the lining's outer faces (the Door mesh inside the wall's thickness)
-inwall = VD[(VD[:, 1] <= FY0 - 0.005) & (VD[:, 1] >= FY0 - 0.30 - 1e-3) & (np.abs(VD[:, 0] - DCX) < 0.6)]
-joinery = dict(x=r4([inwall[:, 0].min(), inwall[:, 0].max()]), z_top=round(float(inwall[:, 2].max()), 4),
-               width=round(float(inwall[:, 0].max() - inwall[:, 0].min()), 4)) if len(inwall) else None
 
 
-def first_hits(o_y, d_y, xs_, zs_):
-    """What the eye meets first, looking straight at a wall opening from the room (visible meshes, no glass)."""
+def first_hits(side, d_in, us_, zs_):
+    """What the eye meets first, looking straight at side's wall from d_in metres inside the room (visible meshes, no
+    glass)."""
     rows = []
+    out_ = Vector(F.outward(side))
     for z in zs_:
         names_ = set()
-        ys_ = []
-        for x in xs_:
-            h = BV_V.ray_cast(Vector((x, o_y, z)), Vector((0, d_y, 0)), 2.0)
+        ds_ = []
+        for u in us_:
+            h = BV_V.ray_cast(Vector(F.point(side, u, d_in, z)), out_, 2.0)
             names_.add(OWN_V[h[2]] if h[0] is not None else None)
-            ys_.append(round(h[0].y, 4) if h[0] is not None else None)
-        rows.append(dict(z=round(float(z), 4), first=sorted(str(n) for n in names_), y=sorted({v for v in ys_ if v is not None})))
+            ds_.append(round(F.depth(side, h[0]), 4) if h[0] is not None else None)
+        rows.append(dict(z=round(float(z), 4), first=sorted(str(n) for n in names_),
+                         beyond_face=sorted({v for v in ds_ if v is not None})))
     return rows
 
 
-door_strip = first_hits(FY0 + 1.0, -1.0, np.arange(DCX - 0.43, DCX + 0.431, 0.02), np.arange(2.0, 2.2001, 0.005))
-R["door"] = dict(leaf=leaf, clear_width_inside_lining=r4([min(clear_w), max(clear_w)]) if clear_w else None,
-                 clear_head_z=round(float(head[0].z), 4) if head else None, rough_opening_in_wall=dop,
-                 joinery_opening=joinery, door_mesh_bbox=[r4(VD.min(0)), r4(VD.max(0))], head_first_hits=door_strip)
-check(f"door_about_{roomcfg.tag(DOOR['width_m'])}_x_{roomcfg.tag(DOOR['height_m'])}",
-      joinery is not None and abs(joinery["width"] - DOOR["width_m"]) <= 0.03
-      and abs(joinery["z_top"] - DOOR["height_m"]) <= 0.03,
-      joinery_opening=joinery, wall_cut=dop and dict(x=dop["u"], z=dop["z"], width=dop["width"], height=dop["height"]),
-      leaf=leaf, clear_width_inside_lining=R["door"]["clear_width_inside_lining"], clear_head_z=R["door"]["clear_head_z"])
-wall_strip_d = [r["z"] for r in door_strip if any(f.endswith("_Wall_" + DOOR["wall"]) for f in r["first"])]
-check("door_wall_cut_matches_joinery", dop is not None and joinery is not None and abs(dop["z"][1] - joinery["z_top"]) <= 0.01
-      and not wall_strip_d,
-      wall_cut_top=dop and dop["z"][1], joinery_top=joinery and joinery["z_top"],
-      wall_plaster_seen_in_the_doorway_z=[min(wall_strip_d), max(wall_strip_d)] if wall_strip_d else None)
-WSX, WSZ = WINDOW["search"]["x"], WINDOW["search"]["z"]
-wop = opening(walls[WINDOW["wall"]], FY1, True, -1, WSX[0], WSX[1], WSZ[0], WSZ[1], 0.01 if QUICK else 0.005)
-R["window_rough_opening_in_Wall_" + WINDOW["wall"]] = wop
-if wop:
-    wx = np.arange(wop["u"][0] + 0.03, wop["u"][1] - 0.029, 0.02)
-    win_strip = first_hits(FY1 - 1.0, 1.0, wx, np.concatenate([np.arange(0.6, 0.9001, 0.005), np.arange(2.2, 2.4001, 0.005)]))
-    R["window_first_hits"] = win_strip
-    wall_strip_w = [r["z"] for r in win_strip if any(f.endswith("_Wall_" + WINDOW["wall"]) for f in r["first"])]
-    check("window_wall_cut_matches_joinery", not wall_strip_w, wall_cut=dict(x=wop["u"], z=wop["z"]),
-          wall_plaster_seen_in_the_window_z=[min(wall_strip_w), max(wall_strip_w)] if wall_strip_w else None)
+st_o = 0.01 if QUICK else 0.0025
+R["doors"], R["windows"] = {}, {}
+for DO in F.doors:
+    side, dc = DO["side"], (DO["a"] + DO["b"]) / 2
+    wall = walls[side]
+    sr = DO["search"]
+    dop = opening(wall, side, sr[0], sr[1], sr[2], sr[3], st_o)
+    door_parts = [x for x in PR if x["wid"] == DO["id"] or x["wid"].startswith(DO["id"] + ":")]
+    if not door_parts:
+        check(F.named(f"door_about_{roomcfg.tag(round(DO['b'] - DO['a'], 3))}_x_{roomcfg.tag(DO['z1'])}", DO, F.doors),
+              False, missing=f"no mesh with the door's id {DO['id']}")
+        continue
+    BV_D, OWN_D, VD, _ = bvh_of(door_parts)
+    out_d, ax_d = Vector(F.outward(side)), Vector(F.along_axis(side))
+    # the leaf, seen from the room: rays out over the doorway; hits behind the wall's face are the leaf (and stops)
+    us = np.arange(dc - 0.6, dc + 0.6 + 1e-9, 0.005)
+    zs = np.arange(0.005, min(DO["z1"] + 0.25, CEIL - 0.05), 0.005)
+    leaf_d, leaf_cells = [], []
+    for z in zs:
+        for u in us:
+            h = BV_D.ray_cast(Vector(F.point(side, u, 0.3, z)), out_d, 0.8)
+            if h[0] is not None and F.depth(side, h[0]) > 0.012:
+                leaf_cells.append((u, z))
+                leaf_d.append(F.depth(side, h[0]))
+    leaf = None
+    if leaf_cells:
+        L = np.array(leaf_cells)
+        LD = np.array(leaf_d)
+        deep = LD > np.median(LD) - 0.004                   # the leaf's face (the stops sit a little deeper or shallower)
+        leaf = dict(face_beyond_m=round(float(np.median(LD)), 4), u=r4([L[deep, 0].min(), L[deep, 0].max()]),
+                    z=r4([L[deep, 1].min(), L[deep, 1].max()]),
+                    width=round(float(L[deep, 0].max() - L[deep, 0].min() + 0.005), 3),
+                    height=round(float(L[deep, 1].max() - L[deep, 1].min() + 0.005), 3))
+    # the clear passage: the lining's inner faces at the leaf's face (just in front of it) and the head above it
+    clear_w = []
+    for z in np.arange(0.1, DO["z1"] - 0.15, 0.05):
+        o_ = Vector(F.point(side, dc, -0.02, z))
+        a = ray(BV_D, o_, ax_d, 1.0)
+        b = ray(BV_D, o_, -ax_d, 1.0)
+        if a and b:
+            clear_w.append(F.along(side, a[0]) - F.along(side, b[0]))
+    head = ray(BV_D, F.point(side, dc, -0.02, 1.0), (0, 0, 1), 3.0)
+    # the joinery's own opening: the lining's outer faces (the Door mesh inside the wall's thickness)
+    dep = np.array([F.depth(side, v) for v in VD])
+    alo = VD[:, 1] if side in "EW" else VD[:, 0]
+    inwall = VD[(dep >= 0.005) & (dep <= 0.30 + 1e-3) & (np.abs(alo - dc) < 0.6)]
+    ia = inwall[:, 1] if side in "EW" else inwall[:, 0]
+    joinery = dict(u=r4([ia.min(), ia.max()]), z_top=round(float(inwall[:, 2].max()), 4),
+                   width=round(float(ia.max() - ia.min()), 4)) if len(inwall) else None
+    door_strip = first_hits(side, 1.0, np.arange(dc - 0.43, dc + 0.431, 0.02),
+                            np.arange(DO["z1"] - 0.15, DO["z1"] + 0.0501, 0.005))
+    R["doors"][DO["id"]] = dict(side=side, centre=round(dc, 4), leaf=leaf,
+                                clear_width_inside_lining=r4([min(clear_w), max(clear_w)]) if clear_w else None,
+                                clear_head_z=round(float(head[0].z), 4) if head else None, rough_opening_in_wall=dop,
+                                joinery_opening=joinery, door_mesh_bbox=[r4(VD.min(0)), r4(VD.max(0))],
+                                head_first_hits=door_strip)
+    W_, H_ = round(DO["b"] - DO["a"], 3), DO["z1"]
+    check(F.named(f"door_about_{roomcfg.tag(W_)}_x_{roomcfg.tag(H_)}", DO, F.doors),
+          joinery is not None and abs(joinery["width"] - W_) <= 0.03 and abs(joinery["z_top"] - H_) <= 0.03,
+          joinery_opening=joinery, wall_cut=dop and dict(u=dop["u"], z=dop["z"], width=dop["width"], height=dop["height"]),
+          leaf=leaf, clear_width_inside_lining=R["doors"][DO["id"]]["clear_width_inside_lining"],
+          clear_head_z=R["doors"][DO["id"]]["clear_head_z"], side=side)
+    wall_strip_d = [r["z"] for r in door_strip if any(f.endswith("_Wall_" + side) for f in r["first"])]
+    check(F.named("door_wall_cut_matches_joinery", DO, F.doors),
+          dop is not None and joinery is not None and abs(dop["z"][1] - joinery["z_top"]) <= 0.01 and not wall_strip_d,
+          wall_cut_top=dop and dop["z"][1], joinery_top=joinery and joinery["z_top"],
+          wall_plaster_seen_in_the_doorway_z=[min(wall_strip_d), max(wall_strip_d)] if wall_strip_d else None)
+WOPS = []
+for WO in F.windows:
+    side = WO["side"]
+    sr = WO["search"]
+    wop = opening(walls[side], side, sr[0], sr[1], sr[2], sr[3], 0.01 if QUICK else 0.005)
+    R["windows"][WO["id"]] = dict(side=side, rough_opening_in_wall=wop)
+    if wop:
+        WOPS.append((side, wop))
+        wx = np.arange(wop["u"][0] + 0.03, wop["u"][1] - 0.029, 0.02)
+        sill, top = wop["z"]
+        if F.legacy:                                       # the bedroom's strips, as they were
+            zz = np.concatenate([np.arange(0.6, 0.9001, 0.005), np.arange(2.2, 2.4001, 0.005)])
+        else:                                              # at its sill and its head
+            zz = np.concatenate([np.arange(sill - 0.15, sill + 0.1501, 0.005), np.arange(top - 0.1, top + 0.1001, 0.005)])
+        win_strip = first_hits(side, 1.0, wx, zz)
+        R["windows"][WO["id"]]["first_hits"] = win_strip
+        wall_strip_w = [r["z"] for r in win_strip if any(f.endswith("_Wall_" + side) for f in r["first"])]
+        check(F.named("window_wall_cut_matches_joinery", WO, F.windows), not wall_strip_w,
+              wall_cut=dict(u=wop["u"], z=wop["z"]), side=side,
+              wall_plaster_seen_in_the_window_z=[min(wall_strip_w), max(wall_strip_w)] if wall_strip_w else None)
+    else:
+        check(F.named("window_wall_cut_matches_joinery", WO, F.windows), False, side=side, search=sr,
+              missing="no cut found in the wall where the manifest puts the window")
 
 # ---------------------------------------------------------------------------------------------------- capsule grid
 CELL = 0.10 if QUICK else 0.05
@@ -494,16 +526,22 @@ for j, y in enumerate(ys):
         k = int(np.argmin(d))
         DC[j, i], DCB[j, i] = d[k], k
 FREE = (DC >= RADIUS - 1e-6) & ~np.isnan(GROUND)
-SP = scene["spawns"][0]
-spn = [x for x in nodes if x.get("name") == f"Spawn_{SID}_{SP['id']}"]
-sp_i = [i for i, x in enumerate(nodes) if x.get("name") == f"Spawn_{SID}_{SP['id']}"][0]
-spw = G2B @ world_m(sp_i)[:3, 3]
-SX, SY = float(spw[0]), float(spw[1])
-si, sj = int(round((SX - xs[0]) / CELL)), int(round((SY - ys[0]) / CELL))
+SPAWNS = []                                               # every scene spawn's node: (id, x, y, z, i, j)
+for SP in scene["spawns"]:
+    sp_i = next((i for i, x in enumerate(nodes) if x.get("name") == f"Spawn_{SID}_{SP['id']}"), None)
+    if sp_i is None:
+        continue
+    spw = G2B @ world_m(sp_i)[:3, 3]
+    SPAWNS.append((SP["id"], float(spw[0]), float(spw[1]), float(spw[2]), int(round((spw[0] - xs[0]) / CELL)),
+                   int(round((spw[1] - ys[0]) / CELL))))
+_, SX, SY, _, si, sj = SPAWNS[0]                          # the first spawn: the fans' and the eyes' first point
 REACH = np.zeros((NY, NX), bool)
-if FREE[sj, si]:
-    REACH[sj, si] = True
-    q = deque([(sj, si)])
+q = deque()
+for (_, _, _, _, i_, j_) in SPAWNS:
+    if FREE[j_, i_] and not REACH[j_, i_]:
+        REACH[j_, i_] = True
+        q.append((j_, i_))
+if q:
     while q:
         j, i = q.popleft()
         for dj, di in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)):
@@ -516,8 +554,11 @@ if FREE[sj, si]:
                 continue
             REACH[jj, ii] = True
             q.append((jj, ii))
-check("spawn_free_on_the_floor", bool(FREE[sj, si]) and abs(GROUND[sj, si] - spw[2]) < 1e-3, spawn=r4([SX, SY, spw[2]]),
-      capsule_clearance_m=round(float(DC[sj, si]), 4), ground_z=float(GROUND[sj, si]))
+check("spawn_free_on_the_floor", len(SPAWNS) == len(scene["spawns"])
+      and all(FREE[j_, i_] and abs(GROUND[j_, i_] - z_) < 1e-3 for (_, _, _, z_, i_, j_) in SPAWNS),
+      spawns=[dict(id=k_, at=r4([x_, y_, z_]), capsule_clearance_m=round(float(DC[j_, i_]), 4),
+                   ground_z=float(GROUND[j_, i_]), free=bool(FREE[j_, i_])) for (k_, x_, y_, z_, i_, j_) in SPAWNS],
+      found=len(SPAWNS), in_scene=len(scene["spawns"]))
 rj, ri = np.nonzero(REACH)
 RX, RY = xs[ri], ys[rj]
 R["reach"] = dict(cell=CELL, cells=int(REACH.sum()), area_m2=round(float(REACH.sum()) * CELL * CELL, 3),
@@ -530,15 +571,24 @@ check("nothing_outside_the_room_reachable", bool(inside.all()), reachable_outsid
       reach_x=R["reach"]["x"], reach_y=R["reach"]["y"],
       free_cells_outside_the_walls=int(outer_free.sum()),
       note="the grid runs 1 m past the walls; a cell is free when the capsule clears every box and the rays find ground")
-pi_ = [i for i, x in enumerate(nodes) if x.get("name") == f"Portal_{door['id']}"][0]
-pw = G2B @ world_m(pi_)[:3, 3]
-PX, PY = float(pw[0]), float(pw[1])
-pdist = np.hypot(RX - PX, RY - PY)
-kmin = int(np.argmin(pdist))
-check("portal_fires_walking_in", pdist.min() <= 1.0 and (pdist > 1.0).any() and abs(pw[2]) <= 2.0,
-      portal=r4(pw), nearest_reachable_feet=r4([RX[kmin], RY[kmin]]), nearest_m=round(float(pdist.min()), 4),
-      spawn_to_portal_m=round(math.hypot(SX - PX, SY - PY), 3), can_leave_1m_to_arm=bool((pdist > 1.0).any()),
-      reachable_within_1m_cells=int((pdist <= 1.0).sum()), use_within_2m=bool((pdist <= 2.0).any()))
+PORTALS, prow = [], []                                    # every scene portal: it fires when walked into
+for po in scene["portals"]:
+    pi_ = next((i for i, x in enumerate(nodes) if x.get("name") == f"Portal_{po['id']}"), None)
+    if pi_ is None:
+        prow.append(dict(portal=po["id"], missing=True))
+        continue
+    pw = G2B @ world_m(pi_)[:3, 3]
+    PX, PY = float(pw[0]), float(pw[1])
+    PORTALS.append((PX, PY))
+    pdist = np.hypot(RX - PX, RY - PY)
+    kmin = int(np.argmin(pdist))
+    prow.append(dict(portal=po["id"], at=r4(pw), nearest_reachable_feet=r4([RX[kmin], RY[kmin]]),
+                     nearest_m=round(float(pdist.min()), 4), spawn_to_portal_m=round(math.hypot(SX - PX, SY - PY), 3),
+                     can_leave_1m_to_arm=bool((pdist > 1.0).any()), reachable_within_1m_cells=int((pdist <= 1.0).sum()),
+                     use_within_2m=bool((pdist <= 2.0).any()),
+                     ok=bool(pdist.min() <= 1.0 and (pdist > 1.0).any() and abs(pw[2]) <= 2.0)))
+check("portal_fires_walking_in", all(r.get("ok") for r in prow) and len(PORTALS) == len(scene["portals"]),
+      portals=prow, note="each portal: the walker reaches within 1 m of it and can step 1 m away to arm it again")
 
 grid = scene["grid"]
 WALK = [(x, y) for y in range(HT) for x in range(WT) if grid[y][x] in ".S"]
@@ -652,16 +702,21 @@ def out_of_boxes(P2, ks):
 
 groups = {}
 for x in INTERIOR:
-    if x["wid"].startswith(PFX + ".") or x["wid"] in ("curtains", "swag"):
-        gid = x["wid"].split(":")[0]
-        if gid == "swag":
-            gid = "curtains"
-        groups.setdefault(gid, []).append(x)
+    w_ = x["wid"]
+    if w_.startswith(PFX + "."):
+        groups.setdefault(w_.split(":")[0], []).append(x)
+    elif x["what"] == "cloth" and (w_ in ("curtains", "swag") or w_.startswith(("curtains_", "swag_"))):
+        groups.setdefault("curtains" + w_[len(w_.split("_")[0]):], []).append(x)     # swag_<w> with curtains_<w>
 FURN = [k for k, b in enumerate(BOX) if b["kind"] == "furniture"]
+# the pieces the builder gives no collision (a rug, the photographs: flat or on the wall) never own a box: a table's
+# boxes over a rug went to the rug, as wide as the table, and left the table "uncovered"
+NOCOLL = {p["id"] for p in F.man.get("pieces", []) if (p.get("spec") or {}).get("model") in ("rug", "photos")}
 owner = {}
 for k in FURN:                                             # each furniture box goes to the piece it overlaps most
     best, bid = 0.0, None
     for gid, prims in groups.items():
+        if gid in NOCOLL:
+            continue
         P2 = band_pts(prims, 0.0, CEIL)
         if not len(P2):
             continue
@@ -717,7 +772,6 @@ TOL = 1e-3
 st = dict(rays=0, col_miss=0, col_beyond_inner_faces=0, col_max_beyond_m=0.0, vis_void=0, vis_out_window=0,
           vis_out_elsewhere=0)
 col_bad, vis_bad = [], []
-win = wop
 for (x, y) in FAN:
     for z in (0.3, 1.0, 1.6, 2.4):
         o = Vector((x, y, z))
@@ -744,10 +798,17 @@ for (x, y) in FAN:
                 if FX0 - 0.31 <= p.x <= FX1 + 0.31 and FY0 - 0.31 <= p.y <= FY1 + 0.31 and -0.31 <= p.z <= CEIL + 0.31:
                     continue
                 ok = False
-                if d.y > 1e-6 and win:
-                    t = (FY1 - y) / d.y
-                    cx, cz = x + t * d.x, z + t * d.z
-                    ok = win["u"][0] - 0.01 <= cx <= win["u"][1] + 0.01 and win["z"][0] - 0.01 <= cz <= win["z"][1] + 0.01
+                for side, win in WOPS:                     # out through a window's cut
+                    nx_, ny_ = F.inward(side)
+                    dn = -(d.x * nx_ + d.y * ny_)          # the ray's component out of the room through that wall
+                    if dn <= 1e-6:
+                        continue
+                    t = F.depth(side, (x, y, z)) / -dn
+                    hp = (x + t * d.x, y + t * d.y, z + t * d.z)
+                    cu = F.along(side, hp)
+                    if win["u"][0] - 0.01 <= cu <= win["u"][1] + 0.01 and win["z"][0] - 0.01 <= hp[2] <= win["z"][1] + 0.01:
+                        ok = True
+                        break
                 if ok:
                     st["vis_out_window"] += 1
                 else:
@@ -869,8 +930,11 @@ for ty in range(HT + 1):
     if 0 <= j < NY:
         img[j, :] *= 0.6
 img[sj - 1:sj + 2, si - 1:si + 2] = (40, 200, 60)
-pi2, pj2 = int(round((PX - xs[0]) / CELL)), int(round((PY - ys[0]) / CELL))
-img[pj2 - 1:pj2 + 2, pi2 - 1:pi2 + 2] = (40, 120, 255)
+for (PX, PY) in PORTALS:
+    pi2, pj2 = int(round((PX - xs[0]) / CELL)), int(round((PY - ys[0]) / CELL))
+    img[pj2 - 1:pj2 + 2, pi2 - 1:pi2 + 2] = (40, 120, 255)
+for (_, _, _, _, i_, j_) in SPAWNS[1:]:
+    img[j_ - 1:j_ + 2, i_ - 1:i_ + 2] = (40, 200, 60)
 for e in EYES:
     img[int(round((e[1] - ys[0]) / CELL)), int(round((e[0] - xs[0]) / CELL))] = (0, 160, 160)
 big = np.repeat(np.repeat(img, 4, 0), 4, 1).clip(0, 255).astype(np.uint8)

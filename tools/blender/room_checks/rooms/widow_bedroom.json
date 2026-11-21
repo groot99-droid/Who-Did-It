@@ -1,6 +1,6 @@
 {
   "room": "widow_bedroom",
-  "about": "The widow's bedroom as the room checks know it (tools/blender/room_checks): the numbers that stood in the scripts while this was the only room. Metres in the room's frame: x east, y north, z up, the floor's centre on the origin. A later step reads them from the builder's manifest and the scene instead.",
+  "about": "The widow's bedroom as the room checks know it (tools/blender/room_checks): the numbers that stood in the scripts while this was the only room. Metres in the room's frame: x east, y north, z up, the floor's centre on the origin. Since G2b the checks read them from the builder's manifest and the scene (roomcfg.Facts); the numbers here stand in only for a manifest written before G2b (no `openings`), such as the READY build's of 2026-11-16. The judged failures and the sweep points are the file's own.",
   "ceiling_m": 3.0,
   "door": {
     "wall": "S",

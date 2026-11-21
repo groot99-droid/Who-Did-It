@@ -15,9 +15,13 @@ Usage: bash tools/blender/bl.sh -b --factory-startup -P tools/blender/room_check
            <roomId> [--glb F] [--scene F] [--manifest F] [--out DIR] [--config F]                  (roomcfg.py)
 <out> must hold cc_grid.npz written by cc_geom.py from the same GLB. Writes <out>/r7_extra.json.
 Reuses cc_geom.py's decode and collision-box sections (the GLB parser and the glTF add-on's Draco bridge;
-`roomcfg.cc_geom_head`). The room file gives the banned words. Still the bedroom's own here: the first spawn, the spots
-that stand for another piece (ALIAS), the pieces left out of the intersection test and the names left out of the
-floating test (the photographs, the dressing table's cloth, the bed's coverlet).
+`roomcfg.cc_geom_head`). What it knows of the room comes from the builder's manifest and the scene (G2b): the flood
+starts at every spawn; a spot or prop stands for the piece the manifest's `coverage` names (an opening's prop, such as
+a window's drapes, has no piece to walk up to; a manifest without `coverage` keeps the bedroom's two aliases); a spot
+the room skips is left out of the approach rule (a piece hung on a wall, `rise`, is not: the bedroom's photographs over
+the bed's head are its judged failure); the objects hung on purpose (a
+piece with `rise`, the cloths over a piece, the openings' joinery) are left out of the floating test; every point
+light with an anchor is held to its flame or its firebox; the banned words are `roomcfg.BANNED` and the check file's.
 """
 import json
 import math
@@ -33,6 +37,7 @@ import roomcfg  # noqa: E402
 H = roomcfg.cc_geom_head("shell measures")
 np, Vector, log, r4, tile_centre, bvh_of = H["np"], H["Vector"], H["log"], H["r4"], H["tile_centre"], H["bvh_of"]
 ARGS, ROOM, GLB, OUTD, J, scene, SID, PFX = (H[k] for k in ("ARGS", "ROOM", "GLB", "OUTD", "J", "scene", "SID", "PFX"))
+F = H["F"]
 FX0, FX1, FY0, FY1, CEIL = H["FX0"], H["FX1"], H["FY0"], H["FY1"], H["CEIL"]
 RADIUS, STEP, SNAP, EYE, AX0, AX1 = (H[k] for k in ("RADIUS", "STEP", "SNAP", "EYE", "AX0", "AX1"))
 nodes, world_m, G2B, PR, GLASS, INTERIOR = (H[k] for k in ("nodes", "world_m", "G2B", "PR", "GLASS", "INTERIOR"))
@@ -88,12 +93,12 @@ def free_at(x, y, feet):
     return bool(seg_box_dist(x, y, feet + AX0, feet + AX1).min() >= RADIUS - 1e-6)
 
 
-sp_i = [i for i, n in enumerate(nodes) if n.get("name", "").startswith("Spawn_")][0]
-spw = G2B @ world_m(sp_i)[:3, 3]
-si, sj = int(round((spw[0] - xs[0]) / CELL)), int(round((spw[1] - ys[0]) / CELL))
-seen = {(sj, si, 0.0)}
-q = deque(seen)
-levels = {0.0: 1}
+seen = set()                                               # the flood starts at every spawn
+for sp_i in [i for i, n in enumerate(nodes) if n.get("name", "").startswith("Spawn_")]:
+    spw = G2B @ world_m(sp_i)[:3, 3]
+    seen.add((int(round((spw[1] - ys[0]) / CELL)), int(round((spw[0] - xs[0]) / CELL)), 0.0))
+q = deque(sorted(seen))
+levels = {0.0: len(seen)}
 climbs = []
 while q:
     j, i, g = q.popleft()
@@ -199,7 +204,14 @@ FACE = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}
 rows = []
 want = [(s["id"], "spot:" + s["kind"], (s["x"], s["y"])) for s in scene.get("spots", [])] + \
        [(p["id"], "prop", (p["x"], p["y"])) for p in scene.get("props", [])]
-ALIAS = {f"{PFX}.under_bed": f"{PFX}.bed", f"{PFX}.draped_window": None}
+# what each scene spot and prop stands for: the manifest's coverage (a piece, an opening's prop, a cover, a skip);
+# without one, the bedroom's two aliases
+COV = MAN.get("coverage")
+if COV is None:
+    ALIAS = {f"{PFX}.under_bed": f"{PFX}.bed", f"{PFX}.draped_window": None}
+else:
+    ALIAS = {k: (v.get("id") if v.get("by") in ("piece", "covers") else None) for k, v in COV.items()}
+SKIPPED = set((MAN.get("skip") or {}).keys())
 for sid, kind, (tx, ty) in want:
     pid = ALIAS.get(sid, sid)
     p = pieces.get(pid) if pid else None
@@ -235,9 +247,14 @@ for sid, kind, (tx, ty) in want:
                 near = front & (dist < 0.75)
                 cov = np.unique(np.round(w_ax[near] / CELL).astype(int))
                 e["front_width_reachable_share"] = round(float(len(cov) * CELL / (hi - lo)), 2)
+    if p and p.get("rise"):
+        e["hung"] = p["rise"]           # on the wall at that height: for the record (the bedroom's photographs stay judged)
+    if sid in SKIPPED:
+        e["skipped"] = MAN["skip"][sid]
     rows.append(e)
 X["approach"] = rows
-far = [r["id"] for r in rows if r.get("nearest_reach_to_piece_m") is not None and r["nearest_reach_to_piece_m"] > 0.55]
+far = [r["id"] for r in rows if r.get("nearest_reach_to_piece_m") is not None and r["nearest_reach_to_piece_m"] > 0.55
+       and not r.get("skipped")]
 nofront = [r["id"] for r in rows if "nearest_reach_in_front_m" in r and (r["nearest_reach_in_front_m"] is None
                                                                         or r["nearest_reach_in_front_m"] > 0.75)]
 xcheck("every_spot_and_prop_can_be_walked_up_to", not far, farther_than_0_55=far, no_standing_room_in_front=nofront,
@@ -245,18 +262,49 @@ xcheck("every_spot_and_prop_can_be_walked_up_to", not far, farther_than_0_55=far
                                     "front_width_reachable_share", "piece_centre_off_tile_centre_m")} for r in rows])
 
 # ------------------------------------------------------------------------------------------- 5. flame, names
-flame = [x for x in PR if x["wid"].endswith(":flame")]
 LT = J.get("extensions", {}).get("KHR_lights_punctual", {}).get("lights", [])
 cand = [(i, n) for i, n in enumerate(nodes) if n.get("extensions", {}).get("KHR_lights_punctual") is not None
         and LT[n["extensions"]["KHR_lights_punctual"]["light"]]["type"] == "point"]
-if flame and cand:
-    fp = np.concatenate([x["P"] for x in flame])
-    lp = G2B @ world_m(cand[0][0])[:3, 3]
-    top = fp[np.argmax(fp[:, 2])]
-    xcheck("candle_light_at_its_flame", abs(lp[0] - fp[:, 0].mean()) < 0.03 and abs(lp[1] - fp[:, 1].mean()) < 0.03
-           and 0.0 <= lp[2] - fp[:, 2].max() <= 0.06, light=r4(lp), flame_bbox=[r4(fp.min(0)), r4(fp.max(0))],
-           light_above_flame_top_m=round(float(lp[2] - fp[:, 2].max()), 4))
-BAN = re.compile("|".join(re.escape(w) for w in ROOM["banned_words"]), re.I)
+MLIGHTS = {r["name"]: r for r in MAN.get("lights", [])}
+if any(r.get("anchor") for r in MLIGHTS.values()):
+    # every point light with an anchor (G4): a lamp at its flame (its anchor within 0.15 m, the light over the flame's
+    # mesh when the piece has one), a fire inside its firebox's glow
+    rows_l, ok_l = [], True
+    for i, n in cand:
+        r = MLIGHTS.get(LT[n["extensions"]["KHR_lights_punctual"]["light"]].get("name"), {})
+        lp = G2B @ world_m(i)[:3, 3]
+        row = dict(light=n.get("name"), role=r.get("role"), at=r4(lp), anchor=r.get("anchor"))
+        if r.get("at") is not None:
+            row["from_anchor_m"] = round(float(np.linalg.norm(lp - np.array(r["at"]))), 4)
+            ok_l &= row["from_anchor_m"] <= 0.15
+        host = (r.get("anchor") or {}).get("piece")
+        if r.get("role") == "fire":
+            glow = [x for x in PR if x["wid"] == f"{host}:glow"]
+            if glow:
+                gp = np.concatenate([x["P"] for x in glow])
+                row["glow_bbox"] = [r4(gp.min(0)), r4(gp.max(0))]
+                row["over_its_glow"] = bool(gp[:, 0].min() - 0.05 <= lp[0] <= gp[:, 0].max() + 0.05
+                                            and gp[:, 1].min() - 0.05 <= lp[1] <= gp[:, 1].max() + 0.05)
+                ok_l &= row["over_its_glow"]
+        else:
+            fl = [x for x in PR if x["wid"] == f"{host}:flame"]
+            if fl:
+                fp = np.concatenate([x["P"] for x in fl])
+                row["flame_bbox"] = [r4(fp.min(0)), r4(fp.max(0))]
+                row["above_flame_top_m"] = round(float(lp[2] - fp[:, 2].max()), 4)
+                ok_l &= bool(abs(lp[0] - fp[:, 0].mean()) < 0.03 and abs(lp[1] - fp[:, 1].mean()) < 0.03
+                             and 0.0 <= lp[2] - fp[:, 2].max() <= 0.06)
+        rows_l.append(row)
+    xcheck("each_light_at_its_flame_or_fire", ok_l and len(rows_l) == len(cand), lights=rows_l)
+else:
+    flame = [x for x in PR if x["wid"].endswith(":flame")]
+    if flame and cand:
+        fp = np.concatenate([x["P"] for x in flame])
+        lp = G2B @ world_m(cand[0][0])[:3, 3]
+        xcheck("candle_light_at_its_flame", abs(lp[0] - fp[:, 0].mean()) < 0.03 and abs(lp[1] - fp[:, 1].mean()) < 0.03
+               and 0.0 <= lp[2] - fp[:, 2].max() <= 0.06, light=r4(lp), flame_bbox=[r4(fp.min(0)), r4(fp.max(0))],
+               light_above_flame_top_m=round(float(lp[2] - fp[:, 2].max()), 4))
+BAN = re.compile("|".join(re.escape(w) for w in F.banned), re.I)
 names_all = []
 for coll in ("nodes", "meshes", "materials", "images", "textures", "scenes"):
     names_all += [(coll, x.get("name", "")) for x in J.get(coll, [])]
@@ -271,6 +319,9 @@ xcheck("no_banned_word_in_any_name", not hits and not ex_hits, names=len(names_a
        cloth_materials=sorted({m.get("name", "") for m in J["materials"] if re.search(r"cloth|curtain|linen|coverlet|wool", m.get("name", ""), re.I)}))
 
 # ------------------------------------------------------------------------------------------- 6. intersections, floating
+OPEN_IDS = {o["id"] for o in F.openings}                   # the doors and windows: joinery set in the wall
+
+
 def gid_of(x):
     w = x["wid"]
     if w.startswith(PFX + "."):
@@ -281,7 +332,8 @@ def gid_of(x):
 by_piece = {}
 for x in INTERIOR:
     g = gid_of(x)
-    if g and g not in (f"{PFX}.door", f"{PFX}.draped_window", f"{PFX}.photos", f"{PFX}.rug"):
+    if g and g not in (f"{PFX}.door", f"{PFX}.draped_window", f"{PFX}.photos", f"{PFX}.rug") and g not in OPEN_IDS \
+            and not g.endswith(".rug"):
         by_piece.setdefault(g, []).append(x)
 PB = {g: bvh_of(v) for g, v in by_piece.items()}
 inter = []
@@ -311,10 +363,30 @@ obj = {}
 for x in INTERIOR:
     obj.setdefault(x["name"], []).append(x)
 rest = []
+# hung on purpose, from the manifest: a piece with `rise` (a frame, a letter box), a cloth over a piece (a mirror's
+# black cloth, a bed's coverlet), the openings' joinery and cloth (named with their id)
+HUNG = {p["id"].replace(".", "_") for p in MAN["pieces"] if p.get("rise")}
+OPEN_TAGS = {o["id"].replace(".", "_") for o in F.openings}
+# a hearth's dress hung over its mantel shelf (the manifest's made.dress `at` above made.mantel): a mirror on the chimney
+# breast, and its black cloth; by its material, in the hearth's own object
+HUNG_MATS = {}
+for p in MAN["pieces"]:
+    mk = (p.get("made") or {})
+    if isinstance(mk.get("mantel"), list) and mk.get("dress"):
+        hung = [d for d in mk["dress"] if d.get("at") and d["at"][2] > mk["mantel"][1] + 0.005]
+        mats = {d["slug"] for d in hung if d.get("slug")} | ({"black_cloth"} if any(d.get("cloth") for d in hung) else set())
+        if mats:
+            HUNG_MATS[f"{SID}_{p['id'].replace('.', '_')}"] = mats
 for name, prims in sorted(obj.items()):
     if SKIP.search(name) or name.startswith(f"{SID}_Outside"):
         continue
+    bare = name[len(SID) + 1:] if name.startswith(SID + "_") else name
+    if bare in HUNG or any(bare.endswith("_" + t) for t in OPEN_TAGS) or (
+            prims[0]["what"] == "cloth" and prims[0]["wid"].endswith((":coverlet", ":cloth"))):
+        continue
     for x in prims:
+        if any(f"_M_{m}" in (x["mat"] or "") for m in HUNG_MATS.get(name, ())):
+            continue
         P = x["P"]
         z0 = float(P[:, 2].min())
         low = P[P[:, 2] <= z0 + 0.003]

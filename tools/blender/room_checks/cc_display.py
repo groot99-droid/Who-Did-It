@@ -129,14 +129,19 @@ for p_i in np.unique(prim):
     for p in albp:
         albp[p][sel] = dark[k][p]
 outside = np.isin(what[prim], ["outside", "sky"])
-glass_m = next(m for m in MAT if m["alpha"] == "BLEND")
-glass_disp = agx_display(glass_m["factor"], E)[0]
-GLASS_A = float(next(m for m in J["materials"] if m.get("alphaMode") == "BLEND")["pbrMetallicRoughness"]["baseColorFactor"][3])
+# the glass the outside is seen through: none in a windowless room; with several glass materials, the first (the
+# builder makes one M_glass a room)
+glass_j = next((m for m in J["materials"] if m.get("alphaMode") == "BLEND"), None)
+if glass_j is not None:
+    glass_disp = agx_display(np.array(glass_j.get("pbrMetallicRoughness", {}).get("baseColorFactor", [1, 1, 1, 1])[:3]),
+                             E)[0]
+    GLASS_A = float(glass_j.get("pbrMetallicRoughness", {}).get("baseColorFactor", [1, 1, 1, 1])[3])
 
 
 def show(a):
     d = agx_display(a * C, E)
-    d[outside] = (1 - GLASS_A) * d[outside] + GLASS_A * glass_disp     # seen through the 10 % glass (blended sRGB)
+    if glass_j is not None:
+        d[outside] = (1 - GLASS_A) * d[outside] + GLASS_A * glass_disp     # seen through the 10 % glass (blended sRGB)
     return luma255(d), d
 
 

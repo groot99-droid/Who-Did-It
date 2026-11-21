@@ -4,7 +4,9 @@
 # Usage: bash tools/blender/room_checks/run.sh <roomId> [--quick] [--glb F] [--blend F] [--scene F] [--manifest F]
 #            [--out DIR] [--config F]
 #   The defaults are the build's own files (roomcfg.py): tools/blender/build/rooms/<roomId>.glb, .blend and .json,
-#   packages/content/data/scenes/<roomId>.json, rooms/<roomId>.json here; results in
+#   packages/content/data/scenes/<roomId>.json, rooms/<roomId>.json here (optional: what the checks know of a room comes
+#   from the manifest and the scene; the check file holds judged failures, and the numbers of a manifest written
+#   before G2b); results in
 #   tools/blender/build/rooms/checks/<roomId>/ (git-ignored). A relative path is taken from where you stand.
 #   --quick   cc_struct, a coarse cc_geom and r7_extra on its grid only, into checks/<roomId>_quick/: a smoke run,
 #             its verdicts are not the full run's. It never ends with 0: cc_geom's walls_closed_collision_fans wants
@@ -36,7 +38,7 @@ cd "$ROOT" || exit 2
 RC=tools/blender/room_checks
 BL=tools/blender/bl.sh
 
-for F in "$GLB" "$SCENE" "$MANIFEST" "$CONFIG"; do
+for F in "$GLB" "$SCENE" "$MANIFEST"; do     # the check file is optional (G2b)
   if [ ! -f "$F" ]; then
     echo "run.sh: no such file: $F" >&2
     exit 2

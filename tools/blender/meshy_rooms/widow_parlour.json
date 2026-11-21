@@ -1,0 +1,456 @@
+{
+  "room": "widow_parlour",
+  "about": "The widow's parlour, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 14 x 9 m inside (x -7..7, y -4.5..4.5), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/widow_parlour.json is named below. Grey boxes stand in for the pieces that have no model yet (decision D2). Built from the test fixture tests/fixtures/widow_parlour.v2.json; a key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Widow Vane's parlour",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the front door",
+    "bedroom": "By the bedroom door"
+  },
+  "height": 3.0,
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.86, 1.0, 0.78]
+  },
+  "floor_note": "the scene's material layer is all wood: the bedroom's floor, unchanged",
+  "wall_colour": "#847A62",
+  "wall_colour_note": "guess: a warm drab a step browner than the bedroom's sage (#80866E), so the two rooms read as one house; never pink or lilac under the lamps and the moon",
+  "ceiling_colour": "#D6D0C2",
+  "paint_colour": "#CFC5AD",
+  "wood_colour": "#45301F",
+  "skirting": 0.22,
+  "picture_rail": 2.5,
+  "cornice": 0.2,
+  "openings": [
+    {
+      "id": "wp.door",
+      "kind": "door",
+      "portal": "wp.door",
+      "width": 0.9,
+      "height": 2.15,
+      "knob": "N",
+      "note": "the front door in the east wall; the scene puts the portal on tile (15,5), so the doorway is centred at y 0.0 and the portal stands at its foot, (7.0, 0.0). The door spawn stands 0.5 m inside it, (6.5, 0.0), by design."
+    },
+    {
+      "id": "wp.bedroom",
+      "kind": "door",
+      "portal": "wp.bedroom",
+      "width": 0.9,
+      "height": 2.15,
+      "knob": "E",
+      "note": "the door to the widow's bedroom in the north wall, tile (3,0): centred at x -4.5, the portal at (-4.5, 4.5); the bedroom spawn is (-4.5, 4.0). Its own file's door (wb.door) is the other side of this one."
+    },
+    {
+      "id": "wp.draped_window_0",
+      "kind": "window",
+      "prop": "wp.draped_window_0",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "rod": 2.44,
+      "curtain_colour": "#4B4A3C",
+      "curtain_colour_note": "guess: a dark olive-brown, the mourning room's curtains; the bedroom's are slate (#4A5264)",
+      "swag": true
+    },
+    {
+      "id": "wp.draped_window_1",
+      "kind": "window",
+      "prop": "wp.draped_window_1",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "rod": 2.44,
+      "curtain_colour": "#4B4A3C",
+      "swag": true,
+      "note": "the moon's window: the scene's wp.lt_moon stands on this prop's tile (11,0)"
+    }
+  ],
+  "outside": {
+    "ground": -0.3,
+    "ground_note": "guess: a ground-floor view, the snow a step below the sill's outer ledge (the bedroom's is -3.2, an upper floor). The first no-bake build shows the view from both windows.",
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    },
+    "note": "the bedroom's view (the same village, the same Meshy models), copied: both windows are in the north wall, so one night outside serves both"
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "the bedroom's: from straight out of the window toward its wall's +s side"
+  },
+  "exposure": null,
+  "lights": [
+    {
+      "id": "wp.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "wp.tea_table"
+      },
+      "note": "the oil lamp on the tea table; the round-3 candle stand stands in until the oil lamp (a .blend, G8) can be built"
+    },
+    {
+      "id": "wp.lt_lamp_chair",
+      "role": "lamp",
+      "anchor": {
+        "piece": "wp.lamp_table"
+      },
+      "note": "the lamp on the table beside the hearth chair"
+    },
+    {
+      "id": "wp.lt_fire",
+      "role": "fire",
+      "anchor": {
+        "piece": "wp.fireplace_e",
+        "name": "fire"
+      },
+      "note": "the hearth's fire: the firebox's own anchor"
+    },
+    {
+      "id": "wp.lt_moon",
+      "role": "moon",
+      "window": "wp.draped_window_1"
+    }
+  ],
+  "lights_note": "wp.lt_window is the scene's day and dusk window light: a night room does not build it, so it needs no entry. Bake groups: candle (the two lamps), fire, moon, fill = 4, about 41 minutes at 410k vertices (coverage.md).",
+  "look": {
+    "lights": {
+      "fire": {
+        "color": "#FFB457",
+        "power": 60.0,
+        "radius": 0.12
+      }
+    },
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the hearth's coals (G6), under the candle flame's 6.0, the emit cap of k; a deep orange, as the first bake showed [2.0, 0.8, 0.12] near white",
+    "note": "G9: the room's override of meshy_looks/interior_fp.json. The look file has no `fire` role yet: this one is a first guess (the lamp is 38 W, radius 0.04), to be tuned with --sweep on the first group bake. Nothing else of the look is changed.",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "ink_lift": {
+      "form": 0.0
+    },
+    "exposure_note": "the darker-room lever (pool_display 0.55 to 0.35, ink_lift.form 0.5 to 0): a mourning parlour at night. From the first 128-sample bake: E 3.06 at the look's own values, 1.02 with these; the ink floor holds (cc_display)",
+    "settings": {
+      "parlour": {
+        "label": "the parlour",
+        "mix": {
+          "candle": 1.0,
+          "fire": 1.0,
+          "moon": 3.0,
+          "fill": 0.35
+        },
+        "note": "from the first bake's light numbers: the moon's patch 1.21 times the floor round it (midway gave 1.17), the far wall 0.57 of the lamp wall; the fill at 0.35, the fire at its own power"
+      }
+    }
+  },
+  "light": "parlour",
+  "light_note": "the room's own light setting (look.settings.parlour; --light overrides)",
+  "pieces": [
+    {
+      "id": "wp.clock",
+      "face": "S",
+      "place": ["wall", "N", -5.55],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.32, 2.19],
+        "label": "Longcase clock (grey box until the .blend model can be built, G8)"
+      },
+      "note": "guess: the lock gives the clock 0.997 x 0.795 x 2.191 m, which looks wrong for a longcase clock (the survey says size it by its height). The box is 0.5 x 0.32 and the first no-bake build measures the .blend. 0.28 m clear of the bedroom door's architrave and of the pantry."
+    },
+    {
+      "id": "wp.writing_desk",
+      "face": "S",
+      "place": ["wall", "N", -0.4],
+      "spec": {
+        "model": "ph",
+        "slug": "ClassicConsole_01",
+        "scale": 0.8,
+        "lod": 0.7
+      },
+      "note": "the bedroom's dressing-table console at the same scale (1.23 x 0.47 m). Letters, inkwell and the unsent envelope are dress for a later task."
+    },
+    {
+      "id": "wp.portrait",
+      "face": "N",
+      "place": ["wall", "N", 0.5],
+      "rise": 1.45,
+      "spec": {
+        "model": "ph",
+        "slug": "fancy_picture_frame_02",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "hung turned to the wall: `face` N shows the frame's back to the room; its bottom edge is 1.45 m up. Check the back is modelled. The print (a portrait of the widow's husband) is G18."
+    },
+    {
+      "id": "wp.sideboard",
+      "face": "S",
+      "place": ["wall", "N", 1.75],
+      "spec": {
+        "model": "ph",
+        "slug": "GothicCommode_01",
+        "scale": 0.8,
+        "lod": 0.6
+      },
+      "note": "guess, 0.79 m from its tile: moved 0.75 m west so that it clears window 1's left curtain (which reaches x 2.55)"
+    },
+    {
+      "id": "wp.letter_box",
+      "face": "S",
+      "place": ["wall", "N", 5.9],
+      "rise": 1.3,
+      "spec": {
+        "model": "box",
+        "size": [0.3, 0.1, 0.36],
+        "label": "Letter box (a task source: keep it legible)"
+      },
+      "moved": "0.6 m west along the north wall: at its tile (x 6.5) the bed's head stands under it and nobody can stand within reach; the task needs a floor to stand on",
+      "note": "its tile is (14,0), x 6.5. Task source: the finished piece must read as a letter box from the standing point at (5.7, 4.1)."
+    },
+    {
+      "id": "wp.crawl_stairs",
+      "spot": true,
+      "face": "S",
+      "place": ["wall", "N", 5.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.12, 0.7],
+        "label": "Crawl-space skirt (slatted, with a dark opening: a child-only hide)"
+      },
+      "note": "the scene calls it crawl_stairs: a low panel in the north wall by the bed. A box until a later task gives it slats and a dark opening."
+    },
+    {
+      "id": "wp.bed",
+      "face": "W",
+      "place": ["wall", "E", "N"],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "-",
+          "cover": "coverlet",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing west, the model's -x end is the north end"
+      },
+      "note": "G7: a day bed lies north to south along the east wall, its head at the north end, its front to the west. The scene's table row would give the carved double bed (GothicBed_01); this piece names its own model. Pale country wood next to the dark carved set: grade it."
+    },
+    {
+      "id": "wp.coat_stand",
+      "face": "S",
+      "place": ["wall", "E", -2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.5, 1.8],
+        "label": "Coat stand (bentwood; a greatcoat and a top hat)"
+      }
+    },
+    {
+      "id": "wp.boot_rack",
+      "face": "W",
+      "place": ["wall", "E", -3.85],
+      "spec": {
+        "model": "ph",
+        "slug": "painted_wooden_bench",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "note": "the parlour's boot bench: the settle model at 0.85. It is barn red: grade it."
+    },
+    {
+      "id": "wp.boot_rack.boots",
+      "decor": true,
+      "face": "W",
+      "place": ["beside", "wp.boot_rack", "N", 6.75],
+      "spec": {
+        "model": "box",
+        "size": [0.6, 0.3, 0.2],
+        "label": "Three pairs of boots (one caked in red mud: a clue)"
+      },
+      "note": "the boots are dress of the boot rack in the scene (no id of their own): a decor piece, so the room file says so"
+    },
+    {
+      "id": "wp.fireplace_e",
+      "face": "E",
+      "place": ["wall", "W", 0.0],
+      "spec": {
+        "model": "hearth",
+        "style": "surround",
+        "size": [1.7, 0.42, 1.25],
+        "opening": [0.72, 0.85],
+        "surface": "marble",
+        "mantel": {
+          "z": 1.25,
+          "depth": 0.3,
+          "overhang": 0.06,
+          "thickness": 0.07
+        },
+        "breast": {
+          "width": 1.45,
+          "depth": 0.22,
+          "depth_note": "0.22 m: the mantel shelf before it is 0.2 m deep, room for the clock (0.13 m)",
+          "to": "ceiling"
+        },
+        "firebox": {
+          "depth": 0.3,
+          "glow": {
+            "shape": "box",
+            "material": "coal"
+          }
+        },
+        "anchors": {
+          "fire": [0.0, 0.0, 0.32]
+        },
+        "dress": [
+          {
+            "slug": "ornate_mirror_01",
+            "scale": 1.3,
+            "at": [0.0, 0.0, 0.12],
+            "cloth": true
+          },
+          {
+            "slug": "mantel_clock_01",
+            "scale": 1.0,
+            "at": [-0.45, 0.02, 0.0],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "G6. A marble surround and mantel built from boxes in the room's own marble, a firebox with a coal glow, and the mirror over it hung in plain matte black cloth. The scene calls it fireplace_e: a chimney breast on the west wall at y 0 (tile (0,5)). 0.73 m from its tile, which is on the wall's row."
+    },
+    {
+      "id": "wp.lamp_table",
+      "key": "candle",
+      "face": "E",
+      "place": ["wall", "W", 1.1],
+      "spec": {
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the bedroom's candle stand (side_table_tall_01 and a wooden candlestick with its flame), against the west wall between the hearth and the chair: the scene's lamp_table, with the flame of wp.lt_lamp_chair",
+      "moved": "0.1 m south along the west wall (D4), to clear the armchair moved beside it"
+    },
+    {
+      "id": "wp.armchair_0",
+      "face": "E",
+      "place": ["wall", "W", 1.8],
+      "spec": {
+        "model": "ph",
+        "slug": "ArmChair_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "guess: the grey tub chair of the kit; the canon is a faded-red wing chair (tint it). The bedroom's decor armchair is the same model.",
+      "moved": "0.5 m south along the west wall (D4): at y 2.3 it left 0.22 m to the pantry and tile (1,2) could not be stood on (cc_geom walkable_tiles_standable); 0.2 m from its tile's centre now"
+    },
+    {
+      "id": "wp.pantry",
+      "spot": true,
+      "key": "wardrobe",
+      "face": "E",
+      "place": ["wall", "W", "N"],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "lod": 0.6
+      },
+      "note": "a hide spot: the bedroom's wardrobe piece, doors shut, in the north-west corner (its tile (1,1) is the corner tile)"
+    },
+    {
+      "id": "wp.birdcage",
+      "face": "S",
+      "place": ["wall", "W", -3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.4, 1.6],
+        "label": "Birdcage (brass, domed, on a ring stand)"
+      }
+    },
+    {
+      "id": "wp.tea_table",
+      "place": ["at", -0.5, 0.0],
+      "face": "S",
+      "spec": {
+        "model": "ph",
+        "slug": "round_wooden_table_01",
+        "tall": 0.74,
+        "extras": ["flame"],
+        "lod": 0.7,
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [-0.25, null, 0.0],
+            "lod": 0.02
+          },
+          {
+            "slug": "tea_set_01",
+            "scale": 0.75,
+            "at": [0.12, null, 0.0],
+            "lod": 0.15
+          }
+        ]
+      },
+      "note": "tea laid for two, one cup never used: the lock's tea set (pot, sugar bowl, two cups; 40k triangles, so decimated). The first dress piece carries the flame of wp.lt_lamp. At its own tile (-0.5, 0.0)."
+    },
+    {
+      "id": "wp.armchair_1",
+      "face": "E",
+      "place": ["at", -1.7, 0.75],
+      "spec": {
+        "model": "ph",
+        "slug": "ArmChair_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "guess: facing the tea table's second place; 0.32 m from its tile"
+    },
+    {
+      "id": "wp.rug",
+      "key": "rug",
+      "place": ["at", -1.0, -0.4],
+      "spec": {
+        "size": [2.4, 1.6]
+      },
+      "note": "guess: under the tea table and the chair, 0.78 m from its tile (-1.5, -1.0); the survey's 1.4 x 0.9 m is the 2.5D tile's"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door and spawn_bedroom are the two spawns' own views; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_door": [[6.5, 0.0, 1.6], [-7.0, 0.0, 1.35], 70.0],
+    "spawn_bedroom": [[-4.5, 4.0, 1.6], [-4.5, -4.5, 1.1], 70.0],
+    "north": [[0.5, -2.5, 1.6], [0.5, 4.5, 1.4], 70.0],
+    "east": [[-3.0, 0.0, 1.6], [7.0, 0.5, 1.2], 70.0],
+    "south": [[0.0, 2.5, 1.6], [0.0, -4.5, 1.2], 70.0],
+    "west": [[3.0, 0.0, 1.6], [-7.0, 0.5, 1.3], 70.0],
+    "hearth": [[-3.8, 0.0, 1.6], [-7.0, 0.0, 1.5], 70.0],
+    "windows": [[0.5, 0.0, 1.6], [0.5, 4.5, 1.5], 70.0]
+  }
+}
