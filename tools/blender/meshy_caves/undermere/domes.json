@@ -22,7 +22,7 @@
       [199.75, 15.375, 9.5, 203.375, 23.25, 12.875],
       [185.125, 36.125, 6.5, 197.25, 48.25, 19.125],
       [171.75, 33.75, 6.5, 181.125, 41.625, 11.625],
-      [177.5, 28.0, 6.5, 195.5, 46.0, 18.5],
+      [177.5, 28.0, 6.5, 195.5, 45.25, 18.5],
       [189.0, 40.375, 14.625, 196.125, 47.5, 19.125],
       [166.0, 36.0, 6.5, 176.0, 46.0, 15.125],
       [184.0, 35.0, 16.5, 190.0, 41.0, 23.0]
@@ -105,19 +105,19 @@
     },
     {
       "id": "do_cat_face",
-      "from": [193.0, 36.0, 7.5],
-      "to": [193.5, 35.376, 10.4],
+      "from": [193.57, 35.92, 7.5],
+      "to": [194.36, 35.79, 10.4],
       "profile": "climb_face",
-      "width": 3.0,
+      "width": 2.0,
       "clear": 3.0,
       "geology": "flowstone",
       "ledge_depth": 2.0,
       "approach": 1.5,
-      "notes": "the Cataract Steps"
+      "notes": "the Cataract Steps (route 2: the face turned 41 degrees and moved 0.6 m to lie on the Great Dome's wall, which ate the ledge in front of the old face line, so the viewer's climber could not mantle; 2.0 m wide where the wall runs straight)"
     },
     {
       "id": "do_upper",
-      "from": [193.0, 36.0, 10.4],
+      "from": [194.36, 35.79, 10.4],
       "to": [201.6, 21.45, 10.6],
       "profile": "tube",
       "width": 3.0,
@@ -241,6 +241,26 @@
       "base_z": 10.4,
       "height": 1.0,
       "notes": "a flowstone kerb on the Cataract Gallery's dome side, 0.5 to 3.0 m past the Cataract Steps' top: the Great Dome's roof undercuts the gallery's floor there (3 unguarded drops in the round-5 build)"
+    },
+    {
+      "id": "rim_cataract_n",
+      "line": [
+        [193.94, 36.92],
+        [194.97, 37.01]
+      ],
+      "base_z": 10.4,
+      "height": 1.0,
+      "notes": "route 2: a flowstone rim on the ledge's north edge beyond the Cataract Steps' face, where the ledge turns back along the dome's wall: the viewer's walker stepped off there and fell 2.9 m outside the climb zone"
+    },
+    {
+      "id": "kerb_cataract_lip",
+      "line": [
+        [193.2, 34.4],
+        [193.62, 35.0]
+      ],
+      "base_z": 10.4,
+      "height": 1.0,
+      "notes": "route 2: a flowstone kerb on the ledge's edge 1.2 to 1.4 m behind the Cataract Steps' face line, where the Great Dome's wall undercuts the ledge (1 unguarded drop of 2.9 m in the core's flood)"
     }
   ],
   "spawns": [

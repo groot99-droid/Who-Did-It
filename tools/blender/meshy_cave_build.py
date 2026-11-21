@@ -65,6 +65,7 @@ SCENE = "undermere"
 EYE, CRAWL_EYE = 1.6, 0.55
 PORTAL_CLEAR, SEAM_ARRIVAL_CLEAR = 1.0, 1.2
 GRILLE_PLUG = 0.1  # metres: the collision plug's thickness behind a gate's grille
+GRILLE_H = {"arch": 3.0}  # metres: a grille's bar height by gate type (else 2.1)
 ATTR = "wdi_light"
 TINT_ATTR = "wdi_tint"
 INK = (0x12, 0x14, 0x1C)
@@ -248,7 +249,39 @@ def fill_points(sec_d: dict, look: dict) -> list:
         w = min(max(f["watts_per_m2"] * L * W, f["min_watts"]), f["max_watts"])
         out.append({"id": f"fill_{c['id']}", "at": [c["center"][0], c["center"][1], c["center"][2] + f["height_frac"] * H],
                     "watts": round(w, 3)})
+        big = f.get("big")
+        if big and L * W >= float(big["min_area_m2"]):
+            # a big chamber also gets a ring of low lights near its walls, so its blocks and walls are lit from the
+            # side and read as shapes (route 1: the 32 m Well Dome read flat under its one light)
+            ax_ = c.get("axis", [1.0, 0.0])
+            n_ = math.hypot(ax_[0], ax_[1]) or 1.0
+            ux, uy = ax_[0] / n_, ax_[1] / n_
+            k = int(big["ring"])
+            wr = min(float(big["watts_per_m2"]) * L * W / k, float(big["max_watts"]))
+            for i in range(k):
+                a = 2.0 * math.pi * (i + 0.5) / k
+                du, dv = 0.5 * L * big["ring_frac"] * math.cos(a), 0.5 * W * big["ring_frac"] * math.sin(a)
+                out.append({"id": f"fill_{c['id']}_ring_{i}",
+                            "at": [c["center"][0] + du * ux - dv * uy, c["center"][1] + du * uy + dv * ux,
+                                   c["center"][2] + big["height_frac"] * H], "watts": round(wr, 3)})
     nodes = sec_d.get("nodes", {})
+    cf = f.get("climb")
+    for p in sec_d.get("passages", []) if cf else []:
+        # a climb face of some height gets a low light at the side of its foot, so the face is lit across
+        if p["profile"] != "climb_face":
+            continue
+        A = nodes[p["from"]] if isinstance(p["from"], str) else p["from"]
+        B = nodes[p["to"]] if isinstance(p["to"], str) else p["to"]
+        if B[2] - A[2] < float(cf["min_height_m"]):
+            continue
+        dx, dy = B[0] - A[0], B[1] - A[1]
+        n_ = math.hypot(dx, dy) or 1.0
+        dx, dy = dx / n_, dy / n_
+        wv = p["width"] if isinstance(p["width"], (int, float)) else max(p["width"])
+        side = 0.5 * float(wv) + float(cf["side_m"])
+        out.append({"id": f"fill_{p['id']}_foot",
+                    "at": [A[0] - cf["back_m"] * dx - side * dy, A[1] - cf["back_m"] * dy + side * dx,
+                           A[2] + cf["height_m"]], "watts": float(cf["watts"])})
     for p in sec_d.get("passages", []):
         if p["profile"] not in core.WALK_PROFILES:
             continue
@@ -772,9 +805,43 @@ def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: s
     return ob
 
 
+def lake_rails(sec) -> list:
+    """The timber rail round each lake's basin, on the ring of the core's automatic basin guard (core.guard_segments:
+    from the lake's floor level, 1 m high, 0.12 m thick), so the walker sees what stops them: two bars along every
+    ring segment, as on a declared rail, and a post about every 1.2 m of the ring."""
+    parts = []
+    for c in sec.own:
+        if not (isinstance(c, core.Chamber) and c.kind == "lake"):
+            continue
+        ring = c.basin_ring()
+        pts = ring + [ring[0]]
+        base, h = float(c.c[2]), 1.0
+        segs = []
+        for a, b in zip(pts[:-1], pts[1:]):
+            L = math.hypot(b[0] - a[0], b[1] - a[1])
+            if L < 1e-6:
+                continue
+            ux, uy = (b[0] - a[0]) / L, (b[1] - a[1]) / L
+            segs.append((a, b, L, ux, uy))
+            cx, cy = 0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])
+            for zz in (base + h - 0.04, base + 0.5 * h):
+                parts.append(box_mesh((cx, cy, zz), 0.5 * L + 0.04, 0.04, 0.04, ux, uy))
+        per = sum(s[2] for s in segs)
+        n = max(3, int(math.ceil(per / 1.2)))
+        step, run, k = per / n, 0.0, 0
+        for a, b, L, ux, uy in segs:
+            while k < n and k * step <= run + L + 1e-9:
+                t = (k * step - run) / L
+                parts.append(box_mesh((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base + 0.5 * h),
+                                      0.05, 0.05, 0.5 * h, ux, uy))
+                k += 1
+            run += L
+    return parts
+
+
 def guard_pieces(z: dict, sec, look: dict, out_dir: str) -> list:
     """What the walker sees of the proxies: a rock kerb for a guard 0.15 m thick or more, a timber rail (posts and two
-    bars) for a thinner one, a plank deck for a bridge."""
+    bars) for a thinner one and round every lake's basin, a plank deck for a bridge."""
     out = []
     kerb_parts, rail_parts, deck_parts = [], [], []
     for gd in sec.d.get("guards", []):
@@ -796,6 +863,7 @@ def guard_pieces(z: dict, sec, look: dict, out_dir: str) -> list:
                     t = i / n
                     rail_parts.append(box_mesh((a[0] + t * (b[0] - a[0]), a[1] + t * (b[1] - a[1]), base + 0.5 * h),
                                                0.05, 0.05, 0.5 * h, ux, uy))
+    rail_parts += lake_rails(sec)
     for br in sec.d.get("bridges", []):
         x0, y0, x1, y1 = br["box"]
         th = float(br.get("thickness", 0.2))
@@ -835,12 +903,27 @@ def gate_piece(sec, look: dict, out_dir: str, design_gate: dict | None) -> dict:
     along /= max(W, 1e-9)
     parts = []
     n = int(round(W / 0.15))
+    gtype = design_gate.get("type")
+    bar_h = GRILLE_H.get(gtype, 2.1)   # an arch's grille fills the arch, so no one climbs over it
     for i in range(n + 1):
         t = -0.5 * W + i * W / n
-        c = (gmid[0] + t * along[0], gmid[1] + t * along[1], gz + 1.0)
-        parts.append(box_mesh(c, 0.015, 0.015, 1.05, along[0], along[1]))
-    for zz in (gz + 0.15, gz + 1.0, gz + 1.95):
+        c = (gmid[0] + t * along[0], gmid[1] + t * along[1], gz + 0.5 * bar_h - 0.05)
+        parts.append(box_mesh(c, 0.015, 0.015, 0.5 * bar_h, along[0], along[1]))
+    rails = (gz + 0.15, gz + 1.0, gz + 1.95) + ((gz + bar_h - 0.15,) if bar_h > 2.2 else ())
+    for zz in rails:
         parts.append(box_mesh((gmid[0], gmid[1], zz), 0.5 * W + 0.05, 0.02, 0.025, along[0], along[1]))
+    if gtype == "arch":
+        # the narrow iron door at the portal: two heavy stiles, its own rails and a lock box
+        tp = float(np.dot(pa[:2] - gmid, along))
+        for sgn in (-1.0, 1.0):
+            c = (gmid[0] + (tp + sgn * 0.45) * along[0], gmid[1] + (tp + sgn * 0.45) * along[1], gz + 1.0)
+            parts.append(box_mesh(c, 0.035, 0.03, 1.05, along[0], along[1]))
+        for zz in (gz + 0.5, gz + 1.5, gz + 2.05):
+            c = (gmid[0] + tp * along[0], gmid[1] + tp * along[1], zz)
+            parts.append(box_mesh(c, 0.45, 0.03, 0.03, along[0], along[1]))
+        c = (gmid[0] + (tp + 0.33) * along[0] + 0.05 * inward[0], gmid[1] + (tp + 0.33) * along[1] + 0.05 * inward[1],
+             gz + 1.05)
+        parts.append(box_mesh(c, 0.06, 0.03, 0.08, along[0], along[1]))
     V, F = merge(parts)
     iron = bpy.data.materials.new("cave_iron")
     iron.use_nodes = True
@@ -884,6 +967,16 @@ def gate_piece(sec, look: dict, out_dir: str, design_gate: dict | None) -> dict:
     P[:, 2] = Zg.ravel()
     air = (sec.field_points(P) > 0).reshape(Ug.shape)
     rock = ~(air[:-1, :-1] | air[1:, :-1] | air[:-1, 1:] | air[1:, 1:])
+    if gtype == "adit":
+        # the headwall: dry stone up to the ground behind it, and its parapet over the cutting's width
+        cut = design_gate.get("cutting", {})
+        th_ = float(cut.get("wall_thick", 0.55))
+        ucut = (gmid[ua] - 0.5 * W - th_, gmid[ua] + 0.5 * W + th_)
+        top = gz + float(cut.get("wall_h", 3.5))
+        uc = 0.5 * (us[:-1] + us[1:])
+        zc = 0.5 * (zs[:-1] + zs[1:])
+        cap = np.where((uc >= ucut[0]) & (uc <= ucut[1]), top + float(cut.get("parapet_h", 1.0)), top)
+        rock &= zc[None, :] <= cap[:, None]
     Vo, Fo = [], []
 
     def pt(u, z, w=plane):
@@ -908,9 +1001,14 @@ def gate_piece(sec, look: dict, out_dir: str, design_gate: dict | None) -> dict:
     R = 40.0
     cu = 0.5 * (ob_[ua] + ob_[3 + ua])
     far = plane + fr["sign"] * R
-    sv = np.array([pt(cu - R, g0), pt(cu + R, g0), pt(cu + R, g0 - 1.5, far), pt(cu - R, g0 - 1.5, far)])
-    snow = textured(f"um_{sec.key}_vista_snow", sv, facing(sv, [(0, 1, 2), (0, 2, 3)], (0, 0, 1)),
+    if gtype == "adit":
+        sv, sf = cutting_ground(fr, gmid, W, gz, design_gate.get("cutting", {}), R)
+    else:
+        sv = np.array([pt(cu - R, g0), pt(cu + R, g0), pt(cu + R, g0 - 1.5, far), pt(cu - R, g0 - 1.5, far)])
+        sf = [(0, 1, 2), (0, 2, 3)]
+    snow = textured(f"um_{sec.key}_vista_snow", sv, facing(sv, sf, (0, 0, 1)),
                     look["kits"]["snow"], look["sky"]["snow"], look, out_dir, repeat=3.0)
+    out["extras"], out["extra_coll"] = gate_extras(sec, look, out_dir, design_gate, fr, gz, gmid, inward, along, W)
     bd = hex_lin(look["sky"]["backdrop_display"])
     back = flat_material("cave_vista_sky", bd)
     MATS[back.name] = {"mat": back, "kind": "emit", "display": bd}
@@ -923,6 +1021,188 @@ def gate_piece(sec, look: dict, out_dir: str, design_gate: dict | None) -> dict:
     pc = (gmid[0] - (GRILLE_PLUG * 0.5 + 0.02) * inward[0], gmid[1] - (GRILLE_PLUG * 0.5 + 0.02) * inward[1], gz + 1.3)
     out["plug"] = box_mesh(pc, 0.5 * W + 0.6, 0.5 * GRILLE_PLUG, 2.0, along[0], along[1])
     return out
+
+
+def cutting_ground(fr: dict, gmid, W: float, gz: float, cut: dict, R: float) -> tuple:
+    """The Adit Gate's cutting as the walker sees it through the grille: the landing and the ramp between the walls,
+    the trail's level beyond, and the ground either side, which falls from the headwall's top to the trail as the
+    walls do (design.json's adit_cut: a level landing to the ramp's foot, a 15 degree ramp up to the outlaws' trail,
+    walls from nothing at the trail to wall_h at the headwall). Returns (V, F), quads as triangle pairs."""
+    ax, ua, sg = fr["axis"], fr["u_axis"], fr["sign"]
+    face = fr["plane"]
+    land = float(cut.get("landing_m", 2.5))
+    ramp = float(cut.get("ramp_m", 6.7))
+    rise = float(cut.get("rise_m", 1.79))
+    wall_h = float(cut.get("wall_h", 3.5))
+    th = float(cut.get("wall_thick", 0.55))
+    u0, u1 = float(gmid[ua]) - 0.5 * W, float(gmid[ua]) + 0.5 * W
+    w_foot, w_top = face + sg * land, face + sg * (land + ramp)
+
+    def P(w, u, z):
+        q = [0.0, 0.0, z]
+        q[ax], q[ua] = w, u
+        return q
+
+    def ground(w):
+        t = min(max((w - face) * sg / (land + ramp), 0.0), 1.0)
+        return gz + wall_h + t * (rise - wall_h)
+
+    V, F = [], []
+
+    def quad(a, b, c, d):
+        n = len(V)
+        V.extend([a, b, c, d])
+        F.extend([(n, n + 1, n + 2), (n, n + 2, n + 3)])
+
+    quad(P(face, u0, gz), P(face, u1, gz), P(w_foot, u1, gz), P(w_foot, u0, gz))
+    quad(P(w_foot, u0, gz), P(w_foot, u1, gz), P(w_top, u1, gz + rise), P(w_top, u0, gz + rise))
+    far = face + sg * R
+    quad(P(w_top, u0 - R, gz + rise), P(w_top, u1 + R, gz + rise), P(far, u1 + R, gz + rise - 1.0),
+         P(far, u0 - R, gz + rise - 1.0))
+    for ua_, ub_ in ((u0 - R, u0 - th), (u1 + th, u1 + R)):
+        quad(P(face, ua_, ground(face)), P(face, ub_, ground(face)), P(w_top, ub_, ground(w_top)),
+             P(w_top, ua_, ground(w_top)))
+    return np.array(V, float), F
+
+
+def gate_extras(sec, look: dict, out_dir: str, gate_d: dict, fr: dict, gz: float, gmid, inward, along, W: float):
+    """A gate type's own pieces, baked like the shell, and their collision: the Adit Gate's timber sets and its
+    cutting's dry-stone walls with their parapets; the Old Rising Gate's icicle fringe, the ravine's walls and the
+    broken trestle over the ravine. Returns (objects, collision parts)."""
+    t = gate_d.get("type")
+    kits = look["kits"]
+    objs, coll = [], []
+    ax, ua, sg = fr["axis"], fr["u_axis"], fr["sign"]
+    inw = np.array([inward[0], inward[1], 0.0])
+    alo = np.array([along[0], along[1], 0.0])
+    g2 = np.array([gmid[0], gmid[1], gz])
+    face = fr["plane"]
+    if t == "adit":
+        cut = gate_d.get("cutting", {})
+        # three box-built sets (two posts and a cap each): the first just inside the grille, then every 1.2 m
+        posts, caps_ = [], []
+        clear = float(cut.get("set_h", 2.15))
+        for k in range(3):
+            c = g2 + (0.17 + 1.2 * k) * inw
+            for sgn in (-1.0, 1.0):
+                pc = c + sgn * (0.5 * W - 0.12) * alo + np.array([0, 0, 0.5 * clear])
+                posts.append(box_mesh(tuple(pc), 0.1, 0.1, 0.5 * clear, inward[0], inward[1]))
+            caps_.append(box_mesh(tuple(c + np.array([0, 0, clear + 0.1])), 0.11, 0.5 * W + 0.05, 0.1,
+                                  inward[0], inward[1]))
+        coll += posts
+        V, F = merge(posts + caps_)
+        objs.append(textured(f"um_{sec.key}_portal_timber", V, F, kits["timber"], "#6B5440", look, out_dir,
+                             repeat=1.2))
+        # the cutting's dry-stone walls with their parapets, from the headwall's face out to the trail
+        land = float(cut.get("landing_m", 2.5))
+        ramp = float(cut.get("ramp_m", 6.7))
+        rise = float(cut.get("rise_m", 1.79))
+        wall_h = float(cut.get("wall_h", 3.5))
+        par = float(cut.get("parapet_h", 1.0))
+        th = float(cut.get("wall_thick", 0.55))
+        L = land + ramp
+        wp = []
+        for sgn in (-1.0, 1.0):
+            uc = float(gmid[ua]) + sgn * (0.5 * W + 0.5 * th)
+            Vw = []
+            for w_, ztop in ((face, gz + wall_h + par), (face + sg * L, gz + rise + 0.25)):
+                for du in (-0.5 * th, 0.5 * th):
+                    for zz in (gz - 0.3, ztop):
+                        q = [0.0, 0.0, zz]
+                        q[ax], q[ua] = w_, uc + du
+                        Vw.append(q)
+            # vertices: (face | trail end) x (u- | u+) x (foot | top), index 4 * iw + 2 * iu + iz
+            Fw = [(0, 1, 3), (0, 3, 2), (4, 6, 7), (4, 7, 5), (0, 4, 5), (0, 5, 1), (2, 3, 7), (2, 7, 6),
+                  (0, 2, 6), (0, 6, 4), (1, 5, 7), (1, 7, 3)]
+            wp.append((np.array(Vw, float), np.array(Fw)))
+        V, F = merge(wp)
+        objs.append(textured(f"um_{sec.key}_vista_walls", V, facing_out(V, F),
+                             kits[mouth_kit_name(kits, gate_d)]["wall"], "#7E7A70", look, out_dir, repeat=1.5))
+    elif t == "arch":
+        # the icicle fringe on the arch's lip, just outside the grille: cones hung from the roof the field finds
+        rng = np.random.default_rng(20261121)
+        cones = []
+        n = int(W / 0.22)
+        for i in range(n):
+            u = -0.5 * W + (i + 0.5) * W / n + rng.uniform(-0.06, 0.06)
+            base = g2 + u * alo - (0.25 + rng.uniform(0.0, 0.35)) * inw
+            zz = np.arange(gz + 1.2, gz + 6.0, 0.05)
+            Pz = np.tile(base, (len(zz), 1))
+            Pz[:, 2] = zz
+            rk = np.nonzero(sec.field_points(Pz) <= 0)[0]
+            if not len(rk):
+                continue
+            top = float(zz[rk[0]]) + 0.05
+            ln = float(rng.uniform(0.15, 0.7)) * (1.0 if abs(u) < 0.5 * W - 0.4 else 0.5)
+            cones.append(cone_mesh((base[0], base[1], top), 0.03 + 0.05 * ln, ln, 5))
+        if cones:
+            V, F = merge(cones)
+            objs.append(textured(f"um_{sec.key}_icicles", V, F, kits["ice"]["wall"], "#C9D3DB", look, out_dir,
+                                 repeat=1.0))
+        # the ravine's walls either side, running out from the headwall
+        rw = []
+        for sgn in (-1.0, 1.0):
+            uw = float(gmid[ua]) + sgn * 7.0
+            Vr = []
+            for w_ in (face + sg * 0.5, face + sg * 30.0):
+                for zz in (gz - 2.0, gz + 14.0):
+                    q = [0.0, 0.0, zz]
+                    q[ax], q[ua] = w_, uw
+                    Vr.append(q)
+            rw.append((np.array(Vr, float), np.array([(0, 1, 3), (0, 3, 2)])))
+        V, F = merge(rw)
+        F = facing_point(V, F, g2 - 8.0 * inw + np.array([0, 0, 2.0]))
+        objs.append(textured(f"um_{sec.key}_vista_ravine", V, F, kits[mouth_kit_name(kits, gate_d)]["wall"],
+                             "#8A857A", look, out_dir, repeat=3.0))
+        # the broken trestle across the ravine: two bents (the far one has lost a leg), a snapped stringer hanging
+        tp = []
+        deck = gz + 7.0
+        for k, w_ in enumerate((6.0, 12.0)):
+            c = g2 - w_ * inw
+            for sgn in (-1.0, 1.0):
+                if k == 1 and sgn > 0:
+                    continue
+                leg = c + sgn * 2.2 * alo + np.array([0, 0, 0.5 * (deck - gz + 2.0) - 2.0])
+                tp.append(box_mesh(tuple(leg), 0.15, 0.15, 0.5 * (deck - gz + 2.0), along[0], along[1]))
+            tp.append(box_mesh(tuple(c + np.array([0, 0, deck - gz])), 2.6, 0.18, 0.15, along[0], along[1]))
+        tp.append(box_mesh(tuple(g2 - 9.0 * inw - 1.6 * alo + np.array([0, 0, deck - gz + 0.3])), 3.3, 0.12, 0.15,
+                           -inward[0], -inward[1]))
+        tp.append(box_mesh(tuple(g2 - 8.0 * inw + 1.6 * alo + np.array([0, 0, deck - gz - 0.8])), 2.4, 0.12, 0.15,
+                           -inward[0] * 0.9, -inward[1] * 0.9 + 0.1))
+        V, F = merge(tp)
+        objs.append(textured(f"um_{sec.key}_vista_trestle_timber", V, F, kits["timber"], "#6B5440", look, out_dir,
+                             repeat=1.2))
+    return objs, coll
+
+
+def cone_mesh(top, r: float, length: float, n: int = 5) -> tuple:
+    """A cone hanging down (an icicle): a ring of n points at `top`'s height, its tip `length` below."""
+    cx, cy, cz = top
+    V = [[cx + r * math.cos(2 * math.pi * i / n), cy + r * math.sin(2 * math.pi * i / n), cz] for i in range(n)]
+    V.append([cx, cy, cz - length])
+    return np.array(V, float), np.array([(i, n, (i + 1) % n) for i in range(n)])
+
+
+def facing_out(V: np.ndarray, F) -> np.ndarray:
+    """Winds each box's faces outward (every 12 faces are one closed box)."""
+    F = np.asarray(F).copy()
+    for b in range(0, len(F), 12):
+        c = V[np.unique(F[b:b + 12])].mean(0)
+        for i in range(b, b + 12):
+            a, b_, d = V[F[i, 0]], V[F[i, 1]], V[F[i, 2]]
+            if np.dot(np.cross(b_ - a, d - a), (a + b_ + d) / 3.0 - c) < 0:
+                F[i] = F[i, [0, 2, 1]]
+    return F
+
+
+def facing_point(V: np.ndarray, F, p) -> np.ndarray:
+    """Winds each face towards a point."""
+    F = np.asarray(F).copy()
+    for i in range(len(F)):
+        a, b_, d = V[F[i, 0]], V[F[i, 1]], V[F[i, 2]]
+        if np.dot(np.cross(b_ - a, d - a), np.asarray(p) - a) < 0:
+            F[i] = F[i, [0, 2, 1]]
+    return F
 
 
 def caps(sec, mouth_ids: set) -> list:
@@ -1446,7 +1726,36 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
         d = np.array([-math.sin(yaw), math.cos(yaw), -0.12])
         e = np.array(s["at"]) + np.array([0, 0, eye])
         views.append((s["id"], e, e + 5 * d))
-    mouth_sp = [s for s in nodes["spawns"] if s["id"].startswith(f"{SCENE}_mouth_")]
+    for c in sec.d.get("chambers", []):
+        L_, W_, H_ = (float(v) for v in c["size"])
+        if not c.get("walk", True) or L_ * W_ < 150.0:
+            continue
+        ax_ = np.array(c.get("axis", [1.0, 0.0]), float)
+        ax_ = np.array([ax_[0], ax_[1], 0.0]) / max(np.linalg.norm(ax_), 1e-9)
+        cc = np.array(c["center"], float)
+        e = cc - 0.4 * L_ * ax_ + np.array([0, 0, EYE])
+        views.append((f"view_{c['id']}", e, cc + 0.25 * L_ * ax_ + np.array([0, 0, 0.3 * H_])))
+    for c in sec.own:
+        # a lake's basin and its rail, from standing height about 3 m out from the rail, looking down at the water
+        if not (isinstance(c, core.Chamber) and c.kind == "lake"):
+            continue
+        ring = np.array(c.basin_ring())
+        rr = float(np.max(np.hypot(ring[:, 0] - c.c[0], ring[:, 1] - c.c[1])))
+        for ang in range(0, 360, 15):
+            dv = np.array([math.cos(math.radians(ang)), math.sin(math.radians(ang)), 0.0])
+            q = np.array([c.c[0], c.c[1], c.c[2] + 1.6]) + (rr + 3.0) * dv
+            P = q[None, :] - np.outer(np.linspace(0.0, 3.0, 10), dv)
+            if not np.all(sec.field_points(P) > 0.15):
+                continue
+            zs = q[2] - np.linspace(0.0, 2.5, 51)
+            col = sec.field_points(np.column_stack([np.full(51, q[0]), np.full(51, q[1]), zs]))
+            solid = np.nonzero(col <= 0)[0]
+            if not len(solid):
+                continue
+            e = np.array([q[0], q[1], zs[solid[0]] + EYE])
+            views.append((f"view_{c.id}", e, np.array([c.c[0], c.c[1], c.c[2] + 0.3])))
+            break
+    mouth_sp =[s for s in nodes["spawns"] if s["id"].startswith(f"{SCENE}_mouth_")]
     for p in nodes["portals"]:
         # from 3 m inside, looking at the portal (a gate's grille and vista, a seam's crossing); a gate's from the
         # side of its arrival in the cave, so the grille is seen from inside
@@ -1474,7 +1783,13 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
         kind = z["extras"]["wdi_traverse"]
         if kind == "climb":
             Zo = -np.array([z["basis"][0][1], z["basis"][1][1], 0.0])
-            e = np.array([c[0], c[1], foot]) + 2.2 * Zo + np.array([0, 0, EYE])
+            # from 3.2 m out and to one side when the camera stands in air there, else straight out, nearer
+            tgt = np.array([c[0], c[1], c[2] + 0.5 * z["extras"]["size"][1]])
+            for back, side in ((3.2, 0.35 * sx), (3.2, 0.0), (2.2, 0.0), (1.4, 0.0)):
+                e = np.array([c[0], c[1], foot]) + back * Zo + side * X + np.array([0, 0, EYE])
+                line = e[None, :] + np.outer(np.linspace(0.0, 0.8, 5), tgt - e)
+                if np.all(sec.field_points(line) > 0.1):
+                    break
             views.append((z["name"], e, np.array([c[0], c[1], c[2] + 0.5 * z["extras"]["size"][1]])))
         else:
             e = c - (0.5 * sx + 1.2) * X
@@ -1508,9 +1823,8 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
     cam.location = (0.5 * (x0 + x1), 0.5 * (y0 + y1), bx[:, 5].max() + 30.0)
     cam.rotation_euler = (0.0, 0.0, 0.0)
     sc.camera = cam
-    for nm_ in ("vista_sky", "vista_snow", "outcrop"):
-        o = bpy.data.objects.get(f"um_{sec.key}_{nm_}")
-        if o is not None:
+    for o in bpy.data.objects:
+        if o.name.startswith((f"um_{sec.key}_vista", f"um_{sec.key}_outcrop")):
             o.hide_render = True
     p = os.path.join(out_dir, f"{area}_plan_top.png")
     px = 1200
@@ -1607,13 +1921,14 @@ def main(argv) -> int:
     for k_ in ("outcrop", "snow"):
         if gate.get(k_) is not None:
             objs.append(gate[k_])
+    objs += gate.get("extras", [])
     others = [gate[k_] for k_ in ("grille", "lamp_housing", "lamp_iron") if gate.get(k_) is not None]
     caps(sec, {o["id"] for o in sec.d.get("openings", []) if o["id"].startswith("mouth_")})
     area_ob = bpy.data.objects.new(f"Area_{aid}", None)
     COL["nodes"].objects.link(area_ob)
     for k_, v in nodes["extras"].items():
         area_ob[k_] = v
-    coll_ob, coll_tris = collision_object(z, aid, [gate.get("plug")])
+    coll_ob, coll_tris = collision_object(z, aid, [gate.get("plug")] + list(gate.get("extra_coll", [])))
     empties(nodes, area_ob)
     groups = rig(sec, look, gate)
     finish_attrs(objs)

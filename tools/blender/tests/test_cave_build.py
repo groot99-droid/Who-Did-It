@@ -149,6 +149,33 @@ class CaveBuildTest(unittest.TestCase):
         self.assertTrue(any(i.startswith("fill_ga_trunk_1") for i in gal))
         self.assertFalse(any(i.startswith("fill_bottomless_pit") for i in gal))
 
+    def test_big_chamber_ring_and_climb_fill(self):
+        f = self.look["fill"]
+        well = core.load_json(os.path.join(UNDERMERE, "well.json"))
+        ids = [p["id"] for p in cb.fill_points(well, self.look)]
+        ring = [i for i in ids if i.startswith("fill_we_dome_ring_")]
+        self.assertEqual(len(ring), f["big"]["ring"])                 # the 32 m dome: a ring of low lights
+        self.assertIn("fill_we_dome", ids)
+        self.assertIn("fill_we_dam_face_foot", ids)                    # the Flowstone Dam (3.2 m) is lit across
+        pts = {p["id"]: p for p in cb.fill_points(well, self.look)}
+        dome = next(c for c in well["chambers"] if c["id"] == "we_dome")
+        for i in ring:
+            self.assertLess(pts[i]["at"][2], dome["center"][2] + 0.5 * dome["size"][2])
+            self.assertLessEqual(pts[i]["watts"], f["big"]["max_watts"])
+        north = core.load_json(os.path.join(UNDERMERE, "north.json"))
+        no = [p["id"] for p in cb.fill_points(north, self.look)]
+        self.assertFalse(any("_ring_" in i for i in no))               # the Organ Chamber (90 m2) is under the size
+
+    def test_adit_cutting_ground_rises_to_the_trail(self):
+        fr = cb.mouth_frame([124.0, 2.5, 3.6, 127.0, 6.5, 7.6], [125.45, 4.5, 4.1], [[125.0, 3.5], [125.0, 5.5]])
+        self.assertEqual((fr["axis"], fr["sign"]), (0, -1.0))          # the Adit faces west (-x)
+        V, F = cb.cutting_ground(fr, (125.0, 4.5), 2.0, 4.1, {}, 40.0)
+        self.assertEqual(len(F), 10)
+        self.assertAlmostEqual(float(V[8:12, 2].min()), 4.1 + 1.79 - 1.0)  # the ground falls away beyond the trail
+        land = V[:4]
+        self.assertTrue(np.allclose(land[:, 2], 4.1))                  # the landing is level at the sill
+        self.assertAlmostEqual(float(V[4:8, 0].min()), fr["plane"] - 2.5 - 6.7)
+
     def test_face_materials_split_by_kit_and_surface(self):
         V = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [10, 10, 0], [11, 10, 0], [10, 11, 0]], float)
         F = np.array([[0, 1, 2], [0, 3, 1], [4, 5, 6]])
@@ -234,6 +261,8 @@ class CaveBuildTest(unittest.TestCase):
         self.assertEqual(cb.mouth_kit_name(kits, {"type": "notch"}), "mouth")
         self.assertEqual(cb.mouth_kit_name(kits, {"type": "cliff_slot"}), "mouth_cliff_slot")
         self.assertEqual(cb.mouth_kit_name(kits, None), "mouth")
+        self.assertEqual(cb.mouth_kit_name(kits, {"type": "adit"}), "mouth_adit")
+        self.assertEqual(cb.mouth_kit_name(kits, {"type": "arch"}), "mouth_arch")
         b = [-59.5, -22.1, -0.6, -55.5, -18.1, 3.4]
         sw = cb.mouth_frame(b, [-57.5, -19.65, -0.1], [[-58.4, -20.1], [-56.6, -20.1]])
         # the Swallow's: as before, now that the mouth faces along its own axis
@@ -272,6 +301,24 @@ class CaveBuildTest(unittest.TestCase):
         self.assertEqual((k_r, m_r), (self.look["hot"]["knee"], self.look["hot"]["max"]))
         self.assertLess(m_t, m_r)
         self.assertLess(k_t, m_t)
+
+    def test_every_basin_guard_is_drawn(self):
+        """The core's automatic guard round a lake is collision; the walker must see a rail on that same ring."""
+        sec, _w = core.load_section(os.path.join(UNDERMERE, "rising.json"))
+        segs = [s for s in core.guard_segments(sec) if s[0].endswith("_basin_guard")]
+        self.assertTrue(segs)
+        parts = cb.lake_rails(sec)
+        self.assertTrue(parts)
+        V = np.concatenate([p[0] for p in parts])
+        C = np.array([p[0].mean(axis=0) for p in parts])
+        # a bar is centred on every guard segment's midpoint, and the rail spans the guard's height
+        for _id, a, b, base, h, _th in segs:
+            mid = np.array([0.5 * (a[0] + b[0]), 0.5 * (a[1] + b[1])])
+            self.assertLess(np.min(np.hypot(C[:, 0] - mid[0], C[:, 1] - mid[1])), 1e-6)
+            self.assertAlmostEqual(V[:, 2].max(), base + h, places=6)
+            self.assertAlmostEqual(V[:, 2].min(), base, places=6)
+        # a section without a lake gets none
+        self.assertEqual(cb.lake_rails(self.secs["swallow"][0]), [])
 
 
 if __name__ == "__main__":

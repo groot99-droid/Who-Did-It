@@ -1684,6 +1684,34 @@ def weld(parts):
     return q[fi], faces, cells
 
 
+def cancel_pairs(F, cells):
+    """Drops each pair of faces on the same three vertices wound opposite ways: where the field is exactly zero on
+    a lattice node, the cubes either side of it can each emit the same triangle, back to back, which leaves a
+    zero-area sliver and four faces on its edges (the Well Dome's shell had four such pairs). The pair encloses
+    nothing, so removing both keeps the shell closed."""
+    if not len(F):
+        return F, cells
+    S = np.sort(F, axis=1)
+    n = int(F.max()) + 1
+    key = (S[:, 0] * n + S[:, 1]) * n + S[:, 2]
+    u, inv, cnt = np.unique(key, return_inverse=True, return_counts=True)
+    inv = inv.ravel()
+    dup = cnt[inv] == 2
+    if not dup.any():
+        return F, cells
+    # orientation: the parity of the permutation that sorts the face
+    r = np.argsort(F, axis=1)
+    par = ((r[:, 0] > r[:, 1]).astype(int) + (r[:, 0] > r[:, 2]) + (r[:, 1] > r[:, 2])) % 2
+    drop = np.zeros(len(F), bool)
+    idx = np.nonzero(dup)[0]
+    order = idx[np.argsort(inv[idx], kind="stable")]
+    a, b = order[0::2], order[1::2]
+    opp = par[a] != par[b]
+    drop[a[opp]] = True
+    drop[b[opp]] = True
+    return F[~drop], cells[~drop]
+
+
 def edges_of(F):
     e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
     return np.sort(e, axis=1)
@@ -3565,6 +3593,7 @@ def mesh_section(sec, log=print):
             nodes.append((np.stack([g0[0] + kx, g0[1] + ky, g0[2] + kz], 1).astype(np.int32),
                           Fo[kz, ky, kx].astype(np.float32)))
     Vq, Fs, cells = weld(shell)
+    Fs, cells = cancel_pairs(Fs, cells)
     Cq, Cf, _ = weld(coll)
     T = np.concatenate(trans) if trans else np.zeros((0, 4))
     log(f"  field + marching cubes: {len(act)} active blocks of {len(blocks)}, {len(Fs)} triangles, "

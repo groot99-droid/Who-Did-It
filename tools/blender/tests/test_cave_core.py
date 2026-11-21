@@ -665,5 +665,18 @@ class CaveCoreTest(unittest.TestCase):
         self.assertTrue(math.isfinite(self.rep["seconds"]))
 
 
+class CancelPairsTest(unittest.TestCase):
+    def test_back_to_back_pairs_go_and_the_rest_stay(self):
+        if core is None:
+            self.skipTest("numpy")
+        F = np.array([[0, 1, 2], [0, 2, 1], [1, 3, 2], [2, 3, 4], [4, 3, 2]])
+        cells = np.arange(15).reshape(5, 3)
+        G, C = core.cancel_pairs(F, cells)
+        self.assertEqual(G.tolist(), [[1, 3, 2]])
+        self.assertEqual(C.tolist(), [[6, 7, 8]])
+        same = np.array([[0, 1, 2], [1, 2, 0]])      # the same face twice, wound the same way: kept
+        self.assertEqual(len(core.cancel_pairs(same, same)[0]), 2)
+
+
 if __name__ == "__main__":
     unittest.main()

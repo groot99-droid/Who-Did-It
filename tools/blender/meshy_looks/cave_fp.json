@@ -37,7 +37,17 @@
     "min_watts": 2.0,
     "max_watts": 40.0,
     "height_frac": 0.6,
-    "radius_m": 1.0
+    "radius_m": 1.0,
+    "big": {
+      "min_area_m2": 200.0,
+      "ring": 6,
+      "ring_frac": 0.62,
+      "height_frac": 0.22,
+      "watts_per_m2": 0.06,
+      "max_watts": 12.0
+    },
+    "climb": { "min_height_m": 2.5, "back_m": 1.6, "side_m": 1.2, "height_m": 0.9, "watts": 5.0 },
+    "about_route2": "route 2: a chamber of min_area_m2 or more also gets a ring of low lights near its walls (the Well Dome read flat under one light; the Great Dome too), and a climb face of min_height_m or more a low light beside its foot, so the face is lit across"
   },
   "weights": {
     "lamp": 1.0,
@@ -78,6 +88,8 @@
     "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
     "ice": { "wall": "snow_02", "floor": "snow_03" },
     "mouth_cliff_slot": { "wall": "rock_wall_08", "floor": "snow_03" },
+    "mouth_adit": { "wall": "rock_wall_08", "floor": "gravel" },
+    "mouth_arch": { "wall": "quarry_wall_02", "floor": "snow_03" },
     "snow": "snow_02",
     "timber": "weathered_planks"
   },
