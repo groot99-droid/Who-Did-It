@@ -1,0 +1,363 @@
+{
+  "format": "cave-section/1",
+  "key": "domes",
+  "name": "The Domes",
+  "notes": "under_domes: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "flowstone",
+  "region": {
+    "boxes": [
+      [172.75, 24.625, 5.5, 179.375, 27.375, 10.0],
+      [175.5, 23.5, 5.5, 180.625, 33.5, 11.875],
+      [175.5, 28.5, 5.75, 184.5, 34.0, 12.25],
+      [179.5, 29.0, 6.125, 186.5, 35.0, 12.5],
+      [182.25, 46.125, 4.75, 187.125, 48.875, 9.125],
+      [183.5, 44.75, 4.75, 189.75, 49.75, 10.5],
+      [185.25, 40.75, 5.375, 191.75, 49.25, 11.5],
+      [182.25, 15.375, 6.5, 216.875, 59.875, 14.5],
+      [190.5, 31.0, 9.375, 197.5, 38.5, 14.75],
+      [192.5, 27.5, 9.375, 202.0, 36.0, 14.75],
+      [194.0, 21.5, 9.5, 202.0, 32.5, 14.75],
+      [194.0, 18.875, 9.5, 204.125, 26.5, 14.875],
+      [199.75, 15.375, 9.5, 203.375, 23.25, 12.875],
+      [185.125, 36.125, 6.5, 197.25, 48.25, 19.125],
+      [171.75, 33.75, 6.5, 181.125, 41.625, 11.625],
+      [177.5, 28.0, 6.5, 195.5, 45.25, 18.5],
+      [189.0, 40.375, 14.625, 196.125, 47.5, 19.125],
+      [166.0, 36.0, 6.5, 176.0, 46.0, 15.125],
+      [184.0, 35.0, 16.5, 190.0, 41.0, 23.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "do_holing",
+      "from": [172.75, 26.0, 6.6],
+      "to": [178.05, 26.0, 6.6],
+      "profile": "fissure",
+      "width": 0.54,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the East Holing (east half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "do_link",
+      "from": [178.05, 26.0, 6.6],
+      "to": [184.0, 32.5, 7.5],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Holing Passage",
+      "via": [
+        [178.0, 31.0, 6.8],
+        [182.0, 31.5, 7.2]
+      ]
+    },
+    {
+      "id": "do_slot",
+      "from": [182.25, 47.5, 5.8],
+      "to": [185.85, 47.5, 5.8],
+      "profile": "fissure",
+      "width": 0.54,
+      "clear": 2.3,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Moonmilk Slot (east half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "do_north_1",
+      "from": [185.85, 47.5, 5.8],
+      "to": [187.5, 47.0, 6.4],
+      "profile": "tube",
+      "width": [1.2, 2.5],
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Passage (leg 1 of 2)"
+    },
+    {
+      "id": "do_north_2",
+      "from": [187.5, 47.0, 6.4],
+      "to": [189.5, 43.0, 7.5],
+      "profile": "tube",
+      "width": 2.5,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Passage (leg 2 of 2)"
+    },
+    {
+      "id": "do_cat_face",
+      "from": [193.57, 35.92, 7.5],
+      "to": [194.36, 35.79, 10.4],
+      "profile": "climb_face",
+      "width": 2.0,
+      "clear": 3.0,
+      "geology": "flowstone",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Cataract Steps (route 2: the face turned 41 degrees and moved 0.6 m to lie on the Great Dome's wall, which ate the ledge in front of the old face line, so the viewer's climber could not mantle; 2.0 m wide where the wall runs straight)"
+    },
+    {
+      "id": "do_upper",
+      "from": [194.36, 35.79, 10.4],
+      "to": [201.6, 21.45, 10.6],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 3.2,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Cataract Gallery",
+      "via": [
+        [195.0, 33.5, 10.45],
+        [199.5, 30.0, 10.5],
+        [196.5, 24.0, 10.55]
+      ]
+    },
+    {
+      "id": "do_gour",
+      "from": [201.6, 21.45, 10.6],
+      "to": [201.6, 15.375, 10.6],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.25,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Gour Dam (north half)"
+    },
+    {
+      "id": "do_crown_face",
+      "from": [191.2, 42.2, 7.5],
+      "to": [191.709, 42.817, 15.7],
+      "profile": "climb_face",
+      "width": 2.0,
+      "clear": 2.4,
+      "geology": "flowstone",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Crown climb"
+    },
+    {
+      "id": "do_bell",
+      "from": [178.8, 36.0, 7.5],
+      "to": [174.0, 39.3, 7.6],
+      "profile": "tube",
+      "width": 2.5,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Bell passage"
+    },
+    {
+      "id": "doline_shaft",
+      "from": [187.0, 38.0, 17.5],
+      "to": [187.0, 38.0, 21.5],
+      "profile": "shaft",
+      "width": 4.0,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the doline shaft"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "do_great",
+      "kind": "dome",
+      "center": [186.5, 37.0, 7.5],
+      "size": [16.0, 14.0, 10.0],
+      "axis": [1.0, 0.0],
+      "geology": "flowstone",
+      "notes": "the Great Dome"
+    },
+    {
+      "id": "do_grotto",
+      "kind": "pocket",
+      "center": [192.6, 43.9, 15.7],
+      "size": [5.0, 4.0, 2.4],
+      "axis": [0.866, 0.5],
+      "geology": "flowstone",
+      "notes": "the Helictite Grotto"
+    },
+    {
+      "id": "do_bellch",
+      "kind": "dome",
+      "center": [171.0, 41.0, 7.6],
+      "size": [8.0, 8.0, 6.5],
+      "axis": [1.0, 0.0],
+      "geology": "flowstone",
+      "notes": "the Bell Dome"
+    }
+  ],
+  "guards": [
+    {
+      "id": "rim_crown_w",
+      "line": [
+        [190.524, 42.951],
+        [188.594, 44.541]
+      ],
+      "base_z": 15.7,
+      "height": 1.0,
+      "notes": "a rim of helictite-crusted flowstone"
+    },
+    {
+      "id": "rim_crown_e",
+      "line": [
+        [192.067, 41.68],
+        [193.997, 40.091]
+      ],
+      "base_z": 15.7,
+      "height": 1.0,
+      "notes": "a rim of helictite-crusted flowstone"
+    },
+    {
+      "id": "kerb_cataract_gallery",
+      "line": [
+        [192.61, 35.047],
+        [194.171, 33.095]
+      ],
+      "base_z": 10.4,
+      "height": 1.0,
+      "notes": "a flowstone kerb on the Cataract Gallery's dome side, 0.5 to 3.0 m past the Cataract Steps' top: the Great Dome's roof undercuts the gallery's floor there (3 unguarded drops in the round-5 build)"
+    },
+    {
+      "id": "rim_cataract_n",
+      "line": [
+        [193.94, 36.92],
+        [194.97, 37.01]
+      ],
+      "base_z": 10.4,
+      "height": 1.0,
+      "notes": "route 2: a flowstone rim on the ledge's north edge beyond the Cataract Steps' face, where the ledge turns back along the dome's wall: the viewer's walker stepped off there and fell 2.9 m outside the climb zone"
+    },
+    {
+      "id": "kerb_cataract_lip",
+      "line": [
+        [193.2, 34.4],
+        [193.62, 35.0]
+      ],
+      "base_z": 10.4,
+      "height": 1.0,
+      "notes": "route 2: a flowstone kerb on the ledge's edge 1.2 to 1.4 m behind the Cataract Steps' face line, where the Great Dome's wall undercuts the ledge (1 unguarded drop of 2.9 m in the core's flood)"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_domes",
+      "at": [186.5, 34.0, 7.5],
+      "yaw_deg": 0.0,
+      "mode": "walk",
+      "notes": "The Great Dome"
+    }
+  ],
+  "seams": [
+    {
+      "id": "adit_domes",
+      "neighbour": "adit",
+      "side": "b",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": 172.75,
+        "toward": "-"
+      },
+      "window": [25.725, 6.595, 26.275, 9.005],
+      "stub_m": 9.2,
+      "portal": [173.2, 26.0, 6.6],
+      "arrival": {
+        "at": [174.4, 26.0, 6.6],
+        "mode": "sidle",
+        "yaw_deg": -90.0
+      },
+      "notes": "the East Holing: a natural joint the drive broke into, 0.54 m wide"
+    },
+    {
+      "id": "domes_rising",
+      "neighbour": "rising",
+      "side": "a",
+      "kind": "arch",
+      "plane": {
+        "axis": "y",
+        "at": 15.375,
+        "toward": "-"
+      },
+      "window": [200.785, 10.534, 202.415, 11.916],
+      "stub_m": 8.0,
+      "portal": [201.6, 15.82, 10.6],
+      "arrival": {
+        "at": [201.6, 17.02, 10.6],
+        "mode": "crawl",
+        "yaw_deg": 0.0
+      },
+      "notes": "the Gour Dam: a crawl over gour rims under a low roof"
+    },
+    {
+      "id": "highlevel_domes",
+      "neighbour": "highlevel",
+      "side": "b",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": 182.25,
+        "toward": "-"
+      },
+      "window": [47.224, 5.795, 47.776, 8.105],
+      "stub_m": 6.8,
+      "portal": [182.7, 47.5, 5.8],
+      "arrival": {
+        "at": [183.9, 47.5, 5.8],
+        "mode": "sidle",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Moonmilk Slot: a 0.54 m slot lined with moonmilk"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["doline_shaft", "do_great"],
+    ["do_crown_face", "do_great"],
+    ["do_crown_face", "do_grotto"],
+    ["do_cat_face", "do_great"],
+    ["ad_holing", "do_holing"],
+    ["do_bell", "do_link"],
+    ["do_cat_face", "do_upper"],
+    ["do_crown_face", "do_north_1"],
+    ["do_crown_face", "do_north_2"],
+    ["do_gour", "do_upper"],
+    ["do_gour", "rs_gour"],
+    ["do_great", "do_grotto"],
+    ["do_great", "do_upper"],
+    ["do_holing", "do_link"],
+    ["do_north_1", "do_slot"],
+    ["do_north_2", "do_slot"],
+    ["do_slot", "hl_slot"],
+    ["do_bell", "do_bellch"],
+    ["do_bell", "do_great"],
+    ["do_great", "do_link"],
+    ["do_great", "do_north_1"],
+    ["do_great", "do_north_2"],
+    ["hl_slot", "do_slot"]
+  ]
+}

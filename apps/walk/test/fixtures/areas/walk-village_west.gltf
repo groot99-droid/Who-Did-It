@@ -1,0 +1,295 @@
+{
+  "asset": {
+    "version": "2.0",
+    "generator": "tools/blender/walk_areas/fixture/make-areas-fixture.mjs"
+  },
+  "scene": 0,
+  "scenes": [
+    {
+      "name": "Walk fixture village_west",
+      "nodes": [10, 11]
+    }
+  ],
+  "nodes": [
+    {
+      "name": "Ground and gate",
+      "mesh": 0
+    },
+    {
+      "name": "Spawn_square",
+      "translation": [-30, 0, 0],
+      "rotation": [0, -0.707106781186547, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "square",
+        "wdi_district": "Village west",
+        "wdi_facing_deg": 0
+      }
+    },
+    {
+      "name": "Spawn_overworld_shop_door",
+      "translation": [-40, 0, -6],
+      "rotation": [0, -1, 0, 0],
+      "extras": {
+        "wdi_spawn": "Outside the shop",
+        "wdi_district": "Village west",
+        "wdi_facing_deg": -90
+      }
+    },
+    {
+      "name": "Spawn_overworld_seam_west_east_a_1",
+      "translation": [-1.65, 0, 1.8],
+      "rotation": [0, 0.707106781186548, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East gate, arrival 1",
+        "wdi_district": "Village west",
+        "wdi_facing_deg": 180,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Spawn_overworld_seam_west_east_a_2",
+      "translation": [-1.65, 0, 0],
+      "rotation": [0, 0.707106781186548, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East gate, arrival 2",
+        "wdi_district": "Village west",
+        "wdi_facing_deg": 180,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Spawn_overworld_seam_west_east_a_3",
+      "translation": [-1.65, 0, -1.8],
+      "rotation": [0, 0.707106781186548, 0, 0.707106781186548],
+      "extras": {
+        "wdi_spawn": "East gate, arrival 3",
+        "wdi_district": "Village west",
+        "wdi_facing_deg": 180,
+        "wdi_picker": false
+      }
+    },
+    {
+      "name": "Portal_ov.shop",
+      "translation": [-40, 0, -7.55],
+      "extras": {
+        "to": "shop",
+        "toSpawn": "door",
+        "kind": "door",
+        "wdi_portal_id": "ov.shop"
+      }
+    },
+    {
+      "name": "Portal_seam_west_east_a_1",
+      "translation": [-0.45, 0, 1.8],
+      "extras": {
+        "to": "overworld",
+        "toSpawn": "seam_west_east_b_1",
+        "kind": "gate",
+        "wdi_portal_id": "seam_west_east_a_1",
+        "wdi_seam": "west_east",
+        "wdi_seam_kind": "gate",
+        "wdi_width_m": 5
+      }
+    },
+    {
+      "name": "Portal_seam_west_east_a_2",
+      "translation": [-0.45, 0, 0],
+      "extras": {
+        "to": "overworld",
+        "toSpawn": "seam_west_east_b_2",
+        "kind": "gate",
+        "wdi_portal_id": "seam_west_east_a_2",
+        "wdi_seam": "west_east",
+        "wdi_seam_kind": "gate",
+        "wdi_width_m": 5
+      }
+    },
+    {
+      "name": "Portal_seam_west_east_a_3",
+      "translation": [-0.45, 0, -1.8],
+      "extras": {
+        "to": "overworld",
+        "toSpawn": "seam_west_east_b_3",
+        "kind": "gate",
+        "wdi_portal_id": "seam_west_east_a_3",
+        "wdi_seam": "west_east",
+        "wdi_seam_kind": "gate",
+        "wdi_width_m": 5
+      }
+    },
+    {
+      "name": "Area_village_west",
+      "children": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+      "extras": {
+        "wdi_area": "village_west",
+        "wdi_kind": "section",
+        "wdi_scene": "overworld",
+        "wdi_name": "Village west",
+        "wdi_walk_region": [-60, -20, 0, 20],
+        "wdi_exposure": 2.3784,
+        "fog_color": [0.026, 0.034, 0.058],
+        "fog_density": 0.006
+      }
+    },
+    {
+      "name": "HM_Collision_village_west",
+      "mesh": 1,
+      "extras": {
+        "wdi_collision": true
+      }
+    }
+  ],
+  "meshes": [
+    {
+      "name": "Ground and gate",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 0,
+            "NORMAL": 1,
+            "TEXCOORD_0": 2
+          },
+          "indices": 3,
+          "material": 0
+        }
+      ]
+    },
+    {
+      "name": "HM_Collision_village_west",
+      "primitives": [
+        {
+          "attributes": {
+            "POSITION": 4
+          },
+          "indices": 5
+        }
+      ]
+    }
+  ],
+  "materials": [
+    {
+      "name": "Snow",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [1, 1, 1, 1],
+        "baseColorTexture": {
+          "index": 0
+        },
+        "metallicFactor": 0,
+        "roughnessFactor": 0.95
+      }
+    },
+    {
+      "name": "Stone",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.4, 0.38, 0.36, 1],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.9
+      }
+    },
+    {
+      "name": "Wood",
+      "pbrMetallicRoughness": {
+        "baseColorFactor": [0.4, 0.27, 0.16, 1],
+        "metallicFactor": 0,
+        "roughnessFactor": 0.9
+      }
+    }
+  ],
+  "images": [
+    {
+      "uri": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAGklEQVR4nGOoaJo4bcF6CMkAZ1U0TWTAKQMAycIbga4nRCIAAAAASUVORK5CYII=",
+      "name": "snow_4x4"
+    }
+  ],
+  "textures": [
+    {
+      "source": 0
+    }
+  ],
+  "accessors": [
+    {
+      "bufferView": 0,
+      "componentType": 5126,
+      "count": 120,
+      "type": "VEC3",
+      "min": [-70, -0.20000000298023224, -30],
+      "max": [10, 4, 30]
+    },
+    {
+      "bufferView": 1,
+      "componentType": 5126,
+      "count": 120,
+      "type": "VEC3"
+    },
+    {
+      "bufferView": 2,
+      "componentType": 5126,
+      "count": 120,
+      "type": "VEC2"
+    },
+    {
+      "bufferView": 3,
+      "componentType": 5123,
+      "count": 180,
+      "type": "SCALAR"
+    },
+    {
+      "bufferView": 4,
+      "componentType": 5126,
+      "count": 144,
+      "type": "VEC3",
+      "min": [-60.29999923706055, -0.20000000298023224, -20.299999237060547],
+      "max": [0.30000001192092896, 4, 20.299999237060547]
+    },
+    {
+      "bufferView": 5,
+      "componentType": 5123,
+      "count": 216,
+      "type": "SCALAR"
+    }
+  ],
+  "bufferViews": [
+    {
+      "buffer": 0,
+      "byteOffset": 0,
+      "byteLength": 1440,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 1440,
+      "byteLength": 1440,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 2880,
+      "byteLength": 960,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 3840,
+      "byteLength": 360,
+      "target": 34963
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 4200,
+      "byteLength": 1728,
+      "target": 34962
+    },
+    {
+      "buffer": 0,
+      "byteOffset": 5928,
+      "byteLength": 432,
+      "target": 34963
+    }
+  ],
+  "buffers": [
+    {
+      "byteLength": 6360,
+      "uri": "data:application/octet-stream;base64,AAAgQc3MTL4AAPDBAAAgQQAAAAAAAPDBAAAgQQAAAAAAAPBBAAAgQc3MTL4AAPBBAACMws3MTL4AAPBBAACMwgAAAAAAAPBBAACMwgAAAAAAAPDBAACMws3MTL4AAPDBAACMwgAAAAAAAPDBAACMwgAAAAAAAPBBAAAgQQAAAAAAAPBBAAAgQQAAAAAAAPDBAACMws3MTL4AAPBBAACMws3MTL4AAPDBAAAgQc3MTL4AAPDBAAAgQc3MTL4AAPBBAAAgQc3MTL4AAPBBAAAgQQAAAAAAAPBBAACMwgAAAAAAAPBBAACMws3MTL4AAPBBAACMws3MTL4AAPDBAACMwgAAAAAAAPDBAAAgQQAAAAAAAPDBAAAgQc3MTL4AAPDBmpkZPgAAAAAAACBAmpkZPgAAQEAAACBAmpkZPgAAQEDNzExAmpkZPgAAAADNzExAmpkZvgAAAADNzExAmpkZvgAAQEDNzExAmpkZvgAAQEAAACBAmpkZvgAAAAAAACBAmpkZvgAAQEAAACBAmpkZvgAAQEDNzExAmpkZPgAAQEDNzExAmpkZPgAAQEAAACBAmpkZvgAAAADNzExAmpkZvgAAAAAAACBAmpkZPgAAAAAAACBAmpkZPgAAAADNzExAmpkZPgAAAADNzExAmpkZPgAAQEDNzExAmpkZvgAAQEDNzExAmpkZvgAAAADNzExAmpkZvgAAAAAAACBAmpkZvgAAQEAAACBAmpkZPgAAQEAAACBAmpkZPgAAAAAAACBAmpkZPgAAAADNzEzAmpkZPgAAQEDNzEzAmpkZPgAAQEAAACDAmpkZPgAAAAAAACDAmpkZvgAAAAAAACDAmpkZvgAAQEAAACDAmpkZvgAAQEDNzEzAmpkZvgAAAADNzEzAmpkZvgAAQEDNzEzAmpkZvgAAQEAAACDAmpkZPgAAQEAAACDAmpkZPgAAQEDNzEzAmpkZvgAAAAAAACDAmpkZvgAAAADNzEzAmpkZPgAAAADNzEzAmpkZPgAAAAAAACDAmpkZPgAAAAAAACDAmpkZPgAAQEAAACDAmpkZvgAAQEAAACDAmpkZvgAAAAAAACDAmpkZvgAAAADNzEzAmpkZvgAAQEDNzEzAmpkZPgAAQEDNzEzAmpkZPgAAAADNzEzAmpkZPgAAQEDNzEzAmpkZPpqZWUDNzEzAmpkZPpqZWUDNzExAmpkZPgAAQEDNzExAmpkZvgAAQEDNzExAmpkZvpqZWUDNzExAmpkZvpqZWUDNzEzAmpkZvgAAQEDNzEzAmpkZvpqZWUDNzEzAmpkZvpqZWUDNzExAmpkZPpqZWUDNzExAmpkZPpqZWUDNzEzAmpkZvgAAQEDNzExAmpkZvgAAQEDNzEzAmpkZPgAAQEDNzEzAmpkZPgAAQEDNzExAmpkZPgAAQEDNzExAmpkZPpqZWUDNzExAmpkZvpqZWUDNzExAmpkZvgAAQEDNzExAmpkZvgAAQEDNzEzAmpkZvpqZWUDNzEzAmpkZPpqZWUDNzEzAmpkZPgAAQEDNzEzAAAAMwgAAAAAAAGDBAAAMwgAAgEAAAGDBAAAMwgAAgEAAAADBAAAMwgAAAAAAAADBAAA0wgAAAAAAAADBAAA0wgAAgEAAAADBAAA0wgAAgEAAAGDBAAA0wgAAAAAAAGDBAAA0wgAAgEAAAGDBAAA0wgAAgEAAAADBAAAMwgAAgEAAAADBAAAMwgAAgEAAAGDBAAA0wgAAAAAAAADBAAA0wgAAAAAAAGDBAAAMwgAAAAAAAGDBAAAMwgAAAAAAAADBAAAMwgAAAAAAAADBAAAMwgAAgEAAAADBAAA0wgAAgEAAAADBAAA0wgAAAAAAAADBAAA0wgAAAAAAAGDBAAA0wgAAgEAAAGDBAAAMwgAAgEAAAGDBAAAMwgAAAAAAAGDBAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAPwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAACAvwAAAAAAAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgD8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAgL8AAAAAAAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIA/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AAAAAAAAAAAAAIC/AACAPwAAQMAAAIA/AABAwAAAgD8AAEBAAACAPwAAQEAAAODAAABAQAAA4MAAAEBAAADgwAAAQMAAAODAAABAwAAA4MAAAEDAAADgwAAAQEAAAIA/AABAQAAAgD8AAEDAAADgwAAAQEAAAODAAABAwAAAgD8AAEDAAACAPwAAQEAAAIA/AABAQAAAgD8AAEBAAADgwAAAQEAAAODAAABAQAAA4MAAAEDAAADgwAAAQMAAAIA/AABAwAAAgD8AAEDAj8J1PAAAgD6PwnU8AACAPo/CdTwK16M+j8J1PArXoz6PwnW8CtejPo/CdbwK16M+j8J1vAAAgD6PwnW8AACAPo/CdbwAAIA+j8J1vArXoz6PwnU8CtejPo/CdTwAAIA+j8J1vArXoz6PwnW8AACAPo/CdTwAAIA+j8J1PArXoz6PwnU8CtejPo/CdTwK16M+j8J1vArXoz6PwnW8CtejPo/CdbwAAIA+j8J1vAAAgD6PwnU8AACAPo/CdTwAAIA+j8J1PArXo76PwnU8Ctejvo/CdTwAAIC+j8J1PAAAgL6PwnW8AACAvo/CdbwAAIC+j8J1vArXo76PwnW8Ctejvo/CdbwK16O+j8J1vAAAgL6PwnU8AACAvo/CdTwK16O+j8J1vAAAgL6PwnW8Ctejvo/CdTwK16O+j8J1PAAAgL6PwnU8AACAvo/CdTwAAIC+j8J1vAAAgL6PwnW8AACAvo/CdbwK16O+j8J1vArXo76PwnU8Ctejvo/CdTwK16O+j8J1PArXo76PwnU8Ctejvo/CdTwK16M+j8J1PArXoz6PwnW8CtejPo/CdbwK16M+j8J1vArXo76PwnW8Ctejvo/CdbwK16O+j8J1vArXoz6PwnU8CtejPo/CdTwK16O+j8J1vArXoz6PwnW8Ctejvo/CdTwK16O+j8J1PArXoz6PwnU8CtejPo/CdTwK16M+j8J1vArXoz6PwnW8CtejPo/CdbwK16O+j8J1vArXo76PwnU8Ctejvo/CdTwK16O+AABgwDMzs78AAGDAMzOzvwAAYMDNzEy/AABgwM3MTL8AAJDAzcxMvwAAkMDNzEy/AACQwDMzs78AAJDAMzOzvwAAkMAzM7O/AACQwM3MTL8AAGDAzcxMvwAAYMAzM7O/AACQwM3MTL8AAJDAMzOzvwAAYMAzM7O/AABgwM3MTL8AAGDAzcxMvwAAYMDNzEy/AACQwM3MTL8AAJDAzcxMvwAAkMAzM7O/AACQwDMzs78AAGDAMzOzvwAAYMAzM7O/AAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAAAAAAM3MTL4AAKDBAAAAAAAAAAAAAKDBAAAAAAAAAAAAAKBBAAAAAM3MTL4AAKBBAABwws3MTL4AAKBBAABwwgAAAAAAAKBBAABwwgAAAAAAAKDBAABwws3MTL4AAKDBAABwwgAAAAAAAKDBAABwwgAAAAAAAKBBAAAAAAAAAAAAAKBBAAAAAAAAAAAAAKDBAABwws3MTL4AAKBBAABwws3MTL4AAKDBAAAAAM3MTL4AAKDBAAAAAM3MTL4AAKBBAAAAAM3MTL4AAKBBAAAAAAAAAAAAAKBBAABwwgAAAAAAAKBBAABwws3MTL4AAKBBAABwws3MTL4AAKDBAABwwgAAAAAAAKDBAAAAAAAAAAAAAKDBAAAAAM3MTL4AAKDBAABwwgAAAABmZqLBAABwwgAAQEBmZqLBAABwwgAAQEBmZqJBAABwwgAAAABmZqJBMzNxwgAAAABmZqJBMzNxwgAAQEBmZqJBMzNxwgAAQEBmZqLBMzNxwgAAAABmZqLBMzNxwgAAQEBmZqLBMzNxwgAAQEBmZqJBAABwwgAAQEBmZqJBAABwwgAAQEBmZqLBMzNxwgAAAABmZqJBMzNxwgAAAABmZqLBAABwwgAAAABmZqLBAABwwgAAAABmZqJBAABwwgAAAABmZqJBAABwwgAAQEBmZqJBMzNxwgAAQEBmZqJBMzNxwgAAAABmZqJBMzNxwgAAAABmZqLBMzNxwgAAQEBmZqLBAABwwgAAQEBmZqLBAABwwgAAAABmZqLBmpmZPgAAAABmZqLBmpmZPgAAQEBmZqLBmpmZPgAAQEBmZqJBmpmZPgAAAABmZqJBAAAAAAAAAABmZqJBAAAAAAAAQEBmZqJBAAAAAAAAQEBmZqLBAAAAAAAAAABmZqLBAAAAAAAAQEBmZqLBAAAAAAAAQEBmZqJBmpmZPgAAQEBmZqJBmpmZPgAAQEBmZqLBAAAAAAAAAABmZqJBAAAAAAAAAABmZqLBmpmZPgAAAABmZqLBmpmZPgAAAABmZqJBmpmZPgAAAABmZqJBmpmZPgAAQEBmZqJBAAAAAAAAQEBmZqJBAAAAAAAAAABmZqJBAAAAAAAAAABmZqLBAAAAAAAAQEBmZqLBmpmZPgAAQEBmZqLBmpmZPgAAAABmZqLBAAAAAAAAAAAAAKBBAAAAAAAAQEAAAKBBAAAAAAAAQEBmZqJBAAAAAAAAAABmZqJBAABwwgAAAABmZqJBAABwwgAAQEBmZqJBAABwwgAAQEAAAKBBAABwwgAAAAAAAKBBAABwwgAAQEAAAKBBAABwwgAAQEBmZqJBAAAAAAAAQEBmZqJBAAAAAAAAQEAAAKBBAABwwgAAAABmZqJBAABwwgAAAAAAAKBBAAAAAAAAAAAAAKBBAAAAAAAAAABmZqJBAAAAAAAAAABmZqJBAAAAAAAAQEBmZqJBAABwwgAAQEBmZqJBAABwwgAAAABmZqJBAABwwgAAAAAAAKBBAABwwgAAQEAAAKBBAAAAAAAAQEAAAKBBAAAAAAAAAAAAAKBBAAAAAAAAAABmZqLBAAAAAAAAQEBmZqLBAAAAAAAAQEAAAKDBAAAAAAAAAAAAAKDBAABwwgAAAAAAAKDBAABwwgAAQEAAAKDBAABwwgAAQEBmZqLBAABwwgAAAABmZqLBAABwwgAAQEBmZqLBAABwwgAAQEAAAKDBAAAAAAAAQEAAAKDBAAAAAAAAQEBmZqLBAABwwgAAAAAAAKDBAABwwgAAAABmZqLBAAAAAAAAAABmZqLBAAAAAAAAAAAAAKDBAAAAAAAAAAAAAKDBAAAAAAAAQEAAAKDBAABwwgAAQEAAAKDBAABwwgAAAAAAAKDBAABwwgAAAABmZqLBAABwwgAAQEBmZqLBAAAAAAAAQEBmZqLBAAAAAAAAAABmZqLBAAAMwgAAAAAAAGDBAAAMwgAAgEAAAGDBAAAMwgAAgEAAAADBAAAMwgAAAAAAAADBAAA0wgAAAAAAAADBAAA0wgAAgEAAAADBAAA0wgAAgEAAAGDBAAA0wgAAAAAAAGDBAAA0wgAAgEAAAGDBAAA0wgAAgEAAAADBAAAMwgAAgEAAAADBAAAMwgAAgEAAAGDBAAA0wgAAAAAAAADBAAA0wgAAAAAAAGDBAAAMwgAAAAAAAGDBAAAMwgAAAAAAAADBAAAMwgAAAAAAAADBAAAMwgAAgEAAAADBAAA0wgAAgEAAAADBAAA0wgAAAAAAAADBAAA0wgAAAAAAAGDBAAA0wgAAgEAAAGDBAAAMwgAAgEAAAGDBAAAMwgAAAAAAAGDBAAABAAIAAAACAAMABAAFAAYABAAGAAcACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcAGAAZABoAGAAaABsAHAAdAB4AHAAeAB8AIAAhACIAIAAiACMAJAAlACYAJAAmACcAKAApACoAKAAqACsALAAtAC4ALAAuAC8AMAAxADIAMAAyADMANAA1ADYANAA2ADcAOAA5ADoAOAA6ADsAPAA9AD4APAA+AD8AQABBAEIAQABCAEMARABFAEYARABGAEcASABJAEoASABKAEsATABNAE4ATABOAE8AUABRAFIAUABSAFMAVABVAFYAVABWAFcAWABZAFoAWABaAFsAXABdAF4AXABeAF8AYABhAGIAYABiAGMAZABlAGYAZABmAGcAaABpAGoAaABqAGsAbABtAG4AbABuAG8AcABxAHIAcAByAHMAdAB1AHYAdAB2AHcAeAB5AHoAeAB6AHsAfAB9AH4AfAB+AH8AgACBAIIAgACCAIMAhACFAIYAhACGAIcAiACJAIoAiACKAIsAjACNAI4AjACOAI8A"
+    }
+  ]
+}

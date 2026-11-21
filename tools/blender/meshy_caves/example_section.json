@@ -1,0 +1,164 @@
+{
+  "format": "cave-section/1",
+  "key": "example",
+  "name": "Core example: one section with every traversal",
+  "notes": "Used by tests/test_cave_core.py. About 43 x 30 m: a tube with a ramp and stairs into a breakdown hall; from the hall a crawl to a pocket and the seam stub north, a fissure (sidle) to a pocket east, and a 3 m climb face onto a ledge room; a pit in the hall floor behind a guard rail.",
+  "network": {
+    "format": "cave-network/1",
+    "scene": "undermere",
+    "name": "Core example network",
+    "area_prefix": "under_",
+    "lattice": { "origin": [-128, -64, -96], "cell": 0.125, "block": 32 },
+    "seed": 1893,
+    "geology": {
+      "limestone": { "tint": "#9A958A", "repeat_m": 1.5, "noise": 0.12, "bedding": [0.6, 0.04] }
+    },
+    "sections": ["example"]
+  },
+  "geology": "limestone",
+  "region": { "boxes": [[0, 0, -20, 43, 30, -4]] },
+  "nodes": {
+    "west_end": [2.0, 5.0, -16.0],
+    "ramp_top": [13.0, 5.0, -15.0],
+    "stair_top": [19.0, 5.0, -14.0],
+    "hall_west": [23.0, 6.0, -14.0],
+    "crawl_in": [24.5, 13.0, -14.0],
+    "crawl_out": [24.5, 19.5, -14.0],
+    "pocket_north": [24.5, 21.0, -14.0],
+    "seam_north": [24.5, 30.0, -14.0],
+    "fissure_in": [33.4, 8.0, -14.0],
+    "fissure_out": [39.2, 8.0, -14.0],
+    "climb_foot": [30.0, 14.3, -14.0],
+    "climb_top": [30.0, 17.3, -11.0]
+  },
+  "passages": [
+    {
+      "id": "tube_ramp",
+      "from": "west_end",
+      "to": "ramp_top",
+      "profile": "tube",
+      "width": 2.6,
+      "clear": 2.8,
+      "floor": { "kind": "ramp" }
+    },
+    {
+      "id": "tube_stairs",
+      "from": "ramp_top",
+      "to": "stair_top",
+      "profile": "tube",
+      "width": 2.4,
+      "clear": 2.8,
+      "floor": { "kind": "stairs", "riser": 0.2, "tread": 0.3 }
+    },
+    {
+      "id": "hall_link",
+      "from": "stair_top",
+      "to": "hall_west",
+      "profile": "tube",
+      "width": 2.4,
+      "clear": 2.8,
+      "floor": { "kind": "flat" }
+    },
+    {
+      "id": "crawl_north",
+      "from": "crawl_in",
+      "to": "crawl_out",
+      "profile": "crawl",
+      "width": 1.4,
+      "clear": 1.1,
+      "floor": { "kind": "flat" }
+    },
+    {
+      "id": "seam_tube",
+      "from": "pocket_north",
+      "to": "seam_north",
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": { "kind": "flat" }
+    },
+    {
+      "id": "fissure_east",
+      "from": "fissure_in",
+      "to": "fissure_out",
+      "profile": "fissure",
+      "width": 0.46,
+      "clear": 2.4,
+      "floor": { "kind": "flat" }
+    },
+    {
+      "id": "ledge_climb",
+      "from": "climb_foot",
+      "to": "climb_top",
+      "profile": "climb_face",
+      "width": 2.0,
+      "clear": 2.6,
+      "ledge_depth": 3.0,
+      "approach": 1.5
+    }
+  ],
+  "chambers": [
+    { "id": "hall", "kind": "breakdown", "center": [28.0, 9.0, -14.0], "size": [13.0, 10.0, 7.0] },
+    { "id": "crawl_pocket", "kind": "hall", "center": [24.5, 21.25, -14.0], "size": [4.0, 3.5, 2.6] },
+    { "id": "fissure_pocket", "kind": "hall", "center": [40.5, 8.0, -14.0], "size": [3.0, 3.0, 2.6] },
+    { "id": "ledge_room", "kind": "hall", "center": [30.0, 18.5, -11.0], "size": [3.5, 3.0, 2.6] },
+    {
+      "id": "pit",
+      "kind": "pocket",
+      "center": [30.0, 6.5, -15.6],
+      "size": [3.0, 2.4, 2.2],
+      "walk": false,
+      "notes": "A hole in the hall floor 1.6 m deep: no way out, so the rail keeps the walker off it."
+    }
+  ],
+  "features": [
+    {
+      "id": "hall_straws",
+      "kind": "stalactites",
+      "at": [28.0, 9.0, -13.5],
+      "radius": 3.0,
+      "count": 10,
+      "length": [0.4, 1.5]
+    },
+    { "id": "hall_column", "kind": "column", "at": [27.0, 11.8, -13.5], "radius": 0.35 },
+    { "id": "west_boss", "kind": "stalagmite", "at": [23.0, 10.0, -13.5], "radius": 0.25, "height": 1.0 },
+    {
+      "id": "big_block",
+      "kind": "breakdown",
+      "at": [28.0, 9.5, -13.5],
+      "size": [1.2, 0.9, 0.8],
+      "axis": [0.8, 0.6]
+    },
+    { "id": "east_block", "kind": "breakdown", "at": [32.3, 11.5, -13.5], "size": [0.9, 0.7, 0.6] },
+    { "id": "rubble", "kind": "breakdown", "at": [25.5, 7.5, -13.5], "size": [0.4, 0.3, 0.25] },
+    { "id": "west_flow", "kind": "flowstone", "at": [21.6, 9.0, -12.0], "radius": 0.9 }
+  ],
+  "guards": [
+    {
+      "id": "pit_rail",
+      "line": [
+        [28.4, 5.1],
+        [31.6, 5.1],
+        [31.6, 7.9],
+        [28.4, 7.9]
+      ],
+      "closed": true,
+      "base_z": -14.0,
+      "height": 1.0
+    }
+  ],
+  "spawns": [{ "id": "west", "at": [3.5, 5.0, -16.0], "yaw_deg": -90 }],
+  "seams": [
+    {
+      "id": "north",
+      "neighbour": "example_b",
+      "side": "a",
+      "kind": "passage",
+      "plane": { "axis": "y", "at": 30.0, "toward": "+" },
+      "window": [22.5, -14.5, 26.5, -11.0],
+      "stub_m": 0,
+      "portal": [24.5, 29.55, -14.0],
+      "arrival": { "at": [24.5, 27.9, -14.0], "mode": "walk", "yaw_deg": 180 }
+    }
+  ]
+}

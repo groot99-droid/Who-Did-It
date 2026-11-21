@@ -1,0 +1,224 @@
+{
+  "format": "cave-section/1",
+  "key": "spar",
+  "name": "The Spar Maze",
+  "notes": "under_spar: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "skarn",
+  "region": {
+    "boxes": [
+      [74.5, -15.5, -33.625, 77.125, -6.875, -29.0],
+      [73.625, -10.25, -33.625, 81.125, -4.875, -28.125],
+      [76.875, -9.125, -33.25, 87.125, 0.125, -27.5],
+      [82.875, -4.125, -32.625, 93.125, 3.125, -27.0],
+      [88.875, -1.125, -32.125, 98.125, 8.625, -26.5],
+      [93.875, 4.375, -31.625, 98.625, 14.125, -26.0],
+      [76.875, -9.125, -33.25, 82.625, 5.125, -27.75],
+      [78.375, 0.875, -32.875, 90.125, 9.625, -27.125],
+      [85.875, 4.375, -32.25, 98.125, 9.625, -26.5],
+      [83.0, -4.0, -32.625, 90.0, 9.5, -27.125],
+      [78.5, 1.0, -32.875, 85.875, 12.875, -27.375],
+      [82.125, 9.125, -32.5, 86.125, 18.125, -29.375],
+      [82.875, 14.875, -32.5, 87.125, 20.125, -29.375],
+      [94.875, 10.375, -31.125, 99.5, 15.75, -26.75],
+      [96.25, 12.5, -31.125, 99.75, 15.75, -26.625],
+      [82.875, 16.875, -32.5, 89.0, 23.0, -27.75]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "sp_joint",
+      "from": [75.8, -15.5, -32.6],
+      "to": [75.8, -8.15, -32.6],
+      "profile": "fissure",
+      "width": 0.44,
+      "clear": 2.5,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Joint (north half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "sp_m1",
+      "from": [75.8, -8.15, -32.6],
+      "to": [96.5, 12.0, -30.1],
+      "profile": "keyhole",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Maze: the main joint",
+      "via": [
+        [79.0, -7.0, -32.2],
+        [85.0, -2.0, -31.6],
+        [91.0, 1.0, -31.1],
+        [96.0, 6.5, -30.6]
+      ]
+    },
+    {
+      "id": "sp_m2",
+      "from": [79.0, -7.0, -32.2],
+      "to": [96.0, 6.5, -30.6],
+      "profile": "keyhole",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Maze: the cross joint",
+      "via": [
+        [80.5, 3.0, -31.8],
+        [88.0, 7.5, -31.2]
+      ]
+    },
+    {
+      "id": "sp_m3",
+      "from": [85.0, -2.0, -31.6],
+      "to": [88.0, 7.5, -31.2],
+      "profile": "keyhole",
+      "width": 2.0,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Maze: the short joint"
+    },
+    {
+      "id": "sp_m4",
+      "from": [80.5, 3.0, -31.8],
+      "to": [83.783, 10.764, -31.4],
+      "profile": "keyhole",
+      "width": 2.0,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Maze: the Vugh joint"
+    },
+    {
+      "id": "sp_vugh",
+      "from": [83.783, 10.764, -31.4],
+      "to": [85.5, 18.5, -31.4],
+      "profile": "crawl",
+      "width": 1.2,
+      "clear": 1.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "skarn",
+      "notes": "the Vugh crawl",
+      "via": [[84.5, 16.5, -31.4]]
+    },
+    {
+      "id": "sp_elbow",
+      "from": [96.5, 12.0, -30.1],
+      "to": [99.75, 14.1, -30.0],
+      "profile": "tube",
+      "width": 1.2,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "skarn",
+      "notes": "the Spar Elbow (west half)",
+      "via": [[97.85, 14.1, -30.05]]
+    }
+  ],
+  "chambers": [
+    {
+      "id": "sp_vughpocket",
+      "kind": "pocket",
+      "center": [85.9, 19.9, -31.4],
+      "size": [4.0, 3.5, 2.6],
+      "axis": [0.866, 0.5],
+      "geology": "skarn",
+      "notes": "the Vugh"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_spar",
+      "at": [85.0, -2.0, -31.6],
+      "yaw_deg": -60.0,
+      "mode": "walk",
+      "notes": "The Spar Maze"
+    }
+  ],
+  "seams": [
+    {
+      "id": "reach_spar",
+      "neighbour": "reach",
+      "side": "b",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "y",
+        "at": -15.5,
+        "toward": "-"
+      },
+      "window": [75.575, -32.606, 76.025, -30.095],
+      "stub_m": 6.5,
+      "portal": [75.8, -15.05, -32.6],
+      "arrival": {
+        "at": [75.8, -13.85, -32.6],
+        "mode": "sidle",
+        "yaw_deg": 0.0
+      },
+      "notes": "the Spar Joint: a joint lined with spar crystals, 0.44 m wide"
+    },
+    {
+      "id": "spar_levels",
+      "neighbour": "levels",
+      "side": "a",
+      "kind": "bend",
+      "plane": {
+        "axis": "x",
+        "at": 99.75,
+        "toward": "+"
+      },
+      "window": [13.362, -30.125, 14.838, -27.515],
+      "stub_m": 3.9,
+      "portal": [99.3, 14.1, -30.01],
+      "arrival": {
+        "at": [98.1, 14.1, -30.04],
+        "mode": "walk",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Spar Elbow: the long drift's holing, between a right-angle bend in the joint and a bend in the drive"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["lv_longdrift_1", "sp_elbow"],
+    ["lv_longdrift_2", "sp_elbow"],
+    ["lv_longdrift_3", "sp_elbow"],
+    ["lv_longdrift_4", "sp_elbow"],
+    ["lv_longdrift_1", "sp_m1"],
+    ["lv_longdrift_2", "sp_m1"],
+    ["lv_longdrift_3", "sp_m1"],
+    ["lv_longdrift_4", "sp_m1"],
+    ["re_canyon", "sp_joint"],
+    ["re_joint", "sp_joint"],
+    ["re_jointmouth", "sp_joint"],
+    ["sp_elbow", "sp_m1"],
+    ["sp_joint", "sp_m1"],
+    ["sp_joint", "sp_m2"],
+    ["sp_m1", "sp_m2"],
+    ["sp_m1", "sp_m3"],
+    ["sp_m2", "sp_m3"],
+    ["sp_m2", "sp_m4"],
+    ["sp_m4", "sp_vugh"],
+    ["sp_vugh", "sp_vughpocket"],
+    ["sp_elbow", "lv_longdrift_4"],
+    ["lv_longdrift_4r", "sp_elbow"],
+    ["lv_longdrift_4r", "sp_m1"]
+  ]
+}

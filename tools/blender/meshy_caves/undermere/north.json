@@ -1,0 +1,548 @@
+{
+  "format": "cave-section/1",
+  "key": "north",
+  "name": "The North Road",
+  "notes": "under_north: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "flowstone",
+  "region": {
+    "boxes": [
+      [6.875, 104.125, -9.625, 9.5, 109.875, -5.375],
+      [1.5, 18.625, -17.0, 6.5, 24.0, -11.0],
+      [0.75, 18.625, -17.0, 11.75, 28.75, -9.5],
+      [-0.25, 22.25, -16.625, 11.75, 34.25, -9.125],
+      [-1.25, 27.75, -16.25, 6.25, 39.25, -8.75],
+      [-6.25, 32.75, -15.875, 5.25, 53.25, -7.75],
+      [-6.25, 46.75, -14.875, 3.25, 67.25, -6.75],
+      [-3.25, 60.75, -13.875, 9.25, 81.25, -5.75],
+      [1.75, 74.75, -12.875, 9.25, 95.25, -4.5],
+      [-0.25, 88.75, -11.625, 8.25, 102.25, -3.875],
+      [-0.25, 95.75, -11.0, 11.25, 106.25, -3.375],
+      [4.75, 99.75, -10.5, 11.5, 108.75, -2.5],
+      [-12.5, 47.5, -14.875, -0.5, 56.5, -8.5],
+      [-14.5, 51.5, -14.625, -7.5, 58.0, -8.5],
+      [-22.875, 55.625, -14.5, -14.125, 64.375, -5.0],
+      [6.125, 100.125, -10.5, 11.5, 104.875, -6.125],
+      [7.75, 100.125, -10.5, 13.375, 103.875, -7.125],
+      [-21.5, 51.5, -14.5, -9.5, 63.5, -3.375],
+      [-21.75, 58.125, -9.5, -16.125, 63.75, -5.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "no_curtain",
+      "from": [8.2, 109.875, -8.6],
+      "to": [8.2, 105.45, -8.6],
+      "profile": "fissure",
+      "width": 0.55,
+      "clear": 2.2,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Ice Curtain (south half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "no_road_1",
+      "from": [4.0, 18.625, -16.0],
+      "to": [4.0, 19.125, -16.0],
+      "profile": "tube",
+      "width": [1.4, 1.678],
+      "clear": [2.6, 2.843],
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 1 of 11) (its 0.5 m at the seam well_north; round 4)"
+    },
+    {
+      "id": "no_road_1r",
+      "from": [4.0, 19.125, -16.0],
+      "to": [4.0, 21.5, -16.0],
+      "profile": "tube",
+      "width": [1.678, 3.0],
+      "clear": [2.843, 4.0],
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 1 of 11) (the rest, beyond 0.5 m from the seam well_north; round 4)"
+    },
+    {
+      "id": "no_road_2",
+      "from": [4.0, 21.5, -16.0],
+      "to": [8.5, 25.5, -15.6],
+      "profile": "tube",
+      "width": [3.0, 4.5],
+      "clear": [4.0, 5.0],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 2 of 11)"
+    },
+    {
+      "id": "no_road_3",
+      "from": [8.5, 25.5, -15.6],
+      "to": [3.0, 31.0, -15.2],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 3 of 11)"
+    },
+    {
+      "id": "no_road_4",
+      "from": [3.0, 31.0, -15.2],
+      "to": [2.0, 36.0, -14.8],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 4 of 11)"
+    },
+    {
+      "id": "no_road_5",
+      "from": [2.0, 36.0, -14.8],
+      "to": [-3.0, 50.0, -13.8],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 5 of 11)"
+    },
+    {
+      "id": "no_road_6",
+      "from": [-3.0, 50.0, -13.8],
+      "to": [0.0, 64.0, -12.8],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 6 of 11)"
+    },
+    {
+      "id": "no_road_7",
+      "from": [0.0, 64.0, -12.8],
+      "to": [6.0, 78.0, -11.8],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 7 of 11)"
+    },
+    {
+      "id": "no_road_8",
+      "from": [6.0, 78.0, -11.8],
+      "to": [5.0, 92.0, -10.6],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 8 of 11)"
+    },
+    {
+      "id": "no_road_9",
+      "from": [5.0, 92.0, -10.6],
+      "to": [3.0, 99.0, -9.9],
+      "profile": "tube",
+      "width": 4.5,
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 9 of 11)"
+    },
+    {
+      "id": "no_road_10",
+      "from": [3.0, 99.0, -9.9],
+      "to": [8.0, 103.0, -9.15],
+      "profile": "tube",
+      "width": [4.5, 2.4],
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 10 of 11) (route 1: its end raised 0.25 m and narrowed to 2.4 m, so its end's floor does not dig a 0.6 m pit under the next leg's steeper ramp)"
+    },
+    {
+      "id": "no_road_11",
+      "from": [8.0, 103.0, -9.15],
+      "to": [8.2, 105.45, -8.6],
+      "profile": "tube",
+      "width": [2.4, 1.6],
+      "clear": 5.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the North Road (leg 11 of 11)"
+    },
+    {
+      "id": "no_organ",
+      "from": [-3.0, 50.0, -13.8],
+      "to": [-12.0, 55.5, -13.5],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Organ passage",
+      "via": [[-10.0, 54.0, -13.6]]
+    },
+    {
+      "id": "no_organ_face",
+      "from": [-18.5, 60.0, -13.4],
+      "to": [-18.825, 60.731, -8.4],
+      "profile": "climb_face",
+      "width": 1.6,
+      "clear": 2.3,
+      "geology": "flowstone",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Organ Loft climb"
+    },
+    {
+      "id": "no_archmouth",
+      "from": [8.0, 103.0, -9.15],
+      "to": [9.65, 102.03, -9.4],
+      "profile": "tube",
+      "width": 1.6,
+      "clear": 2.2,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Dry Arch's mouth (route 1: a ramp down 0.25 m to the crawl)"
+    },
+    {
+      "id": "no_dryarch",
+      "from": [9.65, 102.03, -9.4],
+      "to": [13.375, 102.03, -9.4],
+      "profile": "crawl",
+      "width": 1.6,
+      "clear": 1.25,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Dry Arch (west half)"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "no_organch",
+      "kind": "dome",
+      "center": [-15.5, 57.5, -13.4],
+      "size": [10.0, 9.0, 9.0],
+      "axis": [0.94, 0.342],
+      "geology": "flowstone",
+      "notes": "the Organ"
+    },
+    {
+      "id": "no_loft",
+      "kind": "pocket",
+      "center": [-18.9, 60.9, -8.4],
+      "size": [3.5, 2.5, 2.3],
+      "axis": [0.94, 0.342],
+      "geology": "flowstone",
+      "notes": "the Organ Loft"
+    }
+  ],
+  "guards": [
+    {
+      "id": "rim_organ_loft_w",
+      "line": [
+        [-19.292, 59.812],
+        [-21.577, 58.797]
+      ],
+      "base_z": -8.4,
+      "height": 1.0,
+      "notes": "a flowstone kerb under the draperies"
+    },
+    {
+      "id": "rim_organ_loft_e",
+      "line": [
+        [-17.83, 60.462],
+        [-15.545, 61.477]
+      ],
+      "base_z": -8.4,
+      "height": 1.0,
+      "notes": "a flowstone kerb under the draperies"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_north",
+      "at": [-1.0, 57.0, -13.3],
+      "yaw_deg": -10.0,
+      "mode": "walk",
+      "notes": "The North Road"
+    }
+  ],
+  "seams": [
+    {
+      "id": "well_north",
+      "neighbour": "well",
+      "side": "b",
+      "kind": "arch",
+      "plane": {
+        "axis": "y",
+        "at": 18.625,
+        "toward": "-"
+      },
+      "window": [3.057, -16.205, 4.943, -13.091],
+      "stub_m": 4.6,
+      "portal": [4.0, 19.07, -16.0],
+      "arrival": {
+        "at": [4.0, 20.27, -16.0],
+        "mode": "walk",
+        "yaw_deg": 0.0
+      },
+      "notes": "the top of the Flowstone Dam, under a low flowstone canopy"
+    },
+    {
+      "id": "ice_north",
+      "neighbour": "ice",
+      "side": "b",
+      "kind": "curtain",
+      "plane": {
+        "axis": "y",
+        "at": 109.875,
+        "toward": "+"
+      },
+      "window": [7.919, -8.605, 8.48, -6.395],
+      "stub_m": 6.5,
+      "portal": [8.2, 109.42, -8.6],
+      "arrival": {
+        "at": [8.2, 108.22, -8.6],
+        "mode": "sidle",
+        "yaw_deg": -180.0
+      },
+      "notes": "the Ice Curtain: a frozen drip curtain leaves 0.55 m beside the rift wall"
+    },
+    {
+      "id": "north_highlevel",
+      "neighbour": "highlevel",
+      "side": "a",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": 13.375,
+        "toward": "+"
+      },
+      "window": [101.145, -9.486, 102.915, -8.064],
+      "stub_m": 6.9,
+      "portal": [12.93, 102.03, -9.4],
+      "arrival": {
+        "at": [11.72, 102.03, -9.4],
+        "mode": "crawl",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Dry Arch: a dry crawl in cave earth, 1.25 m high"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["no_road_1", "no_road_11"],
+    ["no_road_1", "no_road_2"],
+    ["no_road_1", "no_road_3"],
+    ["no_road_1", "no_road_4"],
+    ["no_road_1", "no_road_5"],
+    ["no_road_1", "no_road_6"],
+    ["no_road_1", "no_road_7"],
+    ["no_road_1", "no_road_8"],
+    ["no_road_1", "no_road_9"],
+    ["no_road_10", "no_road_2"],
+    ["no_road_10", "no_road_3"],
+    ["no_road_10", "no_road_4"],
+    ["no_road_10", "no_road_5"],
+    ["no_road_10", "no_road_6"],
+    ["no_road_10", "no_road_7"],
+    ["no_road_10", "no_road_8"],
+    ["no_road_10", "no_road_9"],
+    ["no_road_11", "no_road_3"],
+    ["no_road_11", "no_road_4"],
+    ["no_road_11", "no_road_5"],
+    ["no_road_11", "no_road_6"],
+    ["no_road_11", "no_road_7"],
+    ["no_road_11", "no_road_8"],
+    ["no_road_11", "no_road_9"],
+    ["no_road_2", "no_road_4"],
+    ["no_road_2", "no_road_5"],
+    ["no_road_2", "no_road_6"],
+    ["no_road_2", "no_road_7"],
+    ["no_road_2", "no_road_8"],
+    ["no_road_2", "no_road_9"],
+    ["no_road_3", "no_road_5"],
+    ["no_road_3", "no_road_6"],
+    ["no_road_3", "no_road_7"],
+    ["no_road_3", "no_road_8"],
+    ["no_road_3", "no_road_9"],
+    ["no_road_4", "no_road_6"],
+    ["no_road_4", "no_road_7"],
+    ["no_road_4", "no_road_8"],
+    ["no_road_4", "no_road_9"],
+    ["no_road_5", "no_road_7"],
+    ["no_road_5", "no_road_8"],
+    ["no_road_5", "no_road_9"],
+    ["no_road_6", "no_road_8"],
+    ["no_road_6", "no_road_9"],
+    ["no_road_7", "no_road_9"],
+    ["no_organ_face", "no_organch"],
+    ["no_organ_face", "no_loft"],
+    ["hl_dryarch", "no_archmouth"],
+    ["hl_dryarch", "no_dryarch"],
+    ["hl_dryarch", "no_road_1"],
+    ["hl_dryarch", "no_road_2"],
+    ["hl_dryarch", "no_road_3"],
+    ["hl_dryarch", "no_road_4"],
+    ["hl_dryarch", "no_road_5"],
+    ["hl_dryarch", "no_road_6"],
+    ["hl_dryarch", "no_road_7"],
+    ["hl_dryarch", "no_road_8"],
+    ["hl_dryarch", "no_road_9"],
+    ["hl_dryarch", "no_road_10"],
+    ["hl_dryarch", "no_road_11"],
+    ["hl_tube", "no_dryarch"],
+    ["ic_curtain", "no_curtain"],
+    ["no_archmouth", "no_curtain"],
+    ["no_archmouth", "no_dryarch"],
+    ["no_archmouth", "no_road_1"],
+    ["no_archmouth", "no_road_2"],
+    ["no_archmouth", "no_road_3"],
+    ["no_archmouth", "no_road_4"],
+    ["no_archmouth", "no_road_5"],
+    ["no_archmouth", "no_road_6"],
+    ["no_archmouth", "no_road_7"],
+    ["no_archmouth", "no_road_8"],
+    ["no_archmouth", "no_road_9"],
+    ["no_archmouth", "no_road_10"],
+    ["no_archmouth", "no_road_11"],
+    ["no_curtain", "no_road_1"],
+    ["no_curtain", "no_road_2"],
+    ["no_curtain", "no_road_3"],
+    ["no_curtain", "no_road_4"],
+    ["no_curtain", "no_road_5"],
+    ["no_curtain", "no_road_6"],
+    ["no_curtain", "no_road_7"],
+    ["no_curtain", "no_road_8"],
+    ["no_curtain", "no_road_9"],
+    ["no_curtain", "no_road_10"],
+    ["no_curtain", "no_road_11"],
+    ["no_dryarch", "no_road_1"],
+    ["no_dryarch", "no_road_2"],
+    ["no_dryarch", "no_road_3"],
+    ["no_dryarch", "no_road_4"],
+    ["no_dryarch", "no_road_5"],
+    ["no_dryarch", "no_road_6"],
+    ["no_dryarch", "no_road_7"],
+    ["no_dryarch", "no_road_8"],
+    ["no_dryarch", "no_road_9"],
+    ["no_dryarch", "no_road_10"],
+    ["no_dryarch", "no_road_11"],
+    ["no_loft", "no_organch"],
+    ["no_organ", "no_road_1"],
+    ["no_organ", "no_road_2"],
+    ["no_organ", "no_road_3"],
+    ["no_organ", "no_road_4"],
+    ["no_organ", "no_road_5"],
+    ["no_organ", "no_road_6"],
+    ["no_organ", "no_road_7"],
+    ["no_organ", "no_road_8"],
+    ["no_organ", "no_road_9"],
+    ["no_organ", "no_road_10"],
+    ["no_organ", "no_road_11"],
+    ["no_road_1", "we_dam_face"],
+    ["no_road_2", "we_dam_face"],
+    ["no_road_3", "we_dam_face"],
+    ["no_road_4", "we_dam_face"],
+    ["no_road_5", "we_dam_face"],
+    ["no_road_6", "we_dam_face"],
+    ["no_road_7", "we_dam_face"],
+    ["no_road_8", "we_dam_face"],
+    ["no_road_9", "we_dam_face"],
+    ["no_road_10", "we_dam_face"],
+    ["no_road_11", "we_dam_face"],
+    ["no_road_1", "we_damfoot"],
+    ["no_road_2", "we_damfoot"],
+    ["no_road_3", "we_damfoot"],
+    ["no_road_4", "we_damfoot"],
+    ["no_road_5", "we_damfoot"],
+    ["no_road_6", "we_damfoot"],
+    ["no_road_7", "we_damfoot"],
+    ["no_road_8", "we_damfoot"],
+    ["no_road_9", "we_damfoot"],
+    ["no_road_10", "we_damfoot"],
+    ["no_road_11", "we_damfoot"],
+    ["no_road_1", "we_damtop_1"],
+    ["no_road_2", "we_damtop_1"],
+    ["no_road_3", "we_damtop_1"],
+    ["no_road_4", "we_damtop_1"],
+    ["no_road_5", "we_damtop_1"],
+    ["no_road_6", "we_damtop_1"],
+    ["no_road_7", "we_damtop_1"],
+    ["no_road_8", "we_damtop_1"],
+    ["no_road_9", "we_damtop_1"],
+    ["no_road_10", "we_damtop_1"],
+    ["no_road_11", "we_damtop_1"],
+    ["no_organ", "no_organch"],
+    ["no_road_1", "no_road_1r"],
+    ["no_road_1r", "no_road_11"],
+    ["no_road_1r", "no_road_2"],
+    ["no_road_1r", "no_road_3"],
+    ["no_road_1r", "no_road_4"],
+    ["no_road_1r", "no_road_5"],
+    ["no_road_1r", "no_road_6"],
+    ["no_road_1r", "no_road_7"],
+    ["no_road_1r", "no_road_8"],
+    ["no_road_1r", "no_road_9"],
+    ["no_road_1r", "hl_dryarch"],
+    ["no_road_1r", "no_archmouth"],
+    ["no_road_1r", "no_curtain"],
+    ["no_road_1r", "no_dryarch"],
+    ["no_road_1r", "no_organ"],
+    ["no_road_1r", "we_dam_face"],
+    ["no_road_1r", "we_damfoot"],
+    ["no_road_1r", "we_damtop_1"],
+    ["we_damtop_1", "no_road_1"],
+    ["no_dryarch", "hl_dryarch"],
+    ["we_damtop_1r", "no_road_1"],
+    ["we_damtop_1r", "no_road_2"],
+    ["we_damtop_1r", "no_road_3"],
+    ["we_damtop_1r", "no_road_4"],
+    ["we_damtop_1r", "no_road_5"],
+    ["we_damtop_1r", "no_road_6"],
+    ["we_damtop_1r", "no_road_7"],
+    ["we_damtop_1r", "no_road_8"],
+    ["we_damtop_1r", "no_road_9"],
+    ["we_damtop_1r", "no_road_10"],
+    ["we_damtop_1r", "no_road_11"],
+    ["we_damtop_1r", "no_road_1r"]
+  ]
+}

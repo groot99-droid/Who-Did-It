@@ -1,0 +1,61 @@
+{
+  "name": "interior_warm",
+  "render": {
+    "samples": 32,
+    "raytracing": true,
+    "shadow_pool": "1024",
+    "shadow_scale": 1.0,
+    "fog_tile": "8",
+    "fog_samples": 16,
+    "fog_end": 40.0,
+    "motion_blur": 0.0,
+    "filter_size": 1.5
+  },
+  "sky": {
+    "on": false,
+    "ink": [0.006, 0.007, 0.012],
+    "ambient": 4.5,
+    "ambient_color": [0.0105, 0.0095, 0.0085],
+    "stars": 0.0,
+    "moon_disc": 0.0
+  },
+  "moon": { "on": false },
+  "fog": { "density": 0.0, "mere_density": 0.0 },
+  "lights": {
+    "lamp": { "energy": 55.0, "color": [1.0, 0.456, 0.093], "radius": 0.015, "volume": 0.0, "shadow": true },
+    "lantern": {
+      "energy": 90.0,
+      "color": [1.0, 0.456, 0.093],
+      "radius": 0.06,
+      "volume": 0.0,
+      "bulb": 20.0,
+      "shadow": true
+    },
+    "torch": { "energy": 70.0, "color": [1.0, 0.5, 0.17], "radius": 0.06, "volume": 0.0, "shadow": true },
+    "fire": { "energy": 160.0, "color": [1.0, 0.45, 0.14], "radius": 0.3, "volume": 0.0, "shadow": true },
+    "window": { "energy": 0.0, "color": [1.0, 0.54, 0.19], "radius": 0.5, "volume": 0.0, "shadow": true },
+    "moon": { "energy": 60.0, "color": [0.258, 0.393, 0.849], "radius": 0.5, "volume": 0.0, "shadow": true },
+    "moss": {
+      "energy": 20.0,
+      "color": [0.027, 0.553, 0.471],
+      "radius": 0.3,
+      "volume": 0.0,
+      "shadow": "keep"
+    },
+    "shaft": { "energy": 30.0, "color": [0.212, 0.392, 1.0], "radius": 1.0, "volume": 0.0, "shadow": "keep" }
+  },
+  "emissive": { "strength": 0.0 },
+  "snow": { "roof": 0.0 },
+  "snowfall": { "on": false },
+  "color": { "view_transform": "AgX", "look": "AgX - Medium High Contrast", "exposure": 1.4, "gamma": 1.0 },
+  "post": {
+    "bloom": 0.35,
+    "bloom_threshold": 1.0,
+    "bloom_size": 0.5,
+    "saturation": 1.05,
+    "lift": [1.0, 1.0, 1.0],
+    "gamma": [1.0, 1.0, 1.0],
+    "gain": [1.0, 1.0, 1.0],
+    "ink": [0.00575, 0.00589, 0.00889]
+  }
+}

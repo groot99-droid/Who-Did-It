@@ -1,0 +1,259 @@
+{
+  "format": "cave-section/1",
+  "key": "bottom",
+  "name": "The Bottom",
+  "notes": "under_bottom: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "flooded",
+  "region": {
+    "boxes": [
+      [101.375, -35.75, -36.0, 105.125, -32.0, -31.0],
+      [101.5, -37.125, -36.0, 105.375, -32.0, -31.0],
+      [101.375, -40.5, -40.5, 108.75, -30.0, -31.0],
+      [101.375, -39.5, -40.625, 108.0, -32.75, -34.5],
+      [109.0, -24.375, -39.25, 112.625, -20.125, -36.125],
+      [109.0, -24.5, -39.25, 117.125, -20.625, -36.125],
+      [112.625, -26.5, -39.5, 119.5, -20.125, -33.625],
+      [111.5, -32.0, -40.625, 119.5, -21.5, -33.875],
+      [121.75, -51.25, -40.75, 129.25, -42.75, -34.75],
+      [124.75, -53.75, -40.375, 130.75, -46.75, -34.5],
+      [123.25, -56.75, -40.0, 133.75, -46.25, -28.0],
+      [102.0, -55.0, -41.0, 111.0, -43.5, -35.75],
+      [101.0, -62.0, -41.25, 106.0, -51.0, -36.0],
+      [104.0, -52.0, -43.875, 130.0, -26.0, -27.75],
+      [126.0, -55.5, -33.0, 132.0, -49.375, -28.0],
+      [127.5, -56.5, -30.0, 132.5, -51.5, -1.5]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "bo_ledge",
+      "from": [101.375, -33.9, -35.0],
+      "to": [103.5, -35.3, -35.0],
+      "profile": "canyon",
+      "width": 1.6,
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flooded",
+      "notes": "the ledge behind the Cascade (south half)",
+      "via": [[103.32, -33.9, -35.0]]
+    },
+    {
+      "id": "bo_cascade_face",
+      "from": [103.5, -35.3, -39.5],
+      "to": [103.398, -34.506, -35.0],
+      "profile": "climb_face",
+      "width": 1.6,
+      "clear": 3.0,
+      "geology": "flooded",
+      "ledge_depth": 2.0,
+      "approach": 2.75,
+      "notes": "the Cascade climb"
+    },
+    {
+      "id": "bo_west",
+      "from": [103.787, -37.532, -39.5],
+      "to": [105.539, -37.307, -39.6],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flooded",
+      "notes": "the West Bank (round 5: its end moved 2.25 m back from bo_cascade_face's face) (round 5: its end moved 0.31 m back from bo_cascade_face's face)"
+    },
+    {
+      "id": "bo_plug",
+      "from": [110.8, -20.125, -38.2],
+      "to": [115.249, -22.677, -38.2],
+      "profile": "crawl",
+      "width": 1.6,
+      "clear": 1.05,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flooded",
+      "notes": "the Last Plug (south half)",
+      "via": [[110.8, -22.525, -38.2]]
+    },
+    {
+      "id": "bo_plugside",
+      "from": [115.249, -22.677, -38.2],
+      "to": [114.0, -29.5, -39.6],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 3.5,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flooded",
+      "notes": "the Plug Passage",
+      "via": [[117.0, -24.0, -38.4]]
+    },
+    {
+      "id": "bo_throat",
+      "from": [124.0, -45.0, -39.7],
+      "to": [128.5, -51.5, -39.0],
+      "profile": "tube",
+      "width": 2.5,
+      "clear": 3.5,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flooded",
+      "notes": "the way to the Throat",
+      "via": [[127.0, -49.0, -39.3]]
+    },
+    {
+      "id": "bo_throat_face",
+      "from": [128.5, -51.5, -39.0],
+      "to": [128.889, -52.199, -32.0],
+      "profile": "climb_face",
+      "width": 2.5,
+      "clear": 3.0,
+      "geology": "flooded",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Throat climb"
+    },
+    {
+      "id": "bo_drainway",
+      "from": [109.0, -45.5, -39.8],
+      "to": [103.0, -60.0, -40.2],
+      "profile": "canyon",
+      "width": 2.0,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flooded",
+      "notes": "the Drainway",
+      "via": [[104.0, -53.0, -40.0]]
+    },
+    {
+      "id": "throat",
+      "from": [130.0, -54.0, -29.0],
+      "to": [130.0, -54.0, -3.0],
+      "profile": "shaft",
+      "width": 3.0,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Throat"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "bo_lake",
+      "kind": "hall",
+      "center": [117.0, -39.0, -39.8],
+      "size": [24.0, 20.0, 11.0],
+      "axis": [1.0, 0.0],
+      "geology": "flooded",
+      "notes": "the Bottom (round 5: written as a hall; its water bo_deep_water is the lake chamber bo_lake_water)"
+    },
+    {
+      "id": "bo_lake_water",
+      "kind": "lake",
+      "center": [116.0, -40.0, -39.8],
+      "size": [26.667, 15.0, 3.0],
+      "axis": [1.0, 0.0],
+      "basin_depth": 3.0,
+      "geology": "flooded",
+      "notes": "bo_deep_water: the basin is the design's water ellipse 16.0 x 9.0 m; the builder's rail is its guard"
+    },
+    {
+      "id": "bo_throatledge",
+      "kind": "pocket",
+      "center": [129.0, -52.4, -32.0],
+      "size": [4.0, 3.0, 3.0],
+      "axis": [0.866, 0.5],
+      "geology": "flooded",
+      "notes": "under the Throat"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_bottom",
+      "at": [108.0, -33.0, -39.8],
+      "yaw_deg": -150.0,
+      "mode": "walk",
+      "notes": "The Bottom"
+    }
+  ],
+  "seams": [
+    {
+      "id": "reach_bottom",
+      "neighbour": "reach",
+      "side": "b",
+      "kind": "sump_ledge",
+      "plane": {
+        "axis": "x",
+        "at": 101.375,
+        "toward": "-"
+      },
+      "window": [-34.845, -35.145, -32.955, -31.855],
+      "stub_m": 3.9,
+      "portal": [101.83, -33.9, -35.0],
+      "arrival": {
+        "at": [103.03, -33.9, -35.0],
+        "mode": "walk",
+        "yaw_deg": -90.0
+      },
+      "notes": "the ledge behind the Cascade: the river falls past the ledge's edge into the Bottom"
+    },
+    {
+      "id": "bottom_levels",
+      "neighbour": "levels",
+      "side": "a",
+      "kind": "choke",
+      "plane": {
+        "axis": "y",
+        "at": -20.125,
+        "toward": "+"
+      },
+      "window": [109.915, -38.286, 111.685, -37.065],
+      "stub_m": 4.4,
+      "portal": [110.8, -20.57, -38.2],
+      "arrival": {
+        "at": [110.8, -21.77, -38.2],
+        "mode": "crawl",
+        "yaw_deg": -180.0
+      },
+      "notes": "the Last Plug: the burst bulkhead, crawled through its timbers"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["throat", "bo_throatledge"],
+    ["throat", "bo_throat_face"],
+    ["bo_cascade_face", "bo_lake"],
+    ["bo_cascade_face", "bo_ledge"],
+    ["bo_cascade_face", "bo_west"],
+    ["bo_cascade_face", "re_canyon"],
+    ["bo_cascade_face", "re_ledge"],
+    ["bo_lake", "bo_ledge"],
+    ["bo_ledge", "bo_west"],
+    ["bo_ledge", "re_canyon"],
+    ["bo_ledge", "re_ledge"],
+    ["bo_plug", "bo_plugside"],
+    ["bo_plug", "lv_plug"],
+    ["bo_throat", "bo_throat_face"],
+    ["bo_west", "re_canyon"],
+    ["bo_west", "re_ledge"],
+    ["bo_drainway", "bo_lake"],
+    ["bo_lake", "bo_plugside"],
+    ["bo_lake", "bo_throat"],
+    ["bo_lake", "bo_west"],
+    ["bo_throat_face", "bo_throatledge"],
+    ["re_ledge", "bo_ledge"],
+    ["bo_lake_water", "bo_west"],
+    ["bo_lake_water", "bo_plugside"],
+    ["bo_lake_water", "bo_throat"],
+    ["bo_lake_water", "bo_drainway"],
+    ["bo_lake_water", "bo_lake"]
+  ]
+}

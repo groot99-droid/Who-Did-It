@@ -1,0 +1,104 @@
+{
+  "about": "The caves' look (the Undermere, first person): one look for every cave file, read by meshy_cave_build.py. The exposure, the fog and wdi_baked are the network's and go into every cave's Area extras exactly as written here (contract docs/walk-areas.md, world.cave_look). Colours are sRGB hex. Light kinds: a lamp only at a gate (lamp group), the night sky through a mouth (sky group), dim fill lights in the chambers and the wide passages (fill group), and AO.",
+  "status": "P0 prototype (2026-11-21): not frozen. E, the scene exposure the light is graded at, is the Swallow's lamp pool at its first full bake (384 samples, 2026-11-21): every cave is graded at it, so the light matches across seams",
+  "wdi_exposure": 2.378414230005442,
+  "wdi_indoor": true,
+  "wdi_baked": true,
+  "fog_color": [0.006, 0.007, 0.0116],
+  "fog_color_srgb": "#12141C",
+  "fog_density": 0.02,
+  "ink": "#12141C",
+  "E": 79.95282180445103,
+  "lamp_pool": {
+    "radius_m": 4.0,
+    "percentile": 90,
+    "display": 0.55
+  },
+  "lamp": {
+    "colour": "#FFB457",
+    "watts": 30.0,
+    "radius_m": 0.05,
+    "glass_display": "#FFD9A0",
+    "glass_emit": [1.0, 0.2, 0.0],
+    "iron_emit": [0.01504, 0.01074, 0.0075],
+    "about_emit": "COLOR_0-free emitters (linear, at most 1): the glass shows #F0B481 and the lamp's iron cap, base and bracket #382C22 through the viewer's exposure and AgX (route 1: the P0 glass at glass_display read as a flat grey box)"
+  },
+  "sky": {
+    "colour": "#7FA8FF",
+    "strength": 0.06,
+    "snow": "#C8D2E6",
+    "backdrop_display": "#1A2336"
+  },
+  "fill": {
+    "colour": "#C9C2B4",
+    "watts_per_m2": 0.06,
+    "passage_step_m": 10.0,
+    "passage_min_width_m": 3.0,
+    "min_watts": 2.0,
+    "max_watts": 40.0,
+    "height_frac": 0.6,
+    "radius_m": 1.0,
+    "big": {
+      "min_area_m2": 200.0,
+      "ring": 6,
+      "ring_frac": 0.62,
+      "height_frac": 0.22,
+      "watts_per_m2": 0.06,
+      "max_watts": 12.0
+    },
+    "climb": { "min_height_m": 2.5, "back_m": 1.6, "side_m": 1.2, "height_m": 0.9, "watts": 5.0 },
+    "about_route2": "route 2: a chamber of min_area_m2 or more also gets a ring of low lights near its walls (the Well Dome read flat under one light; the Great Dome too), and a climb face of min_height_m or more a low light beside its foot, so the face is lit across"
+  },
+  "weights": {
+    "lamp": 1.0,
+    "sky": 1.0,
+    "fill": 1.0
+  },
+  "ao": {
+    "distance_m": 1.2,
+    "samples": 64,
+    "strength": 0.55,
+    "gamma": 1.0
+  },
+  "ink_lift": {
+    "margin_luma": 1.2,
+    "dark_percentile": 0.5,
+    "texture_lift": 0.45,
+    "form": 0.5,
+    "form_ao": 1.0,
+    "form_gamma": 1.0
+  },
+  "hot": {
+    "knee": 0.62,
+    "max": 0.8,
+    "timber": { "knee": 0.3, "max": 0.38 },
+    "about": "display luminance over knee is eased towards max; timber (the guards' rails and the gates' railway timbers, creosoted) has its own lower knee and max, as the grille has its iron cap (route 1 fix: the Cutting Gate's centre post 0.3 m under the lamp read as a cream bar)"
+  },
+  "cycles": {
+    "samples": 384,
+    "draft_samples": 32
+  },
+  "kits": {
+    "limestone": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
+    "lakeclay": { "wall": "brown_mud_02", "floor": "brown_mud_02" },
+    "slate": { "wall": "rock_face", "floor": "rock_face" },
+    "breakdown": { "wall": "rock_ground", "floor": "rock_ground" },
+    "flowstone": { "wall": "seaside_rock", "floor": "seaside_rock" },
+    "default": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
+    "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
+    "ice": { "wall": "snow_02", "floor": "snow_03" },
+    "mouth_cliff_slot": { "wall": "rock_wall_08", "floor": "snow_03" },
+    "mouth_adit": { "wall": "rock_wall_08", "floor": "gravel" },
+    "mouth_arch": { "wall": "quarry_wall_02", "floor": "snow_03" },
+    "snow": "snow_02",
+    "timber": "weathered_planks"
+  },
+  "iron": "#2D2C2A",
+  "iron_display": {
+    "cap": 0.3,
+    "warm": 0.5,
+    "ink_margin": 1.12,
+    "about": "a gate's grille: display luminance held between ink_margin x the ink and cap, its hue the iron's grey warmed towards the lamp's colour by up to warm where the lamp gives the light (route 1: the P0 bars read cream in a saturated blue frame)"
+  },
+  "floor_normal_z": 0.7
+}

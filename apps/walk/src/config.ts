@@ -9,6 +9,26 @@ export const DEFAULT_GLB_URL: string | null = WALK_GLB_FILE
   ? `${import.meta.env.BASE_URL}${WALK_GLB_FILE}`
   : null;
 
+/** The index a build opens when the address names no world (docs/walk-areas.md, section 2): `VITE_WALK_INDEX`, a
+ * `walk-index.json` beside the page or a full address. It wins over `DEFAULT_GLB_URL`; `?glb=` wins over both. No
+ * deploy sets it yet, so it is null in every build today. */
+const WALK_INDEX_FILE: string | undefined = import.meta.env.VITE_WALK_INDEX;
+export const DEFAULT_INDEX_URL: string | null = WALK_INDEX_FILE
+  ? /^[a-z]+:/i.test(WALK_INDEX_FILE)
+    ? WALK_INDEX_FILE
+    : `${import.meta.env.BASE_URL}${WALK_INDEX_FILE}`
+  : null;
+
+/** Crossings between area files (an index world): the ink fade and the loading hint. */
+export const CROSSING = {
+  /** Each way of the fade to ink and back, milliseconds: about 0.4 s in all. */
+  fadeMs: 200,
+  /** The loading hint shows above the ink once a crossing has taken this long, milliseconds. */
+  hintAfterMs: 400,
+  /** The ink, `#12141C`: the fade, the indoor background, the page and the canvas before a world shows. */
+  ink: '#12141C',
+} as const;
+
 export const WALK = {
   /** Camera height above the feet, metres. */
   eyeHeight: 1.6,
@@ -36,6 +56,83 @@ export const WALK = {
   maxFrame: 0.25,
   /** Below the world's lowest point by this much, the player returns to the spawn. */
   killDepth: 25,
+} as const;
+
+// The traversal modes (src/traverse.ts): a cave file's `Trav_<id>` zones put the walker into them by themselves; the
+// WALK values hold everywhere else.
+
+export const TRAVERSE = {
+  /** A crawl or sidle box counts this much longer at both ends of its X axis (the passage), metres: the walking
+   * body (radius 0.3 m) stops that far from a low or narrow mouth, and its feet must still reach the box. */
+  endMargin: 0.3,
+  /** Feet this close outside a box still count as inside it, metres (feet resting exactly on one of its faces). */
+  edge: 0.01,
+  /** Time for the eye to move between the walking and the crawling height, seconds. */
+  eyeSeconds: 0.3,
+} as const;
+
+export const CRAWL = {
+  /** Top of the body above the feet, metres. The solid part runs from the step height (0.35 m) to here: a sphere of
+   * radius 0.275 m, so a passage 1 m high is crawled and not walked. */
+  bodyHeight: 0.9,
+  /** Camera height above the feet, metres. */
+  eyeHeight: 0.55,
+  /** m/s; there is no running. */
+  speed: 0.6,
+  /** Standing up needs nothing within this height above the feet, metres. */
+  standRoom: 1.8,
+} as const;
+
+export const SIDLE = {
+  /** Body radius while walking sideways, metres; the height stays the walking one. */
+  radius: 0.18,
+  /** m/s along the passage; there is no running. */
+  speed: 0.5,
+  /** The view is held within this angle of the wall it faces, radians (60 degrees). */
+  viewHold: Math.PI / 3,
+  /** How fast the view turns to face that wall, radians per second (a quarter turn in about 0.3 s). */
+  turnRate: 5,
+  /** After walking into a sidle box through one of its sides (between its X ends), input across the passage moves
+   * the walker only outwards, away from the box's middle plane, and only once the feet are this far off it, metres:
+   * it backs out the way it came. Entered through an X end (or arriving), movement is only along the passage. */
+  sideOut: 0.001,
+  /** Hysteresis at a sidle box's X ends. A walker who sidled out through an end walks, and walks on in that box (its
+   * end margins included) unless it heads back into the passage through that end within this angle of its axis,
+   * radians (30 degrees): where a fissure opens at an angle into walking space, the way on leaves it beside the box,
+   * and a walker on that way no longer sidles and walks by turns (route 1, the Ice Curtain: 26 changes). */
+  reentryAngle: Math.PI / 6,
+  /** ... until the feet are this far clear of the box with its end margins, metres; from there it is entered as
+   * always, through an end or a side. */
+  reentryClear: 0.15,
+} as const;
+
+export const CLIMB = {
+  /** Speed on the face, up, down and sideways, m/s. */
+  speed: 0.6,
+  /** The feet are held this far out from the face plane, metres. */
+  hold: 0.35,
+  /** How far in front of the face plane a walker at the foot attaches, and a walker stepping off the ledge is caught,
+   * metres. */
+  reach: 0.6,
+  /** How far the feet may be from the foot of the face (the bottom of its box) to attach, metres. Going down, a floor
+   * under the feet lets the walker go only within this far of the foot (rock higher up the face does not), and a
+   * walker with no floor under it lets go and falls this far below the foot. */
+  footBand: 0.5,
+  /** A walker falling past the face within this depth below its top is caught, metres. */
+  catchBand: 0.5,
+  /** The input must point within this angle of the face to attach, radians (60 degrees). */
+  attachAngle: Math.PI / 3,
+  /** The mantle at the top: how long it takes, seconds, and how far beyond the face plane it sets the feet down,
+   * metres. */
+  mantleSeconds: 0.5,
+  mantleReach: 0.8,
+  /** Rock on the ledge, or a drop behind a narrow ridge, shortens the mantle: the body is tested every `mantleStep`
+   * metres out from the edge, and the feet land as far out as it fits with ground under them, but no nearer the face
+   * plane than `mantleMinReach`. With no such room even for the crawling body the walker hangs at the top. */
+  mantleStep: 0.05,
+  mantleMinReach: 0.2,
+  /** The ledge is looked for down to this far below the top of the box, metres. */
+  ledgeDrop: 1,
 } as const;
 
 export const LOOK = {

@@ -1,0 +1,436 @@
+{
+  "format": "cave-section/1",
+  "key": "adit",
+  "name": "Vane's Adit",
+  "notes": "under_adit: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "limestone",
+  "region": {
+    "boxes": [
+      [124.0, 2.5, 2.875, 129.0, 6.5, 7.5],
+      [125.0, 2.5, 2.5, 130.875, 10.5, 7.25],
+      [126.75, 6.375, 2.375, 132.0, 13.625, 7.0],
+      [128.0, 9.5, 2.375, 133.375, 14.0, 6.75],
+      [129.5, 10.0, 2.375, 142.5, 16.125, 5.75],
+      [138.625, 12.25, 2.375, 146.0, 17.5, 7.0],
+      [142.0, 13.5, 2.375, 149.0, 18.5, 7.0],
+      [145.0, 14.5, 2.5, 152.0, 19.5, 7.0],
+      [148.0, 14.375, 2.5, 157.5, 19.5, 7.0],
+      [153.5, 14.375, 2.5, 157.5, 18.25, 7.0],
+      [148.0, 15.5, 2.5, 157.0, 23.5, 7.5],
+      [153.0, 19.5, 3.125, 164.0, 25.5, 8.5],
+      [160.0, 21.5, 4.125, 168.0, 29.5, 9.375],
+      [164.0, 24.0, 5.0, 170.125, 29.5, 10.0],
+      [166.875, 24.625, 5.5, 172.75, 27.375, 10.0],
+      [142.125, 13.625, 2.375, 146.875, 21.875, 6.875],
+      [153.0, 19.5, 3.125, 158.875, 27.5, 8.875],
+      [154.75, 23.5, 4.125, 160.0, 29.625, 10.0],
+      [152.5, 22.125, 5.375, 163.5, 33.0, 13.625],
+      [156.0, 25.5, 9.375, 160.25, 31.625, 13.625],
+      [156.0, 27.5, 9.375, 160.25, 33.0, 13.625],
+      [142.5, 19.5, -3.0, 147.5, 24.5, 13.5],
+      [157.0, 30.0, 11.5, 159.0, 32.0, 17.0],
+      [124.0, 2.5, 3.0, 127.0, 6.5, 7.625]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "ad_mouth",
+      "from": [122.5, 4.5, 4.1],
+      "to": [127.0, 4.5, 3.9],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Portal (route 2: from 122.5, so the drift runs out through the headwall's face at x 124 to the cutting)"
+    },
+    {
+      "id": "ad_portaldrive",
+      "from": [127.0, 4.5, 3.9],
+      "to": [130.0, 11.6, 3.4],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Portal Drive",
+      "via": [[128.8, 8.4, 3.62]]
+    },
+    {
+      "id": "ad_arch",
+      "from": [130.0, 11.6, 3.4],
+      "to": [131.302, 11.876, 3.42],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Adit (the masonry arch)"
+    },
+    {
+      "id": "ad_fall",
+      "from": [131.302, 11.876, 3.42],
+      "to": [140.649, 14.212, 3.44],
+      "profile": "crawl",
+      "width": 1.6,
+      "clear": 1.25,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Run"
+    },
+    {
+      "id": "ad_adit",
+      "from": [140.649, 14.212, 3.44],
+      "to": [150.0, 17.5, 3.55],
+      "profile": "drift",
+      "width": 1.9,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Adit",
+      "via": [
+        [144.0, 15.5, 3.48],
+        [147.0, 16.5, 3.52]
+      ]
+    },
+    {
+      "id": "ad_doorway_1",
+      "from": [150.0, 17.5, 3.55],
+      "to": [155.5, 16.275, 3.58],
+      "profile": "drift",
+      "width": 1.8,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Air Door (west side) (leg 1 of 2)"
+    },
+    {
+      "id": "ad_doorway_2",
+      "from": [155.5, 14.875, 3.595],
+      "to": [155.5, 14.375, 3.6],
+      "profile": "drift",
+      "width": [1.505, 1.4],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Air Door (west side) (leg 2 of 2) (its 0.5 m at the seam levels_adit; round 4)"
+    },
+    {
+      "id": "ad_doorway_2r",
+      "from": [155.5, 16.275, 3.58],
+      "to": [155.5, 14.875, 3.595],
+      "profile": "drift",
+      "width": [1.8, 1.505],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Air Door (west side) (leg 2 of 2) (the rest, beyond 0.5 m from the seam levels_adit; round 4)"
+    },
+    {
+      "id": "ad_east",
+      "from": [150.0, 17.5, 3.55],
+      "to": [168.15, 26.0, 6.6],
+      "profile": "drift",
+      "width": 1.8,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the East Drive",
+      "via": [
+        [155.0, 21.5, 4.2],
+        [162.0, 23.5, 5.2],
+        [166.0, 27.5, 6.0]
+      ]
+    },
+    {
+      "id": "ad_holing",
+      "from": [168.15, 26.0, 6.6],
+      "to": [172.75, 26.0, 6.6],
+      "profile": "fissure",
+      "width": 0.54,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the East Holing (west half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "ad_shaftside",
+      "from": [144.0, 15.5, 3.48],
+      "to": [145.0, 20.0, 3.55],
+      "profile": "drift",
+      "width": 1.6,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Shaft Collar"
+    },
+    {
+      "id": "ad_bandit_1",
+      "from": [155.0, 21.5, 4.2],
+      "to": [156.8, 25.5, 5.2],
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.6,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Talus (leg 1 of 2)"
+    },
+    {
+      "id": "ad_bandit_2",
+      "from": [156.8, 25.5, 5.2],
+      "to": [158.0, 27.6, 6.4],
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.6,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2401,
+        "tread": 0.34
+      },
+      "geology": "limestone",
+      "notes": "the Talus (leg 2 of 2)"
+    },
+    {
+      "id": "ad_bandit_face",
+      "from": [158.0, 27.6, 6.4],
+      "to": [158.079, 28.396, 10.4],
+      "profile": "climb_face",
+      "width": 2.0,
+      "clear": 2.2,
+      "geology": "limestone",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Bandit's climb"
+    },
+    {
+      "id": "ad_den",
+      "from": [158.0, 27.6, 10.4],
+      "to": [158.0, 31.0, 10.4],
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.2,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the Bandits' Den",
+      "via": [[158.2, 29.6, 10.4]]
+    },
+    {
+      "id": "engine_shaft",
+      "from": [145.0, 22.0, -3.0],
+      "to": [145.0, 22.0, 12.0],
+      "profile": "shaft",
+      "width": 2.8,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Engine Shaft"
+    },
+    {
+      "id": "bandit_chink",
+      "from": [158.0, 31.0, 12.6],
+      "to": [158.0, 31.0, 16.4],
+      "profile": "shaft",
+      "width": 0.15,
+      "clear": 0.3,
+      "walk": false,
+      "notes": "the Chink: a slot 0.15 x 0.8 m, its long side at 90.0 degrees (the builder's shaft is round: a question)"
+    }
+  ],
+  "chambers": [],
+  "guards": [
+    {
+      "id": "engine_collar_rail",
+      "line": [
+        [144.0, 20.5],
+        [146.0, 20.5]
+      ],
+      "base_z": 3.55,
+      "height": 1.1,
+      "thickness": 0.12,
+      "notes": "the collar station's timber rail across the shaft side (1.1 m)"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_adit",
+      "at": [147.0, 16.5, 3.52],
+      "yaw_deg": 90.0,
+      "mode": "walk",
+      "notes": "Vane's Adit"
+    },
+    {
+      "id": "undermere_mouth_adit",
+      "at": [126.6, 4.5, 3.94],
+      "yaw_deg": -90.0,
+      "mode": "walk"
+    }
+  ],
+  "portals": [
+    {
+      "id": "um.adit_out",
+      "at": [125.45, 4.5, 4.1],
+      "to": "overworld",
+      "to_spawn": "mouth_adit",
+      "kind": "cave_mouth"
+    }
+  ],
+  "seams": [
+    {
+      "id": "levels_adit",
+      "neighbour": "levels",
+      "side": "b",
+      "kind": "mine_door",
+      "plane": {
+        "axis": "y",
+        "at": 14.375,
+        "toward": "-"
+      },
+      "window": [154.582, 3.435, 156.418, 6.165],
+      "stub_m": 4.4,
+      "portal": [155.5, 14.82, 3.6],
+      "arrival": {
+        "at": [155.5, 16.02, 3.58],
+        "mode": "walk",
+        "yaw_deg": 0.0
+      },
+      "notes": "a Company air door at the incline head (inside the workings)"
+    },
+    {
+      "id": "adit_domes",
+      "neighbour": "domes",
+      "side": "a",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": 172.75,
+        "toward": "+"
+      },
+      "window": [25.725, 6.595, 26.275, 9.005],
+      "stub_m": 7.3,
+      "portal": [172.3, 26.0, 6.6],
+      "arrival": {
+        "at": [171.1, 26.0, 6.6],
+        "mode": "sidle",
+        "yaw_deg": -270.0
+      },
+      "notes": "the East Holing: a natural joint the drive broke into, 0.54 m wide"
+    }
+  ],
+  "openings": [
+    {
+      "id": "engine_shaft_cap",
+      "box": [143.0, 19.4, -4.0, 147.0, 24.0, -2.98],
+      "notes": "the ink cap where the other file's part of the Engine Shaft begins (route 2: from y 19.4, where the levels' sollar and ladderway meet the shaft box's south face)"
+    },
+    {
+      "id": "engine_shaft_window",
+      "box": [143.4, 19.45, -3.1, 146.6, 19.55, 2.0],
+      "notes": "route 2: an ink window on the shaft box's south face below the collar, where the levels' sollar, ladderway and first-level station run on beyond this file (Vane's Levels draws them)"
+    },
+    {
+      "id": "bandit_chink_top",
+      "box": [157.8, 30.55, 16.0, 158.2, 31.45, 16.8],
+      "notes": "the Chink's top"
+    },
+    {
+      "id": "mouth_adit",
+      "box": [124.0, 2.5, 3.6, 127.0, 6.5, 7.6],
+      "notes": "the gate's mouth (the vista beyond) (route 2: the headwall's outer face at x 124, as the design's cutting has it)"
+    }
+  ],
+  "joins": [
+    ["engine_shaft", "ad_shaftside"],
+    ["engine_shaft", "lv_first"],
+    ["engine_shaft", "lv_ladder_face"],
+    ["engine_shaft", "lv_sollar"],
+    ["engine_shaft", "lv_wet"],
+    ["ad_den", "bandit_chink"],
+    ["ad_adit", "ad_doorway_1"],
+    ["ad_adit", "ad_doorway_2"],
+    ["ad_adit", "ad_east"],
+    ["ad_adit", "ad_fall"],
+    ["ad_adit", "ad_shaftside"],
+    ["ad_arch", "ad_fall"],
+    ["ad_arch", "ad_portaldrive"],
+    ["ad_bandit_1", "ad_bandit_face"],
+    ["ad_bandit_2", "ad_bandit_face"],
+    ["ad_bandit_1", "ad_den"],
+    ["ad_bandit_2", "ad_den"],
+    ["ad_bandit_1", "ad_east"],
+    ["ad_bandit_2", "ad_east"],
+    ["ad_bandit_face", "ad_den"],
+    ["ad_doorway_1", "ad_east"],
+    ["ad_doorway_2", "ad_east"],
+    ["ad_doorway_1", "lv_incline_1"],
+    ["ad_doorway_1", "lv_incline_2"],
+    ["ad_doorway_1", "lv_incline_3"],
+    ["ad_doorway_1", "lv_incline_4"],
+    ["ad_doorway_1", "lv_incline_5"],
+    ["ad_doorway_1", "lv_incline_6"],
+    ["ad_doorway_1", "lv_incline_7"],
+    ["ad_doorway_2", "lv_incline_1"],
+    ["ad_doorway_2", "lv_incline_2"],
+    ["ad_doorway_2", "lv_incline_3"],
+    ["ad_doorway_2", "lv_incline_4"],
+    ["ad_doorway_2", "lv_incline_5"],
+    ["ad_doorway_2", "lv_incline_6"],
+    ["ad_doorway_2", "lv_incline_7"],
+    ["ad_doorway_1", "lv_platform_1"],
+    ["ad_doorway_2", "lv_platform_1"],
+    ["ad_east", "ad_holing"],
+    ["ad_fall", "ad_portaldrive"],
+    ["ad_fall", "ad_shaftside"],
+    ["ad_holing", "do_holing"],
+    ["ad_mouth", "ad_portaldrive"],
+    ["ad_shaftside", "lv_first"],
+    ["ad_shaftside", "lv_ladder_face"],
+    ["ad_shaftside", "lv_sollar"],
+    ["ad_bandit_face", "bandit_chink"],
+    ["ad_doorway_2", "ad_doorway_2r"],
+    ["ad_doorway_2r", "ad_adit"],
+    ["ad_doorway_2r", "ad_east"],
+    ["ad_doorway_2r", "lv_incline_1"],
+    ["ad_doorway_2r", "lv_incline_2"],
+    ["ad_doorway_2r", "lv_incline_3"],
+    ["ad_doorway_2r", "lv_incline_4"],
+    ["ad_doorway_2r", "lv_incline_5"],
+    ["ad_doorway_2r", "lv_incline_6"],
+    ["ad_doorway_2r", "lv_incline_7"],
+    ["ad_doorway_2r", "lv_platform_1"],
+    ["ad_doorway_2", "ad_doorway_1"],
+    ["lv_platform_1", "ad_doorway_2"],
+    ["lv_platform_1r", "ad_doorway_1"],
+    ["lv_platform_1r", "ad_doorway_2"],
+    ["lv_platform_1r", "ad_doorway_2r"],
+    ["ad_doorway_2r", "ad_doorway_1"]
+  ]
+}

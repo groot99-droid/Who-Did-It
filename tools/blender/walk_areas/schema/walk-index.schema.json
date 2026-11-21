@@ -1,0 +1,288 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tools/blender/walk_areas/schema/walk-index.schema.json",
+  "title": "walk-index.json, format 1",
+  "description": "The index of a walk world: one entry per area file. Contract: docs/walk-areas.md, version 1.1 (the index is still format 1). Axes: every 3-number vector is in glTF world axes (x east, y up, z = -north), in metres; every field whose name ends in _xy is a plan view in Blender axes (x east, y north), in metres.",
+  "type": "object",
+  "required": ["format", "axes", "start", "areas", "scenes", "seams", "pending"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": 1,
+      "description": "The version of this file's layout. A viewer that does not know the number treats the index as absent."
+    },
+    "world": { "type": "string", "description": "A label for people. Nothing reads it." },
+    "axes": {
+      "type": "string",
+      "minLength": 1,
+      "description": "The sentence that says which axes the fields use."
+    },
+    "start": {
+      "$ref": "#/$defs/spawnId",
+      "description": "The spawn the viewer starts at when the address names none."
+    },
+    "areas": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/area" },
+      "description": "Area id to area. A village section is village_<key>, a room is room_<sceneId>, a wild area is its scene id, a cave is the area prefix of its walk-only scene and a key (under_<key>)."
+    },
+    "scenes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "minItems": 1,
+        "uniqueItems": true,
+        "items": { "type": "string" }
+      },
+      "description": "Scene id (a game scene id, or a walk-only scene id of walk_scenes) to the area ids that make it up. overworld is all the village sections; a walk-only scene is all its caves."
+    },
+    "seams": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/seam" },
+      "description": "The crossings between two sections of one scene: two village sections, or two caves of one walk-only scene."
+    },
+    "pending": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string" },
+      "description": "Scene ids (game scene ids or walk-only scene ids) that are not built yet. A portal into one says so and does not move the player."
+    },
+    "walk_scenes": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]*$" },
+      "additionalProperties": { "$ref": "#/$defs/walkScene" },
+      "description": "Optional (contract 1.1): the walk-only scenes the files use (an area's scene, or where a portal leads), each entry copied from tools/blender/walk_areas/walk_scenes.json. Left out when the files use none. For tools, and for a viewer that wants better words for a door into one; a viewer needs nothing here to load a file, place the player or find a portal's target."
+    }
+  },
+  "$defs": {
+    "spawnId": { "type": "string", "pattern": "^[a-z0-9_]+$" },
+    "walkScene": {
+      "type": "object",
+      "required": ["name", "kind", "area_prefix", "portal_ns"],
+      "additionalProperties": false,
+      "description": "A scene of the walk that the game does not have, cut into areas of one kind joined by seams.",
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "description": "Plain words for people." },
+        "kind": { "enum": ["cave"], "description": "The kind of its areas." },
+        "area_prefix": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*_$",
+          "description": "The id of each of its areas is this and a key: under_<key>."
+        },
+        "portal_ns": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9]*$",
+          "description": "Its mouths are the portals <portal_ns>.<gate>_in in the village and <portal_ns>.<gate>_out in one of its areas."
+        }
+      }
+    },
+    "vec3": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "type": "number" },
+      "description": "glTF world axes, metres: x east, y up, z = -north."
+    },
+    "xy": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": { "type": "number" },
+      "description": "Blender plan view, metres: x east, y north."
+    },
+    "area": {
+      "type": "object",
+      "required": [
+        "file",
+        "bytes",
+        "sha256",
+        "kind",
+        "scene",
+        "name",
+        "indoor",
+        "baked",
+        "walk_region_xy",
+        "look",
+        "spawns",
+        "portals"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "file": {
+          "type": "string",
+          "pattern": "^[^/\\\\]+\\.(glb|gltf)$",
+          "description": "The file's name, in the same folder as the index. walk-<areaId>.glb."
+        },
+        "bytes": { "type": "integer", "minimum": 1, "description": "The file's size, for the loading bar." },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "The hash of the file's bytes."
+        },
+        "kind": { "enum": ["section", "room", "wild", "cave"] },
+        "scene": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The scene this area belongs to: a game scene, or for a cave its walk-only scene."
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Plain words for people (the Area's wdi_name)."
+        },
+        "indoor": { "type": "boolean" },
+        "baked": { "type": "boolean" },
+        "walk_region_xy": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": { "type": "number" },
+          "description": "x0, y0, x1, y1: the rectangle around the ground the player can walk in this file."
+        },
+        "walk_polygon_xy": {
+          "type": "array",
+          "minItems": 3,
+          "items": { "$ref": "#/$defs/xy" },
+          "description": "Optional: the outline of that ground when it is not the whole rectangle."
+        },
+        "look": {
+          "type": "object",
+          "required": ["wdi_exposure"],
+          "additionalProperties": false,
+          "description": "The Area's own look extras, copied: the same keys the viewer reads from the file.",
+          "properties": {
+            "wdi_exposure": { "type": "number", "exclusiveMinimum": 0 },
+            "fog_color": {
+              "anyOf": [
+                { "type": "string" },
+                { "type": "array", "minItems": 3, "items": { "type": "number" } }
+              ]
+            },
+            "fog_density": { "type": "number", "exclusiveMinimum": 0 },
+            "fog_near": { "type": "number" },
+            "fog_far": { "type": "number" }
+          }
+        },
+        "spawns": { "type": "array", "items": { "$ref": "#/$defs/spawn" } },
+        "portals": { "type": "array", "items": { "$ref": "#/$defs/portal" } },
+        "stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Counts read from the file, for tools. The viewer does not need them.",
+          "properties": {
+            "triangles_loaded": { "type": "integer", "minimum": 0 },
+            "triangles_collision": { "type": "integer", "minimum": 0 },
+            "draw_calls": { "type": "integer", "minimum": 0 },
+            "instanced_groups": { "type": "integer", "minimum": 0 },
+            "images": { "type": "integer", "minimum": 0 },
+            "texture_gpu_mb": { "type": "number", "minimum": 0 },
+            "lights": { "type": "integer", "minimum": 0 }
+          }
+        }
+      }
+    },
+    "spawn": {
+      "type": "object",
+      "required": ["id", "label", "name", "group", "position", "yaw_deg"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/spawnId",
+          "description": "The node's name without Spawn_. Unique in the whole index."
+        },
+        "label": {
+          "type": "string",
+          "description": "The picker's words with the district, as the viewer builds them."
+        },
+        "name": { "type": "string", "description": "The picker's words without the district." },
+        "group": { "type": "string", "description": "The district the picker groups by." },
+        "position": { "$ref": "#/$defs/vec3" },
+        "yaw_deg": { "type": "number", "description": "0 looks along -z (north), positive turns left." },
+        "picker": {
+          "type": "boolean",
+          "description": "false keeps an arrival-only spawn out of the picker. Left out when the spawn is listed."
+        }
+      }
+    },
+    "portal": {
+      "type": "object",
+      "required": ["id", "portal_id", "position", "to", "toSpawn", "kind", "target_area"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The id the viewer reads: the node's name without Portal_ and without . [ ] : /"
+        },
+        "portal_id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "wdi_portal_id: the same id with its dot."
+        },
+        "position": { "$ref": "#/$defs/vec3" },
+        "to": {
+          "type": "string",
+          "minLength": 1,
+          "description": "A scene id, never an area id: a game scene id, or a walk-only scene id (walk_scenes)."
+        },
+        "toSpawn": { "type": "string", "minLength": 1 },
+        "kind": { "type": "string" },
+        "target_area": {
+          "type": ["string", "null"],
+          "description": "The area that holds Spawn_<to>_<toSpawn>, or null when the scene is pending."
+        },
+        "seam": { "type": "string", "description": "The seam id, on seam portals only." }
+      }
+    },
+    "seam": {
+      "type": "object",
+      "required": ["id", "kind", "width_m", "a", "b", "portals", "opening_xy", "normal_xy"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z][a-z0-9]*(_[a-z0-9]+)*$" },
+        "kind": {
+          "enum": [
+            "gate",
+            "level_crossing",
+            "footbridge",
+            "lychgate",
+            "stile",
+            "cutting",
+            "belt_gate",
+            "passage",
+            "arch",
+            "mine_door",
+            "bend",
+            "squeeze",
+            "choke",
+            "curtain",
+            "sump_ledge"
+          ],
+          "description": "The device: one of the first seven between village sections, one of the last eight between caves."
+        },
+        "width_m": { "type": "number", "exclusiveMinimum": 0, "description": "The width of the opening." },
+        "a": { "type": "string", "description": "The area id of side a." },
+        "b": { "type": "string", "description": "The area id of side b." },
+        "portals": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "How many portal points each side has."
+        },
+        "opening_xy": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": { "$ref": "#/$defs/xy" },
+          "description": "The two ends of the opening on the seam line."
+        },
+        "normal_xy": {
+          "$ref": "#/$defs/xy",
+          "description": "The unit direction across the seam, from side a to side b."
+        }
+      }
+    }
+  }
+}

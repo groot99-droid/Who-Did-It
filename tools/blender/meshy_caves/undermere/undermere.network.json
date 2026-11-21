@@ -1,0 +1,103 @@
+{
+  "format": "cave-network/1",
+  "scene": "undermere",
+  "name": "The Undermere",
+  "area_prefix": "under_",
+  "notes": "written by the Undermere design's work/to_builder.py from network.json; noise and bedding per kit are proposals (est.)",
+  "lattice": {
+    "origin": [-120.0, -64.0, -48.0],
+    "cell": 0.125,
+    "block": 32
+  },
+  "seed": 1893,
+  "geology": {
+    "limestone": {
+      "tint": "#9A958A",
+      "repeat_m": 1.5,
+      "noise": 0.12,
+      "bedding": [0.6, 0.04],
+      "detail": "rock_01 / rock_06"
+    },
+    "flowstone": {
+      "tint": "#B9A98A",
+      "repeat_m": 2.0,
+      "noise": 0.06,
+      "bedding": [0.6, 0.0],
+      "detail": "worn_rock_natural_01"
+    },
+    "breakdown": {
+      "tint": "#8E887A",
+      "repeat_m": 1.8,
+      "noise": 0.2,
+      "bedding": [0.6, 0.0],
+      "detail": "rock_boulder_dry"
+    },
+    "gypsum": {
+      "tint": "#D8D3C4",
+      "repeat_m": 1.8,
+      "noise": 0.08,
+      "bedding": [0.5, 0.03],
+      "detail": "marble_rock_03"
+    },
+    "lakeclay": {
+      "tint": "#7D6A55",
+      "repeat_m": 2.0,
+      "noise": 0.08,
+      "bedding": [0.3, 0.02],
+      "detail": "brown_mud_02 / dry_river_pebbles"
+    },
+    "ice": {
+      "tint": "#C9D3DB",
+      "repeat_m": 1.5,
+      "noise": 0.04,
+      "bedding": [0.6, 0.0],
+      "detail": "generated ice + snow_02"
+    },
+    "slate": {
+      "tint": "#4C5363",
+      "repeat_m": 2.0,
+      "noise": 0.1,
+      "bedding": [0.25, 0.03],
+      "detail": "dark_rock_02"
+    },
+    "skarn": {
+      "tint": "#9C6B55",
+      "repeat_m": 1.8,
+      "noise": 0.12,
+      "bedding": [0.6, 0.0],
+      "detail": "marble_rock_03 + tiger_rock"
+    },
+    "granite": {
+      "tint": "#6E6258",
+      "repeat_m": 2.55,
+      "noise": 0.08,
+      "bedding": [0.6, 0.0],
+      "detail": "tiger_rock / quarry_wall_02"
+    },
+    "flooded": {
+      "tint": "#55606A",
+      "repeat_m": 2.0,
+      "noise": 0.1,
+      "bedding": [0.6, 0.04],
+      "detail": "river_small_rocks + brown_mud_rocks_01"
+    }
+  },
+  "sections": [
+    "swallow",
+    "killas",
+    "gallery",
+    "well",
+    "white",
+    "ice",
+    "north",
+    "highlevel",
+    "river",
+    "reach",
+    "spar",
+    "bottom",
+    "levels",
+    "adit",
+    "domes",
+    "rising"
+  ]
+}

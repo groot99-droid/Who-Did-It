@@ -4,6 +4,8 @@
   --panel: rgb(18 20 26 / 0.82);
   --accent: #e3a857;
   --danger: #ef8a7a;
+  /* The darkest colour on the page: the fade, the background before a world shows. Never black. */
+  --ink-dark: #12141c;
   font-family:
     system-ui,
     -apple-system,
@@ -17,7 +19,7 @@ body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: #11131a;
+  background: var(--ink-dark);
 }
 
 #view {
@@ -43,6 +45,8 @@ body {
   padding: 20px 22px;
   border-radius: 12px;
   background: var(--panel);
+  /* Above the fade: a crossing's progress shows over the ink. */
+  z-index: 2;
 }
 
 .panel h1 {
@@ -138,7 +142,7 @@ body {
   margin: -60px 0 0 -60px;
   border-radius: 50%;
   border: 2px solid rgb(255 255 255 / 0.35);
-  background: rgb(0 0 0 / 0.15);
+  background: rgb(18 20 28 / 0.15);
 }
 
 .stick .knob {
@@ -158,16 +162,17 @@ body {
   place-items: center;
   border: 3px dashed var(--accent);
   border-radius: 16px;
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(18 20 28 / 0.45);
   font-size: 1.4rem;
 }
 
 .fade {
   position: absolute;
   inset: 0;
-  background: #000;
+  background: var(--ink-dark);
   opacity: 0;
   transition: opacity 0.18s;
+  z-index: 1;
 }
 
 .fade.on {
@@ -198,6 +203,36 @@ body {
   border-radius: 8px;
   background: var(--panel);
   text-align: center;
+  z-index: 2;
+}
+
+/* A crossing's loading hint, above the ink. */
+.loading {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: calc(100vw - 32px);
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-align: center;
+  z-index: 2;
+}
+
+/* The traversal mode (Crawling, Sideways, Climbing), above the door prompt. */
+.mode {
+  position: absolute;
+  left: 50%;
+  bottom: 116px;
+  transform: translateX(-50%);
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
 }
 
 [hidden] {
