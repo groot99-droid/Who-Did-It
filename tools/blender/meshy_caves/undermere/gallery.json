@@ -1,0 +1,391 @@
+{
+  "format": "cave-section/1",
+  "key": "gallery",
+  "name": "The Great Gallery",
+  "notes": "under_gallery: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "limestone",
+  "region": {
+    "boxes": [
+      [-52.5, -23.0, -17.25, -45.25, -19.375, -14.0],
+      [-52.5, -24.5, -17.625, -34.0, 0.0, -6.375],
+      [-50.0, -16.0, -18.0, -29.0, 10.0, -6.5],
+      [-45.0, -6.0, -18.375, -20.0, 14.5, -6.875],
+      [-36.0, -3.5, -18.75, -15.625, 14.5, -7.25],
+      [-27.5, -4.0, -19.0, -15.625, 10.0, -9.625],
+      [-41.5, -1.5, -18.0, -33.5, 14.5, -10.25],
+      [-42.0, 7.5, -16.875, -34.5, 18.0, -9.375],
+      [-36.75, 8.75, -15.875, -28.25, 18.75, -11.125],
+      [-20.875, -0.375, -19.125, -15.75, 3.625, -14.625],
+      [-19.5, 0.0, -19.25, -15.625, 3.625, -14.75],
+      [-49.0, 11.0, -15.875, -29.0, 31.0, -4.75],
+      [-47.0, -15.5, -18.25, -41.0, -9.5, -15.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "ga_lakearch",
+      "from": [-52.5, -21.2, -16.2],
+      "to": [-47.0, -21.2, -16.2],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.15,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the Lake Arch (east half)"
+    },
+    {
+      "id": "ga_trunk_1",
+      "from": [-44.5, -16.5, -16.4],
+      "to": [-42.0, -8.0, -16.6],
+      "profile": "tube",
+      "width": 14.0,
+      "clear": 9.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Great Gallery (leg 1 of 5)"
+    },
+    {
+      "id": "ga_trunk_2",
+      "from": [-42.0, -8.0, -16.6],
+      "to": [-37.0, 2.0, -16.9],
+      "profile": "tube",
+      "width": 14.0,
+      "clear": 9.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Great Gallery (leg 2 of 5)"
+    },
+    {
+      "id": "ga_trunk_3",
+      "from": [-37.0, 2.0, -16.9],
+      "to": [-28.0, 6.5, -17.3],
+      "profile": "tube",
+      "width": 14.0,
+      "clear": 9.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Great Gallery (leg 3 of 5)"
+    },
+    {
+      "id": "ga_trunk_4",
+      "from": [-28.0, 6.5, -17.3],
+      "to": [-22.0, 4.5, -17.7],
+      "profile": "tube",
+      "width": [14.0, 9.0],
+      "clear": [9.0, 7.0],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Great Gallery (leg 4 of 5)"
+    },
+    {
+      "id": "ga_trunk_5",
+      "from": [-22.0, 4.5, -17.7],
+      "to": [-19.0, 1.5, -18.0],
+      "profile": "tube",
+      "width": [9.0, 4.0],
+      "clear": [7.0, 4.0],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Great Gallery (leg 5 of 5)"
+    },
+    {
+      "id": "ga_star",
+      "from": [-37.0, 2.0, -16.9],
+      "to": [-38.5, 14.5, -14.9],
+      "profile": "tube",
+      "width": 5.0,
+      "clear": 4.5,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Star Passage",
+      "via": [[-38.0, 11.0, -15.8]]
+    },
+    {
+      "id": "ga_jump",
+      "from": [-34.5, 16.5, -14.8],
+      "to": [-30.5, 11.0, -14.8],
+      "profile": "tube",
+      "width": 2.5,
+      "clear": 2.6,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the Jump ledge"
+    },
+    {
+      "id": "ga_choke",
+      "from": [-19.0, 1.5, -18.0],
+      "to": [-15.625, 1.8, -18.2],
+      "profile": "tube",
+      "width": 1.6,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the Leaning Blocks (west half)",
+      "via": [[-17.6, 1.8, -18.1]]
+    },
+    {
+      "id": "bottomless_pit",
+      "from": [-44.0, -12.5, -18.25],
+      "to": [-44.0, -12.5, -16.5],
+      "profile": "shaft",
+      "width": 4.0,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Bottomless Pit"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "ga_starch",
+      "kind": "hall",
+      "center": [-39.0, 21.0, -14.8],
+      "size": [18.0, 12.0, 9.0],
+      "axis": [0.0, 1.0],
+      "geology": "limestone",
+      "notes": "the Star Chamber"
+    }
+  ],
+  "guards": [
+    {
+      "id": "pit_kerb_w",
+      "line": [
+        [-44.75, -10.485],
+        [-44.95, -10.571],
+        [-45.14, -10.677],
+        [-45.318, -10.801],
+        [-45.483, -10.943],
+        [-45.633, -11.101],
+        [-45.766, -11.273],
+        [-45.881, -11.458],
+        [-45.976, -11.653],
+        [-46.052, -11.857],
+        [-46.106, -12.068],
+        [-46.139, -12.283],
+        [-46.15, -12.5],
+        [-46.139, -12.717],
+        [-46.106, -12.932],
+        [-46.052, -13.143],
+        [-45.976, -13.347],
+        [-45.881, -13.542],
+        [-45.766, -13.727],
+        [-45.633, -13.899],
+        [-45.483, -14.057],
+        [-45.318, -14.199],
+        [-45.14, -14.323],
+        [-44.95, -14.429],
+        [-44.75, -14.515]
+      ],
+      "base_z": -16.5,
+      "height": 1.0,
+      "thickness": 0.3,
+      "notes": "the Great Gallery's rock kerb round the Bottomless Pit, west side (1.0 m)"
+    },
+    {
+      "id": "pit_kerb_e",
+      "line": [
+        [-43.25, -14.515],
+        [-43.05, -14.429],
+        [-42.86, -14.323],
+        [-42.682, -14.199],
+        [-42.517, -14.057],
+        [-42.367, -13.899],
+        [-42.234, -13.727],
+        [-42.119, -13.542],
+        [-42.024, -13.347],
+        [-41.948, -13.143],
+        [-41.894, -12.932],
+        [-41.861, -12.717],
+        [-41.85, -12.5],
+        [-41.861, -12.283],
+        [-41.894, -12.068],
+        [-41.948, -11.857],
+        [-42.024, -11.653],
+        [-42.119, -11.458],
+        [-42.234, -11.273],
+        [-42.367, -11.101],
+        [-42.517, -10.943],
+        [-42.682, -10.801],
+        [-42.86, -10.677],
+        [-43.05, -10.571],
+        [-43.25, -10.485]
+      ],
+      "base_z": -16.5,
+      "height": 1.0,
+      "thickness": 0.3,
+      "notes": "the Great Gallery's rock kerb round the Bottomless Pit, east side (1.0 m)"
+    },
+    {
+      "id": "pit_bridge_rail_w",
+      "line": [
+        [-44.6, -14.565],
+        [-44.6, -10.435]
+      ],
+      "base_z": -16.5,
+      "height": 1.0,
+      "thickness": 0.08,
+      "notes": "the plank bridge's west rail (timber, 1.0 m)"
+    },
+    {
+      "id": "pit_bridge_rail_e",
+      "line": [
+        [-43.4, -14.565],
+        [-43.4, -10.435]
+      ],
+      "base_z": -16.5,
+      "height": 1.0,
+      "thickness": 0.08,
+      "notes": "the plank bridge's east rail (timber, 1.0 m)"
+    }
+  ],
+  "drops": [
+    {
+      "id": "the_jump",
+      "from": [-30.5, 11.0, -14.8],
+      "to": [-30.5, 11.0, -17.3],
+      "radius": 1.0,
+      "notes": "the Jump"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_gallery",
+      "at": [-37.0, 0.0, -16.9],
+      "yaw_deg": -200.0,
+      "mode": "walk",
+      "notes": "The Great Gallery"
+    }
+  ],
+  "seams": [
+    {
+      "id": "swallow_gallery",
+      "neighbour": "swallow",
+      "side": "b",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": -52.5,
+        "toward": "-"
+      },
+      "window": [-22.035, -16.285, -20.365, -14.964],
+      "stub_m": 9.5,
+      "portal": [-52.05, -21.2, -16.2],
+      "arrival": {
+        "at": [-50.85, -21.2, -16.2],
+        "mode": "crawl",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Lake Arch: the roof comes down to 1.15 m over dry silt"
+    },
+    {
+      "id": "gallery_well",
+      "neighbour": "well",
+      "side": "a",
+      "kind": "choke",
+      "plane": {
+        "axis": "x",
+        "at": -15.625,
+        "toward": "+"
+      },
+      "window": [0.795, -18.405, 2.805, -15.694],
+      "stub_m": 6.9,
+      "portal": [-16.07, 1.8, -18.18],
+      "arrival": {
+        "at": [-17.27, 1.8, -18.12],
+        "mode": "walk",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Leaning Blocks: a 1.6 m gap between two leaning blocks, zigzag"
+    }
+  ],
+  "openings": [
+    {
+      "id": "bottomless_pit_cap",
+      "box": [-46.6, -15.1, -19.25, -41.4, -9.9, -18.23],
+      "notes": "the ink cap where the other file's part of the Bottomless Pit begins"
+    }
+  ],
+  "joins": [
+    ["ga_trunk_1", "ga_trunk_3"],
+    ["ga_trunk_1", "ga_trunk_4"],
+    ["ga_trunk_1", "ga_trunk_5"],
+    ["ga_trunk_2", "ga_trunk_4"],
+    ["ga_trunk_2", "ga_trunk_5"],
+    ["ga_trunk_3", "ga_trunk_5"],
+    ["bottomless_pit", "ga_trunk_1"],
+    ["bottomless_pit", "ga_trunk_2"],
+    ["bottomless_pit", "ga_trunk_3"],
+    ["bottomless_pit", "ga_trunk_4"],
+    ["bottomless_pit", "ga_trunk_5"],
+    ["bottomless_pit", "ri_canyon"],
+    ["ga_jump", "ga_trunk_1"],
+    ["ga_jump", "ga_trunk_2"],
+    ["ga_jump", "ga_trunk_3"],
+    ["ga_jump", "ga_trunk_4"],
+    ["ga_jump", "ga_trunk_5"],
+    ["ga_choke", "ga_trunk_1"],
+    ["ga_choke", "ga_trunk_2"],
+    ["ga_choke", "ga_trunk_3"],
+    ["ga_choke", "ga_trunk_4"],
+    ["ga_choke", "ga_trunk_5"],
+    ["ga_choke", "we_choke"],
+    ["ga_jump", "ga_star"],
+    ["ga_lakearch", "ga_trunk_1"],
+    ["ga_lakearch", "ga_trunk_2"],
+    ["ga_lakearch", "ga_trunk_3"],
+    ["ga_lakearch", "ga_trunk_4"],
+    ["ga_lakearch", "ga_trunk_5"],
+    ["ga_lakearch", "sw_lakearch"],
+    ["ga_star", "ga_trunk_1"],
+    ["ga_star", "ga_trunk_2"],
+    ["ga_star", "ga_trunk_3"],
+    ["ga_star", "ga_trunk_4"],
+    ["ga_star", "ga_trunk_5"],
+    ["ga_starch", "ga_trunk_1"],
+    ["ga_starch", "ga_trunk_2"],
+    ["ga_starch", "ga_trunk_3"],
+    ["ga_starch", "ga_trunk_4"],
+    ["ga_starch", "ga_trunk_5"],
+    ["ga_trunk_1", "sw_lakearch"],
+    ["ga_trunk_2", "sw_lakearch"],
+    ["ga_trunk_3", "sw_lakearch"],
+    ["ga_trunk_4", "sw_lakearch"],
+    ["ga_trunk_5", "sw_lakearch"],
+    ["ga_trunk_1", "we_choke"],
+    ["ga_trunk_2", "we_choke"],
+    ["ga_trunk_3", "we_choke"],
+    ["ga_trunk_4", "we_choke"],
+    ["ga_trunk_5", "we_choke"],
+    ["ga_jump", "ga_starch"],
+    ["ga_star", "ga_starch"],
+    ["sw_lakearch", "ga_lakearch"]
+  ],
+  "bridges": [
+    {
+      "id": "pit_bridge",
+      "box": [-44.6, -14.75, -43.4, -10.25],
+      "top_z": -16.5,
+      "thickness": 0.15,
+      "notes": "the Company's plank bridge over the Bottomless Pit, flush with the trunk's floor, 0.25 m of bearing each end"
+    }
+  ]
+}

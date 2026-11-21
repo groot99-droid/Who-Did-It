@@ -1,0 +1,518 @@
+{
+  "format": "cave-section/1",
+  "key": "swallow",
+  "name": "The Swallow",
+  "notes": "under_swallow: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "lakeclay",
+  "region": {
+    "boxes": [
+      [-59.75, -22.375, -1.125, -55.25, -15.125, 3.375],
+      [-59.75, -19.625, -1.125, -55.25, -14.375, 3.375],
+      [-63.25, -22.375, -4.125, -51.75, -10.875, 3.375],
+      [-59.625, -18.75, -4.125, -55.375, -13.5, 1.0],
+      [-62.125, -17.75, -6.0, -55.375, -12.0, 1.0],
+      [-64.625, -16.375, -8.375, -57.875, -9.375, -1.0],
+      [-68.125, -13.625, -10.5, -60.375, -5.375, -3.25],
+      [-73.125, -9.625, -11.875, -63.875, -4.875, -5.375],
+      [-78.125, -10.625, -12.75, -68.875, -4.875, -6.75],
+      [-81.75, -11.75, -13.0, -73.875, -6.375, -7.625],
+      [-78.0, -16.5, -14.0, -65.5, -10.0, -7.5],
+      [-70.5, -20.5, -15.5, -60.0, -11.5, -8.5],
+      [-65.0, -23.75, -16.625, -57.5, -15.5, -10.0],
+      [-62.5, -23.75, -17.25, -55.0, -18.625, -11.125],
+      [-59.25, -23.0, -17.25, -52.5, -19.375, -14.0],
+      [-98.375, -22.875, -13.375, -93.125, -13.125, -7.0],
+      [-98.375, -26.75, -13.625, -93.625, -18.125, -7.25],
+      [-107.25, -35.625, -18.125, -84.75, -13.125, -7.5],
+      [-98.375, -27.75, -18.125, -93.25, -22.0, -11.0],
+      [-98.0, -32.375, -20.5, -91.625, -23.0, -11.0],
+      [-96.375, -35.875, -23.0, -88.625, -27.625, -13.5],
+      [-93.375, -38.875, -25.375, -86.125, -31.125, -16.0],
+      [-90.875, -39.0, -26.625, -84.125, -34.125, -18.25],
+      [-87.75, -37.875, -26.625, -82.0, -35.375, -22.0],
+      [-102.25, -11.25, -13.25, -97.25, -8.75, -7.625],
+      [-103.75, -12.75, -13.25, -99.75, -8.75, -7.625],
+      [-104.5, -12.75, -13.25, -101.25, -10.25, -7.625],
+      [-100.0, -24.0, -13.0, -74.0, 2.0, -4.0],
+      [-59.5, -22.125, -1.125, -55.5, -18.0, 3.5]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "sw_notch",
+      "from": [-57.5, -20.1, -0.1],
+      "to": [-57.5, -16.6, -0.1],
+      "profile": "tube",
+      "width": 2.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Notch (the lake-shore notch)",
+      "via": [[-57.5, -17.4, -0.1]]
+    },
+    {
+      "id": "sw_lip_face",
+      "from": [-57.5, -16.6, -3.1],
+      "to": [-57.5, -17.4, -0.1],
+      "profile": "climb_face",
+      "width": 2.4,
+      "clear": 2.4,
+      "geology": "lakeclay",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Lip"
+    },
+    {
+      "id": "sw_gullet_1",
+      "from": [-57.5, -16.6, -3.1],
+      "to": [-57.5, -15.6, -3.1],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 1 of 7)"
+    },
+    {
+      "id": "sw_gullet_2",
+      "from": [-57.5, -15.6, -3.1],
+      "to": [-60.0, -14.2, -5.0],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2375,
+        "tread": 0.3235
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 2 of 7)"
+    },
+    {
+      "id": "sw_gullet_3",
+      "from": [-60.0, -14.2, -5.0],
+      "to": [-62.5, -11.5, -7.3],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.23,
+        "tread": 0.34
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 3 of 7)"
+    },
+    {
+      "id": "sw_gullet_4",
+      "from": [-62.5, -11.5, -7.3],
+      "to": [-66.0, -7.5, -9.4],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2334,
+        "tread": 0.34
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 4 of 7)"
+    },
+    {
+      "id": "sw_gullet_5",
+      "from": [-66.0, -7.5, -9.4],
+      "to": [-71.0, -7.0, -10.8],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 5 of 7)"
+    },
+    {
+      "id": "sw_gullet_6",
+      "from": [-71.0, -7.0, -10.8],
+      "to": [-76.0, -8.5, -11.7],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 6 of 7)"
+    },
+    {
+      "id": "sw_gullet_7",
+      "from": [-76.0, -8.5, -11.7],
+      "to": [-79.6, -9.6, -12.0],
+      "profile": "tube",
+      "width": 2.2,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Gullet (leg 7 of 7)"
+    },
+    {
+      "id": "sw_archway",
+      "from": [-75.5, -12.5, -12.0],
+      "to": [-57.5, -21.2, -16.2],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 3.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Archway",
+      "via": [
+        [-68.0, -14.0, -13.0],
+        [-62.5, -18.0, -14.5],
+        [-60.0, -21.2, -15.6]
+      ]
+    },
+    {
+      "id": "sw_lakearch",
+      "from": [-57.5, -21.2, -16.2],
+      "to": [-52.5, -21.2, -16.2],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.15,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Lake Arch (west half)"
+    },
+    {
+      "id": "sw_stairhead",
+      "from": [-95.5, -15.5, -12.0],
+      "to": [-96.0, -24.4, -12.6],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 4.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Stair Head",
+      "via": [[-96.0, -20.5, -12.3]]
+    },
+    {
+      "id": "sw_stair_face",
+      "from": [-96.0, -24.4, -17.1],
+      "to": [-96.0, -23.6, -12.6],
+      "profile": "climb_face",
+      "width": 2.6,
+      "clear": 4.0,
+      "geology": "lakeclay",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Swallow Stair"
+    },
+    {
+      "id": "sw_terraces_1",
+      "from": [-96.0, -24.4, -17.1],
+      "to": [-95.6, -25.4, -17.1],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 5.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Terraces (leg 1 of 5)"
+    },
+    {
+      "id": "sw_terraces_2",
+      "from": [-95.6, -25.4, -17.1],
+      "to": [-94.0, -30.0, -19.5],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 5.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.24,
+        "tread": 0.34
+      },
+      "geology": "lakeclay",
+      "notes": "the Terraces (leg 2 of 5)"
+    },
+    {
+      "id": "sw_terraces_3",
+      "from": [-94.0, -30.0, -19.5],
+      "to": [-91.0, -33.5, -22.0],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 5.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.25,
+        "tread": 0.34
+      },
+      "geology": "lakeclay",
+      "notes": "the Terraces (leg 3 of 5)"
+    },
+    {
+      "id": "sw_terraces_4",
+      "from": [-91.0, -33.5, -22.0],
+      "to": [-88.5, -36.5, -24.3],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 5.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2301,
+        "tread": 0.34
+      },
+      "geology": "lakeclay",
+      "notes": "the Terraces (leg 4 of 5)"
+    },
+    {
+      "id": "sw_terraces_5",
+      "from": [-88.5, -36.5, -24.3],
+      "to": [-86.5, -36.6, -25.6],
+      "profile": "canyon",
+      "width": 2.6,
+      "clear": 5.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2167,
+        "tread": 0.2803
+      },
+      "geology": "lakeclay",
+      "notes": "the Terraces (leg 5 of 5)"
+    },
+    {
+      "id": "sw_slit",
+      "from": [-86.5, -36.6, -25.6],
+      "to": [-82.0, -36.6, -25.6],
+      "profile": "fissure",
+      "width": 0.45,
+      "clear": 2.6,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Curtain Slit (west half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "sw_killasslot",
+      "from": [-98.5, -10.0, -12.2],
+      "to": [-104.5, -11.5, -12.2],
+      "profile": "fissure",
+      "width": 0.43,
+      "clear": 3.5,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Killas Slot (east half)",
+      "via": [
+        [-101.0, -10.0, -12.2],
+        [-102.5, -11.5, -12.2]
+      ],
+      "noise": 0.0,
+      "blend": 0.0
+    }
+  ],
+  "chambers": [
+    {
+      "id": "sw_clayhall",
+      "kind": "hall",
+      "center": [-87.0, -11.0, -12.0],
+      "size": [24.0, 14.0, 7.0],
+      "axis": [1.0, 0.0],
+      "geology": "lakeclay",
+      "notes": "the Clay Hall"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_swallow",
+      "at": [-84.0, -11.0, -12.0],
+      "yaw_deg": -90.0,
+      "mode": "walk",
+      "notes": "The Clay Hall"
+    },
+    {
+      "id": "undermere_mouth_swallow",
+      "at": [-57.5, -18.0, -0.1],
+      "yaw_deg": 0.0,
+      "mode": "walk"
+    }
+  ],
+  "portals": [
+    {
+      "id": "um.swallow_out",
+      "at": [-57.5, -19.65, -0.1],
+      "to": "overworld",
+      "to_spawn": "mouth_swallow",
+      "kind": "cave_mouth"
+    }
+  ],
+  "seams": [
+    {
+      "id": "swallow_killas",
+      "neighbour": "killas",
+      "side": "a",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": -104.5,
+        "toward": "-"
+      },
+      "window": [-11.72, -12.205, -11.28, -8.694],
+      "stub_m": 9.5,
+      "portal": [-104.05, -11.5, -12.2],
+      "arrival": {
+        "at": [-102.85, -11.5, -12.2],
+        "mode": "sidle",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Killas Slot: a fault slot in slate, 0.43 m wide"
+    },
+    {
+      "id": "swallow_gallery",
+      "neighbour": "gallery",
+      "side": "a",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": -52.5,
+        "toward": "+"
+      },
+      "window": [-22.035, -16.285, -20.365, -14.964],
+      "stub_m": 7.5,
+      "portal": [-52.95, -21.2, -16.2],
+      "arrival": {
+        "at": [-54.15, -21.2, -16.2],
+        "mode": "crawl",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Lake Arch: the roof comes down to 1.15 m over dry silt"
+    },
+    {
+      "id": "swallow_river",
+      "neighbour": "river",
+      "side": "a",
+      "kind": "curtain",
+      "plane": {
+        "axis": "x",
+        "at": -82.0,
+        "toward": "+"
+      },
+      "window": [-36.831, -25.605, -36.37, -22.995],
+      "stub_m": 11.5,
+      "portal": [-82.45, -36.6, -25.6],
+      "arrival": {
+        "at": [-83.65, -36.6, -25.6],
+        "mode": "sidle",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Curtain Slit: a slit through a flowstone curtain, 0.45 m wide"
+    }
+  ],
+  "openings": [
+    {
+      "id": "mouth_swallow",
+      "box": [-59.5, -22.1, -0.6, -55.5, -18.1, 3.4],
+      "notes": "the gate's mouth (the vista beyond)"
+    }
+  ],
+  "joins": [
+    ["sw_gullet_1", "sw_gullet_3"],
+    ["sw_gullet_1", "sw_gullet_4"],
+    ["sw_gullet_1", "sw_gullet_5"],
+    ["sw_gullet_1", "sw_gullet_6"],
+    ["sw_gullet_1", "sw_gullet_7"],
+    ["sw_gullet_2", "sw_gullet_4"],
+    ["sw_gullet_2", "sw_gullet_5"],
+    ["sw_gullet_2", "sw_gullet_6"],
+    ["sw_gullet_2", "sw_gullet_7"],
+    ["sw_gullet_3", "sw_gullet_5"],
+    ["sw_gullet_3", "sw_gullet_6"],
+    ["sw_gullet_3", "sw_gullet_7"],
+    ["sw_gullet_4", "sw_gullet_6"],
+    ["sw_gullet_4", "sw_gullet_7"],
+    ["sw_gullet_5", "sw_gullet_7"],
+    ["sw_terraces_1", "sw_terraces_3"],
+    ["sw_terraces_1", "sw_terraces_4"],
+    ["sw_terraces_1", "sw_terraces_5"],
+    ["sw_terraces_2", "sw_terraces_4"],
+    ["sw_terraces_2", "sw_terraces_5"],
+    ["sw_terraces_3", "sw_terraces_5"],
+    ["ga_lakearch", "sw_lakearch"],
+    ["ga_trunk_1", "sw_lakearch"],
+    ["ga_trunk_2", "sw_lakearch"],
+    ["ga_trunk_3", "sw_lakearch"],
+    ["ga_trunk_4", "sw_lakearch"],
+    ["ga_trunk_5", "sw_lakearch"],
+    ["ki_slot", "sw_killasslot"],
+    ["ri_slit", "sw_slit"],
+    ["sw_archway", "sw_gullet_1"],
+    ["sw_archway", "sw_gullet_2"],
+    ["sw_archway", "sw_gullet_3"],
+    ["sw_archway", "sw_gullet_4"],
+    ["sw_archway", "sw_gullet_5"],
+    ["sw_archway", "sw_gullet_6"],
+    ["sw_archway", "sw_gullet_7"],
+    ["sw_archway", "sw_lakearch"],
+    ["sw_gullet_1", "sw_lip_face"],
+    ["sw_gullet_2", "sw_lip_face"],
+    ["sw_gullet_3", "sw_lip_face"],
+    ["sw_gullet_4", "sw_lip_face"],
+    ["sw_gullet_5", "sw_lip_face"],
+    ["sw_gullet_6", "sw_lip_face"],
+    ["sw_gullet_7", "sw_lip_face"],
+    ["sw_gullet_1", "sw_notch"],
+    ["sw_gullet_2", "sw_notch"],
+    ["sw_gullet_3", "sw_notch"],
+    ["sw_gullet_4", "sw_notch"],
+    ["sw_gullet_5", "sw_notch"],
+    ["sw_gullet_6", "sw_notch"],
+    ["sw_gullet_7", "sw_notch"],
+    ["sw_lip_face", "sw_notch"],
+    ["sw_slit", "sw_terraces_1"],
+    ["sw_slit", "sw_terraces_2"],
+    ["sw_slit", "sw_terraces_3"],
+    ["sw_slit", "sw_terraces_4"],
+    ["sw_slit", "sw_terraces_5"],
+    ["sw_stair_face", "sw_stairhead"],
+    ["sw_stair_face", "sw_terraces_1"],
+    ["sw_stair_face", "sw_terraces_2"],
+    ["sw_stair_face", "sw_terraces_3"],
+    ["sw_stair_face", "sw_terraces_4"],
+    ["sw_stair_face", "sw_terraces_5"],
+    ["sw_stairhead", "sw_terraces_1"],
+    ["sw_stairhead", "sw_terraces_2"],
+    ["sw_stairhead", "sw_terraces_3"],
+    ["sw_stairhead", "sw_terraces_4"],
+    ["sw_stairhead", "sw_terraces_5"],
+    ["sw_archway", "sw_clayhall"],
+    ["sw_clayhall", "sw_gullet_1"],
+    ["sw_clayhall", "sw_gullet_2"],
+    ["sw_clayhall", "sw_gullet_3"],
+    ["sw_clayhall", "sw_gullet_4"],
+    ["sw_clayhall", "sw_gullet_5"],
+    ["sw_clayhall", "sw_gullet_6"],
+    ["sw_clayhall", "sw_gullet_7"],
+    ["sw_clayhall", "sw_killasslot"],
+    ["sw_clayhall", "sw_stairhead"],
+    ["sw_killasslot", "ki_slot"],
+    ["sw_lakearch", "ga_lakearch"],
+    ["sw_slit", "ri_slit"]
+  ]
+}

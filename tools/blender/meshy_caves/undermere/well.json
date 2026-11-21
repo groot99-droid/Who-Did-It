@@ -1,0 +1,452 @@
+{
+  "format": "cave-section/1",
+  "key": "well",
+  "name": "The Well Dome",
+  "notes": "under_well: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "breakdown",
+  "region": {
+    "boxes": [
+      [-15.625, 0.0, -19.5, -11.875, 3.625, -14.875],
+      [-15.625, -1.25, -20.25, -9.125, 3.625, -15.0],
+      [0.5, -11.5, -20.25, 5.5, -2.5, -14.125],
+      [0.5, -15.5, -24.625, 13.5, -6.5, -14.125],
+      [8.5, -20.0, -27.625, 15.0, -10.5, -18.5],
+      [3.875, -20.0, -30.5, 15.0, -14.625, -21.5],
+      [4.625, -23.125, -30.5, 8.125, -15.375, -27.25],
+      [0.75, 10.25, -20.25, 7.25, 18.625, -13.125],
+      [-1.875, 10.125, -20.25, 9.875, 18.625, -12.375],
+      [2.0, 14.0, -17.0, 6.0, 18.625, -12.375],
+      [15.75, 1.25, -20.375, 21.25, 6.75, -15.875],
+      [17.75, 2.25, -20.375, 22.375, 6.75, -15.875],
+      [18.875, 2.25, -20.5, 22.5, 5.75, -15.875],
+      [-11.0, 8.0, -20.25, -6.0, 13.5, -15.125],
+      [-15.625, -5.75, -20.25, 8.25, 18.625, -5.0],
+      [-11.5, 9.875, -9.25, -7.375, 14.375, -5.0],
+      [-11.5, 11.0, -9.25, -4.875, 14.375, -5.0],
+      [-8.125, 6.875, -9.25, -1.875, 14.25, -5.0],
+      [-5.125, 2.25, -9.25, 1.5, 10.125, -5.0],
+      [-13.0, -13.75, -20.25, 21.5, 18.625, -9.125],
+      [-1.375, 1.375, -11.625, 2.5, 5.25, 1.5]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "we_choke",
+      "from": [-15.625, 1.8, -18.2],
+      "to": [-11.0, 0.6, -19.2],
+      "profile": "tube",
+      "width": 1.6,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "breakdown",
+      "notes": "the Leaning Blocks (east half)",
+      "via": [[-13.725, 1.8, -18.4]]
+    },
+    {
+      "id": "we_slope_1",
+      "from": [3.0, -5.0, -19.2],
+      "to": [3.0, -9.0, -19.2],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Breakdown Path (leg 1 of 4)"
+    },
+    {
+      "id": "we_slope_2",
+      "from": [3.0, -9.0, -19.2],
+      "to": [11.0, -13.0, -23.6],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2445,
+        "tread": 0.34
+      },
+      "geology": "breakdown",
+      "notes": "the Breakdown Path (leg 2 of 4)"
+    },
+    {
+      "id": "we_slope_3",
+      "from": [11.0, -13.0, -23.6],
+      "to": [12.5, -17.5, -26.6],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.25,
+        "tread": 0.34
+      },
+      "geology": "breakdown",
+      "notes": "the Breakdown Path (leg 3 of 4)"
+    },
+    {
+      "id": "we_slope_4",
+      "from": [12.5, -17.5, -26.6],
+      "to": [6.4, -17.15, -29.4],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 4.0,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2334,
+        "tread": 0.34
+      },
+      "geology": "breakdown",
+      "notes": "the Breakdown Path (leg 4 of 4)"
+    },
+    {
+      "id": "we_rattle",
+      "from": [6.4, -17.15, -29.4],
+      "to": [6.4, -23.125, -29.5],
+      "profile": "crawl",
+      "width": 1.4,
+      "clear": 1.05,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "breakdown",
+      "notes": "the Rattle (north half)"
+    },
+    {
+      "id": "we_dam_face",
+      "from": [4.0, 16.0, -19.2],
+      "to": [4.0, 16.8, -16.0],
+      "profile": "climb_face",
+      "width": 4.5,
+      "clear": 2.6,
+      "geology": "breakdown",
+      "ledge_depth": 2.0,
+      "approach": 3.5,
+      "notes": "the Flowstone Dam"
+    },
+    {
+      "id": "we_damtop_1",
+      "from": [4.0, 18.125, -16.0],
+      "to": [4.0, 18.625, -16.0],
+      "profile": "tube",
+      "width": [1.476, 1.4],
+      "clear": 2.6,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Dam Crest (south half) (leg 1 of 1) (its 0.5 m at the seam well_north; round 4)"
+    },
+    {
+      "id": "we_damtop_1r",
+      "from": [4.0, 16.0, -16.0],
+      "to": [4.0, 18.125, -16.0],
+      "profile": "tube",
+      "width": [1.8, 1.476],
+      "clear": 2.6,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Dam Crest (south half) (leg 1 of 1) (the rest, beyond 0.5 m from the seam well_north; round 4)"
+    },
+    {
+      "id": "we_narrows_1",
+      "from": [17.5, 3.0, -19.3],
+      "to": [19.5, 5.0, -19.3],
+      "profile": "keyhole",
+      "width": 1.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Narrows (west half) (leg 1 of 3)"
+    },
+    {
+      "id": "we_narrows_2",
+      "from": [19.5, 5.0, -19.3],
+      "to": [20.6, 4.0, -19.35],
+      "profile": "keyhole",
+      "width": 1.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "breakdown",
+      "notes": "the Narrows (west half) (leg 2 of 3)"
+    },
+    {
+      "id": "we_narrows_3",
+      "from": [20.6, 4.0, -19.35],
+      "to": [22.5, 4.0, -19.4],
+      "profile": "keyhole",
+      "width": 1.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "breakdown",
+      "notes": "the Narrows (west half) (leg 3 of 3)"
+    },
+    {
+      "id": "we_chimneyfoot_1",
+      "from": [-8.0, 10.0, -19.2],
+      "to": [-9.0, 11.5, -19.2],
+      "profile": "tube",
+      "width": [2.0, 1.2],
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Chimney Foot (leg 1 of 1)"
+    },
+    {
+      "id": "we_chimney_face",
+      "from": [-9.0, 11.5, -19.2],
+      "to": [-9.444, 12.166, -8.2],
+      "profile": "climb_face",
+      "width": 1.4,
+      "clear": 2.2,
+      "geology": "breakdown",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Well Chimney (iron rungs)"
+    },
+    {
+      "id": "we_niche",
+      "from": [-9.0, 11.5, -8.2],
+      "to": [-0.2, 3.9, -8.2],
+      "profile": "tube",
+      "width": 1.2,
+      "clear": 2.2,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "breakdown",
+      "notes": "the Diggers' Niche",
+      "via": [
+        [-9.8, 12.7, -8.2],
+        [-6.5, 12.6, -8.2],
+        [-3.5, 8.5, -8.2]
+      ]
+    },
+    {
+      "id": "well_shaft",
+      "from": [0.6, 3.3, -10.6],
+      "to": [0.6, 3.3, 0.0],
+      "profile": "shaft",
+      "width": 1.8,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the well shaft"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "we_dome",
+      "kind": "breakdown",
+      "center": [4.25, 3.5, -19.2],
+      "size": [32.5, 21.0, 9.0],
+      "axis": [1.0, 0.0],
+      "geology": "breakdown",
+      "notes": "the Well Dome"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_well",
+      "at": [3.0, 4.0, -19.2],
+      "yaw_deg": 90.0,
+      "mode": "walk",
+      "notes": "The Well Dome"
+    }
+  ],
+  "seams": [
+    {
+      "id": "gallery_well",
+      "neighbour": "gallery",
+      "side": "b",
+      "kind": "choke",
+      "plane": {
+        "axis": "x",
+        "at": -15.625,
+        "toward": "-"
+      },
+      "window": [0.795, -18.405, 2.805, -15.694],
+      "stub_m": 5.4,
+      "portal": [-15.18, 1.8, -18.25],
+      "arrival": {
+        "at": [-13.97, 1.8, -18.37],
+        "mode": "walk",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Leaning Blocks: a 1.6 m gap between two leaning blocks, zigzag"
+    },
+    {
+      "id": "well_white",
+      "neighbour": "white",
+      "side": "a",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": 22.5,
+        "toward": "+"
+      },
+      "window": [3.095, -19.605, 4.905, -16.794],
+      "stub_m": 3.9,
+      "portal": [22.05, 4.0, -19.39],
+      "arrival": {
+        "at": [20.85, 4.0, -19.36],
+        "mode": "walk",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Narrows: a 1.4 m keyhole with two tight bends"
+    },
+    {
+      "id": "well_north",
+      "neighbour": "north",
+      "side": "a",
+      "kind": "arch",
+      "plane": {
+        "axis": "y",
+        "at": 18.625,
+        "toward": "+"
+      },
+      "window": [3.057, -16.205, 4.943, -13.091],
+      "stub_m": 4.9,
+      "portal": [4.0, 18.18, -16.0],
+      "arrival": {
+        "at": [4.0, 16.98, -16.0],
+        "mode": "walk",
+        "yaw_deg": -180.0
+      },
+      "notes": "the top of the Flowstone Dam, under a low flowstone canopy"
+    },
+    {
+      "id": "well_river",
+      "neighbour": "river",
+      "side": "a",
+      "kind": "choke",
+      "plane": {
+        "axis": "y",
+        "at": -23.125,
+        "toward": "-"
+      },
+      "window": [5.615, -29.585, 7.186, -28.365],
+      "stub_m": 6.4,
+      "portal": [6.4, -22.68, -29.49],
+      "arrival": {
+        "at": [6.4, -21.48, -29.47],
+        "mode": "crawl",
+        "yaw_deg": 0.0
+      },
+      "notes": "the Rattle: a crawl among loose breakdown blocks, 1.05 m high"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["we_slope_1", "we_slope_3"],
+    ["we_slope_1", "we_slope_4"],
+    ["we_slope_2", "we_slope_4"],
+    ["we_narrows_1", "we_narrows_3"],
+    ["well_shaft", "we_dome"],
+    ["well_shaft", "we_niche"],
+    ["we_chimney_face", "we_dome"],
+    ["we_chimneyfoot_1", "we_dome"],
+    ["we_niche", "we_dome"],
+    ["ga_choke", "we_choke"],
+    ["ga_trunk_1", "we_choke"],
+    ["ga_trunk_2", "we_choke"],
+    ["ga_trunk_3", "we_choke"],
+    ["ga_trunk_4", "we_choke"],
+    ["ga_trunk_5", "we_choke"],
+    ["no_road_1", "we_dam_face"],
+    ["no_road_2", "we_dam_face"],
+    ["no_road_3", "we_dam_face"],
+    ["no_road_4", "we_dam_face"],
+    ["no_road_5", "we_dam_face"],
+    ["no_road_6", "we_dam_face"],
+    ["no_road_7", "we_dam_face"],
+    ["no_road_8", "we_dam_face"],
+    ["no_road_9", "we_dam_face"],
+    ["no_road_10", "we_dam_face"],
+    ["no_road_11", "we_dam_face"],
+    ["no_road_1", "we_damtop_1"],
+    ["no_road_2", "we_damtop_1"],
+    ["no_road_3", "we_damtop_1"],
+    ["no_road_4", "we_damtop_1"],
+    ["no_road_5", "we_damtop_1"],
+    ["no_road_6", "we_damtop_1"],
+    ["no_road_7", "we_damtop_1"],
+    ["no_road_8", "we_damtop_1"],
+    ["no_road_9", "we_damtop_1"],
+    ["no_road_10", "we_damtop_1"],
+    ["no_road_11", "we_damtop_1"],
+    ["ri_canyon", "we_rattle"],
+    ["ri_rattle", "we_rattle"],
+    ["we_chimney_face", "we_chimneyfoot_1"],
+    ["we_chimney_face", "we_niche"],
+    ["we_dam_face", "we_damtop_1"],
+    ["we_dam_face", "we_dome"],
+    ["we_damtop_1", "we_dome"],
+    ["we_dome", "wh_narrows_1"],
+    ["we_dome", "wh_narrows_2"],
+    ["we_dome", "wh_narrows_3"],
+    ["we_narrows_1", "wh_narrows_1"],
+    ["we_narrows_1", "wh_narrows_2"],
+    ["we_narrows_1", "wh_narrows_3"],
+    ["we_narrows_2", "wh_narrows_1"],
+    ["we_narrows_2", "wh_narrows_2"],
+    ["we_narrows_2", "wh_narrows_3"],
+    ["we_narrows_3", "wh_narrows_1"],
+    ["we_narrows_3", "wh_narrows_2"],
+    ["we_narrows_3", "wh_narrows_3"],
+    ["we_rattle", "we_slope_1"],
+    ["we_rattle", "we_slope_2"],
+    ["we_rattle", "we_slope_3"],
+    ["we_rattle", "we_slope_4"],
+    ["we_choke", "we_dome"],
+    ["we_dome", "we_narrows_1"],
+    ["we_dome", "we_narrows_2"],
+    ["we_dome", "we_narrows_3"],
+    ["we_dome", "we_slope_1"],
+    ["we_dome", "we_slope_2"],
+    ["we_dome", "we_slope_3"],
+    ["we_dome", "we_slope_4"],
+    ["we_damtop_1", "we_damtop_1r"],
+    ["we_damtop_1r", "no_road_1"],
+    ["we_damtop_1r", "no_road_2"],
+    ["we_damtop_1r", "no_road_3"],
+    ["we_damtop_1r", "no_road_4"],
+    ["we_damtop_1r", "no_road_5"],
+    ["we_damtop_1r", "no_road_6"],
+    ["we_damtop_1r", "no_road_7"],
+    ["we_damtop_1r", "no_road_8"],
+    ["we_damtop_1r", "no_road_9"],
+    ["we_damtop_1r", "no_road_10"],
+    ["we_damtop_1r", "no_road_11"],
+    ["we_damtop_1r", "we_dam_face"],
+    ["we_damtop_1r", "we_dome"],
+    ["we_damtop_1", "no_road_1"],
+    ["we_rattle", "ri_rattle"],
+    ["no_road_1r", "we_dam_face"],
+    ["no_road_1r", "we_damtop_1"],
+    ["no_road_1r", "we_damtop_1r"]
+  ],
+  "bridges": [
+    {
+      "id": "well_shaft_deck",
+      "box": [-0.4, 2.3, 1.6, 4.3],
+      "top_z": -8.2,
+      "thickness": 0.12,
+      "notes": "the well-diggers' iron grating: a deck of iron bars with collision across the whole shaft (2.0 by 2.0 m round its 1.8 m "
+    }
+  ]
+}

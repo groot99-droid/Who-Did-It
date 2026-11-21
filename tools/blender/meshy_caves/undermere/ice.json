@@ -1,0 +1,342 @@
+{
+  "format": "cave-section/1",
+  "key": "ice",
+  "name": "The Ice Rift",
+  "notes": "under_ice: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "ice",
+  "region": {
+    "boxes": [
+      [26.25, 134.25, -0.625, 33.75, 138.25, 4.5],
+      [22.625, 132.125, -0.75, 29.75, 137.75, 5.0],
+      [14.375, 123.875, -3.5, 34.5, 144.0, 4.375],
+      [21.75, 131.5, -3.5, 26.25, 135.75, 2.625],
+      [19.125, 128.625, -4.0, 25.5, 135.25, 3.125],
+      [15.125, 124.625, -5.625, 22.875, 132.375, 3.5],
+      [11.625, 119.625, -7.375, 18.875, 128.375, 2.5],
+      [8.625, 116.625, -8.25, 15.375, 123.375, 0.75],
+      [8.625, 113.125, -9.0, 13.875, 120.375, -0.625],
+      [6.375, 112.5, -9.625, 13.875, 116.875, -2.5],
+      [6.875, 109.875, -9.625, 9.5, 115.625, -5.375],
+      [11.625, 124.625, -5.625, 18.875, 130.375, -0.375],
+      [10.125, 126.625, -5.5, 15.375, 130.875, -0.375],
+      [7.0, 124.0, -5.5, 17.0, 134.0, 5.125],
+      [8.0, 126.5, 0.5, 14.0, 132.625, 5.125],
+      [30.0, 134.5, -0.625, 34.0, 138.5, 4.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "ic_slot_1",
+      "from": [32.0, 136.5, 0.45],
+      "to": [28.0, 136.0, 0.4],
+      "profile": "rift",
+      "width": 1.4,
+      "clear": [2.6, 3.0],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Cutting Slot (leg 1 of 2)"
+    },
+    {
+      "id": "ic_slot_2",
+      "from": [28.0, 136.0, 0.4],
+      "to": [24.4, 133.9, 0.3],
+      "profile": "rift",
+      "width": 1.4,
+      "clear": [3.0, 3.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Cutting Slot (leg 2 of 2)"
+    },
+    {
+      "id": "ic_steps_face",
+      "from": [24.4, 133.9, -2.4],
+      "to": [25.091, 134.304, 0.3],
+      "profile": "climb_face",
+      "width": 1.6,
+      "clear": 3.0,
+      "geology": "ice",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Ice Steps"
+    },
+    {
+      "id": "ic_rift_1",
+      "from": [24.4, 133.9, -2.4],
+      "to": [23.6, 133.4, -2.4],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": 4.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 1 of 7)"
+    },
+    {
+      "id": "ic_rift_2",
+      "from": [23.6, 133.4, -2.4],
+      "to": [21.0, 130.5, -3.0],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [4.0, 4.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 2 of 7)"
+    },
+    {
+      "id": "ic_rift_3",
+      "from": [21.0, 130.5, -3.0],
+      "to": [17.0, 126.5, -4.6],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [4.5, 5.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 3 of 7)"
+    },
+    {
+      "id": "ic_rift_4",
+      "from": [17.0, 126.5, -4.6],
+      "to": [13.5, 121.5, -6.3],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [5.5, 6.0],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 4 of 7)"
+    },
+    {
+      "id": "ic_rift_5",
+      "from": [13.5, 121.5, -6.3],
+      "to": [10.5, 118.5, -7.2],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [6.0, 5.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 5 of 7)"
+    },
+    {
+      "id": "ic_rift_6",
+      "from": [10.5, 118.5, -7.2],
+      "to": [12.0, 115.0, -8.0],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [5.5, 4.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 6 of 7)"
+    },
+    {
+      "id": "ic_rift_7",
+      "from": [12.0, 115.0, -8.0],
+      "to": [8.2, 114.35, -8.6],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": [4.5, 3.5],
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the Ice Rift (leg 7 of 7)"
+    },
+    {
+      "id": "ic_curtain",
+      "from": [8.2, 114.35, -8.6],
+      "to": [8.2, 109.875, -8.6],
+      "profile": "fissure",
+      "width": 0.55,
+      "clear": 2.2,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "ice",
+      "notes": "the Ice Curtain (north half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "ic_frost_1",
+      "from": [17.0, 126.5, -4.6],
+      "to": [13.5, 128.5, -4.4],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "ice",
+      "notes": "the way to the Frost Chimney (leg 1 of 2)"
+    },
+    {
+      "id": "ic_frost_2",
+      "from": [13.5, 128.5, -4.4],
+      "to": [12.0, 129.0, -4.4],
+      "profile": "rift",
+      "width": 1.6,
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "ice",
+      "notes": "the way to the Frost Chimney (leg 2 of 2)"
+    },
+    {
+      "id": "ic_frost_face",
+      "from": [12.0, 129.0, -4.4],
+      "to": [11.314, 129.412, 1.6],
+      "profile": "climb_face",
+      "width": 1.8,
+      "clear": 2.5,
+      "geology": "ice",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Frost Chimney"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "ic_frostpocket",
+      "kind": "pocket",
+      "center": [11.0, 129.6, 1.6],
+      "size": [4.0, 3.0, 2.5],
+      "axis": [0.866, 0.5],
+      "geology": "ice",
+      "notes": "the Hoarfrost Pocket"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_ice",
+      "at": [17.0, 126.5, -4.6],
+      "yaw_deg": -40.0,
+      "mode": "walk",
+      "notes": "The Ice Rift"
+    },
+    {
+      "id": "undermere_mouth_cutting",
+      "at": [30.0, 136.4, 0.42],
+      "yaw_deg": 90.0,
+      "mode": "walk"
+    }
+  ],
+  "portals": [
+    {
+      "id": "um.cutting_out",
+      "at": [31.55, 136.5, 0.45],
+      "to": "overworld",
+      "to_spawn": "mouth_cutting",
+      "kind": "cave_mouth"
+    }
+  ],
+  "seams": [
+    {
+      "id": "ice_north",
+      "neighbour": "north",
+      "side": "a",
+      "kind": "curtain",
+      "plane": {
+        "axis": "y",
+        "at": 109.875,
+        "toward": "-"
+      },
+      "window": [7.919, -8.605, 8.48, -6.395],
+      "stub_m": 8.9,
+      "portal": [8.2, 110.33, -8.6],
+      "arrival": {
+        "at": [8.2, 111.53, -8.6],
+        "mode": "sidle",
+        "yaw_deg": 0.0
+      },
+      "notes": "the Ice Curtain: a frozen drip curtain leaves 0.55 m beside the rift wall"
+    }
+  ],
+  "openings": [
+    {
+      "id": "mouth_cutting",
+      "box": [30.0, 134.5, -0.05, 34.0, 138.5, 3.95],
+      "notes": "the gate's mouth (the vista beyond)"
+    }
+  ],
+  "joins": [
+    ["ic_rift_1", "ic_rift_3"],
+    ["ic_rift_1", "ic_rift_4"],
+    ["ic_rift_1", "ic_rift_5"],
+    ["ic_rift_1", "ic_rift_6"],
+    ["ic_rift_1", "ic_rift_7"],
+    ["ic_rift_2", "ic_rift_4"],
+    ["ic_rift_2", "ic_rift_5"],
+    ["ic_rift_2", "ic_rift_6"],
+    ["ic_rift_2", "ic_rift_7"],
+    ["ic_rift_3", "ic_rift_5"],
+    ["ic_rift_3", "ic_rift_6"],
+    ["ic_rift_3", "ic_rift_7"],
+    ["ic_rift_4", "ic_rift_6"],
+    ["ic_rift_4", "ic_rift_7"],
+    ["ic_rift_5", "ic_rift_7"],
+    ["ic_frost_face", "ic_frostpocket"],
+    ["ic_curtain", "ic_rift_1"],
+    ["ic_curtain", "ic_rift_2"],
+    ["ic_curtain", "ic_rift_3"],
+    ["ic_curtain", "ic_rift_4"],
+    ["ic_curtain", "ic_rift_5"],
+    ["ic_curtain", "ic_rift_6"],
+    ["ic_curtain", "ic_rift_7"],
+    ["ic_curtain", "no_curtain"],
+    ["ic_frost_1", "ic_frost_face"],
+    ["ic_frost_2", "ic_frost_face"],
+    ["ic_frost_1", "ic_rift_1"],
+    ["ic_frost_1", "ic_rift_2"],
+    ["ic_frost_1", "ic_rift_3"],
+    ["ic_frost_1", "ic_rift_4"],
+    ["ic_frost_1", "ic_rift_5"],
+    ["ic_frost_1", "ic_rift_6"],
+    ["ic_frost_1", "ic_rift_7"],
+    ["ic_frost_2", "ic_rift_1"],
+    ["ic_frost_2", "ic_rift_2"],
+    ["ic_frost_2", "ic_rift_3"],
+    ["ic_frost_2", "ic_rift_4"],
+    ["ic_frost_2", "ic_rift_5"],
+    ["ic_frost_2", "ic_rift_6"],
+    ["ic_frost_2", "ic_rift_7"],
+    ["ic_rift_1", "ic_slot_1"],
+    ["ic_rift_1", "ic_slot_2"],
+    ["ic_rift_2", "ic_slot_1"],
+    ["ic_rift_2", "ic_slot_2"],
+    ["ic_rift_3", "ic_slot_1"],
+    ["ic_rift_3", "ic_slot_2"],
+    ["ic_rift_4", "ic_slot_1"],
+    ["ic_rift_4", "ic_slot_2"],
+    ["ic_rift_5", "ic_slot_1"],
+    ["ic_rift_5", "ic_slot_2"],
+    ["ic_rift_6", "ic_slot_1"],
+    ["ic_rift_6", "ic_slot_2"],
+    ["ic_rift_7", "ic_slot_1"],
+    ["ic_rift_7", "ic_slot_2"],
+    ["ic_rift_1", "ic_steps_face"],
+    ["ic_rift_2", "ic_steps_face"],
+    ["ic_rift_3", "ic_steps_face"],
+    ["ic_rift_4", "ic_steps_face"],
+    ["ic_rift_5", "ic_steps_face"],
+    ["ic_rift_6", "ic_steps_face"],
+    ["ic_rift_7", "ic_steps_face"],
+    ["ic_slot_1", "ic_steps_face"],
+    ["ic_slot_2", "ic_steps_face"]
+  ]
+}

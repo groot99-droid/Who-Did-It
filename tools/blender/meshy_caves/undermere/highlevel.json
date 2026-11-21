@@ -1,0 +1,176 @@
+{
+  "format": "cave-section/1",
+  "key": "highlevel",
+  "name": "The High Level",
+  "notes": "under_highlevel: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "limestone",
+  "region": {
+    "boxes": [
+      [13.375, 100.125, -10.5, 20.125, 103.875, -7.125],
+      [15.5, 99.25, -10.5, 23.25, 108.25, -4.875],
+      [17.75, 100.25, -10.375, 28.75, 108.25, -4.625],
+      [23.25, 96.25, -10.125, 40.75, 105.75, -4.125],
+      [35.25, 95.25, -9.625, 48.75, 101.75, -3.875],
+      [43.25, 92.25, -9.375, 60.75, 100.75, -3.125],
+      [55.25, 87.25, -8.625, 74.75, 97.75, -2.125],
+      [69.25, 81.25, -7.625, 88.75, 92.75, -1.125],
+      [83.25, 75.25, -6.625, 102.75, 86.75, 0.0],
+      [97.25, 69.25, -5.5, 116.75, 80.75, 1.125],
+      [111.25, 63.25, -4.375, 130.75, 74.75, 2.5],
+      [125.25, 57.25, -3.0, 144.75, 68.75, 4.125],
+      [139.25, 52.25, -1.375, 156.75, 62.75, 5.75],
+      [151.25, 48.25, 0.25, 167.75, 57.75, 7.375],
+      [162.25, 48.25, 1.875, 178.25, 54.25, 9.75],
+      [172.75, 44.75, 4.25, 180.25, 54.25, 10.25],
+      [176.125, 46.125, 4.75, 182.25, 48.875, 9.125],
+      [44.625, 96.625, -6.0, 47.375, 99.375, 1.5]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "hl_dryarch",
+      "from": [13.375, 102.03, -9.4],
+      "to": [18.3, 102.03, -9.4],
+      "profile": "crawl",
+      "width": 1.6,
+      "clear": 1.25,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the Dry Arch (east half)"
+    },
+    {
+      "id": "hl_tube",
+      "from": [18.3, 102.03, -9.4],
+      "to": [177.5, 47.5, 5.8],
+      "profile": "tube",
+      "width": 3.5,
+      "clear": 3.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "limestone",
+      "notes": "the High Level",
+      "via": [
+        [20.5, 105.5, -9.3],
+        [26.0, 103.0, -9.1],
+        [38.0, 99.0, -8.6],
+        [46.0, 98.0, -8.3],
+        [58.0, 95.0, -7.6],
+        [72.0, 90.0, -6.6],
+        [86.0, 84.0, -5.6],
+        [100.0, 78.0, -4.5],
+        [114.0, 72.0, -3.3],
+        [128.0, 66.0, -1.9],
+        [142.0, 60.0, -0.3],
+        [154.0, 55.0, 1.3],
+        [165.0, 51.0, 2.9],
+        [175.5, 51.5, 5.3]
+      ]
+    },
+    {
+      "id": "hl_slot",
+      "from": [177.5, 47.5, 5.8],
+      "to": [182.25, 47.5, 5.8],
+      "profile": "fissure",
+      "width": 0.54,
+      "clear": 2.3,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "limestone",
+      "notes": "the Moonmilk Slot (west half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "line_drain",
+      "from": [46.0, 98.0, -4.9],
+      "to": [46.0, 98.0, 0.0],
+      "profile": "shaft",
+      "width": 0.7,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Line Above"
+    }
+  ],
+  "chambers": [],
+  "spawns": [
+    {
+      "id": "undermere_highlevel",
+      "at": [86.0, 84.0, -5.6],
+      "yaw_deg": -115.0,
+      "mode": "walk",
+      "notes": "The High Level"
+    }
+  ],
+  "seams": [
+    {
+      "id": "north_highlevel",
+      "neighbour": "north",
+      "side": "b",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": 13.375,
+        "toward": "-"
+      },
+      "window": [101.145, -9.486, 102.915, -8.064],
+      "stub_m": 7.6,
+      "portal": [13.82, 102.03, -9.4],
+      "arrival": {
+        "at": [15.03, 102.03, -9.4],
+        "mode": "crawl",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Dry Arch: a dry crawl in cave earth, 1.25 m high"
+    },
+    {
+      "id": "highlevel_domes",
+      "neighbour": "domes",
+      "side": "a",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": 182.25,
+        "toward": "+"
+      },
+      "window": [47.224, 5.795, 47.776, 8.105],
+      "stub_m": 7.3,
+      "portal": [181.8, 47.5, 5.8],
+      "arrival": {
+        "at": [180.6, 47.5, 5.8],
+        "mode": "sidle",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Moonmilk Slot: a 0.54 m slot lined with moonmilk"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["line_drain", "hl_tube"],
+    ["do_slot", "hl_slot"],
+    ["hl_dryarch", "hl_tube"],
+    ["hl_dryarch", "no_archmouth"],
+    ["hl_dryarch", "no_dryarch"],
+    ["hl_dryarch", "no_road_1"],
+    ["hl_dryarch", "no_road_2"],
+    ["hl_dryarch", "no_road_3"],
+    ["hl_dryarch", "no_road_4"],
+    ["hl_dryarch", "no_road_5"],
+    ["hl_dryarch", "no_road_6"],
+    ["hl_dryarch", "no_road_7"],
+    ["hl_dryarch", "no_road_8"],
+    ["hl_dryarch", "no_road_9"],
+    ["hl_dryarch", "no_road_10"],
+    ["hl_dryarch", "no_road_11"],
+    ["hl_slot", "hl_tube"],
+    ["hl_tube", "no_dryarch"],
+    ["no_dryarch", "hl_dryarch"],
+    ["hl_slot", "do_slot"],
+    ["no_road_1r", "hl_dryarch"]
+  ]
+}
