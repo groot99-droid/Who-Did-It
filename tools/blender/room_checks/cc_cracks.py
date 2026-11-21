@@ -111,8 +111,9 @@ for a, b in edges:
                        (1.0 if p[2] > 1.5 else -1.0) if (abs(p[2] - CEIL) < 1e-6 or abs(p[2]) < 1e-6) else 0.0])
         edge_pts.append(tuple(p + eps * o_))
 MX, MY, HX, HY = (FX0 + FX1) / 2, (FY0 + FY1) / 2, (FX1 - FX0) / 2, (FY1 - FY0) / 2
-eyes = [(MX + fx * HX, MY + fy * HY, z) for fx, fy, z in ((0.0, 0.0, 1.6), (-0.6, -3 / 7, 0.8), (0.6, -4 / 7, 2.2),
-                                                         (-0.2, 2 / 7, 2.6))]
+# the eyes' heights held 0.1 m under a low ceiling (the loft's 2.4 m: an eye at 2.6 stood over it); 2.7 m and up as before
+eyes = [(MX + fx * HX, MY + fy * HY, min(z, CEIL - 0.1)) for fx, fy, z in ((0.0, 0.0, 1.6), (-0.6, -3 / 7, 0.8),
+                                                                          (0.6, -4 / 7, 2.2), (-0.2, 2 / 7, 2.6))]
 if not F.legacy:
     eyes = [snap(e) for e in eyes]
 n, v = scan(eyes, edge_pts)

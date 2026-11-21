@@ -1013,6 +1013,62 @@ class RoomFileV2(unittest.TestCase):
             change(self.bed(data))
             self.assertIn(said, self.stops(data), said)
 
+    # -- G12, first part: a stairs flight in a well (the apothecary's loft), and a box in the joinery's wood
+    def loft(self):
+        return raw(os.path.join(ROOMS_DIR, "apoth_loft.json"))
+
+    def test_the_loft_flight_reads_with_its_steps_rail_and_box(self):
+        _cfg, spec = self.read(self.loft())
+        st = next(e for e in spec["openings"] if e["id"] == "al.stairs")
+        fl = st["flight"]
+        self.assertEqual((st["kind"], st["side"], st["foot"], st["cut"]), ("stairs", "W", [-4.5, 3.0], False))
+        self.assertEqual((fl["dir"], fl["head"], fl["length"], fl["rail"], fl["on_wall"]), ("S", 3.5, 1.0, ["E", "S"],
+                                                                                          ["W", "N"]))
+        self.assertEqual(len(fl["steps"]), 10)                  # 1.0 m of well and 1.0 m under the floor at 0.2 m
+        self.assertEqual(fl["steps"][0], [0.0, 0.2, -0.22])
+        self.assertEqual(fl["steps"][-1], [1.8, 2.0, -2.2])
+        self.assertAlmostEqual(fl["bottom"], -2.32)
+        self.assertEqual(fl["box"], [-5.0, 2.43, 0.0, -3.98, 3.5, 0.9])     # the well and the rail's width, rail high
+        sc = rf.Scene(scene("apoth_loft"))
+        dflt = rf.flight_values({"well": [-5.0, 2.5, -4.05, 3.5], "dir": "S"}, sc)
+        self.assertEqual((dflt["rail"], dflt["riser"], dflt["tread"], dflt["under"]), (["E", "S"], 0.22, 0.22, 1.0))
+
+    def test_flight_rules(self):
+        def stairs(d):
+            return next(o for o in d["openings"] if o["id"] == "al.stairs")["flight"]
+
+        cases = [(lambda f: f.update(well=[-5.0, 2.5, -4.05]), "flight.well is [x0, y0, x1, y1]"),
+                 (lambda f: f.update(well=[-5.5, 2.5, -4.05, 3.5]), "reaches out of the room (x -5..5, y -3.5..3.5) (R-F3)"),
+                 (lambda f: f.update(well=[-5.0, 3.0, -4.05, 3.5]), "the well is 0.95 x 0.50 m: 0.6 m each way"),
+                 (lambda f: f.update(dir="X"), "flight.dir is the wall the flight descends toward"),
+                 (lambda f: f.update(riser=0.4), "flight.riser is a step's height, over 0 and at most 0.35 m"),
+                 (lambda f: f.update(tread=0.6), "flight.tread is a step's depth, 0.12 to 0.45 m"),
+                 (lambda f: f.update(rail=["E", "W"]), "flight.rail W: the well's W edge is on the W wall (R-F5)"),
+                 (lambda f: f.update(rail_h=0.5), "flight.rail_h is the balustrade's height"),
+                 (lambda f: f.update(dir="N"), "past the N wall"),
+                 (lambda f: f.update(riser=0.05), "under the floor at least (a steeper flight or a longer well)"),
+                 (lambda f: f.update(well=[-5.0, 0.5, -4.05, 1.5]), "is 1.50 m from its well: at most 1 m"),
+                 (lambda f: f.update(stepz=1), 'the key "stepz" is not a flight key')]
+        for change, said in cases:
+            data = self.loft()
+            change(stairs(data))
+            self.assertIn(said, self.stops(data), said)
+        data = self.parlour_flight()
+        self.assertIn("a flight is a stairs opening's (R-F1)", self.stops(data))
+
+    def parlour_flight(self):
+        data = raw(PARLOUR)
+        data["openings"][0]["flight"] = {"well": [5.0, -0.5, 6.0, 0.5], "dir": "W"}
+        return data
+
+    def test_a_box_may_be_grey_or_wood(self):
+        data = self.loft()
+        beam = next(p for p in data["pieces"] if p["id"] == "al.beam_w")
+        self.assertEqual(beam["spec"]["finish"], "wood")
+        self.read(data)
+        beam["spec"]["finish"] = "brick"
+        self.assertIn('finish "brick" is not built yet (G15 to G19); a box is "grey" or "wood"', self.stops(data))
+
 
 class GateDigest(unittest.TestCase):
     """The manifest digest and the bake gate's arithmetic in regress.py, on stand-in manifests."""

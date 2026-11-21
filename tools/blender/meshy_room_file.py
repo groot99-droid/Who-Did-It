@@ -55,7 +55,7 @@ SPEC_KEYS = frozenset("model slug name scale tall size kmax lod extras dress doo
                       "wall drape head label finish anchors glow style opening surface mantel breast firebox beam "
                       "seats".split())
 OPENING_KEYS = frozenset("id kind portal prop side in at width height style knob sill head panes rod curtains swag "
-                         "curtain_colour outside foot".split())
+                         "curtain_colour outside foot flight".split())
 LIGHT_KEYS = frozenset("id role anchor z group power color radius glow window pool name".split())
 ANCHOR_KEYS = frozenset("piece name offset at wall along out z".split())
 GLOW_KEYS = frozenset("shape size material at".split())
@@ -67,6 +67,8 @@ LOOK_NOT_OVERRIDABLE = frozenset(("ink", "view", "bake"))     # R-K2
 DATA_MAPS = ("spawn_labels", "views", "layouts", "skip", "emit_display", "doors", "dress_lod", "anchors")
 
 MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")     # R-P5: the builders' models
+# a box's finishes: the grey of a piece with no model, and the room's joinery wood (a beam, a rafter: G11's first part)
+BOX_FINISHES = ("grey", "wood")
 BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")   # what the builder builds today
 # the hearth (G6, room_file_v2 section 6): its styles (R-H1), the two built first (the inglenook and the stove come
 # with the tavern), each style's default surface, the surfaces the builder has (brick waits for G11's fetch), the
@@ -92,6 +94,15 @@ SIDES = ("N", "E", "S", "W")
 KNOB_ENDS = {"N": "EW", "S": "EW", "E": "NS", "W": "NS"}       # R-O2b: the ends of an opening seen from inside
 KNOB_DEFAULT = {"S": "E", "E": "N", "N": "W", "W": "S"}        # the end at the higher wall coordinate s
 DOOR_STYLES, WINDOW_STYLES = ("panel",), ("sash",)             # R-O8: what the builder has
+# a visible flight down from a stairs marker (G12, first part: apoth_loft): a well cut in the floor, steps descending
+# from its head edge toward `dir` and on under the floor for `under` metres, a lined shaft, a balustrade on the open
+# edges (R-F1 to R-F8)
+FLIGHT_KEYS = frozenset("well dir riser tread under rail rail_h".split())
+FLIGHT_DEFAULTS = dict(riser=0.22, tread=0.22, under=1.0, rail_h=0.9)
+FLOOR_T = 0.25            # the floor's thickness under the boards: the collision slab's, the well's header
+STEP_MAX = 0.35           # a step the walker climbs (the viewer's stepHeight)
+RAIL_OUT = 0.07           # a balustrade's outer face past the well's edge (its string and handrail)
+HEADROOM_MIN = 0.5        # the tread under the well's far edge stands this far under the floor's underside
 ARCH_W, CURTAIN_W = 0.095, 0.52                                # a door's architrave, a window's curtain, each side
 # the default numbers of an opening (the bedroom's own)
 DOOR_DEFAULTS = dict(width=0.9, height=2.15, style="panel")
@@ -401,8 +412,9 @@ def value_rules(row: dict, bag: Problems) -> None:
             elif _num(row.get("height")) and size[2] + float(p.get("rise") or 0.0) > row["height"]:
                 bag.append(f"{where} is {size[2] + float(p.get('rise') or 0.0):g} m tall under a {row['height']:g} m "
                            f"ceiling (R-P3b)")
-            if spec.get("finish", "grey") != "grey":
-                bag.append(f'{where}: finish "{spec["finish"]}" is not built yet (G15 to G19); a box is "grey"')
+            if spec.get("finish", "grey") not in BOX_FINISHES:
+                bag.append(f'{where}: finish "{spec["finish"]}" is not built yet (G15 to G19); a box is '
+                           f'{" or ".join(chr(34) + x + chr(34) for x in BOX_FINISHES)}')
         if model == "hearth":
             hearth_values(spec, row.get("height"), where, bag)
         if isinstance(spec.get("bed"), dict):
@@ -993,6 +1005,90 @@ def anchor_names(spec: dict) -> set:
 # ---------------------------------------------------------------- the derived reading
 
 
+def flight_values(f, sc, where: str = "the flight", bag: Problems | None = None) -> dict | None:
+    """A stairs opening's visible flight (G12, first part) with every default filled, in room metres: the `well`
+    [x0, y0, x1, y1] cut in the floor; `dir` the wall the flight descends toward (its head is the well's opposite
+    edge); treads `tread` deep and `riser` high from the head edge, on under the floor past the well's far edge for
+    `under` metres; a balustrade `rail_h` high on the `rail` edges (default: every edge of the well that is not on a
+    wall). Derived: `head` (the head edge's coordinate), `length` (the well along dir), the `steps` [u0, u1, top z]
+    (u from the head edge), the shaft's `bottom`, the walls the well touches (`on_wall`) and the collision box `box`
+    [x0, y0, 0, x1, y1, rail_h] (the well and the balustrade's width). Holds R-F2 to R-F7. `sc` needs the room's x0,
+    x1, y0, y1. With no `bag` it stops on a problem; with one it adds to it."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+
+    def done(v):
+        if own:
+            bag.stop()
+        return v if len(bag) == n0 else None
+
+    if not isinstance(f, dict):
+        bag.append(f"{where}: flight is an object (R-F2)")
+        return done(None)
+    _strict(f, FLIGHT_KEYS, f"{where}.flight", "flight", bag)
+    w = f.get("well")
+    if not (_nums(w, 4) and w[0] < w[2] and w[1] < w[3]):
+        bag.append(f"{where}: flight.well is [x0, y0, x1, y1] in metres, x0 < x1 and y0 < y1 (R-F3)")
+        return done(None)
+    x0, y0, x1, y1 = (float(v) for v in w)
+    e = 1e-6
+    if x0 < sc.x0 - e or x1 > sc.x1 + e or y0 < sc.y0 - e or y1 > sc.y1 + e:
+        bag.append(f"{where}: the well {[x0, y0, x1, y1]} reaches out of the room (x {sc.x0:g}..{sc.x1:g}, "
+                   f"y {sc.y0:g}..{sc.y1:g}) (R-F3)")
+    if min(x1 - x0, y1 - y0) < 0.6 - e:
+        bag.append(f"{where}: the well is {x1 - x0:.2f} x {y1 - y0:.2f} m: 0.6 m each way at least (R-F3)")
+    d = f.get("dir")
+    if d not in SIDES:
+        bag.append(f'{where}: flight.dir is the wall the flight descends toward: one of {", ".join(SIDES)} (R-F4)')
+        return done(None)
+    v = {k: f.get(k, dv) for k, dv in FLIGHT_DEFAULTS.items()}
+    if not (_num(v["riser"]) and 0.0 < v["riser"] <= STEP_MAX + e):
+        bag.append(f"{where}: flight.riser is a step's height, over 0 and at most {STEP_MAX:g} m (R-F4)")
+    if not (_num(v["tread"]) and 0.12 - e <= v["tread"] <= 0.45 + e):
+        bag.append(f"{where}: flight.tread is a step's depth, 0.12 to 0.45 m (R-F4)")
+    if not (_num(v["under"]) and 0.0 <= v["under"] <= 3.0 + e):
+        bag.append(f"{where}: flight.under is the metres the flight runs on under the floor, 0 to 3 (R-F4)")
+    if not (_num(v["rail_h"]) and 0.8 - e <= v["rail_h"] <= 1.2 + e):
+        bag.append(f"{where}: flight.rail_h is the balustrade's height, 0.8 to 1.2 m (R-F5)")
+    if len(bag) > n0:
+        return done(None)
+    on_wall = [s for s, ok in (("W", abs(x0 - sc.x0) < e), ("E", abs(x1 - sc.x1) < e), ("S", abs(y0 - sc.y0) < e),
+                               ("N", abs(y1 - sc.y1) < e)) if ok]
+    rail = f.get("rail", [s for s in SIDES if s not in on_wall])
+    if not (isinstance(rail, (list, tuple)) and all(s in SIDES for s in rail) and len(set(rail)) == len(rail)):
+        bag.append(f"{where}: flight.rail lists the well's edges with a balustrade, each one of {', '.join(SIDES)} "
+                   f"once (R-F5)")
+        return done(None)
+    for s in rail:
+        if s in on_wall:
+            bag.append(f"{where}: flight.rail {s}: the well's {s} edge is on the {s} wall (R-F5)")
+    head = {"N": y0, "S": y1, "E": x0, "W": x1}[d]
+    length = (y1 - y0) if d in ("N", "S") else (x1 - x0)
+    room_end = {"N": sc.y1, "S": sc.y0, "E": sc.x1, "W": sc.x0}[d]
+    riser, tread, under = float(v["riser"]), float(v["tread"]), float(v["under"])
+    if abs(room_end - head) < length + under - e:
+        bag.append(f"{where}: the flight runs {length + under:.2f} m from its head edge, past the {d} wall (it has "
+                   f"{abs(room_end - head):.2f} m) (R-F6)")
+    run = length + under
+    n = max(1, int(math.ceil(run / tread - 1e-9)))
+    steps = [[round((i - 1) * tread, 6), round(min(i * tread, run), 6), round(-i * riser, 6)] for i in range(1, n + 1)]
+    if under > e:
+        edge = next(s_ for s_ in steps if s_[1] > length + e)[2]
+        if edge > -(FLOOR_T + HEADROOM_MIN) + e:
+            bag.append(f"{where}: the tread under the well's far edge stands at {edge:.2f} m: "
+                       f"{FLOOR_T + HEADROOM_MIN:.2f} m under the floor at least (a steeper flight or a longer well) "
+                       f"(R-F7)")
+    bottom = round(-n * riser - 0.12, 6)
+    bx = [x0 - (RAIL_OUT if "W" in rail else 0.0), y0 - (RAIL_OUT if "S" in rail else 0.0),
+          x1 + (RAIL_OUT if "E" in rail else 0.0), y1 + (RAIL_OUT if "N" in rail else 0.0)]
+    out = dict(well=[x0, y0, x1, y1], dir=d, riser=riser, tread=tread, under=under, rail=list(rail),
+               rail_h=float(v["rail_h"]), head=head, length=round(length, 6), steps=steps, bottom=bottom,
+               on_wall=on_wall, box=[round(bx[0], 6), round(bx[1], 6), 0.0, round(bx[2], 6), round(bx[3], 6),
+                                     float(v["rail_h"])])
+    return done(out)
+
+
 def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
     """The openings, as one list of entries with every default filled (R-O1 to R-O11)."""
     if legacy:
@@ -1095,6 +1191,8 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
             first_window = False
         else:
             e["width"] = o.get("width", DOOR_DEFAULTS["width"])
+        if o.get("flight") is not None and kind != "stairs":
+            bag.append(f"{where}: a flight is a stairs opening's (R-F1)")
         e["cut"] = kind in ("door", "window")
         if o.get("foot") is not None:
             e["foot"] = list(o["foot"])
@@ -1104,6 +1202,16 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
             fx = at if side in ("N", "S") else (sc.x1 if side == "E" else sc.x0)
             fy = at if side in ("E", "W") else (sc.y1 if side == "N" else sc.y0)
             e["foot"] = [fx, fy]
+        if o.get("flight") is not None and kind == "stairs":
+            fv = flight_values(o["flight"], sc, where, bag)
+            if fv is not None:
+                e["flight"] = fv
+                x0, y0, x1, y1 = fv["well"]
+                fx, fy = e["foot"][:2]
+                gap = math.hypot(max(x0 - fx, 0.0, fx - x1), max(y0 - fy, 0.0, fy - y1))
+                if gap > 1.0 + 1e-9:
+                    bag.append(f"{where}: its foot ({fx:g}, {fy:g}) is {gap:.2f} m from its well: at most 1 m, so "
+                               f"the walker meets the portal at the well's rail (R-F8)")
         out.append(e)
     # R-O4, R-O4b: every scene portal and window prop has its opening, or a skip
     skip = row.get("skip") or {}
@@ -1625,6 +1733,11 @@ def explain(row: dict, spec: dict, shown: str) -> str:
                         + (", curtains" if e["curtains"] else "") + (", swag" if e["swag"] else ""))
         else:
             bits.append(f"marker at ({e['foot'][0]:g}, {e['foot'][1]:g})")
+            fl = e.get("flight")
+            if fl:
+                bits.append(f"flight down toward {fl['dir']}: well {fl['well']}, {len(fl['steps'])} steps of "
+                            f"{fl['riser']:g} x {fl['tread']:g} m to {fl['steps'][-1][2]:g} m, rail "
+                            f"{''.join(fl['rail']) or 'none'}")
         L.append(", ".join(bits))
     L.append("lights (night):")
     for r in spec["lights"]:

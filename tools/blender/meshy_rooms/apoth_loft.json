@@ -1,0 +1,417 @@
+{
+  "room": "apoth_loft",
+  "about": "The apothecary's loft (Mallory's drying room), a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 7 m inside (x -5..5, y -3.5..3.5), 2.4 m high. Every prop, spot, portal and night light of packages/content/data/scenes/apoth_loft.json is named below. The scene is a dark room (`dark`: near-dark, one green lamp by the bed). No window: the scene has none and no moon light. The stairs down to the shop are a visible flight in a well in the floor (decision D6, G12's first part). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Apothecary loft",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "stairs": "At the top of the stairs"
+  },
+  "height": 2.4,
+  "height_note": "the plan's 2.4 m for the loft (m2_plan Reference E): a low drying loft under tie beams",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.78, 0.9, 0.72]
+  },
+  "floor_note": "the scene's `w` boards (its material layer), the bedroom's scan greyer and darker: an attic's bare boards",
+  "wall_colour": "#7A7262",
+  "wall_colour_note": "guess: a loft's plaster gone drab with dust and the herbs' smoke; never pink or lilac under the green lamp",
+  "ceiling_colour": "#5E5446",
+  "ceiling_colour_note": "the loft's ceiling dark between the beams",
+  "paint_colour": "#9C907A",
+  "wood_colour": "#3B2B1D",
+  "wood_colour_note": "the joinery: the beams, the stair treads, the balustrade, the skirting",
+  "skirting": 0.12,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a loft has no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "al.stairs",
+      "kind": "stairs",
+      "portal": "al.stairs",
+      "side": "W",
+      "flight": {
+        "well": [-5.0, 2.5, -4.05, 3.5],
+        "dir": "S",
+        "riser": 0.22,
+        "tread": 0.2,
+        "under": 1.0,
+        "rail": ["E", "S"],
+        "rail_h": 0.9
+      },
+      "flight_note": "G12's first part (D6: visible stairs): the well is the portal's own tile (1,1), the corner inside the N and W walls, 0.95 m wide; a steep loft flight (0.22 m risers, 0.2 m treads) descends from the north wall toward the south and runs on 1.0 m under the boards into the dark (the shop's stairs). A balustrade on the well's open E and S edges; the walker meets the portal at the rail (its marker at the tile's centre, (-4.5, 3.0), 1.0 m from the spawn).",
+      "note": "the stairs down to the shop (al.stairs: to apoth_shop, spawn stairs). The tile touches the N and W walls; its spawn stands east of it, so the side is W."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": 4.0,
+  "exposure_note": "G22, the darker night for a `dark` scene: E held at 4.0. From the first 128-sample bake: E from the lamp's pool came out 23.1 (the nightstand shades the boards under the globe, so its pool is small) and the whole loft read a flat bright teal; of E 4, 6 and 8 on that saved bake, 4 keeps the loft near-dark with the lamp's corner the brightest",
+  "lights": [
+    {
+      "id": "al.lt_green_lamp",
+      "role": "teal",
+      "anchor": {
+        "piece": "al.green_lamp",
+        "name": "flame"
+      },
+      "glow": {
+        "shape": "sphere",
+        "size": [0.09],
+        "material": "teal"
+      },
+      "note": "the green lamp by the bed: teal as emitted light only (the owner's rule); a sphere of green glass glowing over a brass font on the nightstand stands in for the lamp's shade (the oil lamp model is a .blend, G8)"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the teal lamp), fill = 2, and the AO. No moon, no fire. The teal role sets no pool, so the strongest light (the lamp) sets the exposure.",
+  "look": {
+    "lights": {
+      "teal": {
+        "color": "#2EC4B6",
+        "power": 40.0,
+        "radius": 0.06
+      }
+    },
+    "emit_display": {
+      "M_teal": [0.05, 0.7, 0.6]
+    },
+    "emit_display_note": "the lamp's green glass: a teal display colour, under the flame's 6.0",
+    "note": "G9 and G22: the room's override of meshy_looks/interior_fp.json. The teal role (#2EC4B6, a light's colour only) is new and kept in the room's block until another room needs it. A dark room: the darker exposure of the parlour and the cottage, the fill low.",
+    "settings": {
+      "loft": {
+        "label": "the loft",
+        "mix": {
+          "candle": 1.0,
+          "fill": 0.06
+        },
+        "note": "the dark loft (scene `dark`): the green lamp at its own power, the ceiling's fill panel at 0.06 (from the first 128-sample bake: at 0.12, 0.06 and 0.03 with E 6, 4 and 8 the fill changed little; the lamp's own bounce lights the walls)"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.3
+    },
+    "exposure_note": "the darker-room lever, a step under the parlour's 0.35: a near-dark loft",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "loft",
+  "light_note": "the room's own light setting (look.settings.loft; --light overrides)",
+  "pieces": [
+    {
+      "id": "al.herb_rack_0",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.18, 1.1],
+        "label": "Herb rack: a wall rail hung with drying herb bundles"
+      },
+      "note": "at its tile (3,0), x -2.5 on the north wall, hung 0.9 m off the boards. No model of herb bundles (a grey box until credits or a box build, G17)."
+    },
+    {
+      "id": "al.drying_frame_0",
+      "face": "S",
+      "place": ["at", -0.5, 3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 1.35],
+        "label": "Drying frame: slatted trays of petals and roots on four legs"
+      },
+      "note": "at its tile (5,1), (-0.5, 3.0), free-standing in the row by the north wall"
+    },
+    {
+      "id": "al.roots_0",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.5, 3.0],
+      "rise": 1.355,
+      "spec": {
+        "model": "ph",
+        "slug": "dry_branches_medium_01",
+        "scale": 0.42,
+        "rot": 90.0,
+        "lod": 0.5
+      },
+      "note": "a bundle of dry stems laid on the first frame's top: what it is drying"
+    },
+    {
+      "id": "al.drying_frame_1",
+      "face": "S",
+      "place": ["at", 0.5, 3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 1.35],
+        "label": "Drying frame: slatted trays of petals and roots on four legs"
+      },
+      "note": "at its tile (6,1), (0.5, 3.0), beside the first"
+    },
+    {
+      "id": "al.roots_1",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 3.0],
+      "rise": 1.355,
+      "spec": {
+        "model": "ph",
+        "slug": "dry_branches_medium_01",
+        "scale": 0.42,
+        "rot": 84.0,
+        "lod": 0.5
+      },
+      "note": "and on the second"
+    },
+    {
+      "id": "al.jar_shelf_b",
+      "face": "S",
+      "place": ["wall", "N", 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "Shelf_01",
+        "scale": 0.95,
+        "lod": 0.5
+      },
+      "note": "the jar shelf at its tile (7,0), x 1.5 on the north wall: a plain open shelf (Shelf_01); the jars on it have no model yet"
+    },
+    {
+      "id": "al.herb_rack_1",
+      "face": "S",
+      "place": ["wall", "N", 2.55],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.18, 1.1],
+        "label": "Herb rack: a wall rail hung with drying herb bundles"
+      },
+      "note": "at its tile (8,0), x 2.5 on the north wall (0.05 m east, clear of the shelf), hung 0.9 m off the boards"
+    },
+    {
+      "id": "al.herb_loft",
+      "spot": true,
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.9, 2.1],
+        "label": "Herb loft: a corner screen of herb bundles hung thick from a beam, room to crouch behind"
+      },
+      "note": "the hide spot at its own tile (10,1), the north-east corner (4.5, 3.0); no model (a grey box)"
+    },
+    {
+      "id": "al.barrel",
+      "face": "W",
+      "place": ["wall", "E", 1.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4,
+        "dress": [
+          {
+            "slug": "ceramic_vase_02",
+            "scale": 1.0,
+            "at": [0.05, null, -0.034],
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "at its tile (10,3), y 1.0 on the east wall, a stoneware jar on its head"
+    },
+    {
+      "id": "al.flour_sacks",
+      "face": "E",
+      "place": ["wall", "W", 0.0],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.6, 0.7],
+        "label": "Flour sacks: three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,4), y 0.0 on the west wall. No sack model (a grey box; the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "al.tin_crate",
+      "face": "E",
+      "place": ["wall", "W", -1.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [-0.22, null, 0.0],
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "rot": 20.0,
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.22, null, 0.0],
+            "rot": -15.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the tin crate at its tile (1,5), y -1.0 on the west wall: a crate with three tins on its lid"
+    },
+    {
+      "id": "al.trunk",
+      "spot": true,
+      "face": "N",
+      "place": ["wall", "S", -3.5],
+      "spec": {
+        "model": "meshy",
+        "name": "kit_chest",
+        "size": 0.9
+      },
+      "note": "the body spot at its own tile (2,7), x -3.5 on the south wall: the kit's trunk (the bedroom's chest)"
+    },
+    {
+      "id": "al.bottle_crate",
+      "face": "N",
+      "place": ["wall", "S", -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "wooden_crate_01",
+            "scale": 1.0,
+            "at": [0.04, null, 0.0],
+            "rot": 6.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "crates of empties at the tile (4,7), x -1.5 on the south wall: two crates stacked (the bottles are a .blend, G8)"
+    },
+    {
+      "id": "al.green_lamp",
+      "face": "S",
+      "place": ["at", 2.5, -1.0],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, 0.0, 0.853]
+        }
+      },
+      "note": "the green lamp at its tile (8,5), (2.5, -1.0), by the bed's head: a tall slim stand (the bedroom's candle stand, side_table_tall_01) and the light's globe of green glass standing on it (the glow). A brass font under the globe floated it over the font's open mouth (the first check); a nightstand shaded the boards under it (the first bake)"
+    },
+    {
+      "id": "al.cot",
+      "decor": true,
+      "covers": ["al.under_bed"],
+      "face": "W",
+      "place": ["at", 3.5, -2.45],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "-",
+          "cover": "blanket",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing west, the model's -x end is the north end: the head by the green lamp. The old iron frame (old_bed_frame) was tried first: it has springs and no mattress, and the blanket would not lie on it (the second no-bake build stopped in the shared coverlet code, which this room does not edit)"
+      },
+      "note": "Mallory's bed, which the scene draws only as its under-bed hide (al.under_bed, tile (9,6)): the parlour's and the cottage's day bed north to south, its foot to the south wall, its back to the east, a wool blanket and one pillow (the iron cot is G20's)"
+    },
+    {
+      "id": "al.beam_w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -3.0, 0.0],
+      "rise": 2.16,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [6.98, 0.16, 0.22],
+        "label": "Tie beam"
+      },
+      "note": "the loft's low tie beams, north to south across the room (the plan's rafters), in the joinery's wood: three, at x -3, 0 and 3, their undersides at 2.16 m"
+    },
+    {
+      "id": "al.beam_c",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 0.0, 0.0],
+      "rise": 2.16,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [6.98, 0.16, 0.22],
+        "label": "Tie beam"
+      }
+    },
+    {
+      "id": "al.beam_e",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 3.0, 0.0],
+      "rise": 2.16,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [6.98, 0.16, 0.22],
+        "label": "Tie beam"
+      }
+    },
+    {
+      "id": "al.herbs_c",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 0.0, 0.6],
+      "rise": 1.77,
+      "spec": {
+        "model": "box",
+        "size": [1.6, 0.3, 0.38],
+        "label": "Herb bundles hung from the beam"
+      },
+      "note": "the scene's herbs hung from the rafters: a grey box under the middle beam, its foot 0.02 m over the walker's head (1.75 m)"
+    },
+    {
+      "id": "al.herbs_e",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 3.0, 1.6],
+      "rise": 1.77,
+      "spec": {
+        "model": "box",
+        "size": [1.4, 0.3, 0.38],
+        "label": "Herb bundles hung from the beam"
+      }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_stairs is the spawn's own view; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_stairs": [[-3.5, 3.0, 1.6], [5.0, 1.6, 1.2], 70.0],
+    "north": [[0.0, -2.4, 1.6], [0.0, 3.5, 1.3], 70.0],
+    "east": [[-3.0, 0.0, 1.6], [5.0, 0.5, 1.2], 70.0],
+    "south": [[0.0, 2.0, 1.6], [0.0, -3.5, 1.0], 70.0],
+    "west": [[2.6, 0.6, 1.6], [-5.0, 1.2, 1.0], 70.0],
+    "bed": [[0.4, 0.4, 1.6], [3.5, -2.3, 0.6], 70.0],
+    "stairs": [[-3.65, 3.05, 1.6], [-4.6, 2.3, -0.9], 70.0],
+    "frames": [[-1.4, 0.6, 1.6], [0.0, 3.2, 1.1], 70.0]
+  }
+}

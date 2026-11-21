@@ -318,12 +318,16 @@ def pts(name):
 fl = byname[f"{SID}_Floor"][0]
 fP, fT = fl["P"], fl["T"]
 farea = 0.5 * np.linalg.norm(np.cross(fP[fT[:, 1]] - fP[fT[:, 0]], fP[fT[:, 2]] - fP[fT[:, 0]]), axis=1).sum()
+WELLS = [o["well"] for o in F.openings if o.get("well")]     # a stairs flight's hole in the floor (G12)
+holes = sum((w[2] - w[0]) * (w[3] - w[1]) for w in WELLS)
 check(f"floor_{WT - 2}x{HT - 2}_at_1m_per_tile",
       abs(fP[:, 0].min() - FX0) < 0.005 and abs(fP[:, 0].max() - FX1) < 0.005 and abs(fP[:, 1].min() - FY0) < 0.005
-      and abs(fP[:, 1].max() - FY1) < 0.005 and abs(farea - (FX1 - FX0) * (FY1 - FY0)) < 0.05 and np.ptp(fP[:, 2]) < 1e-3,
+      and abs(fP[:, 1].max() - FY1) < 0.005 and abs(farea - ((FX1 - FX0) * (FY1 - FY0) - holes)) < 0.05
+      and np.ptp(fP[:, 2]) < 1e-3,
       visible_floor_x=r4([fP[:, 0].min(), fP[:, 0].max()]), visible_floor_y=r4([fP[:, 1].min(), fP[:, 1].max()]),
       z=r4([fP[:, 2].min(), fP[:, 2].max()]), area_m2=round(float(farea), 3),
-      grid_floor_tiles=f"{WT - 2} x {HT - 2}", expected_m=f"{FX1 - FX0:.0f} x {FY1 - FY0:.0f}")
+      grid_floor_tiles=f"{WT - 2} x {HT - 2}", expected_m=f"{FX1 - FX0:.0f} x {FY1 - FY0:.0f}",
+      **({"stair_wells": WELLS, "wells_m2": round(holes, 3)} if WELLS else {}))
 cP = pts(f"{SID}_Ceiling")
 ceil_boxes = [b for b in BOX if b["kind"] == "ceiling"]
 floor_boxes = [b for b in BOX if b["kind"] == "floor"]
@@ -772,8 +776,10 @@ TOL = 1e-3
 st = dict(rays=0, col_miss=0, col_beyond_inner_faces=0, col_max_beyond_m=0.0, vis_void=0, vis_out_window=0,
           vis_out_elsewhere=0)
 col_bad, vis_bad = [], []
+FAN_Z = [min(z, CEIL - 0.1) for z in (0.3, 1.0, 1.6, 2.4)]   # 0.1 m under a low ceiling (the loft's 2.4 m)
+SHAFTS = [o["shaft"] for o in F.openings if o.get("shaft")]    # a stairs flight's shaft under the floor (G12)
 for (x, y) in FAN:
-    for z in (0.3, 1.0, 1.6, 2.4):
+    for z in FAN_Z:
         o = Vector((x, y, z))
         for dv in DIRS:
             d = Vector(dv)
@@ -790,12 +796,21 @@ for (x, y) in FAN:
                     st["col_beyond_inner_faces"] += 1
                     col_bad.append([x, y, z] + r4(dv) + [round(p.x, 3), round(p.y, 3), round(p.z, 3)])
             g = BV_V.ray_cast(o, d, 1e4)
+            if g[0] is None:            # a ray that grazes the seam of two meshes (a wall's top edge on the ceiling's)
+                for jit in ((1e-4, 0.0, 0.0), (0.0, 1e-4, 0.0), (0.0, 0.0, 1e-4)):   # can miss both: nudged, it hits
+                    g = BV_V.ray_cast(o, (d + Vector(jit)).normalized(), 1e4)
+                    if g[0] is not None:
+                        st["vis_seam_grazes"] = st.get("vis_seam_grazes", 0) + 1
+                        break
             if g[0] is None:
                 st["vis_void"] += 1
                 vis_bad.append(dict(o=[x, y, z], d=r4(dv)))
             else:
                 p = g[0]
                 if FX0 - 0.31 <= p.x <= FX1 + 0.31 and FY0 - 0.31 <= p.y <= FY1 + 0.31 and -0.31 <= p.z <= CEIL + 0.31:
+                    continue
+                if any(s[0] - 0.05 <= p.x <= s[2] + 0.05 and s[1] - 0.05 <= p.y <= s[3] + 0.05 and s[4] - 0.05 <= p.z <= 0.0
+                       for s in SHAFTS):                   # down the stairs' shaft, which is closed
                     continue
                 ok = False
                 for side, win in WOPS:                     # out through a window's cut
@@ -815,12 +830,13 @@ for (x, y) in FAN:
                     st["vis_out_elsewhere"] += 1
                     vis_bad.append(dict(o=[x, y, z], d=r4(dv), hit=OWN_V[g[2]], at=r4(p)))
 st["col_max_beyond_m"] = round(st["col_max_beyond_m"], 6)
-R["fans"] = dict(points=len(FAN), heights=[0.3, 1.0, 1.6, 2.4], directions=NF, origins=[r4(p) for p in FAN], **st)
+R["fans"] = dict(points=len(FAN), heights=FAN_Z, directions=NF, origins=[r4(p) for p in FAN], **st)
 check("walls_closed_collision_fans", st["col_miss"] == 0 and st["col_beyond_inner_faces"] == 0 and len(FAN) >= 20,
-      points=len(FAN), heights=[0.3, 1.0, 1.6, 2.4], rays=st["rays"], miss=st["col_miss"],
+      points=len(FAN), heights=FAN_Z, rays=st["rays"], miss=st["col_miss"],
       beyond_inner_faces=st["col_beyond_inner_faces"], max_beyond_m=st["col_max_beyond_m"], examples=col_bad[:5])
 check("visible_shell_closed_fans", st["vis_void"] == 0 and st["vis_out_elsewhere"] == 0, rays=st["rays"],
-      void=st["vis_void"], out_through_window=st["vis_out_window"], out_elsewhere=st["vis_out_elsewhere"],
+      void=st["vis_void"], seam_grazes=st.get("vis_seam_grazes", 0), out_through_window=st["vis_out_window"],
+      out_elsewhere=st["vis_out_elsewhere"],
       examples=vis_bad[:6])
 log("fans done")
 

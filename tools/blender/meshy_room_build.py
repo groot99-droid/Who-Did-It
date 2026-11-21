@@ -1295,8 +1295,21 @@ def build_shell(fr: Frame, mt: dict) -> None:
     x0, x1, y0, y1 = fr.x0, fr.x1, fr.y0, fr.y1
     rep = 3.0 * CFG["floor"]["zoom"]      # old_wood_floor is a 3 m scan: the boards enlarged to about 16 cm
     b = Builder()
-    b.quad_grid((x0, y0, 0.0), (x1 - x0, 0, 0), (0, y1 - y0, 0), grid_count(x1 - x0, step), grid_count(y1 - y0, step),
-                mt["floor"], uv_fn=lambda p: (p[1] / rep, p[0] / rep))
+    wells = [m["flight"]["well"] for m in fr.markers if m.get("flight")]
+    if not wells:
+        b.quad_grid((x0, y0, 0.0), (x1 - x0, 0, 0), (0, y1 - y0, 0), grid_count(x1 - x0, step),
+                    grid_count(y1 - y0, step), mt["floor"], uv_fn=lambda p: (p[1] / rep, p[0] / rep))
+    else:
+        # a stairs well (G12): the grid's lines run through its edges and its quads are left out
+        us = grid_levels(x1 - x0, step, [v - x0 for w in wells for v in (w[0], w[2])])
+        vs = grid_levels(y1 - y0, step, [v - y0 for w in wells for v in (w[1], w[3])])
+
+        def in_well(i, j, us=us, vs=vs):
+            xm, ym = x0 + (us[i] + us[i + 1]) / 2 * (x1 - x0), y0 + (vs[j] + vs[j + 1]) / 2 * (y1 - y0)
+            return any(w[0] < xm < w[2] and w[1] < ym < w[3] for w in wells)
+
+        b.quad_grid((x0, y0, 0.0), (x1 - x0, 0, 0), (0, y1 - y0, 0), 0, 0, mt["floor"],
+                    uv_fn=lambda p: (p[1] / rep, p[0] / rep), skip=in_well, us=us, vs=vs)
     register(b.build(nm("Floor")), "shell", "floor")
     b = Builder()
     b.quad_grid((x0, y0, H), (0, y1 - y0, 0), (x1 - x0, 0, 0), grid_count(y1 - y0, 0.1), grid_count(x1 - x0, 0.1),
@@ -1329,6 +1342,99 @@ def build_shell(fr: Frame, mt: dict) -> None:
                     uv_fn=lambda p, dx=dx, dy=dy: ((p[0] * dx + p[1] * dy) / 3.0, p[2] / 3.0), us=us, vs=vs)
         register(b.build(nm(f"Wall_{side}")), "shell", f"wall_{side}")
     trims(fr, mt)
+
+
+def _quad(b: Builder, pts, normal, mat, uv_axes) -> None:
+    """One quad with its normal along `normal` (the points' order turned if it is not), UVs in metres on two axes."""
+    P = [np.asarray(p, float) for p in pts]
+    if float(np.dot(np.cross(P[1] - P[0], P[2] - P[0]), np.asarray(normal, float))) < 0:
+        pts = pts[::-1]
+    b.face([tuple(map(float, p)) for p in pts], [(p[uv_axes[0]], p[uv_axes[1]]) for p in pts], mat)
+
+
+def build_flights(fr: Frame, mt: dict) -> list:
+    """Every stairs opening's visible flight (G12, first part): its rows for the manifest."""
+    return [build_flight(fr, mt, m, m["flight"]) for m in fr.markers if m.get("flight")]
+
+
+def build_flight(fr: Frame, mt: dict, e: dict, fl: dict) -> dict:
+    """A flight down from a well in the floor (the loader's flight_values): a tread and a riser a step from the well's
+    head edge toward `dir`, on under the floor for `under` metres into the dark; the shaft lined in the wall's plaster
+    with the floor's thickness (rf.FLOOR_T) in the joinery's wood at its edges and over the run under the floor; a
+    balustrade on the well's open edges (a string on the boards, newels, balusters, a handrail). Two objects,
+    `Stairs_<id>` and `StairRail_<id>`, of kind `stairs` (baked like a piece, out of the shell's exposure measures);
+    the collision is the loader's one box over the well and the rail (collision())."""
+    x0, y0, x1, y1 = fl["well"]
+    d, head, L = fl["dir"], fl["head"], fl["length"]
+    steps, zb, FT = fl["steps"], fl["bottom"], rf.FLOOR_T
+    run = steps[-1][1]
+    LT, TOP = 0.03, -0.002          # the lining's thickness; its top just under the boards (never in their plane)
+    along_x = d in ("E", "W")
+    sg = 1.0 if d in ("N", "E") else -1.0
+    a0, a1 = (y0, y1) if along_x else (x0, x1)
+    wood, plaster = mt["wood"], mt["wall"]
+
+    def W(u, c, z):                 # (u from the head edge, across, z) -> world
+        return (head + sg * u, c, z) if along_x else (c, head + sg * u, z)
+
+    def box(b, u0, u1, c0, c1, z0, z1, mat, vgrain=False):
+        p, q = W(u0, c0, z0), W(u1, c1, z1)
+        b.box(tuple(min(v) for v in zip(p, q)), tuple(max(v) for v in zip(p, q)), mat, vgrain=vgrain)
+
+    fwd = W(1.0, 0.0, 0.0)
+    nu = (fwd[0] - W(0.0, 0.0, 0.0)[0], fwd[1] - W(0.0, 0.0, 0.0)[1], 0.0)     # +u in the world
+    uv_t = (0, 1)
+    uv_r = (1, 2) if along_x else (0, 2)
+    b = Builder()
+    for i, (u0, u1, top) in enumerate(steps):
+        _quad(b, [W(u0, a0, top), W(u1, a0, top), W(u1, a1, top), W(u0, a1, top)], (0, 0, 1), wood, uv_t)
+        low = steps[i + 1][2] if i + 1 < len(steps) else zb
+        _quad(b, [W(u1, a0, low), W(u1, a1, low), W(u1, a1, top), W(u1, a0, top)], nu, wood, uv_r)
+    box(b, -LT, 0.0, a0 - LT, a1 + LT, zb, -FT, plaster)            # the head wall
+    box(b, -LT, 0.0, a0 - LT, a1 + LT, -FT, TOP, wood)
+    for c0, c1 in ((a0 - LT, a0), (a1, a1 + LT)):                   # the two side walls, on under the floor
+        box(b, -LT, run + LT, c0, c1, zb, -FT, plaster)
+        box(b, 0.0, L, c0, c1, -FT, TOP, wood)
+    box(b, L, run + LT, a0, a1, -FT, TOP, wood)                     # the header and the floor's underside
+    box(b, run, run + LT, a0, a1, zb, -FT, plaster)                 # the end of the run, in the dark
+    box(b, -LT, run + LT, a0 - LT, a1 + LT, zb - 0.03, zb, plaster)  # the shaft's floor
+    ob = b.build(nm("Stairs" + sfx(e["id"])))
+    register(ob, "stairs", e["id"] + ":flight")
+    # the balustrade: a string on the boards, a newel at each end and corner, balusters, a handrail
+    r = Builder()
+    rh, c, RO = fl["rail_h"], rf.RAIL_OUT / 2, rf.RAIL_OUT
+    newels = {}
+    for side in fl["rail"]:
+        ew = side in ("E", "W")
+        lo_side, hi_side = ("S", "N") if ew else ("W", "E")
+        e0, e1 = (y0, y1) if ew else (x0, x1)
+        off = {"E": x1 + c, "W": x0 - c, "N": y1 + c, "S": y0 - c}[side]
+
+        def at(s_, off=off, ew=ew):
+            return (off, s_) if ew else (s_, off)
+
+        # each end: on to the outer face where another rail meets it (their newel on the corner), else a newel
+        # inside the end (at a wall, or an open end)
+        s0, n0 = (e0 - RO, e0 - c) if lo_side in fl["rail"] else (e0, e0 + c)
+        s1, n1 = (e1 + RO, e1 + c) if hi_side in fl["rail"] else (e1, e1 - c)
+        wx, wy = (c, 0.0) if ew else (0.0, c)
+        for z0_, z1_ in ((0.0, 0.08), (rh - 0.05, rh)):           # the string on the boards, the handrail
+            (ax, ay), (bx, by) = at(s0), at(s1)
+            r.box((min(ax, bx) - wx, min(ay, by) - wy, z0_), (max(ax, bx) + wx, max(ay, by) + wy, z1_), wood)
+        for s_ in (n0, n1):
+            newels[tuple(round(v, 4) for v in at(s_))] = None
+        n_b = max(1, int(round((n1 - n0) / 0.12)))
+        for k in range(1, n_b):
+            mx, my = at(n0 + (n1 - n0) * k / n_b)
+            r.box((mx - 0.0175, my - 0.0175, 0.08), (mx + 0.0175, my + 0.0175, rh - 0.05), wood, vgrain=True)
+    for (nx, ny) in newels:
+        # a newel as wide as the rail (RAIL_OUT): the collision box's edge is its outer face
+        r.box((nx - c, ny - c, 0.0), (nx + c, ny + c, rh + 0.06), wood, vgrain=True)
+    rail = r.build(nm("StairRail" + sfx(e["id"]))) if fl["rail"] else None
+    if rail is not None:
+        register(rail, "stairs", e["id"] + ":rail")
+    return dict(id=e["id"], steps=len(steps), bottom=zb, newels=len(newels), rail=list(fl["rail"]),
+                box=list(fl["box"]))
 
 
 def trims(fr: Frame, mt: dict) -> None:
@@ -2500,13 +2606,14 @@ def build_box(fr: Frame, piece: dict, spec: dict, name: str):
     its collision comes from the same raster. Returns the box and its anchors in the world (an oven's fire, a bar's
     lamp: `spec.anchors`, in the piece's frame before its face turn)."""
     w, d, h = (float(v) for v in spec["size"])
-    key = nm("M_grey")
+    wood = spec.get("finish", "grey") == "wood"     # a beam or a rafter in the room's joinery (G11's first part)
+    key = nm("M_wood" if wood else "M_grey")
     mat = MATS[key] if key in MATS else RMat("M_grey", None, hex_lin(GREY), rough=0.8, albedo=hex_lin(GREY),
                                              note="grey boxes: pieces with no model yet")
     b = Builder()
     b.box((-w / 2, -d / 2, 0.0), (w / 2, d / 2, h), mat)
     ob = b.build(name)
-    ob["wdi_grey"] = True
+    ob["wdi_grey"] = not wood
     ob["wdi_label"] = str(spec["label"])
     box = place_piece(fr, piece, ob, Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, h)))
     info = {k: tuple(ob.matrix_world @ Vector(tuple(v))) for k, v in (spec.get("anchors") or {}).items()}
@@ -4004,6 +4111,9 @@ def bake_rig(fr: Frame, holes: list, lights: list, moon: Vector) -> list:
     # the light-tight box
     b = Builder()
     pad, z0, z1 = fr.T + 0.04, -0.3, fr.H + 0.3
+    shafts = [m["flight"]["bottom"] for m in fr.markers if m.get("flight")]
+    if shafts:      # a stairs shaft (G12): the box's floor under its own
+        z0 = min(z0, min(shafts) - 0.3)
     X0, X1, Y0, Y1 = fr.x0 - pad, fr.x1 + pad, fr.y0 - pad, fr.y1 + pad
     dark = RMat("M_bake_dark", None, (0.0, 0.0, 0.0), rough=1.0)
     b.box((X0, Y0, z0 - 0.02), (X1, Y1, z0), dark)
@@ -4548,6 +4658,7 @@ def obj_albedo(o) -> np.ndarray:
 
 
 OBJ_KIND: dict = {}         # object name -> what it is (register's `what`)
+FLIGHTS: list = []          # the stairs' flights as built (build_flights), for the manifest
 NO_COLOR0: list = []        # the wdi_id of every registered mesh the bake leaves out on purpose
 
 
@@ -5125,6 +5236,9 @@ def collision(fr: Frame, doors: list) -> tuple:
         tag = f"door_{door['id']}" if is_v2() else "door"
         for k, b in enumerate(door.get("collision", ())):
             boxes.append((f"{tag}#{k}", tuple(b)))
+    for m in fr.markers:    # a stairs well and its balustrade (G12): the walker stands at the rail, the portal fires
+        if m.get("flight"):
+            boxes.append((f"stairs_{m['id']}", tuple(float(v) for v in m["flight"]["box"])))
     groups = {}
     for r in OBJS:
         o = r["obj"]
@@ -5836,6 +5950,7 @@ def blender_main(a) -> None:
         # windowless room, or dark glass only); the village view round the first `snow` window, a sky backdrop on
         # each other wall that has a `sky` window
         doors, wins = build_doors(fr, mt), build_windows(fr, mt)
+        FLIGHTS[:] = build_flights(fr, mt)      # the stairs' visible flights (G12): none in most rooms
         mws = [w for o in moon_windows(fr) for w in wins if w["id"] == o["id"]]   # the moon-lit windows, as built
         win = mws[0] if mws else None
         # one Sun for the room: from moon.bearing, or moon.azimuth off the moon-lit wall (R-L9)
@@ -5884,7 +5999,7 @@ def blender_main(a) -> None:
     for o in targets:
         kind = OBJ_KIND.get(o.name)
         n_ = 0
-        if kind in ("piece", "door", "window", "trim"):
+        if kind in ("piece", "door", "window", "trim", "stairs"):
             n_ = subdivide_long_edges(o, 0.15)
         elif kind == "outside" and ("Houses" in o.name or "Ground" in o.name):
             n_ = subdivide_long_edges(o, 1.5 if "Houses" in o.name else 5.0)
@@ -6115,7 +6230,9 @@ def blender_main(a) -> None:
                        z0=0.0 if e["kind"] == "door" else e.get("sill"),
                        z1=e.get("height") if e["kind"] == "door" else e.get("head"), style=e.get("style"),
                        portal=e.get("portal"), prop=e.get("prop"), outside=e.get("outside"),
-                       foot=[round(float(v), 4) for v in e["foot"]] if e.get("foot") else None)
+                       foot=[round(float(v), 4) for v in e["foot"]] if e.get("foot") else None,
+                       **({"flight": dict(e["flight"], built=next((f for f in FLIGHTS if f["id"] == e["id"]), None))}
+                          if e.get("flight") else {}))
                   for e in SPEC["openings"]],
         sceneFlags={k: room.d[k] for k in ("dark", "silent", "entryNoise") if k in room.d},
         spawns=nodes["spawns"], portals=nodes["portals"],
