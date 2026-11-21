@@ -2439,6 +2439,20 @@ def place_piece(fr: Frame, piece: dict, ob, lo: Vector, hi: Vector) -> tuple:
     return (bx0 + tx, by0 + ty, lo.z, bx1 + tx, by1 + ty, hi.z)
 
 
+# A Poly Haven model's own material names become the room's datablock names (M_<name>, T_<name>), and none may carry a
+# banned word (the owner's rule, D7; room_checks/roomcfg.py BANNED scans every name in the file): the crumb rooms' and
+# the cellar's wall bulbs are Poly Haven's industrial_wall_sconce, whose materials become ..._wall_bracket. The scans
+# are still read and graded under their own names (SCAN_PX, SCAN_GRADE and the file paths are untouched).
+NAME_SWAP = (("sconce", "bracket"),)
+
+
+def clean_name(base: str) -> str:
+    """A datablock name with each banned word of NAME_SWAP replaced by its plain word, in lower case."""
+    for word, plain in NAME_SWAP:
+        base = re.sub(word, plain, base, flags=re.I)
+    return base
+
+
 SCAN_PX = {"GothicBed_01": 1024, "GothicCabinet_01": 1024, "ClassicConsole_01": 1024, "GothicCommode_01": 512,
            "ornate_mirror_01": 512, "side_table_tall_01": 512, "wooden_candlestick": 256, "brass_pot_02": 256,
            "jug_01": 512, "hanging_picture_frame_03": 512, "fancy_picture_frame_02": 512}
@@ -2462,7 +2476,7 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
         base = re.sub(r"\.\d{3}$", "", mat.name)
         if tag:
             base = f"{tag}_{base}"
-        key = f"M_{base}"
+        key = f"M_{clean_name(base)}"
         if nm(key) in MATS:
             ob.data.materials[i] = MATS[nm(key)].mat
             continue
@@ -2491,7 +2505,8 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
             meshy = not os.path.exists(path)
             grade = None if meshy else SCAN_GRADE.get(base)
             if not meshy:
-                sim = scan_image(f"T_{base}", path, px, ao_path=ao, grade=grade, contrast=il.get("scan_contrast"))
+                sim = scan_image(f"T_{clean_name(base)}", path, px, ao_path=ao, grade=grade,
+                                 contrast=il.get("scan_contrast"))
             else:   # a packed or generated image (a Meshy model's): its own pixels, as Meshy made them
                 a = _srgb_to_lin(_pixels(img)[..., :3])
                 W, H = img.size
@@ -2502,7 +2517,7 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
                     # lighter texel kept), so the ink floor needs no extra light on the piece (the chest glowed in
                     # the bed's shadow) and no texel shows under ink
                     a = lift_dark(a, meshy_lift)
-                sim = save_image(f"T_{base}", np.clip(a, 0.0, 1.0))
+                sim = save_image(f"T_{clean_name(base)}", np.clip(a, 0.0, 1.0))
             rm = RMat(key, sim, (1.0, 1.0, 1.0), rough=0.6, albedo=tuple(scan_mean(sim)))
             if grade and grade.get("hot"):
                 rm.hot = tuple(float(v) for v in grade["hot"])

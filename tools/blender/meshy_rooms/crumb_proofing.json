@@ -1,0 +1,254 @@
+{
+  "room": "crumb_proofing",
+  "about": "La Chambre de Pousse, Crumb's proofing room behind the bakery, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 8 m inside (x -5..5, y -4..4), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/crumb_proofing.json is named below. No window: the scene has none and no moon light, so the room is lit by its three wall bulbs on iron arms along the north wall. Grey boxes stand in for the pieces that have no model yet (decision D2): the proofing cabinet, the tray stack, the three sack piles and the slate. A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Crumb's proofing room",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "By the door to the bakery"
+  },
+  "height": 3.0,
+  "height_note": "the bakery family's 3.0 m (the mixing room's)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 0.6,
+    "factor": [0.95, 0.93, 0.88]
+  },
+  "floor_note": "the scene's `c` cobbles (its material layer; the plan calls it a brick floor). The cobble role's scan (mossy_cobblestone) is cached but has green moss in every joint, wrong for a warm bakery room and not removable by the floor's colour factor; the brick scan (red_brick_03) is not cached and nothing is downloaded. So the mixing room's set-stone scan (rock_wall_08, the stone_wall role) stands in at a smaller zoom: setts about 0.22 m long, between a cobble and a brick (the floor's UVs repeat every 3.0 x zoom m)",
+  "wall_colour": "#827A69",
+  "wall_colour_note": "the mixing room's floured limewash a step greyer (#877D68 read orange round the three bulbs in the first 128-sample bake, 2026-11-21); the bakery family's walls (the brick scan is not cached, D8: brick only if cheap); never pink or lilac",
+  "ceiling_colour": "#A0977F",
+  "ceiling_colour_note": "limewash, floured and smoked by the bakery's ovens (the mixing room's)",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the door, the skirting",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting",
+  "picture_rail": null,
+  "picture_rail_note": "a work room: no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "cp.door",
+      "kind": "door",
+      "portal": "cp.door",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the door back into the bakery in the south wall, tile (5,9): centred at x -0.5, the portal at its foot (-0.5, -4.0); the door spawn stands 0.5 m inside it, (-0.5, -3.5), by design. The knob is the default end (east)."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": 1.3,
+  "exposure_note": "fixed. The first 128-sample bake (2026-11-21) chose E 0.95 from the three bulbs' pools (the darker-room lever below): the south half by the door read too dark; 1.3, tried from that saved bake, lifts it a step while the bulbs' pools on the north wall stay under the hot cap",
+  "lights": [
+    {
+      "id": "cp.lt_bulb_w",
+      "role": "lamp",
+      "anchor": {
+        "piece": "cp.wall_bulb_0",
+        "name": "flame"
+      },
+      "glow": false,
+      "note": "the west bulb at its tile (2,0), on the north wall: the light 7 cm under the rim of its iron sconce's shade (the mixing room's lesson: a light inside a shade or a globe bakes the room dark)"
+    },
+    {
+      "id": "cp.lt_cabinet",
+      "role": "lamp",
+      "anchor": {
+        "piece": "cp.wall_bulb_1",
+        "name": "flame"
+      },
+      "glow": false,
+      "note": "the bulb that keeps the cabinet warm, at its tile (5,0) on the north wall over the proofing cabinet"
+    },
+    {
+      "id": "cp.lt_bulb_e",
+      "role": "lamp",
+      "anchor": {
+        "piece": "cp.wall_bulb_2",
+        "name": "flame"
+      },
+      "glow": false,
+      "note": "the east bulb at its tile (9,0), on the north wall"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the three wall bulbs) and fill = 2, and the AO. No moon group: no window. No glow mesh (`glow: false`): each bulb sits inside its shade and is lit from just under it, and the default flame cone hung 1.9 m over the floor (r7_extra nothing_floats, the first no-bake check).",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: its own light setting and the darker-room exposure lever.",
+    "settings": {
+      "proofing": {
+        "label": "the proofing room",
+        "mix": {
+          "candle": 1.0,
+          "fill": 0.03
+        },
+        "note": "three bulbs at the look's lamp power; the fill as the mixing room's"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's and the mixing room's darker-room lever: a work room at night, lit by its bulbs",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "proofing",
+  "light_note": "the room's own light setting (look.settings.proofing; --light overrides)",
+  "pieces": [
+    {
+      "id": "cp.proofer",
+      "face": "S",
+      "place": ["at", -0.5, 2.0],
+      "spec": {
+        "model": "box",
+        "size": [2.6, 1.6, 1.9],
+        "label": "Proofing cabinet (la chambre de pousse): a glass-fronted wooden cupboard of shelves, the dough rising behind its panes"
+      },
+      "note": "the hero piece in the middle of the room on its 3 x 2 footprint, tiles (4,2) to (6,3) (x -2..1, y 1..3), a free lane round it. No model (a grey box, the plan's proving cupboard, Tier 1; its glazing is G15's)"
+    },
+    {
+      "id": "cp.wall_bulb_0",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "rise": 1.9,
+      "spec": {
+        "model": "ph",
+        "slug": "industrial_wall_sconce",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, -0.057, 0.0]
+        }
+      },
+      "note": "the west bulb's iron arm at its tile (2,0), on the north wall: Poly Haven's industrial wall sconce (a single bracket, D7), its back plate from 1.9 m, the shade's rim at 1.97 m; the flame anchor is under the bulb's centre, 7 cm under the rim"
+    },
+    {
+      "id": "cp.wall_bulb_1",
+      "face": "S",
+      "place": ["wall", "N", -0.5],
+      "rise": 1.9,
+      "spec": {
+        "model": "ph",
+        "slug": "industrial_wall_sconce",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, -0.057, 0.0]
+        }
+      },
+      "note": "the cabinet's bulb at its tile (5,0), on the north wall behind the proofing cabinet"
+    },
+    {
+      "id": "cp.chalkboard",
+      "face": "S",
+      "place": ["wall", "N", 1.5],
+      "rise": 1.2,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.03, 0.6],
+        "label": "Proving slate: the proving times chalked up (the writing waits for G18)"
+      },
+      "note": "at its tile (7,0), on the north wall: a flat panel"
+    },
+    {
+      "id": "cp.wall_bulb_2",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "rise": 1.9,
+      "spec": {
+        "model": "ph",
+        "slug": "industrial_wall_sconce",
+        "scale": 1.0,
+        "lod": 0.5,
+        "anchors": {
+          "flame": [0.0, -0.057, 0.0]
+        }
+      },
+      "note": "the east bulb's iron arm at its tile (9,0), on the north wall"
+    },
+    {
+      "id": "cp.couche_rack_0",
+      "face": "W",
+      "place": ["wall", "E", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "a couche trolley at its tile (10,2), against the east wall: Poly Haven's worn metal rack (0.92 x 0.6 x 1.9 m) stands in for the bakers' rack (the plan's box build); its couches and loaves wait for G17"
+    },
+    {
+      "id": "cp.tray_stack",
+      "spot": true,
+      "face": "W",
+      "place": ["wall", "E", 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.6, 1.3],
+        "label": "Tray stack (the hide spot): baking trays stacked on a low trolley, to crouch behind"
+      },
+      "note": "the hide spot at its tile (10,3), between the two couche trolleys against the east wall. No model (a grey box)."
+    },
+    {
+      "id": "cp.couche_rack_1",
+      "face": "W",
+      "place": ["wall", "E", 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "worn_metal_rack",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the second couche trolley at its tile (10,4), against the east wall"
+    },
+    {
+      "id": "cp.flour_sacks",
+      "spot": true,
+      "face": "E",
+      "place": ["wall", "W", 2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.7, 0.9],
+        "label": "Flour sacks (the body spot): a deeper pile of filled hessian sacks of farine"
+      },
+      "note": "the body spot at its tile (1,2), against the west wall: a pile a little taller and deeper than the others (the mixing room's hide pile). No model (a grey box, the plan's sack pile, Tier 1)."
+    },
+    {
+      "id": "cp.flour_sacks_0",
+      "face": "E",
+      "place": ["wall", "W", 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,3), against the west wall. No model (a grey box)."
+    },
+    {
+      "id": "cp.flour_sacks_1",
+      "face": "E",
+      "place": ["wall", "W", 0.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks (FARINE): three filled hessian sacks slumped against the wall"
+      },
+      "note": "at its tile (1,4)"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the spawn's own view; the others look at one corner or piece each.",
+  "views": {
+    "spawn_door": [[-0.5, -3.5, 1.6], [-0.5, 4.0, 1.3], 70.0],
+    "proofer": [[2.2, -1.2, 1.6], [-0.5, 2.0, 1.0], 70.0],
+    "bulbs": [[0.5, -1.0, 1.6], [0.0, 4.0, 2.0], 70.0],
+    "west": [[-1.6, -1.2, 1.6], [-5.0, 2.0, 0.5], 70.0],
+    "east": [[-2.8, -0.5, 1.6], [5.0, 1.5, 1.0], 70.0],
+    "south": [[1.2, 0.6, 1.6], [-0.5, -4.0, 1.1], 70.0],
+    "behind": [[-4.2, 3.4, 1.6], [4.5, 3.2, 1.2], 70.0],
+    "tray_stack": [[2.2, -0.2, 1.6], [4.6, 1.5, 0.7], 70.0]
+  }
+}

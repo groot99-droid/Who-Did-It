@@ -1307,6 +1307,16 @@ class BuilderV2(unittest.TestCase):
                                                 "tools/blender/build/rooms/widow_bedroom_raw_groups.npz",
                                                 "--room-file", "r.json"])
 
+    def test_a_model_material_name_never_carries_a_banned_word(self):
+        import re
+        import roomcfg  # (standard library only; room_checks is on the path)
+        ban = re.compile("|".join(re.escape(w) for w in roomcfg.BANNED), re.I)
+        for base in ("industrial_wall_sconce", "industrial_wall_sconce_bulb", "Industrial_Wall_SCONCE"):
+            self.assertIsNone(ban.search(mrb.clean_name(base)), base)
+        self.assertEqual(mrb.clean_name("industrial_wall_sconce_bulb"), "industrial_wall_bracket_bulb")
+        for base in ("GothicBed_01", "wooden_candlestick", "hanging_industrial_lamp", "kit_chest_Material"):
+            self.assertEqual(mrb.clean_name(base), base)     # every other name as it was (the golden rooms' bytes)
+
     # -- G3: the openings' plain-number parts (the rest is proven by the gate and the scratch rooms' builds)
     @staticmethod
     def frame(x0=-5.0, x1=5.0, y0=-4.0, y1=4.0):
