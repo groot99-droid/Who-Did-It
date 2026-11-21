@@ -473,6 +473,138 @@ def bake_look_md5(look: dict) -> str:
     return hashlib.md5(json.dumps(part, sort_keys=True).encode()).hexdigest()
 
 
+# ---------------------------------------------------------------- a room's look override (G9: room_file_v2, section 5)
+
+# the light colours a look may give (R-K4): the palette's warm, moon and teal (teal only as emitted light) and the
+# fill's near-white
+LIGHT_PALETTE = {"#FFB457": "warm", "#7FA8FF": "moon", "#2EC4B6": "teal", "#F2EDE4": "the fill's near-white"}
+LIGHT_ROLE_KEYS = frozenset("color power radius strength angle area_ref_m2".split())   # a new role's keys
+SETTING_KEYS = frozenset("label mix tint".split())                                     # a new setting's keys
+OPEN_BLOCKS = ("lights", "settings", "emit_display")    # R-K1: these may add a role, a setting, an emitter
+
+
+def near_white(hexc: str) -> bool:
+    """A colour with little hue and much value (the fill's kind): saturation at most 0.12, value at least 0.85."""
+    _h, s, v = _hsv(hexc)
+    return s <= 0.12 and v >= 0.85
+
+
+def merge_look(look: dict, over) -> dict:
+    """The room's look: `over` deep-merged over the look file's (objects key by key, arrays and scalars replace,
+    `null` deletes a key). Neither argument is changed; with no override the result equals the look."""
+    def merge(a, b):
+        out = dict(a)
+        for k, v in b.items():
+            if v is None:
+                out.pop(k, None)
+            elif isinstance(v, dict) and isinstance(a.get(k), dict):
+                out[k] = merge(a[k], v)
+            else:
+                out[k] = json.loads(json.dumps(v))
+        return out
+
+    base = json.loads(json.dumps(look))
+    return merge(base, over) if isinstance(over, dict) else base
+
+
+def look_rules(look: dict, over, light, bag: Problems, shown_look: str = "the look file") -> None:
+    """R-K1, R-K3 and R-K4 on a room's `look` and `light` against the look file (R-K2 and the look's own top keys are
+    key_rules')."""
+    over = over if isinstance(over, dict) else {}
+
+    def walk(o, base, where):
+        for k, v in o.items():
+            if is_note(k, o):
+                continue
+            here = f"{where}.{k}"
+            if isinstance(base, dict) and k in base:
+                if isinstance(v, dict) and isinstance(base[k], dict):
+                    walk(v, base[k], here)
+                continue
+            if v is None:
+                bag.append(f"{here}: null deletes a key, and {shown_look} has none here (R-K1)")
+                continue
+            keys = [x for x in base if not str(x).endswith("note")] if isinstance(base, dict) else []
+            bag.append(f"{here}: no such key in {shown_look}{_did_you_mean(k, keys)} (R-K1)")
+
+    for k, v in over.items():
+        if is_note(k, over) or k in LOOK_NOT_OVERRIDABLE or k not in LOOK_KEYS:
+            continue        # key_rules says these
+        base = look.get(k)
+        if k == "outside":
+            for kk in (v if isinstance(v, dict) else {}):
+                if not is_note(kk, v) and kk != "gain":
+                    bag.append(f"look.outside.{kk}: only outside.gain may change (the sky is meshy_looks/final.json's)"
+                               f" (R-K1)")
+        elif k in OPEN_BLOCKS and isinstance(v, dict):
+            for name, ent in v.items():
+                if is_note(name, v):
+                    continue
+                here = f"look.{k}.{name}"
+                old = base.get(name) if isinstance(base, dict) else None
+                if k == "emit_display":
+                    if ent is not None and not (isinstance(ent, (list, tuple)) and len(ent) == 3 and
+                                                all(_num(x) and x >= 0 for x in ent)):
+                        bag.append(f"{here}: an emitter's display colour is [r, g, b], scene-linear (R-K1)")
+                elif isinstance(ent, dict) and isinstance(old, dict):
+                    walk(ent, old, here)
+                elif isinstance(ent, dict):
+                    allowed = LIGHT_ROLE_KEYS if k == "lights" else SETTING_KEYS
+                    for kk in ent:
+                        if not is_note(kk, ent) and kk not in allowed:
+                            what = "light role" if k == "lights" else "setting"
+                            bag.append(f'{here}: the key "{kk}" is not a {what} key{_did_you_mean(kk, allowed)} (R-K1)')
+                elif ent is None and old is None:
+                    bag.append(f"{here}: null deletes a key, and {shown_look} has none here (R-K1)")
+        elif isinstance(v, dict) and isinstance(base, dict):
+            walk(v, base, f"look.{k}")
+        elif base is None and v is not None:
+            bag.append(f"look.{k}: no such key in {shown_look} (R-K1)")
+    # R-K4: the light colours
+    lights = over.get("lights") if isinstance(over.get("lights"), dict) else {}
+    for role, ent in lights.items():
+        c = ent.get("color") if isinstance(ent, dict) else None
+        if c is None:
+            continue
+        if not (isinstance(c, str) and HEX.match(c)):
+            bag.append(f"look.lights.{role}.color {c!r} is not a colour (#RRGGBB, sRGB)")
+        elif c.upper() not in LIGHT_PALETTE and not near_white(c):
+            bag.append(f"look.lights.{role}.color {c} is not a palette light colour (warm #FFB457, moon #7FA8FF, teal "
+                       f"#2EC4B6 as a light, the fill's #F2EDE4) or a near-white (R-K4)")
+    # R-K3: the room's light setting
+    if light is not None:
+        sets = merge_look(look, over).get("settings") or {}
+        names = sorted(n for n, s in sets.items() if isinstance(s, dict))
+        if not isinstance(light, str) or light not in names:
+            bag.append(f'light {json.dumps(light)}: no such setting (the merged look has {", ".join(names) or "none"}) '
+                       f'(R-K3)')
+
+
+def room_look(look: dict, row: dict, shown: str = "", shown_look: str = "the look file") -> tuple:
+    """The room's merged look, its default light setting and its override's md5 (source.lookRoomMd5, None for none),
+    after R-K1 to R-K4; stops with every problem found."""
+    bag = Problems(shown or f"{row.get('room')}'s room file")
+    look_rules(look, row.get("look"), row.get("light"), bag, shown_look)
+    bag.stop()
+    return merge_look(look, row.get("look")), row.get("light"), look_room_md5(row.get("look"))
+
+
+def look_room_md5(over) -> str | None:
+    """source.lookRoomMd5: the md5 of a room's own look override (its data, notes dropped), None for none."""
+    if not isinstance(over, dict):
+        return None
+    return hashlib.md5(json.dumps(over, sort_keys=True).encode()).hexdigest()
+
+
+def emit_cap(emit_display: dict, used) -> float:
+    """The emit cap in `k` (post_bake): the largest display value among the emitters the room uses (`used`: their
+    material keys, e.g. M_flame), 1.0 with none. An emitter only another room has does not cap this one (coupling 11
+    of the implementation plan: the look's largest entry capped every room)."""
+    used = set(used)
+    vals = [max(v) for kk, v in (emit_display or {}).items() if kk in used and isinstance(v, (list, tuple)) and v]
+    return max(vals or [1.0])
+
+
 def _bake_piece(p):
     if not isinstance(p, dict):
         return p
@@ -1081,6 +1213,11 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
     cover, under, first_bed = _coverage(row, sc, openings, bag)
     lights, dropped, groups, ef, hosts = _lights(row, sc, openings, legacy, bag)
     names = _names(row, sc, openings, lights, legacy, bag)
+    moon = row.get("moon") if isinstance(row.get("moon"), dict) else {}
+    if not legacy and any(r["role"] == "moon" for r in lights) and "bearing" not in moon and not (
+            _num(moon.get("azimuth")) and _num(moon.get("elevation"))):
+        bag.append('a moon light needs "moon": {"azimuth": degrees from straight out of its window toward the wall\'s '
+                   '+s side, "elevation": degrees}')
     bag.stop()
     if legacy and first_bed is not None:
         # the legacy path keeps spot_rows' own rule: an under-bed spot is the first bed piece's (the bedroom's is
@@ -1088,11 +1225,13 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
         under = {s: first_bed for s in under}
     tasks = task_ids() if tasks is None else tasks
     task_pieces = sorted({r["id"] for r in sc.props if r["id"] in tasks or r.get("kind") in ("keyCache", "lockedDoor")})
+    rig, left = rig_lights(lights, legacy)
     pending = []
-    if not legacy:
-        pending.append("openings: the builder reads `door` and `window` until G3 (S3a)")
-    if "look" in row or "light" in row:
-        pending.append("look, light: a room's look override waits for G9 (S4)")
+    if left:
+        pending.append(f"lights {', '.join(left)}: this builder bakes one lamp (at a piece's anchor or a point) and one "
+                       f"moon; the others wait for G4 (S5)")
+    if not legacy and "bearing" in (row.get("moon") or {}):
+        pending.append("moon.bearing: one Sun from a compass bearing waits for G4 (S5c)")
     for p in row["pieces"]:
         spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
         if spec.get("model") == "hearth":
@@ -1106,7 +1245,26 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
         openings=openings, lights=lights, lightsDropped=dropped, groups=groups, exposureFrom=ef, hosts=hosts,
         coverage=cover, underBed=under, pieces=resolved, skip=dict(row.get("skip") or {}),
         spots=[s["id"] for s in sc.spots], taskPieces=task_pieces, plannedNames=names, pending=pending,
-        moveLimitM=MOVE_LIMIT)
+        moveLimitM=MOVE_LIMIT, rig=rig)
+
+
+def rig_lights(lights: list, legacy: bool) -> tuple:
+    """The lights the builder bakes until G4 (S5): one lamp, the first candle-group light anchored at a piece's named
+    anchor (no offset) or at a point, and the first moon light; and the ids of the night lights it leaves out. On the
+    legacy path the lamp is the flame and the moon the window, as the builder has always had them."""
+    lamp = moon = None
+    left = []
+    for r in lights:
+        a = r.get("anchor") or {}
+        if r["role"] == "moon":
+            if moon is None:
+                moon = r
+                continue
+        elif lamp is None and r["group"] == "candle" and (("piece" in a and "offset" not in a) or "at" in a):
+            lamp = r
+            continue
+        left.append(r["id"])
+    return dict(lamp=lamp, moon=moon), ([] if legacy else left)
 
 
 def needs_owner(spec: dict, rows: list, spots: list | None = None) -> list:

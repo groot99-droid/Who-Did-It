@@ -238,6 +238,17 @@ def nm(s: str) -> str:
     return f"{P}{s}"
 
 
+def is_v2() -> bool:
+    """A room file with `openings` (the v2 path: its node names carry the openings' ids); the legacy path (`door` and
+    `window`: the bedroom's) keeps every name, number and order it was built with."""
+    return SPEC.get("schema") == "v2"
+
+
+def sfx(oid: str) -> str:
+    """A v2 opening's node-name suffix (`_<id with . as _>`, room_file_v2 section 11)."""
+    return "_" + oid.replace(".", "_")
+
+
 def log(*a) -> None:
     print("ROOM", *a, flush=True)
 
@@ -633,7 +644,8 @@ class RMat:
         if self.kind in ("emit", "glass"):
             em.inputs["Color"].default_value = (*[min(1.0, c * k_emit) for c in self.emit], 1.0)
             self.exported = [min(1.0, c * k_emit) for c in self.emit]
-            if any(c * k_emit > 1.0 for c in self.emit):
+            # (an emitter no mesh of the room uses is not under its emit cap: no note for it)
+            if any(c * k_emit > 1.0 for c in self.emit) and self.mat.users:
                 NOTES.append(f"{self.name}: emitted colour clamped at 1 (the glTF factor's range)")
         else:
             L.new(self._albedo_socket(nt, with_vc=True), em.inputs["Color"])
@@ -901,7 +913,11 @@ class Frame:
         self.x1, self.y1 = max(b[2] for b in xs), max(b[3] for b in xs)
         self.H, self.T = cfg["height"], cfg["wall_t"]
         self.cx, self.cy = (self.x0 + self.x1) / 2, (self.y0 + self.y1) / 2
-        self.openings = []   # dict(kind, side, a, b (world along-coordinates), z0, z1, id)
+        self.openings = []   # dict(kind, side, a, b (world along-coordinates), z0, z1, id): the holes in the walls
+        self.markers = []    # the loader's stairs, hatch and drop entries, and any opening in the floor: no hole
+        if is_v2():
+            self._v2_openings(room)
+            return
         d = cfg["door"]
         for pt in room.portals:
             if pt["id"] != d["portal"]:
@@ -920,6 +936,24 @@ class Frame:
             # 3.2 cm), so no wall edge lies in the board's top plane
             self.openings.append(dict(kind="window", side=side, a=c - w["width"] / 2, b=c + w["width"] / 2,
                                       z0=w["sill"], z1=w["head"], id=p["id"], cut_z0=w["sill"] - 0.016))
+
+    def _v2_openings(self, room) -> None:
+        """A v2 file's openings, the loader's entries in their order (room_file_v2, section 2): each door and window
+        on a wall a hole in it (its side is the loader's: the border tile's wall, or the file's on an inner tile);
+        stairs, hatches, drops and a hatch in the floor are markers with no hole (G12 builds their flights)."""
+        portals = {pt["id"]: pt for pt in room.portals}
+        for e in SPEC["openings"]:
+            if e["kind"] not in ("door", "window") or e["side"] not in ("N", "E", "S", "W"):
+                self.markers.append(e)
+                continue
+            c, w = e["at"], e["width"]
+            o = dict(kind=e["kind"], side=e["side"], a=c - w / 2, b=c + w / 2, id=e["id"], spec=e)
+            if e["kind"] == "door":
+                o.update(z0=0.0, z1=e["height"], portal=portals.get(e["portal"]) if e.get("portal") else None)
+            else:
+                # cut_z0 as the legacy window's: the wall's cut starts inside the window board's thickness
+                o.update(z0=e["sill"], z1=e["head"], cut_z0=e["sill"] - 0.016)
+            self.openings.append(o)
 
     def border_side(self, tx: int, ty: int) -> str:
         if ty == 0:
@@ -954,14 +988,30 @@ class Frame:
         return (ox + dx * s + nx * out, oy + dy * s + ny * out, z)
 
 
+def win_cfg(o: dict, cfg: dict | None = None) -> dict:
+    """A window's own numbers (panes, rod, swag, curtains, curtain_colour): the legacy `window` block, or its v2
+    opening entry (the loader's, every default filled)."""
+    return o["spec"] if "spec" in o else (cfg or CFG)["window"]
+
+
+def moon_window(fr: Frame) -> dict | None:
+    """The window the moon comes through: on the legacy path the window; on the v2 path the one the room's moon
+    light names (the loader's rig: one moon until G4), None in a room with no moon light."""
+    wins = [o for o in fr.openings if o["kind"] == "window"]
+    if not is_v2():
+        return wins[0] if wins else None
+    mid = ((SPEC.get("rig") or {}).get("moon") or {}).get("window")
+    return next((o for o in wins if o["id"] == mid), None)
+
+
 def moon_patch(fr: Frame, cfg: dict) -> list | None:
     """The moon's patch on the floor as a polygon [(x, y), ...]: the window's clear opening on the wall's inner face
     (inside its frame and the curtains' edges, under the swag's belly) carried along the moon's rays to the floor.
     Plain numbers (no Blender): the light numbers are also taken from an exported GLB."""
-    wins = [o for o in fr.openings if o["kind"] == "window"]
-    if not wins:
+    o = moon_window(fr)
+    if o is None:
         return None
-    o, w, m = wins[0], cfg["window"], cfg["moon"]
+    w, m = win_cfg(o, cfg), cfg["moon"]
     side = o["side"]
     (_o, (dx, dy), (nx, ny), _L) = fr.wall_frame(side)
     a, e = math.radians(m["azimuth"]), math.radians(m["elevation"])
@@ -983,12 +1033,12 @@ def curtain_boxes(fr: Frame, cfg: dict) -> list:
     out with the wall behind the pieces)."""
     out = []
     for o in fr.openings:
-        if o["kind"] != "window":
+        if o["kind"] != "window" or not win_cfg(o, cfg).get("curtains", True):
             continue
         side = o["side"]
         sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
         for s0, s1 in ((sa - 0.50, sa + 0.05), (sb - 0.05, sb + 0.50)):
-            pts = [fr.point(side, s, d, z) for s in (s0, s1) for d in (-0.02, 0.16) for z in (0.0, cfg["window"]["rod"])]
+            pts = [fr.point(side, s, d, z) for s in (s0, s1) for d in (-0.02, 0.16) for z in (0.0, win_cfg(o, cfg)["rod"])]
             out.append(tuple(float(v) for v in (*np.min(pts, 0), *np.max(pts, 0))))
     return out
 
@@ -1120,9 +1170,15 @@ def make_materials(fr: Frame) -> dict:
     out["linen"] = RMat("M_linen", linen, tuple(v / 0.86 for v in hex_lin(lc)), rough=0.9, kind="cloth",
                         albedo=hex_lin(lc))
     wool = detail_image("T_wool", mib.mr.texture_path("wool", "diff", res="1k"), 256, gain=0.6, mean=0.8)
-    cc = hex_lin(cfg["window"]["curtain_colour"])
-    out["curtain"] = RMat("M_curtain", wool, tuple(min(1.0, v / 0.8) for v in cc), rough=0.95, kind="cloth",
-                          albedo=cc)
+    if not is_v2():
+        cc = hex_lin(cfg["window"]["curtain_colour"])
+        out["curtain"] = RMat("M_curtain", wool, tuple(min(1.0, v / 0.8) for v in cc), rough=0.95, kind="cloth",
+                              albedo=cc)
+    else:   # one curtain material a colour, the first window's M_curtain; none in a room with no curtains
+        out["wool"] = wool
+        for o in fr.openings:
+            if o["kind"] == "window" and o["spec"].get("curtains"):
+                curtain_mat(out, o["spec"]["curtain_colour"])
     cov_img = scan_image("T_coverlet", mib.mr.texture_path("coverlet", "diff", res="1k"), 512)
     cf = (1.0, 0.97, 0.9)
     out["coverlet"] = RMat("M_coverlet", cov_img, cf, rough=0.85, kind="cloth",
@@ -1142,6 +1198,18 @@ def make_materials(fr: Frame) -> dict:
     out["litwin"] = RMat("M_lit_window", None, (1, 1, 1), kind="emit")
     out["sky"] = RMat("M_sky", None, (1.0, 1.0, 1.0), kind="sky")
     return out
+
+
+def curtain_mat(mt: dict, hexc: str):
+    """A v2 window's curtain material by its colour: the first colour is M_curtain (the legacy name), each other
+    M_curtain_<n>, made once."""
+    tab = mt.setdefault("curtains", {})
+    if hexc not in tab:
+        cc = hex_lin(hexc)
+        name = "M_curtain" if not tab else f"M_curtain_{len(tab) + 1}"
+        tab[hexc] = RMat(name, mt["wool"], tuple(min(1.0, v / 0.8) for v in cc), rough=0.95, kind="cloth", albedo=cc)
+        mt.setdefault("curtain", tab[hexc])
+    return tab[hexc]
 
 
 def grid_count(L: float, step: float) -> int:
@@ -1184,8 +1252,10 @@ def build_shell(fr: Frame, mt: dict) -> None:
         us = grid_levels(L, step, [v for sa, sb, _a, _b in spans for v in (sa, sb)])
         # ... and just clear of the trims: the wall's row behind the skirting, the picture rail or the cornice bakes
         # dark (it is covered), and at 10 cm rows that dark ran on as a band 10 cm wide into the wall beside the trim
-        trim_z = [CFG["skirting"] + 0.006, CFG["picture_rail"] - 0.026, CFG["picture_rail"] + 0.026,
-                  H - CFG["cornice"] - 0.008]
+        # (a trim given as null is not built, and its rows are not cut: R-S2)
+        sk_, pr_, co_ = CFG.get("skirting"), CFG.get("picture_rail"), CFG.get("cornice")
+        trim_z = ([sk_ + 0.006] if sk_ is not None else []) + \
+            ([pr_ - 0.026, pr_ + 0.026] if pr_ is not None else []) + ([H - co_ - 0.008] if co_ is not None else [])
         vs = grid_levels(H, 0.1, [v for _a, _b, z0, z1 in spans for v in (z0, z1)] + trim_z)
 
         def skip(i, j, spans=spans, L=L, us=us, vs=vs):
@@ -1200,38 +1270,33 @@ def build_shell(fr: Frame, mt: dict) -> None:
 
 
 def trims(fr: Frame, mt: dict) -> None:
-    """Skirting (broken at the door), the picture rail and the cornice, swept round the room."""
+    """Skirting (broken at every door), the picture rail and the cornice, swept round the room; a trim given as null
+    is not built."""
     H = fr.H
     x0, x1, y0, y1 = fr.x0, fr.x1, fr.y0, fr.y1
     loop = [(x0, y0, 0.0), (x1, y0, 0.0), (x1, y1, 0.0), (x0, y1, 0.0)]
-    sk = CFG["skirting"]
-    skirting = [(0.0, 0.0), (0.022, 0.0), (0.022, sk - 0.05), (0.018, sk - 0.03), (0.013, sk - 0.012),
-                (0.006, sk - 0.002), (0.0, sk)]
+    sk = CFG.get("skirting")
     doors = [o for o in fr.openings if o["kind"] == "door"]
-    b = Builder()
-    if doors:
-        o = doors[0]
-        side = o["side"]
-        order = ["S", "E", "N", "W"]
-        ends = {"S": (x1, y0), "E": (x1, y1), "N": (x0, y1), "W": (x0, y0)}   # each wall's far corner along du
-        k = order.index(side)
-        sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
-        path = [fr.point(side, sb + 0.115, 0.0, 0.0)]
-        for j in range(4):
-            cx, cy = ends[order[(k + j) % 4]]
-            path.append((cx, cy, 0.0))
-        path.append(fr.point(side, sa - 0.115, 0.0, 0.0))
-        b.sweep(skirting, path, mt["wood"], uv_scale=2.0, step=0.08)
-    else:
-        b.sweep(skirting, loop, mt["wood"], closed=True, uv_scale=2.0, step=0.05)
-    register(b.build(nm("Skirting")), "trim", "skirting")
-    pr = CFG["picture_rail"]
-    rail = [(0.0, pr - 0.02), (0.010, pr - 0.02), (0.016, pr - 0.012), (0.021, pr), (0.018, pr + 0.012),
-            (0.010, pr + 0.018), (0.0, pr + 0.02)]
-    b = Builder()
-    b.sweep(rail, loop, mt["wood"], closed=True, uv_scale=2.0, step=0.2)
-    register(b.build(nm("PictureRail")), "trim", "picture_rail")
-    c = CFG["cornice"]
+    if sk is not None:
+        skirting = [(0.0, 0.0), (0.022, 0.0), (0.022, sk - 0.05), (0.018, sk - 0.03), (0.013, sk - 0.012),
+                    (0.006, sk - 0.002), (0.0, sk)]
+        b = Builder()
+        if doors:
+            for path in skirting_runs(fr, doors):
+                b.sweep(skirting, path, mt["wood"], uv_scale=2.0, step=0.08)
+        else:
+            b.sweep(skirting, loop, mt["wood"], closed=True, uv_scale=2.0, step=0.05)
+        register(b.build(nm("Skirting")), "trim", "skirting")
+    pr = CFG.get("picture_rail")
+    if pr is not None:
+        rail = [(0.0, pr - 0.02), (0.010, pr - 0.02), (0.016, pr - 0.012), (0.021, pr), (0.018, pr + 0.012),
+                (0.010, pr + 0.018), (0.0, pr + 0.02)]
+        b = Builder()
+        b.sweep(rail, loop, mt["wood"], closed=True, uv_scale=2.0, step=0.2)
+        register(b.build(nm("PictureRail")), "trim", "picture_rail")
+    c = CFG.get("cornice")
+    if c is None:
+        return
     prof = [(0.0, H - c), (0.012, H - c), (0.016, H - c + 0.012), (0.028, H - c + 0.022)]
     r = c - 0.05
     for i in range(1, 6):
@@ -1241,6 +1306,47 @@ def trims(fr: Frame, mt: dict) -> None:
     b = Builder()
     b.sweep(prof, loop, mt["ceiling"], closed=True, uv_scale=3.0, step=0.2)
     register(b.build(nm("Cornice")), "trim", "cornice")
+
+
+SKIRT_BREAK = 0.115     # the skirting stops this far beyond a door's opening (its architrave, 0.095 m, and 2 cm)
+
+
+def skirting_runs(fr: Frame, doors: list) -> list:
+    """The skirting's runs: the loop round the room's walls (S, E, N, W, the room on the left) cut at every door, each
+    run from one door's far end to the next door's near end with the corners it passes. One door gives the one path
+    the builder has always swept (its end, the four corners from its own wall's far corner, its start)."""
+    x0, x1, y0, y1 = fr.x0, fr.x1, fr.y0, fr.y1
+    order = ["S", "E", "N", "W"]
+    ends = {"S": (x1, y0), "E": (x1, y1), "N": (x0, y1), "W": (x0, y0)}   # each wall's far corner along du
+    length = {"S": x1 - x0, "E": y1 - y0, "N": x1 - x0, "W": y1 - y0}
+    off, acc = {}, 0.0
+    for side in order:
+        off[side], acc = acc, acc + length[side]
+    perim = acc
+    breaks = []
+    for o in doors:
+        sa, sb = sorted((fr.to_s(o["side"], o["a"]), fr.to_s(o["side"], o["b"])))
+        breaks.append((off[o["side"]] + sa, o["side"], sa, sb))
+    breaks.sort()
+    runs = []
+    for i, (_p, side, _sa, sb) in enumerate(breaks):
+        _q, side_n, sa_n, _sb = breaks[(i + 1) % len(breaks)]
+        ps = off[side] + sb + SKIRT_BREAK
+        pe = off[side_n] + sa_n - SKIRT_BREAK
+        if i == len(breaks) - 1:    # the last door's run goes round to the first door (the one door's, to itself)
+            pe += perim
+        if pe - ps < 0.05:          # two doors' architraves all but meet: no run between them
+            continue
+        path = [fr.point(side, sb + SKIRT_BREAK, 0.0, 0.0)]
+        for m in range(8):
+            w = order[m % 4]
+            c = off[w] + length[w] + perim * (m // 4)
+            if ps < c < pe:
+                cx, cy = ends[w]
+                path.append((cx, cy, 0.0))
+        path.append(fr.point(side_n, sa_n - SKIRT_BREAK, 0.0, 0.0))
+        runs.append(path)
+    return runs
 
 
 def wall_box(b: Builder, fr: Frame, side: str, s0: float, s1: float, o0: float, o1: float, z0: float, z1: float,
@@ -1275,12 +1381,25 @@ def architrave(b: Builder, fr: Frame, side: str, sa: float, sb: float, z0: float
 
 
 def build_door(fr: Frame, mt: dict) -> dict | None:
-    """The door: lining, stops, threshold, architrave and a closed four-panel leaf with a brass knob, a key escutcheon
-    and hinges; returns where the portal goes (the doorway's foot on the wall face)."""
+    """The legacy path's door (the file's `door`): its knob toward +s for E or N, as the builder has always read it;
+    node names Door and DoorKnob."""
     doors = [o for o in fr.openings if o["kind"] == "door"]
     if not doors:
         return None
-    o = doors[0]
+    return door_one(fr, mt, doors[0], CFG["door"].get("knob", "E") in ("E", "N"), "")
+
+
+def build_doors(fr: Frame, mt: dict) -> list:
+    """Every door of a v2 file, in the file's order: node names Door_<id> and DoorKnob_<id>; the knob at the end its
+    `knob` letter names, seen from inside (the wall coordinate s runs E, N, W, S round the S, E, N, W walls, so the
+    letter is the end at the higher s when it is that wall's: coupling 19 of the implementation plan)."""
+    return [door_one(fr, mt, o, o["spec"]["knob"] == rf.KNOB_DEFAULT[o["side"]], sfx(o["id"]))
+            for o in fr.openings if o["kind"] == "door"]
+
+
+def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dict:
+    """A door: lining, stops, threshold, architrave and a closed four-panel leaf with a brass knob, a key escutcheon
+    and hinges; returns where the portal goes (the doorway's foot on the wall face)."""
     side, T = o["side"], fr.T
     sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
     z1 = o["z1"]
@@ -1326,7 +1445,6 @@ def build_door(fr: Frame, mt: dict) -> dict | None:
             b.face([a0[i], a1[i], a1[j], a0[j]], [(0, 0), (0, 0.03), (0.5, 0.03), (0.5, 0)], wood)
         wall_box(b, fr, side, s0 + bev + 0.018, s1 - bev - 0.018, o_low, f_room - rec * 0.4, za + bev + 0.018,
                  zb - bev - 0.018, wood)
-    knob_right = CFG["door"].get("knob", "E") in ("E", "N")
     ks = (lb - 0.07) if knob_right else (la + 0.07)
     hs = la if knob_right else lb
     kz = lock_z + lock / 2
@@ -1341,9 +1459,9 @@ def build_door(fr: Frame, mt: dict) -> dict | None:
     for hz in (lz0 + 0.24, lz1 - 0.25):
         p = fr.point(side, hs + (0.004 if hs == la else -0.004), f_room + 0.002, hz)
         mb.box(0.010, 0.006, 0.10, M=Matrix.Translation(Vector(p)) @ upright_rot(side), mat=iron.mat)
-    door = b.build(nm("Door"))
+    door = b.build(nm("Door" + suffix))
     register(door, "door", o["id"])
-    hw = mb.build(nm("DoorKnob"), col="room")
+    hw = mb.build(nm("DoorKnob" + suffix), col="room")
     if hw is not None:
         uv_box(hw, 0.2)
         register(hw, "door", o["id"] + ":furniture")
@@ -1368,15 +1486,33 @@ def build_door(fr: Frame, mt: dict) -> dict | None:
 
 
 def build_window(fr: Frame, mt: dict) -> dict | None:
-    """The window: plaster reveals, a painted box frame, two sashes with glazing bars and glass, a window board and
-    apron, an architrave, a stone sill outside with snow on it, and the round-3 curtains, rod and black swag at first
-    person's scale. Returns the opening (the moon comes through it)."""
+    """The legacy path's window (the file's `window`): node names Window, WindowGlass, SillSnow, WindowArchitrave,
+    Curtains, CurtainRod, Swag."""
     wins = [o for o in fr.openings if o["kind"] == "window"]
     if not wins:
         return None
-    o = wins[0]
-    w = CFG["window"]
+    return window_one(fr, mt, wins[0], CFG["window"], "", mt["curtain"])
+
+
+def build_windows(fr: Frame, mt: dict) -> list:
+    """Every window of a v2 file, in the file's order, each with its own numbers and curtains: node names
+    Window_<id> and the rest with the same suffix; ids <part>_<opening id>."""
+    out = []
+    for o in fr.openings:
+        if o["kind"] != "window":
+            continue
+        w = o["spec"]
+        cm = curtain_mat(mt, w["curtain_colour"]) if w.get("curtains") else None
+        out.append(window_one(fr, mt, o, w, sfx(o["id"]), cm))
+    return out
+
+
+def window_one(fr: Frame, mt: dict, o: dict, w: dict, suffix: str, curtain) -> dict:
+    """A window: plaster reveals, a painted box frame, two sashes with glazing bars and glass, a window board and
+    apron, an architrave, a stone sill outside with snow on it, and the round-3 curtains, rod and black swag at first
+    person's scale. Returns the opening (the moon comes through it)."""
     side, T = o["side"], fr.T
+    tag = (lambda k: f"{k}_{o['id']}") if suffix else (lambda k: k)     # the parts' ids: v2 carries the opening's
     sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
     s, h = o["z0"], o["z1"]
     paint, wall, glass = mt["paint"], mt["wall"], mt["glass"]
@@ -1433,13 +1569,13 @@ def build_window(fr: Frame, mt: dict) -> dict | None:
             panes.append((c0, c1, gz0, gz1, tc))
     # outside: the outer reveal round the frame, the stone sill with snow on it
     wall_box(b, fr, side, sa - 0.09, sb + 0.09, -T - 0.13, fo1, s - 0.07, s - 0.012, mt["stone"])
-    register(b.build(nm("Window")), "window", o["id"])
+    register(b.build(nm("Window" + suffix)), "window", o["id"])
     g = Builder()
     for c0, c1, z0, z1, tc in panes:
         p = [fr.point(side, c0, tc, z0), fr.point(side, c1, tc, z0), fr.point(side, c1, tc, z1),
              fr.point(side, c0, tc, z1)]
         g.face(p, [(0, 0), (1, 0), (1, 1), (0, 1)], glass)
-    gl = g.build(nm("WindowGlass"))
+    gl = g.build(nm("WindowGlass" + suffix))
     register(gl, "glass", o["id"] + ":glass")
     # snow on the outer sill: a rounded ridge
     sn = Builder()
@@ -1456,14 +1592,14 @@ def build_window(fr: Frame, mt: dict) -> dict | None:
                 pts = [fr.point(side, sa_, oa, s - 0.012 + za + wob), fr.point(side, sb_, oa, s - 0.012 + za + wob),
                        fr.point(side, sb_, ob, s - 0.012 + zb + wob), fr.point(side, sa_, ob, s - 0.012 + zb + wob)]
                 sn.face(pts, [(ua, k / 4), (ub, k / 4), (ub, (k + 1) / 4), (ua, (k + 1) / 4)], mt["snow"])
-    register(sn.build(nm("SillSnow"), smooth=True), "outside", "sill_snow")
+    register(sn.build(nm("SillSnow" + suffix), smooth=True), "outside", tag("sill_snow"))
     # the architrave, the curtains on their rod, the black swag
     a = Builder()
     architrave(a, fr, side, sa, sb, s, h, paint, plinth=False, foot=s - 0.032)
-    register(a.build(nm("WindowArchitrave")), "trim", "window_architrave")
-    curtains(fr, mt, side, sa, sb, s, h, w)
+    register(a.build(nm("WindowArchitrave" + suffix)), "trim", tag("window_architrave"))
+    curtains(fr, mt, side, sa, sb, s, h, w, curtain, suffix, tag)
     return dict(id=o["id"], side=side, sa=sa, sb=sb, sill=s, head=h, glass_o=-0.21,
-                centre=fr.point(side, (sa + sb) / 2, -0.21, (s + h) / 2))
+                centre=fr.point(side, (sa + sb) / 2, -0.21, (s + h) / 2), outside=w.get("outside", "snow"))
 
 
 def pleat_sheet(b: Builder, fr: Frame, side: str, s0: float, s1: float, out: float, z0: float, z1: float, mat,
@@ -1489,12 +1625,18 @@ def pleat_sheet(b: Builder, fr: Frame, side: str, s0: float, s1: float, out: flo
             b.face([p for p, _s, _z in q], [(sv / 0.27, z / 0.27) for _p, sv, z in q], mat)
 
 
-def curtains(fr: Frame, mt: dict, side: str, sa: float, sb: float, s: float, h: float, w: dict) -> None:
+def curtains(fr: Frame, mt: dict, side: str, sa: float, sb: float, s: float, h: float, w: dict, curtain=None,
+             suffix: str = "", tag=lambda k: k) -> None:
+    """A window's curtains (when it has them: `curtains`, the legacy window always), the rod and the black swag
+    (`swag`); a window with neither has no rod."""
     rod_z, rod_o = w["rod"], 0.10
-    c = Builder()
-    pleat_sheet(c, fr, side, sa - 0.10 - 0.36, sa + 0.03, rod_o - 0.01, 0.012, rod_z - 0.035, mt["curtain"], seed=0.4)
-    pleat_sheet(c, fr, side, sb - 0.03, sb + 0.10 + 0.36, rod_o - 0.01, 0.012, rod_z - 0.035, mt["curtain"], seed=2.2)
-    register(c.build(nm("Curtains"), smooth=True), "cloth", "curtains")
+    if w.get("curtains", True):
+        c = Builder()
+        pleat_sheet(c, fr, side, sa - 0.10 - 0.36, sa + 0.03, rod_o - 0.01, 0.012, rod_z - 0.035, curtain, seed=0.4)
+        pleat_sheet(c, fr, side, sb - 0.03, sb + 0.10 + 0.36, rod_o - 0.01, 0.012, rod_z - 0.035, curtain, seed=2.2)
+        register(c.build(nm("Curtains" + suffix), smooth=True), "cloth", tag("curtains"))
+    elif not w.get("swag"):
+        return
     # the rod: a wooden pole on two brackets with ball finials
     mb = wb.MB()
     pa = Vector(fr.point(side, sa - 0.52, rod_o, rod_z))
@@ -1506,9 +1648,9 @@ def curtains(fr: Frame, mt: dict, side: str, sa: float, sb: float, s: float, h: 
         q0 = Vector(fr.point(side, sv, 0.0, rod_z))
         q1 = Vector(fr.point(side, sv, rod_o, rod_z))
         mb.tube([q0, q1], 0.010, n=8, mat=mt["brass"].mat)
-    rod = mb.build(nm("CurtainRod"), col="room", smooth=True)
+    rod = mb.build(nm("CurtainRod" + suffix), col="room", smooth=True)
     uv_box(rod, 0.5)
-    register(rod, "trim", "curtain_rod")
+    register(rod, "trim", tag("curtain_rod"))
     if not w.get("swag"):
         return
     # the swag: plain matte black cloth across the top, hung from both ends, sagging in the middle, bellied out
@@ -1531,7 +1673,7 @@ def curtains(fr: Frame, mt: dict, side: str, sa: float, sb: float, s: float, h: 
         for i in range(cols):
             q = [grid[j][i], grid[j][i + 1], grid[j + 1][i + 1], grid[j + 1][i]]     # along, then down: inward
             sw.face([p for p, _u, _v in q], [(u * 2.0, v) for _p, u, v in q], mt["black"])
-    register(sw.build(nm("Swag"), smooth=True), "cloth", "swag")
+    register(sw.build(nm("Swag" + suffix), smooth=True), "cloth", tag("swag"))
 
 
 # ---------------------------------------------------------------- the night outside
@@ -1760,8 +1902,40 @@ def meshy_outside(fr: Frame, mt: dict, win: dict, P, ground_z, oc: dict, rng) ->
     return made
 
 
-def outside_sky(fr: Frame, mt: dict, win: dict, moon: Vector, P, made: dict) -> dict:
-    """The sky dome round the window (the half that can be seen through it) and the moon's disc."""
+def build_backdrop(fr: Frame, mt: dict, win: dict, moon: Vector) -> dict:
+    """What a window that says `sky` shows (a v2 file's window off the village view's wall): a level snow plain out to
+    the horizon and the sky dome round it, no village, no moon disc (G14 gives each window its own view). Names
+    Outside_Ground_<wall> and Outside_Sky_<wall>: one backdrop a wall."""
+    side = win["side"]
+    s0 = (win["sa"] + win["sb"]) / 2
+    T = fr.T
+    oc = CFG.get("outside") or {}
+    gz = float(oc.get("ground", -0.3))
+
+    def P(u, d, z):
+        return fr.point(side, s0 + u, -T - d, z)
+
+    ds = [0.0]
+    while ds[-1] < 200.0:
+        ds.append(ds[-1] + max(1.0, 0.1 * ds[-1]))
+    us = np.linspace(-120.0, 120.0, 25)
+    b = Builder()
+    for j in range(len(ds) - 1):
+        for i in range(len(us) - 1):
+            q = [(us[i], ds[j]), (us[i], ds[j + 1]), (us[i + 1], ds[j + 1]), (us[i + 1], ds[j])]
+            pts = [P(u, d, gz) for u, d in q]
+            if side in ("N", "W"):
+                pts, q = pts[::-1], q[::-1]
+            b.face(pts, [(u / 2.0, d / 2.0) for u, d in q], mt["snow"])
+    g = b.build(nm(f"Outside_Ground_{side}"))
+    _fix_up(g)
+    made = {"ground": register(g, "outside", f"ground_{side}")}
+    return outside_sky(fr, mt, win, moon, P, made, suffix=f"_{side}", disc=False)
+
+
+def outside_sky(fr: Frame, mt: dict, win: dict, moon: Vector, P, made: dict, suffix: str = "",
+                disc: bool = True) -> dict:
+    """The sky dome round the window (the half that can be seen through it) and the moon's disc (`disc`)."""
     side = win["side"]
     look = look_sky()
     R = 190.0
@@ -1783,8 +1957,8 @@ def outside_sky(fr: Frame, mt: dict, win: dict, moon: Vector, P, made: dict) -> 
         for i in range(nu_):
             q = [(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)]
             db.face([tuple(c0 + dirs[k] * R) for k in q], [(k[0] / nu_, k[1] / nv_) for k in q], mt["sky"])
-    dome = db.build(nm("Outside_Sky"))
-    made["sky"] = register(dome, "sky", "sky")
+    dome = db.build(nm("Outside_Sky" + suffix))
+    made["sky"] = register(dome, "sky", "sky" + suffix.lower())
     me = dome.data
     a = me.color_attributes.new(ATTR, "FLOAT_COLOR", "POINT")
     cols = np.zeros((len(me.vertices), 4), np.float32)
@@ -1794,6 +1968,8 @@ def outside_sky(fr: Frame, mt: dict, win: dict, moon: Vector, P, made: dict) -> 
         cols[vi, 3] = 1.0
     a.data.foreach_set("color", cols.ravel())
     dome["wdi_sky_raw"] = True
+    if not disc:
+        return made
     mb = wb.MB()
     mpos = c0 + moon * (R - 5.0)
     mb.disc(R * math.tan(math.radians(0.55)), n=24, M=Matrix.Translation(mpos) @
@@ -2005,6 +2181,40 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
     return used
 
 
+def rig_anchor(anchors: dict):
+    """A v2 file's lamp position: its rig lamp's anchor (the loader's: a piece's named anchor, or a point `at`), None
+    when the room has no lamp."""
+    lamp = (SPEC.get("rig") or {}).get("lamp")
+    if lamp is None:
+        return None
+    a = lamp["anchor"]
+    if "at" in a:
+        at = list(a["at"])
+        return (float(at[0]), float(at[1]), float(at[2] if len(at) > 2 else a.get("z", 1.0)))
+    key = f"{a['piece']}:{a.get('name') or 'flame'}"
+    if key not in anchors:
+        raise SystemExit(f"meshy_room_build: light {lamp['id']}: piece {a['piece']} built no anchor "
+                         f"{a.get('name') or 'flame'!r} (it built: {sorted(k for k in anchors if ':' in k) or 'none'})")
+    return anchors[key]
+
+
+TEXTURE_MATS = (("wall_plaster", ("M_wall", "M_ceiling", "M_paint")), ("joinery", ("M_wood", "M_outside_wall")),
+                ("linen", ("M_linen",)), ("coverlet", ("M_coverlet",)), ("snow", ("M_snow",)))
+
+
+def texture_roles(used: set, floor_role: str, rug: bool) -> list:
+    """The texture roles a room used, from the room materials its meshes keep (`used`: names without the room's
+    prefix): the floor's, the plaster, the joinery, the linen, the curtains' wool (M_curtain, M_curtain_<n>), the
+    coverlet, the snow, and the rug's carpet."""
+    out = [floor_role]
+    out += [role for role, mats in TEXTURE_MATS if any(m in used for m in mats)]
+    if any(m == "M_curtain" or m.startswith("M_curtain_") for m in used):
+        out.append("wool")
+    if rug:
+        out.append("carpet")
+    return out
+
+
 def build_furniture(fr: Frame, mt: dict) -> dict:
     """Every piece of the room's file, at real size, against its wall; returns the light anchors (the flame)."""
     anchors = {}
@@ -2038,6 +2248,8 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
             ob, box, info = build_ph_kit(fr, piece, spec, name, mt)
             if "flame" in info:
                 anchors["flame"] = info["flame"]
+            for k_, v_ in info.items():         # each piece's own anchors, for a v2 file's lights
+                anchors.setdefault(f"{pid}:{k_}", v_)
         else:
             raise SystemExit(f"meshy_room_build: no first-person builder for {pid} (model {model})")
         PIECES[pid] = dict(obj=ob, box=box, spec=spec, piece=piece)
@@ -3203,10 +3415,11 @@ def portrait(variant: str, w: int, h: int, seed: int = 0) -> np.ndarray:
 # ---------------------------------------------------------------- lights: the bake rig and the exported night lights
 
 
-def bake_rig(fr: Frame, win: dict | None, flame, moon: Vector) -> list:
+def bake_rig(fr: Frame, holes: list, flame, moon: Vector) -> list:
     """The lights the bake sees: the candle at its flame, the moon (a sun lamp) through the window, a faint fill
-    panel under the ceiling, the night sky as the world; a light-tight box round the room with a hole at the window
-    (so no light reaches in through a seam). Returns the rig's objects (removed after the bake)."""
+    panel under the ceiling, the night sky as the world; a light-tight box round the room with a hole at each window
+    in `holes` (the moon-lit ones: a window no moon light names is dark glass), so no light reaches in through a
+    seam. Returns the rig's objects (removed after the bake)."""
     rig = []
     c = CFG["candle"]
     if flame is not None:
@@ -3262,17 +3475,32 @@ def bake_rig(fr: Frame, win: dict | None, flame, moon: Vector) -> list:
     b.box((X0, Y0, z1), (X1, Y1, z1 + 0.02), dark)
     for side in ("S", "E", "N", "W"):
         (_o, (dx, dy), (nx, ny), L) = fr.wall_frame(side)
-        holes = [h for h in ([win] if win else []) if h["side"] == side]
         lo_s, hi_s = -fr.T - 0.2, (fr.x1 - fr.x0 if side in ("N", "S") else fr.y1 - fr.y0) + fr.T + 0.2
-        cuts = [(lo_s, hi_s, z0, z1)]
-        for h in holes:
-            cuts = [(lo_s, h["sa"], z0, z1), (h["sb"], hi_s, z0, z1), (h["sa"], h["sb"], z0, h["sill"]),
-                    (h["sa"], h["sb"], h["head"], z1)]
+        cuts = tight_cuts(lo_s, hi_s, z0, z1, [(h["sa"], h["sb"], h["sill"], h["head"]) for h in holes
+                                               if h["side"] == side])
         for (sa, sb, za, zb) in cuts:
             wall_box(b, fr, side, sa, sb, -pad - 0.02, -pad, za, zb, dark)
     tight = b.build(nm("Bake_tight"), col="rig")
     rig.append(tight)
     return rig
+
+
+def tight_cuts(lo: float, hi: float, z0: float, z1: float, holes: list) -> list:
+    """The light-tight box's panels on one wall, (s0, s1, z0, z1) each, round its holes (s0, s1, sill, head): the
+    holes sorted along the wall, the full-height panels between them first, then each hole's panel under and over
+    it. One hole gives the four panels the box has always had, in the same order; none gives the whole wall (the
+    loop it replaces kept only the last hole of a wall: coupling 18 of the implementation plan)."""
+    if not holes:
+        return [(lo, hi, z0, z1)]
+    hs = sorted(holes)
+    cols, prev = [], lo
+    for sa, sb, _sill, _head in hs:
+        cols.append((prev, sa, z0, z1))
+        prev = sb
+    cols.append((prev, hi, z0, z1))
+    for sa, sb, sill, head in hs:
+        cols += [(sa, sb, z0, sill), (sa, sb, head, z1)]
+    return cols
 
 
 def export_lights(fr: Frame, win: dict | None, flame, moon: Vector, k: float) -> list:
@@ -3282,16 +3510,24 @@ def export_lights(fr: Frame, win: dict | None, flame, moon: Vector, k: float) ->
     later matches the bake under wdi_exposure."""
     out = []
     by_kind = {lt["kind"]: lt for lt in fr.room.lights}
+    names = {"lamp": ("Light_candle", "lamp"), "moon": ("Light_moon", "moon")}
+    if is_v2():     # the loader's rig lights (one lamp, one moon until G4), named Light_<name> (section 11)
+        scene_lt = {lt["id"]: lt for lt in fr.room.lights}
+        by_kind, names = {}, {}
+        for key, r in (SPEC.get("rig") or {}).items():
+            if r is not None:
+                by_kind[key] = scene_lt[r["id"]]
+                names[key] = ("Light_" + r["name"].replace(".", "_"), r["role"])
     c = CFG["candle"]
     aw = CFG.get("applied_weights") or {}       # the light setting's (and --mix's) weights, as the bake has them
     lt = by_kind.get("lamp")
     if flame is not None and lt is not None:
-        ld = bpy.data.lights.new(nm("Light_candle"), "POINT")
+        ld = bpy.data.lights.new(nm(names["lamp"][0]), "POINT")
         ld.energy, ld.color, ld.shadow_soft_size = c["power"] * k * float(aw.get("candle", 1.0)), \
             hex_lin(c["color"]), c["radius"]
-        o = bpy.data.objects.new(nm("Light_candle"), ld)
+        o = bpy.data.objects.new(nm(names["lamp"][0]), ld)
         o.location = (flame[0], flame[1], flame[2] + 0.012)
-        o["wdi_light"], o["wdi_light_id"] = "lamp", lt["id"]
+        o["wdi_light"], o["wdi_light_id"] = names["lamp"][1], lt["id"]
         o["wdi_radius_tiles"] = float(lt.get("radiusTiles", 2))
         o["wdi_cast_shadow"] = False
         COL["room"].objects.link(o)
@@ -3303,15 +3539,15 @@ def export_lights(fr: Frame, win: dict | None, flame, moon: Vector, k: float) ->
         target.z = 0.0
         src = Vector(win["centre"]) + moon * 1.2
         d = (target - src).length
-        ld = bpy.data.lights.new(nm("Light_moon"), "SPOT")
+        ld = bpy.data.lights.new(nm(names["moon"][0]), "SPOT")
         ld.spot_size, ld.spot_blend = math.radians(50.0), 0.25
         ld.energy = 4.0 * math.pi * m["strength"] * d * d * k * float(aw.get("moon", 1.0))
         ld.color = hex_lin(m["color"])
         ld.shadow_soft_size = 0.0
-        o = bpy.data.objects.new(nm("Light_moon"), ld)
+        o = bpy.data.objects.new(nm(names["moon"][0]), ld)
         o.location = src
         o.rotation_euler = (target - src).to_track_quat("-Z", "Y").to_euler()
-        o["wdi_light"], o["wdi_light_id"] = "moon", lt["id"]
+        o["wdi_light"], o["wdi_light_id"] = names["moon"][1], lt["id"]
         o["wdi_radius_tiles"] = float(lt.get("radiusTiles", 2))
         o["wdi_note"] = "the moon through the window as a spot (a directional light would replace the village's moon)"
         COL["room"].objects.link(o)
@@ -3636,12 +3872,14 @@ def wall_hidden_rows(name: str, co: np.ndarray, L: np.ndarray) -> int:
     the wall's nearest row clear of the trim, in its own column (`L`, N x C, is changed in place). Returns the
     vertices set."""
     H = FRAME[0].H
-    sk, pr, c = CFG["skirting"], CFG["picture_rail"], CFG["cornice"]
+    sk, pr, c = CFG.get("skirting"), CFG.get("picture_rail"), CFG.get("cornice")
     z = co[:, 2]
     col = np.round((co[:, 0] if name.endswith(("Wall_N", "Wall_S")) else co[:, 1]) / 1e-3).astype(np.int64)
     n = 0
-    for hidden, refs in ((z < sk + 0.003, (sk + 0.006,)), (np.abs(z - pr) < 0.022, (pr - 0.026, pr + 0.026)),
-                         (z > H - c - 0.004, (H - c - 0.008,))):
+    rows = ([(z < sk + 0.003, (sk + 0.006,))] if sk is not None else []) + \
+        ([(np.abs(z - pr) < 0.022, (pr - 0.026, pr + 0.026))] if pr is not None else []) + \
+        ([(z > H - c - 0.004, (H - c - 0.008,))] if c is not None else [])     # a trim given as null hides no row
+    for hidden, refs in rows:
         ref = np.zeros(len(z), bool)
         for zr in refs:
             ref |= np.abs(z - zr) < 1.5e-3
@@ -3883,6 +4121,21 @@ def limit_steps(o, L: np.ndarray, ratio: float, passes: int = 8) -> int:
     return int(raised.sum())
 
 
+def emitters_used() -> list:
+    """The emit and glass materials the room's meshes use, by their look key (M_flame, M_moon, ...: the name without
+    the room's prefix)."""
+    names = set()
+    for r in OBJS:
+        o = r["obj"]
+        if o is None or o.type != "MESH" or o.data is None:
+            continue
+        for m in o.data.materials:
+            rm = MATS.get(m.name) if m is not None else None
+            if rm is not None and rm.kind in ("emit", "glass"):
+                names.add(m.name[len(P):] if m.name.startswith(P) else m.name)
+    return sorted(names)
+
+
 def post_bake(objs: list, flame, outside: set, no_bake: bool, raw: dict | None = None, ao: dict | None = None) -> dict:
     """Denoise, scale the outside, choose E and k, then grade the light per vertex (palette rules) and write
     COLOR_0 = k x light:
@@ -3940,8 +4193,9 @@ def post_bake(objs: list, flame, outside: set, no_bake: bool, raw: dict | None =
     room_L = np.concatenate([lum(L) for n_, (o, L, a, c) in data.items() if n_ not in outside and n_ not in hosts])
     # k: the room's light at its 99.9th percentile becomes 1 (a normalized export would clip only the flame-side hot
     # spots; the candle stand, lit from a few centimetres, left out), and never so large that an emitter's display
-    # colour / wdi_exposure leaves the glTF factor's 0..1
-    emit_max = max([max(v) for v in CFG.get("emit_display", {}).values()] or [1.0])
+    # colour / wdi_exposure leaves the glTF factor's 0..1: the emitters this room builds (a look entry for one it has
+    # not, another room's coals, does not cap its k: coupling 11 of the implementation plan)
+    emit_max = rf.emit_cap(CFG.get("emit_display", {}), emitters_used())
     k = min(1.0 / max(float(np.percentile(room_L, 99.9)), 1e-6), E / (1.05 * emit_max))
     ink = ex["ink_D"]
     target = (lum(np.array(INK, float)) + float(il.get("margin_luma", 1.2))) / 255.0
@@ -4232,7 +4486,7 @@ def footprint_boxes(objs: list, fr: Frame, cell: float = 0.01, tol: float = 0.02
     return boxes
 
 
-def collision(fr: Frame, door: dict | None) -> tuple:
+def collision(fr: Frame, doors: list) -> tuple:
     """HM_Collision_room_<id>: the floor and ceiling slabs, the four walls overlapping at the corners (the door shut,
     the window glazed), and every standing piece and the curtains as boxes that hug what the player can touch
     (footprint_boxes). Room coordinates, no material."""
@@ -4245,15 +4499,17 @@ def collision(fr: Frame, door: dict | None) -> tuple:
     boxes.append(("wall_N", (x0 - T, y1, -0.25, x1 + T, y1 + T, H + 0.25)))
     boxes.append(("wall_W", (x0 - T, y0 - T, -0.25, x0, y1 + T, H + 0.25)))
     boxes.append(("wall_E", (x1, y0 - T, -0.25, x1 + T, y1 + T, H + 0.25)))
-    for k, b in enumerate((door or {}).get("collision", ())):     # the architrave's legs and the knob (build_door)
-        boxes.append((f"door#{k}", tuple(b)))
+    for door in doors:      # each door's architrave legs and knob (door_one): door#k, a v2 door's door_<id>#k
+        tag = f"door_{door['id']}" if is_v2() else "door"
+        for k, b in enumerate(door.get("collision", ())):
+            boxes.append((f"{tag}#{k}", tuple(b)))
     groups = {}
     for r in OBJS:
         o = r["obj"]
         if o is None or o.type != "MESH" or r["what"] not in ("piece", "cloth"):
             continue
         pid = r["id"].split(":")[0]
-        if pid in ("swag",):
+        if pid == "swag" or pid.startswith("swag_"):     # the swag hangs overhead (a v2 window's: swag_<id>)
             continue
         p = PIECES.get(pid)
         if p is not None and p["spec"].get("model") in ("rug", "photos"):
@@ -4288,10 +4544,13 @@ def boxes_sha1(boxes: list) -> str:
     return hashlib.sha1(json.dumps(rows, separators=(",", ":")).encode()).hexdigest()
 
 
-def walk_check(fr: Frame, boxes: list, spawn_xy, portal_xy) -> dict:
-    """Can the player (capsule r 0.3, 0.35 to 1.75 m) reach the door and the walkable tiles from the spawn? A 2 cm
-    grid of the floor, the boxes that reach into the capsule's height grown by its radius, a flood fill from the
-    spawn; the same at r 0.35 for the 0.7 m walking gaps."""
+def walk_check(fr: Frame, boxes: list, spawns_xy: list, portals_xy: list) -> dict:
+    """Can the player (capsule r 0.3, 0.35 to 1.75 m) reach the doors and the walkable tiles from the spawns? A 2 cm
+    grid of the floor, the boxes that reach into the capsule's height grown by its radius, a flood fill from every
+    spawn (the floor any of them reaches); the same at r 0.35 and 0.4 for the walking gaps. `spawns_xy` and
+    `portals_xy` are lists of (x, y): every spawn must stand free (spawnFree), and portalNearestReachM is the
+    farthest any portal stands from the reached floor (byPortal gives each one's when there are more than one; a
+    room with no portal has None). One spawn and one portal give the numbers the check has always given."""
     res = 0.02
     xs = np.arange(fr.x0 + res / 2, fr.x1, res)
     ys = np.arange(fr.y0 + res / 2, fr.y1, res)
@@ -4310,11 +4569,15 @@ def walk_check(fr: Frame, boxes: list, spawn_xy, portal_xy) -> dict:
             dy = np.maximum(np.maximum(b0 - Y, 0), Y - b1)
             blocked |= (dx * dx + dy * dy) < rr * rr
         free = ~blocked
-        sj, si = int((spawn_xy[1] - ys[0]) / res + 0.5), int((spawn_xy[0] - xs[0]) / res + 0.5)
         reach = np.zeros_like(free)
-        if 0 <= sj < free.shape[0] and 0 <= si < free.shape[1] and free[sj, si]:
-            stack = [(sj, si)]
-            reach[sj, si] = True
+        stack, spawn_free = [], []
+        for spawn_xy in spawns_xy:
+            sj, si = int((spawn_xy[1] - ys[0]) / res + 0.5), int((spawn_xy[0] - xs[0]) / res + 0.5)
+            spawn_free.append(bool(free[sj, si]) if 0 <= sj < free.shape[0] else False)
+            if 0 <= sj < free.shape[0] and 0 <= si < free.shape[1] and free[sj, si] and not reach[sj, si]:
+                stack.append((sj, si))
+                reach[sj, si] = True
+        if stack:
             while stack:
                 j, i = stack.pop()
                 for dj, di in ((1, 0), (-1, 0), (0, 1), (0, -1)):
@@ -4331,8 +4594,11 @@ def walk_check(fr: Frame, boxes: list, spawn_xy, portal_xy) -> dict:
                 d2 = (X - cx) ** 2 + (Y - cy) ** 2
                 near = reach & (d2 < 0.35 ** 2)
                 (tiles_ok if near.any() else tiles_no).append([tx, ty])
-        pd = np.sqrt((X - portal_xy[0]) ** 2 + (Y - portal_xy[1]) ** 2)
-        door_d = float(pd[reach].min()) if reach.any() else None
+        by_portal = []
+        for portal_xy in portals_xy:
+            pd = np.sqrt((X - portal_xy[0]) ** 2 + (Y - portal_xy[1]) ** 2)
+            by_portal.append(float(pd[reach].min()) if reach.any() else None)
+        door_d = None if not by_portal or None in by_portal else max(by_portal)
         # how near the body's centre comes to each standing piece's body box (r: it stands against it)
         near = {}
         for pid, p in PIECES.items():
@@ -4342,11 +4608,14 @@ def walk_check(fr: Frame, boxes: list, spawn_xy, portal_xy) -> dict:
             dx = np.maximum(np.maximum(b[0] - X, 0), X - b[3])
             dy = np.maximum(np.maximum(b[1] - Y, 0), Y - b[4])
             near[pid] = round(float(np.sqrt(dx * dx + dy * dy)[reach].min()), 3)
-        out[f"r{r:.2f}"] = dict(spawnFree=bool(free[sj, si]) if 0 <= sj < free.shape[0] else False,
+        out[f"r{r:.2f}"] = dict(spawnFree=bool(spawn_free) and all(spawn_free),
                                 reachableShare=round(float(reach.sum()) / float(free.size), 3),
                                 tilesReached=len(tiles_ok), tilesNotReached=tiles_no,
                                 portalNearestReachM=None if door_d is None else round(door_d, 3),
-                                portalFires=door_d is not None and door_d <= 1.0, pieceNearestM=near)
+                                portalFires=(door_d is not None and door_d <= 1.0) if portals_xy else None,
+                                pieceNearestM=near)
+        if len(portals_xy) > 1:
+            out[f"r{r:.2f}"]["byPortal"] = [None if d_ is None else round(d_, 3) for d_ in by_portal]
         if r == CAPSULE_R:
             out["_mask"] = reach
     out["_grid"] = (float(xs[0]), float(ys[0]), res, reach.shape)
@@ -4429,9 +4698,13 @@ def spot_rows(fr: Frame, walk: dict) -> list:
 FACING_RZ = {"n": 0.0, "e": -90.0, "s": 180.0, "w": 90.0}   # turns the empty's +Y (glTF -Z) to the scene facing
 
 
-def contract_nodes(fr: Frame, door: dict | None) -> dict:
+def contract_nodes(fr: Frame, doors: list) -> dict:
     """Spawn_<sceneId>_<spawnId> at each spawn tile's centre on the floor, looking along its facing; Portal_<portalId>
-    at the doorway's foot with {to, toSpawn, kind}; Area_room_<sceneId> on the floor's centre."""
+    with {to, toSpawn, kind} at its doorway's foot on the wall face, a stairs', hatch's or drop's at its marker's foot
+    (the wall face at its `at` on a border tile, the tile's centre on an inner tile or in the floor: G12 moves it to
+    its flight), a portal with no opening (a skipped one: a scratch room) at its tile's centre. The manifest's row
+    says which (`placed`: door_foot, marker_foot, tile_centre) and copies the scene portal's noise, oneWay and
+    elevationDelta; Area_room_<sceneId> on the floor's centre."""
     out = {"spawns": [], "portals": []}
     room = fr.room
     for s in room.spawns:
@@ -4446,11 +4719,16 @@ def contract_nodes(fr: Frame, door: dict | None) -> dict:
         COL["room"].objects.link(e)
         out["spawns"].append(dict(name=e.name, local=[round(x, 3), round(y, 3), 0.0], facing=s.get("facing", "n"),
                                   label=e["wdi_spawn"], district=e["wdi_district"], tile=[s["x"], s["y"]]))
+    by_portal = {d["portal"]["id"]: d for d in doors if d.get("portal")}
+    markers = {m["portal"]: m for m in fr.markers if m.get("portal")}
     for pt in room.portals:
-        if door is not None and pt["id"] == door["id"]:
-            x, y, _z = door["foot"]
+        door = by_portal.get(pt["id"])
+        if door is not None:
+            (x, y), placed, opening = door["foot"][:2], "door_foot", door["id"]
+        elif pt["id"] in markers:
+            (x, y), placed, opening = markers[pt["id"]]["foot"][:2], "marker_foot", markers[pt["id"]]["id"]
         else:
-            x, y = room.centre(pt["x"], pt["y"])
+            (x, y), placed, opening = room.centre(pt["x"], pt["y"]), "tile_centre", None
         e = bpy.data.objects.new(f"Portal_{pt['id']}", None)
         e.empty_display_type = "CIRCLE"
         e.empty_display_size = 1.0
@@ -4459,7 +4737,9 @@ def contract_nodes(fr: Frame, door: dict | None) -> dict:
         e["wdi_portal_id"] = pt["id"]
         COL["room"].objects.link(e)
         out["portals"].append(dict(name=e.name, id=pt["id"], local=[round(x, 3), round(y, 3), 0.0], to=pt["to"],
-                                   toSpawn=pt["toSpawn"], kind=pt["kind"], tile=[pt["x"], pt["y"]]))
+                                   toSpawn=pt["toSpawn"], kind=pt["kind"], tile=[pt["x"], pt["y"]],
+                                   placed=placed, opening=opening,
+                                   **{k: pt[k] for k in ("noise", "oneWay", "elevationDelta") if k in pt}))
     return out
 
 
@@ -4744,7 +5024,7 @@ def plan_step(scene_id: str, out_dir: str) -> str:
         font = ImageFont.load_default()
     for s in m["spawns"]:
         a, b = px(*s["local"][:2])
-        d2.text((a + 14, b - 8), f"Spawn_{scene_id}_door", fill=(127, 168, 255), font=font)
+        d2.text((a + 14, b - 8), s["name"], fill=(127, 168, 255), font=font)
     for p in m["portals"]:
         a, b = px(*p["local"][:2])
         d2.text((a + 14, b + 6), f"Portal_{p['id']} -> {p['to']}/{p['toSpawn']}", fill=(255, 255, 255), font=font)
@@ -4860,12 +5140,18 @@ def blender_main(a) -> None:
     # the derived reading (openings, lights, groups, coverage, the pieces' places from the scene): a separate dict,
     # so nothing derived reaches CFG, whose md5 a saved bake records
     SPEC = rf.derive(CFG, room.d, shown=from_root(room_file))
-    if SPEC["pending"]:
+    if SPEC["pending"] and not a.partial:
         raise SystemExit(f"meshy_room_build: {from_root(room_file)} needs what this builder does not build yet:\n  "
-                         + "\n  ".join(SPEC["pending"]))
+                         + "\n  ".join(SPEC["pending"]) + "\n(--partial builds the rest, for a scratch room)")
+    for p_ in SPEC["pending"]:    # --partial: a scratch room's proof build; never a finished room
+        NOTES.append(f"--partial: not built: {p_}")
     look_file = os.path.abspath(a.look) if a.look else FP_LOOK
     with open(look_file, encoding="utf-8") as fh:
-        look = json.load(fh)
+        look_whole = json.load(fh)
+    # the room's look (G9): its `look` deep-merged over the look file before anything reads it; `light` its default
+    # setting. With neither the merged look is the file's own (and so is its lookBakeMd5)
+    look, room_light, look_room = rf.room_look(look_whole, CFG, shown=from_root(room_file),
+                                               shown_look=from_root(look_file))
     # What made the outputs, each input by its own md5: this script (the shared code: no room's data stands in it,
     # so adding a room does not change it), the room's own file, the look file, the kit and the room files' loader.
     # scriptMd5, roomMd5, lookMd5, kitMd5 and loaderMd5 are the files as saved with their line ends made LF (a
@@ -4878,7 +5164,7 @@ def blender_main(a) -> None:
                room=from_root(room_file), roomMd5=forms["room"][0],
                roomBakeMd5=bake_room_md5(CFG),
                look=from_root(look_file), lookMd5=forms["look"][0],
-               lookBakeMd5=bake_look_md5(look),
+               lookBakeMd5=bake_look_md5(look), lookRoomMd5=look_room,
                kit=from_root(kit_file), kitMd5=forms["kit"][0],
                loader=from_root(loader_file), loaderMd5=rf.text_md5(loader_file),
                roomSchema=SPEC["schema"], layout=layout,
@@ -4888,7 +5174,7 @@ def blender_main(a) -> None:
     CFG["look"] = look
     # the light setting: weights on the look's candle, moon and fill (the look's `settings`)
     sets = {k: v for k, v in (look.get("settings") or {}).items() if isinstance(v, dict)}
-    light = a.light or (look.get("settings") or {}).get("default")
+    light = a.light or room_light or (look.get("settings") or {}).get("default")
     if light and light not in sets:
         raise SystemExit(f"meshy_room_build: no light setting {light!r} in {from_root(look_file)} (it has "
                          f"{sorted(sets)})")
@@ -4921,13 +5207,29 @@ def blender_main(a) -> None:
         + ", ".join(f"{o['kind']} {o['id']} {o['side']} {o['a']:.2f}..{o['b']:.2f}" for o in fr.openings))
     mt = make_materials(fr)
     build_shell(fr, mt)
-    door = build_door(fr, mt)
-    win = build_window(fr, mt)
-    moon = moon_dir(CFG["moon"], fr, win["side"] if win else "N")
-    if win:
-        build_outside(fr, mt, win, moon)
+    if is_v2():
+        # every door and window in the file's order; the moon through the window its moon light names (none: a
+        # windowless room, or dark glass only); the village view round the first `snow` window, a sky backdrop on
+        # each other wall that has a `sky` window
+        doors, wins = build_doors(fr, mt), build_windows(fr, mt)
+        mw = moon_window(fr)
+        win = next((w for w in wins if mw is not None and w["id"] == mw["id"]), None)
+        moon = moon_dir(CFG["moon"], fr, win["side"]) if win else Vector((0.0, 0.0, 1.0))
+        snow = next((w for w in wins if w["outside"] == "snow"), None)
+        if snow:
+            build_outside(fr, mt, snow, moon)
+        for side in dict.fromkeys(w["side"] for w in wins if w["outside"] == "sky"):
+            if snow is None or side != snow["side"]:
+                build_backdrop(fr, mt, next(w for w in wins if w["outside"] == "sky" and w["side"] == side), moon)
+    else:
+        door = build_door(fr, mt)
+        doors = [door] if door else []
+        win = build_window(fr, mt)
+        moon = moon_dir(CFG["moon"], fr, win["side"] if win else "N")
+        if win:
+            build_outside(fr, mt, win, moon)
     anchors = build_furniture(fr, mt)
-    flame = anchors.get("flame")
+    flame = anchors.get("flame") if not is_v2() else rig_anchor(anchors)
     log(f"flame at {flame}, moon toward {tuple(round(v, 3) for v in moon)}")
     print(f"PH masters removed: {mib.purge_ph_masters()}", flush=True)
     for c in ("src",):
@@ -4958,7 +5260,7 @@ def blender_main(a) -> None:
             log(f"split {o.name}: +{n_} vertices (now {len(o.data.vertices)})")
     log(f"bake targets {len(targets)}, edges split adding {added} vertices")
     prepare_attrs(targets)
-    rig = bake_rig(fr, win, flame, moon)
+    rig = bake_rig(fr, [win] if win else [], flame, moon)
     if a.rig_print:     # the rig's fingerprint (room_checks/rig_print.py): what the gate cannot see of a bake
         sys.path.insert(0, os.path.join(HERE, "room_checks"))
         import rig_print
@@ -5124,11 +5426,10 @@ def blender_main(a) -> None:
     CFG["applied_weights"] = ex["weights"]
     lights = export_lights(fr, win, flame, moon, ex["k"])
     to_unlit(ex)
-    coll_ob, boxes = collision(fr, door)
-    nodes = contract_nodes(fr, door)
-    spawn_xy = nodes["spawns"][0]["local"][:2] if nodes["spawns"] else (fr.cx, fr.cy)
-    portal_xy = nodes["portals"][0]["local"][:2] if nodes["portals"] else (fr.cx, fr.cy)
-    walk = walk_check(fr, boxes, spawn_xy, portal_xy)
+    coll_ob, boxes = collision(fr, doors)
+    nodes = contract_nodes(fr, doors)
+    walk = walk_check(fr, boxes, [s_["local"][:2] for s_ in nodes["spawns"]] or [(fr.cx, fr.cy)],
+                      [p_["local"][:2] for p_ in nodes["portals"]])
     log("walk", json.dumps({k: v for k, v in walk.items() if not k.startswith("_")}))
     checks = piece_checks(fr)
     spots = spot_rows(fr, walk)
@@ -5165,6 +5466,17 @@ def blender_main(a) -> None:
         area=dict(name=area.name, origin=[round(v, 3) for v in area.location], extras={k: area[k] for k in area.keys()
                                                                                      if k.startswith("wdi_")}),
         bounds=dict(room=[fr.x0, fr.y0, 0.0, fr.x1, fr.y1, fr.H], wallThickness=fr.T),
+        # the openings as built (the loader's entries; a and b along the wall's world axis) and the scene's flags the
+        # walk viewer plays (a dark room, a silent one, the noise on entering: room_file_v2, section 12)
+        openings=[dict(id=e["id"], kind=e["kind"], side=e["side"], tile=e["tile"], at=e.get("at"),
+                       a=None if e.get("at") is None else round(e["at"] - e["width"] / 2, 4),
+                       b=None if e.get("at") is None else round(e["at"] + e["width"] / 2, 4),
+                       z0=0.0 if e["kind"] == "door" else e.get("sill"),
+                       z1=e.get("height") if e["kind"] == "door" else e.get("head"), style=e.get("style"),
+                       portal=e.get("portal"), prop=e.get("prop"), outside=e.get("outside"),
+                       foot=[round(float(v), 4) for v in e["foot"]] if e.get("foot") else None)
+                  for e in SPEC["openings"]],
+        sceneFlags={k: room.d[k] for k in ("dark", "silent", "entryNoise") if k in room.d},
         spawns=nodes["spawns"], portals=nodes["portals"],
         lights=[dict(name=o.name, id=o.get("wdi_light_id"), kind=o.get("wdi_light"), type=o.data.type,
                      location=[round(v, 3) for v in o.location], color=list(o.data.color),
@@ -5191,11 +5503,14 @@ def blender_main(a) -> None:
         coverage=SPEC.get("coverage"), skip=SPEC.get("skip"),
         collision=dict(name=coll_ob.name, boxes=len(boxes), triangles=len(boxes) * 12, boxesSha1=boxes_sha1(boxes)),
         walk={k: v for k, v in walk.items() if not k.startswith("_")}, checks=checks, notes=NOTES,
+        # the Poly Haven models and textures this room used (its credits: coupling 24 of the implementation plan)
         polyHaven=dict(models=sorted({p["spec"].get("slug") for p in PIECES.values() if p["spec"].get("slug")} |
                                      {d["slug"] for p in PIECES.values() for d in p["spec"].get("dress", ())} |
-                                     {ph[0] for ph in PHOTOS}),
-                       textures=sorted({mib.mr.role(r).slug for r in (CFG["floor"]["role"], "wall_plaster", "joinery",
-                                                                      "linen", "wool", "coverlet", "carpet", "snow")})),
+                                     ({ph[0] for ph in PHOTOS} if any(p["spec"].get("model") == "photos"
+                                                                      for p in PIECES.values()) else set())),
+                       textures=sorted({mib.mr.role(r).slug for r in texture_roles(
+                           {m.name[len(P):] for m in bpy.data.materials if m.users and m.name.startswith(P)},
+                           CFG["floor"]["role"], any(p["spec"].get("model") == "rug" for p in PIECES.values()))})),
         meshy=[p["spec"]["name"] for p in PIECES.values() if p["spec"].get("model") == "meshy"] +
         sorted({h[0] for h in CFG["outside"].get("meshy", {}).get("houses", ())} |
                ({"pine_tall", "pine_short"} if CFG["outside"].get("meshy") else set())),
@@ -5251,6 +5566,9 @@ def parse(argv: list[str]):
     p.add_argument("--look", help="build with this look file instead of meshy_looks/interior_fp.json (a scratch look)")
     p.add_argument("--rig-print", help="write the bake rig's fingerprint to this JSON file (room_checks/rig_print.py)")
     p.add_argument("--rig-stop", action="store_true", help="with --rig-print: stop once the fingerprint is written")
+    p.add_argument("--partial", action="store_true",
+                   help="build what this builder has of a file that needs more (its `pending`, written to the notes): "
+                        "a scratch room's proof build, never a finished room")
     p.add_argument("--step", help="plain Python: plan (the overlay on the plan render)")
     return p.parse_args(argv)
 

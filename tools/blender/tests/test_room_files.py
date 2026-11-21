@@ -495,7 +495,10 @@ class RoomFileV2(unittest.TestCase):
                          {"wp.lt_lamp": "candle", "wp.lt_lamp_chair": "candle", "wp.lt_fire": "fire", "wp.lt_moon": "moon"})
         self.assertEqual(len(spec["plannedNames"]), 44)
         self.assertEqual(len(spec["coverage"]), 19)       # 17 props and 2 spots
-        self.assertEqual(len(spec["pending"]), 4)         # openings, look, the day bed, the hearth: not built yet
+        # not built yet: the second lamp and the fire (G4), the day bed (G7), the hearth (G6); the openings (G3) and
+        # the look override (G9) are built
+        self.assertEqual(len(spec["pending"]), 3)
+        self.assertIn("lights wp.lt_lamp_chair, wp.lt_fire:", spec["pending"][0])
         self.assertEqual(spec["pieces"]["wp.letter_box"]["ref"], [6.5, 5.0])
 
     # -- R0: the whole file
@@ -733,6 +736,114 @@ class RoomFileV2(unittest.TestCase):
         self.assertIn("path v2", done.stdout)
         self.assertIn("bake groups: candle, fire, moon, fill", done.stdout)
 
+    # -- the rig the builder bakes until G4 (S3), the moon's numbers
+    def test_the_rig_is_one_lamp_and_one_moon(self):
+        _cfg, spec = self.read(self.bedroom())
+        self.assertEqual((spec["rig"]["lamp"]["id"], spec["rig"]["moon"]["id"]), ("wb.lt_candle", "wb.lt_moon"))
+        self.assertEqual(spec["pending"], [])
+        _cfg, spec = self.read(raw(PARLOUR))
+        self.assertEqual((spec["rig"]["lamp"]["id"], spec["rig"]["moon"]["window"]), ("wp.lt_lamp", "wp.draped_window_1"))
+        lamp = dict(id="x", role="lamp", group="candle", anchor={"piece": "p", "offset": [0, 0, 0.1]})
+        rig, left = rf.rig_lights([lamp, dict(lamp, id="y", anchor={"at": [0, 0, 1]})], legacy=False)
+        self.assertEqual((rig["lamp"]["id"], rig["moon"], left), ("y", None, ["x"]))     # an offset waits for G4
+
+    def test_a_v2_moon_needs_its_angles_and_a_bearing_waits(self):
+        data = raw(PARLOUR)
+        del data["moon"]
+        self.assertIn('a moon light needs "moon": {"azimuth"', self.stops(data))
+        data = raw(PARLOUR)
+        data["moon"] = {"bearing": 20.0, "elevation": 30.0}
+        _cfg, spec = self.read(data)
+        self.assertIn("moon.bearing: one Sun from a compass bearing waits for G4 (S5c)", spec["pending"])
+
+    # -- G9: the look override (room_file_v2, section 5)
+    def look(self):
+        return raw(os.path.join(BLENDER, "meshy_looks", "interior_fp.json"))
+
+    def look_stops(self, over, light=None):
+        bag = rf.Problems("room.json")
+        rf.look_rules(self.look(), over, light, bag)
+        return "\n".join(bag)
+
+    def test_no_override_is_the_look_itself(self):
+        look = self.look()
+        merged, light, own = rf.room_look(look, rf.load_room("widow_bedroom"))
+        self.assertEqual(merged, look)
+        self.assertEqual((light, own), (None, None))
+        self.assertEqual(rf.bake_look_md5(merged), LOOK_MD5)
+
+    def test_the_override_merges_deep_replaces_arrays_and_null_deletes(self):
+        look = self.look()
+        over = {"lights": {"fire": {"color": "#FFB457", "power": 60.0}, "lamp": {"power": 30.0}},
+                "exposure": {"pool_display": 0.35}, "ink_lift": {"scan_contrast": {"gamma_min": 0.4}, "form": None},
+                "black_cloth": [0.01, 0.01, 0.01]}
+        before = json.dumps(look, sort_keys=True)
+        merged = rf.merge_look(look, over)
+        self.assertEqual(json.dumps(look, sort_keys=True), before)              # the look file's data is not changed
+        self.assertEqual(merged["lights"]["lamp"]["power"], 30.0)
+        self.assertEqual(merged["lights"]["lamp"]["color"], look["lights"]["lamp"]["color"])
+        self.assertEqual(merged["lights"]["fire"]["power"], 60.0)
+        self.assertEqual(merged["exposure"]["pool_display"], 0.35)
+        self.assertEqual(merged["exposure"]["pool_radius_m"], look["exposure"]["pool_radius_m"])
+        self.assertEqual(merged["ink_lift"]["scan_contrast"]["gamma_min"], 0.4)
+        self.assertEqual(merged["ink_lift"]["scan_contrast"]["dark_below"], look["ink_lift"]["scan_contrast"]["dark_below"])
+        self.assertNotIn("form", merged["ink_lift"])
+        self.assertEqual(merged["black_cloth"], [0.01, 0.01, 0.01])
+        self.assertEqual(self.look_stops(over), "")
+        self.assertRegex(rf.look_room_md5(over), r"^[0-9a-f]{32}$")
+        self.assertNotEqual(rf.bake_look_md5(merged), LOOK_MD5)     # the room's merged look is its bake's own
+
+    def test_look_rules(self):
+        cases = [({"exposure": {"pool_dispaly": 0.4}}, 'look.exposure.pool_dispaly: no such key in the look file '
+                                                       '(did you mean "pool_display"?) (R-K1)'),
+                 ({"lights": {"fire": {"colour": "#FFB457"}}}, 'look.lights.fire: the key "colour" is not a light '
+                                                               'role key (did you mean "color"?) (R-K1)'),
+                 ({"lights": {"lamp": {"powr": 3.0}}}, "look.lights.lamp.powr: no such key"),
+                 ({"settings": {"dusk": {"mix": {"candle": 1.0}, "lable": "x"}}}, 'the key "lable" is not a setting'),
+                 ({"emit_display": {"M_coal": [1.0, 2.0]}}, "look.emit_display.M_coal: an emitter's display colour is"),
+                 ({"outside": {"sky": "x"}}, "look.outside.sky: only outside.gain may change"),
+                 ({"hot": {"knee": None, "kneee": 1.0}}, "look.hot.kneee: no such key"),
+                 ({"ao": {"walls": {"strenght": 0.3}}}, "look.ao.walls.strenght: no such key"),
+                 ({"lights": {"fire": {"color": "#FF00FF"}}}, "look.lights.fire.color #FF00FF is not a palette light "
+                                                             "colour"),
+                 ({"lights": {"fill": {"color": "#C08060"}}}, "is not a palette light colour")]
+        for over, said in cases:
+            self.assertIn(said, self.look_stops(over), said)
+        # allowed: a new role, a new setting, a new emitter, a near-white, outside.gain, a null on a key the look has
+        self.assertEqual(self.look_stops({"lights": {"teal": {"color": "#2EC4B6", "power": 5.0},
+                                                     "fill": {"color": "#F4F2EE", "area_ref_m2": None}},
+                                          "settings": {"dusk": {"label": "dusk", "mix": {"fire": 1.2}}},
+                                          "emit_display": {"M_coal": [3.0, 1.2, 0.3]}, "outside": {"gain": 0.4},
+                                          "hot": {"knee": None}}), 'look.lights.fill.area_ref_m2: null deletes a key, '
+                                                                    'and the look file has none here (R-K1)')
+        # R-K3: the room's light setting is one of the merged look's
+        self.assertIn('light "dusk": no such setting (the merged look has first, last, midway) (R-K3)',
+                      self.look_stops(None, "dusk"))
+        self.assertEqual(self.look_stops({"settings": {"dusk": {"mix": {"candle": 1.0}}}}, "dusk"), "")
+        # R-K2 and an unknown top key are the loader's own (load_room)
+        data = raw(PARLOUR)
+        data["look"] = {"bake": {}, "ink_lft": 0.3}
+        said = self.stops(data)
+        self.assertIn("look.bake: the look's bake is not overridable (R-K2)", said)
+        self.assertIn('look: the key "ink_lft" is not a look key (did you mean "ink_lift"?)', said)
+
+    def test_the_room_look_stops_with_its_problems(self):
+        row = dict(rf.load_room("widow_parlour", path=PARLOUR))
+        merged, light, own = rf.room_look(self.look(), row)
+        self.assertEqual((light, merged["lights"]["fire"]["power"]), ("midway", 60.0))
+        self.assertEqual(own, rf.look_room_md5(row["look"]))
+        row["light"] = "dawn"
+        with self.assertRaises(SystemExit) as caught:
+            rf.room_look(self.look(), row, shown="p.json")
+        self.assertIn('meshy_room_build: p.json: light "dawn": no such setting', str(caught.exception))
+
+    def test_the_emit_cap_is_the_rooms_own_emitters(self):
+        shown = dict(self.look()["emit_display"], M_fire=[9.0, 4.0, 1.0])
+        self.assertEqual(rf.emit_cap(shown, ["M_flame", "M_moon", "M_lit_window", "M_glass"]), 6.0)
+        self.assertEqual(rf.emit_cap(shown, ["M_flame", "M_fire"]), 9.0)
+        self.assertEqual(rf.emit_cap(shown, ["M_glass"]), 0.04)
+        self.assertEqual(rf.emit_cap(shown, []), 1.0)
+
 
 class GateDigest(unittest.TestCase):
     """The manifest digest and the bake gate's arithmetic in regress.py, on stand-in manifests."""
@@ -839,6 +950,64 @@ class BuilderV2(unittest.TestCase):
         self.assertEqual(mrb.shown_argv(argv), ["--scene", "widow_bedroom", "--out", "out", "--raw",
                                                 "tools/blender/build/rooms/widow_bedroom_raw_groups.npz",
                                                 "--room-file", "r.json"])
+
+    # -- G3: the openings' plain-number parts (the rest is proven by the gate and the scratch rooms' builds)
+    @staticmethod
+    def frame(x0=-5.0, x1=5.0, y0=-4.0, y1=4.0):
+        fr = object.__new__(mrb.Frame)      # the room box alone: wall_frame, to_s and point need no scene
+        fr.x0, fr.x1, fr.y0, fr.y1 = x0, x1, y0, y1
+        return fr
+
+    def test_the_bake_box_keeps_every_hole_of_a_wall(self):
+        self.assertEqual(mrb.tight_cuts(-1.0, 11.0, -0.3, 3.3, []), [(-1.0, 11.0, -0.3, 3.3)])
+        # one hole: the four panels the box has always had, in their order
+        self.assertEqual(mrb.tight_cuts(-1.0, 11.0, -0.3, 3.3, [(4.0, 5.0, 0.75, 2.3)]),
+                         [(-1.0, 4.0, -0.3, 3.3), (5.0, 11.0, -0.3, 3.3), (4.0, 5.0, -0.3, 0.75), (4.0, 5.0, 2.3, 3.3)])
+        # two holes, given out of order: both kept (the old loop kept only the last)
+        got = mrb.tight_cuts(-1.0, 11.0, -0.3, 3.3, [(7.0, 8.0, 0.8, 2.2), (2.0, 3.0, 0.75, 2.3)])
+        self.assertEqual(got, [(-1.0, 2.0, -0.3, 3.3), (3.0, 7.0, -0.3, 3.3), (8.0, 11.0, -0.3, 3.3),
+                               (2.0, 3.0, -0.3, 0.75), (2.0, 3.0, 2.3, 3.3), (7.0, 8.0, -0.3, 0.8), (7.0, 8.0, 2.2, 3.3)])
+
+    def test_the_skirting_breaks_at_every_door(self):
+        fr = self.frame()
+        door = lambda side, a, b: dict(kind="door", side=side, a=a, b=b)     # noqa: E731
+        # one door on the south wall: the one path the builder has always swept (its end, the four corners from the
+        # south wall's far corner, its start)
+        runs = mrb.skirting_runs(fr, [door("S", -2.95, -2.05)])
+        self.assertEqual(runs, [[fr.point("S", 2.95 + 0.115, 0.0, 0.0), (5.0, -4.0, 0.0), (5.0, 4.0, 0.0),
+                                 (-5.0, 4.0, 0.0), (-5.0, -4.0, 0.0), fr.point("S", 2.05 - 0.115, 0.0, 0.0)]])
+        # the same for a door on the east wall: the corners from the east wall's far corner on
+        runs = mrb.skirting_runs(fr, [door("E", -0.45, 0.45)])
+        self.assertEqual([p[:2] for p in runs[0][1:-1]], [(5.0, 4.0), (-5.0, 4.0), (-5.0, -4.0), (5.0, -4.0)])
+        # the parlour's two: the east door and the north one; two runs, each from one door to the next
+        # (the parlour's box, 14 x 9 m; the north wall's s runs west, so the north door's near end is its east end)
+        fr = self.frame(-7.0, 7.0, -4.5, 4.5)
+        runs = mrb.skirting_runs(fr, [door("E", -0.45, 0.45), door("N", -4.95, -4.05)])
+        self.assertEqual(len(runs), 2)
+        ends = [(tuple(round(v, 3) for v in r[0][:2]), tuple(round(v, 3) for v in r[-1][:2]), len(r) - 2) for r in runs]
+        self.assertEqual(sorted(ends), sorted([((7.0, 0.565), (-3.935, 4.5), 1),          # E door north to the N door
+                                              ((-5.065, 4.5), (7.0, -0.565), 3)]))       # N door round to the E door
+        fr = self.frame()
+        # two doors on one wall whose architraves all but meet: no run between them
+        runs = mrb.skirting_runs(fr, [door("S", -1.0, -0.1), door("S", 0.13, 1.0)])
+        self.assertEqual(len(runs), 1)
+
+    def test_a_knob_letter_is_an_end_seen_from_inside(self):
+        # the wall coordinate s runs E, N, W, S round the S, E, N, W walls: the letter of the higher-s end is each
+        # wall's default, and the legacy reading ("E" or "N" toward +s) agrees on the S and E walls only
+        fr = self.frame()
+        for side, end in rf.KNOB_DEFAULT.items():
+            self.assertIn(end, rf.KNOB_ENDS[side])
+            (_o, (dx, dy), _n, _L) = fr.wall_frame(side)
+            self.assertEqual({(1.0, 0.0): "E", (0.0, 1.0): "N", (-1.0, 0.0): "W", (0.0, -1.0): "S"}[(dx, dy)], end)
+            self.assertEqual(end in ("E", "N"), side in ("S", "E"))
+
+    def test_the_credits_are_the_textures_the_room_used(self):
+        used = {"M_floor", "M_wall", "M_wood", "M_curtain_2", "M_snow"}
+        self.assertEqual(mrb.texture_roles(used, "floor_boards", rug=False),
+                         ["floor_boards", "wall_plaster", "joinery", "snow", "wool"])
+        self.assertEqual(mrb.texture_roles({"M_floor", "M_wood"}, "floor_boards", rug=True),
+                         ["floor_boards", "joinery", "carpet"])
 
     def test_a_bake_is_hashed_by_group(self):
         import numpy as np
