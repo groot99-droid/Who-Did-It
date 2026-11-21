@@ -994,29 +994,39 @@ def win_cfg(o: dict, cfg: dict | None = None) -> dict:
     return o["spec"] if "spec" in o else (cfg or CFG)["window"]
 
 
-def moon_window(fr: Frame) -> dict | None:
-    """The window the moon comes through: on the legacy path the window; on the v2 path the one the room's moon
-    light names (the loader's rig: one moon until G4), None in a room with no moon light."""
+def moon_windows(fr: Frame) -> list:
+    """The windows the moon comes through (the openings): on the legacy path the window; on the v2 path each window
+    a moon light names, in the lights' order (none in a room with no moon light: its windows are dark glass)."""
     wins = [o for o in fr.openings if o["kind"] == "window"]
     if not is_v2():
-        return wins[0] if wins else None
-    mid = ((SPEC.get("rig") or {}).get("moon") or {}).get("window")
-    return next((o for o in wins if o["id"] == mid), None)
+        return wins[:1]
+    ids = dict.fromkeys(r["window"] for r in SPEC.get("lights") or () if r["role"] == "moon")
+    return [o for i in ids for o in wins if o["id"] == i]
 
 
-def moon_patch(fr: Frame, cfg: dict) -> list | None:
+def moon_patches(fr: Frame, cfg: dict) -> list:
+    """The moon's patches on the floor, one polygon per moon-lit window (the legacy path's one)."""
+    return [q for q in (moon_patch(fr, cfg, o) for o in moon_windows(fr)) if q is not None]
+
+
+def moon_patch(fr: Frame, cfg: dict, o: dict | None = None) -> list | None:
     """The moon's patch on the floor as a polygon [(x, y), ...]: the window's clear opening on the wall's inner face
     (inside its frame and the curtains' edges, under the swag's belly) carried along the moon's rays to the floor.
-    Plain numbers (no Blender): the light numbers are also taken from an exported GLB."""
-    o = moon_window(fr)
+    Plain numbers (no Blender): the light numbers are also taken from an exported GLB. `o`: the window (default the
+    first moon-lit one)."""
+    if o is None:
+        o = next(iter(moon_windows(fr)), None)
     if o is None:
         return None
     w, m = win_cfg(o, cfg), cfg["moon"]
     side = o["side"]
     (_o, (dx, dy), (nx, ny), _L) = fr.wall_frame(side)
-    a, e = math.radians(m["azimuth"]), math.radians(m["elevation"])
-    d = np.array([(-nx * math.cos(a) - dx * math.sin(a)) * math.cos(e),
-                  (-ny * math.cos(a) - dy * math.sin(a)) * math.cos(e), math.sin(e)])     # toward the moon
+    if is_v2() and m.get("bearing") is not None:      # one Sun from a compass bearing (R-L9)
+        d = np.array(rf.bearing_dir(m["bearing"], m["elevation"]))
+    else:
+        a, e = math.radians(m["azimuth"]), math.radians(m["elevation"])
+        d = np.array([(-nx * math.cos(a) - dx * math.sin(a)) * math.cos(e),
+                      (-ny * math.cos(a) - dy * math.sin(a)) * math.cos(e), math.sin(e)])     # toward the moon
     sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
     z0 = o["z0"] + 0.03
     z1 = min(o["z1"] - 0.05, (w["rod"] + 0.03 - 0.40) if w.get("swag") else 1e9)
@@ -1060,11 +1070,58 @@ def _poly_signed(poly: list, xy: np.ndarray) -> np.ndarray:
     return np.where(inside, dist, -dist)
 
 
+def _points(flames) -> list:
+    """The pool lights' points as arrays: a list of points, or one point, or None."""
+    if flames is None:
+        return []
+    if len(flames) == 3 and all(isinstance(v, (int, float, np.floating)) for v in flames):
+        flames = [flames]
+    return [np.asarray(f, float) for f in flames]
+
+
+def near_dist(co: np.ndarray, points: list) -> np.ndarray:
+    """Each point's distance to the nearest of `points` (arrays); one point gives np.linalg.norm(co - f, axis=1)
+    itself, so a room with one pool light measures as it always has."""
+    if len(points) == 1:
+        return np.linalg.norm(co - points[0], axis=1)
+    return np.minimum.reduce([np.linalg.norm(co - f, axis=1) for f in points])
+
+
+def patch_signed(patches, xy: np.ndarray) -> np.ndarray:
+    """The signed distance to the union of the moon's patches: the maximum of the per-patch distances (positive
+    inside one); one patch gives _poly_signed's array, none -1e9 everywhere."""
+    if patches and len(patches[0]) and isinstance(patches[0][0], (int, float, np.floating)):
+        patches = [patches]         # one polygon given as [(x, y), ...]
+    patches = [q for q in (patches or ()) if q]
+    if not patches:
+        return np.full(len(xy), -1e9)
+    if len(patches) == 1:
+        return _poly_signed(patches[0], xy)
+    return np.maximum.reduce([_poly_signed(q, xy) for q in patches])
+
+
+def pool_level(pools: list, pct: float) -> float:
+    """The exposure's pool: each pool light's shell vertices within the pool radius (a list of arrays a light), their
+    `pct` percentile, the largest over the lights (the strongest pool sets E); one light gives the percentile of its
+    pool as it always has, none the 0.05 the builder has always fallen back on."""
+    best = None
+    for arrs in pools:
+        if not arrs:
+            continue
+        a_ = np.concatenate(arrs)
+        if not a_.size:
+            continue
+        v = float(np.percentile(a_, pct))
+        best = v if best is None else max(best, v)
+    return best if best is not None else float(np.percentile(np.array([0.05]), pct))
+
+
 def light_numbers(surf: dict, flame, boxes: list, patch: list | None) -> dict:
     """The room's light in a few numbers, from its shell's vertices as the viewer shows them. `surf`: {"Floor",
     "Wall_N", "Wall_E", "Wall_S", "Wall_W"} -> (positions N x 3, display luminance 0..255 of each vertex with its
     material's mean colour); `boxes`: the pieces' body boxes (a vertex behind or under one is left out); `patch`:
-    the moon's patch (moon_patch).
+    the moon's patches (moon_patches; one polygon is read as one patch); `flame`: the pool lights' points (one point
+    is read as one light). With several, "the flame" is the nearest of them and the patch their union.
 
     - candle_wall: the walls within 2 m of the flame, between 0.8 and 2.3 m: their median;
     - far_wall: the wall farthest from the flame, between 1.0 and 2.3 m: its median;
@@ -1072,7 +1129,7 @@ def light_numbers(surf: dict, flame, boxes: list, patch: list | None) -> dict:
       glazing bars' shadows); floor_round: the floor 0.25 to 0.9 m outside the patch: its median;
     - dim_floor: the open floor more than 3 m from the flame and 0.9 m from the patch: its median.
     The same definitions measure every build (the first, the last and this one), whatever its arrangement."""
-    f = np.asarray(flame, float) if flame is not None else None
+    fs = _points(flame)
 
     def clear(co):
         keep = np.ones(len(co), bool)
@@ -1083,13 +1140,13 @@ def light_numbers(surf: dict, flame, boxes: list, patch: list | None) -> dict:
 
     out = {}
     walls = {k: v for k, v in surf.items() if k.startswith("Wall_")}
-    if f is not None and walls:
+    if fs and walls:
         near, far = [], None
         for k, (co, y) in walls.items():
             ok = clear(co) & (co[:, 2] < 2.3)
-            d = np.linalg.norm(co - f, axis=1)
+            d = near_dist(co, fs)
             near.append(y[ok & (co[:, 2] > 0.8) & (d < 2.0)])
-            dist_wall = float(np.median(np.linalg.norm(co[:, :2] - f[:2], axis=1)))
+            dist_wall = float(np.median(near_dist(co[:, :2], [f[:2] for f in fs])))
             if far is None or dist_wall > far[0]:
                 far = (dist_wall, k, y[ok & (co[:, 2] > 1.0)])
         near = np.concatenate(near)
@@ -1102,15 +1159,15 @@ def light_numbers(surf: dict, flame, boxes: list, patch: list | None) -> dict:
     if "Floor" in surf:
         co, y = surf["Floor"]
         ok = clear(co)
-        sd = _poly_signed(patch, co[:, :2]) if patch else np.full(len(co), -1e9)
+        sd = patch_signed(patch, co[:, :2])
         inner, ring = ok & (sd > 0.06), ok & (sd < -0.25) & (sd > -0.9)
         if inner.any() and ring.any():
             out["moon_patch"] = round(float(np.percentile(y[inner], 75)), 1)
             out["floor_round"] = round(float(np.median(y[ring])), 1)
             out["moon_over_floor"] = round(out["moon_patch"] / max(out["floor_round"], 1e-6), 3)
         dim = ok & (sd < -0.9)
-        if f is not None:
-            dim &= np.linalg.norm(co[:, :2] - f[:2], axis=1) > 3.0
+        if fs:
+            dim &= near_dist(co[:, :2], [f[:2] for f in fs]) > 3.0
         if dim.any():
             out["dim_floor"] = round(float(np.median(y[dim])), 1)
     return out
@@ -1686,7 +1743,9 @@ def look_sky() -> dict:
 
 def moon_dir(cfg: dict, fr: Frame, side: str) -> Vector:
     """The unit vector toward the moon: `azimuth` degrees from straight out of the window wall toward the wall's
-    +s side, at `elevation`."""
+    +s side, at `elevation`; in a v2 file `bearing` (a compass angle) in its place: one Sun for the room."""
+    if is_v2() and cfg.get("bearing") is not None:
+        return Vector(rf.bearing_dir(cfg["bearing"], cfg["elevation"])).normalized()
     nx, ny = _NORMALS[side]
     out = Vector((-nx, -ny, 0.0))
     (_o, (dx, dy), _n, _L) = fr.wall_frame(side)
@@ -2098,6 +2157,9 @@ def place_piece(fr: Frame, piece: dict, ob, lo: Vector, hi: Vector) -> tuple:
             tx = ob_box[3] + gap - bx0
             ty = along - (by0 + by1) / 2
     rise = float(piece.get("rise") or 0.0) if MODEL_OF.get(piece.get("id")) != "photos" else 0.0
+    # the piece's frame (its anchors, offsets and glows): the footprint's centre on the floor before the turn
+    PLACE_M[piece.get("id")] = (Matrix.Translation((tx, ty, rise)) @ R,
+                                Vector(((lo.x + hi.x) / 2, (lo.y + hi.y) / 2, lo.z)))
     if rise:    # a wall-hung piece (a letter box, a frame): lifted off the floor
         ob.matrix_world = Matrix.Translation((tx, ty, rise)) @ R @ ob.matrix_world
         return (bx0 + tx, by0 + ty, lo.z + rise, bx1 + tx, by1 + ty, hi.z + rise)
@@ -2181,21 +2243,172 @@ def swap_ph_materials(ob, size: int = 512, tag: str | None = None, meshy_pct: fl
     return used
 
 
-def rig_anchor(anchors: dict):
-    """A v2 file's lamp position: its rig lamp's anchor (the loader's: a piece's named anchor, or a point `at`), None
-    when the room has no lamp."""
-    lamp = (SPEC.get("rig") or {}).get("lamp")
-    if lamp is None:
-        return None
-    a = lamp["anchor"]
+LIGHTS: list = []           # the room's night lights as built (resolve_lights): the rig's, the export's, the manifest's
+PLACE_M: dict = {}          # piece id -> (its placement matrix, its footprint's centre on the floor before the turn)
+
+
+def piece_point(pid: str, v) -> tuple:
+    """A point given in a piece's frame (the centre of its footprint on the floor, +x along its width, +y toward its
+    back, z up, before its face turn) in the world."""
+    M, c = PLACE_M[pid]
+    return tuple(M @ (c + Vector(tuple(float(x) for x in v))))
+
+
+def anchor_point(fr: Frame, r: dict, anchors: dict) -> tuple:
+    """A light's anchor in the world (R-L2, R-L3): a piece's named anchor, a point in a piece's frame (`offset`), a
+    world point (`at`), or a point against a wall's inner face (`wall`, `along`, `out`, `z`)."""
+    a = r["anchor"]
     if "at" in a:
-        at = list(a["at"])
-        return (float(at[0]), float(at[1]), float(at[2] if len(at) > 2 else a.get("z", 1.0)))
+        at = [float(v) for v in a["at"]]
+        return (at[0], at[1], at[2] if len(at) > 2 else float(a.get("z", 1.0)))
+    if "wall" in a:
+        side = a["wall"]
+        return tuple(float(v) for v in fr.point(side, fr.to_s(side, float(a["along"])), float(a.get("out", 0.12)),
+                                                 float(a["z"])))
+    if "offset" in a:
+        return piece_point(a["piece"], a["offset"])
     key = f"{a['piece']}:{a.get('name') or 'flame'}"
     if key not in anchors:
-        raise SystemExit(f"meshy_room_build: light {lamp['id']}: piece {a['piece']} built no anchor "
+        raise SystemExit(f"meshy_room_build: light {r['id']}: piece {a['piece']} built no anchor "
                          f"{a.get('name') or 'flame'!r} (it built: {sorted(k for k in anchors if ':' in k) or 'none'})")
     return anchors[key]
+
+
+def resolve_lights(fr: Frame, anchors: dict, flame, shown: str = "") -> list:
+    """The night lights the room builds (LIGHTS): each with its world point `at` (the flame anchor; a moon light has
+    none, it shines through its `window`), power, colour, radius, group, glow and the name it exports as. The legacy
+    path keeps its rig: the flame and the window, the look's lamp as CFG["candle"], Light_candle and Light_moon."""
+    rows = SPEC.get("lights") or []
+    if not is_v2():
+        out = []
+        lamp = next((r for r in rows if r["role"] != "moon"), None)
+        moon = next((r for r in rows if r["role"] == "moon"), None)
+        wins = [o for o in fr.openings if o["kind"] == "window"]
+        c = CFG["candle"]
+        if lamp is not None and flame is not None:
+            out.append(dict(lamp, at=flame, power=c["power"], color=c["color"], radius=c["radius"], glow=None,
+                            host=(lamp.get("anchor") or {}).get("piece"), export="Light_candle"))
+        if moon is not None and wins:
+            out.append(dict(moon, window=wins[0]["id"], at=None, glow=None, host=None, export="Light_moon"))
+        return out
+    vals = rf.light_values(rows, CFG["look"], CFG.get("candle"), shown=shown)
+    out = []
+    for r, v in zip(rows, vals):
+        L = dict(r, **v)
+        L["at"] = None if r["role"] == "moon" else anchor_point(fr, r, anchors)
+        L["host"] = (r.get("anchor") or {}).get("piece")
+        L["export"] = "Light_" + r["name"].replace(".", "_")
+        L["glowDefault"] = "glow" not in r      # the flame cone a `flame` anchor gets unless the entry says
+        out.append(L)
+        for pid, p_ in PIECES.items():          # a grey box is closed: a light inside one lights nothing
+            b_ = p_["box"]
+            if L["at"] is not None and p_["spec"].get("model") == "box" and all(
+                    b_[i] + 0.01 < L["at"][i] < b_[i + 3] - 0.01 for i in range(3)):
+                NOTES.append(f"light {r['id']} stands inside the grey box {pid}: it lights nothing outside it (give "
+                             f"its anchor a point outside the box)")
+                log("WARNING", NOTES[-1])
+    return out
+
+
+def pool_points(lights: list) -> list:
+    """The points of the lights whose pools set the exposure (the loader's exposureFrom)."""
+    want = set(SPEC.get("exposureFrom") or ())
+    return [L["at"] for L in lights if L["id"] in want and L["at"] is not None]
+
+
+# the glows (5e): an emissive mesh, unlit at its emit_display colour, hidden in the bake, exported unlit
+def glow_mat(mt: dict, material: str):
+    """A glow's material: M_flame (the candles'), or M_bulb, M_coal, M_teal made on first use."""
+    if material == "flame":
+        return mt["flame"]
+    key = nm(rf.emit_key(material))
+    return MATS[key] if key in MATS else RMat(rf.emit_key(material), None, (1, 1, 1), kind="emit")
+
+
+def glow_shape(b: Builder, c, shape: str, size, mat, R: Matrix) -> None:
+    """One glow at the world point `c`: a cone or a box standing on it, a sphere round it, a card (a flat quad)
+    upright on it facing the frame's front (-y turned by R)."""
+    c = Vector(c)
+    if shape == "box":
+        w, d, h = (float(v) for v in size)
+        b.box((-w / 2, -d / 2, 0.0), (w / 2, d / 2, h), mat, M=Matrix.Translation(c) @ R)
+    elif shape == "cone":
+        r_, h = float(size[0]), float(size[1])
+        n = 10
+        for k in range(n):
+            a0, a1 = 2 * math.pi * k / n, 2 * math.pi * (k + 1) / n
+            p0 = c + Vector((r_ * math.cos(a0), r_ * math.sin(a0), 0.0))
+            p1 = c + Vector((r_ * math.cos(a1), r_ * math.sin(a1), 0.0))
+            b.face([p0, p1, c + Vector((0.0, 0.0, h))], [(k / n, 0), ((k + 1) / n, 0), ((k + 0.5) / n, 1)], mat)
+            b.face([p1, p0, c], [((k + 1) / n, 0), (k / n, 0), ((k + 0.5) / n, 0.5)], mat)
+    elif shape == "sphere":
+        r_ = float(size[0])
+        nu, nv = 10, 6
+        ring = [[c + Vector((r_ * math.sin(math.pi * j / nv) * math.cos(2 * math.pi * i / nu),
+                             r_ * math.sin(math.pi * j / nv) * math.sin(2 * math.pi * i / nu),
+                             r_ * math.cos(math.pi * j / nv))) for i in range(nu)] for j in range(nv + 1)]
+        for j in range(nv):
+            for i in range(nu):
+                i1 = (i + 1) % nu
+                uv = [(i / nu, j / nv), (i / nu, (j + 1) / nv), ((i + 1) / nu, (j + 1) / nv), ((i + 1) / nu, j / nv)]
+                q = [ring[j][i], ring[j + 1][i], ring[j + 1][i1], ring[j][i1]]
+                if j == 0:              # the poles are triangles
+                    b.face(q[:3], uv[:3], mat)
+                elif j == nv - 1:
+                    b.face([q[0], q[1], q[3]], [uv[0], uv[1], uv[3]], mat)
+                else:
+                    b.face(q, uv, mat)
+    else:   # card
+        w, h = float(size[0]), float(size[1])
+        q = [c + R @ Vector(v) for v in ((-w / 2, 0.0, 0.0), (w / 2, 0.0, 0.0), (w / 2, 0.0, h), (-w / 2, 0.0, h))]
+        b.face(q, [(0, 0), (1, 0), (1, 1), (0, 1)], mat)
+
+
+def face_turn(pid: str | None) -> Matrix:
+    """A piece's face turn (identity for none)."""
+    if pid is None or pid not in PIECES:
+        return Matrix.Identity(4)
+    return face_matrix(PIECES[pid]["piece"].get("face", "S"))
+
+
+def build_glows(mt: dict, lights: list) -> list:
+    """The lights' glows (`glow`, the flame cone for a `flame` anchor whose piece built no flame of its own) and the
+    pieces' light-less glows (`spec.glow`), each one mesh named <piece>_glow (or <light>_glow), registered `emit`:
+    left out of the bake and of the exposure's hot set (`wdi_split_of` the host's name), exported unlit at its
+    emit_display colour. Returns the rows for the manifest."""
+    rows = []
+    own_flame = {r["id"].split(":", 1)[0] for r in OBJS if r["what"] == "emit" and r["id"].endswith(":flame")}
+    todo = []
+    for L in lights:
+        g = L.get("glow")
+        if not g or L["at"] is None:
+            continue
+        if L["host"] in own_flame and L.get("glowDefault"):
+            continue    # the candle kit's own flame stands there already
+        R = face_turn(L["host"])
+        pts = [tuple(Vector(L["at"]) + R @ Vector(tuple(float(v) for v in q))) for q in (g.get("at") or [(0, 0, 0)])]
+        todo.append((L["host"], L["host"] or L["name"], L["id"], g, pts, R))
+    for pid, g in rf.piece_glows(CFG, CFG["look"]).items():
+        todo.append((pid, pid, None, g, [piece_point(pid, q) for q in g["at"]], face_turn(pid)))
+    seen = {}
+    for host, base, lid, g, pts, R in todo:
+        b = Builder()
+        mat = glow_mat(mt, g["material"])
+        for c in pts:
+            glow_shape(b, c, g["shape"], g["size"], mat, R)
+        stem = base.replace(".", "_") + "_glow"
+        seen[stem] = seen.get(stem, 0) + 1
+        if seen[stem] > 1:
+            stem += f"_{seen[stem]}"
+        ob = b.build(nm(stem))
+        if ob is None:
+            continue
+        if host is not None and host in PIECES:
+            ob["wdi_split_of"] = PIECES[host]["obj"].name
+        register(ob, "emit", (host or base) + ":glow" + (f":{lid}" if lid else ""))
+        rows.append(dict(name=ob.name, light=lid, piece=host, shape=g["shape"], material=rf.emit_key(g["material"]),
+                         points=[[round(float(v), 3) for v in c] for c in pts]))
+    return rows
 
 
 TEXTURE_MATS = (("wall_plaster", ("M_wall", "M_ceiling", "M_paint")), ("joinery", ("M_wood", "M_outside_wall")),
@@ -2253,6 +2466,9 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
         else:
             raise SystemExit(f"meshy_room_build: no first-person builder for {pid} (model {model})")
         PIECES[pid] = dict(obj=ob, box=box, spec=spec, piece=piece)
+        if pid in PLACE_M:      # any model's `spec.anchors` (a box's are its own already), in the piece's frame
+            for k_, v_ in (spec.get("anchors") or {}).items():
+                anchors.setdefault(f"{pid}:{k_}", piece_point(pid, v_))
         piece_rules(fr, pid, box)
         tile = next(((p["x"], p["y"]) for p in fr.room.props if p["id"] == pid), None) or \
             next(((s["x"], s["y"]) for s in fr.room.spots if s["id"] == pid), None)
@@ -3415,34 +3631,60 @@ def portrait(variant: str, w: int, h: int, seed: int = 0) -> np.ndarray:
 # ---------------------------------------------------------------- lights: the bake rig and the exported night lights
 
 
-def bake_rig(fr: Frame, holes: list, flame, moon: Vector) -> list:
+def bake_rig(fr: Frame, holes: list, lights: list, moon: Vector) -> list:
     """The lights the bake sees: the candle at its flame, the moon (a sun lamp) through the window, a faint fill
     panel under the ceiling, the night sky as the world; a light-tight box round the room with a hole at each window
     in `holes` (the moon-lit ones: a window no moon light names is dark glass), so no light reaches in through a
-    seam. Returns the rig's objects (removed after the bake)."""
+    seam. Returns the rig's objects (removed after the bake).
+
+    A v2 file (G4): a point light per lamp and fire at its anchor, one Sun for the room when it has a moon light
+    (none without: a windowless room bakes no moon group and its world is at 0), the fill panel with its energy
+    scaled by its area over the bedroom's (`fill.area_ref_m2`, null for none); each light carries its bake group as
+    `wdi_group`. The legacy path builds the bedroom's three lights by name, as it always has."""
     rig = []
-    c = CFG["candle"]
-    if flame is not None:
-        ld = bpy.data.lights.new(nm("Bake_candle"), "POINT")
-        ld.energy, ld.color, ld.shadow_soft_size = c["power"], hex_lin(c["color"]), c["radius"]
-        o = bpy.data.objects.new(nm("Bake_candle"), ld)
-        o.location = (flame[0], flame[1], flame[2] + 0.012)
+    if not is_v2():
+        lamp = next((L for L in lights if L["role"] != "moon"), None)
+        flame = lamp["at"] if lamp is not None else None
+        c = CFG["candle"]
+        if flame is not None:
+            ld = bpy.data.lights.new(nm("Bake_candle"), "POINT")
+            ld.energy, ld.color, ld.shadow_soft_size = c["power"], hex_lin(c["color"]), c["radius"]
+            o = bpy.data.objects.new(nm("Bake_candle"), ld)
+            o.location = (flame[0], flame[1], flame[2] + 0.012)
+            COL["rig"].objects.link(o)
+            rig.append(o)
+    else:
+        for L in lights:
+            if L["at"] is None:
+                continue
+            ld = bpy.data.lights.new(nm("Bake_" + L["export"][len("Light_"):]), "POINT")
+            ld.energy, ld.color, ld.shadow_soft_size = float(L["power"]), hex_lin(L["color"]), float(L["radius"])
+            o = bpy.data.objects.new(ld.name, ld)
+            o.location = (L["at"][0], L["at"][1], L["at"][2] + 0.012)
+            o["wdi_group"], o["wdi_light_id"] = L["group"], L["id"]
+            COL["rig"].objects.link(o)
+            rig.append(o)
+    m = CFG["moon"]
+    if not is_v2() or any(L["role"] == "moon" for L in lights):
+        ld = bpy.data.lights.new(nm("Bake_moon"), "SUN")
+        ld.energy, ld.color, ld.angle = m["strength"], hex_lin(m["color"]), math.radians(m["angle"])
+        o = bpy.data.objects.new(nm("Bake_moon"), ld)
+        o.rotation_euler = (-moon).to_track_quat("-Z", "Y").to_euler()
+        if is_v2():
+            o["wdi_group"] = "moon"
         COL["rig"].objects.link(o)
         rig.append(o)
-    m = CFG["moon"]
-    ld = bpy.data.lights.new(nm("Bake_moon"), "SUN")
-    ld.energy, ld.color, ld.angle = m["strength"], hex_lin(m["color"]), math.radians(m["angle"])
-    o = bpy.data.objects.new(nm("Bake_moon"), ld)
-    o.rotation_euler = (-moon).to_track_quat("-Z", "Y").to_euler()
-    COL["rig"].objects.link(o)
-    rig.append(o)
     f = CFG["fill"]
     ld = bpy.data.lights.new(nm("Bake_fill"), "AREA")
     ld.shape = "RECTANGLE"
     ld.size, ld.size_y = (fr.x1 - fr.x0) - 0.8, (fr.y1 - fr.y0) - 0.8
     ld.energy, ld.color = f["power"], hex_lin(f["color"])
+    if is_v2():     # a large room's panel as bright a square metre as the bedroom's (coupling 26)
+        ld.energy = rf.fill_energy(f["power"], ld.size * ld.size_y, f.get("area_ref_m2", rf.FILL_AREA_REF))
     o = bpy.data.objects.new(nm("Bake_fill"), ld)
     o.location = (fr.cx, fr.cy, fr.H - 0.03)
+    if is_v2():
+        o["wdi_group"] = "fill"
     COL["rig"].objects.link(o)
     rig.append(o)
     # the world: the look's night sky (it lights the snow outside and comes in faintly at the window)
@@ -3465,6 +3707,8 @@ def bake_rig(fr: Frame, holes: list, flame, moon: Vector) -> list:
     nt.links.new(mr_.outputs[0], mix.inputs[0])
     nt.links.new(mix.outputs[2], bg.inputs["Color"])
     bg.inputs["Strength"].default_value = look["sky"]["light"]
+    if is_v2() and not any(L["role"] == "moon" for L in lights):
+        bg.inputs["Strength"].default_value = 0.0       # no moon group: the sky lights no group (coupling 21)
     bpy.context.scene.world = w
     # the light-tight box
     b = Builder()
@@ -3503,23 +3747,24 @@ def tight_cuts(lo: float, hi: float, z0: float, z1: float, holes: list) -> list:
     return cols
 
 
-def export_lights(fr: Frame, win: dict | None, flame, moon: Vector, k: float) -> list:
+def export_lights(fr: Frame, wins: list, lights: list, moon: Vector, k: float, aw: dict) -> list:
     """The scene's night lights as Blender lights the glTF exporter writes as KHR_lights_punctual (COMPAT: W / 4 pi):
     the candle at its flame and the moon as a spot through the window (a directional light would take the village's
     own moon away: apps/walk keeps a GLB's directional light). Energies times k, like COLOR_0, so a lit object added
-    later matches the bake under wdi_exposure."""
+    later matches the bake under wdi_exposure, and times the group's weight (`aw`: the light setting's and --mix's,
+    as the bake has them). `wins`: the built windows. A v2 file exports one light per night light, named
+    Light_<name>, with `wdi_group`; the legacy path exports Light_candle and Light_moon with their old extras and
+    products, multiplied left to right as they always were (coupling 17)."""
+    if is_v2():
+        return export_lights_v2(wins, lights, moon, k, aw)
     out = []
     by_kind = {lt["kind"]: lt for lt in fr.room.lights}
     names = {"lamp": ("Light_candle", "lamp"), "moon": ("Light_moon", "moon")}
-    if is_v2():     # the loader's rig lights (one lamp, one moon until G4), named Light_<name> (section 11)
-        scene_lt = {lt["id"]: lt for lt in fr.room.lights}
-        by_kind, names = {}, {}
-        for key, r in (SPEC.get("rig") or {}).items():
-            if r is not None:
-                by_kind[key] = scene_lt[r["id"]]
-                names[key] = ("Light_" + r["name"].replace(".", "_"), r["role"])
+    lamp = next((L for L in lights if L["role"] != "moon"), None)
+    flame = lamp["at"] if lamp is not None else None
+    mw = next((L["window"] for L in lights if L["role"] == "moon"), None)
+    win = next((w for w in wins if w["id"] == mw), None)
     c = CFG["candle"]
-    aw = CFG.get("applied_weights") or {}       # the light setting's (and --mix's) weights, as the bake has them
     lt = by_kind.get("lamp")
     if flame is not None and lt is not None:
         ld = bpy.data.lights.new(nm(names["lamp"][0]), "POINT")
@@ -3550,6 +3795,66 @@ def export_lights(fr: Frame, win: dict | None, flame, moon: Vector, k: float) ->
         o["wdi_light"], o["wdi_light_id"] = names["moon"][1], lt["id"]
         o["wdi_radius_tiles"] = float(lt.get("radiusTiles", 2))
         o["wdi_note"] = "the moon through the window as a spot (a directional light would replace the village's moon)"
+        COL["room"].objects.link(o)
+        out.append(o)
+    return out
+
+
+def moon_spot(win: dict, moon: Vector) -> tuple:
+    """A moon light's spot: its source 1.2 m out along the moon's rays from the window's centre, its target where
+    the ray through the centre meets the floor, and the distance between them."""
+    target = Vector(win["centre"]) - moon * (win["centre"][2] / max(moon.z, 0.1))
+    target.z = 0.0
+    src = Vector(win["centre"]) + moon * 1.2
+    return src, target, (target - src).length
+
+
+def light_row(lid) -> dict:
+    """The manifest's facts of an exported light beyond the exporter's (role, group, the loader's anchor, where it
+    stands, its window)."""
+    L = next((x for x in LIGHTS if x["id"] == lid), None)
+    if L is None:
+        return {}
+    out = dict(role=L["role"], group=L["group"], lightName=L["name"])
+    if L.get("anchor"):
+        out["anchor"] = dict(L["anchor"])
+    if L.get("at") is not None:
+        out["at"] = [round(float(v), 4) for v in L["at"]]
+    if L.get("window"):
+        out["window"] = L["window"]
+    return out
+
+
+def export_lights_v2(wins: list, lights: list, moon: Vector, k: float, aw: dict) -> list:
+    """A v2 file's exported lights: a point light per lamp and fire at its anchor (+1.2 cm), a 50 degree spot per
+    moon light through its window; extras wdi_light (the role), wdi_light_id, wdi_group, wdi_radius_tiles."""
+    out = []
+    m = CFG["moon"]
+    by_win = {w["id"]: w for w in wins}
+    for L in lights:
+        w_ = float(aw.get(L["group"], 1.0))
+        if L["role"] == "moon":
+            win = by_win.get(L["window"])
+            if win is None:
+                continue
+            src, target, d = moon_spot(win, moon)
+            ld = bpy.data.lights.new(nm(L["export"]), "SPOT")
+            ld.spot_size, ld.spot_blend = math.radians(50.0), 0.25
+            ld.energy = 4.0 * math.pi * m["strength"] * d * d * k * w_
+            ld.color = hex_lin(m["color"])
+            ld.shadow_soft_size = 0.0
+            o = bpy.data.objects.new(nm(L["export"]), ld)
+            o.location = src
+            o.rotation_euler = (target - src).to_track_quat("-Z", "Y").to_euler()
+        else:
+            ld = bpy.data.lights.new(nm(L["export"]), "POINT")
+            ld.energy, ld.color, ld.shadow_soft_size = float(L["power"]) * k * w_, hex_lin(L["color"]), \
+                float(L["radius"])
+            o = bpy.data.objects.new(nm(L["export"]), ld)
+            o.location = (L["at"][0], L["at"][1], L["at"][2] + 0.012)
+            o["wdi_cast_shadow"] = False
+        o["wdi_light"], o["wdi_light_id"], o["wdi_group"] = L["role"], L["id"], L["group"]
+        o["wdi_radius_tiles"] = float(L.get("radiusTiles", 2))
         COL["room"].objects.link(o)
         out.append(o)
     return out
@@ -3662,24 +3967,33 @@ def run_bake(objs: list, samples: int, hide: list) -> float:
     return time.time() - t0
 
 
-BAKE_GROUPS = ("candle", "moon", "fill")   # the moon's group is the moon lamp and the night sky (the world)
+BAKE_GROUPS = rf.LEGACY_GROUPS   # the bedroom's: the moon's group is the moon lamp and the night sky (the world)
 
 
-def run_bake_groups(objs: list, samples: int, hide: list, rig: list) -> dict:
-    """--bake-groups: one bake per light group (the others switched off), so the light balance can be tuned on
-    the saved raw bake without baking again. Returns {object name: {group: light}}."""
+def rig_group(o) -> str:
+    """A rig light's bake group: its `wdi_group` (a v2 file's), else its name's suffix (the legacy Bake_candle,
+    Bake_moon, Bake_fill: their names and extras stay as the rig fingerprint has them)."""
+    return o.get("wdi_group") or o.name.rsplit("Bake_", 1)[-1]
+
+
+def run_bake_groups(objs: list, samples: int, hide: list, rig: list, groups=BAKE_GROUPS) -> tuple:
+    """--bake-groups: one bake per light group (the others switched off, every light still there at energy 0), so
+    the light balance can be tuned on the saved raw bake without baking again; the groups in the room's order (the
+    loader's: candle, fire, a room's own, moon, fill). Returns ({object name: {group: light}}, {group: seconds})."""
     sc = bpy.context.scene
     bg = sc.world.node_tree.nodes["Background"] if sc.world and sc.world.use_nodes else None
     ws = bg.inputs["Strength"].default_value if bg else 0.0
     energy = {o.name: o.data.energy for o in rig if o.type == "LIGHT"}
     out = {o.name: {} for o in objs}
-    for g in BAKE_GROUPS:
+    secs = {}
+    for g in groups:
         for o in rig:
             if o.type == "LIGHT":
-                o.data.energy = energy[o.name] if o.name.endswith(f"Bake_{g}") else 0.0
+                o.data.energy = energy[o.name] if rig_group(o) == g else 0.0
         if bg:
             bg.inputs["Strength"].default_value = ws if g == "moon" else 0.0
         t = run_bake(objs, samples, hide)
+        secs[g] = round(t, 1)
         log(f"baked group {g} in {t:.0f}s")
         for o in objs:
             out[o.name][g] = read_attr(o)
@@ -3688,7 +4002,7 @@ def run_bake_groups(objs: list, samples: int, hide: list, rig: list) -> dict:
             o.data.energy = energy[o.name]
     if bg:
         bg.inputs["Strength"].default_value = ws
-    return out
+    return out, secs
 
 
 def mix_groups(groups: dict, weights: dict, tints: dict | None = None) -> dict:
@@ -3788,11 +4102,12 @@ def load_raw(path: str, objs: list) -> dict:
     return out
 
 
-def quick_light(objs: list, flame, moon: Vector, win: dict | None) -> None:
-    """--no-bake: an unshadowed stand-in (the candle's inverse square and a little ambient) for fast smoke runs."""
-    f = Vector(flame) if flame is not None else Vector((0, 0, 1))
-    P_ = CFG["candle"]["power"] / (4 * math.pi)
-    col = np.array(hex_lin(CFG["candle"]["color"]))
+def quick_light(objs: list, lights: list) -> None:
+    """--no-bake: an unshadowed stand-in (each lamp's and fire's inverse square and a little ambient) for fast smoke
+    runs; a room with none takes the candle's from above the floor's centre."""
+    pts = [(Vector(L["at"]), float(L["power"]) / (4 * math.pi), np.array(hex_lin(L["color"])))
+           for L in lights if L["at"] is not None] or \
+        [(Vector((0, 0, 1)), CFG["candle"]["power"] / (4 * math.pi), np.array(hex_lin(CFG["candle"]["color"])))]
     for o in objs:
         me = o.data
         M = o.matrix_world
@@ -3803,10 +4118,14 @@ def quick_light(objs: list, flame, moon: Vector, win: dict | None) -> None:
         me.vertices.foreach_get("normal", nr)
         co = co.reshape(-1, 3) @ np.array(M.to_3x3()).T + np.array(M.translation)
         nr = nr.reshape(-1, 3) @ np.array(M.to_3x3()).T
-        d = np.array(f) - co
-        r2 = np.maximum((d * d).sum(1), 0.04)
-        cosv = np.clip((d * nr).sum(1) / np.sqrt(r2) / np.maximum(np.linalg.norm(nr, axis=1), 1e-6), 0, 1)
-        L = (P_ * cosv / r2 / math.pi)[:, None] * col[None, :] + 0.004
+        L = None
+        for f, P_, col in pts:
+            d = np.array(f) - co
+            r2 = np.maximum((d * d).sum(1), 0.04)
+            cosv = np.clip((d * nr).sum(1) / np.sqrt(r2) / np.maximum(np.linalg.norm(nr, axis=1), 1e-6), 0, 1)
+            term = (P_ * cosv / r2 / math.pi)[:, None] * col[None, :]
+            L = term if L is None else L + term
+        L = L + 0.004
         rgba = np.ones((n, 4), np.float32)
         rgba[:, :3] = L
         me.color_attributes[ATTR].data.foreach_set("color", rgba.ravel())
@@ -3941,9 +4260,12 @@ OBJ_KIND: dict = {}         # object name -> what it is (register's `what`)
 
 
 def flame_hosts() -> set:
-    """The pieces a flame was split from (the candle stand with its candlestick): their surfaces a hand's breadth from
-    the flame are left out of E's hot surfaces and of k."""
-    return {r["obj"].get("wdi_split_of") for r in OBJS if r["obj"] is not None and r["obj"].get("wdi_split_of")}
+    """The pieces a flame or a glow was split from (the candle stand with its candlestick) and every piece a light
+    anchors to (the loader's hosts: a wall bracket, an oven, a lantern hook): their surfaces a hand's breadth from the
+    flame are left out of E's hot surfaces and of k."""
+    out = {r["obj"].get("wdi_split_of") for r in OBJS if r["obj"] is not None and r["obj"].get("wdi_split_of")}
+    out |= {PIECES[h]["obj"].name for h in SPEC.get("hosts") or () if h in PIECES and PIECES[h]["obj"] is not None}
+    return out
 
 
 def choose_exposure(data: dict, flame, outside: set) -> dict:
@@ -3951,9 +4273,14 @@ def choose_exposure(data: dict, flame, outside: set) -> dict:
     floor and walls within 1.8 m of the flame; its 90th percentile) at a display luminance of 0.55, warm and bright;
     capped so that the pool's hottest large surfaces (the 99th percentile of every room surface within 1.3 m of the
     flame, the candlestick and stand left out) stay under AgX's white (no clipping). Reported: the far floor and walls
-    against ink (their 2nd and 10th percentiles: the darkest corners), the moon's patch. CFG["exposure"] overrides E."""
-    pool, hot, shell = [], [], []
-    f = np.array(flame) if flame is not None else None
+    against ink (their 2nd and 10th percentiles: the darkest corners), the moon's patch. CFG["exposure"] overrides E.
+
+    `flame`: the points of the lights whose pools set E (the loader's exposureFrom; one point is one light). With
+    several (G4): each light's pool and the largest of their percentiles, the hot surfaces near any of them, the far
+    shell farther than 3 m from all of them; one gives the arrays it always has."""
+    hot, shell = [], []
+    fs = [np.array(f) for f in _points(flame)]
+    pools = [[] for _ in fs]
     patch = []
     hosts = flame_hosts()
     for name, (o, L, alb, co) in data.items():
@@ -3961,21 +4288,22 @@ def choose_exposure(data: dict, flame, outside: set) -> dict:
             continue
         D0 = lum(alb * L)
         kind = OBJ_KIND.get(name)
-        if f is not None:
-            dist = np.linalg.norm(co - f, axis=1)
+        if fs:
+            each = [np.linalg.norm(co - f, axis=1) for f in fs]
+            dist = each[0] if len(each) == 1 else np.minimum.reduce(each)
             xl = CFG["look"]["exposure"]
             if kind == "shell":
-                pool.append(D0[dist < xl["pool_radius_m"]])
-            if name not in hosts and not name.endswith("wb_candle") and "flame" not in name:
+                for i, d_ in enumerate(each):
+                    pools[i].append(D0[d_ < xl["pool_radius_m"]])
+            if name not in hosts and "flame" not in name:
                 hot.append(D0[(dist < xl["hot_radius_m"]) & (dist > 0.25)])
         if kind == "shell":
-            shell.append(D0 if f is None else D0[np.linalg.norm(co - f, axis=1) > 3.0])
+            shell.append(D0 if not fs else D0[dist > 3.0])
         if name.endswith("Floor"):
             patch.append((L, co))
-    pool = np.concatenate(pool) if pool else np.array([0.05])
     hot = np.concatenate(hot) if hot else np.array([0.1])
     shell = np.concatenate(shell) if shell else np.array([0.01])
-    p90 = float(np.percentile(pool, CFG["look"]["exposure"]["pool_percentile"]))
+    p90 = pool_level(pools, CFG["look"]["exposure"]["pool_percentile"])
     h99 = float(np.percentile(hot, 99))
 
     def solve(level, D):
@@ -3998,6 +4326,8 @@ def choose_exposure(data: dict, flame, outside: set) -> dict:
                hot_p99_display=float(lum(agx([h99 * E] * 3))[0]), far_p2=p2, far_p10=p10, ink_D=ink,
                far_p2_over_ink=p2 * E / ink, far_p10_over_ink=p10 * E / ink,
                far_p10_display=float(lum(agx([p10 * E] * 3))[0]), ink_display=float(lum(np.array(INK) / 255.0)))
+    if len(fs) > 1:     # the pools one by one (a v2 room with several pool lights)
+        out["pool_p90_each"] = [round(pool_level([p_], CFG["look"]["exposure"]["pool_percentile"]), 6) for p_ in pools]
     if patch:   # the moon's patch on the floor: the bluest bright floor vertices
         L, co = patch[0]
         blue = L[:, 2] / np.maximum(L.sum(1), 1e-9)
@@ -4355,7 +4685,7 @@ def room_light_numbers(fr: Frame, objs: list, ex: dict, flame) -> dict:
         used[li] = True
         surf[m.group(1)] = (co[used], y[used])
     return light_numbers(surf, flame, [p["box"] for p in PIECES.values()] + curtain_boxes(fr, CFG),
-                         moon_patch(fr, CFG))
+                         moon_patches(fr, CFG))
 
 
 # ---------------------------------------------------------------- collision and the walk check
@@ -5178,7 +5508,9 @@ def blender_main(a) -> None:
     if light and light not in sets:
         raise SystemExit(f"meshy_room_build: no light setting {light!r} in {from_root(look_file)} (it has "
                          f"{sorted(sets)})")
-    setting_w = {g: float(((sets.get(light) or {}).get("mix") or {}).get(g, 1.0)) for g in BAKE_GROUPS}
+    # the room's bake groups (the loader's: the bedroom's candle, moon, fill; a v2 room's from its lights, at most 5)
+    rgroups = list(SPEC.get("groups") or BAKE_GROUPS)
+    setting_w = {g: float(((sets.get(light) or {}).get("mix") or {}).get(g, 1.0)) for g in rgroups}
     CFG["light"], CFG["light_weights"] = light, dict(setting_w)
     CFG["candle"] = {**look["lights"]["lamp"], **CFG.get("candle", {})}
     CFG["moon"] = {**look["lights"]["moon"], **CFG.get("moon", {})}
@@ -5212,8 +5544,9 @@ def blender_main(a) -> None:
         # windowless room, or dark glass only); the village view round the first `snow` window, a sky backdrop on
         # each other wall that has a `sky` window
         doors, wins = build_doors(fr, mt), build_windows(fr, mt)
-        mw = moon_window(fr)
-        win = next((w for w in wins if mw is not None and w["id"] == mw["id"]), None)
+        mws = [w for o in moon_windows(fr) for w in wins if w["id"] == o["id"]]   # the moon-lit windows, as built
+        win = mws[0] if mws else None
+        # one Sun for the room: from moon.bearing, or moon.azimuth off the moon-lit wall (R-L9)
         moon = moon_dir(CFG["moon"], fr, win["side"]) if win else Vector((0.0, 0.0, 1.0))
         snow = next((w for w in wins if w["outside"] == "snow"), None)
         if snow:
@@ -5225,12 +5558,17 @@ def blender_main(a) -> None:
         door = build_door(fr, mt)
         doors = [door] if door else []
         win = build_window(fr, mt)
+        wins = mws = [win] if win else []
         moon = moon_dir(CFG["moon"], fr, win["side"] if win else "N")
         if win:
             build_outside(fr, mt, win, moon)
     anchors = build_furniture(fr, mt)
-    flame = anchors.get("flame") if not is_v2() else rig_anchor(anchors)
-    log(f"flame at {flame}, moon toward {tuple(round(v, 3) for v in moon)}")
+    # the night lights (G4): each at its anchor, with its group and values; the glows beside them; the pool lights
+    LIGHTS[:] = resolve_lights(fr, anchors, anchors.get("flame") if not is_v2() else None, shown=from_root(room_file))
+    glows = build_glows(mt, LIGHTS) if is_v2() else []
+    flame = pool_points(LIGHTS)
+    log(f"lights {[(L['id'], L['group'], L['at']) for L in LIGHTS]}, pools at {flame}, groups {rgroups}, moon toward "
+        f"{tuple(round(v, 3) for v in moon)}")
     print(f"PH masters removed: {mib.purge_ph_masters()}", flush=True)
     for c in ("src",):
         for o in list(COL[c].objects):
@@ -5260,7 +5598,8 @@ def blender_main(a) -> None:
             log(f"split {o.name}: +{n_} vertices (now {len(o.data.vertices)})")
     log(f"bake targets {len(targets)}, edges split adding {added} vertices")
     prepare_attrs(targets)
-    rig = bake_rig(fr, [win] if win else [], flame, moon)
+    bake_vertices = sum(len(o.data.vertices) for o in targets)
+    rig = bake_rig(fr, mws, LIGHTS, moon)
     if a.rig_print:     # the rig's fingerprint (room_checks/rig_print.py): what the gate cannot see of a bake
         sys.path.insert(0, os.path.join(HERE, "room_checks"))
         import rig_print
@@ -5271,6 +5610,7 @@ def blender_main(a) -> None:
     outside_names = {r["obj"].name for r in OBJS if r["what"] == "outside"}
     bake_s = 0.0
     groups = None
+    gsecs = {}
     bake_meta = dict(scriptMd5=src["scriptMd5"], roomMd5=src["roomMd5"], roomBakeMd5=src["roomBakeMd5"],
                      lookMd5=src["lookMd5"], lookBakeMd5=src["lookBakeMd5"], kitMd5=src["kitMd5"], layout=layout)
     if a.raw:
@@ -5311,20 +5651,20 @@ def blender_main(a) -> None:
             NOTES.append(f"the raw bake {RAW_META.get('file')} was made by other code, other room data or another "
                          f"layout than this run's: {json.dumps(same)}")
     elif a.no_bake:
-        quick_light(targets, flame, moon, win)
+        quick_light(targets, LIGHTS)
     elif a.bake_groups:
         t0 = time.time()
-        groups = run_bake_groups(targets, a.samples, hide, rig)
+        groups, gsecs = run_bake_groups(targets, a.samples, hide, rig, rgroups)
         bake_s = time.time() - t0
-        log(f"baked {len(targets)} meshes in {len(BAKE_GROUPS)} light groups at {a.samples} samples in {bake_s:.0f}s")
+        log(f"baked {len(targets)} meshes in {len(rgroups)} light groups at {a.samples} samples in {bake_s:.0f}s")
     else:
         # one bake of all the lights: the light setting scales the lamps themselves (and the night sky with the moon)
         for o in rig:
             if o.type == "LIGHT":
-                o.data.energy *= setting_w.get(o.name.rsplit("Bake_", 1)[-1], 1.0)
+                o.data.energy *= setting_w.get(rig_group(o), 1.0)
         bg_ = sc.world.node_tree.nodes.get("Background") if sc.world and sc.world.use_nodes else None
         if bg_ is not None:
-            bg_.inputs["Strength"].default_value *= setting_w["moon"]
+            bg_.inputs["Strength"].default_value *= setting_w.get("moon", 1.0)
         bake_s = run_bake(targets, a.samples, hide)
         groups = {o.name: {"all": read_attr(o)} for o in targets}
         bake_meta["light"] = light or ""
@@ -5339,7 +5679,7 @@ def blender_main(a) -> None:
                 groups[n_]["ao"] = v
         if a.save_raw and not a.raw:
             save_raw(a.save_raw, targets, groups, samples=a.samples, seconds=bake_s, meta=bake_meta)
-        grouped = all(g in next(iter(groups.values())) for g in BAKE_GROUPS)
+        grouped = all(g in next(iter(groups.values())) for g in rgroups)
         # a group bake is mixed here: the light setting's weights, times --mix's
         weights = dict(setting_w) if grouped else {}
         for kv in (a.mix.split(",") if a.mix else ()):
@@ -5352,8 +5692,13 @@ def blender_main(a) -> None:
         tint_hex = {g: str(h) for g, h in ((sets.get(light) or {}).get("tint") or {}).items()}
         tint_hex.update(kv.split("=") for kv in (a.tint.split(",") if a.tint else ()))
         tints = {}
+        group_col = {"candle": CFG["candle"]["color"], "moon": CFG["moon"]["color"], "fill": CFG["fill"]["color"]}
+        for L in LIGHTS:        # a v2 room's own group: its first light's colour
+            group_col.setdefault(L["group"], L.get("color") or CFG["candle"]["color"])
         for g, hexc in tint_hex.items():
-            base = {"candle": CFG["candle"], "moon": CFG["moon"], "fill": CFG["fill"]}[g]["color"]
+            if g not in group_col:
+                raise SystemExit(f"meshy_room_build: a tint names the group {g!r}; the room's groups are {rgroups}")
+            base = group_col[g]
             tints[g] = tuple(n_ / max(b_, 1e-6) for n_, b_ in zip(hex_lin(hexc), hex_lin(base)))
         # each group cleaned once (both steps are linear, so a mix of cleaned groups is the cleaned mix): the walls'
         # rows hidden behind the trims take their neighbours' light, then the bake's noise is filtered (the folded
@@ -5388,7 +5733,7 @@ def blender_main(a) -> None:
                 spec = spec.strip()
                 if not spec:
                     continue
-                w_ = {g: 1.0 for g in BAKE_GROUPS}
+                w_ = {g: 1.0 for g in rgroups}
                 w_.update({k_: float(v_) for k_, v_ in (kv.split("=") for kv in spec.split(","))})
                 ex_s = post_bake(targets, flame, outside_names, False, raw=mix_groups(den, w_, tints), ao=ao)
                 row = dict(mix=spec, E=round(ex_s["E"], 4), wdi_exposure=round(ex_s["wdi_exposure"], 4),
@@ -5409,7 +5754,7 @@ def blender_main(a) -> None:
                   raw=RAW_META.get("file"))
         src["raw"] = dict(RAW_META)
     ex["light"] = light
-    ex["weights"] = {g: round(float(weights.get(g, setting_w.get(g, 1.0))), 4) for g in BAKE_GROUPS}
+    ex["weights"] = {g: round(float(weights.get(g, setting_w.get(g, 1.0))), 4) for g in rgroups}
     ex["lightNumbers"] = room_light_numbers(fr, targets, ex, flame)
     if a.mix:
         ex["mix"] = a.mix
@@ -5423,8 +5768,8 @@ def blender_main(a) -> None:
             me = o.data
             bpy.data.objects.remove(o, do_unlink=True)
             bpy.data.meshes.remove(me)
-    CFG["applied_weights"] = ex["weights"]
-    lights = export_lights(fr, win, flame, moon, ex["k"])
+    # the exported lights at the light setting's (and --mix's) weights, as the bake has them (an argument: coupling 7)
+    lights = export_lights(fr, wins, LIGHTS, moon, ex["k"], ex["weights"])
     to_unlit(ex)
     coll_ob, boxes = collision(fr, doors)
     nodes = contract_nodes(fr, doors)
@@ -5461,7 +5806,8 @@ def blender_main(a) -> None:
         source=src, layout=layout,
         layouts=dict(default=row.get("layout"), others=sorted(row.get("layouts") or {})),
         light=dict(setting=ex.get("light"), weights=ex.get("weights"), numbers=ex.get("lightNumbers"),
-                   settings=sets, note="numbers: meshy_room_build.light_numbers (display luminance 0..255)"),
+                   settings=sets, note="numbers: meshy_room_build.light_numbers (display luminance 0..255)",
+                   exposureFrom=SPEC.get("exposureFrom") or [], hosts=SPEC.get("hosts") or []),
         spots=spots, pillows=list(PILLOW_STATS),
         area=dict(name=area.name, origin=[round(v, 3) for v in area.location], extras={k: area[k] for k in area.keys()
                                                                                      if k.startswith("wdi_")}),
@@ -5481,8 +5827,15 @@ def blender_main(a) -> None:
         lights=[dict(name=o.name, id=o.get("wdi_light_id"), kind=o.get("wdi_light"), type=o.data.type,
                      location=[round(v, 3) for v in o.location], color=list(o.data.color),
                      energyW=round(o.data.energy, 4),
-                     gltfIntensity=round(o.data.energy / (4 * math.pi), 5))
+                     gltfIntensity=round(o.data.energy / (4 * math.pi), 5), **light_row(o.get("wdi_light_id")))
                 for o in lights],
+        # the night lights the room leaves out and why (a day and dusk light), the bake groups (their lights, the
+        # vertices each bakes, its seconds when this run baked it), the glows (G4)
+        lightsDropped=SPEC.get("lightsDropped") or [],
+        bakeGroups=[dict(group=g, lights=[L["id"] for L in LIGHTS if L["group"] == g] + (
+            ["world"] if g == "moon" else ["fill panel"] if g == "fill" else []), vertices=bake_vertices,
+            seconds=gsecs.get(g)) for g in rgroups],
+        glows=glows,
         exposure=ex, counts={k: v for k, v in cnt.items() if k != "perObject"}, perObject=cnt["perObject"],
         materials=material_rows(),
         pieces=[dict(id=pid, slug=p["spec"].get("slug") or p["spec"].get("name") or p["spec"].get("model"),

@@ -5,6 +5,7 @@ its tests are skipped where numpy is missing."""
 
 import hashlib
 import json
+import math
 import os
 import struct
 import subprocess
@@ -24,6 +25,7 @@ import meshy_room_file as rf  # noqa: E402  (standard library only)
 
 try:
     import meshy_room_build as mrb  # noqa: E402
+    import numpy as np  # noqa: E402
 except ImportError:  # no numpy here: the files are still checked
     mrb = None
 
@@ -495,10 +497,10 @@ class RoomFileV2(unittest.TestCase):
                          {"wp.lt_lamp": "candle", "wp.lt_lamp_chair": "candle", "wp.lt_fire": "fire", "wp.lt_moon": "moon"})
         self.assertEqual(len(spec["plannedNames"]), 44)
         self.assertEqual(len(spec["coverage"]), 19)       # 17 props and 2 spots
-        # not built yet: the second lamp and the fire (G4), the day bed (G7), the hearth (G6); the openings (G3) and
-        # the look override (G9) are built
-        self.assertEqual(len(spec["pending"]), 3)
-        self.assertIn("lights wp.lt_lamp_chair, wp.lt_fire:", spec["pending"][0])
+        # not built yet: the day bed (G7) and the hearth (G6); the openings (G3), the look override (G9) and every
+        # light (G4) are built
+        self.assertEqual(len(spec["pending"]), 2)
+        self.assertFalse([p for p in spec["pending"] if "light" in p])
         self.assertEqual(spec["pieces"]["wp.letter_box"]["ref"], [6.5, 5.0])
 
     # -- R0: the whole file
@@ -736,25 +738,76 @@ class RoomFileV2(unittest.TestCase):
         self.assertIn("path v2", done.stdout)
         self.assertIn("bake groups: candle, fire, moon, fill", done.stdout)
 
-    # -- the rig the builder bakes until G4 (S3), the moon's numbers
-    def test_the_rig_is_one_lamp_and_one_moon(self):
-        _cfg, spec = self.read(self.bedroom())
-        self.assertEqual((spec["rig"]["lamp"]["id"], spec["rig"]["moon"]["id"]), ("wb.lt_candle", "wb.lt_moon"))
-        self.assertEqual(spec["pending"], [])
-        _cfg, spec = self.read(raw(PARLOUR))
-        self.assertEqual((spec["rig"]["lamp"]["id"], spec["rig"]["moon"]["window"]), ("wp.lt_lamp", "wp.draped_window_1"))
-        lamp = dict(id="x", role="lamp", group="candle", anchor={"piece": "p", "offset": [0, 0, 0.1]})
-        rig, left = rf.rig_lights([lamp, dict(lamp, id="y", anchor={"at": [0, 0, 1]})], legacy=False)
-        self.assertEqual((rig["lamp"]["id"], rig["moon"], left), ("y", None, ["x"]))     # an offset waits for G4
+    # -- G4: the lights (room_file_v2, section 3)
+    def test_every_night_light_is_built_with_its_values(self):
+        cfg, spec = self.read(self.bedroom())
+        self.assertEqual([(r["id"], r["role"], r["group"]) for r in spec["lights"]],
+                         [("wb.lt_candle", "lamp", "candle"), ("wb.lt_moon", "moon", "moon")])
+        self.assertEqual((spec["groups"], spec["exposureFrom"], spec["hosts"], spec["pending"]),
+                         (["candle", "moon", "fill"], ["wb.lt_candle"], ["wb.candle"], []))
+        look = raw(os.path.join(BLENDER, "meshy_looks", "interior_fp.json"))
+        vals = rf.light_values(spec["lights"], look)
+        self.assertEqual((vals[0]["power"], vals[0]["color"], vals[0]["radius"]), (38.0, "#FFB457", 0.04))
+        self.assertIsNone(vals[1]["glow"])                  # a moon has no glow
+        # the parlour: two lamps, a fire, the moon; the fire's role needs a look entry (R-L4)
+        cfg, spec = self.read(raw(PARLOUR))
+        with self.assertRaises(SystemExit) as cm:
+            rf.light_values(spec["lights"], look, shown="parlour.json")
+        self.assertIn('light wp.lt_fire: role "fire" is not in the look' + "'" + 's lights (lamp, moon, fill); add it '
+                      'to the room' + "'" + 's "look" (R-L4)', str(cm.exception))
+        merged = rf.merge_look(look, {"lights": {"fire": {"color": "#FFB457", "power": 120.0, "radius": 0.2}}})
+        vals = {r["id"]: v for r, v in zip(spec["lights"], rf.light_values(spec["lights"], merged, {"power": 30.0}))}
+        self.assertEqual(vals["wp.lt_lamp"]["power"], 30.0)            # the file's candle block over the lamp role
+        self.assertEqual(vals["wp.lt_fire"]["power"], 120.0)           # ... not over the fire's
+        lamp = dict(spec["lights"][0], power=50.0, color="#FFB457")    # a light entry's own values over both
+        self.assertEqual(rf.light_values([lamp], merged, {"power": 30.0})[0]["power"], 50.0)
 
-    def test_a_v2_moon_needs_its_angles_and_a_bearing_waits(self):
+    def test_a_glow_is_checked_and_a_flame_anchor_has_one_by_default(self):
+        flame = dict(id="x", role="lamp", anchor={"piece": "p", "name": "flame"})
+        self.assertEqual(rf.glow_of(flame), rf.FLAME_GLOW)
+        self.assertIsNone(rf.glow_of(dict(flame, glow=False)))
+        self.assertIsNone(rf.glow_of(dict(flame, anchor={"piece": "p", "name": "fire"})))
+        look = raw(os.path.join(BLENDER, "meshy_looks", "interior_fp.json"))
+        bad = dict(flame, glow={"shape": "cube", "size": [0.1], "material": "coal"})
+        with self.assertRaises(SystemExit) as cm:
+            rf.light_values([bad], look)
+        self.assertIn("glow shape 'cube' is not one of cone, sphere, box, card", str(cm.exception))
+        coal = dict(flame, glow={"shape": "box", "size": [0.4, 0.2, 0.08], "material": "coal"})
+        with self.assertRaises(SystemExit) as cm:
+            rf.light_values([coal], look)
+        self.assertIn("the look has no emit_display entry M_coal for its glow", str(cm.exception))
+        merged = rf.merge_look(look, {"emit_display": {"M_coal": [3.0, 1.0, 0.3]}})
+        self.assertEqual(rf.light_values([coal], merged)[0]["glow"]["material"], "coal")
+        # a piece's glow needs its points
+        row = {"pieces": [{"id": "p", "spec": {"model": "box", "glow": {"shape": "card", "size": [0.3, 0.2],
+                                                                         "material": "teal"}}}]}
+        merged = rf.merge_look(look, {"emit_display": {"M_teal": [0.2, 0.9, 0.8]}})
+        with self.assertRaises(SystemExit) as cm:
+            rf.piece_glows(row, merged)
+        self.assertIn('piece p: a piece' + "'" + 's glow needs "at"', str(cm.exception))
+        row["pieces"][0]["spec"]["glow"]["at"] = [[0.0, 0.0, 1.0]]
+        self.assertEqual(list(rf.piece_glows(row, merged)), ["p"])
+
+    def test_the_moon_needs_its_angles_and_a_bearing_is_built(self):
         data = raw(PARLOUR)
         del data["moon"]
         self.assertIn('a moon light needs "moon": {"azimuth"', self.stops(data))
         data = raw(PARLOUR)
+        data["moon"] = {"bearing": 20.0}
+        self.assertIn('a moon light needs "moon"', self.stops(data))           # a bearing needs its elevation too
         data["moon"] = {"bearing": 20.0, "elevation": 30.0}
         _cfg, spec = self.read(data)
-        self.assertIn("moon.bearing: one Sun from a compass bearing waits for G4 (S5c)", spec["pending"])
+        self.assertFalse([p for p in spec["pending"] if "moon" in p])
+        x, y, z = rf.bearing_dir(90.0, 30.0)                                    # due east, 30 degrees up
+        self.assertAlmostEqual(x, math.cos(math.radians(30.0)))
+        self.assertAlmostEqual(y, 0.0)
+        self.assertAlmostEqual(z, 0.5)
+        self.assertAlmostEqual(x * x + y * y + z * z, 1.0)
+
+    def test_the_fill_is_scaled_by_its_area_in_v2(self):
+        self.assertEqual(rf.fill_energy(16.0, 57.04, rf.FILL_AREA_REF), 16.0)
+        self.assertAlmostEqual(rf.fill_energy(16.0, 332.0, rf.FILL_AREA_REF), 16.0 * 332.0 / 57.04)
+        self.assertEqual(rf.fill_energy(16.0, 332.0, None), 16.0)               # null: no scaling
 
     # -- G9: the look override (room_file_v2, section 5)
     def look(self):
@@ -957,6 +1010,61 @@ class BuilderV2(unittest.TestCase):
         fr = object.__new__(mrb.Frame)      # the room box alone: wall_frame, to_s and point need no scene
         fr.x0, fr.x1, fr.y0, fr.y1 = x0, x1, y0, y1
         return fr
+
+    # -- G4: the exposure's and the light numbers' many lights (plain numpy)
+    def test_one_light_measures_as_it_always_has(self):
+        rng = np.random.default_rng(7)
+        co = rng.uniform(-4.0, 4.0, (500, 3))
+        f = (0.6, -1.2, 1.31)
+        self.assertTrue(np.array_equal(mrb.near_dist(co, mrb._points(f)), np.linalg.norm(co - np.asarray(f), axis=1)))
+        self.assertTrue(np.array_equal(mrb.near_dist(co, mrb._points([f])), np.linalg.norm(co - np.asarray(f), axis=1)))
+        g = (-2.0, 2.0, 1.0)
+        both = mrb.near_dist(co, mrb._points([f, g]))
+        self.assertTrue(np.array_equal(both, np.minimum(np.linalg.norm(co - np.asarray(f), axis=1),
+                                                        np.linalg.norm(co - np.asarray(g), axis=1))))
+        sq = [(-1.0, -1.0), (1.0, -1.0), (1.0, 1.0), (-1.0, 1.0)]
+        xy = co[:, :2]
+        self.assertTrue(np.array_equal(mrb.patch_signed(sq, xy), mrb._poly_signed(sq, xy)))      # one polygon
+        self.assertTrue(np.array_equal(mrb.patch_signed([sq], xy), mrb._poly_signed(sq, xy)))    # a list of one
+        self.assertTrue(np.array_equal(mrb.patch_signed([], xy), np.full(len(xy), -1e9)))
+        sq2 = [(x + 2.5, y) for x, y in sq]
+        u = mrb.patch_signed([sq, sq2], xy)
+        self.assertTrue(np.array_equal(u, np.maximum(mrb._poly_signed(sq, xy), mrb._poly_signed(sq2, xy))))
+        self.assertTrue(((u > 0) == ((mrb._poly_signed(sq, xy) > 0) | (mrb._poly_signed(sq2, xy) > 0))).all())
+
+    def test_the_strongest_pool_sets_the_exposure(self):
+        rng = np.random.default_rng(3)
+        a, b, c = rng.uniform(0.0, 1.0, 300), rng.uniform(0.0, 3.0, 200), rng.uniform(0.0, 0.2, 100)
+        # one light: the percentile of its pool, the objects' arrays joined as they always were
+        self.assertEqual(mrb.pool_level([[a, c]], 90), float(np.percentile(np.concatenate([a, c]), 90)))
+        # several: the largest of their percentiles, not the percentile of the union
+        got = mrb.pool_level([[a], [b], [c]], 90)
+        self.assertEqual(got, float(np.percentile(b, 90)))
+        self.assertGreater(got, float(np.percentile(np.concatenate([a, b, c]), 90)))
+        self.assertEqual(mrb.pool_level([[a], [], [np.array([])]], 90), float(np.percentile(a, 90)))   # an empty pool
+        self.assertEqual(mrb.pool_level([], 90), 0.05)                     # no pool light: the old fallback
+
+    def test_light_numbers_take_a_list_of_lights_and_patches(self):
+        rng = np.random.default_rng(11)
+        surf = {}
+        for k, (x, y) in {"Wall_N": (None, 3.5), "Wall_S": (None, -3.5), "Wall_E": (5.0, None),
+                          "Wall_W": (-5.0, None)}.items():
+            n = 400
+            co = np.column_stack([rng.uniform(-5, 5, n) if x is None else np.full(n, x),
+                                  rng.uniform(-3.5, 3.5, n) if y is None else np.full(n, y), rng.uniform(0, 3, n)])
+            surf[k] = (co, rng.uniform(5.0, 120.0, n))
+        fl = np.column_stack([rng.uniform(-5, 5, 2000), rng.uniform(-3.5, 3.5, 2000), np.zeros(2000)])
+        surf["Floor"] = (fl, rng.uniform(5.0, 120.0, 2000))
+        f = (3.6, -2.4, 1.3)
+        patch = [(-1.6, 1.0), (0.6, 1.0), (0.6, 3.2), (-1.6, 3.2)]
+        one = mrb.light_numbers(surf, f, [], patch)
+        self.assertEqual(mrb.light_numbers(surf, [f], [], [patch]), one)     # the list forms read the same
+        self.assertIn("far_over_candle", one)
+        self.assertIn("moon_over_floor", one)
+        two = mrb.light_numbers(surf, [f, (-3.6, 2.4, 1.3)], [], [patch])
+        self.assertIn("candle_wall", two)
+        none = mrb.light_numbers(surf, None, [], None)             # no pool light, no moon: the floor's median alone
+        self.assertEqual(set(none), {"dim_floor"})
 
     def test_the_bake_box_keeps_every_hole_of_a_wall(self):
         self.assertEqual(mrb.tight_cuts(-1.0, 11.0, -0.3, 3.3, []), [(-1.0, 11.0, -0.3, 3.3)])

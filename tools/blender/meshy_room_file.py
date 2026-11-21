@@ -1076,7 +1076,13 @@ def _lights(row: dict, sc: Scene, openings: list, legacy: bool, bag: Problems) -
             continue
         r = dict(id=lt["id"], kind=lt.get("kind"), role=role, group=ent.get("group") or ROLE_GROUP.get(role, "candle"),
                  tile=[lt["x"], lt["y"]], name=ent.get("name") or lt["id"],
-                 pool=bool(ent.get("pool", ROLE_POOL.get(role, False))))
+                 pool=bool(ent.get("pool", ROLE_POOL.get(role, False))),
+                 radiusTiles=float(lt.get("radiusTiles", 2)))
+        for k in ("power", "color", "radius"):     # the entry's own values over its role's look entry (S5)
+            if ent.get(k) is not None:
+                r[k] = ent[k]
+        if "glow" in ent:
+            r["glow"] = ent["glow"]
         if role == "moon":
             r["pool"] = False
             win = ent.get("window")
@@ -1214,10 +1220,10 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
     lights, dropped, groups, ef, hosts = _lights(row, sc, openings, legacy, bag)
     names = _names(row, sc, openings, lights, legacy, bag)
     moon = row.get("moon") if isinstance(row.get("moon"), dict) else {}
-    if not legacy and any(r["role"] == "moon" for r in lights) and "bearing" not in moon and not (
-            _num(moon.get("azimuth")) and _num(moon.get("elevation"))):
+    if not legacy and any(r["role"] == "moon" for r in lights) and not (
+            (_num(moon.get("azimuth")) or _num(moon.get("bearing"))) and _num(moon.get("elevation"))):
         bag.append('a moon light needs "moon": {"azimuth": degrees from straight out of its window toward the wall\'s '
-                   '+s side, "elevation": degrees}')
+                   '+s side, or "bearing": a compass angle toward the moon, and "elevation": degrees}')
     bag.stop()
     if legacy and first_bed is not None:
         # the legacy path keeps spot_rows' own rule: an under-bed spot is the first bed piece's (the bedroom's is
@@ -1225,46 +1231,122 @@ def derive(row: dict, scene: dict, shown: str = "", tasks: set | None = None) ->
         under = {s: first_bed for s in under}
     tasks = task_ids() if tasks is None else tasks
     task_pieces = sorted({r["id"] for r in sc.props if r["id"] in tasks or r.get("kind") in ("keyCache", "lockedDoor")})
-    rig, left = rig_lights(lights, legacy)
     pending = []
-    if left:
-        pending.append(f"lights {', '.join(left)}: this builder bakes one lamp (at a piece's anchor or a point) and one "
-                       f"moon; the others wait for G4 (S5)")
-    if not legacy and "bearing" in (row.get("moon") or {}):
-        pending.append("moon.bearing: one Sun from a compass bearing waits for G4 (S5c)")
     for p in row["pieces"]:
         spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
         if spec.get("model") == "hearth":
             pending.append(f"piece {p['id']}: the hearth waits for G6 (S6)")
         if isinstance(spec.get("bed"), dict):
             pending.append(f"piece {p['id']}: a bed object (a day bed) waits for G7 (S7)")
-        if spec.get("glow") is not None:
-            pending.append(f"piece {p['id']}: a glow waits for G4 (S5e: an emitter must not raise the emit cap)")
     return dict(
         room=sc.id, schema="legacy" if legacy else "v2", names="legacy" if legacy else "v2", rules=SCHEMA,
         openings=openings, lights=lights, lightsDropped=dropped, groups=groups, exposureFrom=ef, hosts=hosts,
         coverage=cover, underBed=under, pieces=resolved, skip=dict(row.get("skip") or {}),
         spots=[s["id"] for s in sc.spots], taskPieces=task_pieces, plannedNames=names, pending=pending,
-        moveLimitM=MOVE_LIMIT, rig=rig)
+        moveLimitM=MOVE_LIMIT)
 
 
-def rig_lights(lights: list, legacy: bool) -> tuple:
-    """The lights the builder bakes until G4 (S5): one lamp, the first candle-group light anchored at a piece's named
-    anchor (no offset) or at a point, and the first moon light; and the ids of the night lights it leaves out. On the
-    legacy path the lamp is the flame and the moon the window, as the builder has always had them."""
-    lamp = moon = None
-    left = []
+# ---------------------------------------------------------------- the lights' values and glows (G4, S5)
+
+GLOW_SHAPES = {"cone": 2, "sphere": 1, "box": 3, "card": 2}    # a glow's shape and the numbers its `size` takes
+EMIT_ROLES = ("flame", "bulb", "coal", "teal")                 # a glow's `material`: its look key is M_<material>
+FLAME_GLOW = dict(shape="cone", size=[0.012, 0.035], material="flame")   # the default glow of a `flame` anchor
+FILL_AREA_REF = 57.04                                          # the bedroom's fill panel (9.2 x 6.2 m), in m2
+
+
+def light_values(lights: list, look: dict, candle: dict | None = None, shown: str = "") -> list:
+    """Each night light's power (W), colour and radius (m) for the rig and the export, and its glow: its role's entry
+    in the merged look's `lights`, under the file's `candle` block for a lamp (the legacy override, kept for v2),
+    under the light entry's own `power`, `color` and `radius`. Stops when a role has no look entry (R-L4) or a glow is
+    not one the builder makes. A moon light shines with the room's moon (the Sun's `strength`): no power here."""
+    bag = Problems(shown or "the room file")
+    roles = (look or {}).get("lights") or {}
+    known = ", ".join(k for k in roles if isinstance(roles[k], dict))
+    emit = (look or {}).get("emit_display") or {}
+    out = []
     for r in lights:
-        a = r.get("anchor") or {}
-        if r["role"] == "moon":
-            if moon is None:
-                moon = r
-                continue
-        elif lamp is None and r["group"] == "candle" and (("piece" in a and "offset" not in a) or "at" in a):
-            lamp = r
+        base = roles.get(r["role"])
+        if not isinstance(base, dict):
+            bag.append(f'light {r["id"]}: role "{r["role"]}" is not in the look\'s lights ({known}); add it to the '
+                       f'room\'s "look" (R-L4)')
             continue
-        left.append(r["id"])
-    return dict(lamp=lamp, moon=moon), ([] if legacy else left)
+        v = {k: base[k] for k in ("power", "color", "radius") if k in base}
+        if r["role"] == "lamp":
+            v.update({k: candle[k] for k in ("power", "color", "radius") if k in (candle or {})})
+        v.update({k: r[k] for k in ("power", "color", "radius") if r.get(k) is not None})
+        if r["role"] != "moon":
+            for k in ("power", "color"):
+                if k not in v:
+                    bag.append(f'light {r["id"]}: role "{r["role"]}" gives no {k} (the look\'s lights.{r["role"]})')
+            v.setdefault("radius", 0.04)
+        g = glow_of(r)
+        if g is not None:
+            _glow_rule(g, f"light {r['id']}", emit, bag)
+        out.append(dict(v, glow=g))
+    bag.stop()
+    return out
+
+
+def glow_of(r: dict):
+    """A light's glow: its own (`false` for none), or the flame cone for a `flame` anchor, else none."""
+    if "glow" in r:
+        return r["glow"] or None
+    a = r.get("anchor") or {}
+    return dict(FLAME_GLOW) if r["role"] != "moon" and a.get("name") == "flame" else None
+
+
+def _glow_rule(g, where: str, emit: dict, bag: Problems, need_at: bool = False) -> None:
+    if not isinstance(g, dict):
+        bag.append(f'{where}: a glow is false or {{"shape", "size", "material", "at"}}')
+        return
+    shape = g.get("shape")
+    if shape not in GLOW_SHAPES:
+        bag.append(f'{where}: glow shape {shape!r} is not one of {", ".join(GLOW_SHAPES)}')
+    elif not (isinstance(g.get("size"), (list, tuple)) and len(g["size"]) == GLOW_SHAPES[shape]
+              and all(_num(x) and x > 0 for x in g["size"])):
+        bag.append(f"{where}: a {shape} glow's size is {GLOW_SHAPES[shape]} positive numbers in metres")
+    if g.get("material") not in EMIT_ROLES:
+        bag.append(f'{where}: glow material {g.get("material")!r} is not one of {", ".join(EMIT_ROLES)}')
+    elif emit_key(g["material"]) not in emit:
+        bag.append(f'{where}: the look has no emit_display entry {emit_key(g["material"])} for its glow; add it to '
+                   f'the room\'s "look"')
+    at = g.get("at")
+    if at is None and need_at:
+        bag.append(f'{where}: a piece\'s glow needs "at" (points in the piece\'s frame)')
+    if at is not None and not (isinstance(at, (list, tuple)) and at and all(
+            isinstance(q, (list, tuple)) and len(q) == 3 and all(_num(x) for x in q) for q in at)):
+        bag.append(f'{where}: glow "at" is a list of [x, y, z] points')
+
+
+def piece_glows(row: dict, look: dict, shown: str = "") -> dict:
+    """The light-less glows the pieces declare (`spec.glow`, its `at` required): {piece id: glow}."""
+    bag = Problems(shown or "the room file")
+    emit = (look or {}).get("emit_display") or {}
+    out = {}
+    for p in row.get("pieces") or ():
+        spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
+        if spec.get("glow") is not None:
+            _glow_rule(spec["glow"], f"piece {p['id']}", emit, bag, need_at=True)
+            out[p["id"]] = spec["glow"]
+    bag.stop()
+    return out
+
+
+def emit_key(material: str) -> str:
+    """A glow material's look key: M_flame, M_bulb, M_coal, M_teal."""
+    return f"M_{material}"
+
+
+def fill_energy(power: float, area: float, ref) -> float:
+    """The fill panel's energy in a v2 file: its power times the panel's area over the bedroom's 57.04 m2 (`ref`;
+    None: no scaling), so a large room's panel lights a square metre as the bedroom's does."""
+    return float(power) if ref is None else float(power) * (float(area) / float(ref))
+
+
+def bearing_dir(bearing: float, elevation: float) -> tuple:
+    """The unit vector toward the moon from a compass bearing (0 north, 90 east) and an elevation, in degrees."""
+    b, e = math.radians(float(bearing)), math.radians(float(elevation))
+    return (math.sin(b) * math.cos(e), math.cos(b) * math.cos(e), math.sin(e))
 
 
 def needs_owner(spec: dict, rows: list, spots: list | None = None) -> list:
