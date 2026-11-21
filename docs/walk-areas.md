@@ -1039,6 +1039,15 @@ file's size and hash). These values come from the checker's journey through the 
   room files, so that rooms can be walked into as they are finished. It works only in a viewer that takes file names
   from the index. Cave files can stand beside it in the same way, with the cave mouths' `Portal_um.<gate>_in` and
   `Spawn_overworld_mouth_<gate>` in the legacy village file.
+- **A mouth whose cave is not built, in a network that is.** The legacy village written with
+  `meshy_walk_export.py --gates meshy_gates/undermere_gates.json` holds all four mouths. While some caves exist and
+  the Adit's and the Old Rising's do not, both checkers fail `village.portal_target` for `Portal_um.adit_in` and
+  `Portal_um.rising_in`: `undermere` is a built scene, so `pending` cannot name it, and their exact targets are in no
+  file (measured 2026-11-21 with the five caves of route 1). The viewer is right there: with an index it routes them as
+  missing and says "The Undermere is not built yet" (`areas.ts`, `routePortal`), and in single-file mode
+  `resolvePortal` finds nothing. A rule for a single target that is not built yet inside a built scene (a mouth, or a
+  seam into a cave not yet built) is open; until then such an index is written only once the caves behind every
+  mouth exist, or from a village file built without those gates.
 
 ## 12. Version
 

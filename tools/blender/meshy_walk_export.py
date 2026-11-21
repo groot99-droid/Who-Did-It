@@ -5618,6 +5618,13 @@ def finalize(X: Export) -> dict:
             log(f"cleanup: {gone} objects removed, {len(bpy.data.objects)} left, {len(bpy.data.images)} images, {len(bpy.data.materials)} materials")
         with X.step("textures"):
             X.tex_fit = fit_textures(X, float(args.tex_budget_mb), getattr(X, "near_meshes", set()))
+    if getattr(args, "gates", None):
+        # the Undermere's gates (meshy_gates.py): their mouth pieces, collision, portals, arrivals and terrain edits;
+        # without --gates this step does not run and the file is as before
+        import meshy_gates  # noqa: E402
+        with X.step("gates"):
+            X.gates = meshy_gates.add_gates(X, args.gates, dict(
+                log=log, fit=lambda: fit_textures(X, float(args.tex_budget_mb), getattr(X, "near_meshes", set()))))
     if args.rooms:
         with X.step("rooms"):
             X.rooms = append_rooms(X)
@@ -5628,8 +5635,8 @@ def finalize(X: Export) -> dict:
                 for s in o.material_slots:
                     if s.material is None:
                         bad.append(f"{o.name}: empty material slot")
-                    elif o.get("wdi_room"):
-                        room_mats.add(s.material)
+                    elif o.get("wdi_room") or o.get("wdi_gate"):
+                        room_mats.add(s.material)   # unlit trees (a gate's mouth piece is one too)
                     else:
                         mats.add(s.material)
         for m in sorted(mats, key=lambda m: m.name):
@@ -5651,8 +5658,14 @@ def finalize(X: Export) -> dict:
             export_vertex_color="MATERIAL", export_all_vertex_colors=False,
             export_active_vertex_color_when_no_material=False, export_tangents=False, **DRACO)
         log("exported", args.out, os.path.getsize(args.out))
+    if getattr(args, "gates", None) and getattr(args, "gates_journey", None):
+        with X.step("gates journey file"):
+            import meshy_gates  # noqa: E402
+            meshy_gates.write_journey(args.gates_journey, log)
     with X.step("report"):
         rep = report(X)
+        if getattr(X, "gates", None):
+            rep["gates"] = X.gates
     if args.keep_blend:
         with X.step("save blend"):
             sc["wdi_walk_state"] = walk_state(X)  # for a later --base-blend run (the rooms' short run)
@@ -5988,6 +6001,10 @@ def main() -> None:
     p.add_argument("--draw-budget", type=int, default=DRAW_BUDGET, help="draw calls per area the instancing clusters may use")
     p.add_argument("--only-models", default="", help="smoke test: export only these Meshy models (trees, ground kept)")
     p.add_argument("--only-tiles", default="", help="smoke test: bake only these ground tiles (the rest flat)")
+    p.add_argument("--gates", default=None, help="a gates data file (meshy_gates/undermere_gates.json): add the cave "
+                                                 "gates' surface side (meshy_gates.py); without it nothing changes")
+    p.add_argument("--gates-journey", default=None, help="with --gates: also write the walker's file (collision, "
+                                                         "spawns and portals, no Draco) for a controller journey")
     a = p.parse_args(argv)
     if a.verify:
         verify(a.verify, a.report)
