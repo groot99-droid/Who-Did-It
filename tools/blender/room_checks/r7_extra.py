@@ -20,7 +20,7 @@ starts at every spawn; a spot or prop stands for the piece the manifest's `cover
 a window's drapes, has no piece to walk up to; a manifest without `coverage` keeps the bedroom's two aliases); a spot
 the room skips is left out of the approach rule (a piece hung on a wall, `rise`, is not: the bedroom's photographs over
 the bed's head are its judged failure); the objects hung on purpose (a
-piece with `rise`, the cloths over a piece, the openings' joinery) are left out of the floating test; every point
+piece with `rise`, the photographs builder's frames, the cloths over a piece, the openings' joinery) are left out of the floating test; every point
 light with an anchor is held to its flame or its firebox; the banned words are `roomcfg.BANNED` and the check file's.
 """
 import json
@@ -366,6 +366,9 @@ rest = []
 # hung on purpose, from the manifest: a piece with `rise` (a frame, a letter box), a cloth over a piece (a mirror's
 # black cloth, a bed's coverlet), the openings' joinery and cloth (named with their id)
 HUNG = {p["id"].replace(".", "_") for p in MAN["pieces"] if p.get("rise")}
+# the photographs builder's frames hang flat on the wall at eye height, one object each (<id>_1, <id>_2, ...): the
+# bedroom's by the SKIP pattern above, any other room's (the tavern bar's) by its manifest row
+PHOTOS = {p["id"].replace(".", "_") for p in MAN["pieces"] if (p.get("spec") or {}).get("model") == "photos"}
 OPEN_TAGS = {o["id"].replace(".", "_") for o in F.openings}
 # a hearth's dress hung over its mantel shelf (the manifest's made.dress `at` above made.mantel): a mirror on the chimney
 # breast, and its black cloth; by its material, in the hearth's own object
@@ -381,7 +384,7 @@ for name, prims in sorted(obj.items()):
     if SKIP.search(name) or name.startswith(f"{SID}_Outside"):
         continue
     bare = name[len(SID) + 1:] if name.startswith(SID + "_") else name
-    if bare in HUNG or any(bare.endswith("_" + t) for t in OPEN_TAGS) or (
+    if bare in HUNG or re.sub(r"_\d+$", "", bare) in PHOTOS or any(bare.endswith("_" + t) for t in OPEN_TAGS) or (
             prims[0]["what"] == "cloth" and prims[0]["wid"].endswith((":coverlet", ":cloth"))):
         continue
     for x in prims:

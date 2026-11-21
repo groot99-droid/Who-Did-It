@@ -2806,11 +2806,12 @@ def hearth_soot():
 
 
 def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
-    """A hearth (room file v2, G6: styles `surround` and `stone`), box-built in the room's own materials in the piece's
-    frame (x along its width, its back against the wall at +d/2, its front -y): the body with the firebox's mouth
-    (two jambs and the frieze over the mouth), the firebox lined in soot with an iron grate in it, the mantel shelf
-    (marble on a surround, a timber shelf and a timber lintel over the mouth on a stone hearth), the chimney breast
-    above the mantel, and the `dress` over the mantel: each Poly Haven model through ph_object (a mirror with
+    """A hearth (room file v2, G6: styles `surround`, `stone` and `inglenook`), box-built in the room's own materials in
+    the piece's frame (x along its width, its back against the wall at +d/2, its front -y): the body with the firebox's
+    mouth (two jambs and the frieze over the mouth), the firebox lined in soot with an iron grate in it, the mantel
+    shelf (marble on a surround, a timber shelf and a timber lintel over the mouth on a stone hearth), the chimney
+    breast above the mantel; an inglenook's mouth runs up to its timber lintel beam (no frieze), its recess has cheeks
+    in its own surface, a sooted back and throat, and a timber seat against each cheek with the grate between them, and the `dress` over the mantel: each Poly Haven model through ph_object (a mirror with
     "cloth" hung in plain matte black cloth by mirror_cloths and its glass blackened by mirror_glass_to_cloth, both
     unchanged), each labelled box a grey box of its own. The coals' glow is built with the lights' glows
     (build_glows, from meshy_room_file.piece_glows), split from this piece. Returns (object, box, its anchors in the
@@ -2821,7 +2822,8 @@ def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
     body, sh, fb, br = hv["body"], hv["shelf"], hv["firebox"], hv["breast"]
     surf = hearth_mat(mt, hv["surface"])
     stone = hv["style"] == "stone"
-    shelf_mat = mt["wood"] if stone else surf
+    ingle = hv["style"] == "inglenook"
+    shelf_mat = mt["wood"] if stone or ingle else surf
     soot = hearth_soot()
     ow, oh = hv["opening"]
     z0, z1 = sh["z0"], sh["z1"]
@@ -2832,21 +2834,27 @@ def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
     # floor or a neighbour (the firebox's own faces are its lining)
     b.box((bx0, yf, 0.0), (-ow / 2, yb, z0), surf, skip=("bottom", "N", "E"))
     b.box((ow / 2, yf, 0.0), (bx1, yb, z0), surf, skip=("bottom", "N", "W"))
-    b.box((-ow / 2, yf, oh), (ow / 2, yb, z0), surf, skip=("bottom", "N", "W", "E"))
+    if not (ingle and z0 - oh < 1e-6):      # an inglenook's mouth may run up to its beam: no frieze
+        b.box((-ow / 2, yf, oh), (ow / 2, yb, z0), surf, skip=("bottom", "N", "W", "E"))
     b.box((-ow / 2, fy1, 0.0), (ow / 2, yb, oh), surf, skip=("bottom", "N", "W", "E", "S", "top"))
     if sh["y1"] < yb - 1e-6:    # behind a shallow shelf the body rises to its top, so no slot shows under the breast
         b.box((bx0, sh["y1"], z0), (bx1, yb, z1), surf, skip=("bottom", "N", "S"))
     # the firebox's lining (its normals into the recess), the hearth floor and the grate
     xa, xb, ya, yc = -ow / 2, ow / 2, yf, fy1
-    b.face([(xa, ya, 0.0), (xa, yc, 0.0), (xa, yc, oh), (xa, ya, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
-    b.face([(xb, yc, 0.0), (xb, ya, 0.0), (xb, ya, oh), (xb, yc, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
+    cheek = surf if ingle else soot         # an inglenook's cheeks are its masonry; its back and throat are sooted
+    b.face([(xa, ya, 0.0), (xa, yc, 0.0), (xa, yc, oh), (xa, ya, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], cheek)
+    b.face([(xb, yc, 0.0), (xb, ya, 0.0), (xb, ya, oh), (xb, yc, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], cheek)
     b.face([(xa, yc, 0.0), (xb, yc, 0.0), (xb, yc, oh), (xa, yc, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
     b.face([(xa, ya, oh), (xa, yc, oh), (xb, yc, oh), (xb, ya, oh)], [(0, 0), (1, 0), (1, 1), (0, 1)], soot)
     b.box((xa, ya, 0.0), (xb, yc, 0.012), soot, skip=("bottom",))
-    gx, gy = 0.36 * ow, fb["cy"] - 0.6 * fb["depth"] / 2 - 0.02
+    gx, gy = 0.36 * (fb["fire_w"] if ingle else ow), fb["cy"] - 0.6 * fb["depth"] / 2 - 0.02
     for x_ in (-gx, gx):                                        # the grate's two legs and its front bar
         b.box((x_ - 0.012, gy - 0.012, 0.012), (x_ + 0.012, gy + 0.012, 0.15), mt["iron"])
     b.box((-gx - 0.012, gy - 0.012, 0.10), (gx + 0.012, gy + 0.012, 0.125), mt["iron"])
+    if ingle and hv["seats"] is not None:   # a timber seat against each cheek, from the mouth back to the sooted back
+        sw_, sh_ = float(hv["seats"]["width"]), float(hv["seats"]["height"])
+        b.box((xa, ya, 0.012), (xa + sw_, yc, sh_), mt["wood"], skip=("bottom", "W", "N"))
+        b.box((xb - sw_, ya, 0.012), (xb, yc, sh_), mt["wood"], skip=("bottom", "E", "N"))
     # the mantel shelf, overhanging the body at the front and both ends
     b.box((sh["x0"], sh["y0"], z0), (sh["x1"], sh["y1"], z1), shelf_mat, skip=("N",) if sh["y1"] >= yb - 1e-6 else ())
     if stone:   # the timber lintel over the mouth, proud of the stone by up to 3 cm
@@ -2919,6 +2927,8 @@ def build_hearth(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
                 dress=[dict(slug=r["slug"], at=r["at"], dims=r["dims"], cloth=r["cloth"]) for r in rows] +
                 [dict(box=o_.get("wdi_label")) for o_ in greys], mirrorGlassFaces=n_glass,
                 fire=[round(float(v), 3) for v in info["fire"]])
+    if ingle:
+        made.update(beam=hv["beam"], seats=hv["seats"], fireWidth=fb["fire_w"])
     log(f"hearth {pid}: {hv['style']} in {hv['surface']}, opening {ow:g} x {oh:g} m, mantel {z0:.2f}..{z1:.2f} m, "
         f"breast to {br['z1'] if br else 'none'}, fire at {made['fire']}, dress {[r['slug'] for r in rows]}")
     return ob, box, info, made

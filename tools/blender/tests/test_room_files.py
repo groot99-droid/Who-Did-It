@@ -957,8 +957,7 @@ class RoomFileV2(unittest.TestCase):
     def test_hearth_rules(self):
         cases = [(lambda h: h["spec"].update(style="grate"),
                   "hearth style 'grate' is not one of surround, stone, inglenook, stove (R-H1)"),
-                 (lambda h: h["spec"].update(style="inglenook"),
-                  'hearth style "inglenook" is not built yet (it comes with the tavern)'),
+                 (lambda h: h["spec"].update(style="stove"), 'hearth style "stove" is not built yet'),
                  (lambda h: h["spec"].update(size=[1.7, 0.42]), "a hearth's size is [w, d, h]"),
                  (lambda h: h["spec"]["mantel"].update(z=0.9),
                   "the mantel at 0.83 m is lower than the opening's top (0.85 m) (R-H2)"),
@@ -1154,6 +1153,52 @@ class RoomFileV2(unittest.TestCase):
         self.read(data)
         beam["spec"]["finish"] = "brick"
         self.assertIn('finish "brick" is not built yet (G15 to G19); a box is "grey" or "wood"', self.stops(data))
+
+    # -- G6, the third style: the inglenook (the tavern bar)
+    def bar(self):
+        return raw(os.path.join(ROOMS_DIR, "tavern_bar.json"))
+
+    def test_the_tavern_inglenook_reads_with_its_beam_and_seats(self):
+        cfg, spec = self.read(self.bar())
+        p = next(q for q in cfg["pieces"] if q["id"] == "tb.inglenook_e")
+        hv = rf.hearth_values(p["spec"], cfg["height"])
+        # the mouth runs up to the beam's underside (no frieze); the beam is flush with the front, full width
+        self.assertEqual((hv["style"], hv["surface"], hv["opening"]), ("inglenook", "stone", [1.7, 1.51]))
+        self.assertEqual((hv["shelf"]["x0"], hv["shelf"]["x1"], hv["shelf"]["y0"], hv["shelf"]["z0"]),
+                         (-1.1, 1.1, -0.225, 1.51))
+        self.assertEqual((hv["beam"], hv["seats"]), ({"height": 0.24, "depth": 0.26}, {"width": 0.34, "height": 0.45}))
+        # the fire has the mouth less the two seats; the coals' default width follows it
+        self.assertEqual((hv["firebox"]["depth"], hv["firebox"]["fire_w"]), (0.36, 1.02))
+        self.assertEqual(hv["glow"]["size"], [0.714, 0.216, 0.08])
+        self.assertIn("tb.inglenook_e", spec["hosts"])
+        # the defaults: jambs of 0.25 m, the mouth to the beam, the recess 0.1 m short of the back
+        hv = rf.hearth_values({"model": "hearth", "style": "inglenook", "size": [2.4, 0.6, 1.8], "surface": "stone"}, 3.0)
+        self.assertEqual((hv["opening"], hv["firebox"]["depth"], hv["firebox"]["fire_w"]), ([1.9, 1.56], 0.5, 1.22))
+        hv = rf.hearth_values({"model": "hearth", "style": "inglenook", "size": [2.4, 0.6, 1.8], "surface": "stone",
+                               "seats": False}, 3.0)
+        self.assertEqual((hv["seats"], hv["firebox"]["fire_w"]), (None, 1.9))
+
+    def test_inglenook_rules(self):
+        def ingle(d):
+            return next(p for p in d["pieces"] if p["id"] == "tb.inglenook_e")
+
+        cases = [(lambda h: h["spec"].update(mantel={"z": 1.7}), "an inglenook has no mantel shelf"),
+                 (lambda h: h["spec"]["seats"].update(width=0.65), "the seats leave 0.4 m of the 1.7 m mouth"),
+                 (lambda h: h["spec"]["seats"].update(height=1.2), "leave under 0.5 m to the mouth's top"),
+                 (lambda h: h["spec"].update(seats=2), 'seats is {"width": m, "height": m}, or false'),
+                 (lambda h: h["spec"]["beam"].update(depth=0.6), "the beam's height and depth are metres over 0"),
+                 (lambda h: h["spec"]["anchors"].update(fire=[0.6, -0.04, 0.32]), "is not in its firebox (x within 0.51"),
+                 (lambda h: h["spec"]["beam"].update(width=0.3), 'the key "width" is not a beam key'),
+                 (lambda h: h["spec"]["seats"].update(depth=0.3), 'the key "depth" is not a seats key'),
+                 (lambda h: h["spec"].update(surface="brick"), 'surface "brick" waits for G11')]
+        for change, said in cases:
+            data = self.bar()
+            change(ingle(data))
+            self.assertIn(said, self.stops(data), said)
+        # beam and seats are an inglenook's only
+        data = raw(PARLOUR)
+        next(p for p in data["pieces"] if p["id"] == "wp.fireplace_e")["spec"]["seats"] = {"width": 0.3}
+        self.assertIn("beam and seats are an inglenook's (R-H6)", self.stops(data))
 
 
 class GateDigest(unittest.TestCase):

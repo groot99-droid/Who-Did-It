@@ -1,0 +1,639 @@
+{
+  "room": "tavern_bar",
+  "about": "The Drowned Lantern, the village tavern's public room, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 18 x 10 m inside (x -9..9, y -5..5), 3.0 m high. Every prop, spot, portal and night light of packages/content/data/scenes/tavern_bar.json is named below. Three doors: the front door and the back-room door in the south wall, the alley door in the east wall. One window, the shuttered one in the north wall, takes the moon. Lit by the inglenook's fire in the west wall (the hearth's third style, G6, built with this room), the lamp on the bar and the lamps on two tables. Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "The Drowned Lantern",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "front": "Inside the front door",
+    "alley": "By the alley door",
+    "back": "By the door to the back room"
+  },
+  "height": 3.0,
+  "height_note": "the coverage table's 3.0 m: a public room, higher than the back room's 2.7, the beams under it",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.8, 0.93, 0.75]
+  },
+  "floor_note": "the scene's `w` boards (its material layer): the back room's worn boards, a shade lighter",
+  "wall_colour": "#7A7262",
+  "wall_colour_note": "the back room's: a tavern's limewash gone drab with pipe smoke; never pink or lilac under the lamps",
+  "ceiling_colour": "#958B76",
+  "ceiling_colour_note": "limewash, smoked between the beams",
+  "paint_colour": "#B0A58C",
+  "wood_colour": "#3C2B1D",
+  "wood_colour_note": "the joinery: the doors, the skirting, the beams, the bar, the shutters, the inglenook's lintel and seats",
+  "skirting": 0.15,
+  "skirting_note": "a plain plank skirting, the back room's",
+  "picture_rail": null,
+  "picture_rail_note": "a tavern's walls carry shelves, a wheel and pictures, no rail",
+  "cornice": null,
+  "cornice_note": "the limewash meets the ceiling between the beams",
+  "openings": [
+    {
+      "id": "tb.front",
+      "kind": "door",
+      "portal": "tb.front",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the front door to the street (tb.front: to overworld, spawn tavern_front) in the south wall, tile (4,11): centred at x -5.5, the portal at its foot (-5.5, -5.0); the front spawn stands 0.5 m inside it, (-5.5, -4.5), by design"
+    },
+    {
+      "id": "tb.back",
+      "kind": "door",
+      "portal": "tb.back",
+      "width": 0.9,
+      "height": 2.05,
+      "note": "the door through to the back room (tb.back: to tavern_back, spawn door) in the south wall, tile (10,11): centred at x 0.5, the portal at its foot (0.5, -5.0); the back spawn stands 0.5 m inside it, (0.5, -4.5). 2.05 m high, as the back room's side of it."
+    },
+    {
+      "id": "tb.alley",
+      "kind": "door",
+      "portal": "tb.alley",
+      "width": 0.9,
+      "height": 2.15,
+      "note": "the side door to the alley (tb.alley: to overworld, spawn tavern_alley) in the east wall, tile (19,6): centred at y -0.5, the portal at its foot (9.0, -0.5); the alley spawn stands 0.5 m inside it, (8.5, -0.5)"
+    },
+    {
+      "id": "tb.shutters",
+      "kind": "window",
+      "prop": "tb.shutters",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "curtains": false,
+      "curtains_note": "a tavern's street window has shutters, not curtains: the two leaves stand open against the wall either side (tb.shutter_w, tb.shutter_e), as the apothecary's (G14's shutters as wood boxes); the task shutterWindows closes them in the game",
+      "outside": "snow",
+      "note": "the tavern's one window, on the street, tile (10,0): x 0.5 in the north wall, behind the bar's west end. The moon's window (the scene's tb.lt_moon stands on its tile)."
+    }
+  ],
+  "outside": {
+    "ground": -0.3,
+    "ground_note": "a ground-floor view, as the parlour's and the shop's",
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    },
+    "note": "the shop's night (the same village, the same Meshy models): its window is in the north wall too"
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "the parlour's, the bedroom's and the shop's"
+  },
+  "exposure": 0.8,
+  "exposure_note": "fixed, as the loft's and the back room's: from the first 128-sample bake (2026-11-21) the pools' automatic exposure came out 3.85 and the room read flat and lit as by day at any fill (0.01 to 0.08, variants va to vd); at 0.8 the fire, the bar lamp and the table lamps light their pools and the corners fall into the dark (variant vf; 1.5 was still bright)",
+  "lights": [
+    {
+      "id": "tb.lt_hearth",
+      "role": "fire",
+      "anchor": { "piece": "tb.inglenook_e", "name": "fire" },
+      "note": "the inglenook's fire: the firebox's own anchor, between the two seats"
+    },
+    {
+      "id": "tb.lt_lamp_bar",
+      "role": "lamp",
+      "anchor": { "piece": "tb.shop_counter", "name": "flame" },
+      "note": "the bar lamp at its tile (15,3): a candlestick on the bar (tb.bar_candle under the flame) stands in for the brass lamp (brass_diya_lantern is a .blend, G8)"
+    },
+    {
+      "id": "tb.lt_lamp_room",
+      "role": "lamp",
+      "anchor": { "piece": "tb.tavern_table_1" },
+      "note": "the lamp on the long table in the middle of the room: a candlestick with its flame (vintage_oil_lamp is a .blend, G8)"
+    },
+    {
+      "id": "tb.lt_lamp_snug",
+      "role": "lamp",
+      "anchor": { "piece": "tb.tavern_table_0" },
+      "note": "the lamp on the snug's table by the front door: a candlestick with its flame"
+    },
+    {
+      "id": "tb.lt_moon",
+      "role": "moon",
+      "window": "tb.shutters"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the three lamps), fire (the inglenook), moon (the window) and fill = 4, and the AO. The scene's tb.lt_window is a day and dusk light: dropped (night only).",
+  "look": {
+    "lights": {
+      "fire": { "color": "#FFB457", "power": 80.0, "radius": 0.16 }
+    },
+    "lights_note": "the parlour's fire role (60 W, radius 0.12) a size up for the inglenook's wider fire: a first guess, for the first 128-sample bake to set",
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the inglenook's coals as the parlour's hearth",
+    "note": "G9: the room's override of meshy_looks/interior_fp.json. The fire role is the parlour's at the inglenook's size, kept in the room's block until it is promoted into the look file.",
+    "settings": {
+      "bar": {
+        "label": "the bar",
+        "mix": {
+          "candle": 1.2,
+          "fire": 2.5,
+          "moon": 3.0,
+          "fill": 0.02
+        },
+        "note": "from the first 128-sample bake (2026-11-21): the first guess (fill 0.08) lit the room flat; the fill at 0.02, the lamps 1.2, the fire 2.5 (200 W in effect) and the moon 3.0, with the fixed exposure above"
+      }
+    },
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a tavern at night, lit by its fire and its lamps",
+    "ink_lift": {
+      "form": 0.0
+    }
+  },
+  "light": "bar",
+  "light_note": "the room's own light setting (look.settings.bar; --light overrides)",
+  "skip": {
+    "tb.sawdust_0": "a sawdust patch on the boards: a floor decal, which waits for G19 (decals, cards and frost)",
+    "tb.sawdust_1": "a sawdust patch on the boards: a floor decal, which waits for G19"
+  },
+  "pieces": [
+    {
+      "id": "tb.inglenook_e",
+      "face": "E",
+      "place": ["wall", "W", 2.5],
+      "spec": {
+        "model": "hearth",
+        "style": "inglenook",
+        "size": [2.2, 0.45, 1.75],
+        "surface": "stone",
+        "surface_note": "the inglenook's own default is brick, which waits for G11's fetch: the cottage's stone",
+        "beam": { "height": 0.24, "depth": 0.26 },
+        "seats": { "width": 0.34, "height": 0.45 },
+        "breast": { "width": 2.2, "depth": 0.43, "to": "ceiling" },
+        "breast_note": "the stack over the beam, the hearth's full width and 2 cm behind the beam's face, to the ceiling",
+        "firebox": { "depth": 0.36, "glow": { "shape": "box", "material": "coal" } },
+        "anchors": { "fire": [0.0, -0.04, 0.32] }
+      },
+      "note": "G6's third style, built with this room: the inglenook at its tile (0,3), the west wall, centred at y 2.5. A wide mouth (1.7 x 1.51 m) up to a timber lintel beam, a recess 0.36 m deep with stone cheeks and a sooted back, a timber seat against each cheek and the fire between them (1.02 m). It stands 0.45 m out of the wall, so the walker comes within 0.35 m of the centres of the floor tiles (1,3) and (1,4) in front of it (at 0.6 and 0.5 m the no-bake builds' walk did not) (the walls are the room's: the recess cannot be cut into them)."
+    },
+    {
+      "id": "tb.log_basket",
+      "face": "E",
+      "place": ["wall", "W", 3.86],
+      "spec": { "model": "ph", "slug": "wicker_basket_02", "scale": 1.4, "lod": 0.25 },
+      "moved": "0.36 m north along the west wall (D4): at its tile (y 3.5) it stood inside the inglenook's north cheek",
+      "note": "the log basket at its tile (1,2), beside the inglenook (a wicker basket at 1.4; the logs have no model)"
+    },
+    {
+      "id": "tb.rug",
+      "key": "rug",
+      "face": "E",
+      "place": ["at", -8.02, 2.5],
+      "spec": { "size": [1.8, 1.0] },
+      "moved": "0.48 m east (D4): at its tile (x -8.5) it lay under the inglenook's front; now the hearth rug lies before it, 1.8 m along the hearth",
+      "note": "the hearth rug at its tile (1,3)"
+    },
+    {
+      "id": "tb.settle",
+      "face": "E",
+      "place": ["wall", "W", 0.5],
+      "spec": { "model": "ph", "slug": "painted_wooden_bench", "scale": 1.0, "lod": 0.5 },
+      "note": "the settle at its tile (1,5), against the west wall south of the inglenook: the shop's painted bench"
+    },
+    {
+      "id": "tb.bed",
+      "face": "S",
+      "place": ["wall", "N", "W"],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 1.0,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "-",
+          "cover": "blanket",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x; facing south the model's -x end is the west end: the head in the corner"
+      },
+      "moved": "0.5 m east (D4): from the north-west corner along the north wall, as the back room's inn bed; along the west wall it stood through the log basket and the inglenook",
+      "note": "the bed at its tile (1,1), the room's north-west corner: the day bed of the parlour, the cottage, the shop and the back room, with a wool blanket and one pillow"
+    },
+    {
+      "id": "tb.ship_wheel",
+      "face": "S",
+      "place": ["wall", "N", -8.4],
+      "rise": 1.35,
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.12, 0.9],
+        "label": "Ship's wheel: the Constance's wheel, hung on the wall"
+      },
+      "note": "at its tile (1,0), over the bed's head. No model (a grey box; the plan's ship's wheel, Tier 2)."
+    },
+    {
+      "id": "tb.photos",
+      "key": "photos",
+      "place": ["wall", "N", -6.5],
+      "note": "the drowned sailors' photographs at their tile (3,0): the bedroom's frames; their prints are the bedroom's sepia portraits until G18 gives the tavern its own"
+    },
+    {
+      "id": "tb.dartboard",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "rise": 1.5,
+      "spec": { "model": "ph", "slug": "dartboard", "scale": 1.0, "lod": 0.5 },
+      "note": "the dartboard (a task target, deliverLetter: keep it legible) at its tile (6,0), its centre at 1.73 m, the back room's"
+    },
+    {
+      "id": "tb.piano",
+      "face": "S",
+      "place": ["wall", "N", -1.5],
+      "spec": {
+        "model": "box",
+        "size": [1.5, 0.6, 1.3],
+        "label": "Upright piano"
+      },
+      "note": "at its tile (8,1), against the north wall. No model (a grey box; the plan's piano, Tier 1)."
+    },
+    {
+      "id": "tb.shutter_w",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", -0.285],
+      "rise": 0.78,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.42, 0.03, 1.5],
+        "label": "Window shutter, folded open"
+      },
+      "note": "the window's west shutter leaf, folded open against the wall (the shop's)"
+    },
+    {
+      "id": "tb.shutter_e",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", 1.285],
+      "rise": 0.78,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.42, 0.03, 1.5],
+        "label": "Window shutter, folded open"
+      },
+      "note": "the east leaf"
+    },
+    {
+      "id": "tb.bottle_shelf_0",
+      "face": "S",
+      "place": ["wall", "N", 1.95],
+      "spec": { "model": "ph", "slug": "Shelf_01", "scale": 0.85, "lod": 0.5 },
+      "note": "the back bar's bottle shelves at their tiles (11,0) to (14,0): four plain open shelves at 0.85 (0.85 m wide), 0.45 m east of the first tile's centre to clear the east shutter, the next three 0.9 m apart; their bottles have no model (wine_bottles_01 is a .blend, G8)"
+    },
+    {
+      "id": "tb.bottle_shelf_b_0",
+      "face": "S",
+      "place": ["wall", "N", 2.85],
+      "spec": { "model": "ph", "slug": "Shelf_01", "scale": 0.85, "lod": 0.5 },
+      "note": "at its tile (12,0), 0.35 m east"
+    },
+    {
+      "id": "tb.bottle_shelf_1",
+      "face": "S",
+      "place": ["wall", "N", 3.75],
+      "spec": { "model": "ph", "slug": "Shelf_01", "scale": 0.85, "lod": 0.5 },
+      "note": "at its tile (13,0), 0.25 m east"
+    },
+    {
+      "id": "tb.bottle_shelf_b_1",
+      "face": "S",
+      "place": ["wall", "N", 4.65],
+      "spec": { "model": "ph", "slug": "Shelf_01", "scale": 0.85, "lod": 0.5 },
+      "note": "at its tile (14,0), 0.15 m east"
+    },
+    {
+      "id": "tb.tide_chart",
+      "face": "S",
+      "place": ["wall", "N", 6.5],
+      "rise": 1.25,
+      "spec": {
+        "model": "box",
+        "size": [0.7, 0.03, 0.9],
+        "label": "Tide chart (the print waits for G18)"
+      },
+      "note": "at its tile (16,0), on the north wall behind the bar: a flat panel"
+    },
+    {
+      "id": "tb.chalkboard",
+      "face": "S",
+      "place": ["wall", "N", 7.5],
+      "rise": 1.4,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.03, 0.6],
+        "label": "Chalkboard: the day's ale and the slate of debts (the writing waits for G18)"
+      },
+      "note": "at its tile (17,0): a flat panel"
+    },
+    {
+      "id": "tb.keg_rack",
+      "face": "W",
+      "place": ["wall", "E", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4,
+        "dress": [
+          { "slug": "wine_barrel_01", "scale": 0.75, "at": [0.0, null, 0.0], "rot": 25.0, "lod": 0.4 }
+        ]
+      },
+      "note": "the keg rack at its tile (18,1), the north-east corner behind the bar: a barrel with a small keg on it (a rack has no model)"
+    },
+    {
+      "id": "tb.shop_counter",
+      "covers": [
+        "tb.bar_counter_0",
+        "tb.bar_counter_1",
+        "tb.bar_counter_taps",
+        "tb.bar_counter_2",
+        "tb.bar_counter_lamp",
+        "tb.bar_counter_3",
+        "tb.behind_bar"
+      ],
+      "face": "S",
+      "place": ["at", 3.5, 2.5],
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [7.0, 0.62, 1.05],
+        "label": "The bar counter, 7 m (the plan's Tier 3 counter)",
+        "anchors": { "flame": [2.0, 0.0, 1.27] }
+      },
+      "note": "the 7 m bar from its seven tiles (10,3) to (16,3), free-standing at y 2.5 (decisions 22): one box in the joinery's wood (G15's counter as a box, its id the first scene prop's). The hide behind the bar (tb.behind_bar, tile (15,1)) is the free floor north of it, as the shop's. The bar lamp's flame stands over tb.bar_candle at x 5.5."
+    },
+    {
+      "id": "tb.bar_taps",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.5, 2.5],
+      "rise": 1.05,
+      "spec": {
+        "model": "box",
+        "size": [0.6, 0.14, 0.42],
+        "label": "Beer taps: three pump handles on the bar"
+      },
+      "note": "on the bar at the taps' tile (13,3) (tb.bar_counter_taps, covered by the bar). No model (a grey box)."
+    },
+    {
+      "id": "tb.bar_candle",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 5.5, 2.5],
+      "rise": 1.05,
+      "spec": { "model": "ph", "slug": "wooden_candlestick", "scale": 1.0, "lod": 0.02 },
+      "note": "the candle on the bar at the lamp's tile (15,3), under tb.lt_lamp_bar's flame"
+    },
+    {
+      "id": "tb.flour_bin",
+      "face": "W",
+      "place": ["wall", "E", 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.55, 0.85],
+        "label": "Flour bin: a lidded wooden bin (a task target, fetchFlour: keep it legible)"
+      },
+      "note": "at its tile (18,4), against the east wall north of the alley door. No model (a grey box; the plan's flour bin, Tier 2)."
+    },
+    {
+      "id": "tb.barrel_2",
+      "face": "W",
+      "place": ["wall", "E", -3.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (18,9), against the east wall"
+    },
+    {
+      "id": "tb.bottle_crate",
+      "face": "W",
+      "place": ["wall", "E", -4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          { "slug": "wooden_crate_01", "scale": 1.0, "at": [0.04, null, 0.0], "rot": 6.0, "lod": 0.5 }
+        ]
+      },
+      "note": "the bottle crates at their tile (18,10), the south-east corner, two stacked (the back room's; the bottles are a .blend, G8)"
+    },
+    {
+      "id": "tb.barrel_0",
+      "face": "N",
+      "place": ["at", -8.6, -3.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (1,9), against the west wall, turned to face north: facing east its front looked onto the keg stack 0.34 m away, with no room to stand before it (r7_extra, the first bake's check)"
+    },
+    {
+      "id": "tb.barrel_1",
+      "face": "E",
+      "place": ["wall", "W", -4.5],
+      "spec": { "model": "ph", "slug": "wine_barrel_01", "scale": 1.0, "lod": 0.4 },
+      "note": "a barrel at its tile (1,10), in the south-west corner"
+    },
+    {
+      "id": "tb.keg_stack",
+      "spot": true,
+      "face": "E",
+      "place": ["at", -7.5, -3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4,
+        "dress": [{ "slug": "wine_barrel_01", "scale": 1.0, "at": [0.0, null, 0.0], "rot": 35.0, "lod": 0.4 }]
+      },
+      "note": "the keg stack (a hide spot) at its own tile (2,9): two barrels, one on the other, 1.7 m high, beside the two against the wall"
+    },
+    {
+      "id": "tb.tavern_table_0",
+      "covers": ["tb.tavern_table_b_0"],
+      "face": "S",
+      "place": ["at", -5.0, -0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "extras": ["flame"],
+        "lod": 0.7,
+        "dress": [
+          { "slug": "wooden_candlestick", "scale": 1.0, "at": [-0.2, null, 0.0], "lod": 0.02 },
+          { "slug": "brass_goblets", "scale": 0.8, "at": [0.22, null, 0.0], "lod": 0.4 }
+        ]
+      },
+      "note": "the snug's table at its two tiles (4,6) and (5,6), under the snug lamp: the cottage's and the back room's plain deal table, a candlestick and brass goblets on it"
+    },
+    {
+      "id": "tb.stool_0n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -5.0, 0.28],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 },
+      "note": "stools round the three tables (not in the scene's props), as the back room's"
+    },
+    {
+      "id": "tb.stool_0s",
+      "decor": true,
+      "face": "N",
+      "place": ["at", -5.0, -1.28],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_0w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -5.83, -0.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_0e",
+      "decor": true,
+      "face": "W",
+      "place": ["at", -4.17, -0.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.tavern_table_1",
+      "covers": ["tb.tavern_table_b_1"],
+      "face": "S",
+      "place": ["at", 3.0, -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "extras": ["flame"],
+        "lod": 0.7,
+        "dress": [
+          { "slug": "wooden_candlestick", "scale": 1.0, "at": [-0.2, null, 0.0], "lod": 0.02 },
+          { "slug": "jug_01", "scale": 1.0, "at": [0.25, null, 0.0], "rot": 30.0, "lod": 0.5 }
+        ]
+      },
+      "note": "the long table in the middle of the room at its two tiles (12,7) and (13,7), under the room lamp, a candlestick and a jug on it"
+    },
+    {
+      "id": "tb.stool_1n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, -0.72],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_1s",
+      "decor": true,
+      "face": "N",
+      "place": ["at", 3.0, -2.28],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_1w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 2.17, -1.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_1e",
+      "decor": true,
+      "face": "W",
+      "place": ["at", 3.83, -1.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.tavern_table_2",
+      "face": "S",
+      "place": ["at", 6.5, -3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 1.0,
+        "lod": 0.7,
+        "dress": [{ "slug": "brass_goblets", "scale": 0.8, "at": [0.0, null, 0.0], "lod": 0.4 }]
+      },
+      "note": "the table by the south-east corner at its tile (16,9), goblets on it (no lamp in the scene)"
+    },
+    {
+      "id": "tb.stool_2n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 6.5, -2.72],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.stool_2w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 5.67, -3.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 }
+    },
+    {
+      "id": "tb.beam_0",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -6.0, 0.0],
+      "rise": 2.75,
+      "spec": { "model": "box", "finish": "wood", "size": [9.98, 0.2, 0.25], "label": "Ceiling beam" },
+      "note": "four ceiling beams across the room's short span (the back room's, a size up), 0.25 m deep under the ceiling"
+    },
+    {
+      "id": "tb.beam_1",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -2.0, 0.0],
+      "rise": 2.75,
+      "spec": { "model": "box", "finish": "wood", "size": [9.98, 0.2, 0.25], "label": "Ceiling beam" }
+    },
+    {
+      "id": "tb.beam_2",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 2.0, 0.0],
+      "rise": 2.75,
+      "spec": { "model": "box", "finish": "wood", "size": [9.98, 0.2, 0.25], "label": "Ceiling beam" }
+    },
+    {
+      "id": "tb.beam_3",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 6.0, 0.0],
+      "rise": 2.75,
+      "spec": { "model": "box", "finish": "wood", "size": [9.98, 0.2, 0.25], "label": "Ceiling beam" }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_front, spawn_alley and spawn_back are the spawns' own views; the others look at the bar, the inglenook, the north-west wall, the east wall and the south wall.",
+  "views": {
+    "spawn_front": [[-5.5, -4.5, 1.6], [-4.5, 5.0, 1.3], 70.0],
+    "spawn_alley": [[8.5, -0.5, 1.6], [-9.0, 0.5, 1.2], 70.0],
+    "spawn_back": [[0.5, -4.5, 1.6], [2.0, 5.0, 1.3], 70.0],
+    "bar": [[2.0, -0.4, 1.6], [4.5, 4.5, 1.1], 70.0],
+    "inglenook": [[-4.6, 0.8, 1.6], [-9.0, 2.5, 1.0], 70.0],
+    "north_west": [[-3.5, -2.0, 1.6], [-5.5, 5.0, 1.5], 70.0],
+    "east": [[-1.0, 0.5, 1.6], [9.0, -0.5, 1.2], 70.0],
+    "south": [[-1.0, 3.6, 1.6], [-1.0, -5.0, 1.1], 70.0]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "room": "tavern_bar",
+  "about": "The tavern bar (The Drowned Lantern) as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "155 of the map's 157 walkable tiles can be stood on. (1,1) and (2,1) lie under the bed (a day bed along the north wall from the north-west corner: along the west wall it stood through the log basket and the inglenook). The same kind as the bedroom's, the parlour's, the cottage's, the loft's, the shop's and the back room's tiles under their beds; listed for the owner (2026-11-21), not yet ruled on."
+    },
+    {
+      "check": "r7_extra:every_spot_and_prop_can_be_walked_up_to",
+      "why": "The ship's wheel (tb.ship_wheel) hangs on the north wall at its tile (1,0), over the bed's head, so nobody can stand in front of it (the nearest standing place is 1.01 m away). The same kind as the bedroom's photographs over its bed's head, its judged failure. Moving it clear of the bed is more than the 1 m the owner allows (D4); listed for the owner (2026-11-21), not yet ruled on."
+    }
+  ],
+  "known_fails_note": "summary.py marks these as known in summary.json. They still count: run.sh ends non-zero while any check fails."
+}
