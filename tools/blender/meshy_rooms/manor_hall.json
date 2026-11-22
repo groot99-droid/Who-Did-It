@@ -1,0 +1,707 @@
+{
+  "room": "manor_hall",
+  "about": "Vane Manor's hall, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 26 x 14 m inside (x -13..13, y -7..7), 3.6 m high. Every prop, spot, portal and night light of packages/content/data/scenes/manor_hall.json is named below. The scene's two partitions (round 8J) are furniture: a library wall of seven real-size bookcases on row 6 and five glazed Vane Tin Co. cases on row 10, the dining bay between them. The curtain alcove in the south-east is walled at its back and on its west side by one wall-piece (G21, decision D5). The stairs up to the upper floor are a visible flight rising south from the north wall through a hole in the ceiling (decision D6). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Vane Manor, hall",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "front": "By the front door",
+    "back": "By the back door",
+    "stairs": "At the foot of the stairs"
+  },
+  "height": 3.6,
+  "height_note": "the plan's 3.6 m for the hall (the upper floor is 3.0)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.9, 0.9, 0.86]
+  },
+  "floor_note": "the scene's material layer is `f` flagstones over most of the hall (the dining bay's `w` boards wait for G11's floor by tile letter). The flagstone scan (stone_floor) is not in the local cache and nothing is downloaded, so the set-stone scan of the stone hearths (rock_wall_08, the stone_wall role) stands in, as in Crumb's mixing room, a step paler and greyer",
+  "wall_colour": "#6C705A",
+  "wall_colour_note": "guess: a deep olive distemper, a step warmer than the upper floor's grey-green (#6E7461); green over red, so the moon's blue never turns it lilac",
+  "ceiling_colour": "#D6D0C2",
+  "ceiling_colour_note": "lime white, as upstairs",
+  "paint_colour": "#CFC5AD",
+  "wood_colour": "#3E2A1B",
+  "wood_colour_note": "the upper floor's dark mahogany joinery",
+  "skirting": 0.25,
+  "picture_rail": 3.0,
+  "picture_rail_note": "a taller rail for the 3.6 m hall (the 3.0 m rooms have theirs at 2.5)",
+  "cornice": 0.25,
+  "openings": [
+    {
+      "id": "mh.stairs",
+      "kind": "stairs",
+      "portal": "mh.stairs",
+      "flight": {
+        "up": true,
+        "well": [-1.0, 2.75, 0.0, 5.0],
+        "dir": "S",
+        "riser": 0.2,
+        "tread": 0.25,
+        "over": 1.0
+      },
+      "flight_note": "G12 (D6: visible stairs): the scene puts the portal on the north wall's tile (14,0), its spawn on (14,1) facing south. Along the north wall the flight would stand on the clock (west) or the safe (east), so it rises south into the hall from the north wall, on tile column 13 (x -1..0) beside the spawn: a house flight (0.2 m risers, 0.25 m treads), its first riser on the north wall, through a hole in the ceiling (y 2.75..5.0: the tread 2.0 m from the base is the first under the hole, 2.0 m under the ceiling; the tread past 4.25 m stands over the ceiling) and on 1.0 m above it into the dark. Its foot is beside the marker, (0.5, 7.0), 0.5 m from the flight; the flight's run ends at y 2.75, 1.0 m short of the bookcases' fronts.",
+      "note": "the stairs up to the upper floor (mh.stairs: to manor_upper, spawn stairs)"
+    },
+    {
+      "id": "mh.front",
+      "kind": "door",
+      "portal": "mh.front",
+      "width": 1.0,
+      "height": 2.3,
+      "knob": "W",
+      "note": "the front door in the south wall, tile (20,15): centred at x 6.5, its portal at the doorway's foot (6.5, -7.0); the front spawn stands 0.5 m inside it, (6.5, -6.5), by design. A wider, taller door for the hall's main door."
+    },
+    {
+      "id": "mh.back",
+      "kind": "door",
+      "portal": "mh.back",
+      "width": 0.9,
+      "height": 2.15,
+      "knob": "E",
+      "note": "the back door in the south wall, tile (6,15): centred at x -7.5, its portal at (-7.5, -7.0); the back spawn is (-7.5, -6.5)"
+    },
+    {
+      "id": "mh.draped_window_0",
+      "kind": "window",
+      "prop": "mh.draped_window_0",
+      "width": 1.0,
+      "sill": 0.8,
+      "head": 2.6,
+      "panes": [2, 3],
+      "rod": 2.75,
+      "curtain_colour": "#3E463C",
+      "curtain_colour_note": "guess: the upper floor's bottle green",
+      "swag": true,
+      "note": "the west window, tile (4,0): x -9.5 in the north wall, taller than the 3.0 m rooms' (sill 0.8, head 2.6)"
+    },
+    {
+      "id": "mh.draped_window_1",
+      "kind": "window",
+      "prop": "mh.draped_window_1",
+      "width": 1.0,
+      "sill": 0.8,
+      "head": 2.6,
+      "panes": [2, 3],
+      "rod": 2.75,
+      "curtain_colour": "#3E463C",
+      "swag": true,
+      "note": "the moon's window, tile (21,0): x 7.5 in the north wall (the scene's mh.lt_moon stands on its tile)"
+    }
+  ],
+  "outside": {
+    "ground": -0.3,
+    "ground_note": "a ground-floor view, as the parlour's: the snow a step below the sill's outer ledge",
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    },
+    "note": "the parlour's night outside, copied: both windows are in the north wall, so one view serves both"
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "the bedroom's: from straight out of the window toward its wall's +s side"
+  },
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "mh.lt_lamp_w",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mh.lamp_table_1"
+      },
+      "note": "the lamp on the table beside the hearth chair (a candle stand until the oil lamp, a .blend, G8)"
+    },
+    {
+      "id": "mh.lt_lamp_e",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mh.lamp_table_0"
+      },
+      "note": "the lamp on the table at the library wall's east end"
+    },
+    {
+      "id": "mh.lt_table",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mh.dining_table"
+      },
+      "note": "the candle on the dining table, its tile (13,8)"
+    },
+    {
+      "id": "mh.lt_fire",
+      "role": "fire",
+      "anchor": {
+        "piece": "mh.fireplace_e",
+        "name": "fire"
+      },
+      "note": "the hearth's fire: the firebox's own anchor"
+    },
+    {
+      "id": "mh.lt_moon",
+      "role": "moon",
+      "window": "mh.draped_window_1"
+    }
+  ],
+  "lights_note": "mh.lt_window_w and mh.lt_window_e are the scene's day and dusk window lights: a night room does not build them. Bake groups: candle (the three lamps), fire, moon, fill = 4.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the parlour's darker-room lever, its fire, and a setting of the room's own.",
+    "lights": {
+      "fire": {
+        "color": "#FFB457",
+        "power": 60.0,
+        "radius": 0.12
+      }
+    },
+    "emit_display": {
+      "M_coal": [1.3, 0.42, 0.06]
+    },
+    "emit_display_note": "the parlour's coals",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "hall": {
+        "label": "the hall",
+        "mix": {
+          "candle": 1.0,
+          "fire": 1.0,
+          "moon": 3.0,
+          "fill": 0.5
+        },
+        "note": "a first guess from the upper floor (fill 0.5 for a large room) and the parlour (the fire at its own power, the moon 3.0), for the first 128-sample bake to set"
+      }
+    }
+  },
+  "light": "hall",
+  "light_note": "the room's own light setting (look.settings.hall; --light overrides)",
+  "pieces": [
+    {
+      "id": "mh.alcove_wall",
+      "decor": true,
+      "spec": {
+        "model": "wall",
+        "outline": [
+          [10.0, 0.0],
+          [11.0, 0.0],
+          [11.0, -1.0],
+          [13.0, -1.0],
+          [13.0, -2.0],
+          [11.0, -2.0],
+          [11.0, -5.0],
+          [10.0, -5.0]
+        ]
+      },
+      "note": "the curtain alcove's walls (G21, D5): the scene's W tiles (24, 8..12) and (24..26, 9), one wall-piece: its west side runs x 10..11 from y 0 to -5, its back (north) wall y -2..-1 from x 11 to the east wall. Its east edge is the room's own wall and is left out; the other faces carry the room's skirting, picture rail and cornice. North of the back wall a 2 x 1 m nook stays open to the hall, as the map has it."
+    },
+    {
+      "id": "mh.clock",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.32, 2.19],
+        "label": "Longcase clock, stopped at 11:47 (a grey box until the .blend model can be built, G8)"
+      },
+      "note": "the stopped clock at its tile (10,0), x -3.5 on the north wall: the parlour's longcase clock box (vintage_grandfather_clock_01 is a .blend, G8)"
+    },
+    {
+      "id": "mh.safe",
+      "face": "S",
+      "place": ["wall", "N", 4.5],
+      "spec": {
+        "model": "box",
+        "size": [0.7, 0.5, 0.95],
+        "label": "The Vane safe (black iron, a brass combination dial)"
+      },
+      "note": "the safe at its tile (18,0), x 4.5 on the north wall, 0.5 m deep (at 0.6 the first no-bake build's walk could not stand on its tile (18,1)). No model (a grey box; the plan's safe, Tier 2)"
+    },
+    {
+      "id": "mh.vane_portrait",
+      "face": "S",
+      "place": ["wall", "N", -6.5],
+      "rise": 1.5,
+      "spec": {
+        "model": "ph",
+        "slug": "fancy_picture_frame_02",
+        "scale": 1.2,
+        "lod": 0.5
+      },
+      "note": "the Vanes' portrait at its tile (7,0), x -6.5 on the north wall, its foot 1.5 m up; no crepe and no sash on it. The print is the frame's own scan until G18's prints"
+    },
+    {
+      "id": "mh.sideboard",
+      "face": "S",
+      "place": ["wall", "N", -11.25],
+      "spec": {
+        "model": "ph",
+        "slug": "GothicCommode_01",
+        "scale": 0.85,
+        "lod": 0.6
+      },
+      "moved": "0.75 m west along the north wall (D4): at its tile's centre (x -10.5) it stood in the west window's curtain (from x -10.52)",
+      "note": "the sideboard at its tile (3,1): the widow's carved commode at 0.85 (1.02 m wide), as the parlour's sideboard"
+    },
+    {
+      "id": "mh.wardrobe_w",
+      "spot": true,
+      "key": "wardrobe",
+      "face": "E",
+      "place": ["wall", "W", 4.5],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "lod": 0.6
+      },
+      "note": "the west hide wardrobe at its tile (1,3), against the west wall: the bedroom's carved press (GothicCabinet_01), doors shut"
+    },
+    {
+      "id": "mh.wardrobe_e",
+      "spot": true,
+      "key": "wardrobe",
+      "face": "W",
+      "place": ["wall", "E", 4.5],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "lod": 0.6
+      },
+      "note": "the east hide wardrobe at its tile (26,3), against the east wall, doors shut"
+    },
+    {
+      "id": "mh.bookcase_0",
+      "covers": ["mh.bookcase_1"],
+      "face": "N",
+      "place": ["at", -4.29, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the library wall (row 6, x -5..5), seven real-size bookcases (the plan: the hall's partitions as real-size pieces): the shop's worn bookcase at 1.0 (1.37 m wide, 2.06 m high), 6 cm apart, their fronts to the stairs' half of the hall. The first stands for the tiles (9,6) and (10,6). No books on the shelves: a decimated book set came out different on the rented box and on this machine upstairs"
+    },
+    {
+      "id": "mh.bookcase_b_0",
+      "face": "N",
+      "place": ["at", -2.86, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the second bookcase, the scene's b variant at its tile (11,6)"
+    },
+    {
+      "id": "mh.bookcase_2",
+      "face": "N",
+      "place": ["at", -1.43, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the third bookcase, at its tile (12,6)"
+    },
+    {
+      "id": "mh.bookcase_3",
+      "covers": ["mh.bookcase_4"],
+      "face": "N",
+      "place": ["at", 0.0, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the middle bookcase, for the tiles (13,6) and (14,6)"
+    },
+    {
+      "id": "mh.bookcase_5",
+      "face": "N",
+      "place": ["at", 1.43, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the fifth bookcase, at its tile (15,6)"
+    },
+    {
+      "id": "mh.bookcase_b_1",
+      "face": "N",
+      "place": ["at", 2.86, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the sixth bookcase, the scene's second b variant at its tile (16,6)"
+    },
+    {
+      "id": "mh.bookcase_6",
+      "covers": ["mh.bookcase_7"],
+      "face": "N",
+      "place": ["at", 4.29, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the last bookcase, for the tiles (17,6) and (18,6)"
+    },
+    {
+      "id": "mh.lamp_table_0",
+      "key": "candle",
+      "face": "N",
+      "place": ["at", 5.5, 1.5],
+      "spec": {
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the lamp table at its tile (19,6), at the library wall's east end: the widow's candle stand, the flame of mh.lt_lamp_e"
+    },
+    {
+      "id": "mh.dining_table",
+      "face": "S",
+      "place": ["at", 0.0, -0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 0.95,
+        "extras": ["flame"],
+        "lod": 1.0,
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [-0.45, null, 0.0],
+            "lod": 0.02
+          },
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.2, 0.15, 0.0],
+            "lod": 0.3
+          },
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.2, 0.52, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "note": "the dining table's footprint (12..15, 8): three of the cottage's tables at 0.95 (1.07 m each, 0.76 m high) end to end make the 3.3 m laid table; this middle one at the footprint's centre carries the candle of mh.lt_table at x -0.45 (its tile (13,8) is at -0.5) and two plates (dress `at` is [along, from the back edge, over the top]). The laid table itself has no model (Tier 2)"
+    },
+    {
+      "id": "mh.decor.table_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -1.1, -0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 0.95,
+        "lod": 1.0,
+        "dress": [
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.0, 0.15, 0.0],
+            "lod": 0.3
+          },
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.0, 0.52, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "note": "the dining table's west third, laid for two"
+    },
+    {
+      "id": "mh.decor.table_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 1.1, -0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_table_02",
+        "scale": 0.95,
+        "lod": 1.0,
+        "dress": [
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.0, 0.15, 0.0],
+            "lod": 0.3
+          },
+          {
+            "slug": "carved_wooden_plate",
+            "scale": 1.0,
+            "at": [0.0, 0.52, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "note": "the dining table's east third, laid for two"
+    },
+    {
+      "id": "mh.tin_cabinet_0",
+      "covers": ["mh.tin_cabinet_1"],
+      "face": "S",
+      "place": ["at", -4.0, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Vane Tin Co. glazed case: the company's tins on show (its glazing waits for G15)"
+      },
+      "note": "the tin cases (row 10, x -5..5), the scene's second partition: five glazed show cases of two bays each, 1.96 m wide, 4 cm apart, fronts to the doors' half of the hall, as the shop's and the bakery's cases (G15's glazed case as a box). The first stands for the tiles (9,10) and (10,10)"
+    },
+    {
+      "id": "mh.tin_cabinet_2",
+      "covers": ["mh.tin_cabinet_3"],
+      "face": "S",
+      "place": ["at", -2.0, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Vane Tin Co. glazed case: the company's tins on show (its glazing waits for G15)"
+      },
+      "note": "the second case, tiles (11,10) and (12,10)"
+    },
+    {
+      "id": "mh.tin_cabinet_b",
+      "covers": ["mh.tin_cabinet_4"],
+      "face": "S",
+      "place": ["at", 0.0, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Vane Tin Co. glazed case: the company's tins on show (its glazing waits for G15)"
+      },
+      "note": "the middle case, the scene's b variant at (13,10) with (14,10)"
+    },
+    {
+      "id": "mh.tin_cabinet_5",
+      "covers": ["mh.tin_cabinet_6"],
+      "face": "S",
+      "place": ["at", 2.0, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Vane Tin Co. glazed case: the company's tins on show (its glazing waits for G15)"
+      },
+      "note": "the fourth case, tiles (15,10) and (16,10)"
+    },
+    {
+      "id": "mh.tin_cabinet_7",
+      "covers": ["mh.tin_cabinet_8"],
+      "face": "S",
+      "place": ["at", 4.0, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.96, 0.6, 1.0],
+        "label": "Vane Tin Co. glazed case: the company's tins on show (its glazing waits for G15)"
+      },
+      "note": "the last case, tiles (17,10) and (18,10)"
+    },
+    {
+      "id": "mh.fireplace_e",
+      "face": "E",
+      "place": ["wall", "W", -0.5],
+      "spec": {
+        "model": "hearth",
+        "style": "surround",
+        "size": [1.9, 0.45, 1.3],
+        "opening": [0.85, 0.9],
+        "surface": "marble",
+        "mantel": {
+          "z": 1.3,
+          "depth": 0.3,
+          "overhang": 0.06,
+          "thickness": 0.07
+        },
+        "breast": {
+          "width": 1.6,
+          "depth": 0.24,
+          "to": "ceiling"
+        },
+        "firebox": {
+          "depth": 0.3,
+          "glow": {
+            "shape": "box",
+            "material": "coal"
+          }
+        },
+        "anchors": {
+          "fire": [0.0, 0.0, 0.32]
+        },
+        "dress": [
+          {
+            "slug": "ornate_mirror_01",
+            "scale": 1.4,
+            "at": [0.0, 0.0, 0.12],
+            "cloth": true
+          }
+        ]
+      },
+      "note": "G6: the parlour's marble surround, a size up for the hall, on the west wall at its tile (0,8) (y -0.5); the mirror over it hung in plain matte black cloth (the scene: its mirror hung in black). The scene calls it fireplace_e"
+    },
+    {
+      "id": "mh.armchair",
+      "face": "W",
+      "place": ["at", -11.4, 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "GreenChair_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the hearth chair at its tile (2,7), facing the fire: the upper floor's green reading chair"
+    },
+    {
+      "id": "mh.lamp_table_1",
+      "key": "candle",
+      "face": "E",
+      "place": ["at", -11.5, -1.35],
+      "spec": {
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "moved": "0.85 m south (D4): at its tile's centre (y -0.5) it stood squarely before the fire's mouth and hid it in the first bake's stills; now before the hearth's south jamb",
+      "note": "the lamp table at its tile (2,8), before the hearth: the widow's candle stand, the flame of mh.lt_lamp_w"
+    },
+    {
+      "id": "mh.coat_stand",
+      "face": "N",
+      "place": ["wall", "S", -9.5],
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.5, 1.8],
+        "label": "Coat stand (bentwood; a greatcoat and a top hat)"
+      },
+      "note": "at its tile (4,14), by the back door. No model (a grey box; the plan's coat stand, Tier 2)"
+    },
+    {
+      "id": "mh.boot_rack",
+      "face": "N",
+      "place": ["wall", "S", 8.5],
+      "spec": {
+        "model": "ph",
+        "slug": "painted_wooden_bench",
+        "scale": 0.85,
+        "lod": 0.5
+      },
+      "note": "the boot bench at its tile (22,14), east of the front door: the parlour's settle at 0.85"
+    },
+    {
+      "id": "mh.boot_rack.boots",
+      "decor": true,
+      "face": "N",
+      "place": ["beside", "mh.boot_rack", "E", -6.8],
+      "spec": {
+        "model": "box",
+        "size": [0.6, 0.3, 0.2],
+        "label": "Boots on the rack (a pair caked in mud: the bootprints on the carpet)"
+      },
+      "note": "the boots are dress of the boot rack in the scene (no id of their own): a decor piece"
+    },
+    {
+      "id": "mh.bed",
+      "face": "E",
+      "place": ["at", 11.405, -2.93],
+      "spec": {
+        "model": "ph",
+        "slug": "vintage_day_bed",
+        "scale": 0.92,
+        "lod": 0.7,
+        "bed": {
+          "kind": "day",
+          "axis": "x",
+          "head": "+",
+          "cover": "coverlet",
+          "pillows": 1
+        },
+        "bed_note": "vintage_day_bed is 1.97 m along its x (1.81 m at 0.92); facing east the model's +x end is the north end: the head against the alcove's back wall"
+      },
+      "note": "G7: the alcove's bed at its tile (25,10), the day bed of the parlour, along the alcove's west side (its back to the wall-piece at x 11), its head at the back wall, so the alcove's east half stays free for the curtain hide. At 0.92 (1.81 x 0.78 m): at full size the low collision box at its foot stood 5.2 to 5.4 cm off the bed in every place tried (cc_geom no_invisible_walls_over_5cm; at 0.92, 4.8 cm)"
+    },
+    {
+      "id": "mh.curtain_alcove",
+      "spot": true,
+      "face": "W",
+      "place": ["at", 12.9, -2.45],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.16, 2.6],
+        "label": "Alcove curtain, drawn back into the corner (the hide)"
+      },
+      "note": "the hide spot at its tile (26,10): the alcove's curtain drawn back against the east wall in the alcove's back corner, 0.4 m from the tile's centre. A grey box (no curtain piece yet, D2); a curtain drawn across the mouth would shut the alcove and its bed off"
+    },
+    {
+      "id": "mh.decor.rug_hall",
+      "decor": true,
+      "key": "rug",
+      "place": ["at", 3.0, 4.0],
+      "spec": {
+        "size": [3.6, 2.4]
+      },
+      "note": "the first person's own: a rug in the stairs' half of the hall"
+    },
+    {
+      "id": "mh.decor.carpet",
+      "decor": true,
+      "key": "rug",
+      "place": ["at", 0.0, -5.0],
+      "spec": {
+        "size": [5.0, 2.2]
+      },
+      "note": "the scene's carpet (its muddy bootprints are a decal for G19): a long rug before the tin cases, between the two doors"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). The spawn_ views are the spawns' own.",
+  "views": {
+    "spawn_stairs": [[0.5, 6.5, 1.6], [0.5, -7.0, 1.2], 70.0],
+    "spawn_front": [[6.5, -6.5, 1.6], [6.5, 7.0, 1.3], 70.0],
+    "spawn_back": [[-7.5, -6.5, 1.6], [-7.5, 7.0, 1.3], 70.0],
+    "stairs": [[2.6, 2.6, 1.6], [-0.5, 4.6, 2.4], 70.0],
+    "hearth": [[-8.0, -0.5, 1.6], [-13.0, -0.3, 1.4], 70.0],
+    "library": [[4.2, 4.4, 1.6], [-1.5, 1.5, 1.2], 70.0],
+    "dining": [[-6.0, -0.6, 1.6], [2.0, -0.5, 0.9], 70.0],
+    "cases": [[0.0, -6.0, 1.6], [0.0, -2.5, 0.9], 70.0],
+    "alcove": [[11.8, -6.4, 1.6], [12.0, -2.0, 1.0], 70.0],
+    "windows": [[3.0, 2.6, 1.6], [7.5, 7.0, 1.6], 70.0],
+    "east": [[2.0, 4.0, 1.6], [13.0, 4.5, 1.3], 70.0],
+    "west": [[-4.0, 4.0, 1.6], [-13.0, 4.5, 1.3], 70.0]
+  }
+}

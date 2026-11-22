@@ -1,0 +1,9 @@
+{
+  "about": "Vane Manor's hall as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "318 of the map's 324 walkable tiles can be stood on. (25,10) and (25,11) lie under the alcove's day bed, the same kind as the bedroom's tiles under its bed. (13,1) to (13,4) lie under the flight up to the upper floor (D6: a visible flight; along the north wall it would stand on the clock or the safe, so it rises south from the north wall beside the stairs spawn), furniture of the same kind over walkable tiles as the shop's tile under its flight and the upper floor's two in its well. Listed for the owner (2026-11-21), not yet ruled on."
+    }
+  ]
+}
