@@ -53,7 +53,7 @@ PIECE_KEYS = frozenset("id spot key face place spec sheets cloth dress_lod lift 
                        "name".split())
 SPEC_KEYS = frozenset("model slug name scale tall size kmax lod extras dress doors mirror bed centre drop sheets rot "
                       "wall drape head label finish anchors glow style opening surface mantel breast firebox beam "
-                      "seats sill dome ledge".split())
+                      "seats sill dome ledge outline in width height knob".split())
 OPENING_KEYS = frozenset("id kind portal prop side in at width height style knob sill head panes rod curtains swag "
                          "curtain_colour outside foot flight hatch".split())
 LIGHT_KEYS = frozenset("id role anchor z group power color radius glow window pool name".split())
@@ -66,10 +66,18 @@ LOOK_NOT_OVERRIDABLE = frozenset(("ink", "view", "bake"))     # R-K2
 # a data map: its keys are ids or names, not schema keys (no strict keys, no R0.7 in it)
 DATA_MAPS = ("spawn_labels", "views", "layouts", "skip", "emit_display", "doors", "dress_lod", "anchors")
 
-MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")     # R-P5: the builders' models
+MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth", "wall", "door")     # R-P5: the builders' models
 # a box's finishes: the grey of a piece with no model, and the room's joinery wood (a beam, a rafter: G11's first part)
 BOX_FINISHES = ("grey", "wood")
-BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth")   # what the builder builds today
+BUILT_MODELS = ("ph", "meshy", "rug", "photos", "box", "hearth", "wall", "door")   # what the builder builds today
+# a wall-piece (G21, manor_upper's study block): an interior wall built as a solid plaster block on the floor, given by
+# its outline seen from above (a rectilinear polygon, any turning), up to the ceiling or `height`; each outline edge on
+# the room's own wall is left out, every other one is a face in the room's wall plaster with the room's trims; and a
+# closed door set into one of its faces (`model: "door"`, `in` naming the wall-piece): the shell door's joinery and
+# leaf in the face, no portal behind it (a locked door) (R-W1 to R-W4)
+FACE_WALL = {"S": "N", "N": "S", "E": "W", "W": "E"}   # a wall-piece's face and the shell wall facing the same way
+WALL_DOOR_DEFAULTS = dict(width=0.9, height=2.15)
+PLINTH_OUT = 0.008        # a door's plinth block stands this far past its architrave's outer edge
 # the hearth (G6, room_file_v2 section 6): its styles (R-H1), the three built (the surround and the stone hearth
 # first, the inglenook with the tavern bar, the bread oven with Crumb's oven room (G16); the stove is later), each style's
 # default surface, the surfaces the builder has (brick waits for G11's fetch), the
@@ -434,8 +442,9 @@ def value_rules(row: dict, bag: Problems) -> None:
         seen[pid], seen3[s3] = i, pid
         if pid.replace(".", "_").endswith(RESERVED_SUFFIXES):
             bag.append(f"{where}: its node name would end in a part's suffix ({', '.join(RESERVED_SUFFIXES)}) (R-N2)")
-        _place_rule(p, seen, where, bag)
         spec = p.get("spec") if isinstance(p.get("spec"), dict) else {}
+        if spec.get("model") != "wall":
+            _place_rule(p, seen, where, bag)
         model = spec.get("model")
         if model is not None and model not in MODELS:
             bag.append(f'{where}: no first-person builder for model "{model}" (the builders: {", ".join(MODELS)}) '
@@ -456,6 +465,10 @@ def value_rules(row: dict, bag: Problems) -> None:
                            f'{" or ".join(chr(34) + x + chr(34) for x in BOX_FINISHES)}')
         if model == "hearth":
             hearth_values(spec, row.get("height"), where, bag)
+        if model == "wall":
+            wall_values(p, row.get("height"), None, where, bag)
+        if model == "door":
+            wall_door_values(p, {q.get("id"): q for q in pieces[:i] if isinstance(q, dict)}, row, None, where, bag)
         if isinstance(spec.get("bed"), dict):
             bed_values(p, spec, where, bag)
         if "covers" in p and not (isinstance(p["covers"], (list, tuple)) and all(isinstance(c, str) for c in p["covers"])):
@@ -502,6 +515,205 @@ def _nums(v, n: int) -> bool:
 GLOW_DEFAULT_SIZE = {"sphere": lambda ow, fd: [0.12], "cone": lambda ow, fd: [round(0.3 * ow, 3), 0.2],
                      "box": lambda ow, fd: [round(0.7 * ow, 3), round(0.6 * fd, 3), 0.08],
                      "card": lambda ow, fd: [round(0.6 * ow, 3), 0.25]}
+
+
+def _in_poly(poly, x: float, y: float) -> bool:
+    """Even-odd: is (x, y) strictly inside the polygon (a point on an edge may read either way)."""
+    inside = False
+    n = len(poly)
+    for i in range(n):
+        (xa, ya), (xb, yb) = poly[i], poly[(i + 1) % n]
+        if (ya > y) != (yb > y) and x < xa + (y - ya) * (xb - xa) / (yb - ya):
+            inside = not inside
+    return inside
+
+
+EDGE_FACE = {(1, 0): "N", (-1, 0): "S", (0, -1): "E", (0, 1): "W"}   # a clockwise outline's edge: its outward face
+
+
+def wall_values(piece: dict, height=None, bounds=None, where: str = "the wall-piece",
+                bag: Problems | None = None) -> dict | None:
+    """A wall-piece's numbers (G21): its `outline` [[x, y], ...] (metres, a rectilinear polygon of 4 or more corners,
+    either turning) made clockwise seen from above, its height `h` (the ceiling's: a lower block with a top is not
+    built yet), its `edges` in order, each {face, start, dir, length, built} (`face` the way it
+    looks: N, E, S or W; `built` false on the room's own wall, given `bounds` (x0, y0, x1, y1)), its bounding `box`
+    [x0, y0, x1, y1] and its collision `boxes` [x0, y0, x1, y1] (the outline cut in bands along y, each band's box
+    run 5 cm on into the band above where that is inside, so no two boxes share a corner). It stands on the floor (no
+    `rise`, no `place`: the outline places it). Holds R-W1. With no `bag` it stops on a problem; with one it adds."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+
+    def done(v):
+        if own:
+            bag.stop()
+        return v if len(bag) == n0 else None
+
+    spec = piece.get("spec") if isinstance(piece.get("spec"), dict) else {}
+    ol = spec.get("outline")
+    if not (isinstance(ol, (list, tuple)) and len(ol) >= 4 and all(_nums(q, 2) for q in ol)):
+        bag.append(f"{where}: a wall-piece's outline is [[x, y], ...] in metres, 4 corners or more (R-W1)")
+        return done(None)
+    poly = [(float(q[0]), float(q[1])) for q in ol]
+    n = len(poly)
+    for i in range(n):
+        (xa, ya), (xb, yb) = poly[i], poly[(i + 1) % n]
+        if (abs(xa - xb) > 1e-9) == (abs(ya - yb) > 1e-9):
+            bag.append(f"{where}: the outline's edge {i} ({xa:g}, {ya:g}) to ({xb:g}, {yb:g}) runs along x or along y, "
+                       f"and is not of no length (R-W1)")
+            return done(None)
+    area = sum(poly[i][0] * poly[(i + 1) % n][1] - poly[(i + 1) % n][0] * poly[i][1] for i in range(n)) / 2
+    if area > 0:
+        poly = poly[::-1]
+    for i in range(n):          # two edges running on in one line: one edge
+        (xa, ya), (xb, yb), (xc, yc) = poly[i - 1], poly[i], poly[(i + 1) % n]
+        if abs((xb - xa) * (yc - yb) - (yb - ya) * (xc - xb)) < 1e-12:
+            bag.append(f"{where}: the outline's corner ({xb:g}, {yb:g}) is not a corner (R-W1)")
+            return done(None)
+    if piece.get("rise"):
+        bag.append(f"{where}: a wall-piece stands on the floor (no rise) (R-W1)")
+    if piece.get("place") is not None or piece.get("face") is not None:
+        bag.append(f"{where}: its outline places a wall-piece: no place, no face (R-W1)")
+    h = height if _num(height) else 3.0
+    if spec.get("height") is not None:
+        bag.append(f"{where}: a wall-piece stands up to the ceiling: a lower one (a half wall with a top) is not built "
+                   f"yet (R-W1)")
+    xs = [q[0] for q in poly]
+    ys = [q[1] for q in poly]
+    if bounds is not None and (min(xs) < bounds[0] - 1e-6 or max(xs) > bounds[2] + 1e-6 or min(ys) < bounds[1] - 1e-6
+                               or max(ys) > bounds[3] + 1e-6):
+        bag.append(f"{where}: the outline reaches out of the room (x {bounds[0]:g}..{bounds[2]:g}, y {bounds[1]:g}.."
+                   f"{bounds[3]:g}) (R-W1)")
+        return done(None)
+    edges = []
+    for i in range(n):
+        (xa, ya), (xb, yb) = poly[i], poly[(i + 1) % n]
+        L = abs(xb - xa) + abs(yb - ya)
+        d = (round((xb - xa) / L), round((yb - ya) / L))
+        face = EDGE_FACE[d]
+        on = bounds is not None and ((face == "W" and abs(xa - bounds[0]) < 1e-6) or (face == "E" and abs(xa - bounds[2])
+                                     < 1e-6) or (face == "S" and abs(ya - bounds[1]) < 1e-6)
+                                     or (face == "N" and abs(ya - bounds[3]) < 1e-6))
+        edges.append(dict(face=face, start=[xa, ya], dir=list(d), length=round(L, 6), built=not on))
+    # the collision: bands between the corners' ys, each band's runs inside; a band's run carried on up while the band
+    # over it has the same run; then each box run 5 cm into the band above where that strip is inside
+    cuts = sorted(set(ys))
+    rows = []
+    for ya, yb in zip(cuts, cuts[1:]):
+        ym = (ya + yb) / 2
+        xc = sorted(poly[i][0] for i in range(n) if poly[i][0] == poly[(i + 1) % n][0]
+                    and (poly[i][1] > ym) != (poly[(i + 1) % n][1] > ym))
+        rows.append((ya, yb, [(xc[k], xc[k + 1]) for k in range(0, len(xc) - 1, 2)]))
+    boxes = []
+    for ya, yb, runs in rows:
+        for xa, xb in runs:
+            prev = next((b for b in boxes if b[0] == xa and b[2] == xb and abs(b[3] - ya) < 1e-9), None)
+            if prev is not None:
+                prev[3] = yb
+            else:
+                boxes.append([xa, ya, xb, yb])
+    for b in boxes:
+        top = b[3] + 0.05
+        if all(_in_poly(poly, x_, b[3] + 0.025) for x_ in (b[0] + 1e-3, (b[0] + b[2]) / 2, b[2] - 1e-3)) and \
+                top < max(ys) + 1e-9:
+            b[3] = top
+    return done(dict(outline=[list(q) for q in poly], h=float(h), edges=edges,
+                     box=[min(xs), min(ys), max(xs), max(ys)],
+                     boxes=[[round(v, 6) for v in b] for b in boxes]))
+
+
+def wall_door_values(piece: dict, earlier: dict, row: dict, bounds=None, where: str = "the door",
+                     bag: Problems | None = None) -> dict | None:
+    """A door set into a wall-piece's face (G21): `in` the wall-piece (one earlier in the list), `face` the way the
+    door looks onto the room, `place` ["at", x, y] its doorway's foot on one of the wall-piece's faces that looks that
+    way, `width` and `height` the opening (default the shell door's 0.9 x 2.15), `knob` the end its knob is at seen
+    from the room (default as a shell door's: the end at the higher wall coordinate). Derived: `side` the shell wall
+    facing the same way (the door's joinery is built as that wall's), `edge` the face's edge of the outline, `at` the
+    door's centre along it, `wall` the wall-piece's numbers. Holds R-W2 to R-W4: the opening with its architraves and
+    plinths on the face, clear of every wall-piece beside it, its architrave under the picture rail and the block's
+    top."""
+    own = bag is None
+    bag = Problems("the room file") if own else bag
+    n0 = len(bag)
+
+    def done(v):
+        if own:
+            bag.stop()
+        return v if len(bag) == n0 else None
+
+    spec = piece.get("spec") if isinstance(piece.get("spec"), dict) else {}
+    host = earlier.get(spec.get("in"))
+    hspec = (host or {}).get("spec") if isinstance((host or {}).get("spec"), dict) else {}
+    if host is None or hspec.get("model") != "wall":
+        bag.append(f'{where}: a door piece names the wall-piece it is set into, one earlier in the list: "in" (R-W2)')
+        return done(None)
+    wv = wall_values(host, row.get("height"), bounds, f"{where}'s wall-piece {host.get('id')}", bag)
+    if wv is None:
+        return done(None)
+    face, pl = piece.get("face"), piece.get("place")
+    if face not in SIDES:
+        bag.append(f"{where}: face is the way the door looks onto the room: one of {', '.join(SIDES)} (R-W2)")
+        return done(None)
+    if not (isinstance(pl, (list, tuple)) and len(pl) == 3 and pl[0] == "at" and _num(pl[1]) and _num(pl[2])):
+        bag.append(f"{where}: a door stands by its doorway's foot on its face: place [\"at\", x, y] (R-W2)")
+        return done(None)
+    fx, fy = float(pl[1]), float(pl[2])
+    edge = None
+    for e in wv["edges"]:
+        if e["face"] != face or not e["built"]:
+            continue
+        sx, sy = e["start"]
+        dx, dy = e["dir"]
+        s_ = (fx - sx) * dx + (fy - sy) * dy
+        off = abs((fx - sx) * dy - (fy - sy) * dx)
+        if off < 1e-3 and -1e-9 <= s_ <= e["length"] + 1e-9:
+            edge = dict(e, s=s_)
+            break
+    if edge is None:
+        bag.append(f"{where}: its foot ({fx:g}, {fy:g}) is on none of {host.get('id')}'s {face} faces (R-W2)")
+        return done(None)
+    v = {k: spec.get(k, dv) for k, dv in WALL_DOOR_DEFAULTS.items()}
+    if not (_num(v["width"]) and 0.6 - 1e-9 <= v["width"] <= 1.2 + 1e-9):
+        bag.append(f"{where}: width is the opening's, 0.6 to 1.2 m (R-W3)")
+        return done(None)
+    top = wv["h"] - ARCH_W - 0.05
+    if not (_num(v["height"]) and 1.8 - 1e-9 <= v["height"] <= top + 1e-9):
+        bag.append(f"{where}: height is the opening's, 1.8 m to {top:.2f} m (under the wall-piece's top with its "
+                   f"architrave) (R-W3)")
+        return done(None)
+    side = FACE_WALL[face]
+    knob = spec.get("knob", KNOB_DEFAULT[side])
+    if knob not in KNOB_ENDS[side]:
+        bag.append(f'{where}: knob "{knob}" on a {face} face: the ends are "{KNOB_ENDS[side][0]}" and '
+                   f'"{KNOB_ENDS[side][1]}" (R-W3)')
+    w = float(v["width"])
+    s0, s1 = edge["s"] - w / 2 - ARCH_W - PLINTH_OUT, edge["s"] + w / 2 + ARCH_W + PLINTH_OUT
+    if s0 < -1e-9 or s1 > edge["length"] + 1e-9:
+        bag.append(f"{where}: the door with its architraves runs off its face ({s0:.3f}..{s1:.3f} m along a face "
+                   f"{edge['length']:g} m long) (R-W4)")
+    nx, ny = {"N": (0, 1), "S": (0, -1), "E": (1, 0), "W": (-1, 0)}[face]
+    sx, sy = edge["start"]
+    dx, dy = edge["dir"]
+    for qid, q in list(earlier.items()):
+        qs = q.get("spec") if isinstance(q.get("spec"), dict) else {}
+        if qs.get("model") != "wall":
+            continue
+        qv = wv if qid == host.get("id") else wall_values(q, row.get("height"), bounds, f"wall-piece {qid}",
+                                                          Problems("the room file"))
+        if qv is None:
+            continue
+        for s_ in (s0, s1):         # the architrave's two outer edges, 3 cm out from the face
+            px, py = sx + dx * s_ + nx * 0.03, sy + dy * s_ + ny * 0.03
+            if _in_poly(qv["outline"], px, py):
+                bag.append(f"{where}: the door with its architraves runs into the wall-piece {qid} at ({px:.3f}, "
+                           f"{py:.3f}) (R-W4)")
+                break
+    rail = row.get("picture_rail")
+    if _num(rail) and v["height"] + ARCH_W + 0.03 > rail - 0.02:
+        bag.append(f"{where}: its top at {v['height']:g} m and its architrave would touch the picture rail at "
+                   f"{rail:g} m (R-W4)")
+    return done(dict(wall=wv, host=host.get("id"), face=face, side=side, edge=edge, at=round(edge["s"], 6),
+                     foot=[fx, fy], width=w, height=float(v["height"]), knob=knob, style="panel"))
 
 
 def hearth_values(spec: dict, height=None, where: str = "the hearth", bag: Problems | None = None) -> dict | None:
@@ -1853,6 +2065,8 @@ def _names(row: dict, sc: Scene, openings: list, lights: list, legacy: bool, bag
     names = []
     for p in row["pieces"]:
         names.append(("piece " + p["id"], P + (p.get("name") or p["id"]).replace(".", "_")))
+        if (p.get("spec") or {}).get("model") == "door":     # a door in a wall-piece: named as a shell door is (G21)
+            names += [("piece " + p["id"], f"{P}{s}_{p['id'].replace('.', '_')}") for s in ("Door", "DoorKnob")]
     if legacy:
         names += [("door", P + "Door"), ("door", P + "DoorKnob")]
         names += [("window", P + s) for s in ("Window", "WindowGlass", "SillSnow", "WindowArchitrave", "Curtains",

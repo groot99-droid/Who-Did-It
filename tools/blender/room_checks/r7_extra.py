@@ -320,6 +320,8 @@ xcheck("no_banned_word_in_any_name", not hits and not ex_hits, names=len(names_a
 
 # ------------------------------------------------------------------------------------------- 6. intersections, floating
 OPEN_IDS = {o["id"] for o in F.openings}                   # the doors and windows: joinery set in the wall
+# ... and a door set into a wall-piece (G21: the manor's study door), joinery set in that wall as a shell door's is
+OPEN_IDS |= {p["id"] for p in MAN["pieces"] if (p.get("spec") or {}).get("model") == "door"}
 
 
 def gid_of(x):
@@ -369,7 +371,7 @@ HUNG = {p["id"].replace(".", "_") for p in MAN["pieces"] if p.get("rise")}
 # the photographs builder's frames hang flat on the wall at eye height, one object each (<id>_1, <id>_2, ...): the
 # bedroom's by the SKIP pattern above, any other room's (the tavern bar's) by its manifest row
 PHOTOS = {p["id"].replace(".", "_") for p in MAN["pieces"] if (p.get("spec") or {}).get("model") == "photos"}
-OPEN_TAGS = {o["id"].replace(".", "_") for o in F.openings}
+OPEN_TAGS = {g.replace(".", "_") for g in OPEN_IDS}
 # a hearth's dress hung over its mantel shelf (the manifest's made.dress `at` above made.mantel): a mirror on the chimney
 # breast, and its black cloth; by its material, in the hearth's own object
 HUNG_MATS = {}

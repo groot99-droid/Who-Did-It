@@ -1,0 +1,484 @@
+{
+  "room": "manor_upper",
+  "about": "Vane Manor's upper floor, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 22 x 10 m inside (x -11..11, y -5..5), 3.0 m high. The plan is an L: the locked study fills the south-west corner (x -11..-5, y -3..0 and x -11..-6, y -5..-3), built as one wall-piece (G21, decision D5) with its locked door in the notch off the landing. Every prop, spot, portal and night light of packages/content/data/scenes/manor_upper.json is named below. The stairs down to the hall are a visible flight in a well along the south wall (decision D6). The balcony's one-way drop is a closed door in the east wall until G14's balcony door. A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "Vane Manor, upstairs",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "stairs": "At the top of the stairs"
+  },
+  "height": 3.0,
+  "height_note": "the survey's 3.0 m (the hall below is 3.6)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "old_wood_floor",
+    "role": "wood_floor",
+    "zoom": 1.55,
+    "factor": [0.8, 0.92, 0.72]
+  },
+  "floor_note": "the scene's material layer is all wood (`w`): the widow's boards, a step darker and greyer for an older house",
+  "wall_colour": "#6E7461",
+  "wall_colour_note": "guess: a deep grey-green distemper, a step darker than the widow's sage (#80866E); green above red, so the moon's blue never turns it lilac",
+  "ceiling_colour": "#D6D0C2",
+  "ceiling_colour_note": "lime white, as the widow's house",
+  "paint_colour": "#CFC5AD",
+  "wood_colour": "#3E2A1B",
+  "wood_colour_note": "the joinery's dark mahogany, a little darker than the widow's (#45301F)",
+  "skirting": 0.22,
+  "picture_rail": 2.5,
+  "cornice": 0.2,
+  "openings": [
+    {
+      "id": "mu.stairs",
+      "kind": "stairs",
+      "portal": "mu.stairs",
+      "flight": {
+        "well": [-2.0, -5.0, 0.0, -4.0],
+        "dir": "W",
+        "riser": 0.19,
+        "tread": 0.25,
+        "under": 1.0,
+        "rail": ["N", "E", "W"],
+        "rail_h": 0.9
+      },
+      "flight_note": "G12 (D6: visible stairs): the scene puts the portal on the south wall's tile (12,11), its spawn on (12,10) facing north. The flight cannot leave through the wall, so it goes down in a well along the south wall west of the spawn: tiles (10,10) and (11,10), x -2..0, 1 m wide, its head on the well's east edge beside the spawn; a house flight (0.19 m risers, 0.25 m treads) descends west and runs on 1.0 m under the boards into the dark (the hall's stairs). A balustrade on the three open edges; the portal stays at the foot the scene gives it, (0.5, -5.0), 0.5 m from the well and from the spawn.",
+      "note": "the stairs down to the hall (mu.stairs: to manor_hall, spawn stairs)"
+    },
+    {
+      "id": "mu.balcony",
+      "kind": "door",
+      "portal": "mu.balcony",
+      "width": 0.9,
+      "height": 2.15,
+      "knob": "N",
+      "note": "the balcony's one-way drop (mu.balcony: to the village's balcony_drop spawn, no way back) on the east wall's tile (23,5): centred at y 0.5, its portal at the doorway's foot (11.0, 0.5). A closed panel door for now: G14's glazed balcony door with its rail and the view is not built. The scene gives this portal no spawn."
+    },
+    {
+      "id": "mu.draped_window_0",
+      "kind": "window",
+      "prop": "mu.draped_window_0",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "rod": 2.44,
+      "curtain_colour": "#3E463C",
+      "curtain_colour_note": "guess: a deep bottle green, darker than the walls",
+      "swag": true,
+      "note": "the bedroom's window between the two beds, tile (6,0): x -5.5 in the north wall"
+    },
+    {
+      "id": "mu.draped_window_1",
+      "kind": "window",
+      "prop": "mu.draped_window_1",
+      "width": 0.9,
+      "sill": 0.75,
+      "head": 2.3,
+      "panes": [2, 2],
+      "rod": 2.44,
+      "curtain_colour": "#3E463C",
+      "swag": true,
+      "note": "the moon's window, tile (16,0): x 4.5 in the north wall (the scene's mu.lt_moon stands on its tile)"
+    }
+  ],
+  "outside": {
+    "ground": -3.2,
+    "ground_note": "an upper floor: the widow's bedroom's view, the snow 3.2 m under the floor",
+    "fence_y": 9.5,
+    "houses": [
+      [-15.0, 30.0, 8.0, 6.0, 0.0],
+      [4.0, 36.0, 9.0, 6.5, 0.0],
+      [20.0, 28.0, 7.0, 6.0, 0.0]
+    ],
+    "trees": [38.0, 75.0],
+    "lit_window": [1, -1.6, 2.2],
+    "gain": 0.55,
+    "meshy": {
+      "houses": [
+        ["fisher_cottage", -15.0, 30.0, 8.0, null],
+        ["Frosted_Hearth_Cabin", 4.0, 36.0, 9.25, null],
+        ["mother_moll_hut", 20.0, 28.0, 6.3, null]
+      ],
+      "trees": 16,
+      "house_lod": 0.03,
+      "tree_lod": 0.04
+    },
+    "note": "the bedroom's night outside, copied: both windows are in the north wall, so one view serves both"
+  },
+  "moon": {
+    "azimuth": 15.0,
+    "elevation": 32.0,
+    "note": "the bedroom's: from straight out of the window toward its wall's +s side"
+  },
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "mu.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mu.nightstand_0"
+      },
+      "note": "the candle on her nightstand, east of the west bed (the oil lamp is a .blend, G8: the round-3 candlestick stands in)"
+    },
+    {
+      "id": "mu.lt_lamp_e",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mu.nightstand_1"
+      },
+      "note": "the candle on his nightstand, east of the east bed"
+    },
+    {
+      "id": "mu.lt_landing",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mu.lamp_table_0"
+      },
+      "note": "the lamp on the landing's table by the stairs"
+    },
+    {
+      "id": "mu.lt_nook",
+      "role": "lamp",
+      "anchor": {
+        "piece": "mu.lamp_table_1"
+      },
+      "note": "the reading lamp beside the armchair"
+    },
+    {
+      "id": "mu.lt_moon",
+      "role": "moon",
+      "window": "mu.draped_window_1"
+    }
+  ],
+  "lights_note": "mu.lt_window_w and mu.lt_window_e are the scene's day and dusk window lights: a night room does not build them. Bake groups: candle (the four lamps), moon, fill = 3.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the parlour's darker-room lever and a setting of the room's own.",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "manor": {
+        "label": "the manor upstairs",
+        "mix": {
+          "candle": 1.0,
+          "moon": 3.0,
+          "fill": 0.5
+        },
+        "note": "from the first 128-sample bake: at the parlour's fill (0.35) the far wall was 0.54 of the lamp wall and the landing's south-east corner sat at half the ink floor before the lift; the fill raised to 0.5 for a room twice the parlour's size"
+      }
+    }
+  },
+  "light": "manor",
+  "light_note": "the room's own light setting (look.settings.manor; --light overrides)",
+  "pieces": [
+    {
+      "id": "mu.study_wall",
+      "decor": true,
+      "spec": {
+        "model": "wall",
+        "outline": [
+          [-11.0, 0.0],
+          [-5.0, 0.0],
+          [-5.0, -3.0],
+          [-6.0, -3.0],
+          [-6.0, -5.0],
+          [-11.0, -5.0]
+        ]
+      },
+      "note": "the locked study's walls (G21, D5): the scene's W block in the south-west corner, tiles (1..6, 6..8) and (1..5, 9..10), one L-shaped wall-piece. Its west and south edges are the room's own walls and are left out; its other four faces carry the room's skirting, picture rail and cornice. Nothing is built behind its faces (the study is a V1.5 room)."
+    },
+    {
+      "id": "mu.study_door",
+      "face": "S",
+      "place": ["at", -5.5, -3.0],
+      "spec": {
+        "model": "door",
+        "in": "mu.study_wall",
+        "width": 0.78,
+        "height": 2.1,
+        "knob": "E"
+      },
+      "note": "the locked study door (Study Key, V1.5) on its tile (6,8): the study's south face in the notch off the landing, 1.0 m wide, so the door is 0.78 m with its two architraves (0.97 m). Its knob at the east end, toward the landing; the hinges by the notch's corner. No portal: the scene gives it none."
+    },
+    {
+      "id": "mu.bed",
+      "key": "bed",
+      "face": "S",
+      "place": ["wall", "N", -8.5],
+      "lift": 0.22,
+      "bedding": true,
+      "spec": {
+        "lod": 0.7
+      },
+      "note": "her bed at its tile (3,1), its head on the north wall, over the under-bed hide (3,2): the widow's carved bed (GothicBed_01), made up"
+    },
+    {
+      "id": "mu.bed_e",
+      "decor": true,
+      "covers": ["mu.under_bed_e"],
+      "key": "bed",
+      "face": "S",
+      "place": ["wall", "N", -3.5],
+      "lift": 0.22,
+      "bedding": true,
+      "spec": {
+        "lod": 0.7
+      },
+      "note": "his bed over the east under-bed hide (8,2): the scene draws only the hide, so this bed is the first person's own (decor), the same carved bed"
+    },
+    {
+      "id": "mu.nightstand_0",
+      "face": "S",
+      "place": ["wall", "N", -7.45],
+      "spec": {
+        "model": "ph",
+        "slug": "ClassicNightstand_01",
+        "scale": 1.0,
+        "lod": 0.22,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "lod": 0.02
+          }
+        ]
+      },
+      "note": "her nightstand at its tile (4,1), east of her bed, its candle the flame of mu.lt_lamp; 0.05 m east of the tile's centre, clear of the bed"
+    },
+    {
+      "id": "mu.nightstand_1",
+      "face": "S",
+      "place": ["wall", "N", -2.45],
+      "spec": {
+        "model": "ph",
+        "slug": "ClassicNightstand_01",
+        "scale": 1.0,
+        "lod": 0.22,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "lod": 0.02
+          }
+        ]
+      },
+      "note": "his nightstand at its tile (9,1), east of his bed, the flame of mu.lt_lamp_e"
+    },
+    {
+      "id": "mu.dressing_table",
+      "key": "dressing_table",
+      "face": "S",
+      "place": ["wall", "N", "W"],
+      "spec": {
+        "extras": [],
+        "lod": 0.7
+      },
+      "cloth": "all",
+      "dress_lod": {
+        "ornate_mirror_01": 0.25
+      },
+      "note": "her dressing table at its tile (1,1), in the north-west corner: the widow's console and triple glass, each glass hung in plain matte black cloth (the scene: her mirror hung in black)"
+    },
+    {
+      "id": "mu.vane_portrait",
+      "face": "S",
+      "place": ["wall", "N", -0.5],
+      "rise": 1.45,
+      "spec": {
+        "model": "ph",
+        "slug": "fancy_picture_frame_02",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the Vanes' portrait at its tile (11,0), x -0.5 on the north wall, its foot 1.45 m up; no crepe and no sash on it. The print is the frame's own scan until G18's prints"
+    },
+    {
+      "id": "mu.washstand",
+      "key": "washstand",
+      "face": "S",
+      "place": ["wall", "N", 1.5],
+      "dress_lod": {
+        "jug_01": 0.4,
+        "brass_pot_02": 0.6
+      },
+      "note": "the washstand at its tile (13,1): the widow's commode with its marble top, ewer and basin"
+    },
+    {
+      "id": "mu.bookcase",
+      "face": "S",
+      "place": ["wall", "N", 6.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 0.7,
+        "lod": 0.5
+      },
+      "moved": "0.5 m east along the north wall (D4): at its tile's centre (5.5) it stood in the moon window's curtain (to x 5.47)",
+      "note": "the first bookcase at its tile (17,1): the shop's worn bookcase at 0.7 (0.96 m wide). The set of books first laid on its top was left off: its decimated mesh came out 4 vertices different on the rented box and on this machine, so the saved bake would not rebuild here"
+    },
+    {
+      "id": "mu.bookcase_b",
+      "face": "S",
+      "place": ["wall", "N", 7.0],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 0.7,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "marble_bust_01",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "moved": "0.5 m east along the north wall (D4), with the first bookcase",
+      "note": "the second bookcase at its tile (18,1), a marble bust on its top"
+    },
+    {
+      "id": "mu.linen_press",
+      "key": "linen_press",
+      "face": "S",
+      "place": ["wall", "N", "E"],
+      "spec": {
+        "tall": 2.1,
+        "kmax": null,
+        "extras": [],
+        "lod": 0.6,
+        "doors": {
+          "GothicCabinet_01_door1": -118.0,
+          "GothicCabinet_01_door2": 0.0,
+          "GothicCabinet_01_door3": 0.0,
+          "GothicCabinet_01_door4": 0.0
+        }
+      },
+      "sheets": true,
+      "note": "the linen press at its tile (22,1), in the north-east corner: the widow's carved press, its upper west door open on folded sheets (the east door would open into the east wall)"
+    },
+    {
+      "id": "mu.blanket_chest_0",
+      "key": "blanket_chest",
+      "face": "S",
+      "place": ["beside", "mu.bed", "S", -8.5],
+      "gap": 0.07,
+      "spec": {
+        "lod": 0.5
+      },
+      "note": "the chest at her bed's foot, its tile (3,3)"
+    },
+    {
+      "id": "mu.blanket_chest_1",
+      "key": "blanket_chest",
+      "face": "S",
+      "place": ["beside", "mu.bed_e", "S", -3.5],
+      "gap": 0.07,
+      "spec": {
+        "lod": 0.5
+      },
+      "note": "the chest at his bed's foot, its tile (8,3)"
+    },
+    {
+      "id": "mu.lamp_table_1",
+      "key": "candle",
+      "face": "S",
+      "place": ["at", 5.5, 2.5],
+      "spec": {
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the reading lamp's table at its tile (17,3), beside the armchair: the widow's candle stand (side_table_tall_01 and its candlestick), the flame of mu.lt_nook"
+    },
+    {
+      "id": "mu.armchair",
+      "face": "S",
+      "place": ["at", 6.5, 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "GreenChair_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the reading chair at its tile (18,3), facing into the room, the lamp at its right hand"
+    },
+    {
+      "id": "mu.lamp_table_0",
+      "key": "candle",
+      "face": "N",
+      "place": ["wall", "S", 2.5],
+      "spec": {
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the landing's lamp table at its tile (14,10), against the south wall east of the stairs, the flame of mu.lt_landing"
+    },
+    {
+      "id": "mu.attic_hatch",
+      "spot": true,
+      "face": "S",
+      "place": ["at", 8.5, 4.3],
+      "rise": 2.95,
+      "spec": {
+        "model": "box",
+        "finish": "wood",
+        "size": [0.8, 0.8, 0.05],
+        "label": "Attic hatch: a boarded trap in the ceiling"
+      },
+      "note": "the hide spot at its tile (20,1): a timber trap board flush under the ceiling, 0.2 m south of the tile's centre so it clears the cornice. No model and no pull cord yet (D2)"
+    },
+    {
+      "id": "mu.rug_beds",
+      "decor": true,
+      "key": "rug",
+      "place": ["at", -6.0, 1.4],
+      "spec": {
+        "size": [2.6, 1.8]
+      },
+      "note": "the first person's own: a rug between the two beds' feet"
+    },
+    {
+      "id": "mu.rug_landing",
+      "decor": true,
+      "key": "rug",
+      "place": ["at", 5.0, -2.2],
+      "spec": {
+        "size": [3.2, 2.0]
+      },
+      "note": "the first person's own: a rug on the landing"
+    },
+    {
+      "id": "mu.decor.settle",
+      "decor": true,
+      "face": "N",
+      "place": ["wall", "S", 7.0],
+      "spec": {
+        "model": "ph",
+        "slug": "painted_wooden_bench",
+        "scale": 1.0,
+        "lod": 0.5
+      },
+      "note": "the first person's own: the widow's settle on the landing's south wall"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_stairs is the spawn's own view.",
+  "views": {
+    "spawn_stairs": [[0.5, -4.5, 1.6], [0.5, 4.5, 1.3], 70.0],
+    "beds": [[-6.0, 0.3, 1.6], [-6.0, 4.5, 0.9], 70.0],
+    "dressing": [[-8.0, 1.6, 1.6], [-10.6, 4.6, 1.15], 70.0],
+    "nook": [[3.0, 0.3, 1.6], [6.5, 4.0, 1.1], 70.0],
+    "press": [[6.2, 1.2, 1.6], [10.0, 4.4, 2.1], 70.0],
+    "study_door": [[-3.6, -4.6, 1.6], [-5.6, -3.0, 1.1], 70.0],
+    "stairs": [[0.5, -4.45, 1.6], [-1.5, -4.5, -1.4], 70.0],
+    "balcony": [[4.0, 0.5, 1.6], [11.0, 0.5, 1.2], 70.0],
+    "landing": [[9.5, -3.0, 1.6], [-5.0, -1.0, 1.2], 70.0],
+    "north": [[0.0, -2.5, 1.6], [0.0, 5.0, 1.5], 70.0]
+  }
+}

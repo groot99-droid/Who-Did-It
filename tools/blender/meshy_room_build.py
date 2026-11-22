@@ -1606,8 +1606,7 @@ def trims(fr: Frame, mt: dict) -> None:
     sk = CFG.get("skirting")
     doors = [o for o in fr.openings if o["kind"] == "door"]
     if sk is not None:
-        skirting = [(0.0, 0.0), (0.022, 0.0), (0.022, sk - 0.05), (0.018, sk - 0.03), (0.013, sk - 0.012),
-                    (0.006, sk - 0.002), (0.0, sk)]
+        skirting = skirting_profile(sk)
         b = Builder()
         if doors:
             for path in skirting_runs(fr, doors):
@@ -1617,26 +1616,43 @@ def trims(fr: Frame, mt: dict) -> None:
         register(b.build(nm("Skirting")), "trim", "skirting")
     pr = CFG.get("picture_rail")
     if pr is not None:
-        rail = [(0.0, pr - 0.02), (0.010, pr - 0.02), (0.016, pr - 0.012), (0.021, pr), (0.018, pr + 0.012),
-                (0.010, pr + 0.018), (0.0, pr + 0.02)]
+        rail = rail_profile(pr)
         b = Builder()
         b.sweep(rail, loop, mt["wood"], closed=True, uv_scale=2.0, step=0.2)
         register(b.build(nm("PictureRail")), "trim", "picture_rail")
     c = CFG.get("cornice")
     if c is None:
         return
-    prof = [(0.0, H - c), (0.012, H - c), (0.016, H - c + 0.012), (0.028, H - c + 0.022)]
-    r = c - 0.05
-    for i in range(1, 6):
-        a = math.pi / 2 * i / 5
-        prof.append((0.028 + r * math.sin(a), H - c + 0.022 + r * (1.0 - math.cos(a))))
-    prof += [(c - 0.012, H - 0.012), (c, H - 0.012), (c, H)]
+    prof = cornice_profile(c, H)
     b = Builder()
     b.sweep(prof, loop, mt["ceiling"], closed=True, uv_scale=3.0, step=0.2)
     register(b.build(nm("Cornice")), "trim", "cornice")
 
 
 SKIRT_BREAK = 0.115     # the skirting stops this far beyond a door's opening (its architrave, 0.095 m, and 2 cm)
+
+
+def skirting_profile(sk: float) -> list:
+    """The skirting's profile [(out, up), ...], `sk` metres high (trims, wall_trims)."""
+    return [(0.0, 0.0), (0.022, 0.0), (0.022, sk - 0.05), (0.018, sk - 0.03), (0.013, sk - 0.012),
+            (0.006, sk - 0.002), (0.0, sk)]
+
+
+def rail_profile(pr: float) -> list:
+    """The picture rail's profile, centred `pr` metres up."""
+    return [(0.0, pr - 0.02), (0.010, pr - 0.02), (0.016, pr - 0.012), (0.021, pr), (0.018, pr + 0.012),
+            (0.010, pr + 0.018), (0.0, pr + 0.02)]
+
+
+def cornice_profile(c: float, H: float) -> list:
+    """The cornice's profile, `c` metres deep and down from the ceiling at H."""
+    prof = [(0.0, H - c), (0.012, H - c), (0.016, H - c + 0.012), (0.028, H - c + 0.022)]
+    r = c - 0.05
+    for i in range(1, 6):
+        a = math.pi / 2 * i / 5
+        prof.append((0.028 + r * math.sin(a), H - c + 0.022 + r * (1.0 - math.cos(a))))
+    prof += [(c - 0.012, H - 0.012), (c, H - 0.012), (c, H)]
+    return prof
 
 
 def skirting_runs(fr: Frame, doors: list) -> list:
@@ -1725,10 +1741,11 @@ def build_doors(fr: Frame, mt: dict) -> list:
             for o in fr.openings if o["kind"] == "door"]
 
 
-def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dict:
+def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str, what: str = "door") -> dict:
     """A door: lining, stops, threshold, architrave and a closed four-panel leaf with a brass knob, a key escutcheon
     and hinges; returns where the portal goes (the doorway's foot on the wall face). A door of style `steel` is
-    steel_door's."""
+    steel_door's. With `what` "piece" (a door set into a wall-piece, G21: `fr` is then that face's FaceFrame) the two
+    objects are not registered here and come back as `objs` (door, knob): the piece's builder registers them."""
     if (o.get("spec") or {}).get("style", "panel") == "steel":
         return steel_door(fr, mt, o, knob_right, suffix)
     side, T = o["side"], fr.T
@@ -1791,11 +1808,13 @@ def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dic
         p = fr.point(side, hs + (0.004 if hs == la else -0.004), f_room + 0.002, hz)
         mb.box(0.010, 0.006, 0.10, M=Matrix.Translation(Vector(p)) @ upright_rot(side), mat=iron.mat)
     door = b.build(nm("Door" + suffix))
-    register(door, "door", o["id"])
+    if what == "door":
+        register(door, "door", o["id"])
     hw = mb.build(nm("DoorKnob" + suffix), col="room")
     if hw is not None:
         uv_box(hw, 0.2)
-        register(hw, "door", o["id"] + ":furniture")
+        if what == "door":
+            register(hw, "door", o["id"] + ":furniture")
 
     # what of the door stands proud of the wall's face, for the collision (the wall's own slab is flat across the
     # doorway, and the capsule walked 6.4 cm into the brass knob): the architrave's two legs and the knob. Each box
@@ -1809,8 +1828,11 @@ def door_one(fr: Frame, mt: dict, o: dict, knob_right: bool, suffix: str) -> dic
     coll = [cbox(sa - aw, sa + 0.008, -0.05, proud + 0.004, 0.0, z1 + aw),
             cbox(sb - 0.008, sb + aw, -0.05, proud + 0.004, 0.0, z1 + aw),
             cbox(ks - 0.029, ks + 0.029, -0.05, f_room + 0.07 + 0.024 + 0.002, kz - 0.029, kz + 0.029)]
-    return dict(id=o["id"], side=side, sa=sa, sb=sb, foot=fr.point(side, (sa + sb) / 2, 0.0, 0.0), portal=o["portal"],
-                knob=fr.point(side, ks, f_room + 0.09, kz), collision=coll)
+    out = dict(id=o["id"], side=side, sa=sa, sb=sb, foot=fr.point(side, (sa + sb) / 2, 0.0, 0.0), portal=o["portal"],
+               knob=fr.point(side, ks, f_room + 0.09, kz), collision=coll)
+    if what != "door":
+        out["objs"] = (door, hw)
+    return out
 
 
 STEEL = "#74767A"   # a steel door's sheet (G13, crumb_cold): galvanised grey, green above red, so never lilac
@@ -2445,6 +2467,7 @@ def _cone(b: Builder, P, u, d, z0, r0, r1, h, mat, n=10) -> None:
 PIECES: dict = {}           # id -> dict(obj, body box in world, ...)
 MODEL_OF: dict = {}         # id -> the model its builder is building (place_piece: `rise` for all but the photos)
 MADE: dict = {}             # id -> what a hearth or a day bed built (the manifest's `made`: a v2 piece's numbers)
+WALLS: dict = {}            # id -> a wall-piece's numbers (G21: meshy_room_file.wall_values), for its collision
 GREY = "#808080"            # a grey box's flat mid-grey (M_grey, made the first time a box is built)
 
 
@@ -2831,6 +2854,10 @@ def build_furniture(fr: Frame, mt: dict) -> dict:
             ob, box, info = build_box(fr, piece, spec, name)
             for k_, v_ in info.items():
                 anchors.setdefault(f"{pid}:{k_}", v_)
+        elif model == "wall":
+            ob, box = build_wall(fr, piece, spec, name, mt)     # a wall-piece (G21)
+        elif model == "door":
+            ob, box = build_wall_door(fr, piece, name, mt)      # a door set into a wall-piece (G21)
         elif model == "rug":
             ob, box = build_rug(fr, piece, spec, name)
         elif model == "photos":
@@ -2890,6 +2917,194 @@ def build_box(fr: Frame, piece: dict, spec: dict, name: str):
     box = place_piece(fr, piece, ob, Vector((-w / 2, -d / 2, 0.0)), Vector((w / 2, d / 2, h)))
     info = {k: tuple(ob.matrix_world @ Vector(tuple(v))) for k, v in (spec.get("anchors") or {}).items()}
     return ob, box, info
+
+
+class FaceFrame:
+    """A wall-piece's face as the shell door's joinery reads a wall (G21): `wall_frame` gives the face's own origin, its
+    direction along (the room on its left), its outward normal and its length whatever side letter is asked, and
+    `to_s` and `point` are Frame's; `T` the depth the door's lining runs into the block."""
+
+    def __init__(self, origin, du, normal, length: float, T: float):
+        self._f = (tuple(origin), tuple(du), tuple(normal), float(length))
+        self.T = float(T)
+
+    def wall_frame(self, side: str):
+        return self._f
+
+    to_s = Frame.to_s
+    point = Frame.point
+
+
+def wall_doors(pid: str) -> list:
+    """The door pieces set into wall-piece `pid` (G21), each (piece, the loader's numbers), in the file's order."""
+    fr = FRAME[0]
+    out = []
+    for i, q in enumerate(CFG["pieces"]):
+        qs = q.get("spec") or {}
+        if qs.get("model") == "door" and qs.get("in") == pid:
+            earlier = {r["id"]: r for r in CFG["pieces"][:i]}
+            out.append((q, rf.wall_door_values(q, earlier, CFG, (fr.x0, fr.y0, fr.x1, fr.y1), f"piece {q['id']}")))
+    return out
+
+
+def polyline_cut(pts: list, drop: list) -> list:
+    """The parts of a polyline [(x, y, z), ...] outside the distance intervals `drop` [(d0, d1), ...] along it."""
+    P = [np.asarray(q, float) for q in pts]
+    acc = [0.0]
+    for a, b in zip(P, P[1:]):
+        acc.append(acc[-1] + float(np.linalg.norm(b - a)))
+    total = acc[-1]
+    keep, at = [], 0.0
+    for d0, d1 in sorted(drop):
+        if d0 > at + 1e-6:
+            keep.append((at, min(d0, total)))
+        at = max(at, d1)
+    if at < total - 1e-6:
+        keep.append((at, total))
+
+    def point(d):
+        for k in range(len(P) - 1):
+            if d <= acc[k + 1] + 1e-9:
+                t = (d - acc[k]) / max(acc[k + 1] - acc[k], 1e-12)
+                return tuple(P[k] + (P[k + 1] - P[k]) * t)
+        return tuple(P[-1])
+
+    out = []
+    for a, b in keep:
+        if b - a < 0.05:
+            continue
+        run = [point(a)] + [tuple(P[k]) for k in range(1, len(P) - 1) if a + 1e-6 < acc[k] < b - 1e-6] + [point(b)]
+        out.append(run)
+    return out
+
+
+def wall_trims(fr: Frame, mt: dict, pid: str, wv: dict, doors: list) -> None:
+    """A wall-piece's skirting (broken at its doors), picture rail and cornice, the room's own profiles swept along its
+    built faces (each run of faces between the room's walls, or the whole loop); node names <piece>_Skirting,
+    <piece>_PictureRail and <piece>_Cornice. A trim given as null is not built."""
+    H = fr.H
+    edges = wv["edges"]
+    n = len(edges)
+    runs = []
+    if all(e["built"] for e in edges):
+        runs.append((list(range(n)), True))
+    else:
+        k0 = next(k for k in range(n) if not edges[k]["built"])
+        cur = []
+        for j in range(1, n + 1):
+            k = (k0 + j) % n
+            if edges[k]["built"]:
+                cur.append(k)
+            elif cur:
+                runs.append((cur, False))
+                cur = []
+        if cur:
+            runs.append((cur, False))
+    base = pid.replace(".", "_")
+    sk, pr, co = CFG.get("skirting"), CFG.get("picture_rail"), CFG.get("cornice")
+    bs, br, bc = Builder(), Builder(), Builder()
+    for ks, closed in runs:
+        pts = [(edges[ks[0]]["start"][0], edges[ks[0]]["start"][1], 0.0)]
+        offs = {}
+        acc = 0.0
+        for k in ks:
+            e = edges[k]
+            offs[k] = acc
+            acc += e["length"]
+            pts.append((e["start"][0] + e["dir"][0] * e["length"], e["start"][1] + e["dir"][1] * e["length"], 0.0))
+        loop = pts[:-1] if closed else pts
+        if sk is not None:
+            drop = []
+            for _q, dv in doors:
+                k = next((k for k in ks if edges[k]["start"] == dv["edge"]["start"] and
+                          edges[k]["face"] == dv["face"]), None)
+                if k is not None:
+                    c = offs[k] + dv["at"]
+                    drop.append((c - dv["width"] / 2 - SKIRT_BREAK, c + dv["width"] / 2 + SKIRT_BREAK))
+            if closed and not drop:
+                bs.sweep(skirting_profile(sk), loop, mt["wood"], closed=True, uv_scale=2.0, step=0.05)
+            else:
+                path = loop + [loop[0]] if closed else loop
+                for part in polyline_cut(path, drop):
+                    bs.sweep(skirting_profile(sk), part, mt["wood"], uv_scale=2.0, step=0.08)
+        if pr is not None:
+            br.sweep(rail_profile(pr), loop, mt["wood"], closed=closed, uv_scale=2.0, step=0.2)
+        if co is not None:
+            bc.sweep(cornice_profile(co, H), loop, mt["ceiling"], closed=closed, uv_scale=3.0, step=0.2)
+    for b, stem, tag in ((bs, "Skirting", "skirting"), (br, "PictureRail", "picture_rail"), (bc, "Cornice", "cornice")):
+        ob = b.build(nm(f"{base}_{stem}"))
+        if ob is not None:
+            register(ob, "trim", f"{pid}:{tag}")
+
+
+def build_wall(fr: Frame, piece: dict, spec: dict, name: str, mt: dict):
+    """A wall-piece (G21): the block's faces from its outline in the room's wall plaster, 5 cm by 10 cm grids as the
+    shell's walls (their lines through its doors' edges and just clear of the trims), each face on the room's own wall
+    left out, no top (it stands to the ceiling), a hole in its face for each door set into it; its trims (wall_trims).
+    Its collision is the loader's boxes (collision()). Returns the object and its bounding box."""
+    pid = piece["id"]
+    wv = rf.wall_values(piece, fr.H, (fr.x0, fr.y0, fr.x1, fr.y1), f"piece {pid}")
+    H = fr.H
+    doors = wall_doors(pid)
+    sk_, pr_, co_ = CFG.get("skirting"), CFG.get("picture_rail"), CFG.get("cornice")
+    trim_z = ([sk_ + 0.006] if sk_ is not None else []) + \
+        ([pr_ - 0.026, pr_ + 0.026] if pr_ is not None else []) + ([H - co_ - 0.008] if co_ is not None else [])
+    b = Builder()
+    for e in wv["edges"]:
+        if not e["built"]:
+            continue
+        (ox, oy), (dx, dy), L = e["start"], e["dir"], e["length"]
+        spans = [(dv["at"] - dv["width"] / 2, dv["at"] + dv["width"] / 2, dv["height"]) for _q, dv in doors
+                 if dv["edge"]["start"] == e["start"] and dv["face"] == e["face"]]
+        us = grid_levels(L, 0.05, [v for a, b_, _z in spans for v in (a, b_)])
+        vs = grid_levels(H, 0.1, [z for _a, _b, z in spans] + trim_z)
+
+        def skip(i, j, spans=spans, L=L, us=us, vs=vs):
+            sm, zm = (us[i] + us[i + 1]) / 2 * L, (vs[j] + vs[j + 1]) / 2 * H
+            return any(a < sm < b_ and zm < z1 for a, b_, z1 in spans)
+
+        b.quad_grid((ox, oy, 0.0), (dx * L, dy * L, 0.0), (0.0, 0.0, H), 0, 0, mt["wall"], skip=skip, flip=True,
+                    uv_fn=lambda p, dx=dx, dy=dy: ((p[0] * dx + p[1] * dy) / 3.0, p[2] / 3.0), us=us, vs=vs)
+    ob = b.build(name)
+    WALLS[pid] = wv
+    wall_trims(fr, mt, pid, wv, doors)
+    x0, y0, x1, y1 = wv["box"]
+    return ob, (x0, y0, 0.0, x1, y1, H)
+
+
+def build_wall_door(fr: Frame, piece: dict, name: str, mt: dict):
+    """A door set into a wall-piece's face (G21: the manor's locked study door): the shell door's joinery, leaf and
+    knob (door_one) built on the face through a FaceFrame, its lining run into the block; no portal. The knob is a part
+    of the piece (<id>:knob). Returns the door and its body box (from the floor: the threshold's 3 cm under the boards
+    is joinery in the floor, as a shell door's)."""
+    pid = piece["id"]
+    i = next(k for k, q in enumerate(CFG["pieces"]) if q["id"] == pid)
+    dv = rf.wall_door_values(piece, {r["id"]: r for r in CFG["pieces"][:i]}, CFG, (fr.x0, fr.y0, fr.x1, fr.y1),
+                             f"piece {pid}")
+    e = dv["edge"]
+    (sx, sy), (dx, dy), L = e["start"], e["dir"], e["length"]
+    nx, ny = -dy, dx                                   # the edge's left: out of the block (a clockwise outline)
+    T = fr.T
+    fx, fy = sx + dx * dv["at"], sy + dy * dv["at"]
+    if not rf._in_poly(dv["wall"]["outline"], fx - nx * (T + 0.02), fy - ny * (T + 0.02)):
+        T = 0.1                                        # a thin wall-piece: the lining runs 10 cm in
+    ff = FaceFrame((sx, sy), (dx, dy), (nx, ny), L, T)
+
+    def along(s_):
+        return sx + dx * s_ if dx else sy + dy * s_
+
+    w = dv["width"]
+    o = dict(kind="door", side=dv["side"], a=along(dv["at"] - w / 2), b=along(dv["at"] + w / 2), z0=0.0,
+             z1=dv["height"], id=pid, portal=None, spec=dict(style="panel", knob=dv["knob"]))
+    res = door_one(ff, mt, o, dv["knob"] == rf.KNOB_DEFAULT[dv["side"]], sfx(pid), what="piece")
+    door, hw = res["objs"]
+    bb = [world_bbox(door)] + ([world_bbox(hw)] if hw is not None else [])
+    if hw is not None:
+        register(hw, "piece", pid + ":knob")
+    MADE[pid] = dict(wall=dv["host"], face=dv["face"], at=round(dv["at"], 4), width=w, height=dv["height"],
+                     knob=dv["knob"], foot=[round(v, 4) for v in (fx, fy)])
+    return door, (min(q[0] for q in bb), min(q[1] for q in bb), 0.0, max(q[3] for q in bb), max(q[4] for q in bb),
+                  max(q[5] for q in bb))
 
 
 def hearth_mat(mt: dict, surface: str):
@@ -3436,8 +3651,13 @@ def build_meshy(fr: Frame, piece: dict, spec: dict, name: str):
 def build_rug(fr: Frame, piece: dict, spec: dict, name: str):
     """Round 3's worn rug (bone border, madder field, a medallion, the carpet scan's pile) baked to a texture."""
     L, W = spec.get("size", (2.6, 1.8))
-    img = rug_texture(L, W)
-    rm = MATS.get(nm("M_rug")) or RMat("M_rug", img, (1.0, 1.0, 1.0), rough=0.95, albedo=tuple(scan_mean(img)))
+    # a second rug (the manor's two) gets its own texture and material, M_rug_2, ...: a second T_rug would replace
+    # the first rug's image under its material
+    k = 1 + sum(1 for q in PIECES.values() if q["spec"].get("model") == "rug")
+    tail = "" if k == 1 else f"_{k}"
+    img = rug_texture(L, W, "T_rug" + tail)
+    rm = MATS.get(nm("M_rug" + tail)) or RMat("M_rug" + tail, img, (1.0, 1.0, 1.0), rough=0.95,
+                                              albedo=tuple(scan_mean(img)))
     b = Builder()
     n_u, n_v = grid_count(L, 0.05), grid_count(W, 0.05)
     b.quad_grid((-L / 2, -W / 2, 0.0), (L, 0, 0), (0, W, 0), n_u, n_v, rm,
@@ -3455,10 +3675,10 @@ def build_rug(fr: Frame, piece: dict, spec: dict, name: str):
     return ob, box
 
 
-def rug_texture(L: float, W: float):
-    """Bake meshy_interior_build.mat_rug's albedo (its node tree over UVs 0..1) into an image."""
+def rug_texture(L: float, W: float, name: str = "T_rug"):
+    """Bake meshy_interior_build.mat_rug's albedo (its node tree over UVs 0..1) into an image named `name`."""
     w, h = 768, int(768 * W / L)
-    img = bpy.data.images.new(nm("T_rug"), w, h, alpha=False)
+    img = bpy.data.images.new(nm(name), w, h, alpha=False)
     me = bpy.data.meshes.new("rug_tmp")
     me.from_pydata([(-L / 2, -W / 2, 0), (L / 2, -W / 2, 0), (L / 2, W / 2, 0), (-L / 2, W / 2, 0)], [], [(0, 1, 2, 3)])
     uv = me.uv_layers.new(name="UVMap")
@@ -3483,7 +3703,7 @@ def rug_texture(L: float, W: float):
     bpy.data.meshes.remove(me)
     mat.node_tree.nodes.remove(tn)
     bpy.data.images.remove(img)
-    return save_image("T_rug", lin)
+    return save_image(name, lin)
 
 
 # ---------------------------------------------------------------- the bed: lifted, made up
@@ -5602,6 +5822,9 @@ def collision(fr: Frame, doors: list) -> tuple:
     for m in fr.markers:    # a stairs well and its balustrade (G12): the walker stands at the rail, the portal fires
         if m.get("flight"):
             boxes.append((f"stairs_{m['id']}", tuple(float(v) for v in m["flight"]["box"])))
+    for pid, wv in WALLS.items():       # a wall-piece (G21): its outline's boxes, floor to ceiling
+        for k, b in enumerate(wv["boxes"]):
+            boxes.append((f"{pid}#{k}", (float(b[0]), float(b[1]), 0.0, float(b[2]), float(b[3]), H)))
     groups = {}
     for r in OBJS:
         o = r["obj"]
@@ -5611,7 +5834,7 @@ def collision(fr: Frame, doors: list) -> tuple:
         if pid == "swag" or pid.startswith("swag_"):     # the swag hangs overhead (a v2 window's: swag_<id>)
             continue
         p = PIECES.get(pid)
-        if p is not None and p["spec"].get("model") in ("rug", "photos"):
+        if p is not None and p["spec"].get("model") in ("rug", "photos", "wall"):
             continue
         groups.setdefault(pid, []).append(o)
     for pid, objs in groups.items():
@@ -6620,7 +6843,7 @@ def blender_main(a) -> None:
                      size=[round(p["box"][3] - p["box"][0], 3), round(p["box"][4] - p["box"][1], 3),
                            round(p["box"][5] - p["box"][2], 3)], box=[round(v, 3) for v in p["box"]],
                      centre=[round((p["box"][0] + p["box"][3]) / 2, 3), round((p["box"][1] + p["box"][4]) / 2, 3)],
-                     face=p["piece"].get("face"), place=list(p["piece"]["place"]), spec={k: v for k, v in p["spec"].items()
+                     face=p["piece"].get("face"), place=list(p["piece"].get("place") or ()), spec={k: v for k, v in p["spec"].items()
                                                                                        if k not in ("dress",)},
                      **from_tile(fr, pid), **from_ref(pid),
                      **({"rise": p["piece"]["rise"]} if p["piece"].get("rise") else {}),

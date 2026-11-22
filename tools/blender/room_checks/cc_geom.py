@@ -730,9 +730,13 @@ for k in FURN:                                             # each furniture box 
         if ov > best:
             best, bid = ov, gid
     owner[k] = bid
+# a door set into a wall-piece (G21: the manor's study door) is covered by its own boxes and its wall-piece's: its leaf
+# and lining stand in the wall's block, and the boxes of its proud joinery may go to the wall, whose outline holds them
+HOST = {p["id"]: (p.get("spec") or {}).get("in") for p in F.man.get("pieces", [])
+        if (p.get("spec") or {}).get("model") == "door"}
 PIECES = {}
 for gid, prims in sorted(groups.items()):
-    ks = [k for k in FURN if owner[k] == gid]
+    ks = [k for k in FURN if owner[k] == gid or (gid in HOST and owner[k] == HOST[gid])]
     e = dict(objects=sorted({x["name"] for x in prims}), boxes=ks,
              box_xy=[r4(BMIN[k][:2]) + r4(BMAX[k][:2]) for k in ks], box_z=[r4([BMIN[k][2], BMAX[k][2]]) for k in ks])
     for band, (z0, z1) in (("capsule_0.35_1.75", (STEP, BODY)), ("feet_0_0.35", (0.0, STEP)), ("full_0_3", (0.0, CEIL))):

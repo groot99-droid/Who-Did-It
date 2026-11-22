@@ -1290,6 +1290,89 @@ class RoomFileV2(unittest.TestCase):
         self.assertGreaterEqual(g, r)       # green at least red: a blue light turns it blue-grey, not lilac
         self.assertLess(max(r, g, b) - min(r, g, b), 12)      # a near-neutral grey
 
+    # -- G21: the wall-piece and the door set into it (the manor's study block and its locked door)
+    def manor(self):
+        return raw(os.path.join(ROOMS_DIR, "manor_upper.json"))
+
+    @staticmethod
+    def piece(data, pid):
+        return next(p for p in data["pieces"] if p["id"] == pid)
+
+    def test_the_study_block_reads_as_one_l_shaped_wall_piece(self):
+        data = self.manor()
+        wv = rf.wall_values(self.piece(data, "mu.study_wall"), 3.0, (-11.0, -5.0, 11.0, 5.0))
+        self.assertEqual([(e["face"], e["built"]) for e in wv["edges"]],
+                         [("N", True), ("E", True), ("S", True), ("E", True), ("S", False), ("W", False)])
+        self.assertEqual(wv["box"], [-11.0, -5.0, -5.0, 0.0])
+        # two collision boxes, the lower run 5 cm into the upper so no two boxes share a corner
+        self.assertEqual(sorted(wv["boxes"]), [[-11.0, -5.0, -6.0, -2.95], [-11.0, -3.0, -5.0, 0.0]])
+        # the same outline given anticlockwise reads the same
+        p = dict(self.piece(data, "mu.study_wall"))
+        p["spec"] = dict(p["spec"], outline=p["spec"]["outline"][::-1])
+        self.assertEqual(rf.wall_values(p, 3.0, (-11.0, -5.0, 11.0, 5.0))["boxes"], wv["boxes"])
+
+    def test_the_study_door_sits_in_the_notch_face(self):
+        data = self.manor()
+        cfg, spec = self.read(data)
+        self.assertEqual(spec["coverage"]["mu.study_door"], dict(by="piece", id="mu.study_door"))
+        self.assertIn("mu.study_door", spec["taskPieces"])
+        earlier = {p["id"]: p for p in data["pieces"][:1]}
+        dv = rf.wall_door_values(self.piece(data, "mu.study_door"), earlier, data, (-11.0, -5.0, 11.0, 5.0))
+        self.assertEqual((dv["face"], dv["side"], dv["edge"]["start"], dv["at"], dv["knob"]),
+                         ("S", "N", [-5.0, -3.0], 0.5, "E"))
+        self.assertIn("manor_upper_Door_mu_study_door", spec["plannedNames"])
+
+    def test_wall_piece_rules(self):
+        data = self.manor()
+        self.piece(data, "mu.study_wall")["spec"]["outline"][1] = [-5.0, 0.5]
+        self.assertIn("runs along x or along y", self.stops(data))
+        data = self.manor()
+        self.piece(data, "mu.study_wall")["place"] = ["at", -8.0, -2.0]
+        self.assertIn("its outline places a wall-piece: no place, no face (R-W1)", self.stops(data))
+        data = self.manor()
+        self.piece(data, "mu.study_wall")["spec"]["height"] = 2.4
+        self.assertIn("a lower one (a half wall with a top) is not built yet (R-W1)", self.stops(data))
+
+    def test_wall_door_rules(self):
+        data = self.manor()
+        self.piece(data, "mu.study_door")["spec"]["width"] = 0.9      # 0.9 + 2 x 0.103 is wider than the 1 m face
+        self.assertIn("runs off its face", self.stops(data))
+        data = self.manor()
+        self.piece(data, "mu.study_door")["place"] = ["at", -5.5, -2.9]
+        self.assertIn("is on none of mu.study_wall's S faces (R-W2)", self.stops(data))
+        data = self.manor()
+        self.piece(data, "mu.study_door")["spec"]["in"] = "mu.bed"
+        self.assertIn('names the wall-piece it is set into, one earlier in the list: "in" (R-W2)', self.stops(data))
+        data = self.manor()
+        self.piece(data, "mu.study_door")["spec"]["knob"] = "N"
+        self.assertIn('knob "N" on a S face', self.stops(data))
+        # the door's west architrave would reach into the block's own south-west arm 3 cm out from the face
+        data = self.manor()
+        ol = self.piece(data, "mu.study_wall")["spec"]["outline"]
+        ol[3], ol[4] = [-5.9, -3.0], [-5.9, -5.0]
+        self.piece(data, "mu.study_door")["place"] = ["at", -5.45, -3.0]
+        self.piece(data, "mu.study_door")["spec"]["width"] = 0.7
+        self.assertIn("runs into the wall-piece mu.study_wall", self.stops(data))
+
+    @unittest.skipIf(mrb is None, "numpy is not here")
+    def test_a_polyline_cut_keeps_the_corners_between(self):
+        pts = [(0.0, 0.0, 0.0), (4.0, 0.0, 0.0), (4.0, -3.0, 0.0), (3.0, -3.0, 0.0)]
+        parts = mrb.polyline_cut(pts, [(6.5, 7.5)])
+        self.assertEqual(len(parts), 2)
+        self.assertEqual(parts[0][:2], [(0.0, 0.0, 0.0), (4.0, 0.0, 0.0)])
+        self.assertAlmostEqual(parts[0][-1][1], -2.5)
+        self.assertAlmostEqual(parts[1][0][0], 3.5)
+        self.assertEqual(parts[1][-1], (3.0, -3.0, 0.0))
+        self.assertEqual(mrb.polyline_cut(pts, []), [pts])
+
+    @unittest.skipIf(mrb is None, "numpy is not here")
+    def test_a_face_frame_reads_as_its_shell_wall(self):
+        fr = BuilderV2.frame(-11.0, 11.0, -5.0, 5.0)
+        ff = mrb.FaceFrame((-5.0, -3.0), (-1.0, 0.0), (0.0, -1.0), 1.0, 0.3)
+        # the study door's face looks south as the shell's north wall does: s runs west, `out` into the room
+        self.assertEqual(ff.point("N", 0.5, 0.1, 1.0), (-5.5, -3.1, 1.0))
+        self.assertAlmostEqual(ff.to_s("N", -5.89), fr.to_s("N", -5.89) - fr.to_s("N", -5.0))
+
 
 class GateDigest(unittest.TestCase):
     """The manifest digest and the bake gate's arithmetic in regress.py, on stand-in manifests."""
