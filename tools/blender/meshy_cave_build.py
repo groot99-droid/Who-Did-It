@@ -69,6 +69,8 @@ PORTAL_CLEAR, SEAM_ARRIVAL_CLEAR = 1.0, 1.2
 GRILLE_PLUG = 0.1  # metres: the collision plug's thickness behind a gate's grille
 GRILLE_H = {"arch": 3.0}  # metres: a grille's bar height by gate type (else 2.1)
 ATTR = "wdi_light"
+NORMAL_BITS = 8   # Draco's quantization of the normals the lantern shades by
+OCCL_BITS = 6     # ... and of the `_OCCL` attribute (64 levels: smooth, and cheap in the Draco stream)
 TINT_ATTR = "wdi_tint"
 INK = (0x12, 0x14, 0x1C)
 # the rails', the portal frames' and the trestle's timber albedo. Route 2's #6B5440 read lilac beside the orange rock
@@ -567,6 +569,8 @@ def scan_dark_rel(lin: np.ndarray, pct: float, lift: float) -> np.ndarray:
 
 WARM_PROBE = "#FFB457"   # the lamps' colour: the scan's darkest texel is also taken under it
 SCAN_R3 = {"lift": 0.45, "pct": 0.5}   # route 3's scan grade (the look's lantern.route3_*), for the report's baseline
+DARK_GAIN = {"g": 1.0}   # the look's ink_lift.dark_gain (finish_attrs), for the report
+SCAN_CAP = {"mean_max": None}   # the look's ink_lift.texture_mean_max: no scan's mean luminance is over this (derive_scan)
 
 
 WEBP_QUALITY = 80   # the glTF exporter's quality for the scans (meshy_room_build.export_glb)
@@ -700,6 +704,15 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45, margin_
     # (0, 0, 1) texels, which no light could hold over the ink)
     lin = _rb().dark_chroma_smooth(lin.reshape(h, w, 3)).reshape(-1, 3)
     lin = _rb().lift_dark(lin, lift)
+    # a pale scan (the flowstone, the breakdown and the gypsum are two to three times the limestone's) is scaled down
+    # to the cap before the hold: the lantern shows the scan's own albedo (its light is added to the base colour), so
+    # the cap is what keeps a wall that is lit by it from washing out, and the speleothems that wear the flowstone
+    # scan from standing paler than the rock round them. The bake follows (its factor is 1 / the scan's mean)
+    cap = SCAN_CAP["mean_max"]
+    if cap:
+        m_ = float((0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]).mean())
+        if m_ > cap:
+            lin = lin * (cap / m_)
     lo = np.minimum(lin[:, 0], lin[:, 2])
     lin[:, 1] = np.maximum(lin[:, 1], lo)
     y = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
@@ -2464,6 +2477,32 @@ def disp_lin(d: np.ndarray) -> np.ndarray:
     return lmap.srgb_decode(np.asarray(d, np.float64))
 
 
+AO_MIN = 0.04   # the open share the lantern scales by never goes under this: a crevice still takes a little light
+
+
+def occlusion_open(open_sky, look: dict) -> np.ndarray:
+    """The ambient occlusion the lantern reads, as the open share (1 open, AO_MIN at the most closed): the bake's AO
+    with the look's gamma (the share the light's own AO term uses, `grade_rows`), clipped to AO_MIN..1."""
+    g = float(look["ao"]["gamma"]) if look.get("ao") else 1.0
+    return np.clip(np.asarray(open_sky, np.float64) ** g, AO_MIN, 1.0)
+
+
+OCCL = "_occl"   # the attribute (`_OCCL` in the GLB) holding 1 - the open share (the baked AO), per vertex
+
+
+def set_occlusion(o, open_share, mask=None) -> None:
+    """Writes 1 - open_share (per vertex) as the float attribute `_occl` that the glTF exporter writes as `_OCCL`; with
+    `mask`, only where it is true (0 elsewhere: a vertex with no occlusion to show costs the Draco stream nothing)."""
+    me = o.data
+    occ = 1.0 - np.asarray(open_share, np.float64)
+    if mask is not None:
+        occ = np.where(mask, occ, 0.0)
+    if OCCL in me.attributes:
+        me.attributes.remove(me.attributes[OCCL])
+    a = me.attributes.new(OCCL, "FLOAT", "POINT")
+    a.data.foreach_set("value", np.clip(occ, 0.0, 1.0).astype(np.float32))
+
+
 def lm_grade(tg: dict, look: dict, E: float, k: float, no_bake: bool, w_lamp: float) -> dict:
     """The texels' grade: the groups by weight (the lamp's at w_lamp), the bake's noise smoothed within each chart,
     then grade_rows with the texels' own AO and the albedo, darkest texel and tint factor of their face's vertices.
@@ -2755,7 +2794,7 @@ def look_report(objs: list, look: dict, E: float) -> dict:
     through AgX at the network exposure. Under ink, and lilac or magenta, are counted."""
     R = _rb()
     ink_luma = float(R.lum(np.array(INK, float))) / 255.0
-    under = total = 0
+    under = under_raw = total = 0
     lil = []
     for o in objs:
         if o.name not in LIGHT_OUT:
@@ -2763,15 +2802,22 @@ def look_report(objs: list, look: dict, E: float) -> dict:
         L2 = LIGHT_OUT[o.name]
         dd = R.agx(E * DARK[o.name] * L2)
         under += int((R.lum(dd) < ink_luma - 1e-4).sum())
+        # the darkest texel itself (the look's dark_gain taken off): under the ink where the gain lets the darkest few
+        # texels go, which the viewer's ink clamp draws at the ink
+        under_raw += int((R.lum(R.agx(E * DARK[o.name] / DARK_GAIN["g"] * L2)) < ink_luma - 1e-4).sum())
         total += len(L2)
         lil.append(R.agx(E * MEANALB[o.name] * L2))
         lil.append(dd)
     allc = np.concatenate(lil) if lil else np.zeros((0, 3))
-    return {"vertices": total, "dark_texel_under_ink": under, "lilac_share": round(lilac_share(allc), 6)}
+    return {"vertices": total, "dark_texel_under_ink": under, "dark_gain": DARK_GAIN["g"],
+            "darkest_texel_under_ink_before_the_gain": under_raw, "lilac_share": round(lilac_share(allc), 6)}
 
 
-def finish_attrs(objs: list) -> None:
-    """Per vertex: the albedo (linear tint), the darkest kept texel under it (for the ink floor)."""
+def finish_attrs(objs: list, dark_gain: float = 1.0) -> None:
+    """Per vertex: the albedo (linear tint), the darkest kept texel under it (for the ink floor), times `dark_gain`
+    (the look's ink_lift.dark_gain: the floor holds the texel `dark_gain` times lighter than the darkest at the ink, so
+    the bake sits that much darker and the texels under that level, the darkest few, are the viewer's ink clamp's:
+    lantern.ts draws no pixel under the ink)."""
     for o in objs:
         if o.name not in TEXFAC:
             continue
@@ -2801,7 +2847,8 @@ def finish_attrs(objs: list) -> None:
         MEANALB[o.name] = alb
         if o.name in FLOORQ:
             rows = rows * FLOORQ[o.name][:, None]
-        DARK[o.name] = rows * alb
+        DARK[o.name] = rows * alb * dark_gain
+        DARK_GAIN["g"] = dark_gain
         DARK_R3[o.name] = rows_r3 * alb
         g_ = np.maximum(alb[:, 1], 1e-6)
         RATIO[o.name] = q * np.stack([alb[:, 0] / g_, alb[:, 2] / g_], axis=1)
@@ -2812,9 +2859,10 @@ def to_export(objs: list, look: dict) -> None:
     for name, md in MATS.items():
         m = md["mat"]
         if md["kind"] == "rock":
-            # a lightmapped material keeps COLOR_0 too, the shell's vertex light: a viewer without the lightmap
-            # hookup shows that (route 3's way); one with it turns the material's vertex colours off (the contract)
-            unlit_tree(m, image=md["image"], vertex=True)
+            # a lightmapped material has no COLOR_0 any more: its light is the page's (the viewer reads it, as
+            # docs/walk-areas.md says), and the file is smaller by the shell's vertex light. The `_seamv` copies, the
+            # faces within the seam band, keep COLOR_0: the stitched vertex light both files show there
+            unlit_tree(m, image=md["image"], vertex=not (name in LM.get("mats", []) and not name.endswith(SEAMV)))
         elif md["kind"] == "flat":
             unlit_tree(m, image=None, colour=(0.0, 0.0, 0.0))
         elif md["kind"] == "emit":
@@ -2830,7 +2878,6 @@ def to_export(objs: list, look: dict) -> None:
 
 
 def export(path: str, objs: list, area_ob, coll_ob) -> int:
-    R = _rb()
     for o in list(bpy.data.objects):
         if o.type in ("LIGHT", "CAMERA") or o in BAKE_ONLY:
             o.hide_render = True
@@ -2839,7 +2886,38 @@ def export(path: str, objs: list, area_ob, coll_ob) -> int:
     for o in objs + EXPORT_ONLY:
         o.parent = area_ob
     coll_ob.parent = None
-    return R.export_glb(path)
+    smooth_all(objs + EXPORT_ONLY + [coll_ob])
+    return export_glb(path)
+
+
+def smooth_all(objs: list) -> None:
+    """Smooth shading on every mesh that is exported, so the glTF exporter writes one normal per vertex and does not
+    split the vertices along flat faces (the lantern shades by the normal; the viewer reads it from the file)."""
+    for o in objs:
+        if o.type != "MESH":
+            continue
+        me = o.data
+        if len(me.polygons):
+            me.polygons.foreach_set("use_smooth", np.ones(len(me.polygons), bool))
+            me.update()
+
+
+def export_glb(path: str) -> int:
+    """meshy_room_build.export_glb's settings (Draco, unlit, COLOR_0 where a material has vertex colours) with the
+    normals (the lantern's surface-angle term) and the `_occl` attribute (written as `_OCCL`: the baked ambient
+    occlusion, 1 minus the open share, per vertex, which the lantern scales by)."""
+    R = _rb()
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.ops.export_scene.gltf(
+        filepath=os.path.abspath(path), export_format="GLB", use_active_scene=True, use_renderable=True,
+        export_apply=False, export_gpu_instances=True, export_extras=True, export_yup=True,
+        export_image_format="WEBP", export_image_quality=80, export_lights=True,
+        export_import_convert_lighting_mode="COMPAT", export_animations=False, export_cameras=False,
+        export_vertex_color="MATERIAL", export_all_vertex_colors=False,
+        export_active_vertex_color_when_no_material=False, export_tangents=False, export_normals=True,
+        export_attributes=True, **dict(R.DRACO, export_draco_normal_quantization=NORMAL_BITS,
+                                       export_draco_generic_quantization=OCCL_BITS))
+    return os.path.getsize(path)
 
 
 def export_journey(path: str, area_ob, coll_ob) -> int:
@@ -2859,6 +2937,50 @@ def export_journey(path: str, area_ob, coll_ob) -> int:
 
 
 # ---------------------------------------------------------------- stills
+
+
+def clamp_ink_png(path: str) -> int:
+    """The viewer's last steps on a pixel (apps/walk lantern.ts: no lilac, no teal, and none under the ink in luminance,
+    whatever the bake, the texture filter and the encoding left), on a still: green lifted to the lesser of red
+    and blue where it is the least channel; red lifted to 0.9 of the higher of green and blue where both stand well
+    over it (the hue between 160 and 200 degrees); a pixel under the ink's luminance gets the luminance it lacks, plus 0.6 of a level
+    so that the 8-bit rounding never takes it under, in the ink's colour. Returns how many pixels it changed."""
+    img = bpy.data.images.load(path, check_existing=False)
+    w, h = img.size
+    px = np.empty(w * h * 4, np.float32)
+    img.pixels.foreach_get(px)
+    rgba = px.reshape(-1, 4)
+    ink = np.array(INK, np.float64) / 255.0
+    y = np.array([0.2126, 0.7152, 0.0722])
+    y_ink = float(y @ ink)
+    rgb = rgba[:, :3].astype(np.float64)
+    green = np.maximum(rgb[:, 1], np.minimum(rgb[:, 0], rgb[:, 2]))   # never lilac (the shader's guard)
+    n_lilac = int((green > rgb[:, 1] + 1e-6).sum())
+    rgb[:, 1] = green
+    hi, lo = np.maximum(rgb[:, 1], rgb[:, 2]), np.minimum(rgb[:, 1], rgb[:, 2])   # never teal (the shader's guard)
+    teal = (lo - rgb[:, 0] >= 0.67 * (hi - rgb[:, 0])) & (hi - rgb[:, 0] > 0.12 * hi)
+    n_lilac += int(teal.sum())
+    rgb[teal, 0] = 0.9 * hi[teal]
+    lum_ = rgb @ y
+    under = lum_ * 255.0 < y_ink * 255.0 + 0.25   # the checker's tolerance is 0.5 under the ink's luminance
+    n = int(under.sum()) + n_lilac
+    if n:
+        add = np.maximum(y_ink + 0.6 / 255.0 - lum_, 0.0) / y_ink
+        rgba[:, :3] = (rgb + ink[None, :] * add[:, None]).astype(np.float32)
+        img.pixels.foreach_set(rgba.ravel())
+        img.filepath_raw = path
+        img.file_format = "PNG"
+        img.save()
+    bpy.data.images.remove(img)
+    return n
+
+
+def render_still(sc, path: str, w: int, h: int, exposure: float) -> None:
+    """meshy_room_build.render_png, then the ink clamp the viewer's shader applies."""
+    _rb().render_png(sc, path, w, h, exposure=exposure)
+    n = clamp_ink_png(path)
+    if n:
+        log(f"still {os.path.basename(path)}: {n} pixels raised to the ink (the viewer's clamp)")
 
 
 def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int = 16) -> list:
@@ -2993,7 +3115,7 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
         cam.rotation_euler = (Vector(t.tolist()) - Vector(e.tolist())).to_track_quat("-Z", "Y").to_euler()
         sc.camera = cam
         p = os.path.join(out_dir, f"{area}_{name}.png")
-        R.render_png(sc, p, 960, 540, exposure=we)
+        render_still(sc, p, 960, 540, we)
         files.append(p)
     # the top plan: the roof's back faces let the camera through
     for md in MATS.values():
@@ -3014,7 +3136,7 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
             o.hide_render = True
     p = os.path.join(out_dir, f"{area}_plan_top.png")
     px = 1200
-    R.render_png(sc, p, px if w >= h else int(px * w / h), px if h >= w else int(px * h / w), exposure=we)
+    render_still(sc, p, px if w >= h else int(px * w / h), px if h >= w else int(px * h / w), we)
     files.append(p)
     return files
 
@@ -3073,6 +3195,7 @@ def main(argv) -> int:
     look = load_look()
     lt_ = look.get("lantern", {})
     SCAN_R3.update(lift=float(lt_.get("route3_texture_lift", 0.45)), pct=float(lt_.get("route3_dark_percentile", 0.5)))
+    SCAN_CAP["mean_max"] = look["ink_lift"].get("texture_mean_max")
     os.makedirs(a.out, exist_ok=True)
     # 1. the core
     if a.core:
@@ -3123,7 +3246,7 @@ def main(argv) -> int:
     coll_ob, coll_tris = collision_object(z, aid, [gate.get("plug")] + list(gate.get("extra_coll", [])))
     empties(nodes, area_ob)
     groups = rig(sec, look, gate)
-    finish_attrs(objs)
+    finish_attrs(objs, float(look["ink_lift"].get("dark_gain", 1.0)))
     bake_objs = objs + [o for o in others if o.name.endswith("_grille")]
     hide = [coll_ob] + EXPORT_ONLY
     rb.prepare_attrs(bake_objs)
@@ -3200,6 +3323,11 @@ def main(argv) -> int:
     gr = grade(bake_objs, g, ao, look, float(E), a.no_bake)
     if use_lm:
         lm_grade(tg, look, float(E), gr["k"], a.no_bake, w_lamp)
+    # the lantern's occlusion: the vertices' baked AO as `_occl` (written as `_OCCL`), the shell's included
+    if ao is not None:
+        for o in bake_objs:
+            if o.name in ao:
+                set_occlusion(o, occlusion_open(ao[o.name], look))
     # the grille: flat iron under its light
     for o in others:
         if o.name.endswith("_grille"):

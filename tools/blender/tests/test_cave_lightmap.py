@@ -281,6 +281,32 @@ class Glb(unittest.TestCase):
             self.assertNotIn("extras", js["materials"][1])
             self.assertEqual(lm.glb_lightmap_facts(p)["primitives_with_color0"], 1)
 
+    def test_patch_without_color0_has_no_vertex_fallback_and_may_note_where_the_occlusion_is(self):
+        # since the realism pass's second round the shell's primitives carry no COLOR_0: the page is the only light, the
+        # material says no vertex_fallback, and the occlusion note is only written when the caller gives one
+        with tempfile.TemporaryDirectory() as d:
+            p = os.path.join(d, "a.glb")
+            self.make(p, with_c0=False)
+            lm.patch_glb(p, [{"bytes": b"x" * 4, "name": "page", "scale": 0.5}], {"cave_limestone_wall": 0})
+            js, _b = lm.read_glb(p)
+            self.assertNotIn("vertex_fallback", js["materials"][0]["extras"]["wdi_lightmap"])
+            self.assertNotIn("ao", js["materials"][0]["extras"]["wdi_lightmap"])
+            self.assertEqual(lm.glb_lightmap_facts(p)["primitives_with_color0"], 0)
+            self.make(p, with_c0=False)
+            lm.patch_glb(p, [{"bytes": b"x" * 4, "name": "page", "scale": 0.5}], {"cave_limestone_wall": 0}, ao="_OCCL")
+            js, _b = lm.read_glb(p)
+            self.assertEqual(js["materials"][0]["extras"]["wdi_lightmap"]["ao"], "_OCCL")
+
+    def test_the_seam_hold_covers_the_reach_of_a_shell_face(self):
+        # the seam check compares the light 0.6 m from the plane; a face whose centre is that near has all its vertices
+        # within the hold, or the two files draw it differently (page in one, vertex light in the other)
+        self.assertGreaterEqual(lm.SEAM_HOLD_M, 0.6 + 0.3)
+        P = np.array([[10.0 - 0.6 - 0.28, 0, 0], [10.0 - 0.9, 0, 0], [10.0 - 1.2, 0, 0]])
+        w = lm.seam_weight(P, [("s", 0, 10.0, 1.0)])
+        self.assertEqual(float(w[0]), 0.0)    # a vertex 0.28 m past the 0.6 m window: still the shared light alone
+        self.assertAlmostEqual(float(w[1]), 0.0)
+        self.assertGreater(float(w[2]), 0.0)  # and the page fades in beyond the hold
+
     def test_patch_refuses_a_lit_material_without_uv1(self):
         with tempfile.TemporaryDirectory() as d:
             p = os.path.join(d, "a.glb")

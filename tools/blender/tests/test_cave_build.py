@@ -609,6 +609,24 @@ class FloorShapeTest(unittest.TestCase):
         crevice = cb.floor_shape(np.array([1.0]), np.ones(1), np.zeros(1), il)
         self.assertAlmostEqual(float(crevice[0]), 1.0 + float(il["form"]) * (1.0 - float(il["form_ao"])))
 
+    def test_the_lantern_reads_the_occlusion_as_an_open_share(self):
+        look = cb.load_look()
+        open_share = cb.occlusion_open(np.array([0.0, 0.3, 1.0, 1.4]), look)
+        g = float(look["ao"]["gamma"])
+        self.assertTrue(np.all(open_share >= cb.AO_MIN) and np.all(open_share <= 1.0))
+        self.assertAlmostEqual(float(open_share[0]), cb.AO_MIN)           # a closed crevice still takes a little
+        self.assertAlmostEqual(float(open_share[1]), 0.3 ** g)
+        self.assertEqual(float(open_share[2]), 1.0)
+        self.assertEqual(float(open_share[3]), 1.0)                       # over 1 is open
+
+    def test_the_look_darkens_the_bake_by_a_gain_and_the_viewer_clamps_the_ink(self):
+        il = cb.load_look()["ink_lift"]
+        self.assertGreater(il["dark_gain"], 1.0)
+        # the floor holds the texel dark_gain times lighter than the darkest at the ink: the darkest few texels are
+        # under it in the file, and the viewer's ink clamp (apps/walk lantern.ts) draws them at the ink
+        self.assertLessEqual(il["dark_gain"], 2.0)
+        self.assertLess(cb.load_look()["weights"]["fill"], 0.33)
+
     def test_the_look_names_route3s_grade(self):
         look = cb.load_look()
         lt = look["lantern"]

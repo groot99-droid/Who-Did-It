@@ -74,6 +74,14 @@ SEAM_KEEP = 1.5     # metres from a seam plane, a spawn, a portal or an arrival 
 ROUTE_KEEP = 0.9    # metres from a route's centre line (beyond the clear core's half width) no floor item stands
 ZONE_KEEP = 1.0     # metres round a traversal zone's box nothing is placed
 SOLID_TOP = 2.6     # a collision item's flood solid reaches this far above its floor: nothing stands on it
+NARROW_WALL = 1.3   # metres: a spot this near a wall is in a narrow place (a passage, a chamber's edge)
+# What a narrow place's small formations weigh where the rock is poor in them (under NARROW_POOR: the slate and the
+# skarn of the Spar Maze and the Killas Rift weigh a tenth of limestone's, so those passages stood almost bare): small
+# stalagmites, straws and stalactites and loose rock, which keep their own spacing rules (the route's clear core,
+# ROUTE_KEEP for a tall one, a quarter metre for a small one) and so only stand where they leave the core clear
+NARROW_MIN = {"stalagmite": 6.0, "stalactite": 1.5, "rocks": 2.5}
+NARROW_POOR = 0.5
+SNUG_KEEP = 0.1     # metres from the clear core a small (step-free, collision-free) item may stand in such a place
 
 
 def profile(name, geo=None):
@@ -764,7 +772,7 @@ def decor(sec, grid, zones, guards, C):
     def skip(why):
         rep["skipped"][why] = rep["skipped"].get(why, 0) + 1
 
-    def mite(x, y, f, roof, rng, g, w, tall):
+    def mite(x, y, f, roof, rng, g, w, tall, snug=False):
         """A stalagmite at (x, y) on floor f: small (no collision) or tall (collision), if it fits."""
         if tall:
             h = min(rng.uniform(COLLIDE_MIN, 0.6 + 1.9 * rng.uniform() ** 2), roof - f - 0.6)
@@ -774,7 +782,7 @@ def decor(sec, grid, zones, guards, C):
         else:
             h = rng.uniform(0.06, STEP_FREE)
             rb = 0.04 + 0.25 * h * rng.uniform(0.7, 1.3)
-        keep = (ROUTE_KEEP if tall else 0.25) + rb
+        keep = (ROUTE_KEEP if tall else (SNUG_KEEP if snug else 0.25)) + rb
         if route_at(x, y, f) < keep or not placed.free(x, y, f, rb):
             skip("mite_room")
             return False
@@ -795,6 +803,9 @@ def decor(sec, grid, zones, guards, C):
         x, y, f, c = float(X[idx]), float(Y[idx]), float(Fz[idx]), float(Cz[idx])
         g = int(geo[idx])
         w = profs[g]["decor"]
+        poor = {k: v for k, v in NARROW_MIN.items() if w.get(k, 0.0) < NARROW_POOR} if wd[idx] < NARROW_WALL else {}
+        if poor:
+            w = dict(w, **poor)
         rng = C.Rng(seed, int(cand[idx, 4]), int(cand[idx, 5]), int(cand[idx, 6]))
         u, u2 = rng.uniform(), rng.uniform()
         h = c - f
@@ -833,7 +844,8 @@ def decor(sec, grid, zones, guards, C):
                     fm, cm = iv(xm, ym, f + 0.3)
                     if fm is None or abs(fm - f) > 0.15 or not inside(xm, ym):
                         continue
-                    mite(xm, ym, fm, cm, rng, g, w, tall=rng.uniform() < 0.45)
+                    mite(xm, ym, fm, cm, rng, g, w, tall=rng.uniform() < 0.45 and "stalagmite" not in poor,
+                         snug="stalagmite" in poor)
             elif u < (acc := acc + pc):
                 rb = 0.12 + 0.05 * h + 0.4 * rng.uniform() ** 2
                 if route_at(x, y, f) >= ROUTE_KEEP + 1.12 * rb and placed.free(x, y, f, 1.12 * rb):

@@ -37,7 +37,11 @@ PAD = 2             # texels of padding round each chart (the bilinear filter re
 TILE_M = 4.0        # metres: a chart's extent at most, along each of its plane's axes
 PACK_EFF = 0.46     # metres of plane x tpm^2 over the page's texels (measured: the Great Gallery 0.46 at 26 tpm)
 SEAM_BAND_M = 1.0   # metres inside a file over which its own texel light gives way to the shared vertex light
-SEAM_HOLD_M = 0.6   # metres inside a file next to a seam plane where its texels show the shared vertex light alone
+SEAM_HOLD_M = 0.9   # metres inside a file next to a seam plane where its texels show the shared vertex light alone: the seam
+                    # check's 0.6 m window plus 0.3 m, the reach of a shell face (a face is drawn vertex-lit only when every
+                    # vertex is in the hold, so a face whose centre is within 0.6 m must have all of them within it; at 0.6
+                    # the faces astride it were page-lit in one file and vertex-lit in the other: well_north showed 12 %
+                    # of its faces between 0.3 and 0.6 m, p95 16 %, under that rule)
 UV_SET = "lightmap"  # the lightmap's UV map in Blender; the second UV set (TEXCOORD_1) in the GLB
 
 
@@ -603,13 +607,15 @@ def write_glb(path: str, js: dict, bin_: bytes) -> int:
 SAMPLER_LM = {"magFilter": 9729, "minFilter": 9729, "wrapS": 33071, "wrapT": 33071}  # linear, no mips, clamped
 
 
-def patch_glb(path: str, pages: list, lit: dict, scene_extras: dict | None = None) -> dict:
+def patch_glb(path: str, pages: list, lit: dict, scene_extras: dict | None = None, ao: str | None = None) -> dict:
     """Adds the lightmap pages to a GLB in place. pages: [{"bytes": WebP data, "name": str, "scale": S}], lit:
     {material name: page index}. Each such material gets emissiveTexture {index, texCoord 1}, emissiveFactor
     [S, S, S] and extras wdi_lightmap {page, texCoord 1, scale S, encoding srgb}, with vertex_fallback true when its
     primitives also carry COLOR_0 (the same light per vertex, for a viewer without the lightmap hookup; a viewer
-    with it turns that material's vertex colours off). Every primitive drawn with one of them must have TEXCOORD_1
-    (else a ValueError). scene_extras go into scenes[0].extras. Returns a summary."""
+    with it turns that material's vertex colours off). `ao`, when given, is a note of where the baked ambient
+    occlusion is, written into the extras as `ao` (the cave builder writes it in the `_OCCL` attribute and says so
+    in the scene's extras instead). Every primitive drawn with one of them must have TEXCOORD_1 (else a ValueError).
+    scene_extras go into scenes[0].extras. Returns a summary."""
     js, bin_ = read_glb(path)
     names = {m.get("name"): i for i, m in enumerate(js.get("materials", []))}
     missing = sorted(set(lit) - set(names))
@@ -647,6 +653,8 @@ def patch_glb(path: str, pages: list, lit: dict, scene_extras: dict | None = Non
         m["emissiveTexture"] = {"index": tex_of[pi], "texCoord": 1}
         m["emissiveFactor"] = [s, s, s]
         m.setdefault("extras", {})["wdi_lightmap"] = {"page": pi, "texCoord": 1, "scale": s, "encoding": "srgb"}
+        if ao:
+            m["extras"]["wdi_lightmap"]["ao"] = ao
         if c0.get(nm_):
             m["extras"]["wdi_lightmap"]["vertex_fallback"] = True
     for ext in ("EXT_texture_webp",):

@@ -52,7 +52,7 @@
   "weights": {
     "lamp": 1.0,
     "sky": 1.0,
-    "fill": 0.33
+    "fill": 0.2
   },
   "lantern": {
     "route3_form": 0.5,
@@ -60,7 +60,7 @@
     "route3_dark_percentile": 0.5,
     "lamp_reach_m": 8.0,
     "keep_lamps": true,
-    "about": "the walker carries a lantern in the caves (apps/walk src/lantern.ts), so the baked fill is a third of route 3's (weights.fill); placed lamps (the gates' lamps) keep their weight (keep_lamps: the lamp pool rule's dimming, route 1's, is reported but not applied; the highlights' easing caps the pool), and the ink floor still holds the darkest texel. The report compares the display of the texels farther than lamp_reach_m from every placed lamp with route 3's look (every weight 1, form route3_form) on the same bake"
+    "about": "the walker carries a lantern in the caves (apps/walk src/lantern.ts), so the baked fill is a fifth of route 3's (weights.fill; the ink floor, not the fill, sets most rock's level: see ink_lift.dark_gain); placed lamps (the gates' lamps) keep their weight (keep_lamps: the lamp pool rule's dimming, route 1's, is reported but not applied; the highlights' easing caps the pool), and the ink floor still holds the darkest texel. The report compares the display of the texels farther than lamp_reach_m from every placed lamp with route 3's look (every weight 1, form route3_form) on the same bake"
   },
   "lightmap": {
     "quality": 100,
@@ -83,7 +83,9 @@
     "form_base": 0.05,
     "shape_ref": 0.75,
     "floor_blend_per_m": 0.25,
-    "about": "the ink floor holds each texel's darkest kept scan texel at ink (dark_percentile, after the scan's dark tail is lifted towards texture_lift of its mean); its multiplier is 1 + form x the AO term x (form_base + (1 - form_base) x s), s = x / (1 + x), x the bake over shape_ref x the floor's light (meshy_cave_build.floor_shape), so the floor carries the bake's shape and rock far from every light sits on the bare floor; the darkest-texel ratio is relaxed across the materials' edges by at most exp(floor_blend_per_m) a metre (meshy_cave_lightmap.relax_floor), so the light does not step where two scans meet"
+    "dark_gain": 1.4,
+    "texture_mean_max": 0.22,
+    "about": "the ink floor holds each texel's darkest kept scan texel at ink (dark_percentile, after the scan's dark tail is lifted towards texture_lift of its mean); dark_gain (1.4) holds the texel dark_gain times lighter than the darkest at that floor, so the bake sits that much darker (the realism pass: the baked level away from the lamps is about 0.36 of route 3's as the screen gives it, from 0.58): the darkest few texels are then under the ink in the file, and the viewer clamps every pixel of a cave to the ink in luminance (apps/walk lantern.ts) and keeps it from lilac; texture_mean_max (0.22) caps a scan's mean linear luminance, so the pale scans (the flowstone, the breakdown, the gypsum) are not twice as bright as the limestone under the lantern; its multiplier is 1 + form x the AO term x (form_base + (1 - form_base) x s), s = x / (1 + x), x the bake over shape_ref x the floor's light (meshy_cave_build.floor_shape), so the floor carries the bake's shape and rock far from every light sits on the bare floor; the darkest-texel ratio is relaxed across the materials' edges by at most exp(floor_blend_per_m) a metre (meshy_cave_lightmap.relax_floor), so the light does not step where two scans meet"
   },
   "hot": {
     "knee": 0.62,

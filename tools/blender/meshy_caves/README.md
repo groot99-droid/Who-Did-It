@@ -324,7 +324,12 @@ be bypassed); the CLI prints them.
   most 0.3 m tall (stepped over, no collision) or at least 0.5 m with a collision proxy and a flood solid; nothing
   stands within 1.5 m of a seam plane, by a spawn, a portal or an arrival, in a traversal zone or 1 m round it, on a
   drop, a guard or a bridge, in water, or within 0.9 m of a route's clear core (passages' centre lines, chambers'
-  lines between their mouths). The flood then checks every route again with the solids in place.
+  lines between their mouths). The flood then checks every route again with the solids in place. A narrow place (a
+  spot within `NARROW_WALL`, 1.3 m, of a wall) in a rock poor in a kind (under `NARROW_POOR`, 0.5: the slate and skarn
+  of the Spar Maze and the Killas Rift weigh a tenth of limestone's in stalagmites, the granite none) is given the
+  least weight `NARROW_MIN` of small stalagmites, stalactites and loose rock, which keep their own spacing: a small
+  stalagmite leaves 0.1 m (`SNUG_KEEP`) to the clear core, a tall one (collision) never stands in such a place. Where
+  a passage is no wider than its core they still do not fit.
 
 
 ## The light: a lightmap for the shell
@@ -346,14 +351,23 @@ timbers, gates and water keep their light per vertex (COLOR_0).
   (the ink floor with its shape, the lilac and teal guards, highlights eased, the exposure). The vertices' light
   is the page sampled at each vertex: the seam stitch and the checks use it. `--raw` reads `<area>_lm_raw.npz`
   beside `<area>_raw.npz`; the layout must match.
-- **Darker for the lantern.** The walker carries a lantern in the caves, so the fill's weight is a third of route
+- **Darker for the lantern.** The walker carries a lantern in the caves, so the fill's weight is a fifth of route
   3's (`weights.fill` in the cave look) and the gate lamps keep theirs (`lantern.keep_lamps`: route 1's pool rule,
   which dimmed a lamp whose pool passed the look's `lamp_pool` display, is reported as `lamp_weight_pool_rule` but not
   applied; the highlights' easing caps the pool). The bake alone sits far under the ink floor away from the lamps, so the floor
   decides the level there: it holds each texel's darkest kept scan texel at ink, with a multiplier that carries the
   bake's shape (`ink_lift.form`, `form_base`, `shape_ref`): rock in a crevice or far from every light sits on the
   bare floor, rock where the fill or the sky lands a little over it, so the lantern carries. The scans' darkest tail
-  is lifted further (`texture_lift` 0.7, held at the `dark_percentile` 3), which lowers the bare floor.
+  is lifted further (`texture_lift` 0.7, held at the `dark_percentile` 3), which lowers the bare floor. The realism
+  pass's second round lowers it by a gain: `ink_lift.dark_gain` (1.4) holds the texel `dark_gain` times lighter than
+  the darkest at the ink (`finish_attrs`), so the level away from the lamps is about 0.36 of route 3's as the screen
+  gives it (`light.lightmap.grade.away_from_lamps.light_ratio_p50`; 0.58 before), and the darkest few texels are under
+  the ink in the file: the viewer clamps every pixel of a cave to the ink in luminance and keeps it from lilac
+  (apps/walk `lantern.ts`), and the builder's stills apply the same (`clamp_ink_png`). The manifest's
+  `light.look.darkest_texel_under_ink_before_the_gain` counts the vertices whose darkest texel the gain lets go under.
+  `ink_lift.texture_mean_max` (0.22) caps a scan's mean linear luminance in `derive_scan`: the lantern shows the scan's
+  own albedo, and the twelve realism scans are up to twice as bright as the limestone, so the pale ones are scaled
+  down before the hold (the bake follows: its factor is 1 / the scan's mean).
 - **What the viewer samples** (the rebuild, 2026-11-21). The GLB carries each scan as WebP at quality 80, whose
   rounding put 1 to 7 % of the texels under the kept darkest level (down to 0.75 of it at the 0.1st percentile), so
   the viewer showed thousands of pixels under the ink with the lantern off. `derive_scan` first gives the scan's
@@ -392,9 +406,12 @@ timbers, gates and water keep their light per vertex (COLOR_0).
   probes `<area>_seam_lm.npz` hold the light each file shows on the faces near the plane (`vertex_lit` marks the
   copies' faces).
 - **The file.** The page is saved as lossless WebP (`lightmap.quality` in the look) and put into the GLB after the
-  export. Each shell material gets `emissiveTexture` on `TEXCOORD_1` and the extras `wdi_lightmap` with
-  `vertex_fallback: true`: its primitives keep COLOR_0, the same light per vertex, so a viewer without the lightmap
-  hookup shows the dark bake per vertex (as route 3), not the scan unlit. The scene's extras get `wdi_lantern:
-  true`. docs/walk-areas.md (section 4, "A cave's lightmap") gives the shape and what the viewer does with it. The
+  export. Each shell material gets `emissiveTexture` on `TEXCOORD_1` and the extras `wdi_lightmap`. Since the realism
+  pass's second round the shell's primitives carry no COLOR_0 (the viewer reads the page; `vertex_fallback` is not
+  written, `unlit_tree(vertex=False)`), except the faces of the `_seamv` materials, next to a built seam, whose hold
+  is 0.9 m (`SEAM_HOLD_M`: the seam check's 0.6 m plus the reach of a face). The export has `NORMAL` on every mesh
+  (smooth shading, `smooth_all`, quantized to 8 bits) and the float attribute `_OCCL`, 1 minus the open share of the
+  baked AO at the vertex (6 bits): what the lantern shades by. The scene's extras get `wdi_lantern: true`.
+  docs/walk-areas.md (section 4, "A cave's lightmap") gives the shape and what the viewer does with it. The
   manifest's `light.lightmap` and `glb.lightmap` report the page, its checks and the file.
 - `--no-lightmap` builds as route 3 did, with the shell's light in COLOR_0.

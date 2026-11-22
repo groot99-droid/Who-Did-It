@@ -134,6 +134,20 @@ class RockDetailTest(unittest.TestCase):
         self.assertEqual(over["decor"]["stalactite"], 1.0)
         self.assertEqual(rock.ROCK["limestone"]["decor"]["curtain"], 1.0)  # the table itself is untouched
 
+    def test_a_narrow_place_in_a_poor_rock_has_small_formations(self):
+        # the Spar Maze's and the Killas Rift's slate and skarn weigh a tenth of limestone's in stalagmites: a spot
+        # within NARROW_WALL of a wall in such a rock is given the least weight NARROW_MIN, and only for the kinds the
+        # rock is poor in (under NARROW_POOR); limestone, rich in all of them, is untouched
+        for name in ("slate", "skarn", "granite", "breakdown", "gypsum"):
+            w = rock.ROCK[name]["decor"]
+            poor = {k: v for k, v in rock.NARROW_MIN.items() if w.get(k, 0.0) < rock.NARROW_POOR}
+            self.assertIn("stalagmite", poor, name)
+        rich = rock.ROCK["limestone"]["decor"]
+        self.assertEqual({k for k in rock.NARROW_MIN if rich.get(k, 0.0) < rock.NARROW_POOR}, set())
+        # the small ones keep to the step-free height and a clear core: a snug item leaves 0.1 m
+        self.assertLess(rock.SNUG_KEEP, 0.25)
+        self.assertLessEqual(rock.NARROW_WALL, 1.5)
+
     def test_decor_switch_and_rock_overrides_validate(self):
         ex = core.load_json(EXAMPLE)
         ex["decor"] = False
