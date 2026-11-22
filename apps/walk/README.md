@@ -6,15 +6,70 @@ browser. No server, no multiplayer, no rules. Served at `/Who-Did-It/walk/`.
 ```sh
 pnpm --filter @wdi/walk dev        # http://localhost:8090/Who-Did-It/walk/
 pnpm --filter @wdi/walk test       # controller maths, spawns, the fixture world
-pnpm --filter @wdi/walk test:e2e   # Playwright at 390x844 and 1280x720 against the fixture
+pnpm --filter @wdi/walk test:e2e   # Playwright at 390x844 and 1280x720 against the fixtures (index worlds too)
 pnpm --filter @wdi/walk fixture    # rebuild test/fixtures/walk-fixture.gltf, walk-rooms.gltf and walk-traverse.gltf
 ```
 
 ## Opening a world
 
-In this order: `?glb=<url>`; a `.glb` (or `.gltf`) dropped on the page; then `DEFAULT_GLB_URL` in `src/config.ts`,
-which the Pages deploy points at `/Who-Did-It/walk/hollowmere_walk.glb` (below), and which is null in any other build. `?spawn=<id>` starts at `Spawn_<id>`; `?debug` shows the FPS readout,
-the position and the collision source, and exposes `window.__walk` for the e2e spec. Draco, meshopt and KTX2 files load.
+In this order: `?glb=<url>`; a `.glb` (or `.gltf`) dropped on the page; `?index=<url>` (a world in many files,
+below); then `DEFAULT_INDEX_URL` (`VITE_WALK_INDEX`; no deploy sets it yet), then `DEFAULT_GLB_URL` in `src/config.ts`,
+which the Pages deploy points at `/Who-Did-It/walk/hollowmere_walk.glb` (below), and which is null in any other build.
+`?glb=` wins over `?index=`, and opens one file exactly as before. `?spawn=<id>` starts at `Spawn_<id>`; `?debug`
+shows the FPS readout, the position and the collision source, and exposes `window.__walk` for the e2e spec. Draco,
+meshopt and KTX2 files load.
+
+## A world in many files: the index
+
+`docs/walk-areas.md` is the contract: one `walk-<areaId>.glb` per area (a village section, a room, a wild area, a
+cave) and a `walk-index.json` beside them, written by `tools/blender/walk_areas/walk_index.py`. The caves of The
+Undermere are built that way into `tools/blender/build/caves/` (git-ignored); the village will be cut the same way.
+
+- **Opening.** `?index=<address of walk-index.json>` reads the index (format 1; any other number is refused with a
+  message) and opens the file of the area that holds `?spawn=`; else `?area=<areaId>` at the index's start if it is
+  there, else that area's first picker spawn; else the index's `start`. The walker is placed at that exact spawn id.
+  An area file is fetched from the index's folder with the first 8 characters of its hash as `?v=`.
+- **Portals.** A portal's target is the spawn `<to>_<toSpawn>`, looked up in every area of the index (the bare
+  `toSpawn` fallback is single-file mode's only). In the open file it is a short fade, as before. In another file it
+  is a **crossing**. In no file (its scene is pending, or a cave mouth leads to a village that is not in the index)
+  the screen says "… is not built yet" (`The village`, `The Undermere` and the like) and the walker stays.
+- **Crossings.** The page fades to ink (`#12141C`, never black) over 0.2 s; if the crossing takes longer than 0.4 s
+  a loading line ("Opening The Undermere, The Ice Rift · Downloading 60%") shows above the ink. By default the area
+  is swapped inside the page (`src/session.ts`, `AreaSwap`): the next file's bytes are fetched, then the area that was
+  left is freed completely (geometry, materials, textures and their ImageBitmaps, the collider and its BVH;
+  `src/dispose.ts`), then the next one is parsed and built, its shaders compiled and its textures uploaded, and the
+  ink lifts. Two areas' textures are never held at once. With `?cross=reload` the page instead loads itself again
+  with `?area=` and `?spawn=` of the arrival (`location.replace`: no history entry per crossing), keeping `index`,
+  `debug`, `exposure` and `cross`. Either way the arrival's `wdi_mode` starts the walker in its mode (a seam into
+  a fissure arrives sidling). The picker lists every spawn of the index but the arrival-only ones; choosing one in
+  another file is a crossing too.
+- **Failures.** A file that cannot be fetched leaves the walker where they were, with the area still open, and says
+  why. A file that cannot be parsed is found only after the old area is freed: the old area is opened again and the
+  walker put back where they stood.
+- `?debug` adds the open file, the crossings and the renderer's geometry and texture counts; `window.__walk` adds
+  `areaId`, `crossings`, `lastCrossing` (the renderer's memory before and after, what was freed, the time), `notice`
+  and `memory`.
+
+**Walking the caves locally.** Build the caves (the cave builder writes `tools/blender/build/caves/`), then start
+the dev server and open the index through it; Vite serves files of the workspace under `@fs`, so nothing else is
+needed and there is no CORS question:
+
+```sh
+pnpm --filter @wdi/walk dev
+# then open (with the checkout's absolute path, forward slashes):
+# http://localhost:8090/Who-Did-It/walk/?index=/Who-Did-It/walk/@fs/<checkout>/tools/blender/build/caves/walk-index.json
+# add &spawn=undermere_seam_ice_north_a_1 (any spawn id of the index) to start elsewhere, &debug for the readout,
+# &cross=reload to cross by page load
+```
+
+Any static server works as well when it sends `Access-Control-Allow-Origin` (the page fetches the index and the
+files from another origin then).
+
+**Limits.** A crossing is a cold load of the next file: about 0.7 to 1.7 s for the caves' 1.6 to 4.1 MB files in
+headless Chrome with software WebGL on a laptop (measured on 2026-11-21; no phone was measured). Nothing is fetched
+ahead, and the area just left is not kept. With `?cross=reload` a desktop loses the pointer lock at each crossing (a
+click takes it back) and a game pad may need a press before the new page sees it. Lights do not cross a seam: each
+file holds its own. The deploy fetches one file today; hosting an index is not set up.
 
 ## Hosting the GLB
 
@@ -84,6 +139,34 @@ Desktop: click for pointer lock and mouse look, WASD or the arrows, Shift runs. 
 (pushed to the edge it runs), drag on the right half to look. Gamepad: left stick walks, right stick looks, a trigger
 or the left-stick click runs. Near a door, E or Enter (the pad's A, or the door button on touch) goes through. The numbers are in `src/config.ts`.
 In a cave's traversal zones the same controls crawl, sidle and climb (below); no mode has a button of its own.
+In the caves L (the pad's Y, or the lantern button under the spawn picker) turns the lantern off and on.
+
+## The lantern
+
+In the caves the walker carries a lantern (`src/lantern.ts`, numbers in `LANTERN` in `src/config.ts`): a warm
+`#FFB457` point light 0.3 m ahead of the eye and 0.15 m under it (1.45 m above the feet while walking; crawling it
+stays under the eye). It is carried in an area of kind `cave` (the index's `kind`, or the area's `wdi_kind`), or
+where the GLB's scene or the area has `wdi_lantern: true`; `wdi_lantern: false` turns it off there. It is off in the
+village, the wild areas and the rooms. It is on when a cave opens; L, the pad's Y or the button turns it off and on,
+and that choice holds across crossings in the page (a crossing by page load starts with it on).
+
+- **Light.** The cave files are unlit (`KHR_materials_unlit`, three's `MeshBasicMaterial`), so the lantern is added in
+  their shader (`onBeforeCompile`, one program for all of them): the base colour (the factor times the texture,
+  before the baked light in the vertex colours) times lantern(d), added to the bake in linear light before tone
+  mapping and fog, with lantern(d) = I / (1 + (d / 2.5)^2) x (1 - smoothstep(8.4, 12, d)), d in metres from the
+  lantern. I = 4.0: a wall of the caves' common albedo (0.0816) 2 m away then shows display luminance 0.55 through
+  AgX at the caves' exposure (2.378), the cave look's lamp-pool display, which no gate lamp's pool exceeds. There is
+  no shadow and no angle term: a surface is lit by its distance alone. The gate lamps' glass and the sky seen through
+  a cave mouth are not lit (by material name), nor is a material or mesh with `wdi_lantern: false`.
+- **Flicker.** Three slow sines (0.47, 1.13 and 2.07 Hz) move the light by at most 3 % either way; nothing strobes.
+- **Swaps.** A file with a cave area has its unlit materials patched before its shaders are compiled; every patched
+  material reads the same three uniforms, set once a frame. A patched material is freed with its area like any
+  other, and the lantern keeps no reference to any material, texture or geometry.
+- **Cost.** At 390 x 844 (pixel ratio 2) in headless Chrome on a laptop GPU (ANGLE D3D11, no frame cap), three cave
+  spawns ran at 386 to 505 fps with the lantern on, off, or without it (the build before it): the differences were
+  within the run-to-run noise (measured on 2026-11-21; no phone was measured).
+- `?debug` shows a lantern line (on, off or not here, the materials that take it, the flicker), and `window.__walk`
+  has `lantern` (`wanted`, `enabled`, `lit`, `patched`, `flicker`, `position`, `label`).
 
 ## Collision
 
@@ -119,7 +202,14 @@ and `CLIMB` in `src/config.ts`.
   side by the rock keep sidling, by up to 0.3 m, while the walking body does not fit there. The view turns to face
   the box's -Z or +Z wall, whichever is nearer the heading, and is held within 60 degrees of it until the feet are
   0.3 m past either end of the box. Make the box as wide (Z) as the fissure; the walker lines up with it as with a
-  door.
+  door. A walker who sidled out through an end walks on anywhere in that box (its end margins included) until
+  it heads back in through that end within 30 degrees of the box's axis (`SIDLE.reentryAngle`), or has stepped 0.15 m
+  clear of the box (`SIDLE.reentryClear`): where a fissure opens at an angle into walking space and the way on runs
+  beside the box, it no longer sidles and walks by turns (route 1's Ice Curtain switched 26 times there;
+  `test/sidle-flicker.test.ts`). Heading back in also needs a line that stays within the box's width until it is
+  1 m in from that end (`SIDLE.reentryDepth`; the whole box if it is shorter): a heading inside the angle that leaves
+  the box's side sooner goes to an opening beside the passage, not into it (route 2's East Holing, where the way on
+  leaves the fissure through its open side about 1 m before the box's end, switched 62 times).
 - **Climb.** The face is the box's z = 0 plane (the node stands on the rock), the box runs from the floor at its foot
   (y = -sy/2) to the ledge (y = +sy/2), and sx is the climbable width. A walker on the floor at the foot (walking,
   crawling or sidling), within 0.6 m in front of the face and pushing within 60 degrees of it (with forward or
@@ -165,6 +255,11 @@ Drawing the boxes:
 - Draw a climb box's bottom at the floor or a little below it (no more than 0.5 m). A bottom up to 0.5 m above the
   floor still works (the walker attaches from the floor and climbs to it at climbing speed), but above that the foot
   cannot be reached.
+
+The index tests use `test/fixtures/areas/`, a copy of the contract's test world
+(`tools/blender/walk_areas/fixture/areas/`, `.gltf` so that it stays out of LFS), and two tiny `.glb` caves that
+`test/helpers/tiny-areas.ts` builds in memory with their index (a seam into a sidle arrival, a cave mouth to a village
+that is not in the index, one 4 x 4 texture each); `e2e/areas.spec.ts` serves both to the page.
 
 `test/fixtures/walk-traverse.gltf` has one zone of each kind between three rooms (`scripts/make-fixture.mjs`);
 `?debug` shows the mode, its zone and the eye height, and `window.__walk` carries them for `e2e/traverse.spec.ts`.

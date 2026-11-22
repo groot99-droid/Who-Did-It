@@ -124,10 +124,10 @@
       "profile": "climb_face",
       "width": 4.5,
       "clear": 2.6,
-      "geology": "breakdown",
+      "geology": "flowstone",
       "ledge_depth": 2.0,
       "approach": 3.5,
-      "notes": "the Flowstone Dam"
+      "notes": "the Flowstone Dam (route 2: its face in the flowstone kit, cream and banded, not the breakdown's brown)"
     },
     {
       "id": "we_damtop_1",
@@ -447,6 +447,19 @@
       "top_z": -8.2,
       "thickness": 0.12,
       "notes": "the well-diggers' iron grating: a deck of iron bars with collision across the whole shaft (2.0 by 2.0 m round its 1.8 m "
+    }
+  ],
+  "guards": [
+    {
+      "id": "kerb_breakdown_hairpin",
+      "line": [
+        [12.182, -17.257],
+        [10.197, -15.737]
+      ],
+      "base_z": -27.7,
+      "height": 3.9,
+      "thickness": 0.4,
+      "notes": "route 1: a slab of breakdown on edge in the Breakdown Path's hairpin, between the flight from the dome and the flight down to the Rattle, which overlap there 1 to 2 m apart in height"
     }
   ]
 }

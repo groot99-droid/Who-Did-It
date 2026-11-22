@@ -18,6 +18,10 @@
     "passages": { "type": "array", "items": { "$ref": "#/$defs/passage" } },
     "chambers": { "type": "array", "items": { "$ref": "#/$defs/chamber" } },
     "features": { "type": "array", "items": { "$ref": "#/$defs/feature" } },
+    "decor": {
+      "description": "false: no formations, fallen rock or breakdown placed by geology (meshy_cave_rock.decor); default true",
+      "type": "boolean"
+    },
     "guards": { "type": "array", "items": { "$ref": "#/$defs/guard" } },
     "bridges": { "type": "array", "items": { "$ref": "#/$defs/bridge" } },
     "drops": { "type": "array", "items": { "$ref": "#/$defs/drop" } },
@@ -25,6 +29,7 @@
     "portals": { "type": "array", "items": { "$ref": "#/$defs/portal" } },
     "seams": { "type": "array", "items": { "$ref": "#/$defs/seam" } },
     "openings": { "type": "array", "items": { "$ref": "#/$defs/opening" } },
+    "water": { "type": "array", "items": { "$ref": "#/$defs/water" } },
     "joins": {
       "description": "Pairs of passage or chamber ids (this section's or a neighbour's) that are meant to meet although no node, end or footprint joins them. Any other two whose 0.3 m dilations overlap (under 0.6 m of rock between them) fail the build.",
       "type": "array",
@@ -91,7 +96,20 @@
           "minItems": 2,
           "maxItems": 2
         },
-        "detail": { "type": "string" }
+        "detail": { "type": "string" },
+        "rock": {
+          "description": "overrides of the geology's rock profile (meshy_cave_rock.ROCK): dip, ledge, scallop, joints, rubble, decor",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dip": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+            "ledge": { "type": "number", "minimum": 0, "maximum": 0.3 },
+            "scallop": { "type": "number", "minimum": 0, "maximum": 0.2 },
+            "joints": { "type": "array", "minItems": 3, "maxItems": 3 },
+            "rubble": { "type": "number", "minimum": 0, "maximum": 0.3 },
+            "decor": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }
+          }
+        }
       }
     },
     "region": {
@@ -139,6 +157,12 @@
         "approach": { "type": "number", "exclusiveMinimum": 0 },
         "batter": { "type": "number", "minimum": 0 },
         "lip": { "type": "number", "minimum": 0, "maximum": 0.4 },
+        "alternatives": {
+          "description": "Other forced moves of this section (crawls, fissures, climb faces) of which the walker must make one: each is checked as mandatory with the others' zones taken away too.",
+          "type": "array",
+          "items": { "$ref": "#/$defs/id" },
+          "minItems": 1
+        },
         "notes": { "type": "string" }
       }
     },
@@ -298,6 +322,23 @@
             "yaw_deg": { "type": "number" }
           }
         },
+        "notes": { "type": "string" }
+      }
+    },
+    "water": {
+      "description": "Water the builder draws (no collision): a stream along a walking passage at depth over its floor line, against the wall on one side, or a lake's or pool's surface at a level in a lake chamber's basin.",
+      "type": "object",
+      "required": ["id", "kind"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "kind": { "enum": ["stream", "lake", "pool"] },
+        "along": { "$ref": "#/$defs/id" },
+        "side": { "enum": ["left", "right", "all"] },
+        "width": { "type": "number", "exclusiveMinimum": 0 },
+        "depth": { "type": "number", "exclusiveMinimum": 0, "maximum": 0.6 },
+        "chamber": { "$ref": "#/$defs/id" },
+        "level": { "type": "number" },
         "notes": { "type": "string" }
       }
     },

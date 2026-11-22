@@ -34,6 +34,8 @@ import zlib
 
 import numpy as np
 
+import meshy_cave_rock as rock
+
 CORE_VERSION = 1
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCHEMA_PATH = os.path.join(HERE, "meshy_caves", "schema", "cave.schema.json")
@@ -88,10 +90,19 @@ CLIMB_LEDGE_MIN = 1.0
 CLIMB_MAX_BATTER = 0.1405  # tan(8 deg): the face stays above 82 degrees
 RAMP_WARN, RAMP_HARD_WARN, RAMP_MAX = 0.364, 0.466, 0.577  # tan 20, 25, 30 degrees
 NOISE_CAP = {"crawl": 0.08, "fissure": 0.03, "climb_face": 0.0, "shaft": 0.2}
+# A tube's lower wall meets its floor at least this steeply (tan 75 degrees). The viewer has no slope limit, and its
+# ground rays (0.21 m out, finding ground up to 0.35 m above the feet) walk it up a curved wall of 55 to 62 degrees
+# (the flood showed it in the Great Gallery's 14 m trunk, up to 1.4 m above the floor), so the old shape, an ellipse
+# centred 0.4 of the height above the floor, let a walker climb the bowl of any tube lower than about 2.8 times its
+# width. A tube keeps its width and height but its ellipse's centre comes down towards the floor until the wall meets
+# the floor this steeply; above the floor the wall only steepens (vertical at the centre's height), so no part of
+# the lower wall is walkable. The look is a phreatic tube with its foot buried in fill.
+TUBE_FLOOR_SLOPE = 3.7321
 
 CHUNK_CELLS = 96  # 12 m chunks of 0.125 m cells, each overlapping the next by one cell
 COLLISION_TARGET, COLLISION_CEILING = 60000, 150000
 INFLUENCE = 2.0  # metres added to a primitive's box beyond its noise and blend: outside it, it changes nothing
+STUB_CLIP = 0.25  # metres past the seam window where a stub's rock closes (its box is the window plus 0.5 m)
 ACTIVE_BAND = 2.0  # a block is meshed when a 1 m sample lies within this of the surface
 VBAND = 0.25  # the flood keeps the collision field's node values within this of the surface, for its walls
 RIM_RAYS = 24  # points round the body's rim where the flood reads the wall between lattice columns
@@ -487,6 +498,29 @@ def validate(sec, net, sec_path=None):
                 errs.append(f"{kind}: id {o['id']!r} used twice")
             ids.add(o["id"])
     resolved, fissures = [], []
+    pids = {p["id"]: p for p in sec.get("passages", [])}
+    chams = {c["id"]: c for c in sec.get("chambers", [])}
+    for w in sec.get("water", []):
+        # water is drawn by the builder (meshy_cave_build.water_surfaces): along a walking passage, or in a lake's basin
+        where = f"water {w['id']}"
+        if ("along" in w) == ("chamber" in w):
+            errs.append(f"{where}: give either along (a stream) or chamber (a lake's basin)")
+        elif "along" in w and (w["along"] not in pids or pids[w["along"]]["profile"] not in WALK_PROFILES):
+            errs.append(f"{where}: along {w['along']!r} is not a walking passage of this section")
+        elif "chamber" in w and (chams.get(w["chamber"], {}).get("kind") != "lake" or "level" not in w):
+            errs.append(f"{where}: chamber {w['chamber']!r} is not a lake chamber of this section, or no level")
+        elif "chamber" in w:
+            c = chams[w["chamber"]]
+            if not (c["center"][2] - c.get("basin_depth", 1.2) < w["level"] < c["center"][2]):
+                errs.append(f"{where}: the level lies in the basin, under the chamber's floor and over its bottom")
+    for p in sec.get("passages", []):
+        for alt in p.get("alternatives", []):
+            # declared alternatives: forced moves of which the walker must make one (the White Gallery's Giant's
+            # Coffin climb or its Wringer squeeze). Each is checked as mandatory with the other's zones taken away too
+            if alt not in pids or alt == p["id"]:
+                errs.append(f"passage {p['id']}: alternative {alt!r} is not another passage of this section")
+            elif pids[alt]["profile"] not in ("crawl", "fissure", "climb_face") or                     p["profile"] not in ("crawl", "fissure", "climb_face"):
+                errs.append(f"passage {p['id']}: alternatives are crawls, fissures or climb faces ({alt!r})")
     for p in sec.get("passages", []):
         w = p["width"] if isinstance(p["width"], list) else [p["width"]]
         h = p["clear"] if isinstance(p["clear"], list) else [p["clear"]]
@@ -652,26 +686,79 @@ def stairs_line(a, zA, L, st):
     return lo + abs(r) * np.clip((aa - L0 + 0.5 * T) / T, 0.0, n)
 
 
-def prof_wall(profile, d, v, W, H):
+def tube_centre_ratio(a, H):
+    """r = vc / b for a tube of half width a and clear height H: 2/3 (the old shape, centre at 0.4 H) unless the wall
+    would then meet the floor under TUBE_FLOOR_SLOPE. The wall's slope at the floor is (H / a) sqrt((1 - r) / (1 + r))
+    / r; where that is too shallow, r solves K^2 r^3 + K^2 r^2 + r - 1 = 0 with K = TUBE_FLOOR_SLOPE a / H (Newton
+    from r = 2/3: the cubic rises and is convex there, so the steps fall monotonically onto the root). Elementwise,
+    arithmetic and square roots only, so it is the same on every Python."""
+    a = np.asarray(a, dtype=np.float64)
+    H = np.asarray(H, dtype=np.float64)
+    K = TUBE_FLOOR_SLOPE * a / np.maximum(H, 1e-9)
+    r0 = 2.0 / 3.0
+    g0 = math.sqrt((1.0 - r0) / (1.0 + r0)) / r0
+    need = K > g0
+    if not np.any(need):
+        return np.full(np.broadcast(a, H).shape, r0) if np.ndim(a) or np.ndim(H) else r0
+    K2 = np.broadcast_to(K * K, np.broadcast(a, H).shape)
+    r = np.full(K2.shape, r0)
+    for _ in range(16):
+        f = K2 * r * r * (1.0 + r) + r - 1.0
+        fp = K2 * (3.0 * r * r + 2.0 * r) + 1.0
+        r = np.where(need, r - f / fp, r0)
+    return r
+
+
+def prof_wall(profile, d, v, W, H, collision=False):
     """A passage's wall and roof as a field across its section: d the distance from the centre line in plan, v the
-    height above the floor line; positive in the air."""
+    height above the floor line; positive in the air. With collision, a tube's wall is upright from the floor to the
+    ellipse's centre, where the floor meets it (see below)."""
     if profile == "tube":
-        a, b = 0.5 * W, 0.6 * H
-        vc = H - b
-        return np.minimum(a, b) * (1.0 - np.sqrt((d / a) ** 2 + ((v - vc) / b) ** 2))
+        a = 0.5 * W
+        r = tube_centre_ratio(a, H)
+        b = H / (1.0 + r)
+        vc = r * b
+        ell = np.minimum(a, b) * (1.0 - np.sqrt((d / a) ** 2 + ((v - vc) / b) ** 2))
+        if not collision:
+            return ell
+        # The viewer has no slope limit, and even a wall meeting the floor at 75 degrees, with its noise and its
+        # bedding, lets a walker that moves along it (where the centre line slants across the lattice) step up it
+        # 1.0 to 1.25 m (the flood found 23 such states on the Great Gallery's walls). The walker collides with this
+        # field, not with the shell: here the wall is the upright cylinder through the floor's edge d0 wherever the
+        # ellipse lies outside it (from the floor up to 2 vc, where the ellipse comes back to d0), so nothing on the
+        # lower wall faces up and the two meet without a step. It stands at most a - d0 inside the shell's bowl, at
+        # the ellipse's centre (0.25 m in the 14 m trunk), and on the floor's edge itself.
+        d0 = a * np.sqrt(np.maximum(1.0 - (vc / b) ** 2, 0.0))
+        return np.minimum(ell, d0 - d)
     if profile == "crawl":  # a low flat-roofed bedding plane, rounded into its walls
         return smin(0.5 * W - d, H - v, 0.35)
     if profile == "canyon":
         hw = 0.5 * W * (1.0 - 0.3 * np.clip(v / H, 0.0, 1.0))
         return smin(hw - d, H - v, 0.3)
     if profile == "rift":
-        hw = 0.5 * W * (0.85 + 0.15 * (1.0 - np.abs(2.0 * np.clip(v / H, 0.0, 1.0) - 1.0)))
+        u = np.clip(v / H, 0.0, 1.0)
+        hw = 0.5 * W * (0.85 + 0.15 * (1.0 - np.abs(2.0 * u - 1.0)))
+        if collision:
+            # The rift widens from its floor to mid height, so its lower walls lean out and face up: the viewer's
+            # ground rays stood a walker 1.1 m up the Ice Rift's wall on them. The walker meets the upright wall
+            # through the floor's edge instead, all the way up (at most 0.075 W inside the rock you see; a wall
+            # that met the shell above mid height would leave a shelf there).
+            hw = 0.5 * W * 0.85
         return smin(hw - d, H - v, 0.4)
     if profile == "keyhole":
         a, b = 0.5 * W, 0.35 * H
         vc = H - b
         tube = np.minimum(a, b) * (1.0 - np.sqrt((d / a) ** 2 + ((v - vc) / b) ** 2))
-        slot = smin(np.maximum(0.45, 0.22 * W) - d, vc + 0.2 - v, 0.15)
+        hs = np.maximum(0.45, 0.22 * W)
+        if collision:
+            # The tube's lower half is a bowl on each side of the slot, about 1 m above the floor: the shoulders.
+            # Where two keyholes meet on ramps, or a keyhole opens off a fissure, the viewer's ground rays found the
+            # bowls and the walker ran along them and fell 1 m back into the slot (the Spar Maze: 40 falls, 1,429
+            # states off the routes). The walker meets the slot's upright wall up to the tube's centre instead, and
+            # the tube only above it, so the shoulders are never stood on (they lie up to a - hs behind the bowl you
+            # see, where no body fits).
+            return np.maximum(np.minimum(tube, v - vc), smin(hs - d, vc + 0.1 - v, 0.15))
+        slot = smin(hs - d, vc + 0.2 - v, 0.15)
         return np.maximum(tube, slot)
     if profile == "drift":
         hw = 0.5 * W
@@ -681,9 +768,14 @@ def prof_wall(profile, d, v, W, H):
     raise ValueError(profile)
 
 
-def noise_term(n, v, amp):
-    """Noise that only pushes the rock outward below about 2 m (the old builder's wall rule), freely above."""
+def noise_term(n, v, amp, collision=False):
+    """Noise that only pushes the rock outward below about 2 m (the old builder's wall rule), freely above. The
+    collision field leaves out the outward push below 2.6 m: the viewer has no slope limit, and the push's lumps and
+    the bedding's steps on a lower wall are footholds its ground rays find (the flood walked 1.1 m up the Clay Hall's
+    wall on them). So the walker meets the smooth wall, at most amp inside the shell, and never the rock beyond it."""
     t = np.clip((v - 1.8) / 0.8, 0.0, 1.0)
+    if collision:
+        return amp * t * n
     return amp * (np.maximum(n, 0.0) + t * np.minimum(n, 0.0))
 
 
@@ -701,6 +793,8 @@ class Prim:
     blend = 0.5
     amp = 0.0
     geo = 0
+    rock = None    # the rock profile its wall detail follows (meshy_cave_rock), None for none
+    rubble = None  # the rock profile its rubble edge follows, None for none
 
     def hits(self, box):
         b = self.box
@@ -822,15 +916,23 @@ class Passage(Prim):
         if self.profile == "shaft":
             v = Z - self.A[0, 2]
             htot = (self.B[0, 2] - self.A[0, 2]) + H
-            wall = smin(0.5 * W - d, htot - v, 0.3) + noise_term(c.n, v, self.amp)
+            wall = smin(0.5 * W - d, htot - v, 0.3) + noise_term(c.n, v, self.amp, c.walls)
             return smin(wall, v, 0.2), v
         fa, base, _ = self.floors(jj, tj, Z, c.collision)
         v = Z - base
-        wall = prof_wall(self.profile, d, v, W, H)
+        wall = prof_wall(self.profile, d, v, W, H, c.walls)
+        wall0 = wall
+        if self.rock is not None:
+            wall = wall + rock.detail(c, v, self.rock, self.bed)
         if self.amp > 0:
-            wall = wall + noise_term(c.n + (bedding(Z, self.bed) if self.bed else 0.0), v, self.amp)
+            wall = wall + noise_term(c.n + (bedding(Z, self.bed) if self.bed else 0.0), v, self.amp, c.walls)
         kf = min(0.3, 0.25 * float(min(self.w)))
-        return smin(wall, fa, kf), fa
+        out = smin(wall, fa, kf)
+        if self.rubble is not None:
+            h = rock.rubble(c, wall0, self.rubble)
+            if not isinstance(h, float):
+                out = np.minimum(out, fa - h)
+        return out, fa
 
     def eval_climb(self, c):
         X, Y, Z = c.X, c.Y, c.Z
@@ -924,13 +1026,21 @@ class Chamber(Prim):
             if self.kind == "breakdown":
                 roof = roof + 0.6 * (np.floor(c.nb * 3.0) / 3.0)
             wall = smin(side, roof, 0.8)
+        wall0 = wall
+        if self.rock is not None:
+            wall = wall + rock.detail(c, v, self.rock, self.bed)
         if self.amp > 0:
-            wall = wall + noise_term(c.n + (bedding(c.Z, self.bed) if self.bed else 0.0), v, self.amp)
+            wall = wall + noise_term(c.n + (bedding(c.Z, self.bed) if self.bed else 0.0), v, self.amp, c.walls)
         fa = v
         if self.basin > 0:
             inner = 1.0 - np.sqrt((lx / (0.3 * self.sx)) ** 2 + (ly / (0.3 * self.sy)) ** 2)
             fa = np.maximum(v, np.minimum(v + self.basin, inner * 0.3 * min(self.sx, self.sy)))
-        return smin(wall, fa, 0.3), v
+        out = smin(wall, fa, 0.3)
+        if self.rock is not None:
+            h = rock.rubble(c, wall0, self.rock)
+            if not isinstance(h, float):
+                out = np.minimum(out, fa - h)
+        return out, v
 
     def designed(self, x, y, z):
         if not self.walk:
@@ -968,8 +1078,14 @@ class Bulge(Prim):
 
 
 class Ctx:
-    def __init__(self, X, Y, Z, n, nb, collision=False):
+    """Points and their noise. collision: the walker's field (the ramp under stairs, and with walls, the default, the
+    upright tube foot and the lower walls without their noise push); the rock rule takes the stairs' ramp only."""
+
+    def __init__(self, X, Y, Z, n, nb, collision=False, walls=None, seed=1):
         self.X, self.Y, self.Z, self.n, self.nb, self.collision = X, Y, Z, n, nb, collision
+        self.walls = collision if walls is None else walls
+        self.seed = seed
+        self._scal = None  # the scallops at these points, made once (meshy_cave_rock.detail)
 
 
 def union(c, prims, shape, track=False):
@@ -1029,8 +1145,10 @@ class Section:
         self.own = [p for p in self.prims if getattr(p, "sec", None) == self.key]
         # The region in lattice cells, with each seam's overlap (the cell beyond the plane on its + side) and stub.
         boxes = [self.to_cells(b) for b in sec["region"]["boxes"]]
+        self.own_boxes = [[float(v) for v in b] for b in sec["region"]["boxes"]]
         self.openings = []
         self.seam_boxes = []
+        self.stub_clips = []
         for sm in sec.get("seams", []):
             ax = 0 if sm["plane"]["axis"] == "x" else 1
             at = sm["plane"]["at"]
@@ -1045,8 +1163,14 @@ class Section:
             cb = self.to_cells(b)
             boxes.append(cb)
             self.seam_boxes.append((sm, ax, at, plus))
-            far = hi_a if plus else lo_a
-            ob = list(b)
+            if stub > 0:
+                # Past the overlap cell the stub is the neighbour's rock clipped to the window's prism (below).
+                c0, c1 = (at + self.cell, hi_a + 1.0) if plus else (lo_a - 1.0, at)
+                ub = [self.origin[1 - ax] + cb[1 - ax] * self.cell - 0.01, self.origin[1 - ax] + cb[4 - ax] * self.cell + 0.01]
+                zb = [self.origin[2] + cb[2] * self.cell - 0.01, self.origin[2] + cb[5] * self.cell + 0.01]
+                self.stub_clips.append((ax, c0, c1, ub, zb, (u0 - STUB_CLIP, z0 - STUB_CLIP, u1 + STUB_CLIP, z1 + STUB_CLIP)))
+            ob = [float(self.origin[a % 3] + cb[a] * self.cell) for a in range(6)]  # the box as meshed, on the lattice
+            far = ob[ax + 3] if plus else ob[ax]
             ob[ax], ob[ax + 3] = far - 1e-6, far + 1e-6
             self.openings.append(ob)
         for o in sec.get("openings", []):
@@ -1055,6 +1179,24 @@ class Section:
         lo = np.min([b[:3] for b in boxes], axis=0)
         hi = np.max([b[3:] for b in boxes], axis=0)
         self.lo, self.hi = lo.astype(np.int64), hi.astype(np.int64)
+
+    def clip_stubs(self, X, Y, Z, acc):
+        """The field in a seam's stub, past its overlap cell, clipped to the window's prism (the window plus
+        STUB_CLIP on every side). The stub meshes the neighbour's rock beyond the plane in a box of the window plus
+        0.5 m; wherever the neighbour's passage bends, widens or opens into a room within the stub, its air would meet
+        the box's sides and leave the shell open there. The clip closes it with rock 0.25 m inside the box: a hard
+        minimum, so where the neighbour's air stays inside the prism (at the plane, by validation, and down a straight
+        stub) the surface is the neighbour's own. Elementwise on broadcast arrays."""
+        for ax, c0, c1, ub, zb, (u0, z0, u1, z1) in self.stub_clips:
+            A, U = (X, Y) if ax == 0 else (Y, X)
+            inside = (A > c0) & (A < c1) & (U > ub[0]) & (U < ub[1]) & (Z > zb[0]) & (Z < zb[1])
+            for b in self.own_boxes:  # never the section's own region
+                inside = inside & ~((X > b[0]) & (X < b[3]) & (Y > b[1]) & (Y < b[4]) & (Z > b[2]) & (Z < b[5]))
+            if not np.any(inside):
+                continue
+            prism = np.minimum(np.minimum(U - u0, u1 - U), np.minimum(Z - z0, z1 - Z))
+            acc = np.where(inside, np.minimum(acc, prism), acc)
+        return acc
 
     def to_cells(self, b):
         o, c = self.origin, self.cell
@@ -1073,10 +1215,20 @@ class Section:
         nodes = s.get("nodes", {})
         for p in s.get("passages", []):
             gi, g = self.geo_of(p.get("geology") or s.get("geology"))
-            out.append(Passage(s["key"], p, nodes, gi, g))
+            q = Passage(s["key"], p, nodes, gi, g)
+            rk = rock.profile(self.geo_names[gi], g)
+            if q.profile in ("tube", "canyon", "keyhole", "rift"):
+                q.rock = rk  # natural passages; a mine's drift is hewn, crawls, fissures and faces keep their limits
+            if q.profile in WALK_PROFILES and q.floor_kind != "stairs":
+                q.rubble = rk
+            out.append(q)
         for c in s.get("chambers", []):
             gi, g = self.geo_of(c.get("geology") or s.get("geology"))
-            out.append(Chamber(s["key"], c, gi, g))
+            q = Chamber(s["key"], c, gi, g)
+            if q.kind != "stope":
+                q.rock = rk = rock.profile(self.geo_names[gi], g)
+                q.rubble = rk
+            out.append(q)
         for i, f in enumerate(s.get("features", [])):
             if f["kind"] == "flowstone":
                 out.append(Bulge(s["key"], f, i))
@@ -1114,8 +1266,9 @@ class Section:
         Z = (self.origin[2] + (g0[2] + np.arange(n)) * self.cell)[:, None, None]
         nl = noise_block(g0, n, NOISE_LUMP, self.seed)
         nb = noise_block(g0, n, NOISE_BIG, self.seed * 7 + 3)
-        c = Ctx(X, Y, Z, 0.65 * nl + 0.35 * nb, nb, collision)
-        return union(c, ps, (n, n, n))
+        c = Ctx(X, Y, Z, 0.65 * nl + 0.35 * nb, nb, collision, seed=self.seed)
+        acc = union(c, ps, (n, n, n))
+        return self.clip_stubs(X, Y, Z, acc) if self.stub_clips else acc
 
     def field_points(self, P, track=False, collision=False, cores=True):
         """The field at points P (N, 3), per point (for checks and attributes). With track, also the floor term and
@@ -1140,7 +1293,7 @@ class Section:
             if not m.any():
                 continue
             idx = np.nonzero(m)[0]
-            c = Ctx(P[idx, 0], P[idx, 1], P[idx, 2], n[idx], nb[idx], collision)
+            c = Ctx(P[idx, 0], P[idx, 1], P[idx, 2], n[idx], nb[idx], collision, seed=self.seed)
             if p.cls == 2:
                 bv, _ = p.eval(c)
                 acc[idx] = smin(acc[idx], bv, 0.35)
@@ -1168,6 +1321,10 @@ class Section:
                     idx = np.nonzero(m)[0]
                     c = Ctx(P[idx, 0], P[idx, 1], P[idx, 2], n[idx], nb[idx], collision)
                     acc[idx] = np.maximum(acc[idx], p.core_eval(c))
+        if self.stub_clips:
+            acc = self.clip_stubs(P[:, 0], P[:, 1], P[:, 2], acc)
+            if track:
+                rock = self.clip_stubs(P[:, 0], P[:, 1], P[:, 2], rock)
         return (acc, fa, dom, rock) if track else acc
 
     def column(self, x, y, z_hint, zlo=None, zhi=None, step=0.03125):
@@ -1220,7 +1377,7 @@ def prim_field(sec, p, P, collision=True):
     """One primitive's own field at points P (N, 3), with the network's noise."""
     P = np.asarray(P, dtype=np.float64)
     n, nb = prim_noise(sec, P)
-    return p.eval(Ctx(P[:, 0], P[:, 1], P[:, 2], n, nb, collision))[0]
+    return p.eval(Ctx(P[:, 0], P[:, 1], P[:, 2], n, nb, collision, walls=False))[0]
 
 
 def rock_depth(sec, p, P, h=0.03):
@@ -1591,6 +1748,34 @@ def weld(parts):
     return q[fi], faces, cells
 
 
+def cancel_pairs(F, cells):
+    """Drops each pair of faces on the same three vertices wound opposite ways: where the field is exactly zero on
+    a lattice node, the cubes either side of it can each emit the same triangle, back to back, which leaves a
+    zero-area sliver and four faces on its edges (the Well Dome's shell had four such pairs). The pair encloses
+    nothing, so removing both keeps the shell closed."""
+    if not len(F):
+        return F, cells
+    S = np.sort(F, axis=1)
+    n = int(F.max()) + 1
+    key = (S[:, 0] * n + S[:, 1]) * n + S[:, 2]
+    u, inv, cnt = np.unique(key, return_inverse=True, return_counts=True)
+    inv = inv.ravel()
+    dup = cnt[inv] == 2
+    if not dup.any():
+        return F, cells
+    # orientation: the parity of the permutation that sorts the face
+    r = np.argsort(F, axis=1)
+    par = ((r[:, 0] > r[:, 1]).astype(int) + (r[:, 0] > r[:, 2]) + (r[:, 1] > r[:, 2])) % 2
+    drop = np.zeros(len(F), bool)
+    idx = np.nonzero(dup)[0]
+    order = idx[np.argsort(inv[idx], kind="stable")]
+    a, b = order[0::2], order[1::2]
+    opp = par[a] != par[b]
+    drop[a[opp]] = True
+    drop[b[opp]] = True
+    return F[~drop], cells[~drop]
+
+
 def edges_of(F):
     e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
     return np.sort(e, axis=1)
@@ -1720,13 +1905,14 @@ RING8 = [(1.0, 0.0), (S8, S8), (0.0, 1.0), (-S8, S8), (-1.0, 0.0), (-S8, -S8), (
 
 class MeshBuf:
     def __init__(self):
-        self.v, self.f, self.tag = [], [], []
+        self.v, self.f, self.tag, self.geo = [], [], [], []
 
-    def add(self, verts, faces, tag):
+    def add(self, verts, faces, tag, geo=-1):
         base = len(self.v)
         self.v += [tuple(p) for p in verts]
-        self.f += [(a + base, b + base, c + base) for a, b, c in faces]
+        self.f += [(int(a) + base, int(b) + base, int(c) + base) for a, b, c in faces]
         self.tag += [tag] * len(faces)
+        self.geo += [geo] * len(faces)
 
     def tube(self, rings, tag, cap_top=True, tip=None, tip_top=None):
         """Rings of (cx, cy, cz, r, (c, s)) joined by quads; a tip point closes the last ring, a cap the first."""
@@ -1767,6 +1953,10 @@ class MeshBuf:
         V = np.array(self.v, dtype=np.float64).reshape(-1, 3)
         return np.rint(V * Q).astype(np.int64), np.array(self.f, dtype=np.int64).reshape(-1, 3), \
             np.array(self.tag, dtype=np.int64)
+
+    def geos(self):
+        """Each face's geology index (-1 where none was given: the hand-placed features')."""
+        return np.array(self.geo, dtype=np.int64)
 
 
 def truncated_cube():
@@ -2866,6 +3056,10 @@ def run_flood(sec, grid, zones, report_zones=True):
     for p in sec.prims:
         if hasattr(p, "designed"):
             designed |= p.designed(rx, ry, rz)
+    for br in d.get("bridges", []):  # a bridge's deck is walked by design (over a crack or a shaft)
+        x0, y0, x1, y1 = br["box"]
+        designed |= ((rx >= x0 - 0.5) & (rx <= x1 + 0.5) & (ry >= y0 - 0.5) & (ry <= y1 + 0.5)
+                     & (np.abs(rz - br["top_z"]) <= 0.6))
     und = rs[~designed]
     # drops over 0.35 m: guarded (no edge), caught by a climb, or declared. A fall whose start the walker walks
     # straight back to (a perch on a wall's foot, a probe ray resting on the fillet) is not a drop.
@@ -3089,6 +3283,37 @@ def zone_ends(fl, zn):
     return ends[0], ends[1]
 
 
+def alternatives(d, pid):
+    """The passages declared alternatives of passage pid (either way round): its bypass test takes their zones away
+    too, so of a pair the walker must make one move or the other."""
+    out = set()
+    for p in d.get("passages", []):
+        if p["id"] == pid:
+            out |= set(p.get("alternatives", []))
+        elif pid in p.get("alternatives", []):
+            out.add(p["id"])
+    out.discard(pid)
+    return out
+
+
+def without_graph(fl, kept, alt_climbs):
+    """The walk graph with only the kept zones. A declared alternative that is a climb also loses the falls off its
+    ledge: in the viewer a walker who steps off the top meets the face and climbs down it (the face catches the
+    fall), so with the face's zone taken away that fall is the climb itself, not a way round the other move."""
+    src, dst, fall = fl.edges(kept)
+    if alt_climbs:
+        drop = np.zeros(len(src), bool)
+        fe = np.nonzero((fall > STEP + 1e-6) & (src < fl.N))[0]
+        if len(fe):
+            x, y, z, _ = fl.pos(src[fe])
+            for c in alt_climbs:
+                lx, ly, lz = c.local(x, y, z)
+                drop[fe] |= ((np.abs(lx) <= c.half[0] + 0.6) & (lz >= -1.5) & (lz <= 0.6)
+                             & (ly >= c.half[1] - 0.6))
+        src, dst = src[~drop], dst[~drop]
+    return fl.csr(src, dst, fl.N + 1)
+
+
 def zone_check(fl, zn, zones, full, reached=None):
     """For a zone or a passage's chain of zones. Traversable: from each end of the chain to the other with every
     zone. Bypassable: from the walking states at one end to the other without the chain's zones. An end beyond a seam
@@ -3099,7 +3324,9 @@ def zone_check(fl, zn, zones, full, reached=None):
     zn = chain[0]
     a, b = zone_ends(fl, chain)
     seams = [seam_beyond(fl.sec, *p) for p in zone_end_points(chain)]
-    without = fl.graphs([z for z in zones if all(z is not c for c in chain)])[0]
+    alts = alternatives(fl.sec.d, zn.source)
+    without = without_graph(fl, [z for z in zones if all(z is not c for c in chain) and z.source not in alts],
+                            [z for z in zones if z.source in alts and z.kind == "climb"])
 
     walk_n = fl.K * fl.g.NP  # walking states come first in the id space
 
@@ -3171,6 +3398,7 @@ def zone_check(fl, zn, zones, full, reached=None):
             "ends_found": [bool(a), bool(b)], "traversable": bool(trav),
             "bypassable": bool(byp), "mandatory": bool(trav and not byp),
             "segments_walked_round": skipped, "walked_in": [round(v, 2) for v in deep],
+            "alternatives": sorted(alts),
             "seam_ends": [sm["id"] if sm is not None else None for sm in seams]}
 
 
@@ -3315,11 +3543,81 @@ def clearance(sec):
 # ---------------------------------------------------------------- attributes, UVs, chunks
 
 
-def face_uv(Vf, F, repeat):
-    """Cube projection per face: the face's dominant axis picks the plane, UV = position / metres per repeat."""
+UV_SMOOTH_CELL = 0.5    # metres: the grid whose 3 x 3 x 3 neighbourhood smooths the normal that picks a shell projection
+UV_SMOOTH_AGREE = 0.3   # a face takes the smoothed axis only where its own normal agrees with the smoothed one this much
+UV_SMOOTH_MIN = 0.25    # ... and its own normal's share on that axis is at least this (marching cubes' slivers lean)
+UV_MODE_ROUNDS = 4      # rounds of the vote among edge neighbours that removes the last single-face islands
+UV_SEAM_KEEP = 1.5      # metres: within this of a seam plane a face keeps its own axis (both files see the same faces)
+
+
+def smooth_axis(Vf, F, seam_planes=(), cell: float = UV_SMOOTH_CELL, rounds: int = UV_MODE_ROUNDS):
+    """Each face's projection axis from its normal smoothed over its neighbourhood (the area-weighted normals of the
+    faces in the 3 x 3 x 3 cells of `cell` metres around it), so a wall's bedding, scallops and joints keep one
+    projection instead of flipping between planes face by face (the rebuild's check: the Spar Maze's marble showed in
+    triangular facets), then `rounds` of a vote: a face takes the axis most of its edge neighbours have (its own
+    counting half). A face whose own normal disagrees with the smoothed one (a thin fin, a lip), or whose own normal
+    has under UV_SMOOTH_MIN of its length on an axis, never takes that axis. A face within UV_SEAM_KEEP of a seam plane
+    (`seam_planes`: (axis, at) rows; the neighbour's file has other faces beyond it) keeps its own dominant axis.
+    Deterministic: world cells and the faces' edges, not their order. On the Spar Maze: axis changes across edges
+    8.3 % -> 3.2 %, faces unlike two or more neighbours 3.4 % -> 0.4 % of the area."""
     a, b, c = Vf[F[:, 0]], Vf[F[:, 1]], Vf[F[:, 2]]
     n = np.cross(b - a, c - a)
-    axis = np.argmax(np.abs(n), axis=1)
+    own = np.argmax(np.abs(n), axis=1)
+    if not len(F):
+        return own
+    cen = (a + b + c) / 3.0
+    key = np.floor(cen / cell).astype(np.int64)
+    key -= key.min(axis=0) - 1
+    span = int(key.max()) + 2
+    code = (key[:, 0] * span + key[:, 1]) * span + key[:, 2]
+    uk, inv = np.unique(code, return_inverse=True)
+    S = np.zeros((len(uk), 3))
+    np.add.at(S, inv.ravel(), n)
+    acc = np.zeros((len(F), 3))
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                c2 = code + (dx * span + dy) * span + dz
+                j = np.minimum(np.searchsorted(uk, c2), len(uk) - 1)
+                hit = uk[j] == c2
+                acc[hit] += S[j[hit]]
+    nn = np.linalg.norm(n, axis=1)
+    an = np.linalg.norm(acc, axis=1)
+    agree = (acc * n).sum(1) >= UV_SMOOTH_AGREE * np.maximum(an * nn, 1e-30)
+    sm = np.argmax(np.abs(acc), axis=1)
+    share = np.abs(np.take_along_axis(n, sm[:, None], axis=1)[:, 0]) / np.maximum(nn, 1e-30)
+    use = agree & (share >= UV_SMOOTH_MIN) & (an > 0)
+    keep = np.zeros(len(F), bool)
+    for ax, at in seam_planes:
+        keep |= np.abs(cen[:, ax] - at) <= UV_SEAM_KEEP
+    out = np.where(use & ~keep, sm, own)
+    if rounds:
+        e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]]).astype(np.int64)
+        e.sort(axis=1)
+        fi = np.tile(np.arange(len(F)), 3)
+        ec = e[:, 0] * (int(F.max()) + 1) + e[:, 1]
+        o = np.argsort(ec, kind="stable")
+        ec, fi = ec[o], fi[o]
+        pair = ec[1:] == ec[:-1]
+        A, B = fi[:-1][pair], fi[1:][pair]
+        no = np.abs(n) < UV_SMOOTH_MIN * nn[:, None]
+        no[np.arange(len(F)), own] = False
+        for _ in range(rounds):
+            votes = np.zeros((len(F), 3))
+            votes[np.arange(len(F)), out] += 0.5
+            np.add.at(votes, (A, out[B]), 1.0)
+            np.add.at(votes, (B, out[A]), 1.0)
+            votes[no] = -1.0
+            out = np.where(keep, own, np.argmax(votes, axis=1))
+    return out
+
+
+def face_uv(Vf, F, repeat, axis=None):
+    """Cube projection per face: the face's dominant axis (or `axis`, one per face) picks the plane, UV = position /
+    metres per repeat."""
+    a, b, c = Vf[F[:, 0]], Vf[F[:, 1]], Vf[F[:, 2]]
+    n = np.cross(b - a, c - a)
+    axis = np.argmax(np.abs(n), axis=1) if axis is None else np.asarray(axis, np.int64)
     pick = np.array([[1, 2], [0, 2], [0, 1]])[axis]
     corners = np.stack([a, b, c], axis=1)  # (F, 3, 3)
     uv = np.take_along_axis(corners, pick[:, None, :].repeat(3, axis=1), axis=2) / repeat[:, None, None]
@@ -3434,7 +3732,8 @@ def mesh_section(sec, log=print):
         busy = (np.abs(fc) < ACTIVE_BAND).any(1) | ((fc > 0).any(1) & (fc <= 0).any(1))
         act = [bk for bk, b in zip(act, busy) if b]
     shell, coll, trans, nodes = [], [], [], []
-    stairs_prims = [p for p in sec.prims if isinstance(p, Passage) and any(st is not None for st in p.stairs)]
+    # The collision field differs from the shell's under stairs (the ramp through the treads), in tubes (the upright
+    # wall foot, prof_wall) and on every lower wall (no noise push, noise_term); it is evaluated in every block.
     for bk in act:
         g0 = np.array(bk, dtype=np.int64) * B
         mask = sec.cell_mask(g0, B)
@@ -3447,9 +3746,7 @@ def mesh_section(sec, log=print):
         r = mc_block(F, mask, g0, B, sec.cell, sec.origin)
         if r is not None:
             shell.append(r)
-        Fc = F
-        if any(p in ps for p in stairs_prims):
-            Fc = sec.field_block(g0, collision=True, prims=ps)
+        Fc = sec.field_block(g0, collision=True, prims=ps)
         cm = mask.reshape(B // 2, 2, B // 2, 2, B // 2, 2).any(axis=(1, 3, 5))
         rc = mc_block(Fc[::2, ::2, ::2], cm, g0 // 2, B // 2, 2 * sec.cell, sec.origin)
         if rc is not None:
@@ -3469,6 +3766,7 @@ def mesh_section(sec, log=print):
             nodes.append((np.stack([g0[0] + kx, g0[1] + ky, g0[2] + kz], 1).astype(np.int32),
                           Fo[kz, ky, kx].astype(np.float32)))
     Vq, Fs, cells = weld(shell)
+    Fs, cells = cancel_pairs(Fs, cells)
     Cq, Cf, _ = weld(coll)
     T = np.concatenate(trans) if trans else np.zeros((0, 4))
     log(f"  field + marching cubes: {len(act)} active blocks of {len(blocks)}, {len(Fs)} triangles, "
@@ -3598,7 +3896,7 @@ def problems(report):
 
 
 def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks=True, write=True, log=print,
-          sec_obj=None, zones_override=None):
+          sec_obj=None, zones_override=None, decor=True):
     """Validate, mesh, build everything; write the npz, plan and report when out_dir is given. Returns a dict with
     the report and the arrays."""
     t_all = time.time()
@@ -3641,15 +3939,31 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
                  0.5 * th, 1.0, 0.0, 11)
         solids.append(("aabb", x0, y0, x1, y1, br["top_z"] - th, br["top_z"]))
     for sm, ax, at, plus in sec.seam_boxes:
+        # the seam wall: its face toward this file's walker on the plane, its 0.1 m beyond it (the contract's
+        # section 6: the row stands 0.45 m in front of the face)
         u0, z0, u1, z1 = sm["window"]
+        mid = at + (0.05 if plus else -0.05)
         if ax == 0:
-            prox.box((at, 0.5 * (u0 + u1), 0.5 * (z0 + z1)), 0.05, 0.5 * (u1 - u0), 0.5 * (z1 - z0), 1.0, 0.0, 12)
-            solids.append(("aabb", at - 0.05, u0, at + 0.05, u1, z0 - 1.0, z1 + 1.0))
+            prox.box((mid, 0.5 * (u0 + u1), 0.5 * (z0 + z1)), 0.05, 0.5 * (u1 - u0), 0.5 * (z1 - z0), 1.0, 0.0, 12)
+            solids.append(("aabb", mid - 0.05, u0, mid + 0.05, u1, z0 - 1.0, z1 + 1.0))
         else:
-            prox.box((0.5 * (u0 + u1), at, 0.5 * (z0 + z1)), 0.5 * (u1 - u0), 0.05, 0.5 * (z1 - z0), 1.0, 0.0, 12)
-            solids.append(("aabb", u0, at - 0.05, u1, at + 0.05, z0 - 1.0, z1 + 1.0))
-    # the flood
+            prox.box((0.5 * (u0 + u1), mid, 0.5 * (z0 + z1)), 0.5 * (u1 - u0), 0.05, 0.5 * (z1 - z0), 1.0, 0.0, 12)
+            solids.append(("aabb", u0, mid - 0.05, u1, mid + 0.05, z0 - 1.0, z1 + 1.0))
+    # the flood's columns, the formations, fallen rock and breakdown placed on them (meshy_cave_rock.decor), their
+    # solids
     grid = build_grid(sec, m["T"], m["NV"])
+    drep = None
+    if decor and sec.d.get("decor", True):
+        t0 = time.time()
+        pieces, dprox, dsol, drep = rock.decor(sec, grid, zones, guard_segments(sec), sys.modules[__name__])
+        for V_, F_, tag, gi in pieces:
+            vis.add(V_, F_, tag, gi)
+        for V_, F_, tag in dprox:
+            prox.add(V_, F_, tag)
+        solids += dsol
+        drep["seconds"] = round(time.time() - t0, 2)
+        log(f"  decor: {drep['pieces']} pieces ({drep['triangles']} triangles), {drep['collide']} with collision "
+            f"({drep['proxy_triangles']} triangles), {drep['seconds']} s")
     apply_solids(grid, sec, solids)
     fl_rep, fl_parts = (None, None)
     if flood:
@@ -3697,8 +4011,9 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
     attrs = vertex_attrs(sec, Vq, bulges)
     repeats = np.array([float(sec.geo_of(n)[1]["repeat_m"]) for n in sec.geo_names])
     face_geo = attrs["geo"][Fs[:, 0]] if len(Fs) else np.zeros(0, np.int8)
-    uv, uv_axis = face_uv(V, Fs, repeats[face_geo]) if len(Fs) else (np.zeros((0, 3, 2), np.float32),
-                                                                     np.zeros(0, np.int8))
+    sax = smooth_axis(V, Fs, [(ax, at) for _sm, ax, at, _p in sec.seam_boxes]) if len(Fs) else None
+    uv, uv_axis = face_uv(V, Fs, repeats[face_geo], sax) if len(Fs) else (np.zeros((0, 3, 2), np.float32),
+                                                                          np.zeros(0, np.int8))
     ck, coff, cfaces = chunks(cells) if len(Fs) else (np.zeros((0, 3), np.int32), np.zeros(1, np.int64),
                                                       np.zeros(0, np.int32))
     per_chunk = np.diff(coff)
@@ -3739,7 +4054,7 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
                       "total": int(len(Cf) + len(Pf)), "target": COLLISION_TARGET, "ceiling": COLLISION_CEILING,
                       "field_deviation_m": {"max": round(float(devs.max()), 4),
                                             "p99": round(float(np.percentile(devs, 99)), 4)}},
-        "formations": {"triangles": int(len(Ff)), "items": frep},
+        "formations": {"triangles": int(len(Ff)), "items": frep, "decor": drep},
         "budget": {"triangles_loaded": tris + int(len(Ff)), "target": 1500000,
                    "draw_calls_est": int(len(ck)) * max(1, len(set(face_geo.tolist()))) + 2,
                    "collision_total": int(len(Cf) + len(Pf))},
@@ -3767,7 +4082,7 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
             chunk_keys=ck, chunk_offsets=coff, chunk_faces=cfaces,
             coll_verts_q=Cvq, coll_faces=Cf.astype(np.int32), proxy_verts_q=Pq, proxy_faces=Pf.astype(np.int32),
             proxy_kind=Pt.astype(np.int8), form_verts_q=Fq, form_faces=Ff.astype(np.int32),
-            form_kind=Ft.astype(np.int8), form_uv=fuv, form_uv_axis=fax,
+            form_kind=Ft.astype(np.int8), form_geo=vis.geos().astype(np.int8), form_uv=fuv, form_uv_axis=fax,
             geology=np.array(json.dumps(sec.geo_names)), zones_json=np.array(json.dumps(zones_out)),
             report_json=np.array(json.dumps(report)))
         plan(os.path.join(out_dir, f"{sec.key}_plan.png"), sec, grid, zones, fl_parts)

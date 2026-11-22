@@ -58,6 +58,54 @@ export async function loadFile(
   }
 }
 
+/** Fetches a file as bytes with progress: from the response's length, else `expectedBytes` (the index's size),
+ * else none. Rejects with `Could not load <url>: ...`. */
+export async function fetchBytes(
+  url: string,
+  expectedBytes: number,
+  onProgress: (p: Progress) => void,
+): Promise<ArrayBuffer> {
+  let res: Response;
+  try {
+    res = await fetch(url);
+  } catch (err) {
+    throw describeError(err, url);
+  }
+  if (!res.ok) throw describeError(new Error(`HTTP ${res.status}`), url);
+  const total = Number(res.headers.get('content-length')) || expectedBytes || 0;
+  if (!res.body) return res.arrayBuffer();
+  const reader = res.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let loaded = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+    loaded += value.byteLength;
+    onProgress({ fraction: total > 0 ? Math.min(1, loaded / total) : null, loaded, label: 'Downloading' });
+  }
+  const out = new Uint8Array(loaded);
+  let at = 0;
+  for (const c of chunks) {
+    out.set(c, at);
+    at += c.byteLength;
+  }
+  return out.buffer;
+}
+
+/** The first four bytes of a .glb. */
+const GLB_MAGIC = 0x46546c67;
+
+/** Parses a .glb, or a .gltf held as bytes; external files resolve against `url`'s folder. */
+export async function parseBytes(loader: GLTFLoader, bytes: ArrayBuffer, url: string): Promise<GLTF> {
+  try {
+    const glb = bytes.byteLength >= 4 && new DataView(bytes).getUint32(0, true) === GLB_MAGIC;
+    return await loader.parseAsync(glb ? bytes : new TextDecoder().decode(bytes), new URL('.', url).href);
+  } catch (err) {
+    throw describeError(err, url);
+  }
+}
+
 function describeError(err: unknown, source: string): Error {
   const detail = err instanceof Error ? err.message : String(err);
   return new Error(`Could not load ${source}: ${detail}`);

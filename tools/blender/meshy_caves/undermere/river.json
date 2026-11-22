@@ -188,6 +188,17 @@
       "notes": "the ink cap where the other file's part of the Bottomless Pit begins"
     }
   ],
+  "water": [
+    {
+      "id": "ri_stream",
+      "kind": "stream",
+      "along": "ri_canyon",
+      "side": "right",
+      "width": 1.6,
+      "depth": 0.25,
+      "notes": "the Lake River: the south half of the canyon's floor, 0.25 m deep; the walkway on the north half stays dry (the design's ri_stream)"
+    }
+  ],
   "joins": [
     ["bottomless_pit", "ga_trunk_1"],
     ["bottomless_pit", "ga_trunk_2"],

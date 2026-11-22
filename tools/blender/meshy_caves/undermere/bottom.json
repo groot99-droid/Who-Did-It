@@ -22,7 +22,8 @@
       [101.0, -62.0, -41.25, 106.0, -51.0, -36.0],
       [104.0, -52.0, -43.875, 130.0, -26.0, -27.75],
       [126.0, -55.5, -33.0, 132.0, -49.375, -28.0],
-      [127.5, -56.5, -30.0, 132.5, -51.5, -1.5]
+      [127.5, -56.5, -30.0, 132.5, -51.5, -1.5],
+      [101.375, -44.0, -43.875, 104.125, -40.0, -31.0]
     ]
   },
   "nodes": {},
@@ -158,12 +159,12 @@
     {
       "id": "bo_lake_water",
       "kind": "lake",
-      "center": [116.0, -40.0, -39.8],
-      "size": [26.667, 15.0, 3.0],
+      "center": [117.0, -40.0, -39.8],
+      "size": [24.0, 15.0, 3.0],
       "axis": [1.0, 0.0],
       "basin_depth": 3.0,
       "geology": "flooded",
-      "notes": "bo_deep_water: the basin is the design's water ellipse 16.0 x 9.0 m; the builder's rail is its guard"
+      "notes": "bo_deep_water: the basin is the design's water ellipse 16.0 x 9.0 m; the builder's rail is its guard (route 3: 24 m long, centred under the hall, so its floor stops east of the Cascade face; at 26.7 m from x 116 it ran 0.5 m behind the face's foot and the viewer's walker walked under the ledge instead of climbing; its water is 14.4 x 9.0 m)"
     },
     {
       "id": "bo_throatledge",
@@ -173,6 +174,19 @@
       "axis": [0.866, 0.5],
       "geology": "flooded",
       "notes": "under the Throat"
+    }
+  ],
+  "guards": [
+    {
+      "id": "kerb_lake_west",
+      "line": [
+        [105.4, -44.75],
+        [105.4, -40.75]
+      ],
+      "base_z": -39.8,
+      "height": 1.0,
+      "thickness": 0.3,
+      "notes": "route 3: a breakdown kerb along the hall's west end, where the walker's rays stood it 0.4 m up the wall's foot over the lake chamber's floor"
     }
   ],
   "spawns": [
@@ -227,6 +241,15 @@
     }
   ],
   "openings": [],
+  "water": [
+    {
+      "id": "bo_deep_water",
+      "kind": "lake",
+      "chamber": "bo_lake_water",
+      "level": -42.0,
+      "notes": "the flooded lake, 2.2 m under the ledges and the rail (the design's bo_deep_water)"
+    }
+  ],
   "joins": [
     ["throat", "bo_throatledge"],
     ["throat", "bo_throat_face"],

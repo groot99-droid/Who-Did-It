@@ -7,7 +7,7 @@
   "geology": "limestone",
   "region": {
     "boxes": [
-      [123.0, 2.5, 2.875, 129.0, 6.5, 7.5],
+      [124.0, 2.5, 2.875, 129.0, 6.5, 7.5],
       [125.0, 2.5, 2.5, 130.875, 10.5, 7.25],
       [126.75, 6.375, 2.375, 132.0, 13.625, 7.0],
       [128.0, 9.5, 2.375, 133.375, 14.0, 6.75],
@@ -30,14 +30,14 @@
       [156.0, 27.5, 9.375, 160.25, 33.0, 13.625],
       [142.5, 19.5, -3.0, 147.5, 24.5, 13.5],
       [157.0, 30.0, 11.5, 159.0, 32.0, 17.0],
-      [123.0, 2.5, 3.0, 127.0, 6.5, 7.625]
+      [124.0, 2.5, 3.0, 127.0, 6.5, 7.625]
     ]
   },
   "nodes": {},
   "passages": [
     {
       "id": "ad_mouth",
-      "from": [125.0, 4.5, 4.1],
+      "from": [122.5, 4.5, 4.1],
       "to": [127.0, 4.5, 3.9],
       "profile": "drift",
       "width": 2.0,
@@ -46,7 +46,7 @@
         "kind": "ramp"
       },
       "geology": "limestone",
-      "notes": "the Portal"
+      "notes": "the Portal (route 2: from 122.5, so the drift runs out through the headwall's face at x 124 to the cutting)"
     },
     {
       "id": "ad_portaldrive",
@@ -348,8 +348,13 @@
   "openings": [
     {
       "id": "engine_shaft_cap",
-      "box": [143.0, 20.0, -4.0, 147.0, 24.0, -2.98],
-      "notes": "the ink cap where the other file's part of the Engine Shaft begins"
+      "box": [143.0, 19.4, -4.0, 147.0, 24.0, -2.98],
+      "notes": "the ink cap where the other file's part of the Engine Shaft begins (route 2: from y 19.4, where the levels' sollar and ladderway meet the shaft box's south face)"
+    },
+    {
+      "id": "engine_shaft_window",
+      "box": [143.4, 19.45, -3.1, 146.6, 19.55, 2.0],
+      "notes": "route 2: an ink window on the shaft box's south face below the collar, where the levels' sollar, ladderway and first-level station run on beyond this file (Vane's Levels draws them)"
     },
     {
       "id": "bandit_chink_top",
@@ -358,8 +363,8 @@
     },
     {
       "id": "mouth_adit",
-      "box": [123.0, 2.5, 3.6, 127.0, 6.5, 7.6],
-      "notes": "the gate's mouth (the vista beyond)"
+      "box": [124.0, 2.5, 3.6, 127.0, 6.5, 7.6],
+      "notes": "the gate's mouth (the vista beyond) (route 2: the headwall's outer face at x 124, as the design's cutting has it)"
     }
   ],
   "joins": [

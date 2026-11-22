@@ -9,6 +9,26 @@ export const DEFAULT_GLB_URL: string | null = WALK_GLB_FILE
   ? `${import.meta.env.BASE_URL}${WALK_GLB_FILE}`
   : null;
 
+/** The index a build opens when the address names no world (docs/walk-areas.md, section 2): `VITE_WALK_INDEX`, a
+ * `walk-index.json` beside the page or a full address. It wins over `DEFAULT_GLB_URL`; `?glb=` wins over both. No
+ * deploy sets it yet, so it is null in every build today. */
+const WALK_INDEX_FILE: string | undefined = import.meta.env.VITE_WALK_INDEX;
+export const DEFAULT_INDEX_URL: string | null = WALK_INDEX_FILE
+  ? /^[a-z]+:/i.test(WALK_INDEX_FILE)
+    ? WALK_INDEX_FILE
+    : `${import.meta.env.BASE_URL}${WALK_INDEX_FILE}`
+  : null;
+
+/** Crossings between area files (an index world): the ink fade and the loading hint. */
+export const CROSSING = {
+  /** Each way of the fade to ink and back, milliseconds: about 0.4 s in all. */
+  fadeMs: 200,
+  /** The loading hint shows above the ink once a crossing has taken this long, milliseconds. */
+  hintAfterMs: 400,
+  /** The ink, `#12141C`: the fade, the indoor background, the page and the canvas before a world shows. */
+  ink: '#12141C',
+} as const;
+
 export const WALK = {
   /** Camera height above the feet, metres. */
   eyeHeight: 1.6,
@@ -76,6 +96,19 @@ export const SIDLE = {
    * the walker only outwards, away from the box's middle plane, and only once the feet are this far off it, metres:
    * it backs out the way it came. Entered through an X end (or arriving), movement is only along the passage. */
   sideOut: 0.001,
+  /** Hysteresis at a sidle box's X ends. A walker who sidled out through an end walks, and walks on in that box (its
+   * end margins included) unless it heads back into the passage through that end within this angle of its axis,
+   * radians (30 degrees): where a fissure opens at an angle into walking space, the way on leaves it beside the box,
+   * and a walker on that way no longer sidles and walks by turns (route 1, the Ice Curtain: 26 changes). */
+  reentryAngle: Math.PI / 6,
+  /** ... and on a line that stays within the box's width until it is this far in from that end, metres (the whole
+   * box if it is shorter): a heading inside the angle that leaves the box's side sooner goes to an opening beside the
+   * passage, not into it (route 2, the East Holing, where the way on leaves the fissure through its open side 1 m
+   * before the box's end: 62 changes). */
+  reentryDepth: 1,
+  /** ... until the feet are this far clear of the box with its end margins, metres; from there it is entered as
+   * always, through an end or a side. */
+  reentryClear: 0.15,
 } as const;
 
 export const CLIMB = {
@@ -105,6 +138,35 @@ export const CLIMB = {
   mantleMinReach: 0.2,
   /** The ledge is looked for down to this far below the top of the box, metres. */
   ledgeDrop: 1,
+} as const;
+
+/**
+ * The carried lantern (src/lantern.ts): on in cave areas, off in the village and in rooms. A warm point light added
+ * in the unlit materials' shaders as base colour x lantern(d), in linear light before tone mapping, with
+ * lantern(d) = intensity / (1 + (d / near)^2) x (1 - smoothstep(0.7 x reach, reach, d)). No shadows.
+ */
+export const LANTERN = {
+  /** The light's colour, `#FFB457` (the palette's warm), as sRGB; the shader takes it linear. */
+  colour: '#FFB457',
+  /** Below the eye, metres: 1.45 m above the feet while walking (eye 1.6 m); crawling it stays this far under the
+   * eye (0.4 m above the feet), so it is never carried up into a low roof. */
+  belowEye: 0.15,
+  /** How far ahead of the eye on the ground plane, metres. */
+  ahead: 0.3,
+  /** The falloff's knee, metres: at this distance the light is half of `intensity`. */
+  near: 2.5,
+  /** Nothing is lit beyond this, metres; the light fades out from 0.7 of it. */
+  reach: 12,
+  /**
+   * Scene-linear intensity. A cave wall of the most common albedo (the limestone and default walls' mean linear
+   * luminance, 0.0816) 2 m from the lantern then shows display luminance 0.55 through AgX at the caves' exposure
+   * (2.378): the cave look's lamp-pool display (tools/blender/meshy_looks/cave_fp.json, `lamp_pool`), which every
+   * gate lamp's pool is held at or under, so it is the brightest of them. Solved with meshy_room_build.agx: the
+   * light at 2 m is 2.44, and 2.44 x (1 + (2 / 2.5)^2) = 4.0.
+   */
+  intensity: 4.0,
+  /** The flicker's depth: the light moves by at most this share either way, slowly (nothing above 2.2 Hz). */
+  flicker: 0.03,
 } as const;
 
 export const LOOK = {

@@ -74,6 +74,36 @@ def seam_pair(profile):
     return net, section("sa", 0, 20, 14.0, 8.0, "+"), section("sb", 20, 40, 26.0, 32.0, "-")
 
 
+def two_ways(alternatives):
+    """A section with two rooms joined two ways, a fissure to the south and a crawl to the north, each on its own a
+    way round the other; with alternatives, the two are declared alternatives."""
+    net = {"format": "cave-network/1", "scene": "undermere", "name": "two ways", "area_prefix": "under_",
+           "lattice": {"origin": [-128, -64, -96], "cell": 0.125, "block": 32}, "seed": 5,
+           "geology": {"limestone": {"tint": "#9A958A", "repeat_m": 1.5, "noise": 0.12, "bedding": [0.6, 0.04]}},
+           "sections": ["alt"]}
+
+    def tube(i, a, b):
+        return {"id": i, "from": a, "to": b, "profile": "tube", "width": 2.2, "clear": 2.6, "floor": {"kind": "flat"}}
+
+    sec = {"format": "cave-section/1", "key": "alt", "network": net, "geology": "limestone",
+           "region": {"boxes": [[0, 0, -16, 30, 20, -2]]}, "nodes": {},
+           "passages": [tube("t1", [5, 10, -10], [9, 4, -10]),
+                        {"id": "squeeze", "from": [9, 4, -10], "to": [21, 4, -10], "profile": "fissure", "width": 0.48,
+                         "clear": 2.3, "floor": {"kind": "flat"}, "noise": 0.0, "blend": 0.0},
+                        tube("t2", [21, 4, -10], [25, 10, -10]),
+                        tube("t3", [5, 10, -10], [9, 16, -10]),
+                        {"id": "crawl", "from": [9, 16, -10], "to": [21, 16, -10], "profile": "crawl", "width": 1.2,
+                         "clear": 1.1, "floor": {"kind": "flat"}},
+                        tube("t4", [21, 16, -10], [25, 10, -10])],
+           "chambers": [{"id": "room_a", "kind": "hall", "center": [5, 10, -10], "size": [5.0, 5.0, 3.0]},
+                        {"id": "room_b", "kind": "hall", "center": [25, 10, -10], "size": [5.0, 5.0, 3.0]}],
+           "spawns": [{"id": "a", "at": [5, 10, -10]}, {"id": "b", "at": [25, 10, -10]}],
+           "joins": [["t1", "t3"], ["t2", "t4"]]}
+    if alternatives:
+        sec["passages"][1]["alternatives"] = ["crawl"]
+    return sec
+
+
 class Crack(core.Prim if core else object):
     """A straight slot `width` wide and 1.5 m deep across the example hall's floor (a test-only primitive)."""
     cls, blend, walk, core = 1, 0.0, False, None
@@ -544,6 +574,131 @@ class CaveCoreTest(unittest.TestCase):
         seam = rb["report"]["seams"][0]
         self.assertEqual((seam["arrival_mode"], seam["overlap_faces"]), ("walk", len(ob)))
 
+    def test_seam_stub_clipped_to_its_window(self):
+        """A stub that runs into a room wider than the seam's window: the stub's air is clipped to the window's
+        prism, so the shell closes inside the stub's box instead of being cut open by its sides; the overlap cell at
+        the plane is still meshed identically by both sections."""
+        net = dict(self.ex["network"])
+        net["sections"] = ["example", "example_b"]
+        self.write("network.json", net)
+        a = dict(self.ex)
+        a["network"] = "network.json"
+        a["seams"] = [dict(a["seams"][0], stub_m=5.0)]
+        b = neighbour_b()
+        b["passages"][0]["to"] = [24.5, 33.0, -14.0]
+        b["nodes"]["e"] = [24.5, 33.0, -14.0]
+        b["chambers"] = [{"id": "north_room", "kind": "hall", "center": [24.5, 34.5, -14.0], "size": [7.0, 3.0, 2.6]}]
+        b["spawns"] = [{"id": "north_room", "at": [24.5, 34.5, -14.0]}]
+        pa = self.write("example.json", a)
+        pb = self.write("example_b.json", b)
+        ra = core.build(pa, None, write=False, flood=False, log=quiet)
+        self.assertTrue(ra["sec"].stub_clips)
+        self.assertEqual(ra["report"]["shell"]["boundary_edges_outside_openings"], 0)
+        sec = ra["sec"]
+        # inside the stub's box, past the overlap cell, the field is never above the window's prism
+        P = np.array([[x, y, -13.0] for x in np.arange(21.5, 27.6, 0.25) for y in (31.0, 33.0, 34.5)])
+        f = sec.field_points(P)
+        prism = np.minimum(np.minimum(P[:, 0] - (22.5 - core.STUB_CLIP), (26.5 + core.STUB_CLIP) - P[:, 0]),
+                           np.minimum(P[:, 2] - (-14.5 - core.STUB_CLIP), (-11.0 + core.STUB_CLIP) - P[:, 2]))
+        inside = (P[:, 0] > 22.0) & (P[:, 0] < 27.0)
+        self.assertTrue(np.all(f[inside] <= prism[inside] + 1e-9))
+        rb_ = core.build(pb, None, write=False, flood=False, log=quiet)
+        gy = int(round((30.0 - net["lattice"]["origin"][1]) / net["lattice"]["cell"]))
+
+        def overlap(r):
+            sel = r["cells"][:, 1] == gy
+            return sorted(tuple(sorted(tuple(int(v) for v in q) for q in t)) for t in r["Vq"][r["F"][sel]])
+
+        self.assertGreater(len(overlap(ra)), 50)
+        self.assertEqual(overlap(ra), overlap(rb_))
+
+    def test_tube_collision_wall_upright_and_inside_the_shell(self):
+        """The walker's field of a tube is the upright cylinder through the floor's edge wherever the ellipse lies
+        outside it: never more air than the shell's, upright from the floor up to twice the ellipse's centre, and
+        equal to the shell's above that."""
+        for W, H in ((14.0, 9.0), (2.6, 2.8), (3.0, 3.4)):
+            a = 0.5 * W
+            r = float(core.tube_centre_ratio(a, H))
+            b = H / (1.0 + r)
+            vc = r * b
+            d0 = a * math.sqrt(1.0 - (vc / b) ** 2)
+            d = np.linspace(0.0, a + 0.5, 300)[:, None]
+            v = np.linspace(0.0, H, 200)[None, :]
+            vis = core.prof_wall("tube", d, v, W, H)
+            col = core.prof_wall("tube", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            for vv in (0.05, 0.5 * vc, vc, 1.9 * vc):
+                self.assertGreater(float(core.prof_wall("tube", d0 - 0.01, vv, W, H, collision=True)), 0.0)
+                self.assertLess(float(core.prof_wall("tube", d0 + 0.01, vv, W, H, collision=True)), 0.0)
+            hi = v[0] > 2.0 * vc + 1e-6
+            self.assertTrue(np.array_equal(col[:, hi] > 0, vis[:, hi] > 0))   # the same surface above 2 vc
+            # the wall meets the floor at least TUBE_FLOOR_SLOPE steep in the shell itself
+            slope = (H / a) * math.sqrt((1 - r) / (1 + r)) / r
+            self.assertGreaterEqual(slope + 1e-6, min(core.TUBE_FLOOR_SLOPE, (H / a) * math.sqrt(0.2) * 1.5))
+
+    def test_rift_collision_wall_upright_and_inside_the_shell(self):
+        """A rift widens from its floor to mid height, so its shell's lower walls face up; the walker's field is the
+        upright wall through the floor's edge, never more air than the shell's and with no shelf anywhere."""
+        for W, H in ((1.6, 4.0), (1.4, 3.0), (2.2, 6.0)):
+            d = np.linspace(0.0, 0.5 * W + 0.3, 400)[:, None]
+            v = np.linspace(0.02, H - 0.45, 120)[None, :]
+            vis = core.prof_wall("rift", d, v, W, H)
+            col = core.prof_wall("rift", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            edge = (col > 0).sum(axis=0)  # how far the air reaches at each height, in samples
+            self.assertLessEqual(int(edge.max() - edge.min()), 1)  # upright: the same reach at every height
+            self.assertLess(float(core.prof_wall("rift", 0.5 * W * 0.85 + 0.01, 0.5 * H, W, H, collision=True)), 0)
+
+    def test_keyhole_collision_has_no_shoulders(self):
+        """A keyhole's tube is a bowl each side of its slot about 1 m up (the Spar Maze's walker ran along them and
+        fell back into the slot): the walker's field is the slot's upright wall up to the tube's centre and the tube
+        above it, never more air than the shell's."""
+        for W, H in ((2.2, 3.0), (1.4, 2.4), (2.0, 3.0)):
+            a, b = 0.5 * W, 0.35 * H
+            vc, hs = H - b, max(0.45, 0.22 * W)
+            d = np.linspace(0.0, a + 0.4, 400)[:, None]
+            v = np.linspace(0.02, H, 200)[None, :]
+            vis = core.prof_wall("keyhole", d, v, W, H)
+            col = core.prof_wall("keyhole", d, v, W, H, collision=True)
+            self.assertTrue(np.all(col <= vis + 1e-12))
+            band = (v[0] > 0.3) & (v[0] < vc - 0.05)
+            reach = d[:, 0][np.argmax(~(col[:, band] > 0), axis=0) - 1]
+            self.assertTrue(np.all(reach <= hs + 1e-9))                       # no shoulder below the centre
+            self.assertTrue(np.any(vis[:, band][d[:, 0] > hs + 0.1] > 0))     # though the shell has its bowls
+            hi = v[0] > vc + 0.25
+            self.assertTrue(np.array_equal(col[:, hi] > 0, vis[:, hi] > 0))      # the tube itself above it
+            self.assertGreater(float(core.prof_wall("keyhole", 0.5 * (hs + a), vc + 0.3, W, H, collision=True)), 0)
+
+    def test_declared_alternatives_are_mandatory_as_a_pair(self):
+        """Two forced moves each a way round the other: undeclared, both are bypassable; declared alternatives, the
+        walker must make one or the other, so both are mandatory, and each lists the other."""
+        res = {}
+        for alt in (False, True):
+            path = self.write(f"two_ways_{int(alt)}.json", two_ways(alt))
+            rep = core.build(path, None, write=False, log=quiet)["report"]
+            res[alt] = {z["passage"]: z for z in rep["flood"]["zones"]}
+            self.assertEqual(rep["flood"]["traps"], 0)
+        for pid in ("squeeze", "crawl"):
+            self.assertTrue(res[False][pid]["traversable"])
+            self.assertTrue(res[False][pid]["bypassable"], pid)
+            self.assertTrue(res[True][pid]["mandatory"], pid)
+        self.assertEqual(res[True]["squeeze"]["alternatives"], ["crawl"])
+        self.assertEqual(res[True]["crawl"]["alternatives"], ["squeeze"])
+        bad = two_ways(True)
+        bad["passages"][1]["alternatives"] = ["t3"]
+        errs, _w = core.validate(bad, bad["network"])
+        self.assertTrue(any("alternatives are crawls" in e for e in errs), errs)
+
+    def test_lower_wall_noise_left_out_of_the_walkers_field(self):
+        rng = np.random.default_rng(3)
+        n = rng.uniform(-1.0, 1.0, 5000)
+        v = rng.uniform(-0.5, 4.0, 5000)
+        vis = core.noise_term(n, v, 0.12)
+        col = core.noise_term(n, v, 0.12, collision=True)
+        self.assertTrue(np.all(col <= vis + 1e-12))       # the walker never meets rock beyond the shell
+        self.assertTrue(np.all(col[v < 1.8] == 0.0))       # no lumps or bedding steps on the lower wall
+        self.assertTrue(np.allclose(col[v > 2.6], vis[v > 2.6]))
+
     # ---- budgets and files
 
     def test_budgets_reported(self):
@@ -578,6 +733,76 @@ class CaveCoreTest(unittest.TestCase):
             self.assertEqual(json.load(fh)["geometry_md5"], self.rep["geometry_md5"])
         self.assertTrue(self.rep["ok"])
         self.assertTrue(math.isfinite(self.rep["seconds"]))
+
+
+class CancelPairsTest(unittest.TestCase):
+    def test_back_to_back_pairs_go_and_the_rest_stay(self):
+        if core is None:
+            self.skipTest("numpy")
+        F = np.array([[0, 1, 2], [0, 2, 1], [1, 3, 2], [2, 3, 4], [4, 3, 2]])
+        cells = np.arange(15).reshape(5, 3)
+        G, C = core.cancel_pairs(F, cells)
+        self.assertEqual(G.tolist(), [[1, 3, 2]])
+        self.assertEqual(C.tolist(), [[6, 7, 8]])
+        same = np.array([[0, 1, 2], [1, 2, 0]])      # the same face twice, wound the same way: kept
+        self.assertEqual(len(core.cancel_pairs(same, same)[0]), 2)
+
+
+@unittest.skipIf(core is None, "numpy is not installed")
+class SmoothAxisTest(unittest.TestCase):
+    """The shell's projection axis from the smoothed normal: a bumpy wall at 45 degrees between x and y keeps one
+    projection in patches instead of flipping face by face; near a seam plane each face keeps its own axis."""
+
+    @staticmethod
+    def wall(n=40, seed=5):
+        rng = np.random.default_rng(seed)
+        i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
+        t = i.ravel() * 0.125
+        z = j.ravel() * 0.125
+        bump = 0.03 * rng.standard_normal(len(t))
+        V = np.stack([t / np.sqrt(2) + bump, -t / np.sqrt(2) + bump, z], axis=1) + np.array([0.0, 10.0, 0.0])
+        F = []
+        for a in range(n - 1):
+            for b in range(n - 1):
+                v = a * n + b
+                F += [[v, v + n, v + 1], [v + 1, v + n, v + n + 1]]
+        return V, np.array(F, np.int64)
+
+    @staticmethod
+    def flips(F, ax):
+        e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
+        e.sort(axis=1)
+        fi = np.tile(np.arange(len(F)), 3)
+        code = e[:, 0] * (F.max() + 1) + e[:, 1]
+        o = np.argsort(code)
+        code, fi = code[o], fi[o]
+        same = code[1:] == code[:-1]
+        return float((ax[fi[:-1][same]] != ax[fi[1:][same]]).mean())
+
+    def test_fewer_flips(self):
+        V, F = self.wall()
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        own = np.argmax(np.abs(n), axis=1)
+        ax = core.smooth_axis(V, F)
+        self.assertGreater(self.flips(F, own), 0.2)       # the bumps flip x and y face by face
+        self.assertLess(self.flips(F, ax), 0.5 * self.flips(F, own))
+        self.assertLessEqual(float((ax == 2).mean()), float((own == 2).mean()))   # the bumps' z faces join the wall
+        uv, axis = core.face_uv(V, F, np.full(len(F), 2.0), ax)
+        self.assertTrue(np.array_equal(axis, ax))
+        self.assertEqual(uv.shape, (len(F), 3, 2))
+
+    def test_seam_keeps_own_axis_and_is_deterministic(self):
+        V, F = self.wall()
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        own = np.argmax(np.abs(n), axis=1)
+        cen = V[F].mean(axis=1)
+        ax = core.smooth_axis(V, F, [(2, 2.0)])
+        near = np.abs(cen[:, 2] - 2.0) <= core.UV_SEAM_KEEP
+        self.assertTrue(np.array_equal(ax[near], own[near]))
+        # the faces' order does not change any face's axis
+        perm = np.random.default_rng(1).permutation(len(F))
+        ax2 = core.smooth_axis(V, F[perm], [(2, 2.0)])
+        self.assertTrue(np.array_equal(ax2, ax[perm]))
 
 
 if __name__ == "__main__":

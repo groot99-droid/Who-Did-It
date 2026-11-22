@@ -5174,6 +5174,38 @@ def subdivide_long_edges(ob, max_len: float, passes: int = 6) -> int:
     return len(me.vertices) - n0
 
 
+_CYCLES_DEVICE: dict = {}
+
+
+def cycles_device(sc) -> str:
+    """The Cycles device for a bake: the CPU unless WDI_CYCLES_DEVICE names OPTIX or CUDA (an opt-in GPU bake, for a
+    rented box; unset, nothing changes). The GPU's devices of that kind are enabled and logged once per run."""
+    want = (os.environ.get("WDI_CYCLES_DEVICE") or "CPU").strip().upper()
+    if want not in ("CPU", "OPTIX", "CUDA"):
+        raise SystemExit(f"WDI_CYCLES_DEVICE={want!r}: use CPU, OPTIX or CUDA")
+    if want == "CPU":
+        sc.cycles.device = "CPU"
+        if not _CYCLES_DEVICE:
+            _CYCLES_DEVICE["used"] = "CPU"
+            print("cycles device: CPU", flush=True)
+        return "CPU"
+    if not _CYCLES_DEVICE:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+        prefs.compute_device_type = want
+        prefs.get_devices()
+        used = []
+        for d in prefs.devices:
+            d.use = d.type == want
+            if d.use:
+                used.append(d.name)
+        if not used:
+            raise SystemExit(f"WDI_CYCLES_DEVICE={want}: Blender finds no {want} device")
+        _CYCLES_DEVICE["used"] = f"{want}: " + ", ".join(used)
+        print(f"cycles device: {_CYCLES_DEVICE['used']}", flush=True)
+    sc.cycles.device = "GPU"
+    return _CYCLES_DEVICE["used"]
+
+
 def prepare_attrs(objs: list) -> None:
     for o in objs:
         me = o.data
@@ -5190,7 +5222,7 @@ def prepare_attrs(objs: list) -> None:
 def run_bake(objs: list, samples: int, hide: list) -> float:
     sc = bpy.context.scene
     sc.render.engine = "CYCLES"
-    sc.cycles.device = "CPU"
+    cycles_device(sc)
     sc.cycles.samples = samples
     sc.cycles.use_adaptive_sampling = False     # every vertex gets every sample (the dark corners need them)
     sc.cycles.use_denoising = False

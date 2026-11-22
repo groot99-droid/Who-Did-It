@@ -33,10 +33,16 @@ export class Hud {
   private readonly door = el('button', 'door');
   private readonly notice = el('div', 'notice');
   private readonly mode = el('div', 'mode');
+  /** The lantern's toggle and hint, in the caves. */
+  private readonly lantern = el('button', 'lantern');
+  private lanternText: string | null = null;
+  /** The loading hint of a crossing, above the ink. */
+  private readonly hold = el('div', 'loading');
   private modeText: string | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
   onUse: (() => void) | null = null;
+  onLantern: (() => void) | null = null;
 
   constructor(
     root: HTMLElement,
@@ -54,6 +60,13 @@ export class Hud {
     this.door.hidden = true;
     this.notice.hidden = true;
     this.mode.hidden = true;
+    this.hold.hidden = true;
+    this.lantern.hidden = true;
+    this.lantern.type = 'button';
+    this.lantern.addEventListener('click', () => {
+      this.onLantern?.();
+      this.lantern.blur();
+    });
     this.door.type = 'button';
     this.door.addEventListener('click', () => this.onUse?.());
     root.append(
@@ -67,6 +80,8 @@ export class Hud {
       this.door,
       this.notice,
       this.mode,
+      this.hold,
+      this.lantern,
     );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
@@ -153,14 +168,34 @@ export class Hud {
     if (id) this.select.value = id;
   }
 
-  /** Fades to black, runs `midway`, and fades back. */
-  async fade(midway: () => void, ms = 180): Promise<void> {
-    const wait = () => new Promise((r) => setTimeout(r, ms));
+  /** Fades to ink, runs `midway` (and waits for it), and fades back. */
+  async fade(midway: () => void | Promise<void>, ms = 180): Promise<void> {
+    await this.cover(ms);
+    try {
+      await midway();
+    } finally {
+      await this.uncover(ms);
+    }
+  }
+
+  /** Fades to ink over `ms` and stays there (a crossing; a page load that leaves the ink up until it is gone). */
+  async cover(ms = 180): Promise<void> {
+    this.fader.style.transitionDuration = `${ms}ms`;
     this.fader.classList.add('on');
-    await wait();
-    midway();
+    await new Promise((r) => setTimeout(r, ms));
+  }
+
+  /** Lifts the ink over `ms`. */
+  async uncover(ms = 180): Promise<void> {
+    this.fader.style.transitionDuration = `${ms}ms`;
     this.fader.classList.remove('on');
-    await wait();
+    await new Promise((r) => setTimeout(r, ms));
+  }
+
+  /** The loading hint above the ink during a crossing that takes a while; null hides it. */
+  loading(text: string | null): void {
+    this.hold.hidden = text === null;
+    this.hold.textContent = text ?? '';
   }
 
   /** A short line in the middle of the screen, gone after `ms`. */
@@ -171,6 +206,11 @@ export class Hud {
     this.noticeTimer = setTimeout(() => (this.notice.hidden = true), ms);
   }
 
+  /** The line `say` shows, while it shows; else null. */
+  get noticeText(): string | null {
+    return this.notice.hidden ? null : this.notice.textContent;
+  }
+
   /** The door prompt near a portal: a button on touch, a key hint otherwise; null hides it. */
   setDoor(label: string | null, touch: boolean): void {
     this.door.hidden = label === null;
@@ -179,6 +219,22 @@ export class Hud {
 
   showDrop(on: boolean): void {
     this.drop.hidden = !on;
+  }
+
+  /** The lantern's button where the walker carries one (null hides it): its state and the key that toggles it. */
+  setLantern(on: boolean | null, kind: 'desktop' | 'touch' | 'pad'): void {
+    const key = kind === 'touch' ? '' : kind === 'pad' ? 'Y · ' : 'L · ';
+    const text = on === null ? null : `${key}lantern ${on ? 'on' : 'off'}`;
+    if (text === this.lanternText) return;
+    this.lanternText = text;
+    this.lantern.hidden = text === null;
+    this.lantern.textContent = text ?? '';
+    this.lantern.classList.toggle('off', on === false);
+  }
+
+  /** The lantern button's words while it shows; else null. */
+  get lanternLabel(): string | null {
+    return this.lanternText;
   }
 
   /** The traversal mode's word ("Crawling") for as long as it lasts; null hides it. */
