@@ -381,8 +381,11 @@ not its vertices. The rock pieces, kerbs, timbers, gates and water keep their li
 lightmapped material is in the file, and what the viewer does with it:
 
 - The material is `KHR_materials_unlit` with `baseColorTexture` the rock scan on `TEXCOORD_0`, as before. Its
-  primitives have `TEXCOORD_1`, the lightmap's own UV set, and keep `COLOR_0`: the same light per vertex (the
-  vertex fallback, below).
+  primitives have `TEXCOORD_1`, the lightmap's own UV set. Since 2026-11-22 they carry no `COLOR_0`: the viewer reads
+  the page (it hooks it up as below), so the vertex light is not repeated in the file, which makes the 16 files
+  smaller. Only the faces next to a built seam, drawn with the `_seamv` copy of a material (below), keep `COLOR_0`. A
+  file made before that, whose lightmapped primitives also carry `COLOR_0` and say `vertex_fallback: true`, is still
+  valid: a viewer that hooks the page up turns the vertex colours off for it, and one that does not shows them.
 - `emissiveTexture` is the lightmap page: `{"index": <texture>, "texCoord": 1}`. The texture is an `EXT_texture_webp`
   image (lossless WebP, 8-bit, sRGB-encoded) with its own sampler: linear filtering, no mip chain, clamped. The page
   holds, in each texel, what COLOR_0 used to hold for a vertex (k x the light x the tint factor x the albedo, linear),
@@ -396,17 +399,39 @@ lightmapped material is in the file, and what the viewer does with it:
   `lightMapIntensity` to S x pi, because three's basic shader divides the light map by pi (`meshbasic.glsl.js`
   line 91). It also sets the material's `vertexColors` to false (`GLTFLoader` turned them on for `COLOR_0`), or the
   light would count twice. The lantern adds to this light as it does to the vertex light: base colour x lantern(d).
-- **The vertex fallback** (`vertex_fallback: true`). A viewer without that hookup shows the scan x `COLOR_0`: the
-  same dark bake per vertex, as route 3's caves, never the scan unlit. So the files work in today's viewer, and
-  the hookup only sharpens the light.
-- **Seams.** Charts never cross a seam plane. Within 0.6 m of a built seam the texels show the shared vertex light alone,
-  which the stitch makes equal in both files (and over the next metre they give way to their own). The faces there
-  (every vertex within 0.6 m, and the stub) are drawn with a copy of their material named `<material>_seamv`, which
+- **The vertex fallback** (`vertex_fallback: true`, only in a file whose lightmapped primitives also carry
+  `COLOR_0`). A viewer without that hookup shows the scan x `COLOR_0`: the same dark bake per vertex, as route 3's
+  caves, never the scan unlit. The cave files of 2026-11-22 do not have the fallback (the viewer has the hookup:
+  `apps/walk/src/lightmap.ts`, a `GLTFLoader` plugin; a page, its extras and the vertex colours are all it reads); a
+  viewer without it shows their shell as the scan alone, unlit by any baked light.
+- **Seams.** Charts never cross a seam plane. Within 0.9 m of a built seam the texels show the shared vertex light alone,
+  which the stitch makes equal in both files (and over the next metre they give way to their own). The hold is the
+  seam check's 0.6 m window plus 0.3 m, the reach of a shell face: a face is drawn vertex-lit only when every vertex is
+  in the hold, so with the hold at 0.6 m the faces astride it were page-lit in one file and vertex-lit in the other
+  (well_north, 0.3 to 0.6 m from the plane: 12 % of the faces, p95 16 % apart). The faces there (every vertex within
+  0.9 m, and the stub) are drawn with a copy of their material named `<material>_seamv`, which
   has no lightmap and no `wdi_lightmap`: vertex-lit in every viewer. So on the faces both files have, both show the
   same light (the builder's `<area>_seam_lm.npz` probes, compared by the seam check).
 - **Chart borders.** The builder stitches the page along every chart border, so the linear filter reads the same
   light on both sides of a border. The viewer needs nothing for this beyond the sampler above (linear, clamped, no
   mips): a mip chain would average across charts and break it.
+- **The lantern's inputs** (2026-11-22). The walker carries a lantern in the caves (apps/walk's README, "The
+  lantern"), whose light is scaled by the surface angle and by the baked ambient occlusion, so the cave files carry
+  both. Every exported mesh has `NORMAL`: one smooth normal per vertex (the Draco stream quantizes it to 8 bits). Every
+  mesh also has `_OCCL`, the application attribute (glTF names such attributes with a leading underscore) holding 1
+  minus the open share of the baked ambient occlusion at the vertex (a float, 0 open, up to 0.96 in a crevice;
+  quantized to 6 bits in the Draco stream; a vertex the look gives no occlusion holds 0, which costs the stream
+  nothing). The viewer scales the lantern by mix(1, 1 - `_OCCL`, 0.9); a mesh without it is not occluded, and a file
+  without `NORMAL` gets the screen's own derivative. Neither changes the baked light. The occlusion is per vertex, not
+  in the page: a second channel in the lossless page cost 313 KB on the Old Rising's, three times what the vertices
+  cost.
+- **The ink clamp.** A patched material's last step is the viewer's (apps/walk `lantern.ts`): no lilac (where green is
+  the least channel it is lifted to the lesser of red and blue), no teal (where green and blue stand together
+  well over red, red is lifted to 0.9 of the higher of them) and no pixel under the ink in luminance (the
+  luminance it lacks is added in the ink's colour). The look may therefore hold the bake's darkest texel under the
+  ink by `ink_lift.dark_gain` (cave_fp.json: 1.4): the floor puts the darkest scan texel `dark_gain` times lighter
+  than the ink, so the bake sits that much darker, and the few texels under are drawn at the ink. The builder's stills
+  apply the same clamp.
 - **Size.** One page per file, at most 2048 x 2048. The texels per metre follow meshy_cave_lightmap.py's rule
   (`tpm_for`: at most 32, at least 8, so that the shell fits one page). Without mips a 2048 page is 16.8 MB of GPU
   memory. The file stays under its 10 MB (section 9).

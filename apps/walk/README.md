@@ -148,25 +148,59 @@ In the caves the walker carries a lantern (`src/lantern.ts`, numbers in `LANTERN
 stays under the eye). It is carried in an area of kind `cave` (the index's `kind`, or the area's `wdi_kind`), or
 where the GLB's scene or the area has `wdi_lantern: true`; `wdi_lantern: false` turns it off there. It is off in the
 village, the wild areas and the rooms. It is on when a cave opens; L, the pad's Y or the button turns it off and on,
-and that choice holds across crossings in the page (a crossing by page load starts with it on).
+and that choice holds across crossings in the page and across a page load (`?cross=reload` loads the page again at the
+arrival spawn): the toggle is kept in the tab's `sessionStorage` (`wdi-walk-lantern`), and a browser without it starts
+with the lantern on.
 
 - **Light.** The cave files are unlit (`KHR_materials_unlit`, three's `MeshBasicMaterial`), so the lantern is added in
   their shader (`onBeforeCompile`, one program for all of them): the base colour (the factor times the texture,
-  before the baked light in the vertex colours) times lantern(d), added to the bake in linear light before tone
-  mapping and fog, with lantern(d) = I / (1 + (d / 2.5)^2) x (1 - smoothstep(8.4, 12, d)), d in metres from the
-  lantern. I = 4.0: a wall of the caves' common albedo (0.0816) 2 m away then shows display luminance 0.55 through
-  AgX at the caves' exposure (2.378), the cave look's lamp-pool display, which no gate lamp's pool exceeds. There is
-  no shadow and no angle term: a surface is lit by its distance alone. The gate lamps' glass and the sky seen through
-  a cave mouth are not lit (by material name), nor is a material or mesh with `wdi_lantern: false`.
+  before the baked light) times lantern(d) times an angle term times the baked occlusion, added to the bake in linear
+  light before tone mapping and fog, with lantern(d) = I / (1 + (d / 2.5)^2) x (1 - smoothstep(8.4, 12, d)), d in
+  metres from the lantern. I = 1.2: a wall of the caves' common albedo (the limestone scan as the file carries it,
+  0.1843) square to the lantern and 2 m away shows display luminance 0.48 through AgX at the caves' exposure (2.378)
+  from the lantern alone, under the cave look's lamp-pool display (0.55), which no gate lamp's pool exceeds; within
+  1.5 m of a wall it stays under 0.56, so a near wall does not wash out. Measured in the viewer on a synthetic wall
+  (one grey texel of linear albedo 0.1843, no baked light, square to the lantern, local Chrome, 2026-11-22): display
+  luminance 0.55 at 0.7 m from the lantern, 0.53 at 1.2 m, 0.51 at 1.5 m, 0.47 at 2.0 m, 0.40 at 3.0 m and 0.28 at
+  5.0 m. The twelve scans of the realism pass are
+  about twice as bright as the first scans were, so the first lantern's I = 4.0 washed them out; the cave builder
+  also caps a scan's mean at 0.22 (`texture_mean_max` in the cave look), so no wall is lit much brighter than the
+  limestone's.
+- **Angle and occlusion.** The light is scaled by (1 - 0.6) + 0.6 x max(N.L, 0), N the surface normal turned to face
+  the eye, L the direction to the lantern: a wall square to it keeps all of it, one seen edge on keeps 0.4. N is the
+  file's `NORMAL` (the cave builder writes one per vertex; a file without it gets the screen's own, from the
+  derivative of the position, flat per triangle). The light is also scaled by mix(1, ao, 0.9), ao the open share of
+  the file's `_OCCL` attribute (the builder's baked ambient occlusion, per vertex, stored as 1 minus the open share so
+  a mesh without it is not occluded): a crevice stays dark and a formation reads as a form. `LANTERN.form` and
+  `LANTERN.aoWeight` set the two weights. The falloff, the colour, the reach and the flicker are as before.
+- **Lightmap pages.** A cave file's shell light is a texture on the second UV set (docs/walk-areas.md, "A cave's
+  lightmap"). `src/lightmap.ts` (a `GLTFLoader` plugin, registered in `makeLoader`) reads each material's
+  `wdi_lightmap` extras after the file is parsed, takes the page from the material's `emissiveTexture` (GLTFLoader
+  reads no emissive for an unlit material) and sets it as the material's `lightMap` (sRGB, the file's UV channel,
+  `lightMapIntensity` S x pi, because three's basic shader divides the light map by pi) with `vertexColors` off: the
+  shell then shows base colour x page where a vertex-lit material shows base colour x COLOR_0, and the lantern adds
+  to either. A material without the extras, or a file without pages, is left as it was. The page is a texture of the
+  material, so a dispose of the area frees it with the rest.
+- **Ink and hue.** The last thing a patched pixel gets (after the dithering): no lilac (where green is the least
+  channel it is lifted to the lesser of red and blue), no teal (where green and blue stand together well over
+  red, the hue between 160 and 200 degrees, red is lifted to 0.9 of the higher of them: a cold grey) and none under the ink `#12141C` in luminance (the
+  luminance it lacks is added in the ink's colour, to 0.6 of a level over, so the 8-bit rounding never takes it
+  under). The bake's own floor holds the darkest scan texel at the ink in most places; this is for what the floor
+  cannot hold: texture filtering, the encoder and the few texels the look lets go under (the cave look's
+  `dark_gain`).
 - **Flicker.** Three slow sines (0.47, 1.13 and 2.07 Hz) move the light by at most 3 % either way; nothing strobes.
 - **Swaps.** A file with a cave area has its unlit materials patched before its shaders are compiled; every patched
   material reads the same three uniforms, set once a frame. A patched material is freed with its area like any
   other, and the lantern keeps no reference to any material, texture or geometry.
-- **Cost.** At 390 x 844 (pixel ratio 2) in headless Chrome on a laptop GPU (ANGLE D3D11, no frame cap), three cave
-  spawns ran at 386 to 505 fps with the lantern on, off, or without it (the build before it): the differences were
-  within the run-to-run noise (measured on 2026-11-21; no phone was measured).
+- **Cost.** At 390 x 844 (pixel ratio 2) in headless Chrome on a laptop GPU (ANGLE D3D11, no frame cap), four cave
+  spawns (the Swallow, the Great Gallery, the Well Dome and the White Gallery), 6 s each, 2026-11-22, with another
+  program using the GPU (the runs vary by a fifth): the previous viewer with the previous files ran at 273 to 367 fps
+  with the lantern on and 289 to 359 off; this viewer with the rebuilt files 171 to 318 on and 209 to 328 off. The new
+  shader reads a normal and an attribute and takes two derivatives, and the files hold more geometry and larger scans;
+  nothing is near 60 fps (no phone was measured).
 - `?debug` shows a lantern line (on, off or not here, the materials that take it, the flicker), and `window.__walk`
-  has `lantern` (`wanted`, `enabled`, `lit`, `patched`, `flicker`, `position`, `label`).
+  has `lantern` (`wanted`, `enabled`, `lit`, `patched`, `lightmapped`, `flicker`, `position`, `label`): `lightmapped` counts the
+  materials shown with their lightmap page.
 
 ## Collision
 

@@ -158,15 +158,31 @@ export const LANTERN = {
   /** Nothing is lit beyond this, metres; the light fades out from 0.7 of it. */
   reach: 12,
   /**
-   * Scene-linear intensity. A cave wall of the most common albedo (the limestone and default walls' mean linear
-   * luminance, 0.0816) 2 m from the lantern then shows display luminance 0.55 through AgX at the caves' exposure
-   * (2.378): the cave look's lamp-pool display (tools/blender/meshy_looks/cave_fp.json, `lamp_pool`), which every
-   * gate lamp's pool is held at or under, so it is the brightest of them. Solved with meshy_room_build.agx: the
-   * light at 2 m is 2.44, and 2.44 x (1 + (2 / 2.5)^2) = 4.0.
+   * Scene-linear intensity. A cave wall of the most common albedo (the limestone walls' scan, as the file carries it:
+   * its mean linear luminance, 0.1843; the twelve scans of the realism pass are about twice as bright as the first
+   * scans were) square to the lantern and 2 m from it shows display luminance 0.48 through AgX at the caves' exposure
+   * (2.378) from the lantern alone, 0.50 with the bake's floor: under the cave look's lamp-pool display (0.55, which
+   * every gate lamp's pool is held at or under), so the lantern is the dimmer light. Solved with the AgX port in
+   * test/lantern.test.ts: the light at 2 m is 0.73, and 0.73 x (1 + (2 / 2.5)^2) = 1.2. Within 1.5 m of a wall the
+   * display stays under 0.56 (the angle term and the occlusion take it lower still), so the wall does not wash out.
    */
-  intensity: 4.0,
+  intensity: 1.2,
   /** The flicker's depth: the light moves by at most this share either way, slowly (nothing above 2.2 Hz). */
   flicker: 0.03,
+  /**
+   * The surface-angle term's weight, 0 to 1: the light is scaled by (1 - form) + form x max(N.L, 0), N the surface
+   * normal from the GLB (or the screen's derivative of the position, where the file has none) turned to face the eye
+   * and L the direction to the lantern. A wall square to the lantern keeps all of it; one seen edge on keeps 1 - form.
+   */
+  form: 0.6,
+  /**
+   * How far the baked ambient occlusion scales the lantern, 0 to 1: the light is scaled by mix(1, ao, aoWeight), ao
+   * the lightmap page's alpha (1 open, near 0 in a crevice; a material without a page is not occluded). A crevice
+   * stays dark under the lantern and a ledge and a formation read as forms.
+   */
+  aoWeight: 0.9,
+  /** The ink, `#12141C`: the darkest value a cave pixel is drawn at (the cave look's ink; the shader clamps to it). */
+  ink: '#12141C',
 } as const;
 
 export const LOOK = {

@@ -13,8 +13,10 @@ import { LANTERN } from './config';
 
 // The lantern the walker carries in the caves. three's unlit material (MeshBasicMaterial, which glTF's
 // KHR_materials_unlit loads as) takes no light, so the lantern is added in its shader: the base colour (the colour
-// factor times the texture, before the baked light in the vertex colours) times lantern(d), added to the baked light
-// in linear light, before tone mapping and fog. Every patched material reads the same three uniforms, so a frame sets
+// factor times the texture, before the baked light in the lightmap or the vertex colours) times lantern(d) times a
+// surface-angle term (the weak N.L from the lantern's position; the normal is the GLB's, or the screen's derivative
+// where a file has none) times the baked ambient occlusion (the file's `_OCCL` vertex attribute, 1 minus the open
+// share), added to the baked light in linear light, before tone mapping and fog. Every patched material reads the same three uniforms, so a frame sets
 // them once. A patched material is an ordinary material: disposing it (dispose.ts) frees it and its program, and
 // this module keeps no reference to any material.
 
@@ -80,17 +82,28 @@ export function lanternAnywhere(opts: {
   return areas.some((area) => lanternWanted({ kind, sceneExtras, area }));
 }
 
+/** The ink (config LANTERN.ink) as sRGB display values 0 to 1: the colour a pixel that would be darker is lifted by. */
+export function inkDisplay(hex: string = LANTERN.ink): Vector3 {
+  const n = Number.parseInt(hex.replace('#', ''), 16);
+  return new Vector3((n >> 16) & 255, (n >> 8) & 255, n & 255).divideScalar(255);
+}
+
 /** The uniforms every patched material shares: the lantern's position in view space, its colour times its intensity
- * and flicker (zero when it is off), and `near` and `reach`. */
+ * and flicker (zero when it is off), `near` and `reach`, and the weights of the angle and occlusion terms. */
 export const lanternUniforms = {
   wdiLanternPos: { value: new Vector3() },
   wdiLanternColor: { value: new Color(0, 0, 0) },
   wdiLanternRange: { value: new Vector2(LANTERN.near, LANTERN.reach) },
+  /** The surface-angle term's weight and the occlusion's (config LANTERN.form and aoWeight). */
+  wdiLanternShade: { value: new Vector2(LANTERN.form, LANTERN.aoWeight) },
+  /** The ink, as the display shows it (sRGB 0 to 1): no pixel of a cave is drawn darker (in luminance). */
+  wdiInk: { value: inkDisplay() },
 };
 
 const VERTEX_ANCHOR = '#include <project_vertex>';
 const ALBEDO_ANCHOR = '#include <color_fragment>';
 const ADD_ANCHOR = '#include <opaque_fragment>';
+const END_ANCHOR = '#include <dithering_fragment>';
 
 /** The shader with the lantern added, or null when three's basic shader no longer has the anchors this needs (a three
  * update; the material then renders as before). */
@@ -98,19 +111,66 @@ export function injectLantern(vertex: string, fragment: string): { vertex: strin
   if (!vertex.includes(VERTEX_ANCHOR) || !fragment.includes(ALBEDO_ANCHOR) || !fragment.includes(ADD_ANCHOR))
     return null;
   const v =
-    'varying vec3 vWdiView;\n' +
-    vertex.replace(VERTEX_ANCHOR, `${VERTEX_ANCHOR}\n\tvWdiView = mvPosition.xyz;`);
+    'varying vec3 vWdiView;\nvarying vec3 vWdiNormal;\nvarying float vWdiOccl;\nattribute float _occl;\n' +
+    vertex.replace(
+      VERTEX_ANCHOR,
+      [
+        VERTEX_ANCHOR,
+        'vWdiView = mvPosition.xyz;',
+        // The GLB's normal in view space (zero where the file has none: the fragment then uses the screen's own).
+        'vec3 wdiNormal = normal;',
+        '#ifdef USE_INSTANCING',
+        '\twdiNormal = mat3( instanceMatrix ) * wdiNormal;',
+        '#endif',
+        'vWdiNormal = normalMatrix * wdiNormal;',
+        // The baked occlusion (1 - the open share) of the file's `_OCCL` attribute; 0 where a mesh has none.
+        'vWdiOccl = _occl;',
+      ].join('\n\t'),
+    );
   const f =
-    'varying vec3 vWdiView;\nuniform vec3 wdiLanternPos;\nuniform vec3 wdiLanternColor;\nuniform vec2 wdiLanternRange;\n' +
+    'varying vec3 vWdiView;\nvarying vec3 vWdiNormal;\nvarying float vWdiOccl;\nuniform vec3 wdiLanternPos;\nuniform vec3 wdiLanternColor;\n' +
+    'uniform vec2 wdiLanternRange;\nuniform vec2 wdiLanternShade;\nuniform vec3 wdiInk;\n' +
     fragment
-      // The base colour: the factor times the texture, before the baked light (the vertex colours) multiplies it.
+      // The last thing a pixel gets: no darker than the ink, whatever the bake, the filter and the encoding did. A pixel
+      // under the ink's luminance (a little over it, so that the 8-bit rounding never takes it under) gets the missing
+      // luminance in the ink's colour, so a dark warm pixel stays warm and nothing is lifted that is not dark.
+      .replace(
+        END_ANCHOR,
+        [
+          END_ANCHOR,
+          // Never lilac or magenta: where green is the least channel it is lifted to the lesser of red and
+          // blue (a cave's warm light leaves green between them; only a purple cast has it below both).
+          'gl_FragColor.g = max( gl_FragColor.g, min( gl_FragColor.r, gl_FragColor.b ) );',
+          // Never teal on rock (teal is a light's colour here): where green and blue stand together well over red (the
+          // hue between 160 and 200 degrees), red is lifted to 0.9 of the higher of the two, which leaves a cold grey.
+          'float wdiHi = max( gl_FragColor.g, gl_FragColor.b );',
+          'float wdiLo = min( gl_FragColor.g, gl_FragColor.b );',
+          'if ( wdiLo - gl_FragColor.r >= 0.67 * ( wdiHi - gl_FragColor.r ) && wdiHi - gl_FragColor.r > 0.12 * wdiHi )',
+          '\tgl_FragColor.r = 0.9 * wdiHi;',
+          'float wdiLum = dot( gl_FragColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) );',
+          'float wdiInkLum = dot( wdiInk, vec3( 0.2126, 0.7152, 0.0722 ) );',
+          'gl_FragColor.rgb += wdiInk * ( max( wdiInkLum + 0.6 / 255.0 - wdiLum, 0.0 ) / wdiInkLum );',
+        ].join('\n\t'),
+      )
+      // The base colour: the factor times the texture, before the baked light (the lightmap, or the vertex colours)
+      // multiplies it.
       .replace(ALBEDO_ANCHOR, `vec3 wdiAlbedo = diffuseColor.rgb;\n\t${ALBEDO_ANCHOR}`)
       .replace(
         ADD_ANCHOR,
         [
-          'float wdiD = length( vWdiView - wdiLanternPos );',
+          'vec3 wdiToLantern = wdiLanternPos - vWdiView;',
+          'float wdiD = length( wdiToLantern );',
           'float wdiK = ( 1.0 - smoothstep( 0.7 * wdiLanternRange.y, wdiLanternRange.y, wdiD ) ) /',
           '\t( 1.0 + ( wdiD * wdiD ) / ( wdiLanternRange.x * wdiLanternRange.x ) );',
+          // The surface-angle term: the normal turned to face the eye, N.L to the lantern, weakly.
+          'vec3 wdiNd = cross( dFdx( vWdiView ), dFdy( vWdiView ) );',
+          'float wdiNl = length( vWdiNormal );',
+          'vec3 wdiN = wdiNl > 0.5 ? vWdiNormal / wdiNl : normalize( wdiNd + vec3( 1e-12 ) );',
+          'wdiN = faceforward( wdiN, vWdiView, wdiN );',
+          'float wdiNdotL = clamp( dot( wdiN, wdiToLantern / max( wdiD, 1e-4 ) ), 0.0, 1.0 );',
+          'wdiK *= mix( 1.0 - wdiLanternShade.x, 1.0, wdiNdotL );',
+          // The baked occlusion: the open share, 1 minus the vertex attribute.
+          'wdiK *= mix( 1.0, 1.0 - clamp( vWdiOccl, 0.0, 1.0 ), wdiLanternShade.y );',
           'outgoingLight += wdiAlbedo * wdiLanternColor * wdiK;',
           ADD_ANCHOR,
         ].join('\n\t'),
@@ -126,7 +186,7 @@ function compileWithLantern(shader: WebGLProgramParametersWithUniforms): void {
   Object.assign(shader.uniforms, lanternUniforms);
 }
 
-const LANTERN_KEY = 'wdi-lantern-1';
+const LANTERN_KEY = 'wdi-lantern-2';
 const lanternKey = () => LANTERN_KEY;
 
 /** Emitters the lantern does not light: the gate lamps' glass and the sky seen through a cave mouth. A material (or
@@ -167,6 +227,27 @@ export function patchLantern(root: Object3D): number {
 
 const ahead = new Vector3();
 
+/** The key the walker's toggle is kept under in the tab's sessionStorage (`'on'` or `'off'`). */
+export const LANTERN_STORE_KEY = 'wdi-walk-lantern';
+
+/** The part of Storage the toggle uses. */
+export type LanternStore = Pick<Storage, 'getItem' | 'setItem'>;
+
+/** The uniforms a Lantern sets; the shared `lanternUniforms` in the page, stand-ins in a test. */
+export interface LanternUniforms {
+  wdiLanternPos: { value: Vector3 };
+  wdiLanternColor: { value: Color };
+}
+
+/** The tab's sessionStorage, or null where the browser has none or blocks it. */
+export function sessionStore(): LanternStore | null {
+  try {
+    return typeof sessionStorage === 'undefined' ? null : sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
 /**
  * The lantern's state: `wanted` follows the area (lanternWanted), `enabled` the walker's toggle (on at the start, and
  * kept across crossings in the page). `update` once a frame, after the camera has moved, sets the shared uniforms.
@@ -182,7 +263,17 @@ export class Lantern {
   flicker = 1;
   private readonly colour = new Color(LANTERN.colour);
 
-  constructor(readonly uniforms = lanternUniforms) {}
+  constructor(
+    readonly uniforms: LanternUniforms = lanternUniforms,
+    private readonly store: LanternStore | null = null,
+  ) {
+    // The walker's choice outlives a page load (a crossing by `?cross=reload` loads the page again).
+    try {
+      if (store?.getItem(LANTERN_STORE_KEY) === 'off') this.enabled = false;
+    } catch {
+      /* storage can be blocked: the lantern then starts on */
+    }
+  }
 
   /** The lantern shows: the area wants it and the walker has it on. */
   get lit(): boolean {
@@ -192,6 +283,11 @@ export class Lantern {
   /** Turns the lantern on or off; returns whether it is on now. */
   toggle(): boolean {
     this.enabled = !this.enabled;
+    try {
+      this.store?.setItem(LANTERN_STORE_KEY, this.enabled ? 'on' : 'off');
+    } catch {
+      /* storage can be blocked: the choice then holds for this page only */
+    }
     return this.enabled;
   }
 

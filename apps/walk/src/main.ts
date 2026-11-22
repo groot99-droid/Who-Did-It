@@ -28,7 +28,15 @@ import { CROSSING, DEFAULT_GLB_URL, DEFAULT_INDEX_URL, LOOK, RENDER } from './co
 import { disposeWorld, memoryOf, resourcesOf, type DisposeReport } from './dispose';
 import { Hud } from './hud';
 import { Input } from './input';
-import { Lantern, lanternAnywhere, lanternWanted, patchLantern } from './lantern';
+import {
+  Lantern,
+  lanternAnywhere,
+  lanternUniforms,
+  lanternWanted,
+  patchLantern,
+  sessionStore,
+} from './lantern';
+import { countLightmapped } from './lightmap';
 import { fetchBytes, loadFile, loadUrl, makeLoader, parseBytes, type Progress } from './load';
 import { DEFAULT_EXPOSURE, defaultFog, defaultLights, exposureFromScene, makeSky } from './look';
 import { Controller, wishFromInput } from './physics/controller';
@@ -66,8 +74,10 @@ const input = new Input(canvas, STICK_RADIUS);
 input.onStick = (origin, offset) => hud.setStick(origin, offset, STICK_RADIUS);
 const loader = makeLoader(renderer);
 /** The lantern carried in the caves (src/lantern.ts); `lanternPatched` counts the open world's materials that take it. */
-const lantern = new Lantern();
+const lantern = new Lantern(lanternUniforms, sessionStore());
 let lanternPatched = 0;
+/** The open world's materials that are shown with a lightmap page (src/lightmap.ts). */
+let lightmapped = 0;
 
 let world: World | null = null;
 let controller: Controller | null = null;
@@ -121,6 +131,7 @@ function releaseWorld(w: World): void {
   scene.remove(...fallbackLights);
   lantern.wanted = false;
   lanternPatched = 0;
+  lightmapped = 0;
   if (world === w) {
     world = null;
     controller = null;
@@ -335,6 +346,7 @@ async function place(w: World, spawnId: string | null): Promise<void> {
   lanternPatched = lanternAnywhere({ kind: openKind(), sceneExtras: w.root.userData, areas: w.areas })
     ? patchLantern(w.root)
     : 0;
+  lightmapped = countLightmapped(w.root);
   controller = new Controller(w.collider, {}, w.zones);
   trigger = new PortalTrigger(w.portals);
   area = undefined;
@@ -506,7 +518,7 @@ renderer.setAnimationLoop(() => {
       `exposure ${renderer.toneMappingExposure.toFixed(2)} · area ${area?.name ?? '-'}${indoor ? ' (indoor)' : ''}`,
       lanternPatched > 0
         ? `lantern ${lantern.lit ? 'on' : lantern.wanted ? 'off' : 'not here'} · ${lanternPatched} materials` +
-          ` · flicker ${lantern.flicker.toFixed(3)}`
+          ` (${lightmapped} with a lightmap) · flicker ${lantern.flicker.toFixed(3)}`
         : '',
       trip
         ? `portal ${trip.portal} → ${trip.spawn ? `Spawn_${trip.spawn}` : 'no spawn'}` +
@@ -556,6 +568,7 @@ if (debugOn) {
         enabled: lantern.enabled,
         lit: lantern.lit,
         patched: lanternPatched,
+        lightmapped,
         flicker: lantern.flicker,
         position: lantern.position.toArray(),
         label: hud.lanternLabel,

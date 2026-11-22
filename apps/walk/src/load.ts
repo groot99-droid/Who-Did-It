@@ -4,6 +4,7 @@ import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { DEFAULT_GLB_URL } from './config';
+import { LightmapPlugin } from './lightmap';
 
 /** Where the world comes from: `?glb=<url>`, else the default constant, else nothing (the page waits for a drop). */
 export function glbFromQuery(search: string, fallback: string | null = DEFAULT_GLB_URL): string | null {
@@ -18,13 +19,15 @@ export interface Progress {
   label: string;
 }
 
-/** A GLTFLoader with the Draco, meshopt and KTX2 decoders. three resolves the Draco and Basis decoder files
+/** A GLTFLoader with the Draco, meshopt and KTX2 decoders and the cave lightmap hookup (lightmap.ts). three resolves the Draco and Basis decoder files
  * against its own modules (`import.meta.url`), so Vite emits them with the build and nothing comes from a CDN; they
  * are only fetched when a GLB needs them. */
 export function makeLoader(renderer: WebGLRenderer): GLTFLoader {
   const draco = new DRACOLoader();
   const ktx2 = new KTX2Loader().detectSupport(renderer);
-  return new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder);
+  const loader = new GLTFLoader().setDRACOLoader(draco).setKTX2Loader(ktx2).setMeshoptDecoder(MeshoptDecoder);
+  loader.register((parser) => new LightmapPlugin(parser));
+  return loader;
 }
 
 export function loadUrl(loader: GLTFLoader, url: string, onProgress: (p: Progress) => void): Promise<GLTF> {

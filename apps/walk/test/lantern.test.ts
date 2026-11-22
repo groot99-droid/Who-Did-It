@@ -18,6 +18,7 @@ import { LANTERN, WALK } from '../src/config';
 import { disposeWorld, resourcesOf } from '../src/dispose';
 import {
   FLICKER_HZ,
+  LANTERN_STORE_KEY,
   Lantern,
   flickerAt,
   hasLantern,
@@ -103,23 +104,35 @@ describe('the lantern falloff', () => {
     }
   });
 
-  it('lights a cave wall 2 m away as bright as the brightest gate-lamp pool (display 0.55 through AgX)', () => {
-    // The limestone and default walls' mean linear albedo (luminance), at the caves' exposure.
-    const albedo = 0.0816;
+  it('lights a cave wall 2 m away to display 0.48 through AgX, under the gate-lamp pool (0.55), and never washes it out', () => {
+    // The limestone walls' mean linear albedo (luminance) as the file's scan carries it, at the caves' exposure.
+    const albedo = 0.1843;
     const exposure = 2.378414230005442;
     const warm = new Color(LANTERN.colour);
     expect([warm.r, warm.g, warm.b].map((v) => +v.toFixed(3))).toEqual([1, 0.456, 0.095]);
-    const lit = [warm.r, warm.g, warm.b].map((v) => v * albedo * lanternFalloff(2));
-    expect(agxDisplayLuma(lit, exposure)).toBeCloseTo(0.55, 2);
-    // Nearer is brighter and stays under white; 6 m away it is well down.
-    const at = (d: number) =>
+    const at = (d: number, angle = 1) =>
       agxDisplayLuma(
-        [warm.r, warm.g, warm.b].map((v) => v * albedo * lanternFalloff(d)),
+        [warm.r, warm.g, warm.b].map(
+          (v) => v * albedo * lanternFalloff(d) * (1 - LANTERN.form + LANTERN.form * angle),
+        ),
         exposure,
       );
-    expect(at(0.5)).toBeLessThan(1);
-    expect(at(0.5)).toBeGreaterThan(at(2));
+    expect(at(2)).toBeCloseTo(0.48, 2);
+    expect(at(2)).toBeLessThan(0.55);
+    // Nearer is a little brighter and stays under 0.56 (the baked ambient light is not in this): no wash. A wall seen
+    // at an angle (N.L 0.5) is dimmer, and 6 m away it is well down.
+    for (const d of [0.5, 0.75, 1, 1.5]) {
+      expect(at(d)).toBeGreaterThan(at(2));
+      expect(at(d)).toBeLessThan(0.57);
+    }
+    expect(at(2, 0.5)).toBeLessThan(at(2));
     expect(at(6)).toBeLessThan(0.4);
+    // The dark scans (the slate, the lichen) are not lifted by it past a mid grey.
+    const dark = agxDisplayLuma(
+      [warm.r, warm.g, warm.b].map((v) => v * 0.0436 * lanternFalloff(2)),
+      exposure,
+    );
+    expect(dark).toBeLessThan(0.3);
   });
 });
 
@@ -213,6 +226,27 @@ describe('the lantern in the unlit shader', () => {
     expect(add).toBeLessThan(f.indexOf('#include <tonemapping_fragment>'));
     expect(add).toBeLessThan(f.indexOf('#include <fog_fragment>'));
     expect(f).toContain('smoothstep( 0.7 * wdiLanternRange.y, wdiLanternRange.y, wdiD )');
+    // The surface-angle term and the occlusion scale the light before it is added: the normal from the GLB (the
+    // vertex shader passes it in view space), the screen's derivative where it has none, the file's _OCCL attribute as the occlusion.
+    expect(out.vertex).toContain('vWdiNormal = normalMatrix * wdiNormal;');
+    expect(f.indexOf('wdiK *= mix( 1.0 - wdiLanternShade.x, 1.0, wdiNdotL );')).toBeGreaterThan(
+      f.indexOf('float wdiK ='),
+    );
+    expect(
+      f.indexOf('wdiK *= mix( 1.0, 1.0 - clamp( vWdiOccl, 0.0, 1.0 ), wdiLanternShade.y );'),
+    ).toBeLessThan(add);
+    expect(out.vertex).toContain('vWdiOccl = _occl;');
+    expect(out.vertex).toContain('attribute float _occl;');
+    // Never lilac: green is lifted to the lesser of red and blue where it is the least channel.
+    expect(f).toContain('gl_FragColor.g = max( gl_FragColor.g, min( gl_FragColor.r, gl_FragColor.b ) );');
+    // Never teal on rock: red is lifted to 0.9 of the higher of green and blue where both stand well over it.
+    expect(f).toContain('gl_FragColor.r = 0.9 * wdiHi;');
+    // The ink floor: the last thing a pixel gets, after the dithering; the luminance it lacks, in the ink's colour.
+    expect(
+      f.indexOf('gl_FragColor.rgb += wdiInk * ( max( wdiInkLum + 0.6 / 255.0 - wdiLum, 0.0 ) / wdiInkLum );'),
+    ).toBeGreaterThan(f.indexOf('#include <dithering_fragment>'));
+    expect(f).toContain('faceforward( wdiN, vWdiView, wdiN )');
+    expect(f).toContain('dFdx( vWdiView )');
     expect(injectLantern('void main() {}', ShaderLib.basic.fragmentShader)).toBeNull();
   });
 
@@ -246,6 +280,7 @@ describe('the lantern in the unlit shader', () => {
     expect(a.uniforms.wdiLanternPos).toBe(lanternUniforms.wdiLanternPos);
     expect(b.uniforms.wdiLanternColor).toBe(lanternUniforms.wdiLanternColor);
     expect(a.uniforms.wdiLanternRange!.value.toArray()).toEqual([2.5, 12]);
+    expect(a.uniforms.wdiLanternShade!.value.toArray()).toEqual([LANTERN.form, LANTERN.aoWeight]);
   });
 });
 
@@ -296,13 +331,55 @@ describe('the Lantern', () => {
     expect(u.wdiLanternColor.value.toArray()).toEqual([0, 0, 0]);
     expect(l.toggle()).toBe(true);
     l.update(0.016, eye, 0, id);
-    expect(u.wdiLanternColor.value.r).toBeGreaterThan(3.8);
+    expect(u.wdiLanternColor.value.r).toBeGreaterThan(LANTERN.intensity * 0.95);
     // The walker's choice holds when the area changes (a crossing), and the next cave is dark until it is wanted.
     l.toggle();
     l.wanted = false;
     l.wanted = true;
     expect(l.enabled).toBe(false);
     expect(l.lit).toBe(false);
+  });
+});
+
+describe("the walker's toggle across a page load (?cross=reload)", () => {
+  const stand = {
+    wdiLanternPos: { value: new Vector3() },
+    wdiLanternColor: { value: new Color() },
+  };
+  const memory = () => {
+    const kept = new Map<string, string>();
+    return {
+      kept,
+      getItem: (k: string) => kept.get(k) ?? null,
+      setItem: (k: string, v: string) => void kept.set(k, v),
+    };
+  };
+
+  it('is kept in the tab, so a lantern turned off stays off when the page loads again', () => {
+    const store = memory();
+    const first = new Lantern(stand, store);
+    expect(first.enabled).toBe(true);
+    first.toggle();
+    expect(store.kept.get(LANTERN_STORE_KEY)).toBe('off');
+    expect(new Lantern(stand, store).enabled).toBe(false);
+    first.toggle();
+    expect(store.kept.get(LANTERN_STORE_KEY)).toBe('on');
+    expect(new Lantern(stand, store).enabled).toBe(true);
+  });
+
+  it('starts on without storage, and when storage throws', () => {
+    expect(new Lantern(stand, null).enabled).toBe(true);
+    const blocked = {
+      getItem: () => {
+        throw new Error('blocked');
+      },
+      setItem: () => {
+        throw new Error('blocked');
+      },
+    };
+    const l = new Lantern(stand, blocked);
+    expect(l.enabled).toBe(true);
+    expect(l.toggle()).toBe(false);
   });
 });
 

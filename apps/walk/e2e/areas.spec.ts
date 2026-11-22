@@ -148,3 +148,33 @@ test('a cave mouth into a village that is not in the index says so and keeps the
   await page.keyboard.up('KeyS');
   expect(await state(page)).toMatchObject({ areaId: 'under_x', crossings: 0 });
 });
+
+test('the lantern toggle survives a crossing by page load (?cross=reload), kept in the tab', async ({
+  page,
+}) => {
+  type Lantern = { wanted: boolean; enabled: boolean; lit: boolean; patched: number };
+  const lantern = (): Promise<Lantern> =>
+    page.evaluate(() => (window as unknown as { __walk: { lantern: Lantern } }).__walk.lantern);
+  await serve(page);
+  await page.goto(
+    `/Who-Did-It/walk/?${new URLSearchParams({ index: TINY_INDEX_URL, spawn: 'undermere_seam_xy_a_1', cross: 'reload', debug: '' })}`,
+  );
+  await expect.poll(async () => (await state(page)).ready, { timeout: 30_000 }).toBe(true);
+  await page.locator('#view').focus();
+  expect(await lantern()).toMatchObject({ wanted: true, enabled: true, lit: true });
+  // Off with L; then through the seam, where the page loads again at the arrival.
+  await page.keyboard.press('KeyL');
+  await expect.poll(async () => (await lantern()).enabled, { timeout: 10_000 }).toBe(false);
+  expect(await lantern()).toMatchObject({ wanted: true, enabled: false, lit: false });
+  await page.keyboard.down('KeyS');
+  await page.waitForURL(/area=under_y/, { timeout: 30_000 });
+  await page.keyboard.up('KeyS');
+  await expect.poll(async () => (await state(page)).ready, { timeout: 30_000 }).toBe(true);
+  await page.locator('#view').focus();
+  expect(await state(page)).toMatchObject({ areaId: 'under_y' });
+  // The new page starts with the lantern as the walker left it: off.
+  expect(await lantern()).toMatchObject({ wanted: true, enabled: false, lit: false });
+  await page.keyboard.press('KeyL');
+  await expect.poll(async () => (await lantern()).enabled, { timeout: 10_000 }).toBe(true);
+  expect(await lantern()).toMatchObject({ wanted: true, enabled: true, lit: true });
+});

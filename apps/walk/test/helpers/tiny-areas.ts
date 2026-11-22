@@ -108,6 +108,9 @@ function glb(spec: AreaSpec): Buffer {
   nodes[areaNode]!.children = nodes.slice(0, areaNode).map((_, i) => i);
   const json = {
     asset: { version: '2.0', generator: 'apps/walk/test/helpers/tiny-areas.ts' },
+    // The caves are baked and unlit, as the real ones are: three loads the material as MeshBasicMaterial, which
+    // takes the walker's lantern.
+    extensionsUsed: ['KHR_materials_unlit'],
     scene: 0,
     scenes: [{ nodes: [areaNode, areaNode + 1] }],
     nodes,
@@ -115,7 +118,12 @@ function glb(spec: AreaSpec): Buffer {
       { primitives: [{ attributes: { POSITION: 0, TEXCOORD_0: 1 }, indices: 2, material: 0 }] },
       { primitives: [{ attributes: { POSITION: 0 }, indices: 2 }] },
     ],
-    materials: [{ pbrMetallicRoughness: { baseColorTexture: { index: 0 }, metallicFactor: 0 } }],
+    materials: [
+      {
+        extensions: { KHR_materials_unlit: {} },
+        pbrMetallicRoughness: { baseColorTexture: { index: 0 }, metallicFactor: 0 },
+      },
+    ],
     textures: [{ source: 0, sampler: 0 }],
     samplers: [{}],
     images: [{ uri: pngDataUri(spec.colour) }],
