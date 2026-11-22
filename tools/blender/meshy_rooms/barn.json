@@ -1,0 +1,827 @@
+{
+  "room": "barn",
+  "about": "Hale Barn, Pennock's barn, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 18 x 10 m inside (x -9..9, y -5..5), 4.5 m high. Every prop, spot, portal and night light of packages/content/data/scenes/barn.json is named below. Two straw stalls either side of a planked aisle behind board partitions (boxes in the joinery's wood), posts and tie beams, a hay loft over the north-east corner with a ladder up to it at the scene's loft drop (decision D6: the drop's portal at the ladder's foot). No window: the scene has none and no moon light, so the barn is lit by its three storm lanterns on the north boards. Grey boxes stand in for the pieces with no model (decision D2).",
+  "district": "Hale Barn",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "Inside the barn door"
+  },
+  "height": 4.5,
+  "height_note": "the plan's 4.5 m for the barn (Reference E)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "weathered_planks",
+    "role": "wood_rough",
+    "zoom": 1.2,
+    "factor": [0.82, 0.88, 0.74]
+  },
+  "floor_note": "the aisle's planks (`w` in the scene's material layer) over the whole floor: the stalls' straw (`l`) waits for G11's floor by tile letter; the library's rough weathered planks, darker",
+  "wall_colour": "#6A5D4B",
+  "wall_colour_note": "guess: old barn boards gone grey-brown; brown above blue, never pink or lilac under the lanterns",
+  "ceiling_colour": "#54483A",
+  "ceiling_colour_note": "the underside of the roof boards, darker",
+  "paint_colour": "#8A7D66",
+  "wood_colour": "#4A3826",
+  "wood_colour_note": "the joinery: the door, the partitions, posts, beams, the loft, its ladder, the troughs",
+  "skirting": 0.12,
+  "skirting_note": "a plain base board",
+  "picture_rail": null,
+  "picture_rail_note": "a barn has pegs and racks where a picture rail would be",
+  "cornice": null,
+  "cornice_note": "and no cornice: the boards meet the roof",
+  "openings": [
+    {
+      "id": "ba.door",
+      "kind": "door",
+      "portal": "ba.door",
+      "width": 1.1,
+      "height": 2.3,
+      "note": "the barn door in the south wall, tile (10,11): centred at x 0.5, the portal at its foot (0.5, -5.0); the door spawn stands 0.5 m inside it, (0.5, -4.5), by design. 1.1 m wide and 2.3 m high (at 1.2 m, the builder's widest, cc_geom's door check measures only 0.6 m either side of the centre and read 1.14): a panel door until G13's plank and double-leaf doors"
+    },
+    {
+      "id": "ba.loft",
+      "kind": "drop",
+      "portal": "ba.loft",
+      "side": "N",
+      "foot": [7.5, 4.4],
+      "note": "the loft drop (ba.loft: one way to the village's barn_loft_drop spawn, no way back) at its tile (17,1) against the north wall: the portal at the foot of the ladder up to the loft (the ladder's rails 0.12 m off the wall, the portal 0.6 m out), D6. The scene gives this portal no spawn."
+    }
+  ],
+  "openings_note": "no window: the scene has no window prop and no moon light",
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "ba.lt_lantern_w",
+      "role": "lantern",
+      "anchor": {
+        "wall": "N",
+        "along": -4.5,
+        "out": 0.2,
+        "z": 1.995
+      },
+      "glow": {
+        "shape": "sphere",
+        "size": [0.07],
+        "material": "flame"
+      },
+      "note": "the west storm lantern (tile (5,0)): the light at the centre of a lit glass globe (r 7 cm) standing 5 mm over the lantern's grey font, 20 cm out from the boards on its bracket (a glow in front of the box hung in the air: r7_extra's nothing_floats, the first no-bake build)"
+    },
+    {
+      "id": "ba.lt_lantern",
+      "role": "lantern",
+      "anchor": {
+        "wall": "N",
+        "along": 0.5,
+        "out": 0.2,
+        "z": 1.995
+      },
+      "glow": {
+        "shape": "sphere",
+        "size": [0.07],
+        "material": "flame"
+      },
+      "note": "the middle lantern (tile (10,0))"
+    },
+    {
+      "id": "ba.lt_lantern_e",
+      "role": "lantern",
+      "anchor": {
+        "wall": "N",
+        "along": 5.5,
+        "out": 0.2,
+        "z": 1.995
+      },
+      "glow": {
+        "shape": "sphere",
+        "size": [0.07],
+        "material": "flame"
+      },
+      "note": "the east lantern (tile (15,0)), under the loft's boards"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the three lanterns) and fill = 2, and the AO. No moon group: no window.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the lantern role, the darker-room exposure lever and a light setting of the room's own.",
+    "lights": {
+      "lantern": {
+        "color": "#FFB457",
+        "power": 45.0,
+        "radius": 0.06
+      }
+    },
+    "lights_note": "a storm lantern: the look's lamp colour, a little more power and a wider flame for the glass (a first guess, for the first 128-sample bake to set)",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a barn at night, lit by its lanterns",
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "barn": {
+        "label": "the barn",
+        "mix": {
+          "candle": 1.0,
+          "fill": 0.2
+        },
+        "note": "from the first 128-sample bake (2026-11-22): the first guess (the upper floor's 0.5 fill lowered to 0.3) lit the far (south) wall at 0.52 of the lantern wall and the barn read a little flat; the fill a step down for the second bake. The second bake (the light 9 cm off the boards) lit the lantern wall at 28.7 and the far wall at 0.88 of it, flat; five mixes from its saved light (candle 1 to 4, fill 0.25 to 0.1) all gave 0.88 (the exposure follows the lanterns' pool), so the final moves the lanterns 20 cm out on their brackets (the first bake's light, 24 cm out, gave 0.52) and keeps candle 1, fill 0.2"
+      }
+    }
+  },
+  "light": "barn",
+  "light_note": "the room's own light setting (look.settings.barn; --light overrides)",
+  "pieces": [
+    {
+      "id": "ba.partition_w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -3.5, -0.5],
+      "spec": {
+        "model": "box",
+        "size": [4.79, 0.1, 1.4],
+        "label": "Stall partition: rough boards nailed between the posts",
+        "finish": "wood"
+      },
+      "note": "the scene's `K` partition tiles (6,4) to (6,8): a board wall 1.4 m high between the west stall and the aisle, y -2.895..1.895 between its posts (no two pieces may touch: r7_extra; a box in the joinery's wood; D5's wall-pieces are plaster to the ceiling, a stall's boards are not)"
+    },
+    {
+      "id": "ba.partition_e",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 3.5, -0.5],
+      "spec": {
+        "model": "box",
+        "size": [4.79, 0.1, 1.4],
+        "label": "Stall partition: rough boards nailed between the posts",
+        "finish": "wood"
+      },
+      "note": "the east stall's partition, the same boards"
+    },
+    {
+      "id": "ba.post_wn",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -3.5, 2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.2, 0.2, 3.49],
+        "label": "Barn post",
+        "finish": "wood"
+      },
+      "note": "the four posts at the partitions' ends, up to the tie beams (1 cm under them)"
+    },
+    {
+      "id": "ba.post_ws",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -3.5, -3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.2, 0.2, 3.49],
+        "label": "Barn post",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.post_en",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.5, 2.0],
+      "spec": {
+        "model": "box",
+        "size": [0.2, 0.2, 3.49],
+        "label": "Barn post",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.post_es",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.5, -3.0],
+      "spec": {
+        "model": "box",
+        "size": [0.2, 0.2, 3.49],
+        "label": "Barn post",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.beam_w",
+      "decor": true,
+      "rise": 3.5,
+      "face": "E",
+      "place": ["at", -3.5, 0.0],
+      "spec": {
+        "model": "box",
+        "size": [9.98, 0.2, 0.25],
+        "label": "Tie beam",
+        "finish": "wood"
+      },
+      "note": "a tie beam north to south over each pair of posts, its underside at 3.5 m"
+    },
+    {
+      "id": "ba.beam_e",
+      "decor": true,
+      "rise": 3.5,
+      "face": "E",
+      "place": ["at", 3.5, 0.0],
+      "spec": {
+        "model": "box",
+        "size": [9.98, 0.2, 0.25],
+        "label": "Tie beam",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.loft_deck",
+      "decor": true,
+      "rise": 2.6,
+      "face": "S",
+      "place": ["at", 7.0, 3.2],
+      "spec": {
+        "model": "box",
+        "size": [3.99, 2.4, 0.15],
+        "label": "Hay loft floor (boards)",
+        "finish": "wood"
+      },
+      "note": "the loft over the north-east corner, the scene's loft drop at (17,1): boards 2.6 to 2.75 m up over x 5.0..9.0, y 2.0..4.4; the strip along the north wall is in two parts either side of the ladder's hole"
+    },
+    {
+      "id": "ba.loft_deck_w",
+      "decor": true,
+      "rise": 2.6,
+      "face": "S",
+      "place": ["at", 6.05, 4.705],
+      "spec": {
+        "model": "box",
+        "size": [2.1, 0.59, 0.15],
+        "label": "Hay loft floor (boards)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.loft_deck_e",
+      "decor": true,
+      "rise": 2.6,
+      "face": "S",
+      "place": ["at", 8.45, 4.705],
+      "spec": {
+        "model": "box",
+        "size": [1.1, 0.59, 0.15],
+        "label": "Hay loft floor (boards)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.loft_beam",
+      "decor": true,
+      "rise": 2.4,
+      "face": "S",
+      "place": ["at", 7.0, 2.09],
+      "spec": {
+        "model": "box",
+        "size": [3.99, 0.18, 0.195],
+        "label": "Loft beam",
+        "finish": "wood"
+      },
+      "note": "the beam under the loft's front edge, its underside 2.4 m up"
+    },
+    {
+      "id": "ba.loft_post",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 4.88, 2.09],
+      "spec": {
+        "model": "box",
+        "size": [0.18, 0.18, 2.75],
+        "label": "Loft post",
+        "finish": "wood"
+      },
+      "note": "the post at the loft's open corner, 3.5 cm west of its boards (x 4.79..4.97), up to the boards' top: the beam and the boards butt into its side. Under the boards (the first no-bake build) cc_geom gave its collision boxes to the boards above it, whose outline holds it; 0.5 cm from them its own boxes still went to the beam)"
+    },
+    {
+      "id": "ba.loft_hay",
+      "decor": true,
+      "rise": 2.755,
+      "face": "S",
+      "place": ["at", 6.6, 3.4],
+      "spec": {
+        "model": "box",
+        "size": [2.8, 1.6, 0.6],
+        "label": "Loose hay in the loft"
+      },
+      "note": "loose hay heaped on the loft's boards, so the loft reads as one from below (a grey box: the plan's hay heap has no model)"
+    },
+    {
+      "id": "ba.hay_door",
+      "decor": true,
+      "rise": 2.76,
+      "face": "S",
+      "place": ["wall", "N", 6.0],
+      "spec": {
+        "model": "box",
+        "size": [1.2, 0.06, 1.4],
+        "label": "The loft's hay door, shut (the drop out to the yard)",
+        "finish": "wood"
+      },
+      "note": "the loft's hay door in the north boards over the loft floor, the way the loft drop goes out"
+    },
+    {
+      "id": "ba.ladder_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 7.27, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.06, 3.7],
+        "label": "Loft ladder (rail)",
+        "finish": "wood"
+      },
+      "note": "the ladder to the loft at the drop's tile (17,1): its rails"
+    },
+    {
+      "id": "ba.ladder_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 7.73, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.06, 3.7],
+        "label": "Loft ladder (rail)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_0",
+      "decor": true,
+      "rise": 0.45,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      },
+      "note": "the rungs, 0.45 to 3.45 m"
+    },
+    {
+      "id": "ba.rung_1",
+      "decor": true,
+      "rise": 0.75,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_2",
+      "decor": true,
+      "rise": 1.05,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_3",
+      "decor": true,
+      "rise": 1.35,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_4",
+      "decor": true,
+      "rise": 1.65,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_5",
+      "decor": true,
+      "rise": 1.95,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_6",
+      "decor": true,
+      "rise": 2.25,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_7",
+      "decor": true,
+      "rise": 2.55,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_8",
+      "decor": true,
+      "rise": 2.85,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_9",
+      "decor": true,
+      "rise": 3.15,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.rung_10",
+      "decor": true,
+      "rise": 3.45,
+      "face": "S",
+      "place": ["at", 7.5, 4.88],
+      "spec": {
+        "model": "box",
+        "size": [0.392, 0.04, 0.04],
+        "label": "Loft ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ba.study_key",
+      "rise": 1.35,
+      "face": "S",
+      "place": ["wall", "N", -8.5],
+      "spec": {
+        "model": "box",
+        "size": [0.3, 0.12, 0.3],
+        "label": "Key niche in the boards: the study key on its nail (V1.5)"
+      },
+      "note": "the key niche at its tile (1,0), x -8.5 on the north wall (the plan's key niche: no model, a grey box)"
+    },
+    {
+      "id": "ba.harness_rack",
+      "rise": 0.5,
+      "face": "S",
+      "place": ["wall", "N", -6.5],
+      "spec": {
+        "model": "box",
+        "size": [1.1, 0.3, 1.3],
+        "label": "Harness rack: collars, bridles and the harness on pegs, the wolf's pelt hung over it"
+      },
+      "note": "the tack rack at its tile (3,0), x -6.5 on the north wall (the plan's tack rack: a grey box)"
+    },
+    {
+      "id": "ba.lantern_hook_0",
+      "rise": 1.8,
+      "face": "S",
+      "place": ["wall", "N", -4.5],
+      "spec": {
+        "model": "box",
+        "size": [0.18, 0.3, 0.12],
+        "label": "Storm lantern on its hook: its iron font on a bracket out from the boards (lit, the glass a glowing globe over it)"
+      },
+      "note": "the west storm lantern at its tile (5,0), hung on the north boards, its font and frame 1.8 to 1.92 m up and the lit glass a globe on it, its foot over the capsule's 1.75 m top (at 1.75 its collision box ran to the floor, a 14 cm invisible wall: the first no-bake build): a grey box (the lantern models on disk are .blend files, G8), the light ba.lt_lantern_w just in front of it"
+    },
+    {
+      "id": "ba.tool_rack",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.25, 1.9],
+        "label": "Long tools on pegs: hayfork, rake, scythe and spade"
+      },
+      "note": "the tool rack at its tile (7,0) (the plan's long tools: a grey box)"
+    },
+    {
+      "id": "ba.lantern_hook_1",
+      "rise": 1.8,
+      "face": "S",
+      "place": ["wall", "N", 0.5],
+      "spec": {
+        "model": "box",
+        "size": [0.18, 0.3, 0.12],
+        "label": "Storm lantern on its hook: its iron font on a bracket out from the boards (lit, the glass a glowing globe over it)"
+      },
+      "note": "the middle lantern at its tile (10,0), over the aisle"
+    },
+    {
+      "id": "ba.harness_rack_1",
+      "rise": 0.5,
+      "face": "S",
+      "place": ["wall", "N", 2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.1, 0.3, 1.3],
+        "label": "Harness rack: collars and traces on pegs"
+      },
+      "note": "the second tack rack at its tile (12,0)"
+    },
+    {
+      "id": "ba.lantern_hook_2",
+      "rise": 1.8,
+      "face": "S",
+      "place": ["wall", "N", 5.5],
+      "spec": {
+        "model": "box",
+        "size": [0.18, 0.3, 0.12],
+        "label": "Storm lantern on its hook: its iron font on a bracket out from the boards (lit, the glass a glowing globe over it)"
+      },
+      "note": "the east lantern at its tile (15,0), under the loft's boards"
+    },
+    {
+      "id": "ba.hay_bale_2",
+      "face": "E",
+      "place": ["wall", "W", 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 1.2],
+        "label": "Hay bales, three high"
+      },
+      "note": "bales stacked against the west wall at their tiles (1,4) and (1,5) (the plan's hay bales: grey boxes)"
+    },
+    {
+      "id": "ba.hay_bale_3",
+      "face": "E",
+      "place": ["wall", "W", 0.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 0.8],
+        "label": "Hay bales, two high"
+      }
+    },
+    {
+      "id": "ba.hay_w",
+      "spot": true,
+      "face": "S",
+      "place": ["at", -6.5, 2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 1.0, 1.3],
+        "label": "Hay heap (a hide spot): loose hay heaped high to crouch behind"
+      },
+      "note": "the west hide spot at its tile (3,3): a hay heap (the plan's hay heap: no model, a grey box)"
+    },
+    {
+      "id": "ba.hay_body",
+      "spot": true,
+      "face": "S",
+      "place": ["at", -6.5, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 1.0, 0.9],
+        "label": "Hay heap (the body spot)"
+      },
+      "note": "the body spot at its tile (3,8), a lower heap"
+    },
+    {
+      "id": "ba.feed_trough",
+      "face": "W",
+      "place": ["at", -3.8, 0.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.4, 0.5],
+        "label": "Feed trough",
+        "finish": "wood"
+      },
+      "note": "the goats' trough at its tile (5,5), its back against the west partition (0.7 m east of the tile's centre)"
+    },
+    {
+      "id": "ba.water_bucket",
+      "face": "W",
+      "place": ["at", -3.85, -1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the bucket at its tile (5,7), against the partition"
+    },
+    {
+      "id": "ba.flour_sacks",
+      "face": "E",
+      "place": ["at", -3.09, 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.6, 0.7],
+        "label": "Grain sacks: three filled hessian sacks against the boards"
+      },
+      "note": "the grain sacks at their tile (7,4), against the west partition's aisle face (the plan's sack pile: a grey box)"
+    },
+    {
+      "id": "ba.planks",
+      "face": "E",
+      "place": ["at", -3.14, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 0.45],
+        "label": "Stack of sawn planks",
+        "finish": "wood"
+      },
+      "note": "the plank stack at its tile (7,8), against the partition (the plan's plank stack, a box in the joinery's wood)"
+    },
+    {
+      "id": "ba.barrel",
+      "face": "W",
+      "place": ["at", 3.0, 1.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the water cask at its tile (12,4), against the east partition's aisle face"
+    },
+    {
+      "id": "ba.milk_churn",
+      "face": "W",
+      "place": ["at", 3.18, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.4, 0.95],
+        "label": "Milk churns: two steel churns waiting for the cart"
+      },
+      "note": "the churns at their tile (12,8) (no churn model: a grey box)"
+    },
+    {
+      "id": "ba.hay_bale_1",
+      "face": "S",
+      "place": ["at", 3.5, 3.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 0.4],
+        "label": "Hay bale"
+      },
+      "note": "a bale at its tile (13,2), north of the east partition"
+    },
+    {
+      "id": "ba.hay_bale_4",
+      "face": "E",
+      "place": ["at", 4.5, 1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 0.4],
+        "label": "Hay bale"
+      },
+      "note": "a bale at its tile (14,4), inside the east stall by its partition"
+    },
+    {
+      "id": "ba.hay_bale_0",
+      "face": "W",
+      "place": ["wall", "E", 2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.5, 0.8],
+        "label": "Hay bales, two high, thrown down from the loft"
+      },
+      "note": "the bales thrown down under the loft at their tile (18,3), against the east wall"
+    },
+    {
+      "id": "ba.bed",
+      "face": "S",
+      "place": ["at", 8.05, 1.5],
+      "spec": {
+        "model": "box",
+        "size": [1.85, 0.8, 0.4],
+        "label": "Straw pallet: a straw tick on planks, a blanket thrown over"
+      },
+      "note": "the farmhand's pallet at its tile (18,4), lying east to west from the east wall (x 7.1..9.0): along the wall it would stand on the bales at (18,3) and the bucket at (18,5). The plan's straw pallet (G20's pallet is not built): a grey box, 0.4 m high, over the 0.35 m step"
+    },
+    {
+      "id": "ba.water_bucket_1",
+      "face": "W",
+      "place": ["wall", "E", 0.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the east stall's bucket at its tile (18,5), against the east wall"
+    },
+    {
+      "id": "ba.feed_trough_1",
+      "face": "W",
+      "place": ["wall", "E", -1.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.4, 0.5],
+        "label": "Feed trough",
+        "finish": "wood"
+      },
+      "note": "the east stall's trough at its tile (18,7), against the east wall"
+    },
+    {
+      "id": "ba.hay_e",
+      "spot": true,
+      "face": "S",
+      "place": ["at", 5.5, -2.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 1.0, 1.3],
+        "label": "Hay heap (a hide spot): loose hay heaped high to crouch behind"
+      },
+      "note": "the east hide spot at its tile (15,8)"
+    },
+    {
+      "id": "ba.goat",
+      "face": "W",
+      "place": ["at", 7.5, -3.5],
+      "spec": {
+        "model": "box",
+        "size": [1.05, 0.4, 0.85],
+        "label": "Goat: Pennock's nanny goat, who bleats when anyone comes in"
+      },
+      "note": "the goat at her tile (17,9) in the east stall, facing west toward the door (the plan's goat, a Tier 1 hero: no model, a grey box)"
+    },
+    {
+      "id": "ba.log_basket",
+      "face": "W",
+      "place": ["at", 8.5, -4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wicker_basket_02",
+        "scale": 1.4,
+        "lod": 0.25
+      },
+      "note": "the log basket at its tile (18,10), in the south-east corner: the bakery's wicker basket"
+    },
+    {
+      "id": "ba.scarecrow",
+      "face": "E",
+      "place": ["at", -8.5, -4.4],
+      "spec": {
+        "model": "meshy",
+        "name": "scarecrow",
+        "size": 1.4,
+        "lod": 0.2
+      },
+      "note": "last year's scarecrow at its tile (1,10), in the south-west corner by the door: the owner's Meshy scarecrow (scarecrow.glb, its own texture kept), facing the door. At 1.4 m: its arms span 1.18 m, and at 1.8 m they reached through the south wall (the first no-bake build) or, set off the wall, over the walkable tiles beside the corner; 0.1 m north of its tile's centre"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door is the spawn's own view.",
+  "views": {
+    "spawn_door": [[0.5, -4.5, 1.6], [0.5, 5.0, 1.5], 70.0],
+    "aisle": [[0.0, 3.6, 1.6], [0.5, -5.0, 1.1], 70.0],
+    "loft": [[2.2, -0.8, 1.6], [7.5, 4.6, 2.5], 70.0],
+    "tack": [[-1.0, 0.6, 1.6], [-6.0, 5.0, 1.4], 70.0],
+    "west_stall": [[-5.5, 3.7, 1.6], [-6.5, -4.0, 0.6], 70.0],
+    "east_stall": [[5.6, 1.3, 1.6], [7.5, -4.5, 0.6], 70.0],
+    "north": [[0.5, -2.0, 1.6], [0.5, 5.0, 1.8], 70.0],
+    "door_corner": [[-2.0, 0.5, 1.6], [-8.5, -4.5, 1.0], 70.0],
+    "east": [[-2.0, -3.8, 1.6], [9.0, -2.0, 0.9], 70.0],
+    "west": [[2.0, -3.8, 1.6], [-9.0, -1.0, 0.9], 70.0]
+  }
+}

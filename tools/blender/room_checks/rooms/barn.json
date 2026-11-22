@@ -1,0 +1,9 @@
+{
+  "about": "Hale Barn as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the failures listed for the owner.",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "148 of the map's 150 walkable tiles can be stood on. (17,4) and (18,4) lie under the farmhand's straw pallet (ba.bed, a grey box 1.85 x 0.8 m), which lies east to west from the east wall: along the wall it would stand on the bales at (18,3) and the bucket at (18,5). The same kind as the bedroom's tiles under its bed. Listed for the owner (2026-11-22), not yet ruled on."
+    }
+  ]
+}

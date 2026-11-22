@@ -1365,6 +1365,25 @@ class RoomFileV2(unittest.TestCase):
         self.assertEqual(parts[1][-1], (3.0, -3.0, 0.0))
         self.assertEqual(mrb.polyline_cut(pts, []), [pts])
 
+    # -- the barn: a drop marker at a ladder's foot, three lanterns of the room's own role, no window
+    def test_the_barn_reads_its_drop_and_lanterns(self):
+        data = raw(os.path.join(ROOMS_DIR, "barn.json"))
+        cfg, spec = self.read(data)
+        door, drop = spec["openings"]
+        self.assertEqual((door["kind"], door["side"], door["at"], door["width"]), ("door", "S", 0.5, 1.1))
+        # the loft drop: a marker on the north wall with no hole, its portal at the ladder's foot
+        self.assertEqual((drop["kind"], drop["side"], drop["cut"], drop["foot"]), ("drop", "N", False, [7.5, 4.4]))
+        ladder = [p for p in data["pieces"] if p["id"].startswith(("ba.ladder_", "ba.rung_"))]
+        self.assertEqual(len(ladder), 13)
+        # every rung over the walker's step, so the ladder is never climbed
+        self.assertGreater(min(p.get("rise", 0.0) for p in ladder if p["id"].startswith("ba.rung_")), rf.STEP_MAX)
+        lights = {r["id"]: r for r in spec["lights"]}
+        self.assertEqual(sorted(lights), ["ba.lt_lantern", "ba.lt_lantern_e", "ba.lt_lantern_w"])
+        self.assertEqual({(r["role"], r["group"]) for r in lights.values()}, {("lantern", "candle")})
+        self.assertEqual(spec["groups"], ["candle", "fill"])
+        self.assertIn("lantern", data["look"]["lights"])
+        self.assertEqual(spec["pending"], [])
+
     @unittest.skipIf(mrb is None, "numpy is not here")
     def test_a_face_frame_reads_as_its_shell_wall(self):
         fr = BuilderV2.frame(-11.0, 11.0, -5.0, 5.0)
