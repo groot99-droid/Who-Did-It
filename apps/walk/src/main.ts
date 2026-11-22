@@ -28,6 +28,7 @@ import { CROSSING, DEFAULT_GLB_URL, DEFAULT_INDEX_URL, LOOK, RENDER } from './co
 import { disposeWorld, memoryOf, resourcesOf, type DisposeReport } from './dispose';
 import { Hud } from './hud';
 import { Input } from './input';
+import { Lantern, lanternAnywhere, lanternWanted, patchLantern } from './lantern';
 import { fetchBytes, loadFile, loadUrl, makeLoader, parseBytes, type Progress } from './load';
 import { DEFAULT_EXPOSURE, defaultFog, defaultLights, exposureFromScene, makeSky } from './look';
 import { Controller, wishFromInput } from './physics/controller';
@@ -64,6 +65,9 @@ const hud = new Hud(document.querySelector<HTMLElement>('#hud')!, debugOn);
 const input = new Input(canvas, STICK_RADIUS);
 input.onStick = (origin, offset) => hud.setStick(origin, offset, STICK_RADIUS);
 const loader = makeLoader(renderer);
+/** The lantern carried in the caves (src/lantern.ts); `lanternPatched` counts the open world's materials that take it. */
+const lantern = new Lantern();
+let lanternPatched = 0;
 
 let world: World | null = null;
 let controller: Controller | null = null;
@@ -115,6 +119,8 @@ resize();
 function releaseWorld(w: World): void {
   scene.remove(w.root);
   scene.remove(...fallbackLights);
+  lantern.wanted = false;
+  lanternPatched = 0;
   if (world === w) {
     world = null;
     controller = null;
@@ -178,8 +184,15 @@ function updateArea(force = false): void {
   scene.background = indoor ? INDOOR_BACKGROUND : world.fog ? world.fog.color.clone() : null;
   sky.visible = !indoor && !world.fog;
   for (const light of fallbackLights) light.visible = !indoor;
+  lantern.wanted =
+    lanternPatched > 0 && lanternWanted({ kind: openKind(), sceneExtras: world.root.userData, area: next });
   renderer.toneMappingExposure =
     askedExposure > 0 ? askedExposure : (look.exposure ?? exposureFromScene(world.root) ?? DEFAULT_EXPOSURE);
+}
+
+/** The index's kind of the open area file (`cave`, `room` ...), or null in single-file mode. */
+function openKind(): string | null {
+  return index ? (swap.current?.area.kind ?? null) : null;
 }
 
 type FileRoute = { kind: 'file'; found: { spawn: Spawn; fallback: boolean } | null };
@@ -318,6 +331,10 @@ async function place(w: World, spawnId: string | null): Promise<void> {
   scene.add(w.root);
   // Fog from the GLB's extras shows as a flat background; without it the look's fog and sky apply (updateArea).
   if (!w.hasSun) scene.add(...fallbackLights);
+  // The lantern goes into the shaders of a file that has a cave area, before they are compiled below.
+  lanternPatched = lanternAnywhere({ kind: openKind(), sceneExtras: w.root.userData, areas: w.areas })
+    ? patchLantern(w.root)
+    : 0;
   controller = new Controller(w.collider, {}, w.zones);
   trigger = new PortalTrigger(w.portals);
   area = undefined;
@@ -384,6 +401,7 @@ hud.onSpawn = (id) => {
   goTo(world?.spawns.find((s) => s.id === id) ?? null);
 };
 hud.onUse = () => input.requestUse();
+hud.onLantern = () => input.requestLantern();
 
 const source = worldFromQuery(location.search, { index: DEFAULT_INDEX_URL, glb: DEFAULT_GLB_URL });
 if (source?.kind === 'index') {
@@ -462,8 +480,14 @@ renderer.setAnimationLoop(() => {
   }
   camera.rotation.set(pitch, yaw, 0, 'YXZ');
   sky.position.copy(camera.position);
+  // The lantern follows the eye; L (the pad's Y, the button) turns it off and on where it is carried.
+  if (frame.lantern && lantern.wanted) lantern.toggle();
+  camera.updateMatrixWorld();
+  lantern.update(dt, camera.position, yaw, camera.matrixWorldInverse);
   const padOn = navigator.getGamepads?.().some((p) => p?.connected) ?? false;
-  hud.setHint(padOn ? 'pad' : input.touchSeen ? 'touch' : 'desktop', input.locked);
+  const device = padOn ? 'pad' : input.touchSeen ? 'touch' : 'desktop';
+  hud.setHint(device, input.locked);
+  hud.setLantern(lantern.wanted && controller ? lantern.enabled : null, device);
   if (debugOn) {
     const p = controller?.position;
     hud.setDebug([
@@ -480,6 +504,10 @@ renderer.setAnimationLoop(() => {
           ` · ${(world.collider.geometry.index!.count / 3000).toFixed(0)}k tris in ${collisionMs.toFixed(0)} ms`
         : '',
       `exposure ${renderer.toneMappingExposure.toFixed(2)} · area ${area?.name ?? '-'}${indoor ? ' (indoor)' : ''}`,
+      lanternPatched > 0
+        ? `lantern ${lantern.lit ? 'on' : lantern.wanted ? 'off' : 'not here'} · ${lanternPatched} materials` +
+          ` · flicker ${lantern.flicker.toFixed(3)}`
+        : '',
       trip
         ? `portal ${trip.portal} → ${trip.spawn ? `Spawn_${trip.spawn}` : 'no spawn'}` +
           (trip.fallback ? ' (fallback: no Spawn_<to>_<toSpawn>)' : '') +
@@ -522,6 +550,16 @@ if (debugOn) {
       notice: hud.noticeText,
       memory: memoryInfo(),
       held: world ? memoryOf(world.root) : null,
+      // The lantern: wanted here, the walker's toggle, lit, the materials that take it and where it is.
+      lantern: {
+        wanted: lantern.wanted,
+        enabled: lantern.enabled,
+        lit: lantern.lit,
+        patched: lanternPatched,
+        flicker: lantern.flicker,
+        position: lantern.position.toArray(),
+        label: hud.lanternLabel,
+      },
     }),
   });
 }

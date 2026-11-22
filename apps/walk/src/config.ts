@@ -140,6 +140,35 @@ export const CLIMB = {
   ledgeDrop: 1,
 } as const;
 
+/**
+ * The carried lantern (src/lantern.ts): on in cave areas, off in the village and in rooms. A warm point light added
+ * in the unlit materials' shaders as base colour x lantern(d), in linear light before tone mapping, with
+ * lantern(d) = intensity / (1 + (d / near)^2) x (1 - smoothstep(0.7 x reach, reach, d)). No shadows.
+ */
+export const LANTERN = {
+  /** The light's colour, `#FFB457` (the palette's warm), as sRGB; the shader takes it linear. */
+  colour: '#FFB457',
+  /** Below the eye, metres: 1.45 m above the feet while walking (eye 1.6 m); crawling it stays this far under the
+   * eye (0.4 m above the feet), so it is never carried up into a low roof. */
+  belowEye: 0.15,
+  /** How far ahead of the eye on the ground plane, metres. */
+  ahead: 0.3,
+  /** The falloff's knee, metres: at this distance the light is half of `intensity`. */
+  near: 2.5,
+  /** Nothing is lit beyond this, metres; the light fades out from 0.7 of it. */
+  reach: 12,
+  /**
+   * Scene-linear intensity. A cave wall of the most common albedo (the limestone and default walls' mean linear
+   * luminance, 0.0816) 2 m from the lantern then shows display luminance 0.55 through AgX at the caves' exposure
+   * (2.378): the cave look's lamp-pool display (tools/blender/meshy_looks/cave_fp.json, `lamp_pool`), which every
+   * gate lamp's pool is held at or under, so it is the brightest of them. Solved with meshy_room_build.agx: the
+   * light at 2 m is 2.44, and 2.44 x (1 + (2 / 2.5)^2) = 4.0.
+   */
+  intensity: 4.0,
+  /** The flicker's depth: the light moves by at most this share either way, slowly (nothing above 2.2 Hz). */
+  flicker: 0.03,
+} as const;
+
 export const LOOK = {
   /** Radians per pixel of mouse movement. */
   mouse: 0.0022,

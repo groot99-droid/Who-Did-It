@@ -33,12 +33,16 @@ export class Hud {
   private readonly door = el('button', 'door');
   private readonly notice = el('div', 'notice');
   private readonly mode = el('div', 'mode');
+  /** The lantern's toggle and hint, in the caves. */
+  private readonly lantern = el('button', 'lantern');
+  private lanternText: string | null = null;
   /** The loading hint of a crossing, above the ink. */
   private readonly hold = el('div', 'loading');
   private modeText: string | null = null;
   private noticeTimer: ReturnType<typeof setTimeout> | undefined;
   onSpawn: ((id: string) => void) | null = null;
   onUse: (() => void) | null = null;
+  onLantern: (() => void) | null = null;
 
   constructor(
     root: HTMLElement,
@@ -57,6 +61,12 @@ export class Hud {
     this.notice.hidden = true;
     this.mode.hidden = true;
     this.hold.hidden = true;
+    this.lantern.hidden = true;
+    this.lantern.type = 'button';
+    this.lantern.addEventListener('click', () => {
+      this.onLantern?.();
+      this.lantern.blur();
+    });
     this.door.type = 'button';
     this.door.addEventListener('click', () => this.onUse?.());
     root.append(
@@ -71,6 +81,7 @@ export class Hud {
       this.notice,
       this.mode,
       this.hold,
+      this.lantern,
     );
     this.select.addEventListener('change', () => {
       this.onSpawn?.(this.select.value);
@@ -208,6 +219,22 @@ export class Hud {
 
   showDrop(on: boolean): void {
     this.drop.hidden = !on;
+  }
+
+  /** The lantern's button where the walker carries one (null hides it): its state and the key that toggles it. */
+  setLantern(on: boolean | null, kind: 'desktop' | 'touch' | 'pad'): void {
+    const key = kind === 'touch' ? '' : kind === 'pad' ? 'Y · ' : 'L · ';
+    const text = on === null ? null : `${key}lantern ${on ? 'on' : 'off'}`;
+    if (text === this.lanternText) return;
+    this.lanternText = text;
+    this.lantern.hidden = text === null;
+    this.lantern.textContent = text ?? '';
+    this.lantern.classList.toggle('off', on === false);
+  }
+
+  /** The lantern button's words while it shows; else null. */
+  get lanternLabel(): string | null {
+    return this.lanternText;
   }
 
   /** The traversal mode's word ("Crawling") for as long as it lasts; null hides it. */

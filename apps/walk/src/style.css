@@ -238,3 +238,23 @@ body {
 [hidden] {
   display: none !important;
 }
+
+/* The lantern's toggle in the caves (L, the pad's Y, or a tap), under the spawn picker. */
+.lantern {
+  position: absolute;
+  top: 56px;
+  right: 16px;
+  padding: 6px 12px;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  pointer-events: auto;
+}
+
+.lantern.off {
+  border-color: var(--muted);
+  color: var(--muted);
+}

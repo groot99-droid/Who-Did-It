@@ -139,6 +139,34 @@ Desktop: click for pointer lock and mouse look, WASD or the arrows, Shift runs. 
 (pushed to the edge it runs), drag on the right half to look. Gamepad: left stick walks, right stick looks, a trigger
 or the left-stick click runs. Near a door, E or Enter (the pad's A, or the door button on touch) goes through. The numbers are in `src/config.ts`.
 In a cave's traversal zones the same controls crawl, sidle and climb (below); no mode has a button of its own.
+In the caves L (the pad's Y, or the lantern button under the spawn picker) turns the lantern off and on.
+
+## The lantern
+
+In the caves the walker carries a lantern (`src/lantern.ts`, numbers in `LANTERN` in `src/config.ts`): a warm
+`#FFB457` point light 0.3 m ahead of the eye and 0.15 m under it (1.45 m above the feet while walking; crawling it
+stays under the eye). It is carried in an area of kind `cave` (the index's `kind`, or the area's `wdi_kind`), or
+where the GLB's scene or the area has `wdi_lantern: true`; `wdi_lantern: false` turns it off there. It is off in the
+village, the wild areas and the rooms. It is on when a cave opens; L, the pad's Y or the button turns it off and on,
+and that choice holds across crossings in the page (a crossing by page load starts with it on).
+
+- **Light.** The cave files are unlit (`KHR_materials_unlit`, three's `MeshBasicMaterial`), so the lantern is added in
+  their shader (`onBeforeCompile`, one program for all of them): the base colour (the factor times the texture,
+  before the baked light in the vertex colours) times lantern(d), added to the bake in linear light before tone
+  mapping and fog, with lantern(d) = I / (1 + (d / 2.5)^2) x (1 - smoothstep(8.4, 12, d)), d in metres from the
+  lantern. I = 4.0: a wall of the caves' common albedo (0.0816) 2 m away then shows display luminance 0.55 through
+  AgX at the caves' exposure (2.378), the cave look's lamp-pool display, which no gate lamp's pool exceeds. There is
+  no shadow and no angle term: a surface is lit by its distance alone. The gate lamps' glass and the sky seen through
+  a cave mouth are not lit (by material name), nor is a material or mesh with `wdi_lantern: false`.
+- **Flicker.** Three slow sines (0.47, 1.13 and 2.07 Hz) move the light by at most 3 % either way; nothing strobes.
+- **Swaps.** A file with a cave area has its unlit materials patched before its shaders are compiled; every patched
+  material reads the same three uniforms, set once a frame. A patched material is freed with its area like any
+  other, and the lantern keeps no reference to any material, texture or geometry.
+- **Cost.** At 390 x 844 (pixel ratio 2) in headless Chrome on a laptop GPU (ANGLE D3D11, no frame cap), three cave
+  spawns ran at 386 to 505 fps with the lantern on, off, or without it (the build before it): the differences were
+  within the run-to-run noise (measured on 2026-11-21; no phone was measured).
+- `?debug` shows a lantern line (on, off or not here, the materials that take it, the flicker), and `window.__walk`
+  has `lantern` (`wanted`, `enabled`, `lit`, `patched`, `flicker`, `position`, `label`).
 
 ## Collision
 
