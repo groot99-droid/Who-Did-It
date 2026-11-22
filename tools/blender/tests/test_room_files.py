@@ -1384,6 +1384,61 @@ class RoomFileV2(unittest.TestCase):
         self.assertIn("lantern", data["look"]["lights"])
         self.assertEqual(spec["pending"], [])
 
+    # -- G14, first part: the lancet (the chapel's five), and the crypt's narrow flight down
+    def chapel(self):
+        return raw(os.path.join(ROOMS_DIR, "chapel.json"))
+
+    def test_the_chapel_reads_its_lancets_crypt_and_moon(self):
+        data = self.chapel()
+        cfg, spec = self.read(data)
+        wins = [o for o in spec["openings"] if o["kind"] == "window"]
+        self.assertEqual(len(wins), 5)
+        self.assertEqual({o["style"] for o in wins}, {"lancet"})
+        self.assertEqual(sorted((o["side"], o["at"]) for o in wins),
+                         [("N", -5.5), ("N", -1.5), ("N", 2.5), ("W", -2.5), ("W", 1.5)])
+        for o in wins:      # no curtains, a sky backdrop (no outside block), the arch springing under the apex
+            self.assertEqual((o["curtains"], o["swag"], o["outside"]), (False, False, "sky"))
+            self.assertAlmostEqual(o["spring"], o["head"] - o["width"] * math.sqrt(3.0) / 2.0, places=5)
+            self.assertGreater(o["sill"] - 0.2, 1.75)       # the surround over the capsule's top: no invisible wall
+        crypt = next(o for o in spec["openings"] if o["id"] == "ch.crypt")
+        fl = crypt["flight"]
+        self.assertEqual((crypt["side"], crypt["foot"], fl["dir"], fl["rail"]), ("S", [-6.5, -5.0], "N", ["N", "E"]))
+        self.assertAlmostEqual(fl["well"][2] - fl["well"][0], 0.9)
+        # the crypt spawn stands clear of the east rail, beside the stair's head
+        self.assertGreater(-6.5 - (fl["box"][3] + 0.30), 0.0)
+        # the moon-lit lancets stand on two walls: one Sun by its bearing
+        self.assertEqual(sorted(r["window"] for r in spec["lights"] if r["role"] == "moon"),
+                         ["ch.stained_glass_2", "ch.stained_glass_e_1"])
+        self.assertIn("bearing", data["moon"])
+        self.assertEqual(spec["groups"], ["candle", "moon", "fill"])
+        self.assertEqual(spec["pending"], [])
+
+    def test_lancet_rules(self):
+        self.assertEqual(rf.WINDOW_STYLES, ("sash", "lancet"))
+        cases = [(lambda o: o.update(glass=["#2E4C8F", "#C9862C"]), "glass is 3 to 6 colours"),
+                 (lambda o: o.update(glass=["#2E4C8F", "#C9862C", "#8A6FA8"]), "is lilac or magenta"),
+                 (lambda o: o.update(glass=["#2E4C8F", "#2EC4B6", "#D9B64A"]), "is teal"),
+                 (lambda o: o.update(curtains=True, curtain_colour="#4B4A3C"), "a lancet has no curtains or swag"),
+                 (lambda o: o.update(panes=[3, 0]), "panes is a lancet's lead grid"),
+                 (lambda o: o.update(width=1.5), "a lancet is 0.4 to 1.2 m wide"),
+                 (lambda o: o.update(head=2.5), "its arch rises 0.61 m"),
+                 (lambda o: o.update(style="rose"), 'style "rose" is not built yet (G14); the builder has: sash, '
+                                                    'lancet (R-O8)')]
+        for change, said in cases:
+            data = self.chapel()
+            change(next(o for o in data["openings"] if o["id"] == "ch.stained_glass_0"))
+            self.assertIn(said, self.stops(data), said)
+        # glass is a lancet's only: the parlour's sash windows refuse it
+        data = raw(PARLOUR)
+        next(o for o in data["openings"] if o["kind"] == "window")["glass"] = ["#2E4C8F", "#C9862C", "#D9B64A"]
+        self.assertIn("glass is a lancet's stained glass (R-O12)", self.stops(data))
+        # a sash window reads as it did: no lancet key reaches its entry (the finished rooms' bytes)
+        _cfg, spec = self.read(raw(PARLOUR))
+        for o in spec["openings"]:
+            if o["kind"] == "window":
+                self.assertNotIn("glass", o)
+                self.assertNotIn("spring", o)
+
     @unittest.skipIf(mrb is None, "numpy is not here")
     def test_a_face_frame_reads_as_its_shell_wall(self):
         fr = BuilderV2.frame(-11.0, 11.0, -5.0, 5.0)
@@ -1508,6 +1563,27 @@ class BuilderV2(unittest.TestCase):
         self.assertEqual(mrb.clean_name("industrial_wall_sconce_bulb"), "industrial_wall_bracket_bulb")
         for base in ("GothicBed_01", "wooden_candlestick", "hanging_industrial_lamp", "kit_chest_Material"):
             self.assertEqual(mrb.clean_name(base), base)     # every other name as it was (the golden rooms' bytes)
+
+    def test_a_lancet_outline_is_its_pointed_arch(self):
+        sa, sb, s, zs, h = -0.35, 0.35, 2.0, 4.1 - 0.7 * math.sqrt(3.0) / 2.0, 4.1
+        line = mrb.lancet_outline(sa, sb, s, zs, h)
+        self.assertEqual(line[:2], [(sa, s), (sb, s)])
+        self.assertIn((0.0, h), [(round(a, 9), z) for a, z in line])
+        self.assertAlmostEqual(max(z for _a, z in line), h)
+        for a, z in line:   # every arch point on both circles' sides of the lens: inside each disc of radius W
+            if z > zs + 1e-9:
+                self.assertLessEqual(math.hypot(a - sa, z - zs), 0.7 + 1e-9)
+                self.assertLessEqual(math.hypot(a - sb, z - zs), 0.7 + 1e-9)
+        area = 0.5 * sum(a0 * z1 - a1 * z0 for (a0, z0), (a1, z1) in zip(line, line[1:] + line[:1]))
+        self.assertGreater(area, 0.0)                      # anticlockwise: the clip's inside test holds
+        # a quarry over the apex clipped to the arch: inside the outline, its corners on the outline
+        cell = mrb.clip_convex([(-0.1, 3.9), (0.1, 3.9), (0.1, 4.2), (-0.1, 4.2)], line)
+        self.assertGreaterEqual(len(cell), 3)
+        self.assertLessEqual(max(z for _a, z in cell), h + 1e-9)
+        self.assertGreater(min(z for _a, z in cell), 3.9 - 1e-9)
+        # a quarry wholly inside stays as it was; one wholly outside is gone
+        self.assertEqual(len(mrb.clip_convex([(-0.1, 2.2), (0.1, 2.2), (0.1, 2.4), (-0.1, 2.4)], line)), 4)
+        self.assertEqual(mrb.clip_convex([(0.5, 2.2), (0.6, 2.2), (0.6, 2.4), (0.5, 2.4)], line), [])
 
     # -- G3: the openings' plain-number parts (the rest is proven by the gate and the scratch rooms' builds)
     @staticmethod

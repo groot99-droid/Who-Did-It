@@ -1,0 +1,846 @@
+{
+  "room": "chapel",
+  "about": "St Brannock's, the village chapel, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 16 x 10 m inside (x -8..8, y -5..5), 4.5 m high. Every prop, spot, portal and night light of packages/content/data/scenes/chapel.json is named below. The chapel faces north: the altar under the north lancets with a candle stand either side, the lectern and the pulpit at the chancel step, three rows of box pews down the nave either side of the aisle (x 0.5), the font, the alms box and the votive rack by the east door; five lancets of stained glass (G14's lancet), two of them moon-lit; the crypt stairs down in the south-west corner (G12's flight, D6). Grey boxes stand in for the pieces with no model (decision D2).",
+  "district": "St Brannock's",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "door": "Inside the chapel door",
+    "crypt": "At the head of the crypt stairs"
+  },
+  "height": 4.5,
+  "height_note": "the plan's 4.5 m for the chapel (Reference E)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.88, 0.87, 0.82]
+  },
+  "floor_note": "the nave's flags (`f` in the scene's material layer) over the whole floor, as the manor hall's: the chancel's boards (`w`) and the crypt corner's earth (`d`) wait for G11's floor by tile letter",
+  "wall_colour": "#8C8574",
+  "wall_colour_note": "guess: old limewash over stone, a warm grey; yellow-brown above blue, never pink or lilac under the moon and the candles",
+  "ceiling_colour": "#4C4034",
+  "ceiling_colour_note": "the roof boards' underside, dark",
+  "paint_colour": "#6E6452",
+  "wood_colour": "#4A3A2A",
+  "wood_colour_note": "dark oak: the door, the pews, the beams, the crypt stairs",
+  "skirting": null,
+  "skirting_note": "none: limewashed stone to the flags",
+  "picture_rail": null,
+  "picture_rail_note": "none, and the lancets rise to 4.1 m",
+  "cornice": null,
+  "cornice_note": "none: the walls meet the roof boards",
+  "openings": [
+    {
+      "id": "ch.door",
+      "kind": "door",
+      "portal": "ch.door",
+      "width": 1.1,
+      "height": 2.4,
+      "note": "the chapel door in the east wall, tile (17,6): centred at y -0.5, the portal at its foot (8.0, -0.5); the door spawn stands 0.5 m inside it, (7.5, -0.5), facing west up the nave's cross aisle. 1.1 m wide (the barn's: cc_geom's door check measures 0.6 m either side of the centre) and 2.4 m high: a panel door until G13's double door"
+    },
+    {
+      "id": "ch.crypt",
+      "kind": "stairs",
+      "portal": "ch.crypt",
+      "flight": {
+        "well": [-8.0, -5.0, -7.1, -3.0],
+        "dir": "N",
+        "riser": 0.22,
+        "tread": 0.24,
+        "under": 1.0,
+        "rail": ["N", "E"],
+        "rail_h": 0.9
+      },
+      "flight_note": "G12 (D6: visible stairs): a crypt stair against the west wall, 0.9 m wide (x -8.0..-7.1, y -5.0..-3.0, tiles (1,9) and (1,10)), its head at the south wall, descending north and on 1 m under the flags into the dark; a balustrade on its north and east edges. Its two tiles cannot be stood on (listed for the owner): a 0.6 m well with no east rail kept them, but the open edge was an invisible wall (cc_geom, the first no-bake build), and with a rail any well leaves too little of the tiles. The portal at the scene's tile (2,11), its foot on the south wall's face (-6.5, -5.0), 0.9 m east of the stair's head; the crypt spawn (-6.5, -4.5) stands beside the head, facing north",
+      "note": "the crypt stairs down to the cellar (ch.crypt: to cellar, spawn crypt, 3 m down)"
+    },
+    {
+      "id": "ch.stained_glass_0",
+      "kind": "window",
+      "prop": "ch.stained_glass_0",
+      "style": "lancet",
+      "width": 0.7,
+      "sill": 2.0,
+      "head": 4.1,
+      "panes": [3, 9],
+      "glass": ["#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"],
+      "note": "the five lancets (G14's lancet): 0.7 m wide, the sill at 2.0 m and the apex at 4.1 m (the arch springs at 3.49 m), in a dressed stone surround on the wall face, a lead grid of 3 x 9 quarries: a blue border and foot, amber, red and green in turn up the middle, gold in the head. Over 1.75 m: nothing of them is an invisible wall. This one at tile (3,0), x -5.5, dark (no moon light names it)"
+    },
+    {
+      "id": "ch.stained_glass_1",
+      "kind": "window",
+      "prop": "ch.stained_glass_1",
+      "style": "lancet",
+      "width": 0.7,
+      "sill": 2.0,
+      "head": 4.1,
+      "panes": [3, 9],
+      "glass": ["#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"],
+      "note": "at tile (7,0), x -1.5, dark"
+    },
+    {
+      "id": "ch.stained_glass_2",
+      "kind": "window",
+      "prop": "ch.stained_glass_2",
+      "style": "lancet",
+      "width": 0.7,
+      "sill": 2.0,
+      "head": 4.1,
+      "panes": [3, 9],
+      "glass": ["#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"],
+      "note": "at tile (11,0), x 2.5: the moon comes through it (ch.lt_moon_window)"
+    },
+    {
+      "id": "ch.stained_glass_e_0",
+      "kind": "window",
+      "prop": "ch.stained_glass_e_0",
+      "style": "lancet",
+      "width": 0.7,
+      "sill": 2.0,
+      "head": 4.1,
+      "panes": [3, 9],
+      "glass": ["#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"],
+      "note": "the west wall's first lancet, tile (0,4), y 1.5, dark"
+    },
+    {
+      "id": "ch.stained_glass_e_1",
+      "kind": "window",
+      "prop": "ch.stained_glass_e_1",
+      "style": "lancet",
+      "width": 0.7,
+      "sill": 2.0,
+      "head": 4.1,
+      "panes": [3, 9],
+      "glass": ["#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"],
+      "note": "the west wall's second, tile (0,8), y -2.5: the moon comes through it (ch.lt_moon_nave)"
+    }
+  ],
+  "openings_note": "the five lancets say no `outside`: the room has no `outside` block, so each is `sky` (a backdrop on the north wall and one on the west, decision 10 of the builder's design)",
+  "moon": {
+    "bearing": 315.0,
+    "elevation": 35.0,
+    "note": "one Sun for the room (R-L9): the moon-lit lancets stand on the north and the west walls, so a compass bearing toward the moon, north-west, a little higher than the bedroom's 32 degrees"
+  },
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "ch.lt_candles",
+      "role": "lamp",
+      "anchor": {
+        "piece": "ch.candle_stand_0"
+      },
+      "power": 55.0,
+      "note": "the altar's west candle (tile (8,1)): the candlestick's flame on its tall stand, stronger than a room's lamp (the altar's light carries the chapel)"
+    },
+    {
+      "id": "ch.lt_candles_e",
+      "role": "lamp",
+      "anchor": {
+        "piece": "ch.candle_stand_1"
+      },
+      "power": 55.0,
+      "note": "the altar's east candle (tile (10,1))"
+    },
+    {
+      "id": "ch.lt_votives",
+      "role": "lamp",
+      "anchor": {
+        "piece": "ch.votive_rack",
+        "name": "flame"
+      },
+      "power": 30.0,
+      "glow": {
+        "shape": "cone",
+        "size": [0.01, 0.03],
+        "material": "flame",
+        "at": [
+          [-0.3, -0.08, -0.023],
+          [-0.1, -0.08, -0.023],
+          [0.1, -0.08, -0.023],
+          [0.3, -0.08, -0.023],
+          [-0.2, 0.08, -0.023],
+          [0.0, 0.08, -0.023],
+          [0.2, 0.08, -0.023]
+        ]
+      },
+      "note": "the votive candles on their rack (tile (15,3)): one light at the rack's top, seven small flames in two rows, their feet on the rack's top (2.3 cm under the light: the first no-bake build found them floating)"
+    },
+    {
+      "id": "ch.lt_moon_window",
+      "role": "moon",
+      "window": "ch.stained_glass_2",
+      "note": "the moon through the north wall's third lancet (tile (11,0))"
+    },
+    {
+      "id": "ch.lt_moon_nave",
+      "role": "moon",
+      "window": "ch.stained_glass_e_1",
+      "note": "the moon through the west wall's second lancet (tile (0,8)). The scene's day light ch.lt_window_east is a day and dusk light: the walk is night only"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the altar's two candles and the votives), moon (the two lancets) and fill = 3, and the AO.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the parlour's darker-room lever and a light setting of the room's own.",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a chapel at night, lit by its candles",
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "chapel": {
+        "label": "the chapel",
+        "mix": {
+          "candle": 1.0,
+          "moon": 16.0,
+          "fill": 1.2
+        },
+        "note": "the first guess (moon 3.0, fill 0.3, from the parlour and the barn) gave a first 128-sample bake (2026-11-22) whose moon patch read 0.003 to 0.014 on the display (lost) and 93 % of the vertices under the ink before the lift: the moon through the narrow lancets and the fill raised for the second bake (moon 8, fill 0.6: the patch 0.012 to 0.061). From the second bake's saved light, moon 16 and fill 1.2 gave 0.039 to 0.127, the shafts on the west wall and the floor seen; the exposure follows the candles' pool (E 0.39 to 0.40 in all three), so the nave stays a dark church at night"
+      }
+    }
+  },
+  "light": "chapel",
+  "light_note": "the room's own light setting (look.settings.chapel; --light overrides)",
+  "pieces": [
+    {
+      "id": "ch.cot",
+      "face": "S",
+      "place": ["at", -7.055, 4.55],
+      "spec": {
+        "model": "box",
+        "size": [1.85, 0.8, 0.45],
+        "label": "Iron cot: the sexton's narrow cot under a grey blanket"
+      },
+      "note": "the sexton's cot at its tile (1,1), the north-west corner: a grey box (the plan's iron cot is G20's), lying east to west along the north wall (x -7.98..-6.13): north to south it would stand on the confessional at (1,2)"
+    },
+    {
+      "id": "ch.confessional",
+      "spot": true,
+      "face": "E",
+      "place": ["wall", "W", 3.5],
+      "spec": {
+        "model": "box",
+        "size": [0.95, 0.95, 2.2],
+        "label": "Confessional: a panelled oak booth with a curtained door, room to hide inside (a hide spot)"
+      },
+      "note": "the hide spot at its tile (1,2), against the west wall (the plan's confessional, Tier 2: no model, a grey box)"
+    },
+    {
+      "id": "ch.flower_stand_0",
+      "face": "S",
+      "place": ["at", -4.5, 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "brass_vase_01",
+            "scale": 0.8,
+            "at": [0.0, null, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "note": "the flower stand at its tile (4,1): the bedroom's tall stand with a brass vase on it (the lilies, dead in the vase, are G19's)"
+    },
+    {
+      "id": "ch.lectern",
+      "face": "S",
+      "place": ["at", -3.5, 4.5],
+      "spec": {
+        "model": "box",
+        "size": [0.55, 0.5, 1.2],
+        "label": "Lectern: the brass eagle lectern, the great Bible open on its wings"
+      },
+      "note": "the lectern at its tile (5,1), at the chancel step (the plan's lectern, Tier 2: a grey box)"
+    },
+    {
+      "id": "ch.candle_stand_0",
+      "face": "S",
+      "place": ["at", -0.5, 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.4,
+        "lod": 0.5,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.3,
+            "at": [0.0, null, 0.0],
+            "lod": 0.02
+          }
+        ]
+      },
+      "note": "the candle stand west of the altar at its tile (8,1): a tall stand (the bedroom's, at 1.4, 1.07 m) with a candlestick and its flame (the light ch.lt_candles)"
+    },
+    {
+      "id": "ch.altar_main",
+      "face": "S",
+      "place": ["at", 0.5, 4.5],
+      "spec": {
+        "model": "box",
+        "size": [1.2, 0.7, 1.0],
+        "label": "Altar (8D's altar): a stone table under a white linen cloth, a brass cross on it"
+      },
+      "note": "the altar at its tile (9,1), under the north lancets, the aisle's head (tile (9,2)) kept clear before it (the plan's altar, a Tier 1 hero: a grey box). 1.2 m wide, so the candle stands either side stand clear of it"
+    },
+    {
+      "id": "ch.candle_stand_1",
+      "face": "S",
+      "place": ["at", 1.5, 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.4,
+        "lod": 0.5,
+        "extras": ["flame"],
+        "dress": [
+          {
+            "slug": "wooden_candlestick",
+            "scale": 1.3,
+            "at": [0.0, null, 0.0],
+            "lod": 0.02
+          }
+        ]
+      },
+      "note": "the candle stand east of the altar at its tile (10,1) (the light ch.lt_candles_e)"
+    },
+    {
+      "id": "ch.pulpit",
+      "face": "S",
+      "place": ["at", 4.5, 4.5],
+      "spec": {
+        "model": "box",
+        "size": [1.0, 0.9, 1.6],
+        "label": "Pulpit: an oak drum pulpit up three steps, its sounding board over it"
+      },
+      "note": "the pulpit at its tile (13,1), at the chancel step (the plan's pulpit, Tier 1: a grey box)"
+    },
+    {
+      "id": "ch.flower_stand_1",
+      "face": "S",
+      "place": ["at", 5.5, 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "side_table_tall_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "brass_vase_01",
+            "scale": 0.8,
+            "at": [0.0, null, 0.0],
+            "lod": 0.3
+          }
+        ]
+      },
+      "note": "the second flower stand at its tile (14,1)"
+    },
+    {
+      "id": "ch.crypt_niche",
+      "spot": true,
+      "face": "S",
+      "place": ["wall", "N", 7.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 1.0],
+        "label": "Crypt niche: a stone burial recess in the corner, its slab pulled aside (the body spot)"
+      },
+      "note": "the body spot at its tile (16,1), against the north wall in the north-east corner (the plan's crypt niche: a grey box)"
+    },
+    {
+      "id": "ch.hymn_board",
+      "face": "S",
+      "place": ["wall", "N", -2.5],
+      "rise": 1.4,
+      "spec": {
+        "model": "box",
+        "size": [0.5, 0.05, 0.8],
+        "label": "Hymn board: the numbers of the last service on their cards"
+      },
+      "note": "the hymn board at its tile (6,0), on the north wall between the first two lancets (a flat panel; its print is G18's)"
+    },
+    {
+      "id": "ch.memorial",
+      "face": "S",
+      "place": ["wall", "N", 3.5],
+      "rise": 1.5,
+      "spec": {
+        "model": "box",
+        "size": [0.7, 0.05, 0.5],
+        "label": "Memorial tablet: a marble plaque to the drowned of the parish"
+      },
+      "note": "the memorial at its tile (12,0), on the north wall east of the third lancet (a flat panel; its print is G18's)"
+    },
+    {
+      "id": "ch.bell_pull",
+      "covers": ["ch.rope"],
+      "decor": true,
+      "face": "S",
+      "place": ["at", 6.5, 4.85],
+      "rise": 1.15,
+      "spec": {
+        "model": "box",
+        "size": [0.05, 0.05, 3.3],
+        "label": "Bell pull: the bell's line down from the tower, its woollen sally, a torn glove caught in it"
+      },
+      "note": "the scene's ch.rope (decision D7: the chapel's bell line stays): its node and id are ch.bell_pull so that the names pass the word scan; it covers ch.rope at its tile (15,0), hanging 15 cm off the north wall from 4.45 m down to 1.15 m (over the walker's 1.75 m: no invisible wall in front of the niche)"
+    },
+    {
+      "id": "ch.votive_rack",
+      "face": "W",
+      "place": ["at", 6.5, 2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.4, 1.05],
+        "label": "Votive rack: an iron stand with rows of small candles in their cups",
+        "anchors": {
+          "flame": [0.0, 0.0, 1.075]
+        }
+      },
+      "note": "the votive rack at its tile (15,3), facing the nave (the plan's votive rack, Tier 2: a grey box); the light ch.lt_votives stands on its top, its flames a row of small cones"
+    },
+    {
+      "id": "ch.alms_box",
+      "face": "W",
+      "place": ["wall", "E", -2.5],
+      "spec": {
+        "model": "box",
+        "size": [0.3, 0.3, 1.0],
+        "label": "Alms box: an iron-bound poor box on its oak post"
+      },
+      "note": "the alms box at its tile (16,8), against the east wall south of the door (a grey box)"
+    },
+    {
+      "id": "ch.font",
+      "face": "S",
+      "place": ["at", 6.5, -3.5],
+      "spec": {
+        "model": "box",
+        "size": [0.7, 0.7, 1.0],
+        "label": "Font: an octagonal stone bowl on its pillar, a wooden cover on it"
+      },
+      "note": "the font at its tile (15,9), by the door (the plan's font, Tier 2: a grey box)"
+    },
+    {
+      "id": "ch.pew_0",
+      "face": "S",
+      "place": ["at", -2.0, 2.33],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the scene's pew at its footprint (5..8, 3) (x -4..0): its seat, the back on its south side, a front and two ends round it, each a box in the joinery's wood a centimetre apart (the plan's pew is a Tier 1 model)"
+    },
+    {
+      "id": "ch.pew_0_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, 2.1],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_0_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, 2.92],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_0_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -3.96, 2.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_0_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.04, 2.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_1",
+      "face": "S",
+      "place": ["at", 3.0, 2.33],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the pew at its footprint (10..13, 3)"
+    },
+    {
+      "id": "ch.pew_1_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, 2.1],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_1_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, 2.92],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_1_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 1.04, 2.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_1_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 4.96, 2.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_2",
+      "face": "S",
+      "place": ["at", -2.0, 0.33],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the pew at its footprint (5..8, 5)"
+    },
+    {
+      "id": "ch.pew_2_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, 0.1],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_2_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, 0.92],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_2_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -3.96, 0.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_2_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.04, 0.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_3",
+      "face": "S",
+      "place": ["at", 3.0, 0.33],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the pew at its footprint (10..13, 5)"
+    },
+    {
+      "id": "ch.pew_3_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, 0.1],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_3_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, 0.92],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_3_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 1.04, 0.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_3_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 4.96, 0.51],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_4",
+      "face": "S",
+      "place": ["at", -2.0, -1.67],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the pew at its footprint (5..8, 7)"
+    },
+    {
+      "id": "ch.pew_4_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, -1.9],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_4_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -2.0, -1.08],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_4_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -3.96, -1.49],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_4_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.04, -1.49],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_5",
+      "face": "S",
+      "place": ["at", 3.0, -1.67],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.38, 0.45],
+        "label": "Box pew: the oak bench seat",
+        "finish": "wood"
+      },
+      "note": "the pew at its footprint (10..13, 7)"
+    },
+    {
+      "id": "ch.pew_5_back",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, -1.9],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 1.0],
+        "label": "Box pew: its panelled back",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_5_front",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 3.0, -1.08],
+      "spec": {
+        "model": "box",
+        "size": [3.82, 0.06, 0.95],
+        "label": "Box pew: its panelled front",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_5_end_w",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 1.04, -1.49],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.pew_5_end_e",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 4.96, -1.49],
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.9, 1.05],
+        "label": "Box pew: its end board",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.beam_w",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -3.5, 0.0],
+      "rise": 3.6,
+      "spec": {
+        "model": "box",
+        "size": [9.98, 0.22, 0.28],
+        "label": "Tie beam",
+        "finish": "wood"
+      },
+      "note": "the roof's tie beams north to south across the nave (decor, the joinery's wood), between the north lancets, their undersides at 3.6 m"
+    },
+    {
+      "id": "ch.beam_c",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 0.5, 0.0],
+      "rise": 3.6,
+      "spec": {
+        "model": "box",
+        "size": [9.98, 0.22, 0.28],
+        "label": "Tie beam",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "ch.beam_e",
+      "decor": true,
+      "face": "E",
+      "place": ["at", 4.5, 0.0],
+      "rise": 3.6,
+      "spec": {
+        "model": "box",
+        "size": [9.98, 0.22, 0.28],
+        "label": "Tie beam",
+        "finish": "wood"
+      }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_door and spawn_crypt are the spawns' own views.",
+  "views": {
+    "spawn_door": [[7.5, -0.5, 1.6], [-8.0, -0.5, 1.6], 70.0],
+    "spawn_crypt": [[-6.5, -4.5, 1.6], [-6.5, 5.0, 1.6], 70.0],
+    "nave": [[0.5, -4.3, 1.6], [0.5, 5.0, 2.0], 70.0],
+    "altar": [[0.5, 1.5, 1.6], [0.5, 5.0, 1.6], 70.0],
+    "chancel_west": [[-0.5, 3.4, 1.6], [-8.0, 4.0, 1.4], 70.0],
+    "chancel_east": [[1.5, 3.4, 1.6], [8.0, 4.6, 1.4], 70.0],
+    "lancets_west": [[3.5, -0.5, 1.6], [-8.0, -0.5, 2.9], 70.0],
+    "lancets_north": [[0.5, -1.5, 1.6], [0.5, 5.0, 3.3], 70.0],
+    "crypt": [[-5.2, -1.8, 1.6], [-7.7, -4.6, 0.0], 70.0],
+    "east": [[2.5, -3.6, 1.6], [8.0, -1.5, 1.0], 70.0]
+  }
+}

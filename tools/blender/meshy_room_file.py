@@ -55,7 +55,7 @@ SPEC_KEYS = frozenset("model slug name scale tall size kmax lod extras dress doo
                       "wall drape head label finish anchors glow style opening surface mantel breast firebox beam "
                       "seats sill dome ledge outline in width height knob".split())
 OPENING_KEYS = frozenset("id kind portal prop side in at width height style knob sill head panes rod curtains swag "
-                         "curtain_colour outside foot flight hatch".split())
+                         "curtain_colour outside foot flight hatch glass".split())
 LIGHT_KEYS = frozenset("id role anchor z group power color radius glow window pool name".split())
 ANCHOR_KEYS = frozenset("piece name offset at wall along out z".split())
 GLOW_KEYS = frozenset("shape size material at".split())
@@ -123,7 +123,16 @@ MARKERS = ("stairs", "hatch", "drop")
 SIDES = ("N", "E", "S", "W")
 KNOB_ENDS = {"N": "EW", "S": "EW", "E": "NS", "W": "NS"}       # R-O2b: the ends of an opening seen from inside
 KNOB_DEFAULT = {"S": "E", "E": "N", "N": "W", "W": "S"}        # the end at the higher wall coordinate s
-DOOR_STYLES, WINDOW_STYLES = ("panel", "steel"), ("sash",)    # R-O8: what the builder has (steel: G13, crumb_cold)
+DOOR_STYLES, WINDOW_STYLES = ("panel", "steel"), ("sash", "lancet")   # R-O8: what the builder has (steel: G13,
+# crumb_cold; lancet: G14, the chapel)
+# a lancet (G14, the chapel's five): a tall narrow window with an equilateral pointed head (its apex at `head`, its arch
+# springing at head - width x LANCET_RISE), set in a dressed stone surround on the wall face, its leaded stained glass a
+# grid of `panes` [across, up] quarries coloured from `glass` (the border, the field colours in turn, the head's
+# tracery last); no sashes, curtains or swag (R-O12 to R-O14)
+LANCET_RISE = math.sqrt(3.0) / 2.0
+LANCET_DEFAULTS = dict(curtains=False, swag=False, panes=(3, 9),
+                       glass=("#2E4C8F", "#C9862C", "#8E2A22", "#4F7A3A", "#D9B64A"))
+LANCET_STRAIGHT = 0.3     # a lancet's straight jambs under its arch, at least
 # a visible flight down from a stairs marker (G12, first part: apoth_loft): a well cut in the floor, steps descending
 # from its head edge toward `dir` and on under the floor for `under` metres, a lined shaft, a balustrade on the open
 # edges (R-F1 to R-F8)
@@ -328,6 +337,8 @@ def _colours(row: dict) -> list:
     for i, o in enumerate(row.get("openings") or ()):
         if isinstance(o, dict):
             out.append((f"openings[{i}].curtain_colour", o.get("curtain_colour")))
+            for j, c in enumerate(o.get("glass") or () if isinstance(o.get("glass"), (list, tuple)) else ()):
+                out.append((f"openings[{i}].glass[{j}]", c))
     for k in ("candle", "moon", "fill"):
         if isinstance(row.get(k), dict):
             out.append((f"{k}.color", row[k].get("color")))
@@ -1727,7 +1738,13 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
                 bag.append(f'{where}: style "{e["style"]}" is not built yet (G13); the builder has: '
                            f'{", ".join(DOOR_STYLES)} (R-O8)')
         elif kind == "window":
-            e.update({k: o.get(k) if o.get(k) is not None else v for k, v in WINDOW_DEFAULTS.items()})
+            lancet = o.get("style") == "lancet"
+            dflt = {**WINDOW_DEFAULTS, **LANCET_DEFAULTS} if lancet else WINDOW_DEFAULTS
+            e.update({k: o.get(k) if o.get(k) is not None else v for k, v in dflt.items()})
+            if lancet:
+                _lancet_rules(e, where, bag)
+            elif o.get("glass") is not None:
+                bag.append(f"{where}: glass is a lancet's stained glass (R-O12)")
             if e["style"] not in WINDOW_STYLES:
                 bag.append(f'{where}: style "{e["style"]}" is not built yet (G14); the builder has: '
                            f'{", ".join(WINDOW_STYLES)} (R-O8)')
@@ -1814,6 +1831,43 @@ def _opening_rows(row: dict, sc: Scene, legacy: bool, bag: Problems) -> list:
     if _num(ck) and _num(cn) and _num(row.get("height")) and ck + 0.03 > row["height"] - cn:
         bag.append(f"picture_rail {ck:g} m and cornice {cn:g} m do not fit under a ceiling of {row['height']:g} m (R-S1)")
     return out
+
+
+def teal(hexc) -> bool:
+    """A teal glass (hue 150 to 200 degrees, saturation over 0.25): teal is the emitted light's colour only (the
+    owner's rule), and a lancet's glass is shown at its own colour."""
+    if not isinstance(hexc, str) or not HEX.match(hexc):
+        return False
+    h, s, _v = _hsv(hexc)
+    return 150.0 <= h <= 200.0 and s > 0.25
+
+
+def _lancet_rules(e: dict, where: str, bag: Problems) -> None:
+    """A lancet window's numbers (R-O12 to R-O14), its derived `spring` (where its pointed arch begins). Its glass
+    colours are R0.3's too (_colours)."""
+    g = e.get("glass")
+    if not (isinstance(g, (list, tuple)) and 3 <= len(g) <= 6 and all(isinstance(c, str) and HEX.match(c) for c in g)):
+        bag.append(f"{where}: glass is 3 to 6 colours #RRGGBB: the border, the field in turn, the head (R-O12)")
+    else:
+        e["glass"] = list(g)
+        for c in g:
+            if teal(c):
+                bag.append(f"{where}: glass {c} is teal: teal is the emitted light's only (the owner's rule) (R-O12)")
+    if e.get("curtains") or e.get("swag"):
+        bag.append(f"{where}: a lancet has no curtains or swag (R-O13)")
+    p = e.get("panes")
+    if not (isinstance(p, (list, tuple)) and len(p) == 2 and all(isinstance(v, int) and 1 <= v <= 16 for v in p)):
+        bag.append(f"{where}: panes is a lancet's lead grid [across, up], 1 to 16 each (R-O12)")
+    w, sill, head = e.get("width"), e.get("sill"), e.get("head")
+    if not all(_num(v) for v in (w, sill, head)):
+        return
+    if not 0.4 - 1e-9 <= w <= 1.2 + 1e-9:
+        bag.append(f"{where}: a lancet is 0.4 to 1.2 m wide (R-O14)")
+    rise = w * LANCET_RISE
+    if head - sill < rise + LANCET_STRAIGHT - 1e-9:
+        bag.append(f"{where}: its arch rises {rise:.2f} m: the head {head:g} m stands {rise + LANCET_STRAIGHT:.2f} m over "
+                   f"the sill at least (R-O14)")
+    e["spring"] = round(head - rise, 6)
 
 
 def _resolve_pieces(row: dict, sc: Scene, bag: Problems) -> dict:
@@ -2283,7 +2337,9 @@ def explain(row: dict, spec: dict, shown: str) -> str:
             bits.append(f"{e['width']:g} x {e['height']:g} m, knob {e['knob']}, foot ({e['foot'][0]:g}, {e['foot'][1]:g})")
         elif e["kind"] == "window":
             bits.append(f"{e['width']:g} m, sill {e['sill']:g}, head {e['head']:g}, outside {e['outside']}"
-                        + (", curtains" if e["curtains"] else "") + (", swag" if e["swag"] else ""))
+                        + (", curtains" if e["curtains"] else "") + (", swag" if e["swag"] else "")
+                        + (f", lancet (arch from {e['spring']:g} m, lead grid {e['panes'][0]} x {e['panes'][1]}, "
+                           f"glass {' '.join(e['glass'])})" if e.get("style") == "lancet" and "spring" in e else ""))
         else:
             bits.append(f"marker at ({e['foot'][0]:g}, {e['foot'][1]:g})")
             hv = e.get("hatch")

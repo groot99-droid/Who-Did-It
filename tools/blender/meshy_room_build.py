@@ -1945,13 +1945,189 @@ def build_windows(fr: Frame, mt: dict) -> list:
     """Every window of a v2 file, in the file's order, each with its own numbers and curtains: node names
     Window_<id> and the rest with the same suffix; ids <part>_<opening id>."""
     out = []
+    lit = {o["id"] for o in moon_windows(fr)}       # a lancet's glass is brighter where the moon comes through it
     for o in fr.openings:
         if o["kind"] != "window":
             continue
         w = o["spec"]
+        if w.get("style") == "lancet":
+            out.append(lancet_one(fr, mt, o, w, sfx(o["id"]), o["id"] in lit))
+            continue
         cm = curtain_mat(mt, w["curtain_colour"]) if w.get("curtains") else None
         out.append(window_one(fr, mt, o, w, sfx(o["id"]), cm))
     return out
+
+
+# a lancet's stained glass (G14, the chapel): each colour shown at its linear value times this level (scene-linear
+# display, as emit_display), brighter in a window a moon light names; and the glass's alpha (stained glass at night
+# lets little of the sky through)
+LANCET_LEVEL = {True: 0.45, False: 0.18}
+LANCET_ALPHA = 0.9
+LANCET_SURROUND = dict(side=0.1, head=0.11, sill=0.2, proud=0.02)   # the dressed stone round it on the wall face
+LANCET_GLASS_O = -0.2       # the glass's plane, into the wall
+
+
+def lancet_glass_mat(mt: dict, hexc: str, lit: bool):
+    """A lancet's glass of one colour, lit by the moon or dark: M_glass_lancet_<n>, made once each."""
+    tab = mt.setdefault("lancet_glass", {})
+    key = (hexc.upper(), bool(lit))
+    if key not in tab:
+        emit = tuple(v * LANCET_LEVEL[bool(lit)] for v in hex_lin(hexc))
+        tab[key] = RMat(f"M_glass_lancet_{len(tab) + 1}", None, (1, 1, 1), kind="glass", alpha=LANCET_ALPHA, emit=emit)
+    return tab[key]
+
+
+def lancet_outline(sa: float, sb: float, s: float, zs: float, h: float, n: int = 12) -> list:
+    """A lancet's outline in its wall's (s, z), anticlockwise in (s, z): the sill, the right jamb, the right arc
+    (centred on the left springing) up to the apex, the left arc (centred on the right springing) down to the left
+    springing. Convex. The apex is (the middle, h) and the arcs spring at zs."""
+    W, c = sb - sa, (sa + sb) / 2
+    a1 = math.acos(min(1.0, (c - sa) / W))          # the apex's angle at either springing (60 degrees, equilateral)
+    right = [(sa + W * math.cos(a1 * k / n), zs + W * math.sin(a1 * k / n)) for k in range(n + 1)]
+    left = [(sb - W * math.cos(a1 * k / n), zs + W * math.sin(a1 * k / n)) for k in range(n, -1, -1)]
+    right[-1] = left[0] = (c, h)
+    return [(sa, s), (sb, s)] + right + left[1:]
+
+
+def clip_convex(poly: list, clip: list) -> list:
+    """Sutherland-Hodgman: a polygon in the plane clipped to a convex anticlockwise one."""
+    out = list(poly)
+    for i in range(len(clip)):
+        (ax, ay), (bx, by) = clip[i], clip[(i + 1) % len(clip)]
+        inp, out = out, []
+        if not inp:
+            break
+
+        def inside(p, ax=ax, ay=ay, bx=bx, by=by):
+            return (bx - ax) * (p[1] - ay) - (by - ay) * (p[0] - ax) >= -1e-12
+
+        def cross(p, q, ax=ax, ay=ay, bx=bx, by=by):
+            dx, dy = q[0] - p[0], q[1] - p[1]
+            den = (bx - ax) * dy - (by - ay) * dx
+            t = ((bx - ax) * (ay - p[1]) - (by - ay) * (ax - p[0])) / den if abs(den) > 1e-15 else 0.0
+            return (p[0] + t * dx, p[1] + t * dy)
+
+        for k in range(len(inp)):
+            p, q = inp[k], inp[(k + 1) % len(inp)]
+            if inside(q):
+                if not inside(p):
+                    out.append(cross(p, q))
+                out.append(q)
+            elif inside(p):
+                out.append(cross(p, q))
+    return out
+
+
+def _face_toward(b: Builder, pts: list, uvs: list, mat, want) -> None:
+    """A face whose normal points along `want` (its winding reversed when it does not)."""
+    P = [np.array(p, float) for p in pts]
+    n = np.zeros(3)
+    for i in range(1, len(P) - 1):
+        n += np.cross(P[i] - P[0], P[i + 1] - P[0])
+    if float(np.dot(n, want)) < 0:
+        pts, uvs = pts[::-1], uvs[::-1]
+    b.face(pts, uvs, mat)
+
+
+def lancet_one(fr: Frame, mt: dict, o: dict, w: dict, suffix: str, lit: bool) -> dict:
+    """A lancet (G14): the rectangular cut in the wall closed round a pointed outline by a dressed stone surround proud
+    of the wall face (its spandrels fill the cut's top corners), a stone soffit from the surround's face back past the
+    glass round the whole outline (the jambs, the arch, the sill), the leaded stained glass a grid of quarries clipped
+    to the outline, each quarry a colour of `glass` (the border, the field colours in turn by row, the head's tracery
+    over the springing), the lead cames across it on the room side. No sashes, curtains or swag. Names Window_<id> and
+    WindowGlass_<id> as any v2 window; returns the same opening row (the moon comes through it)."""
+    side = o["side"]
+    sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
+    s, h, zs = o["z0"], o["z1"], w["spring"]
+    stone = mt["stone"]
+    fw, ft, fb, pr = (LANCET_SURROUND[k] for k in ("side", "head", "sill", "proud"))
+    go = LANCET_GLASS_O
+    (_o, (dx, dy), (nx, ny), _L) = fr.wall_frame(side)
+    inward = np.array((nx, ny, 0.0))
+    along = np.array((dx, dy, 0.0))
+    up = np.array((0.0, 0.0, 1.0))
+    line = lancet_outline(sa, sb, s, zs, h)
+    n_arc = (len(line) - 2) // 2
+    right = line[2:3 + n_arc]                          # the right springing up to the apex
+    left = line[2 + n_arc:]                            # the apex down to the left springing
+    b = Builder()
+
+    def F(q, want):                    # q: [(s, z)...] on the surround's face, facing `want`
+        pts = [fr.point(side, a, pr, z) for a, z in q]
+        _face_toward(b, pts, [(a / 0.5, z / 0.5) for a, z in q], stone, want)
+
+    # the surround's face: the band under the sill, the band over the head, the jambs' strips, the arch's strips
+    F([(sa - fw, s - fb), (sb + fw, s - fb), (sb + fw, s), (sa - fw, s)], inward)
+    F([(sa - fw, h), (sb + fw, h), (sb + fw, h + ft), (sa - fw, h + ft)], inward)
+    F([(sa - fw, s), (sa, s), (sa, zs), (sa - fw, zs)], inward)
+    F([(sb, s), (sb + fw, s), (sb + fw, zs), (sb, zs)], inward)
+    for (a0, z0), (a1, z1) in zip(right, right[1:]):
+        F([(a0, z0), (sb + fw, z0), (sb + fw, z1), (a1, z1)], inward)
+    for (a0, z0), (a1, z1) in zip(left, left[1:]):     # from the apex down: z falls
+        F([(sa - fw, z1), (a1, z1), (a0, z0), (sa - fw, z0)], inward)
+    # its outer edges, from the wall face to its face
+    for q, want in (([(sa - fw, s - fb), (sb + fw, s - fb)], -up), ([(sa - fw, h + ft), (sb + fw, h + ft)], up),
+                    ([(sa - fw, s - fb), (sa - fw, h + ft)], -along), ([(sb + fw, s - fb), (sb + fw, h + ft)], along)):
+        (a0, z0), (a1, z1) = q
+        pts = [fr.point(side, a0, 0.0, z0), fr.point(side, a1, 0.0, z1), fr.point(side, a1, pr, z1),
+               fr.point(side, a0, pr, z0)]
+        _face_toward(b, pts, [(0, 0), (1, 0), (1, 0.04), (0, 0.04)], stone, want)
+    # the soffit round the outline, from the surround's face back past the glass, facing the opening's middle
+    mid = ((sa + sb) / 2, (s + h) / 2)
+    for k in range(len(line)):
+        (a0, z0), (a1, z1) = line[k], line[(k + 1) % len(line)]
+        want = along * (mid[0] - (a0 + a1) / 2) + up * (mid[1] - (z0 + z1) / 2)
+        L = math.hypot(a1 - a0, z1 - z0)
+        pts = [fr.point(side, a0, pr, z0), fr.point(side, a1, pr, z1), fr.point(side, a1, go - 0.04, z1),
+               fr.point(side, a0, go - 0.04, z0)]
+        _face_toward(b, pts, [(0, 0), (L / 0.5, 0), (L / 0.5, 0.5), (0, 0.5)], stone, want)
+    # the lead cames on the room side of the glass: the grid's lines inside the outline
+    nxg, nyg = w["panes"]
+    iron = mt["iron"]
+    W_ = sb - sa
+    cw, c0, c1 = 0.014, go + 0.004, go + 0.014
+
+    def span_z(a):                     # the outline's top over a point along the wall
+        return min(h, zs + math.sqrt(max(0.0, W_ ** 2 - (a - sa) ** 2)), zs + math.sqrt(max(0.0, W_ ** 2 - (sb - a) ** 2)))
+
+    def span_s(z):                     # the outline's two sides at a height
+        if z <= zs:
+            return sa, sb
+        r = math.sqrt(max(0.0, W_ ** 2 - (z - zs) ** 2))
+        return sb - r, sa + r
+
+    for i in range(1, nxg):
+        a = sa + W_ * i / nxg
+        wall_box(b, fr, side, a - cw / 2, a + cw / 2, c0, c1, s, span_z(a) - 0.01, iron)
+    for j in range(1, nyg):
+        z = s + (h - s) * j / nyg
+        l_, r_ = span_s(z + cw / 2)
+        if r_ - l_ > 0.04:
+            wall_box(b, fr, side, l_ + 0.01, r_ - 0.01, c0, c1, z - cw / 2, z + cw / 2, iron)
+    register(b.build(nm("Window" + suffix)), "window", o["id"])
+    # the stained glass: the quarries clipped to the outline, each its colour
+    cols = w["glass"]
+    g = Builder()
+    for j in range(nyg):
+        for i in range(nxg):
+            q0, q1 = sa + W_ * i / nxg, sa + W_ * (i + 1) / nxg
+            z0, z1 = s + (h - s) * j / nyg, s + (h - s) * (j + 1) / nyg
+            cell = clip_convex([(q0, z0), (q1, z0), (q1, z1), (q0, z1)], line)
+            if len(cell) < 3:
+                continue
+            if i in (0, nxg - 1) or j == 0:
+                hexc = cols[0]
+            elif (z0 + z1) / 2 > zs:
+                hexc = cols[-1]
+            else:
+                hexc = cols[1 + (j - 1) % max(1, len(cols) - 2)]
+            pts = [fr.point(side, a, go, z) for a, z in cell]
+            _face_toward(g, pts, [((a - sa) / W_, (z - s) / (h - s)) for a, z in cell],
+                         lancet_glass_mat(mt, hexc, lit), inward)
+    gl = g.build(nm("WindowGlass" + suffix))
+    register(gl, "glass", o["id"] + ":glass")
+    return dict(id=o["id"], side=side, sa=sa, sb=sb, sill=s, head=h, glass_o=go,
+                centre=fr.point(side, (sa + sb) / 2, go, (s + h) / 2), outside=w.get("outside", "sky"))
 
 
 def window_one(fr: Frame, mt: dict, o: dict, w: dict, suffix: str, curtain) -> dict:
