@@ -71,6 +71,8 @@ GRILLE_H = {"arch": 3.0}  # metres: a grille's bar height by gate type (else 2.1
 ATTR = "wdi_light"
 NORMAL_BITS = 8   # Draco's quantization of the normals the lantern shades by
 OCCL_BITS = 6     # ... and of the `_OCCL` attribute (64 levels: smooth, and cheap in the Draco stream)
+POS_BITS = 16    # Draco's quantization of the positions (1.5 mm over a 100 m file)
+UV_BITS = 14     # ... and of the texture coordinates (a lightmap page of 4096 has 4 levels to the texel)
 TINT_ATTR = "wdi_tint"
 INK = (0x12, 0x14, 0x1C)
 # the rails', the portal frames' and the trestle's timber albedo. Route 2's #6B5440 read lilac beside the orange rock
@@ -570,6 +572,7 @@ def scan_dark_rel(lin: np.ndarray, pct: float, lift: float) -> np.ndarray:
 WARM_PROBE = "#FFB457"   # the lamps' colour: the scan's darkest texel is also taken under it
 SCAN_R3 = {"lift": 0.45, "pct": 0.5}   # route 3's scan grade (the look's lantern.route3_*), for the report's baseline
 DARK_GAIN = {"g": 1.0}   # the look's ink_lift.dark_gain (finish_attrs), for the report
+SCAN_CHROMA = {"default": 1.0}   # the look's scan_chroma: the share of each scan's chroma kept (its hue is the palette's job)
 SCAN_CAP = {"mean_max": None}   # the look's ink_lift.texture_mean_max: no scan's mean luminance is over this (derive_scan)
 
 
@@ -697,6 +700,12 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45, margin_
     rgb = px.reshape(-1, 4)[:, :3].astype(np.float64)   # sRGB values as stored
     lin = srgb_to_lin(rgb)
     rel_r3 = scan_dark_rel(lin, SCAN_R3["pct"], SCAN_R3["lift"])
+    # the scan's own hue is mostly taken out: the rock's colour is the palette's (the baked light's tint factor and the
+    # lantern's `_TINT`), so no scan makes every wall one orange
+    keep = float(SCAN_CHROMA.get(slug, SCAN_CHROMA["default"]))
+    if keep < 1.0:
+        yy = lin @ np.array([0.2126, 0.7152, 0.0722])
+        lin = yy[:, None] + keep * (lin - yy[:, None])
     # the darkest texels toward `lift` of the mean (meshy_room_build.lift_dark): a dim cave's mean texel then sits
     # a little over the ink floor that its darkest texel is held to, instead of far above it
     # the scan's darkest texels take their colour from their neighbours first (meshy_room_build's dark_chroma_smooth):
@@ -886,9 +895,15 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list, mouth
     V = Vq / core.Q
     F = z["shell_faces"].astype(np.int64)
     geo_names = json.loads(str(z["geology"]))
-    tint_lin = srgb_to_lin(np.clip(z["shell_tint"].astype(np.float64), 0.0, 1.0))
-    wm = moss_weight(V, vertex_normals(V, F), moss_sources(sec), sec.field_points, sec)
+    Nv = vertex_normals(V, F)
+    wm = moss_weight(V, Nv, moss_sources(sec), sec.field_points, sec)
+    geo_v = z["shell_geo"].astype(np.int64)
+    wet_v = shell_wet(V, Nv, geo_v, geo_names, z, sec)
+    geo_srgb = np.stack([hex_srgb(sec.geo_of(n)[1]["tint"]) for n in geo_names])
+    core_rel = np.clip(z["shell_tint"].astype(np.float64), 0.0, 1.0) / np.maximum(geo_srgb[geo_v], 1e-3)
+    tint_lin = srgb_to_lin(macro_tint(V, Nv, geo_v, geo_names, sec, look, core_rel, wet_v, wm))
     tint_lin = moss_tint(tint_lin, wm, V, sec)
+    SHELL_WET["share"] = round(float((wet_v > 0.15).mean()), 4)
     MOSS["vertices"] = int((wm > 0.05).sum())
     face_moss = wm[F].mean(1) > MOSS_FACE
     MOSS["faces"] = int(face_moss.sum())
@@ -923,6 +938,7 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list, mouth
             if sel.any():
                 fac[sel] = 1.0 / np.maximum(MATS[mats[j].name]["mean"], 1e-4)
         set_point_colour(ob, TINT_ATTR, alb)
+        WET[ob.name] = wet_v[vs]
         TEXFAC[ob.name] = fac
         FLOORQ[ob.name] = np.minimum(r_vert[vs] / np.maximum(r_mat[ms], 1e-9), 1.0)
         objs.append(ob)
@@ -935,6 +951,7 @@ MOSS_GREEN, MOSS_OLIVE = "#56653A", "#6B5D3B"   # green to olive-brown (hue 80 a
 MOSS_FACE = 0.45   # a face whose vertices' mean moss weight is over this takes the moss kit's scans
 MOSS_R = {"mouth": 18.0, "shaft": 9.0, "lamp": 6.0}   # metres the light of each kind of source grows moss
 MOSS: dict = {}
+SHELL_WET: dict = {}
 
 
 def vertex_normals(V: np.ndarray, F: np.ndarray) -> np.ndarray:
@@ -1012,18 +1029,259 @@ def moss_tint(tint_lin: np.ndarray, w: np.ndarray, V: np.ndarray, sec=None) -> n
     return tint_lin * (1.0 - a) + moss * a
 
 
+# ---------------------------------------------------------------- the rock's colour: palettes, macro variation, wetness
+
+# The look's "palettes" (meshy_looks/cave_fp.json): per geology a base colour and accents (cream calcite, iron red,
+# a dark manganese, a green for damp rock), sRGB hex, and which accent the beds' staining bands and the streaks take.
+# The shell's albedo per vertex is the geology's base, moved towards the accents by fields of low frequency (patches of
+# 14 m and 5 m, so each section and each 12 m chunk has its own tone), by bands that follow the beds (a stain on some
+# beds, patchy along the strike), by vertical streaks (drips), and by dampness (green), then scaled in brightness. The
+# core's own tint (its noise, its flow band, the wet darkening) rides on top as a ratio to the geology's table colour.
+
+WET_GEO = {"lakeclay": 0.35, "flooded": 0.55, "flowstone": 0.30, "ice": 0.45, "limestone": 0.06, "slate": 0.08,
+           "skarn": 0.05, "gypsum": 0.04, "granite": 0.03, "breakdown": 0.04}   # a dry geology's wet weight
+WET_TAG = {0: 0.45, 1: 0.5, 2: 0.45, 3: 0.08, 5: 0.5, 6: 0.85, 7: 0.7, 8: 0.5, 9: 0.8, 13: 0.08, 14: 1.0, 15: 0.3,
+           16: 0.25, 17: 0.8, 18: 0.7, 19: 0.2, 20: 0.1}   # a formation tag's wet weight (core's form_kind)
+DRIP_R = 0.4        # metres: a floor this near under a drip tip is wet
+WATER_R = 1.2       # metres: rock this near a water surface is wet
+STALAC_TAGS = (0, 5, 9, 15)
+WATER_CACHE: dict = {}
+
+
+def hex_srgb(h: str) -> np.ndarray:
+    n = int(h.lstrip("#"), 16)
+    return np.array([(n >> 16) & 255, (n >> 8) & 255, n & 255], np.float64) / 255.0
+
+
+def smooth01(a: float, b: float, x) -> np.ndarray:
+    t = np.clip((np.asarray(x, np.float64) - a) / (b - a), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def vnoise(P: np.ndarray, scale: float, seed: int) -> np.ndarray:
+    """Value noise in 0..1 at the points P (N, 3) metres, features of about `scale` metres (the lattice noise is in
+    -1..1 and bunched round 0: stretched by 1.5 about the middle so the accents' thresholds are met)."""
+    n = core.noise_points(np.asarray(P, np.float64) / scale, 1.0, int(seed) & 0x7FFFFFFF)
+    return np.clip(0.5 + 0.75 * n, 0.0, 1.0)
+
+
+def key_seed(key: str) -> int:
+    return zlib_crc(key) & 0xFFFFFF
+
+
+def zlib_crc(s: str) -> int:
+    import zlib
+    return zlib.crc32(s.encode("utf-8"))
+
+
+def section_bias(key: str) -> dict:
+    """Each section's own taste in accents, 0.55 to 1.45 per accent: one runs redder, one greener, one paler."""
+    out = {}
+    for name in ("cream", "iron", "dark", "green"):
+        out[name] = 0.55 + 0.9 * float(core.rock.hash3(np.array([zlib_crc(key) & 0xFFFF]),
+                                                       np.array([zlib_crc(name) & 0xFFFF]), np.array([3]), 11)[0])
+    return out
+
+
+def near_min(P: np.ndarray, Q: np.ndarray, r: float) -> np.ndarray:
+    """For each point of P (N, 3) the distance to the nearest point of Q (M, 3) when it is under r, else inf (a grid of
+    r-metre cells: no scipy in Blender's Python)."""
+    out = np.full(len(P), np.inf)
+    if not len(Q) or not len(P):
+        return out
+    cq = np.floor(Q / r).astype(np.int64)
+    K = np.int64(1 << 20)
+
+    def key(c):
+        return ((c[:, 0] + 512) * K + (c[:, 1] + 512)) * K + (c[:, 2] + 512)
+
+    kq = key(cq)
+    o = np.argsort(kq, kind="stable")
+    ks, Qs = kq[o], Q[o]
+    cp = np.floor(P / r).astype(np.int64)
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                kk = key(cp + np.array([dx, dy, dz]))
+                lo = np.searchsorted(ks, kk, "left")
+                hi = np.searchsorted(ks, kk, "right")
+                for t in range(int((hi - lo).max()) if len(lo) else 0):
+                    ok = lo + t < hi
+                    if not ok.any():
+                        break
+                    j = np.where(ok, lo + t, 0)
+                    d = np.sqrt(((P - Qs[j]) ** 2).sum(1))
+                    out = np.where(ok & (d < out), d, out)
+    return np.where(out < r, out, np.inf)
+
+
+def water_points(sec) -> np.ndarray:
+    """The section's water surfaces' vertices (N, 3) in metres: a stream's and a lake's grids (cached)."""
+    if sec.key not in WATER_CACHE:
+        ws = water_surfaces(sec, 0.5)
+        WATER_CACHE[sec.key] = np.concatenate([w["V"] for w in ws]) if ws else np.zeros((0, 3))
+    return WATER_CACHE[sec.key]
+
+
+def shell_wet(V: np.ndarray, N: np.ndarray, geo_v: np.ndarray, geo_names: list, z, sec) -> np.ndarray:
+    """Per shell vertex 0 to 1: how wet the rock is. The geology's own (flooded and clay rock, flowstone), the flow
+    bands, rock within WATER_R of a stream or lake (the whole river and the reach, the Bottom's shore), and the floor
+    under a drip (within DRIP_R, plan, under a stalactite's, straw's or icicle's tip)."""
+    gw = np.array([WET_GEO.get(n, 0.05) for n in geo_names])[np.asarray(geo_v, np.int64)]
+    w = np.maximum(gw, 0.6 * np.asarray(z["shell_band"], np.float64) if "shell_band" in z else 0.0)
+    wp = water_points(sec)
+    if len(wp):
+        d = near_min(V, wp, WATER_R)
+        w = np.maximum(w, np.where(np.isfinite(d), 1.0 - 0.6 * (d / WATER_R), 0.0))
+    if "form_piece" in z and len(z["form_faces"]):
+        kind = z["form_kind"].astype(np.int64)
+        fs = np.nonzero(np.isin(kind, STALAC_TAGS))[0]
+        if len(fs):
+            Vq = z["form_verts_q"] / core.Q
+            Fv = z["form_faces"].astype(np.int64)[fs]
+            vid = Fv.ravel()
+            pid = np.repeat(z["form_piece"][fs], 3)
+            zz = Vq[vid, 2]
+            o = np.lexsort((zz, pid))
+            _u, first = np.unique(pid[o], return_index=True)
+            tips = Vq[vid[o][first]]
+            floor_ = N[:, 2] > 0.5
+            idx = np.nonzero(floor_)[0]
+            d = near_min(np.column_stack([V[idx, :2], np.zeros(len(idx))]), np.column_stack([tips[:, :2], np.zeros(len(tips))]),
+                         DRIP_R)
+            # only under the tip: the tip must be above the floor vertex
+            under = np.isfinite(d)
+            w[idx] = np.maximum(w[idx], np.where(under, 0.85 * (1.0 - d / DRIP_R), 0.0))
+    return np.clip(w, 0.0, 1.0)
+
+
+def macro_tint(V: np.ndarray, N: np.ndarray, geo: np.ndarray, geo_names: list, sec, look: dict, rel: np.ndarray,
+               wet: np.ndarray, moss: np.ndarray | None = None) -> np.ndarray:
+    """The rock's albedo per vertex as sRGB (0..1): the geology's palette with the macro variation (see the block's
+    comment). `rel` is the core's tint over the geology's table colour (per channel), `wet` the vertex's wetness,
+    `moss` the moss weight."""
+    pal = look["palettes"]
+    n = len(V)
+    out = np.zeros((n, 3))
+    seed = key_seed(sec.key)
+    bias = section_bias(sec.key)
+    nA, nB = vnoise(V, 14.0, seed + 1), vnoise(V, 5.0, seed + 2)
+    nC, nD = vnoise(V, 1.6, seed + 3), vnoise(V, 7.0, seed + 9)
+    cell = np.floor(V / 12.0).astype(np.int64)
+    chunk = core.rock.hash3(cell[:, 0], cell[:, 1], cell[:, 2], seed + 21)
+    Ph = np.column_stack([(V[:, 0] + 0.7 * V[:, 1]) / 0.5, V[:, 2] / 3.2, np.zeros(n)])
+    s1 = vnoise(Ph, 1.0, seed + 7)
+    s2 = vnoise(Ph + 31.0, 1.0, seed + 8)
+    vert = np.abs(N[:, 2]) < 0.7
+    damp = np.clip(2.0 * np.asarray(wet) + (0.0 if moss is None else np.asarray(moss)), 0.0, 1.0)
+    for gi in np.unique(geo):
+        m = geo == gi
+        name = geo_names[int(gi)]
+        p = pal.get(name) or pal["default"]
+        base = hex_srgb(p["base"])
+        # each section leans its own way (`section_base_mul`: per-channel factors on the palette's base and accents), so
+        # three sections of lake clay or three of limestone are not one tone
+        smul = np.asarray(look.get("section_base_mul", {}).get(sec.key, (1.0, 1.0, 1.0)), np.float64)
+        base = np.clip(base * smul, 0.0, 1.0)
+        acc = {k: hex_srgb(p[k]) for k in ("cream", "iron", "dark", "green") if k in p}
+        amt = p.get("amount", {})
+        rp = core.rock.profile(name, sec.geology.get(name))
+        spacing = max(0.5, 1.6 * float(sec.geo_of(name)[1].get("bedding", [0.6, 0.0])[0]))
+        zb = V[m, 2] - rp["dip"][0] * V[m, 0] - rp["dip"][1] * V[m, 1]
+        bed = np.floor(zb / spacing).astype(np.int64)
+        fz = zb / spacing - bed
+        rb = core.rock.hash3(bed, 0, 0, seed + 5)
+        band = (rb > 0.5) * smooth01(0.0, 0.15, fz) * smooth01(0.6, 0.2, fz) * smooth01(0.3, 0.6, nB[m])
+        pc = smooth01(0.5, 0.75, 0.55 * nA[m] + 0.45 * nB[m])
+        st1 = smooth01(0.6, 0.8, s1[m]) * vert[m]
+        st2 = smooth01(0.62, 0.82, s2[m]) * vert[m]
+        pg = smooth01(0.5, 0.78, nD[m]) * damp[m]
+        c = np.tile(base, (int(m.sum()), 1))
+
+        def toward(c, name_, w):
+            if name_ not in acc:
+                return c
+            a = np.clip(w * bias[name_] * float(amt.get(name_, 1.0)), 0.0, 0.85)[:, None]
+            return c * (1.0 - a) + acc[name_] * a
+        c = toward(c, "cream", 0.6 * pc)
+        c = toward(c, p.get("band", "iron"), 0.4 * band)
+        c = toward(c, p.get("streak", "dark"), 0.7 * st1)
+        c = toward(c, p.get("streak2", "iron"), 0.35 * st2)
+        c = toward(c, "green", 0.6 * pg)
+        br = 1.0 + 0.17 * (2.0 * nA[m] - 1.0) + 0.08 * (2.0 * nB[m] - 1.0) + 0.04 * (2.0 * nC[m] - 1.0) \
+            + 0.10 * (chunk[m] - 0.5)
+        out[m] = c * np.clip(br, 0.65, 1.35)[:, None]
+    return np.clip(out * np.clip(rel, 0.5, 2.0), 0.0, 1.0)
+
+
+def tint_stats(objs: list, key: str) -> dict:
+    """The colour variety of a section's rock: from its vertices' albedo (linear), the hue's circular standard deviation
+    (degrees, weighted by chroma) and its 10th to 90th percentile spread over the chromatic vertices, the luminance's
+    10th to 90th percentile ratio, and the mean chroma (HSV saturation)."""
+    rows = [MEANALB[o.name] for o in objs if o.name in MEANALB and o.name.startswith(f"um_{key}_chunk_")]
+    return hue_stats(np.concatenate(rows)) if rows else {}
+
+
+def hue_stats(lin: np.ndarray) -> dict:
+    """Colour variety of linear RGB rows: see tint_stats."""
+    if not len(lin):
+        return {}
+    s = np.where(lin <= 0.0031308, 12.92 * lin, 1.055 * np.power(np.maximum(lin, 1e-9), 1 / 2.4) - 0.055)
+    mx, mn = s.max(1), s.min(1)
+    ch = mx - mn
+    ok = ch > 0.02
+    r, g, b = s[:, 0], s[:, 1], s[:, 2]
+    h = np.where(mx == r, ((g - b) / np.maximum(ch, 1e-9)) % 6.0, np.where(mx == g, (b - r) / np.maximum(ch, 1e-9) + 2.0,
+                                                                         (r - g) / np.maximum(ch, 1e-9) + 4.0)) * 60.0
+    out = {"vertices": int(len(lin)), "chromatic_share": round(float(ok.mean()), 4)}
+    if ok.any():
+        a = np.deg2rad(h[ok])
+        w = ch[ok]
+        c_, s_ = float((np.cos(a) * w).sum() / w.sum()), float((np.sin(a) * w).sum() / w.sum())
+        R = float(np.hypot(c_, s_))
+        mean = float(np.rad2deg(np.arctan2(s_, c_))) % 360.0
+        dev = (h[ok] - mean + 180.0) % 360.0 - 180.0
+        out.update(hue_mean_deg=round(mean, 1), hue_circ_std_deg=round(float(np.rad2deg(np.sqrt(-2.0 * np.log(max(R, 1e-9))))), 2),
+                   hue_p10_p90_deg=round(float(np.percentile(dev, 90) - np.percentile(dev, 10)), 2))
+    y = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
+    out["luma_p10_p90_ratio"] = round(float(np.percentile(y, 90) / max(np.percentile(y, 10), 1e-9)), 3)
+    out["saturation_mean"] = round(float((ch / np.maximum(mx, 1e-9)).mean()), 4)
+    return out
+
+
+TINT = "_tint"   # the attribute (`_TINT` in the GLB): the albedo the light was graded at, linear, per vertex
+WETA = "_wet"    # the attribute (`_WET`): 0 to 1, how wet the surface is (the viewer's sheen)
+WET: dict = {}   # object name -> per-vertex wetness
+
+
+def set_tint_wet(o, alb: np.ndarray, wet) -> None:
+    """Writes the albedo as the vector attribute `_tint` and, where any vertex is wet, the wetness as `_wet` (the glTF
+    exporter writes them as `_TINT` and `_WET`; the viewer's lantern shades the rock by them)."""
+    me = o.data
+    for nm in (TINT, WETA):
+        if nm in me.attributes:
+            me.attributes.remove(me.attributes[nm])
+    a = me.attributes.new(TINT, "FLOAT_VECTOR", "POINT")
+    a.data.foreach_set("vector", np.clip(np.asarray(alb, np.float64), 0.0, 1.0).astype(np.float32).ravel())
+    if wet is not None and float(np.max(wet)) > 0.02:
+        b = me.attributes.new(WETA, "FLOAT", "POINT")
+        w = np.asarray(wet, np.float64)
+        b.data.foreach_set("value", np.where(w > 0.02, np.clip(w, 0.0, 1.0), 0.0).astype(np.float32))
+
+
 # ---------------------------------------------------------------- formations, fallen rock and breakdown
 
 # Each group of the core's formation tags (meshy_cave_rock.TAG) is one object per scan kit, its albedo per vertex
 # from its geology: speleothems in calcite (paler than the rock), blocks and rocks in the rock's own tint.
-SPELEO = {"limestone": "#B8A88B", "flowstone": "#C4B190", "breakdown": "#ABA089", "gypsum": "#DAD3C3",
-          "lakeclay": "#8C765D", "ice": "#D3DCE2", "slate": "#8A8884", "skarn": "#B5A084", "granite": "#A09583",
-          "flooded": "#8D8880"}
+SPELEO = {"limestone": "#C0B8A6", "flowstone": "#C9BFAA", "breakdown": "#B0A99A", "gypsum": "#DAD5C8",
+          "lakeclay": "#9A8A75", "ice": "#D3DCE2", "slate": "#8E8D8A", "skarn": "#BBAE98", "granite": "#A39B8E",
+          "flooded": "#948F88"}
 CRYSTAL = {"skarn": "#D9C7A2", "gypsum": "#E8E2D4"}
 ICE = "#D2DBE1"
 POOL = "#48443D"     # the still water in a rimstone pool: wet and dark, a warm grey
 ROCK_SHADE = 0.8     # fallen rock and blocks a little darker than the wall they fell from (dust, damp)
-FORM_GROUPS = {"speleothem": (0, 1, 2, 5, 6, 7), "rock": (3, 13), "crystal": (8,), "icicle": (9,), "pool": (14,)}
+FORM_GROUPS = {"speleothem": (0, 1, 2, 5, 6, 7, 15, 17, 18), "rock": (3, 13, 19, 20), "crystal": (8, 16), "icicle": (9,),
+               "pool": (14,)}
 
 
 def form_albedo(group: str, geo_name: str, tint: str) -> str:
@@ -1042,6 +1300,8 @@ def form_scan_kit(group: str, geo_name: str, kits: dict) -> str:
     """The kit whose wall scan a group draws: flowstone's for speleothems, the geology's own for rock, gypsum's for
     crystals, the ice's for icicles."""
     if group in ("speleothem", "pool"):
+        if geo_name == "ice" and "ice" in kits:
+            return "ice"
         return "flowstone" if "flowstone" in kits else "default"
     if group == "crystal":
         return "gypsum" if "gypsum" in kits else "default"
@@ -1063,18 +1323,91 @@ def form_split(kind: np.ndarray, geo: np.ndarray, geo_names: list, kits: dict, d
     return {k: np.sort(np.concatenate(v)) for k, v in out.items()}
 
 
+def piece_uvs(V: np.ndarray, F: np.ndarray, pv: np.ndarray, repeat: float, seed: int) -> np.ndarray:
+    """Each formation piece's own texture coordinates: the piece turned about the vertical by its own angle and moved by
+    its own offset, then projected along each face's dominant axis (box_uvs), so no two pieces show the same crop of
+    the scan, and a stalactite is not the same square of rock as its neighbour."""
+    ids, inv = np.unique(pv, return_inverse=True)
+    cnt = np.bincount(inv).astype(np.float64)
+    cen = np.stack([np.bincount(inv, weights=V[:, k]) / cnt for k in range(3)], 1)
+    r = [core.rock.hash3(ids, k, 0, seed)[inv] for k in (1, 2, 3)]
+    ang = 2.0 * np.pi * r[0]
+    c, s_ = np.cos(ang), np.sin(ang)
+    d = V - cen[inv]
+    Pm = np.stack([c * d[:, 0] - s_ * d[:, 1] + 7.0 * r[1], s_ * d[:, 0] + c * d[:, 1] + 7.0 * r[2], d[:, 2]], 1)
+    return box_uvs(Pm, F, repeat)
+
+
+STAIN, DARK_CALCITE = "#85705C", "#6C675F"   # an iron stain and a dirty calcite, sRGB
+AMBER, SMOKY, DEEP_ICE = "#D2B27A", "#B5ADA2", "#9EB4C8"
+
+
+def form_colour(group: str, geo_v: np.ndarray, kv: np.ndarray, pv: np.ndarray, V: np.ndarray, N: np.ndarray,
+                geo_names: list, sec, look: dict, wet: np.ndarray, seed: int) -> np.ndarray:
+    """A formation's albedo per vertex (sRGB 0..1): its geology's calcite, crystal, ice or rock colour, then each piece
+    its own: a brightness and a warm or cool lean, an iron stain at the foot of a stalagmite or at the roof end of a
+    stalactite, lighter tips, stripes across a curtain or a sheet, amber and smoky crystals, deeper blue in the ice."""
+    n = len(V)
+    ids, inv = np.unique(pv, return_inverse=True)
+
+    def rr(k):
+        return core.rock.hash3(ids, k, 0, seed)[inv]
+    zmin = np.full(len(ids), np.inf)
+    zmax = np.full(len(ids), -np.inf)
+    np.minimum.at(zmin, inv, V[:, 2])
+    np.maximum.at(zmax, inv, V[:, 2])
+    zrel = (V[:, 2] - zmin[inv]) / np.maximum(zmax[inv] - zmin[inv], 1e-6)
+    names = [geo_names[int(g)] for g in geo_v]
+    if group == "rock":
+        rel = np.ones((n, 3))
+        c = macro_tint(V, N, np.asarray(geo_v, np.int64), geo_names, sec, look, rel, wet) * ROCK_SHADE
+        c = c * (0.88 + 0.24 * rr(1))[:, None]
+        return np.clip(c, 0.0, 1.0)
+    if group == "pool":
+        return np.tile(hex_srgb(POOL), (n, 1))
+    if group == "icicle":
+        c = hex_srgb(ICE)[None, :] * (1.0 - 0.55 * (rr(3) * (1.0 - zrel))[:, None]) \
+            + hex_srgb(DEEP_ICE)[None, :] * (0.55 * (rr(3) * (1.0 - zrel)))[:, None]
+        return np.clip(c * (0.9 + 0.2 * rr(1))[:, None], 0.0, 1.0)
+    if group == "crystal":
+        base = np.stack([hex_srgb(CRYSTAL.get(nm, "#DCD3C0")) for nm in names])
+        r6 = rr(6)
+        var = np.where((r6 < 0.3)[:, None], hex_srgb(AMBER)[None, :], np.where((r6 < 0.55)[:, None],
+                                                                              hex_srgb(SMOKY)[None, :], base))
+        return np.clip(var * (0.9 + 0.2 * rr(1))[:, None], 0.0, 1.0)
+    base = np.stack([hex_srgb(SPELEO.get(nm, "#C4B79E")) for nm in names])
+    c = base * (1.0 + 0.14 * (2.0 * rr(1) - 1.0))[:, None]
+    lean = 0.06 * (2.0 * rr(2) - 1.0)
+    c = c * np.stack([1.0 + lean, np.ones(n), 1.0 - lean], 1)
+    hang = np.isin(kv, (0, 5, 9, 15, 6))
+    stain = (0.55 * rr(3)) * np.where(hang, zrel ** 3, (1.0 - zrel) ** 2)
+    c = c * (1.0 - stain)[:, None] + hex_srgb(STAIN)[None, :] * stain[:, None]
+    c = c * (1.0 + 0.1 * np.where(hang, (1.0 - zrel) ** 4, 0.0))[:, None]
+    flat = np.isin(kv, (6, 17, 18))
+    if flat.any():
+        phi = 6.2831853 * rr(4)
+        coord = np.cos(phi) * V[:, 0] + np.sin(phi) * V[:, 1]
+        st = core.rock.forms.saw(coord / 0.09 + rr(5))
+        c = c * np.where(flat, 1.0 + 0.2 * (st - 0.5), 1.0)[:, None]
+        dirty = np.where(flat, 0.3 * smooth01(0.7, 1.0, st), 0.0)
+        c = c * (1.0 - dirty)[:, None] + hex_srgb(DARK_CALCITE)[None, :] * dirty[:, None]
+    return np.clip(c, 0.0, 1.0)
+
+
 def form_objects(z, sec, look: dict, out_dir: str) -> list:
-    """The core's formations as meshes, one per (group, scan kit), baked like the shell; their albedo per vertex
-    from their geology, varied a little."""
+    """The core's formations as meshes, one per (group, scan kit), baked like the shell; each piece its own texture
+    coordinates and colour (piece_uvs, form_colour), the wetness per vertex by the kind of piece."""
     if "form_faces" not in z or not len(z["form_faces"]):
         return []
     Vq = z["form_verts_q"] / core.Q
     F = z["form_faces"].astype(np.int64)
     kind = z["form_kind"].astype(np.int64)
     geo = z["form_geo"].astype(np.int64) if "form_geo" in z else np.full(len(F), -1)
+    piece = z["form_piece"].astype(np.int64) if "form_piece" in z else np.arange(len(F))
     geo_names = json.loads(str(z["geology"]))
     dg = geo_names.index(sec.d["geology"]) if sec.d.get("geology") in geo_names else 0
     kits = look["kits"]
+    seed = key_seed(sec.key) + 77
     objs = []
     for (group, kit), fs in sorted(form_split(kind, geo, geo_names, kits, dg).items()):
         Fg = F[fs]
@@ -1084,16 +1417,21 @@ def form_objects(z, sec, look: dict, out_dir: str) -> list:
         gf = np.where(geo[fs] < 0, dg, geo[fs])
         gv = np.zeros(len(Vg), np.int64)
         gv[Fl.ravel()] = np.repeat(gf, 3)
+        kv = np.zeros(len(Vg), np.int64)
+        kv[Fl.ravel()] = np.repeat(kind[fs], 3)
+        pv = np.zeros(len(Vg), np.int64)
+        pv[Fl.ravel()] = np.repeat(piece[fs], 3)
         tints = {gi: form_albedo(group, geo_names[gi], sec.geo_of(geo_names[gi])[1]["tint"])
                  for gi in set(gv.tolist())}
         ob = textured(f"um_{sec.key}_form_{group}_{kit}", Vg, Fl, kits[kit]["wall"], tints[int(gv[0])], look,
-                      out_dir, repeat=1.0)
-        alb = np.stack([hex_lin(tints[int(gi)]) for gi in gv])
-        u = (Vg - sec.origin) / sec.cell
-        var = 1.0 + 0.15 * core.noise_points(u, 2, sec.seed * 23 + 1)
-        if group == "rock":
-            var = var * ROCK_SHADE
-        set_point_colour(ob, TINT_ATTR, alb * var[:, None])
+                      out_dir, repeat=1.0, uvs=piece_uvs(Vg, Fl, pv, 1.0, seed))
+        wetv = np.array([WET_TAG.get(int(t), 0.1) for t in np.unique(kv)])
+        wet = wetv[np.searchsorted(np.unique(kv), kv)]
+        wet = np.where(np.array([geo_names[int(g)] == "ice" for g in gv]), np.maximum(wet, 0.5), wet)
+        Nv = vertex_normals(Vg, Fl)
+        col = form_colour(group, gv, kv, pv, Vg, Nv, geo_names, sec, look, wet, seed)
+        set_point_colour(ob, TINT_ATTR, srgb_to_lin(col))
+        WET[ob.name] = wet
         objs.append(ob)
     return objs
 
@@ -1142,7 +1480,7 @@ def box_uvs(V, F, repeat: float):
     return (np.take_along_axis(corners, pick[:, None, :].repeat(3, axis=1), axis=2) / repeat).reshape(-1, 2)
 
 
-def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: str, repeat: float = 1.5):
+def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: str, repeat: float = 1.5, uvs=None):
     """A small mesh with one scanned material (kerbs, decks, the outcrop, the snow), baked like the shell."""
     key = f"piece_{slug}"
     if f"cave_{key}" not in MATS:
@@ -1154,7 +1492,8 @@ def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: s
         MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", "image": sc["image"], "mean": sc["mean"],
                         "dark": sc["dark"], "ratio": sc["ratio"], "rel_r3": sc["rel_r3"]}
     md = MATS[f"cave_{key}"]
-    ob = mesh_object(name, V, F, "cave", uvs=box_uvs(np.asarray(V, float), np.asarray(F), repeat), mats=[md["mat"]])
+    ob = mesh_object(name, V, F, "cave", uvs=box_uvs(np.asarray(V, float), np.asarray(F), repeat) if uvs is None else uvs,
+                     mats=[md["mat"]])
     alb = np.tile(hex_lin(albedo_hex), (len(ob.data.vertices), 1))
     set_point_colour(ob, TINT_ATTR, alb)
     TEXFAC[ob.name] = np.tile(1.0 / np.maximum(md["mean"], 1e-4), (len(ob.data.vertices), 1))
@@ -2916,7 +3255,10 @@ def export_glb(path: str) -> int:
         export_vertex_color="MATERIAL", export_all_vertex_colors=False,
         export_active_vertex_color_when_no_material=False, export_tangents=False, export_normals=True,
         export_attributes=True, **dict(R.DRACO, export_draco_normal_quantization=NORMAL_BITS,
-                                       export_draco_generic_quantization=OCCL_BITS))
+                                       export_draco_generic_quantization=OCCL_BITS,
+                                       export_draco_position_quantization=POS_BITS,
+                                       export_draco_texcoord_quantization=UV_BITS,
+                                       export_draco_mesh_compression_level=10))
     return os.path.getsize(path)
 
 
@@ -3163,6 +3505,13 @@ def design_gate(sec_d: dict) -> dict | None:
     return None
 
 
+def mist_for(key: str, look: dict) -> dict:
+    """The area's `wdi_mist` extras (apps/walk lantern.ts setMist): the look's default merged with the section's own."""
+    m = dict(look.get("mist", {}).get("default", {}))
+    m.update(look.get("mist", {}).get("sections", {}).get(key, {}))
+    return {k: (v if isinstance(v, str) else float(v)) for k, v in m.items()}
+
+
 def parse(argv):
     ap = argparse.ArgumentParser(description="build one cave section's walk GLB")
     ap.add_argument("--section", required=True)
@@ -3196,6 +3545,7 @@ def main(argv) -> int:
     lt_ = look.get("lantern", {})
     SCAN_R3.update(lift=float(lt_.get("route3_texture_lift", 0.45)), pct=float(lt_.get("route3_dark_percentile", 0.5)))
     SCAN_CAP["mean_max"] = look["ink_lift"].get("texture_mean_max")
+    SCAN_CHROMA.update(look.get("scan_chroma", {"default": 1.0}))
     os.makedirs(a.out, exist_ok=True)
     # 1. the core
     if a.core:
@@ -3243,6 +3593,7 @@ def main(argv) -> int:
     COL["nodes"].objects.link(area_ob)
     for k_, v in nodes["extras"].items():
         area_ob[k_] = v
+    area_ob["wdi_mist"] = mist_for(sec.key, look)
     coll_ob, coll_tris = collision_object(z, aid, [gate.get("plug")] + list(gate.get("extra_coll", [])))
     empties(nodes, area_ob)
     groups = rig(sec, look, gate)
@@ -3328,6 +3679,10 @@ def main(argv) -> int:
         for o in bake_objs:
             if o.name in ao:
                 set_occlusion(o, occlusion_open(ao[o.name], look))
+    # the rock's colour and wetness for the lantern: `_tint` (the graded albedo) and `_wet` per vertex
+    for o in bake_objs:
+        if o.name in MEANALB and o.type == "MESH" and len(o.data.vertices) == len(MEANALB[o.name]):
+            set_tint_wet(o, MEANALB[o.name], WET.get(o.name))
     # the grille: flat iron under its light
     for o in others:
         if o.name.endswith("_grille"):
@@ -3359,6 +3714,8 @@ def main(argv) -> int:
             log(f"seam faces drawn vertex-lit: {LM['report']['seam_vertex']}")
         LM["report"]["bake_seconds"] = lsecs
     lk = look_report(bake_objs, look, float(E))
+    lk["rock_colour"] = tint_stats(bake_objs, sec.key)
+    lk["rock_colour"]["wet_share_shell"] = SHELL_WET.get("share")
     log(f"look: {lk}")
     water, wrep = water_objects(sec, look, float(E), gr["k"], bake_objs)
     if water:

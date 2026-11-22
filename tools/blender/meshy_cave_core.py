@@ -1905,10 +1905,13 @@ RING8 = [(1.0, 0.0), (S8, S8), (0.0, 1.0), (-S8, S8), (-1.0, 0.0), (-S8, -S8), (
 
 class MeshBuf:
     def __init__(self):
-        self.v, self.f, self.tag, self.geo = [], [], [], []
+        self.v, self.f, self.tag, self.geo, self.piece = [], [], [], [], []
+        self.n_pieces = 0
 
     def add(self, verts, faces, tag, geo=-1):
         base = len(self.v)
+        self.piece += [self.n_pieces] * len(faces)
+        self.n_pieces += 1
         self.v += [tuple(p) for p in verts]
         self.f += [(int(a) + base, int(b) + base, int(c) + base) for a, b, c in faces]
         self.tag += [tag] * len(faces)
@@ -1957,6 +1960,11 @@ class MeshBuf:
     def geos(self):
         """Each face's geology index (-1 where none was given: the hand-placed features')."""
         return np.array(self.geo, dtype=np.int64)
+
+    def pieces(self):
+        """Each face's piece number: one per `add` (a stalactite, a curtain, a block ...), for the builder's per-piece
+        tint and texture coordinates."""
+        return np.array(self.piece, dtype=np.int32)
 
 
 def truncated_cube():
@@ -4082,7 +4090,7 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
             chunk_keys=ck, chunk_offsets=coff, chunk_faces=cfaces,
             coll_verts_q=Cvq, coll_faces=Cf.astype(np.int32), proxy_verts_q=Pq, proxy_faces=Pf.astype(np.int32),
             proxy_kind=Pt.astype(np.int8), form_verts_q=Fq, form_faces=Ff.astype(np.int32),
-            form_kind=Ft.astype(np.int8), form_geo=vis.geos().astype(np.int8), form_uv=fuv, form_uv_axis=fax,
+            form_kind=Ft.astype(np.int8), form_geo=vis.geos().astype(np.int8), form_piece=vis.pieces(), form_uv=fuv, form_uv_axis=fax,
             geology=np.array(json.dumps(sec.geo_names)), zones_json=np.array(json.dumps(zones_out)),
             report_json=np.array(json.dumps(report)))
         plan(os.path.join(out_dir, f"{sec.key}_plan.png"), sec, grid, zones, fl_parts)

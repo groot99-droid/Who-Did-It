@@ -46,7 +46,13 @@
       "watts_per_m2": 0.06,
       "max_watts": 12.0
     },
-    "climb": { "min_height_m": 2.5, "back_m": 1.6, "side_m": 1.2, "height_m": 0.9, "watts": 5.0 },
+    "climb": {
+      "min_height_m": 2.5,
+      "back_m": 1.6,
+      "side_m": 1.2,
+      "height_m": 0.9,
+      "watts": 5.0
+    },
     "about_route2": "route 2: a chamber of min_area_m2 or more also gets a ring of low lights near its walls (the Well Dome read flat under one light; the Great Dome too), and a climb face of min_height_m or more a low light beside its foot, so the face is lit across"
   },
   "weights": {
@@ -90,7 +96,10 @@
   "hot": {
     "knee": 0.62,
     "max": 0.8,
-    "timber": { "knee": 0.3, "max": 0.38 },
+    "timber": {
+      "knee": 0.3,
+      "max": 0.38
+    },
     "about": "display luminance over knee is eased towards max; timber (the guards' rails and the gates' railway timbers, creosoted) has its own lower knee and max, as the grille has its iron cap (route 1 fix: the Cutting Gate's centre post 0.3 m under the lamp read as a cream bar)"
   },
   "cycles": {
@@ -98,22 +107,70 @@
     "draft_samples": 32
   },
   "kits": {
-    "limestone": { "wall": "rock_01", "floor": "rock_ground_02" },
-    "flowstone": { "wall": "worn_rock_natural_01", "floor": "rock_06" },
-    "breakdown": { "wall": "rocks_ground_06", "floor": "rocks_ground_06" },
-    "gypsum": { "wall": "rock_boulder_dry", "floor": "rock_boulder_dry" },
-    "lakeclay": { "wall": "brown_mud_02", "floor": "brown_mud_03" },
-    "slate": { "wall": "dark_rock_02", "floor": "dark_rock_02" },
-    "skarn": { "wall": "marble_rock_03", "floor": "tiger_rock" },
-    "granite": { "wall": "tiger_rock", "floor": "rocks_ground_08" },
-    "flooded": { "wall": "seaside_rock", "floor": "low_tide_rocks" },
-    "default": { "wall": "rock_01", "floor": "rock_ground_02" },
-    "moss": { "wall": "lichen_rock", "floor": "mossy_rock" },
-    "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
-    "ice": { "wall": "snow_02", "floor": "snow_03" },
-    "mouth_cliff_slot": { "wall": "rock_wall_08", "floor": "snow_03" },
-    "mouth_adit": { "wall": "rock_wall_08", "floor": "gravel" },
-    "mouth_arch": { "wall": "quarry_wall_02", "floor": "snow_03" },
+    "limestone": {
+      "wall": "rock_01",
+      "floor": "rock_ground_02"
+    },
+    "flowstone": {
+      "wall": "worn_rock_natural_01",
+      "floor": "rock_06"
+    },
+    "breakdown": {
+      "wall": "rocks_ground_06",
+      "floor": "rocks_ground_06"
+    },
+    "gypsum": {
+      "wall": "rock_boulder_dry",
+      "floor": "rock_boulder_dry"
+    },
+    "lakeclay": {
+      "wall": "brown_mud_02",
+      "floor": "brown_mud_03"
+    },
+    "slate": {
+      "wall": "dark_rock_02",
+      "floor": "dark_rock_02"
+    },
+    "skarn": {
+      "wall": "marble_rock_03",
+      "floor": "tiger_rock"
+    },
+    "granite": {
+      "wall": "tiger_rock",
+      "floor": "rocks_ground_08"
+    },
+    "flooded": {
+      "wall": "seaside_rock",
+      "floor": "low_tide_rocks"
+    },
+    "default": {
+      "wall": "rock_01",
+      "floor": "rock_ground_02"
+    },
+    "moss": {
+      "wall": "lichen_rock",
+      "floor": "mossy_rock"
+    },
+    "mouth": {
+      "wall": "mossy_rock",
+      "floor": "mossy_rock"
+    },
+    "ice": {
+      "wall": "snow_02",
+      "floor": "snow_03"
+    },
+    "mouth_cliff_slot": {
+      "wall": "rock_wall_08",
+      "floor": "snow_03"
+    },
+    "mouth_adit": {
+      "wall": "rock_wall_08",
+      "floor": "gravel"
+    },
+    "mouth_arch": {
+      "wall": "quarry_wall_02",
+      "floor": "snow_03"
+    },
     "snow": "snow_02",
     "timber": "weathered_planks"
   },
@@ -124,5 +181,179 @@
     "ink_margin": 1.12,
     "about": "a gate's grille: display luminance held between ink_margin x the ink and cap, its hue the iron's grey warmed towards the lamp's colour by up to warm where the lamp gives the light (route 1: the P0 bars read cream in a saturated blue frame)"
   },
-  "floor_normal_z": 0.7
+  "palettes": {
+    "about": "per geology the rock's colour (sRGB): a base and accents, with large-scale variation (meshy_cave_build.macro_tint): cream calcite patches, a staining band on some beds (band) and streaks (streak, streak2) in iron red or a dark manganese, a green where it is damp. No accent is lilac, magenta or teal; the darkest is over the ink",
+    "default": {
+      "base": "#8E9088",
+      "cream": "#BDB293",
+      "iron": "#80593F",
+      "dark": "#3A3C40",
+      "green": "#6D7452"
+    },
+    "limestone": {
+      "base": "#8E9088",
+      "cream": "#BDB293",
+      "iron": "#80593F",
+      "dark": "#3A3C40",
+      "green": "#6D7452"
+    },
+    "flowstone": {
+      "base": "#B4AB96",
+      "cream": "#D3C8A6",
+      "iron": "#98714F",
+      "dark": "#5E5C57",
+      "green": "#868C68",
+      "streak": "iron",
+      "streak2": "dark"
+    },
+    "breakdown": {
+      "base": "#7F7D78",
+      "cream": "#A59C88",
+      "iron": "#745041",
+      "dark": "#38393C",
+      "green": "#66705A"
+    },
+    "gypsum": {
+      "base": "#CCC8BA",
+      "cream": "#E1D7B7",
+      "iron": "#B58A60",
+      "dark": "#8A8985",
+      "green": "#A6AE92",
+      "amount": {
+        "iron": 0.8,
+        "dark": 0.7
+      }
+    },
+    "lakeclay": {
+      "base": "#6C6E66",
+      "cream": "#A39F86",
+      "iron": "#7E4F3A",
+      "dark": "#383B3D",
+      "green": "#5C6B4C"
+    },
+    "ice": {
+      "base": "#A8BACB",
+      "cream": "#D5E1EC",
+      "iron": "#7B8BA0",
+      "dark": "#5F6B79",
+      "green": "#9AA5B2",
+      "band": "iron",
+      "streak": "dark",
+      "streak2": "iron"
+    },
+    "slate": {
+      "base": "#6A7684",
+      "cream": "#7D8892",
+      "iron": "#6F4E41",
+      "dark": "#363A42",
+      "green": "#566359",
+      "band": "cream",
+      "streak": "dark",
+      "streak2": "iron"
+    },
+    "skarn": {
+      "base": "#7C6E66",
+      "cream": "#B3A890",
+      "iron": "#8E513B",
+      "dark": "#3A3836",
+      "green": "#6C7A5C"
+    },
+    "granite": {
+      "base": "#857F78",
+      "cream": "#A59E8F",
+      "iron": "#80604F",
+      "dark": "#36363A",
+      "green": "#66705C"
+    },
+    "flooded": {
+      "base": "#777A7C",
+      "cream": "#8A8576",
+      "iron": "#6E5646",
+      "dark": "#33363A",
+      "green": "#5E6B58"
+    }
+  },
+  "scan_chroma": {
+    "about": "the share of each scan's chroma the builder keeps (the rest is taken out in linear light, luminance kept): the palettes give the rock its hue, so a warm scan does not make every wall the same orange under the lantern",
+    "default": 0.35,
+    "tiger_rock": 0.2,
+    "worn_rock_natural_01": 0.25,
+    "rock_06": 0.25,
+    "snow_02": 0.5,
+    "snow_03": 0.5,
+    "lichen_rock": 0.8,
+    "mossy_rock": 0.8,
+    "weathered_planks": 0.7,
+    "brown_mud_02": 0.3,
+    "brown_mud_03": 0.3
+  },
+  "mist": {
+    "about": "the faint cool mist the viewer mixes in by distance (apps/walk lantern.ts setMist): the area's wdi_mist extras, this default merged with the section's own. density per metre, wet_gain the extra per metre on wet surfaces, max the most it mixes in",
+    "default": {
+      "colour": "#222C3B",
+      "density": 0.01,
+      "wet_gain": 0.03,
+      "max": 0.4
+    },
+    "sections": {
+      "river": {
+        "wet_gain": 0.07
+      },
+      "reach": {
+        "wet_gain": 0.07
+      },
+      "bottom": {
+        "wet_gain": 0.07,
+        "density": 0.013
+      },
+      "rising": {
+        "wet_gain": 0.06
+      },
+      "swallow": {
+        "wet_gain": 0.05
+      },
+      "ice": {
+        "colour": "#2A3A4E",
+        "density": 0.014
+      },
+      "gallery": {
+        "density": 0.01
+      },
+      "well": {
+        "density": 0.01
+      },
+      "domes": {
+        "density": 0.01
+      },
+      "white": {
+        "density": 0.01
+      },
+      "spar": {
+        "density": 0.013
+      },
+      "killas": {
+        "density": 0.013
+      }
+    }
+  },
+  "floor_normal_z": 0.7,
+  "section_base_mul": {
+    "about": "per-section channel factors on a palette's base (see meshy_cave_build.macro_tint): olive, cold or warm leans so sections of one geology differ",
+    "river": [0.95, 1.05, 0.97],
+    "reach": [0.98, 1.0, 1.06],
+    "swallow": [1.06, 1.0, 0.9],
+    "gallery": [1.0, 1.0, 1.0],
+    "highlevel": [0.96, 1.0, 1.05],
+    "adit": [1.05, 1.0, 0.92],
+    "levels": [1.03, 1.0, 0.95],
+    "spar": [0.88, 1.07, 0.98],
+    "north": [1.05, 1.0, 0.9],
+    "domes": [0.99, 1.0, 1.04],
+    "rising": [0.97, 1.04, 1.0],
+    "killas": [1.0, 1.0, 1.0],
+    "well": [0.98, 1.0, 1.02],
+    "white": [1.0, 1.0, 0.98],
+    "bottom": [0.97, 1.04, 1.0],
+    "ice": [1.0, 1.0, 1.0]
+  }
 }

@@ -10,6 +10,7 @@ import {
   ShaderLib,
   Texture,
   Vector3,
+  Vector4,
   type WebGLProgramParametersWithUniforms,
   type WebGLRenderer,
 } from 'three';
@@ -28,6 +29,7 @@ import {
   lanternShape,
   lanternUniforms,
   lanternWanted,
+  setMist,
   patchLantern,
   takesLantern,
 } from '../src/lantern';
@@ -83,18 +85,18 @@ function agxDisplayLuma(rgb: number[], exposure: number): number {
 }
 
 describe('the lantern falloff', () => {
-  it('is intensity / (1 + (d / 2.5)^2), fading out between 8.4 and 12 m', () => {
-    expect(LANTERN.near).toBe(2.5);
+  it('is intensity / (1 + (d / 3.4)^2), fading out between 8.4 and 12 m', () => {
+    expect(LANTERN.near).toBe(3.4);
     expect(LANTERN.reach).toBe(12);
     expect(lanternShape(0)).toBe(1);
-    expect(lanternShape(2.5)).toBeCloseTo(0.5, 12);
-    expect(lanternShape(5)).toBeCloseTo(0.2, 12);
+    expect(lanternShape(3.4)).toBeCloseTo(0.5, 12);
+    expect(lanternShape(5)).toBeCloseTo(1 / (1 + (5 / 3.4) ** 2), 12);
     // Up to 0.7 x 12 m no fade; then a smoothstep: half way at 10.2 m, nothing from 12 m.
-    expect(lanternShape(8.4)).toBeCloseTo(1 / (1 + (8.4 / 2.5) ** 2), 12);
-    expect(lanternShape(10.2)).toBeCloseTo(0.5 / (1 + (10.2 / 2.5) ** 2), 12);
+    expect(lanternShape(8.4)).toBeCloseTo(1 / (1 + (8.4 / 3.4) ** 2), 12);
+    expect(lanternShape(10.2)).toBeCloseTo(0.5 / (1 + (10.2 / 3.4) ** 2), 12);
     expect(lanternShape(12)).toBe(0);
     expect(lanternShape(30)).toBe(0);
-    expect(lanternFalloff(2)).toBeCloseTo(LANTERN.intensity / 1.64, 12);
+    expect(lanternFalloff(2)).toBeCloseTo(LANTERN.intensity / (1 + (2 / 3.4) ** 2), 12);
     let last = Infinity;
     for (let d = 0; d <= 13; d += 0.05) {
       const v = lanternShape(d);
@@ -104,12 +106,16 @@ describe('the lantern falloff', () => {
     }
   });
 
-  it('lights a cave wall 2 m away to display 0.48 through AgX, under the gate-lamp pool (0.55), and never washes it out', () => {
+  it('lights a cave wall 2 m away to display 0.49 through AgX, under the gate-lamp pool (0.55), and never washes it out', () => {
     // The limestone walls' mean linear albedo (luminance) as the file's scan carries it, at the caves' exposure.
     const albedo = 0.1843;
     const exposure = 2.378414230005442;
-    const warm = new Color(LANTERN.colour);
-    expect([warm.r, warm.g, warm.b].map((v) => +v.toFixed(3))).toEqual([1, 0.456, 0.095]);
+    // The flame's colour taken `whiten` of the way to white (linear): still plainly warm.
+    const pure = new Color(LANTERN.colour);
+    expect([pure.r, pure.g, pure.b].map((v) => +v.toFixed(3))).toEqual([1, 0.456, 0.095]);
+    const warm = pure.clone().lerp(new Color(1, 1, 1), LANTERN.whiten);
+    expect(warm.r).toBeGreaterThan(warm.g * 1.4);
+    expect(warm.g).toBeGreaterThan(warm.b * 1.4);
     const at = (d: number, angle = 1) =>
       agxDisplayLuma(
         [warm.r, warm.g, warm.b].map(
@@ -117,7 +123,7 @@ describe('the lantern falloff', () => {
         ),
         exposure,
       );
-    expect(at(2)).toBeCloseTo(0.48, 2);
+    expect(at(2)).toBeCloseTo(0.49, 2);
     expect(at(2)).toBeLessThan(0.55);
     // Nearer is a little brighter and stays under 0.56 (the baked ambient light is not in this): no wash. A wall seen
     // at an angle (N.L 0.5) is dimmer, and 6 m away it is well down.
@@ -250,6 +256,60 @@ describe('the lantern in the unlit shader', () => {
     expect(injectLantern('void main() {}', ShaderLib.basic.fragmentShader)).toBeNull();
   });
 
+  it('samples the scan stochastically, lights the rock by its own tint, glints where wet and mixes a mist in', () => {
+    const out = injectLantern(ShaderLib.basic.vertexShader, ShaderLib.basic.fragmentShader)!;
+    const f = out.fragment;
+    // Hex tiling replaces the plain lookup: three tiles per triangle, each rotated and offset, sampled with the plain
+    // lookup's derivatives, blended by weights raised to a power.
+    expect(f).toContain('vec4 sampledDiffuseColor = wdiStochastic( vMapUv );');
+    expect(f).not.toContain('#include <map_fragment>');
+    expect(f).toContain('textureGrad( map,');
+    expect(f).toContain(`pow( w, vec3( ${LANTERN.stochastic.sharp}.0 ) )`);
+    // The lantern shows the rock's own colour: the file's _TINT over the reference, where the mesh has one.
+    expect(out.vertex).toContain('attribute vec3 _tint;');
+    expect(out.vertex).toContain('vWdiTint = _tint;');
+    expect(f).toContain(`vec3 wdiTr = vWdiTint / ${LANTERN.tintRef};`);
+    expect(f).toContain(`wdiTr = pow( wdiTr, vec3( ${LANTERN.tintGamma} ) );`);
+    expect(f).toContain('wdiAlbedo *= wdiTr;');
+    // The darkest palettes keep a floor of luminance, and the chroma gain is applied before the power.
+    expect(f).toContain(`${LANTERN.tintFloor} / max( dot( wdiTr,`);
+    // Far from the eye the scan is read once, plainly (a third of the reads).
+    expect(f).toContain(
+      `if ( length( vWdiView ) > ${LANTERN.stochastic.far}.0 ) return texture2D( map, uv );`,
+    );
+    // The baked light where it is dim: less of its colour, a little cold, a small floor; before the albedo multiplies it.
+    const fill = f.indexOf('float wdiDim = 1.0 - smoothstep( 0.0, ');
+    expect(fill).toBeGreaterThan(0);
+    expect(fill).toBeLessThan(
+      f.indexOf('#include <envmap_fragment>') === -1 ? f.length : f.indexOf('#include <envmap_fragment>'),
+    );
+    expect(f).toContain('wdiBl * vec3( 0.80, 0.95, 1.20 )');
+    // The sheen is only where the vertices are wet, from the lantern at the eye, added to the light before tone mapping.
+    expect(out.vertex).toContain('attribute float _wet;');
+    const wet = f.indexOf('if ( vWdiWet > 0.01 ) {');
+    expect(wet).toBeGreaterThan(f.indexOf('outgoingLight += wdiAlbedo * wdiLanternColor * wdiK;'));
+    expect(wet).toBeLessThan(f.indexOf('#include <tonemapping_fragment>'));
+    expect(f).toContain('wdiLanternColor * ( ');
+    // The mist: after the fog, before the ink floor.
+    const mist = f.indexOf('gl_FragColor.rgb = mix( gl_FragColor.rgb, wdiMistColor');
+    expect(mist).toBeGreaterThan(f.indexOf('#include <dithering_fragment>'));
+    expect(mist).toBeLessThan(f.indexOf('gl_FragColor.rgb += wdiInk'));
+  });
+
+  it('retunes the mist per area from its extras, and keeps the config where it says nothing', () => {
+    const u = { wdiMistColor: { value: new Vector3() }, wdiMist: { value: new Vector4() } };
+    setMist(undefined, u);
+    expect(u.wdiMist.value.x).toBeCloseTo(LANTERN.mist.density, 9);
+    expect(u.wdiMist.value.y).toBeCloseTo(LANTERN.mist.wetGain, 9);
+    setMist({ colour: '#2A3A4E', density: 0.02, wet_gain: 0.07, max: 2 }, u);
+    expect(u.wdiMist.value.x).toBeCloseTo(0.02, 9);
+    expect(u.wdiMist.value.y).toBeCloseTo(0.07, 9);
+    expect(u.wdiMist.value.z).toBe(1); // clamped
+    expect(u.wdiMistColor.value.x).toBeCloseTo(0x2a / 255, 9);
+    setMist({ density: 'x' }, u);
+    expect(u.wdiMist.value.x).toBeCloseTo(LANTERN.mist.density, 9);
+  });
+
   it('patches unlit materials once, skips lit ones and emitters, and shares one set of uniforms', () => {
     const root = new Group();
     const wall = new MeshBasicMaterial({ name: 'cave_limestone_wall', vertexColors: true });
@@ -279,7 +339,7 @@ describe('the lantern in the unlit shader', () => {
     expect(a.fragmentShader).toContain('wdiLanternColor');
     expect(a.uniforms.wdiLanternPos).toBe(lanternUniforms.wdiLanternPos);
     expect(b.uniforms.wdiLanternColor).toBe(lanternUniforms.wdiLanternColor);
-    expect(a.uniforms.wdiLanternRange!.value.toArray()).toEqual([2.5, 12]);
+    expect(a.uniforms.wdiLanternRange!.value.toArray()).toEqual([3.4, 12]);
     expect(a.uniforms.wdiLanternShade!.value.toArray()).toEqual([LANTERN.form, LANTERN.aoWeight]);
   });
 });
@@ -322,7 +382,9 @@ describe('the Lantern', () => {
     l.wanted = true;
     l.update(0.016, eye, 0, id);
     expect(l.lit).toBe(true);
-    const warm = new Color(LANTERN.colour).multiplyScalar(LANTERN.intensity * l.flicker);
+    const warm = new Color(LANTERN.colour)
+      .lerp(new Color(1, 1, 1), LANTERN.whiten)
+      .multiplyScalar(LANTERN.intensity * l.flicker);
     expect(u.wdiLanternColor.value.r).toBeCloseTo(warm.r, 9);
     expect(u.wdiLanternColor.value.g).toBeCloseTo(warm.g, 9);
     expect(u.wdiLanternColor.value.b).toBeCloseTo(warm.b, 9);

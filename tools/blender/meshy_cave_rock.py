@@ -21,6 +21,8 @@ from __future__ import annotations
 
 import numpy as np
 
+import meshy_cave_forms as forms
+
 # ---------------------------------------------------------------- the geologies
 
 # Per geology: dip [dz/dx, dz/dy] of the beds, ledge (m, the beds' step), scallop (m, the dimples' depth), joints
@@ -29,39 +31,42 @@ import numpy as np
 ROCK = {
     "limestone": {"dip": [0.07, 0.025], "ledge": 0.075, "scallop": 0.06, "joints": [[0.8, 0.6], 3.4, 0.09],
                   "rubble": 0.2, "decor": {"stalactite": 1.0, "stalagmite": 1.0, "column": 1.0, "curtain": 1.0,
-                                           "rimstone": 1.0, "blocks": 0.5, "rocks": 1.0}},
+                                           "rimstone": 1.0, "blocks": 0.5, "rocks": 1.0, "sheet": 0.8, "shelf": 0.4, "boss": 0.6, "crust": 0.7, "helictite": 0.5}},
     "flowstone": {"dip": [0.02, 0.01], "ledge": 0.03, "scallop": 0.02, "joints": [[0.7, 0.71], 4.5, 0.05],
                   "rubble": 0.12, "decor": {"stalactite": 1.6, "stalagmite": 1.4, "column": 1.5, "curtain": 1.8,
-                                            "rimstone": 1.8, "blocks": 0.2, "rocks": 0.5}},
+                                            "rimstone": 1.8, "blocks": 0.2, "rocks": 0.5, "sheet": 1.6, "shelf": 1.0, "boss": 0.5, "crust": 1.0, "helictite": 0.8}},
     "breakdown": {"dip": [0.05, 0.05], "ledge": 0.05, "scallop": 0.0, "joints": [[0.6, 0.8], 2.2, 0.14],
                   "rubble": 0.28, "decor": {"stalactite": 0.3, "stalagmite": 0.25, "column": 0.2, "curtain": 0.2,
-                                            "rimstone": 0.1, "blocks": 2.0, "rocks": 2.2}},
+                                            "rimstone": 0.1, "blocks": 2.0, "rocks": 2.2, "sheet": 0.1, "shelf": 0.0, "boss": 0.9, "crust": 0.8}},
     "gypsum": {"dip": [0.03, 0.0], "ledge": 0.05, "scallop": 0.0, "joints": [[1.0, 0.0], 3.0, 0.07],
                "rubble": 0.16, "decor": {"stalactite": 0.25, "stalagmite": 0.2, "crystal": 0.8, "curtain": 0.2,
-                                         "blocks": 0.6, "rocks": 1.0}},
+                                         "blocks": 0.6, "rocks": 1.0, "sheet": 0.2, "boss": 0.3, "crust": 0.8, "flower": 1.1}},
     "lakeclay": {"dip": [0.02, 0.0], "ledge": 0.04, "scallop": 0.0, "joints": [[0.9, 0.44], 4.0, 0.05],
                  "rubble": 0.15, "decor": {"stalactite": 0.8, "stalagmite": 0.8, "column": 0.6, "curtain": 0.45,
-                                           "rimstone": 0.8, "blocks": 0.8, "rocks": 1.4}},
+                                           "rimstone": 0.8, "blocks": 0.8, "rocks": 1.4, "sheet": 0.6, "shelf": 0.3, "boss": 0.5, "crust": 0.8, "helictite": 0.3}},
     "ice": {"dip": [0.0, 0.0], "ledge": 0.02, "scallop": 0.0, "joints": [[1.0, 0.0], 5.0, 0.03], "rubble": 0.1,
-            "decor": {"icicle": 1.6, "blocks": 0.3, "rocks": 0.5}},
+            "decor": {"icicle": 1.6, "blocks": 0.3, "rocks": 0.5, "sheet": 0.8, "boss": 0.3, "crust": 0.8}},
     "slate": {"dip": [0.35, 0.12], "ledge": 0.06, "scallop": 0.0, "joints": [[0.3, 0.95], 1.8, 0.12],
-              "rubble": 0.24, "decor": {"stalactite": 0.15, "stalagmite": 0.1, "blocks": 1.2, "rocks": 1.6}},
+              "rubble": 0.24, "decor": {"stalactite": 0.15, "stalagmite": 0.1, "blocks": 1.2, "rocks": 1.6, "sheet": 1.4, "shelf": 1.3, "boss": 1.4, "crust": 1.3, "helictite": 0.4}},
     "skarn": {"dip": [0.12, 0.2], "ledge": 0.05, "scallop": 0.0, "joints": [[0.5, 0.87], 2.6, 0.1], "rubble": 0.2,
-              "decor": {"stalactite": 0.3, "stalagmite": 0.2, "crystal": 1.6, "blocks": 0.9, "rocks": 1.2}},
+              "decor": {"stalactite": 0.3, "stalagmite": 0.2, "crystal": 2.2, "blocks": 0.9, "rocks": 1.2, "sheet": 1.3, "shelf": 1.0, "boss": 1.5, "crust": 1.3, "flower": 0.5, "helictite": 0.5}},
     "granite": {"dip": [0.0, 0.0], "ledge": 0.0, "scallop": 0.0, "joints": [[0.95, 0.3], 2.4, 0.13], "rubble": 0.24,
-                "decor": {"stalactite": 0.05, "blocks": 1.4, "rocks": 1.5}},
+                "decor": {"stalactite": 0.05, "blocks": 1.4, "rocks": 1.5, "sheet": 0.1, "boss": 0.7, "crust": 0.7}},
     "flooded": {"dip": [0.04, 0.02], "ledge": 0.05, "scallop": 0.05, "joints": [[0.8, 0.6], 3.4, 0.07],
                 "rubble": 0.14, "decor": {"stalactite": 0.7, "stalagmite": 0.4, "column": 0.4, "curtain": 0.5,
-                                          "rimstone": 0.3, "blocks": 0.4, "rocks": 0.8}},
+                                          "rimstone": 0.3, "blocks": 0.4, "rocks": 0.8, "sheet": 0.6, "shelf": 0.4, "boss": 0.4, "crust": 0.7, "helictite": 0.3}},
 }
 PLAIN = {"dip": [0.0, 0.0], "ledge": 0.0, "scallop": 0.0, "joints": [[1.0, 0.0], 4.0, 0.0], "rubble": 0.0,
          "decor": {}}
-DECOR_KINDS = ("stalactite", "stalagmite", "column", "curtain", "rimstone", "crystal", "icicle", "blocks", "rocks")
+DECOR_KINDS = ("stalactite", "stalagmite", "column", "curtain", "rimstone", "crystal", "icicle", "blocks", "rocks", "sheet",
+               "shelf", "boss", "crust", "flower", "helictite")
 
 # The formations' tags in the core's form_kind (0 to 3 are the hand-placed features'; 10 to 12 the guards', bridges'
 # and seam walls' proxies).
 TAG = {"stalactite": 0, "stalagmite": 1, "column": 2, "block": 3, "straw": 5, "curtain": 6, "rimstone": 7,
-       "crystal": 8, "icicle": 9, "rock": 13, "pool": 14}
+       "crystal": 8, "icicle": 9, "rock": 13, "pool": 14, "helictite": 15, "flower": 16, "sheet": 17, "shelf": 18,
+       "boss": 19, "crust": 20}
+WALL_KINDS = ("sheet", "shelf", "boss", "crust", "crystal", "flower", "helictite")   # wall-mounted: no collision
 
 SCALLOP_M = 0.6     # metres between scallops (feature points of a jittered lattice)
 RUBBLE_MAX = 0.3    # the rubble edge never stands higher than this: the walker steps over it (STEP is 0.35)
@@ -74,6 +79,10 @@ SEAM_KEEP = 1.5     # metres from a seam plane, a spawn, a portal or an arrival 
 ROUTE_KEEP = 0.9    # metres from a route's centre line (beyond the clear core's half width) no floor item stands
 ZONE_KEEP = 1.0     # metres round a traversal zone's box nothing is placed
 SOLID_TOP = 2.6     # a collision item's flood solid reaches this far above its floor: nothing stands on it
+SHOWPIECES = {"gallery": 5, "well": 5, "domes": 6, "white": 5}   # large formations per big chamber (section key)
+SHOW_SEQ = {"default": ["chandelier", "drape", "column", "cascade", "forest"],
+            "white": ["blades", "flowers", "chandelier", "blades", "drape"],
+            "well": ["cascade", "drape", "column", "forest", "chandelier"]}
 NARROW_WALL = 1.3   # metres: a spot this near a wall is in a narrow place (a passage, a chamber's edge)
 # What a narrow place's small formations weigh where the rock is poor in them (under NARROW_POOR: the slate and the
 # skarn of the Spar Maze and the Killas Rift weigh a tenth of limestone's, so those passages stood almost bare): small
@@ -162,24 +171,34 @@ def scallops(X, Y, Z, seed, s=SCALLOP_M):
 def ledges(X, Y, Z, thick, dip, warp):
     """The beds' face across a bed, in [-1, 1]: recessed (+, air) towards a bed's top, standing out (-, rock) at its
     foot, with a sharp step between (the bed above overhangs the one below). The beds dip by `dip` and wander by
-    `warp` metres."""
-    zt = (Z - dip[0] * X - dip[1] * Y + warp) / thick
-    f = frac(zt)
+    `warp` metres. Each bed has its own strength (0.35 to 1.5 of the nominal), so the beds do not read as a grid, and
+    the bed boundaries wander by a further, slower warp."""
+    zt = (Z - dip[0] * X - dip[1] * Y + 3.5 * warp) / thick
+    k = np.floor(zt)
+    f = zt - k
     p = np.where(f < 0.85, f / 0.85, (1.0 - f) / 0.15)
-    return 2.0 * p - 1.0
+    amp = 0.35 + 1.15 * hash3(k.astype(np.int64), 0, 0, 913)
+    return (2.0 * p - 1.0) * amp
 
 
 def joints(X, Y, strike, spacing, warp):
-    """Two sets of vertical joints: a V groove 0.36 m wide, 1 on a joint's plane, 0 away from it."""
+    """Two sets of vertical joints: a V groove 0.36 m wide, 1 on a joint's plane, 0 away from it. Each joint of a set
+    sits off its nominal place by up to 0.45 of the spacing and a third are missing, so they are not a grid."""
     ux, uy = strike
     n = float(np.sqrt(ux * ux + uy * uy)) or 1.0
     ux, uy = ux / n, uy / n
     out = 0.0
-    for (ax, ay), sp, w in (((ux, uy), spacing, 1.0), ((-uy, ux), 1.7 * spacing, 0.7)):
+    for si, ((ax, ay), sp, w) in enumerate((((ux, uy), spacing, 1.0), ((-uy, ux), 1.7 * spacing, 0.7))):
         s = (X * ax + Y * ay + warp) / sp
-        g = frac(s)
-        d = np.minimum(g, 1.0 - g) * sp
-        q = np.clip(1.0 - d / 0.18, 0.0, 1.0)
+        j0 = np.floor(s).astype(np.int64)
+        best = 1e9
+        for dj in (-1, 0, 1):
+            j = j0 + dj
+            pos = j + 0.5 + 0.9 * (hash3(j, si, 1, 377) - 0.5)
+            alive = hash3(j, si, 2, 377) > 0.33
+            d = np.where(alive, np.abs(s - pos) * sp, 1e9)
+            best = np.minimum(best, d)
+        q = np.clip(1.0 - best / 0.18, 0.0, 1.0)
         out = np.maximum(out, w * q * q)
     return out
 
@@ -295,18 +314,45 @@ def sides(rb):
 
 
 def stalactite(x, y, roof, length, rb, turn, rng, icicle=False):
-    """A carrot hanging from 0.3 m inside the roof to `length` below it: radius rb (1 - t)^1.5 (an icicle's
-    (1 - t)^2), swollen just under the roof, swaying a little."""
-    k = 3 if length < 0.3 else 5 if length < 1.0 else 7
+    """A stalactite hanging from 0.3 m inside the roof to `length` below it: a tapering cone whose sides are a little
+    concave (radius rb x q x (0.55 + 0.45 sqrt q), q = 1 - t; an icicle's q^2), swollen where it leaves the roof, with
+    an irregular, slightly bent axis (it bows up to 16 % of its length to one side), ringed by a few ripples, and ending
+    in a drip: a neck and a small bead, then the point."""
+    k = 3 if length < 0.3 else 6 if length < 1.0 else 9 if length < 2.2 else 12
     total = length + 0.3
-    sway = rng.uniform(-0.2, 0.2) * rb
-    rings = []
-    for s in range(k):
-        t = s / k
+    bow = min(rng.uniform(0.03, 0.16) * length, 0.3) * (0.5 if icicle else 1.0)
+    bx, by = turn
+    wx, wy = rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5)   # a second, small bend across the first
+    ph = rng.uniform()
+    ripples = 2.0 + 4.0 * rng.uniform()
+    n = sides(rb)
+
+    def centre(t):
+        s = bow * t * t
+        return (x + s * bx + 0.25 * bow * wx * 4.0 * t * (1.0 - t), y + s * by + 0.25 * bow * wy * 4.0 * t * (1.0 - t))
+
+    def radius(t):
         q = 1.0 - t
-        r = rb * (q * q if icicle else q * float(np.sqrt(q))) * (1.3 if s == 1 else 1.0)
-        rings.append((x + sway * t * turn[0], y + sway * t * turn[1], roof + 0.3 - total * t, max(r, 0.003)))
-    return lathe(rings, sides(rb), turn, tip=(x + sway * turn[0], y + sway * turn[1], roof - length), cap=True)
+        body = q * q if icicle else q * (0.55 + 0.45 * float(np.sqrt(q)))
+        rip = 1.0 + 0.1 * float(forms.saw(t * ripples + ph) - 0.5) * (1.0 if length >= 0.3 else 0.0)
+        return rb * body * rip * (1.0 + 0.35 * max(1.0 - 5.0 * t, 0.0))
+
+    ts = [s / k for s in range(k)]
+    drip = length >= 0.3
+    if drip:
+        ts += [0.93, 0.975]
+    rings = []
+    for t in ts:
+        cx, cy = centre(t)
+        r = radius(t)
+        if drip and t == 0.93:
+            r = max(0.45 * radius(0.9), 0.004)
+        elif drip and t == 0.975:
+            r = max(0.62 * radius(0.9), 0.006)
+        rings.append((cx, cy, roof + 0.3 - total * t, max(r, 0.003)))
+    wob = [[rng.uniform(0.92, 1.08) for _ in range(n)] for _ in rings] if length >= 0.3 else None
+    tx, ty = centre(1.0)
+    return lathe(rings, n, turn, wobble=wob, tip=(tx, ty, roof - length), cap=True)
 
 
 STALAGMITE_SHAPES = ("cone", "candle", "mound", "stack")
@@ -314,38 +360,51 @@ STALAGMITE_SHAPES = ("cone", "candle", "mound", "stack")
 
 def stalagmite(x, y, floor, height, rb, turn, rng, n=None, shape=None):
     """A stalagmite from 0.25 m under the floor to `height` over it, its base flared into the floor and its top
-    rounded: a cone (tapering), a candle (straight, then a dome), a mound (low and wide) or a stack (stacked
-    bulges); lumpy. rb is its radius at the floor."""
+    rounded (the last fifth is a dome): a cone (tapering), a candle (straight), a mound (low and wide) or a stack
+    (stacked bulges); lumpy, leaning a little. rb is its radius at the floor."""
     n = n or sides(rb)
     shape = shape or STALAGMITE_SHAPES[int(rng.uniform() * 4) % 4]
-    k = 4 if height < 0.4 else 7
+    ts = [0.30, 0.62, 0.86, 0.96] if height < 0.4 else [0.1, 0.22, 0.36, 0.5, 0.63, 0.74, 0.83, 0.9, 0.96]
+    lean = rng.uniform(-0.12, 0.12) * height
+    lx, ly = turn
     rings = [(x, y, floor - 0.25, 1.25 * rb), (x, y, floor + 0.02, 1.15 * rb)]
-    for s in range(1, k):
-        t = s / k
+    ph = rng.uniform()
+    for t in ts:
         if shape == "candle":
-            r = rb * (0.75 if t < 0.8 else 0.75 * float(np.sqrt(max(1.0 - ((t - 0.8) / 0.2) ** 2, 0.0))) + 0.02)
+            r = rb * 0.75
         elif shape == "mound":
-            r = rb * float(np.sqrt(max(1.0 - t * t, 0.0)))
+            r = rb * (1.0 - 0.75 * t * t)
         elif shape == "stack":
-            q = (3.0 * t) % 1.0
-            r = rb * (1.0 - 0.7 * t) * (0.82 + 0.3 * 4.0 * q * (1.0 - q))
+            q = (3.0 * t + ph) % 1.0
+            r = rb * (1.0 - 0.6 * t) * (0.82 + 0.3 * 4.0 * q * (1.0 - q))
         else:
-            r = rb * (1.0 - 0.85 * t) * (1.0 - 0.15 * t * t)
-        rings.append((x, y, floor + height * t, max(r, 0.01)))
+            r = rb * (1.0 - 0.7 * t) * (1.0 - 0.1 * t * t)
+        dome = 1.0 if t < 0.8 else float(np.sqrt(max(1.0 - ((t - 0.8) / 0.2) ** 2, 0.0)))
+        rings.append((x + lean * t * t * lx, y + lean * t * t * ly, floor + height * t, max(r * dome, 0.01)))
     wob = [[rng.uniform(0.84, 1.16) for _ in range(n)] for _ in range(len(rings))]
-    top = (x + rng.uniform(-0.05, 0.05) * rb, y + rng.uniform(-0.05, 0.05) * rb, floor + height)
+    top = (x + lean * lx + rng.uniform(-0.05, 0.05) * rb, y + lean * ly + rng.uniform(-0.05, 0.05) * rb,
+           floor + height)
     return lathe(rings, n, turn, wobble=wob, tip=top, cap=True)
 
 
 def column(x, y, floor, roof, rb, turn, rng):
-    """A column from 0.25 m under the floor to 0.3 m into the roof: waisted, flared at both ends, fluted."""
-    n, k = 8, 9
+    """A column from 0.25 m under the floor to 0.3 m into the roof: flared at both ends, waisted, with a bulge near one
+    end and a narrowing near the other (a column swells and pinches as the drip and the flow feed it), fluted, and a
+    little off the vertical."""
+    n, k = 8, 12
     span = roof - floor + 0.55
+    c1, c2 = rng.uniform(0.2, 0.4), rng.uniform(0.6, 0.82)
+    a1, a2 = rng.uniform(0.15, 0.35), rng.uniform(0.1, 0.25)
+    lean = rng.uniform(-0.05, 0.05) * (roof - floor)
+    lx, ly = turn
     wob = [[(1.1 if (j + i) % 2 else 0.94) * rng.uniform(0.94, 1.06) for j in range(n)] for i in range(k)]
     rings = []
     for s in range(k):
         t = s / (k - 1)
-        rings.append((x, y, floor - 0.25 + span * t, rb * (1.0 - 0.45 * 4.0 * t * (1.0 - t))))
+        w = 1.0 - 0.45 * 4.0 * t * (1.0 - t)
+        w = w * (1.0 + a1 * float(forms.bump(t, c1, 0.22)) - a2 * float(forms.bump(t, c2, 0.18)))
+        rings.append((x + lean * 4.0 * t * (1.0 - t) * lx, y + lean * 4.0 * t * (1.0 - t) * ly,
+                      floor - 0.25 + span * t, rb * w))
     return lathe(rings, n, turn, wobble=wob, tip=(x, y, roof + 0.35), cap=True)
 
 
@@ -363,14 +422,15 @@ def block(x, y, floor, sx, sy, sz, turn, rng, tc_v, tc_f, sink=0.15):
 def curtain(P, nrm, tops, bottoms, thick=0.035):
     """A drapery: a folded sheet along the points P (K, 2), the folds already in P, hung from tops to bottoms (K,);
     closed (front, back, both ends, the lower edge and the buried top) so it shows from both sides."""
-    K, rows = len(P), 4
+    K, rows = len(P), 6
     V = []
     for side in (0.5, -0.5):
         for i in range(K):
             for r in range(rows):
                 t = r / (rows - 1)
                 z = tops[i] + (bottoms[i] - tops[i]) * t
-                V.append((P[i, 0] + side * thick * nrm[i, 0], P[i, 1] + side * thick * nrm[i, 1], z))
+                th = thick * (1.0 - 0.45 * t) * (1.0 + 0.6 * 4.0 * t * (1.0 - t))   # a sheet thinning to its edge
+                V.append((P[i, 0] + side * th * nrm[i, 0], P[i, 1] + side * th * nrm[i, 1], z))
     V = np.array(V, dtype=np.float64)
     off = K * rows
     F, W = [], []
@@ -798,6 +858,196 @@ def decor(sec, grid, zones, guards, C):
         made("stalagmite", V, F, g, coll)
         return True
 
+    placed_w = Placed()   # wall-mounted pieces, so no two overlap
+
+    def wall_hit(x, y, z, dx, dy, reach=2.4):
+        """The distance from (x, y, z) along (dx, dy) to the first rock, None when there is none within `reach`."""
+        st = 0.04 * np.arange(1, int(reach / 0.04))
+        f_, _c = cols.interval(x + st * dx, y + st * dy, np.full(len(st), z))
+        hit = np.nonzero(~np.isfinite(f_))[0]
+        return float(st[hit[0]]) if len(hit) else None
+
+    def wall_points(cx, cy, cz, dx, dy, s_vals, h_vals):
+        """The wall surface over a grid: from each grid point (s along the wall from (cx, cy), h up from cz) march
+        along (dx, dy) to the first rock. Returns (S, N) as (R, C, 3) arrays (N the unit normal out of the wall, smoothed
+        over the neighbours), or None when a point has no wall or starts in rock."""
+        tx, ty = -dy, dx
+        Sg, Hg = np.meshgrid(np.asarray(s_vals, np.float64), np.asarray(h_vals, np.float64), indexing="ij")
+        px, py, pz = cx + Sg * tx, cy + Sg * ty, cz + Hg
+        d = 0.04 * np.arange(0, 70)
+        X = px[..., None] + d * dx
+        Y = py[..., None] + d * dy
+        Z = np.broadcast_to(pz[..., None], X.shape)
+        fl, _c = cols.interval(X.ravel(), Y.ravel(), Z.ravel())
+        rock_ = ~np.isfinite(fl).reshape(X.shape)
+        if rock_[..., 0].any() or not rock_.any(-1).all():
+            return None
+        dist = d[rock_.argmax(-1)] - 0.02
+        S = np.stack([px + dist * dx, py + dist * dy, pz], -1)
+        a = np.gradient(S, axis=0)
+        b = np.gradient(S, axis=1)
+        N = np.cross(a, b)
+        N = N * np.where((N[..., 0] * dx + N[..., 1] * dy)[..., None] > 0.0, -1.0, 1.0)
+        ln = np.sqrt((N * N).sum(-1, keepdims=True))
+        if (ln < 1e-9).any():
+            return None
+        N = N / ln
+        for _ in range(2):   # the wall's detail makes the normals jitter: smooth them over the neighbours
+            Np = np.pad(N, ((1, 1), (1, 1), (0, 0)), mode="edge")
+            N = (Np[1:-1, 1:-1] * 2.0 + Np[:-2, 1:-1] + Np[2:, 1:-1] + Np[1:-1, :-2] + Np[1:-1, 2:]) / 6.0
+            N = N / np.sqrt((N * N).sum(-1, keepdims=True))
+        return S, N
+
+    def pieces_ok(V):
+        """Every vertex of a wall piece clear of the seams, zones, portals and drops (the keep-out's floor test)."""
+        _r, fo, ho = keep_out(V[:, 0], V[:, 1], V[:, 2])
+        return bool(fo.all() and ho.all())
+
+    def wall_feature(kind, x, y, f, c, k_dir, rng, g, big=False):
+        """One wall-mounted piece by the wall at (x, y) looking along DIR8[k_dir]: a flowstone sheet (a swelling over the
+        wall with gour ripples), shelfstone (a ledge with a lip), a boss (a round swelling), a crust (a wide, thin, rough
+        patch), a cluster of crystals lying on the wall, a gypsum flower or helictites. Where the passage is narrow (the
+        opposite wall less than 1.7 m off) a swelling stays under 0.09 m: it is relief on the wall, not a thing to walk
+        into (a wall piece has no collision). Returns whether it was made."""
+        dx, dy = DIR8[k_dir]
+        if kind in ("sheet", "shelf", "boss", "crust"):
+            W = (rng.uniform(1.4, 3.4) if big else rng.uniform(0.7, 1.9)) if kind != "boss" else rng.uniform(0.25, 0.7)
+            H = (rng.uniform(1.6, 3.2) if big else rng.uniform(0.8, 1.9)) if kind in ("sheet", "crust") else \
+                (0.7 if kind == "shelf" else W)
+            hb = {"sheet": rng.uniform(0.05, 0.12), "shelf": rng.uniform(0.07, 0.17), "boss": rng.uniform(0.06, 0.16),
+                  "crust": rng.uniform(0.02, 0.04)}[kind] * (2.4 if big and kind == "sheet" else 1.0)
+            if kind == "shelf":
+                z0 = rng.uniform(f + 0.5, max(c - 1.0, f + 0.6))
+            else:
+                z0 = min(rng.uniform(f + 0.45 + 0.5 * H, max(c - 0.5 - 0.5 * H, f + 0.5 + 0.5 * H)), c - 0.4 - 0.5 * H)
+                z0 = max(z0, f + 0.1 + 0.5 * H)
+            opp = wall_hit(x, y, z0, -dx, -dy, 4.0)
+            fwd = wall_hit(x, y, z0, dx, dy, 2.4)
+            if fwd is None:
+                return False
+            if opp is None or opp + fwd < (6.0 if big else 1.7):
+                hb = min(hb, 0.09)
+            ns, nh = (13, 13) if big else (9, 9)
+            ss = np.linspace(-0.5 * W, 0.5 * W, ns)
+            if kind == "shelf":
+                vv = np.array([-0.12, -0.06, -0.02, 0.0, 0.06, 0.15, 0.3, 0.45, 0.6])
+                hh = z0 + vv
+            else:
+                hh = z0 + np.linspace(-0.5 * H, 0.5 * H, nh)
+            wp = wall_points(x, y, 0.0, dx, dy, ss, hh)
+            if wp is None:
+                return False
+            S, N = wp
+            sg, vg = np.meshgrid(ss, hh - z0, indexing="ij")
+            if kind == "sheet":
+                es = np.sqrt(np.maximum(1.0 - (2.0 * sg / W) ** 2, 0.0))
+                ev = np.sqrt(np.maximum(1.0 - (2.0 * vg / H) ** 2, 0.0))
+                rip = 1.0 + 0.3 * (forms.saw(vg / rng.uniform(0.16, 0.3) + rng.uniform()) - 0.5)
+                hv = -0.03 + (hb + 0.03) * es * ev * rip
+            elif kind == "shelf":
+                es = np.sqrt(np.maximum(1.0 - (2.0 * sg / W) ** 2, 0.0))
+                pv = np.where(vg < -0.1, 0.0, np.where(vg < -0.02, (vg + 0.1) / 0.08, np.where(
+                    vg < 0.02, 1.0, 0.1 + 0.9 * np.maximum(1.0 - (vg - 0.02) / 0.6, 0.0))))
+                hv = -0.03 + (hb + 0.03) * es * pv
+            elif kind == "boss":
+                r2 = (sg * sg + vg * vg) / (0.5 * W) ** 2
+                lump = 1.0 + 0.25 * (forms.saw(sg * 9.0 + rng.uniform()) + forms.saw(vg * 7.0 + rng.uniform()) - 1.0)
+                hv = -0.03 + (hb + 0.03) * np.sqrt(np.maximum(1.0 - r2, 0.0)) * lump
+            else:   # crust
+                rr = np.sqrt((2.0 * sg / W) ** 2 + (2.0 * vg / H) ** 2)
+                edge = 1.0 + 0.35 * (forms.saw(sg * 5.0 + rng.uniform()) + forms.saw(vg * 4.0 + rng.uniform()) - 1.0)
+                m_ = np.clip((edge - rr) / 0.3, 0.0, 1.0)
+                rough = 1.0 + 0.5 * (forms.saw(sg * 23.0 + vg * 17.0) - 0.5)
+                hv = -0.02 + (hb + 0.02) * m_ * rough
+            V, F = forms.wall_mesh(S, N, hv)
+            if not inside(x, y) or not pieces_ok(V):
+                return False
+            made(kind, V, F, g)
+            return True
+        # crystals, a flower, helictites: small things standing on a patch of the wall
+        wp = wall_points(x, y, rng.uniform(f + 0.4, max(c - 0.6, f + 0.5)), dx, dy, np.linspace(-0.2, 0.2, 3),
+                         np.linspace(-0.2, 0.2, 3))
+        if wp is None:
+            return False
+        S, N = wp
+        fwd = wall_hit(x, y, float(S[1, 1, 2]), dx, dy, 2.4)
+        opp = wall_hit(x, y, float(S[1, 1, 2]), -dx, -dy, 4.0)
+        narrow = opp is None or fwd is None or opp + fwd < 1.7
+        parts = []
+        if kind == "crystal":
+            tag = "crystal"
+            for _k in range(4 + int(8 * rng.uniform())):
+                i_, j_ = int(rng.uniform() * 3) % 3, int(rng.uniform() * 3) % 3
+                nn = N[i_, j_]
+                tang = np.array([rng.uniform(-1.0, 1.0), rng.uniform(-1.0, 1.0), rng.uniform(-1.0, 1.0)])
+                tang = tang - nn * float(tang @ nn)
+                tang = tang / max(float(np.sqrt((tang * tang).sum())), 1e-9)
+                axis = (0.3 if narrow else 0.6) * nn + tang
+                axis = axis / float(np.sqrt((axis * axis).sum()))
+                parts.append(crystal(S[i_, j_] + rng.uniform(-0.06, 0.06) * tang, axis, rng.uniform(0.05, 0.22),
+                                     rng.uniform(0.012, 0.04)))
+        elif kind == "flower":
+            tag = "flower"
+            parts = forms.flower(S[1, 1], N[1, 1], rng.uniform(0.1, 0.2) if narrow else rng.uniform(0.15, 0.32), rng,
+                                 petals=5 + int(3 * rng.uniform()))
+        else:
+            tag = "helictite"
+            for _k in range(1 + int(3 * rng.uniform())):
+                i_, j_ = int(rng.uniform() * 3) % 3, int(rng.uniform() * 3) % 3
+                parts.append(forms.helictite(S[i_, j_], N[i_, j_] + np.array([0.0, 0.0, rng.uniform(-0.3, 0.3)]),
+                                             rng.uniform(0.1, 0.18) if narrow else rng.uniform(0.15, 0.5),
+                                             rng.uniform(0.008, 0.02), rng))
+        if not parts:
+            return False
+        if not inside(x, y) or not pieces_ok(np.concatenate([p_[0] for p_ in parts])):
+            return False
+        for V, F in parts:
+            made(tag, V, F, g)
+        return True
+
+    def drape(x, y, c, k_dir, Lc, drop, amp, wave, phase, tipmin, reach=3.9, jag=0.18, thick=0.035):
+        """A flowstone curtain along the wall in direction k_dir from (x, y) under the roof at c: the sheet follows the
+        wall just under the roof, folded by amp and wave (the swags), hung to `drop` with a scalloped lower edge; None
+        when the wall or the roof gives out."""
+        nx, ny = DIR8[k_dir]
+        tx, ty = -ny, nx
+        K = max(8, int(Lc / 0.08))
+        steps = 0.1 * np.arange(1, int(reach / 0.1) + 1)
+        ph2 = (phase * 7.3) % 1.0
+        P, nrm, tops, bots = [], [], [], []
+        for i in range(K):
+            sx = -0.5 * Lc + Lc * i / (K - 1)
+            q = (sx / wave + phase) % 1.0
+            crest = 4.0 * q * (1.0 - q)
+            fold = amp * (crest - 0.67)
+            bx, by = x + sx * tx, y + sx * ty
+            fa_, _c = cols.interval(bx + steps * nx, by + steps * ny, np.full(len(steps), c - 0.7))
+            hit = np.nonzero(~np.isfinite(fa_))[0]
+            if not len(hit):
+                break
+            off = float(steps[hit[0]]) - 0.12 - amp + fold
+            if off < 0.0:
+                break
+            pxp, pyp = bx + off * nx, by + off * ny
+            if not inside(pxp, pyp):
+                break
+            fm, cm = iv(pxp, pyp, c - 0.6)
+            if cm is None or fm is None or abs(cm - c) > 1.0:
+                break
+            env = 1.0 - (2.0 * sx / Lc) ** 2   # longest in the middle, tapering to both ends
+            edge = float(forms.saw(sx / (wave * 0.45) + ph2))   # the scalloped lower edge: points between the swags
+            bot = cm - drop * (0.2 + 0.8 * env * (0.7 + 0.3 * crest)) - jag * drop * env * edge
+            bot = max(bot, max(fm, tipmin - DECOR_HEAD) + DECOR_HEAD)
+            if bot > cm - 0.1:
+                bot = cm - 0.1
+            P.append((pxp, pyp))
+            nrm.append((nx, ny))
+            tops.append(cm + 0.3)
+            bots.append(bot)
+        if len(P) < 4:
+            return None
+        return curtain(np.array(P), np.array(nrm), np.array(tops), np.array(bots), thick=thick)
+
     order = np.lexsort((cand[:, 6], cand[:, 5], cand[:, 4]))
     for idx in order:
         x, y, f, c = float(X[idx]), float(Y[idx]), float(Fz[idx]), float(Cz[idx])
@@ -862,9 +1112,9 @@ def decor(sec, grid, zones, guards, C):
                 R = 0.4 + 0.8 * rng.uniform()
                 if route_at(x, y, f) >= 0.3 + R and placed.free(x, y, f, R):
                     ring = circle(14)
-                    for step in range(1 + int(2 * rng.uniform())):
-                        cx_, cy_ = x + 0.35 * R * step * DIR8[wdir[idx]][0], y + 0.35 * R * step * DIR8[wdir[idx]][1]
-                        Rk = R * (1.0 - 0.3 * step)
+                    for step in range(2 + int(4 * rng.uniform())):
+                        cx_, cy_ = x + 0.55 * R * step * DIR8[wdir[idx]][0], y + 0.55 * R * step * DIR8[wdir[idx]][1]
+                        Rk = R * (1.0 - 0.14 * step)
                         radii = [Rk * rng.uniform(0.75, 1.2) for _ in ring]
                         fl = []
                         for (ex, ey), rk_ in zip(ring, radii):
@@ -903,6 +1153,20 @@ def decor(sec, grid, zones, guards, C):
                     V, F, _L = block(bx, by, fz, sx, sy, sz, rng.turn(), rng, C.TC_V, C.TC_F, rng.uniform(0.2, 0.4))
                     placed.add(bx, by, fz, 0.5 * s)
                     made("rock", V, F, g)
+        # ---- the wall: sheets, shelves, bosses, crusts, wall crystals, gypsum flowers, helictites
+        if floor_ok[idx] and hang_ok[idx] and wd[idx] <= 1.9 and h >= 1.3:
+            wr = C.Rng(seed, 77, int(cand[idx, 4]), int(cand[idx, 5]), int(cand[idx, 6]))
+            wu = wr.uniform()
+            acc_w = 0.0
+            for kind_w in ("sheet", "shelf", "boss", "crust", "crystal", "flower", "helictite"):
+                acc_w += 0.085 * (1.4 if wd[idx] < NARROW_WALL else 1.0) * w.get(kind_w, 0.0)
+                if wu < acc_w:
+                    if placed_w.free(x, y, f, 0.55):
+                        if wall_feature(kind_w, x, y, f, c, int(wdir[idx]), wr, g):
+                            placed_w.add(x, y, f, 0.55)
+                    else:
+                        skip("wall_room")
+                    break
         # ---- the roof
         tipmin = max(f, float(fnear[idx])) + DECOR_HEAD
         if not hang_ok[idx] or c - tipmin < 0.3:
@@ -935,11 +1199,13 @@ def decor(sec, grid, zones, guards, C):
                     rb = 0.012 + 0.05 * L
                 elif L < 0.4 and rng.uniform() < 0.55:
                     rb = rng.uniform(0.005, 0.011)  # a straw
+                elif L >= 0.4 and rng.uniform() < 0.12:
+                    rb = rng.uniform(0.005, 0.009)  # a long soda straw
                 else:
                     rb = min(0.02 + 0.1 * L * rng.uniform(0.6, 1.4), 0.45)
                 # a big one has its stalagmite under it, on a floor off the route; where the two would all but
                 # meet, they are one column
-                if not ice and L > 0.6 and rng.uniform() < 0.5 * w.get("stalagmite", 0.0):
+                if not ice and L > 0.6 and rb > 0.02 and rng.uniform() < 0.5 * w.get("stalagmite", 0.0):
                     hm = min(0.6 + 1.9 * rng.uniform() ** 2, cm - fm - 0.6)
                     rc = max(1.4 * rb, 0.15)
                     meet = (cm - L) - (fm + hm) < 0.6 and w.get("column", 0.0) > 0
@@ -955,51 +1221,21 @@ def decor(sec, grid, zones, guards, C):
                     mite(xm + rng.uniform(-0.1, 0.1), ym + rng.uniform(-0.1, 0.1), fm, cm, rng, g, w,
                          tall=hm >= COLLIDE_MIN and rng.uniform() < 0.6)
                 V, F = stalactite(xm, ym, cm, L, rb, rng.turn(), rng, icicle=ice)
+                tip_ = V[int(np.argmin(V[:, 2]))]
+                ft_, _c = iv(float(tip_[0]), float(tip_[1]), float(tip_[2]) - 0.05)
+                if ft_ is not None and tip_[2] - ft_ < DECOR_HEAD:   # the bent tip hangs over a higher floor
+                    skip("tip_head")
+                    continue
                 made("icicle" if ice else ("straw" if rb < 0.012 else "stalactite"), V, F, g)
         elif u2 < pu:
-            k_ = int(wdir[idx])
-            nx, ny = DIR8[k_]
-            tx, ty = -ny, nx
             Lc = rng.uniform(1.0, 3.2)
-            K = max(6, int(Lc / 0.1))
             amp = rng.uniform(0.07, 0.16)
             wave = rng.uniform(0.22, 0.4)
             phase = rng.uniform()
             drop = rng.uniform(0.5, 1.8)
-            P, nrm, tops, bots = [], [], [], []
-            steps = 0.1 * np.arange(1, 40)
-            for i in range(K):
-                s = -0.5 * Lc + Lc * i / (K - 1)
-                q = (s / wave + phase) % 1.0
-                crest = 4.0 * q * (1.0 - q)
-                fold = amp * (crest - 0.67)
-                # the wall just under the roof, out along the wall's direction at the floor: the sheet follows it
-                bx, by = x + s * tx, y + s * ty
-                fa_, _ = cols.interval(bx + steps * nx, by + steps * ny, np.full(len(steps), c - 0.7))
-                hit = np.nonzero(~np.isfinite(fa_))[0]
-                if not len(hit):
-                    break
-                off = float(steps[hit[0]]) - 0.12 - amp + fold
-                if off < 0.0:
-                    break
-                pxp, pyp = bx + off * nx, by + off * ny
-                if not inside(pxp, pyp):
-                    break
-                fm, cm = iv(pxp, pyp, c - 0.6)
-                if cm is None or fm is None or abs(cm - c) > 1.0:
-                    break
-                env = 1.0 - (2.0 * s / Lc) ** 2  # longest in the middle, tapering to both ends
-                bot = cm - drop * (0.2 + 0.8 * env * (0.7 + 0.3 * crest))
-                bot = max(bot, max(fm, tipmin - DECOR_HEAD) + DECOR_HEAD)
-                if bot > cm - 0.1:
-                    bot = cm - 0.1
-                P.append((pxp, pyp))
-                nrm.append((nx, ny))
-                tops.append(cm + 0.3)
-                bots.append(bot)
-            if len(P) >= 4:
-                V, F = curtain(np.array(P), np.array(nrm), np.array(tops), np.array(bots))
-                made("curtain", V, F, g)
+            res = drape(x, y, c, int(wdir[idx]), Lc, drop, amp, wave, phase, tipmin)
+            if res is not None:
+                made("curtain", res[0], res[1], g)
             else:
                 skip("curtain_room")
         elif u2 < px:
@@ -1013,6 +1249,230 @@ def decor(sec, grid, zones, guards, C):
                 V, F = crystal((bx, by, cm), (rng.uniform(-0.6, 0.6), rng.uniform(-0.6, 0.6), -1.0),
                                rng.uniform(0.06, 0.25), rng.uniform(0.012, 0.04))
                 made("crystal", V, F, g)
+        elif u2 < px + 0.05 * w.get("helictite", 0.0):
+            for _k in range(1 + int(3 * rng.uniform())):
+                bx, by = x + rng.uniform(-0.3, 0.3), y + rng.uniform(-0.3, 0.3)
+                if not inside(bx, by):
+                    continue
+                _, cm = iv(bx, by, c - 0.2)
+                if cm is None or cm - 0.3 < tipmin:
+                    continue
+                V, F = forms.helictite((bx, by, cm), (rng.uniform(-0.5, 0.5), rng.uniform(-0.5, 0.5), -1.0),
+                                       rng.uniform(0.12, 0.5), rng.uniform(0.008, 0.02), rng)
+                if float(V[:, 2].min()) < tipmin or not pieces_ok(V):
+                    continue
+                made("helictite", V, F, g)
+    # ---- the showpieces: a few large formations in the big chambers, where a walker on a route sees them
+    n_show = int(sec.d.get("showpieces", SHOWPIECES.get(sec.key, 0)))
+    rep["showpieces"] = {"wanted": n_show, "made": 0, "kinds": {}}
+    if n_show:
+        def tall_mite(xm, ym, fm, cm, hh, rb, rng, g_, shape):
+            if route_at(xm, ym, fm) < ROUTE_KEEP + 1.12 * rb or not placed.free(xm, ym, fm, 1.12 * rb):
+                return False
+            turn = rng.turn()
+            V, F = stalagmite(xm, ym, fm, hh, rb, turn, rng, shape=shape)
+            if not pieces_ok(V):
+                return False
+            PV, PF = lathe([(xm, ym, fm - 0.1, rb), (xm, ym, fm + 0.5 * hh, 0.75 * rb)], 6, turn,
+                           tip=(xm, ym, fm + hh), cap=True)
+            solids.append(("disk", xm, ym, 1.12 * rb, fm - 0.2, fm + SOLID_TOP))
+            placed.add(xm, ym, fm, 1.12 * rb)
+            made("stalagmite", V, F, g_, (PV, PF, TAG["stalagmite"]))
+            return True
+
+        def big_column(xm, ym, fm, cm, rb, rng, g_):
+            if route_at(xm, ym, fm) < ROUTE_KEEP + 1.12 * rb or not placed.free(xm, ym, fm, 1.12 * rb):
+                return False
+            turn = rng.turn()
+            V, F = column(xm, ym, fm, cm, rb, turn, rng)
+            if not pieces_ok(V):
+                return False
+            PV, PF = lathe([(xm, ym, fm - 0.1, 1.05 * rb), (xm, ym, cm + 0.2, 1.05 * rb)], 8, turn, cap=True,
+                           tip=(xm, ym, cm + 0.3))
+            solids.append(("disk", xm, ym, 1.15 * rb, fm - 0.2, cm + 0.5))
+            placed.add(xm, ym, fm, 1.15 * rb)
+            made("column", V, F, g_, (PV, PF, TAG["column"]))
+            return True
+
+        def chandelier(x_, y_, f_, c_, g_, rng):
+            Lmax = c_ - f_ - DECOR_HEAD - 0.1
+            if Lmax < 1.0:
+                return 0
+            n_ = 8 + int(6 * rng.uniform())
+            spread = rng.uniform(1.0, 1.6)
+            done = 0
+            big = []
+            for k in range(n_):
+                ox, oy = (rng.uniform(-spread, spread), rng.uniform(-spread, spread)) if k else (0.0, 0.0)
+                if ox * ox + oy * oy > spread * spread:
+                    continue
+                xm, ym = x_ + ox, y_ + oy
+                if not inside(xm, ym):
+                    continue
+                fm, cm = iv(xm, ym, c_ - 0.2)
+                if cm is None or fm is None or abs(cm - c_) > 0.8:
+                    continue
+                room = cm - (max(fm, f_) + DECOR_HEAD)
+                if room < 0.5:
+                    continue
+                near = 1.0 - (ox * ox + oy * oy) / (spread * spread)
+                L = min(room, Lmax) * (0.3 + 0.7 * near) * rng.uniform(0.7, 1.0)
+                rb = min(0.05 + 0.14 * L, 0.5) * rng.uniform(0.8, 1.2)
+                V, F = stalactite(xm, ym, cm, L, rb, rng.turn(), rng)
+                tip_ = V[int(np.argmin(V[:, 2]))]
+                ft_, _c = iv(float(tip_[0]), float(tip_[1]), float(tip_[2]) - 0.05)
+                if (ft_ is not None and tip_[2] - ft_ < DECOR_HEAD) or not pieces_ok(V):
+                    continue
+                made("stalactite", V, F, g_)
+                done += 1
+                if L > 1.0:
+                    big.append((xm, ym, fm, cm, L, rb))
+            for xm, ym, fm, cm, L, rb in big[:3]:   # a stalagmite under the biggest hanging ones, or a column
+                gap = (cm - L) - fm
+                if gap < 0.9:
+                    big_column(xm, ym, fm, cm, max(1.3 * rb, 0.2), rng, g_)
+                else:
+                    hh = min(gap - 0.7, rng.uniform(0.8, 2.4))
+                    if hh >= COLLIDE_MIN:
+                        tall_mite(xm, ym, fm, cm, hh, min(0.1 + 0.18 * hh, 0.5), rng, g_, None)
+            return done
+
+        def forest(x_, y_, f_, c_, g_, rng):
+            done = 0
+            for k in range(4 + int(3 * rng.uniform())):
+                ox, oy = (rng.uniform(-1.8, 1.8), rng.uniform(-1.8, 1.8)) if k else (0.0, 0.0)
+                xm, ym = x_ + ox, y_ + oy
+                if not inside(xm, ym):
+                    continue
+                fm, cm = iv(xm, ym, f_ + 0.3)
+                if fm is None or abs(fm - f_) > 0.15:
+                    continue
+                hh = min(rng.uniform(1.2, 3.2), cm - fm - 0.8)
+                if hh < COLLIDE_MIN:
+                    continue
+                if tall_mite(xm, ym, fm, cm, hh, min(0.1 + 0.15 * hh, 0.5) * rng.uniform(0.8, 1.2), rng, g_,
+                             ("candle", "stack", "cone", "cone")[int(rng.uniform() * 4) % 4]):
+                    done += 1
+            return done
+
+        def blades(x_, y_, f_, c_, g_, rng):
+            spread = rng.uniform(0.5, 0.9)
+            if route_at(x_, y_, f_) < ROUTE_KEEP + spread + 0.2 or not placed.free(x_, y_, f_, spread + 0.2):
+                return 0
+            parts, top = [], 0.0
+            for _k in range(6 + int(5 * rng.uniform())):
+                bx, by = x_ + rng.uniform(-spread, spread), y_ + rng.uniform(-spread, spread)
+                fz, cz = iv(bx, by, f_ + 0.2)
+                if fz is None or abs(fz - f_) > 0.15 or not inside(bx, by):
+                    continue
+                L = min(rng.uniform(0.6, 1.9), cz - fz - 0.8)
+                if L < 0.3:
+                    continue
+                lean = rng.uniform(-0.45, 0.45), rng.uniform(-0.45, 0.45)
+                parts.append(crystal((bx, by, fz), (lean[0], lean[1], 1.0), L, rng.uniform(0.045, 0.11)))
+                top = max(top, L)
+            if len(parts) < 3 or not pieces_ok(np.concatenate([p_[0] for p_ in parts])):
+                return 0
+            turn = rng.turn()
+            PV, PF = lathe([(x_, y_, f_ - 0.1, spread), (x_, y_, f_ + 0.5 * top, 0.7 * spread)], 6, turn,
+                           tip=(x_, y_, f_ + top), cap=True)
+            solids.append(("disk", x_, y_, 1.1 * spread, f_ - 0.2, f_ + SOLID_TOP))
+            placed.add(x_, y_, f_, 1.1 * spread)
+            for k, (V, F) in enumerate(parts):
+                made("crystal", V, F, g_, (PV, PF, TAG["crystal"]) if k == 0 else None)
+            return len(parts)
+
+        def terrace(x_, y_, f_, R, k_dir, g_, rng, count):
+            """Rimstone steps: `count` dams stepping out from the wall, each smaller, each with its pool."""
+            ring = circle(14)
+            done = 0
+            for step in range(count):
+                cx_ = x_ + 0.55 * R * step * DIR8[k_dir][0]
+                cy_ = y_ + 0.55 * R * step * DIR8[k_dir][1]
+                Rk = R * (1.0 - 0.14 * step)
+                radii = [Rk * rng.uniform(0.75, 1.2) for _ in ring]
+                fl = []
+                for (ex, ey), rk_ in zip(ring, radii):
+                    fz, _c = iv(cx_ + rk_ * ex, cy_ + rk_ * ey, f_ + 0.3)
+                    fl.append(fz if fz is not None and abs(fz - f_) < 0.25 else f_)
+                hd = rng.uniform(0.04, 0.1)
+                V, F = rim(cx_, cy_, ring, radii, fl, hd, rng.uniform(0.1, 0.2))
+                if not pieces_ok(V):
+                    continue
+                made("rimstone", V, F, g_)
+                V, F = pool(cx_, cy_, ring, [r_ - 0.04 for r_ in radii], min(fl) + 0.75 * hd)
+                made("pool", V, F, g_)
+                done += 1
+            return done
+
+        gh = Cz - Fz
+        base_ok = floor_ok & hang_ok & (flat < 0.12)
+        pools = {
+            "open": np.nonzero(base_ok & (gh >= 4.5) & (wd >= 1.8) & (route >= 2.2) & (route <= 12.0))[0],
+            "wall": np.nonzero(base_ok & (gh >= 3.6) & (wd >= 0.7) & (wd <= 3.4) & (route >= 1.2) & (route <= 14.0))[0],
+        }
+        for nm_ in pools:
+            ix = pools[nm_]
+            pools[nm_] = ix[np.argsort(hash3(cand[ix, 4], cand[ix, 5], 9, seed), kind="stable")] if len(ix) else ix
+        seq = SHOW_SEQ.get(sec.key, SHOW_SEQ["default"])
+        chosen = []
+        def try_kind(si, kind):
+            pool_ = pools["wall" if kind in ("drape", "cascade", "flowers") else "open"]
+            tries = 0
+            for idx in pool_:
+                x, y, f, c = float(X[idx]), float(Y[idx]), float(Fz[idx]), float(Cz[idx])
+                if any((x - px_) ** 2 + (y - py_) ** 2 < 49.0 for px_, py_ in chosen):
+                    continue
+                tries += 1
+                if tries > 60:
+                    break
+                g = int(geo[idx])
+                rng = C.Rng(seed, 99, si, int(cand[idx, 4]), int(cand[idx, 5]))
+                tipmin = max(f, float(fnear[idx])) + DECOR_HEAD
+                ok = 0
+                if kind == "chandelier":
+                    ok = chandelier(x, y, f, c, g, rng) >= 3
+                elif kind == "column":
+                    rb = rng.uniform(0.45, 0.8)
+                    ok = big_column(x, y, f, c, rb, rng, g)
+                elif kind == "forest":
+                    ok = forest(x, y, f, c, g, rng) >= 3
+                elif kind == "blades":
+                    ok = blades(x, y, f, c, g, rng) >= 3
+                elif kind == "drape":
+                    Lc = rng.uniform(3.5, 6.5)
+                    drop = min(rng.uniform(2.0, 4.5), c - f - DECOR_HEAD - 0.2)
+                    if drop >= 1.2:
+                        res = drape(x, y, c, int(wdir[idx]), Lc, drop, rng.uniform(0.12, 0.25), rng.uniform(0.35, 0.6),
+                                    rng.uniform(), tipmin, reach=4.5, jag=0.25, thick=0.06)
+                        if res is not None and pieces_ok(res[0]):
+                            made("curtain", res[0], res[1], g)
+                            ok = 1
+                elif kind == "cascade":
+                    ok = wall_feature("sheet", x, y, f, c, int(wdir[idx]), rng, g, big=True)
+                    if ok:
+                        terrace(x, y, f, rng.uniform(0.8, 1.3), int(wdir[idx]), g, rng, 3 + int(3 * rng.uniform()))
+                elif kind == "flowers":
+                    n_ok = 0
+                    dx_, dy_ = DIR8[int(wdir[idx])]
+                    for k in range(8):
+                        along = -1.4 + 0.4 * k
+                        xx, yy = x - dy_ * along, y + dx_ * along
+                        n_ok += bool(wall_feature("flower", xx, yy, f, c, int(wdir[idx]), rng, g))
+                    ok = n_ok >= 3
+                if ok:
+                    chosen.append((x, y))
+                    rep["showpieces"]["made"] += 1
+                    rep["showpieces"]["kinds"][kind] = rep["showpieces"]["kinds"].get(kind, 0) + 1
+                    return True
+            return False
+
+        for si in range(n_show):
+            for jj in range(len(seq)):
+                if try_kind(si, seq[(si + jj) % len(seq)]):
+                    break
+
+
     rep["pieces"] = len(pieces)
     rep["triangles"] = int(sum(len(p[1]) for p in pieces))
     rep["proxy_triangles"] = int(sum(len(p[1]) for p in proxies))

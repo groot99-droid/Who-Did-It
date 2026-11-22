@@ -35,6 +35,7 @@ import {
   lanternWanted,
   patchLantern,
   sessionStore,
+  setMist,
 } from './lantern';
 import { countLightmapped } from './lightmap';
 import { fetchBytes, loadFile, loadUrl, makeLoader, parseBytes, type Progress } from './load';
@@ -189,6 +190,8 @@ function updateArea(force = false): void {
   showNearestArea(world.areas, x, z);
   if (next === area && !force) return;
   area = next;
+  // A cave section's mist (its Area's `wdi_mist` extras), else the config's.
+  setMist((next?.userData as Record<string, unknown> | undefined)?.wdi_mist);
   const look = areaLook(next);
   indoor = look.indoor;
   scene.fog = look.fog ?? (indoor ? null : (world.fog ?? defaultFog()));

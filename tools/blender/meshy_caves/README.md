@@ -414,4 +414,26 @@ timbers, gates and water keep their light per vertex (COLOR_0).
   baked AO at the vertex (6 bits): what the lantern shades by. The scene's extras get `wdi_lantern: true`.
   docs/walk-areas.md (section 4, "A cave's lightmap") gives the shape and what the viewer does with it. The
   manifest's `light.lightmap` and `glb.lightmap` report the page, its checks and the file.
+- **Colour, wetness and mist** (realism pass 3). The shell's albedo per vertex is its geology's palette (the look's
+  `palettes`: grey limestone, cream calcite, iron-red and manganese-dark streaks, olive and green where damp, cold
+  grey-blue slate and ice) moved by fields of 14 m, 5 m and 1.6 m (each section and each 12 m chunk its own tone), by
+  staining bands that follow the beds and by vertical streaks (`macro_tint`); each scan keeps only `scan_chroma` of its
+  chroma (the hue is the palette's). Each formation piece has its own texture coordinates (`piece_uvs`) and colour
+  (`form_colour`: a lean, a stain at the foot or the roof end, stripes on a curtain, amber and smoky crystals). `_TINT`
+  and `_WET` (the shell's wetness by geology, the flow bands, rock within 1.2 m of water and the floor under a drip;
+  formations by kind) are written as vertex attributes; the Area gets `wdi_mist` (the look's `mist`, per section). The
+  manifest's `light.look.rock_colour` reports the hue's spread (circular standard deviation and the 10th to 90th
+  percentile, degrees) and the luminance's 10th to 90th ratio per section.
+- **Formations** (`meshy_cave_forms.py`, `meshy_cave_rock.py`): stalactites with a concave taper, a bowed axis, ripples
+  and a drip tip; stalagmites with a domed top; columns that swell and pinch; curtains with scalloped lower edges;
+  helictites, soda straws, gypsum flowers, rimstone steps; wall-mounted sheets, shelfstone, bosses, crusts and crystals
+  (relief of at most 0.09 m in a narrow passage, no collision); and a few showpieces in the big chambers
+  (`SHOWPIECES`: chandeliers of long stalactites over stalagmites, great columns, forests of stalagmites, drapery
+  walls, flowstone cascades with rimstone steps, gypsum blades and flower beds) placed 1.2 to 14 m off a route.
+- **Irregular beds and joints, per-section lean** (realism pass 3, round 2). A wall's beds each have their own strength
+  (0.35 to 1.5 of the geology's nominal step) and their boundaries wander by a slower warp, and each joint of a set sits
+  off its nominal place by up to 0.45 of the spacing with a third of them missing (`ledges`, `joints` in
+  `meshy_cave_rock.py`; tested in `tests/test_cave_rock.py`), so a wall never reads as a regular grid of blocks. The look's
+  `section_base_mul` gives each section per-channel factors on its palette's base (`macro_tint`), so two sections of
+  one geology (the river and the reach, the two lake-clay halls) lean olive, cold or warm differently.
 - `--no-lightmap` builds as route 3 did, with the shell's light in COLOR_0.

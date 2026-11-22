@@ -154,19 +154,26 @@ export const LANTERN = {
   /** How far ahead of the eye on the ground plane, metres. */
   ahead: 0.3,
   /** The falloff's knee, metres: at this distance the light is half of `intensity`. */
-  near: 2.5,
+  near: 3.4,
   /** Nothing is lit beyond this, metres; the light fades out from 0.7 of it. */
   reach: 12,
   /**
    * Scene-linear intensity. A cave wall of the most common albedo (the limestone walls' scan, as the file carries it:
    * its mean linear luminance, 0.1843; the twelve scans of the realism pass are about twice as bright as the first
-   * scans were) square to the lantern and 2 m from it shows display luminance 0.48 through AgX at the caves' exposure
+   * scans were) square to the lantern and 2 m from it shows display luminance 0.49 through AgX at the caves' exposure
    * (2.378) from the lantern alone, 0.50 with the bake's floor: under the cave look's lamp-pool display (0.55, which
    * every gate lamp's pool is held at or under), so the lantern is the dimmer light. Solved with the AgX port in
-   * test/lantern.test.ts: the light at 2 m is 0.73, and 0.73 x (1 + (2 / 2.5)^2) = 1.2. Within 1.5 m of a wall the
+   * test/lantern.test.ts: the light at 2 m is 0.58 (near 3.4 m, whitened 0.3), and 0.58 x (1 + (2 / 3.4)^2) = 0.78. Within 1.5 m of a wall the
    * display stays under 0.56 (the angle term and the occlusion take it lower still), so the wall does not wash out.
    */
-  intensity: 1.2,
+  intensity: 0.78,
+  /**
+   * How far the lantern's light is taken toward white (linear, 0 to 1). A flame is warm, but a pure orange light makes
+   * every rock it touches orange whatever the rock is: at 0.3 it is still plainly warm, and grey limestone, cream calcite,
+   * olive moss and cold slate keep their own hue in its light. `intensity` is set so the light's luminance is a little over what the
+   * pure `colour` had.
+   */
+  whiten: 0.3,
   /** The flicker's depth: the light moves by at most this share either way, slowly (nothing above 2.2 Hz). */
   flicker: 0.03,
   /**
@@ -183,6 +190,48 @@ export const LANTERN = {
   aoWeight: 0.9,
   /** The ink, `#12141C`: the darkest value a cave pixel is drawn at (the cave look's ink; the shader clamps to it). */
   ink: '#12141C',
+  /**
+   * The rock's own colour under the lantern. A cave file's vertices carry `_TINT`, the albedo the baker graded the rock
+   * at (linear, its geology's palette with the macro variation); the lantern lights the scan's texture (its hue taken
+   * out by the builder) times `_TINT` over `tintRef`, so the lantern shows the rock's own colour, not one orange.
+   * `tintRef` is the mean linear luminance of the limestone palette's base, so a wall of it keeps the brightness the
+   * lantern's intensity was set at.
+   */
+  tintRef: 0.26,
+  /** The exponent on `_TINT` over `tintRef`: under 1 lifts the dark palettes (slate, flooded rock) so they are not black. */
+  tintGamma: 0.75,
+  /**
+   * The `_TINT` ratio's chroma gain (1 = as graded; over 1 pulls the rock's hue further from grey) and the least
+   * luminance of the factor it multiplies the scan by (so the darkest palettes still show their grain under the lantern).
+   */
+  tintChroma: 1.0,
+  tintFloor: 0.8,
+  /**
+   * The baked light's chroma where it is dim. The gate lamps' pools are warm and the rock far from them took that one
+   * orange: a baked light under `knee` (linear luminance, after the page's scale) keeps only `chroma` of its colour and is
+   * pulled `cool` of the way to a cold grey-blue (the moon's `#7FA8FF` washed out), the pool itself (over the knee) is as baked.
+   */
+  fill: { chroma: 0.35, cool: 0.3, knee: 0.8, lift: 0.05 },
+  /**
+   * Stochastic texture sampling (hex tiling): the unlit cave materials sample their scan from three random, rotated
+   * copies per triangle of a grid, blended by weights raised to `sharp`, so no 1.5 m square of the scan repeats. `cell`
+   * is the grid's scale in texture repeats (a triangle is about 1 / `cell` of one repeat) and `jitter` the brightness
+   * jitter per tile (+- that share). Beyond `far` metres from the eye (where the mist has begun to take the grain) the scan is read once
+   * plainly, which costs a third of the reads on the distant walls.
+   */
+  stochastic: { cell: 1.6, sharp: 6, jitter: 0.08, far: 14 },
+  /**
+   * The wet sheen: a Blinn-Phong term from the lantern at the eye, with the GLB's normal bent by the texture's own
+   * luminance (a screen-space bump), times the vertex's `_WET` weight (the river and the water's edge, the drips'
+   * floors, flowstone, the speleothems): drier rock has none. `strength` is the light's share added at the peak,
+   * `shininess` the exponent, `bump` the bend.
+   */
+  gloss: { strength: 0.3, shininess: 45, bump: 0.006 },
+  /**
+   * The mist: a faint cool haze mixed into the picture by distance from the eye, 1 - exp(-(density + wetGain x _WET) x
+   * d) times `max`, toward `colour` (an sRGB display value). The area's extras (`wdi_mist`) retune it per section.
+   */
+  mist: { colour: '#222C3B', density: 0.01, wetGain: 0.03, max: 0.4 },
 } as const;
 
 export const LOOK = {

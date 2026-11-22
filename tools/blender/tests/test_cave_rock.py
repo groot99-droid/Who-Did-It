@@ -81,7 +81,7 @@ class RockDetailTest(unittest.TestCase):
         b = rock.ledges(self.X + 1.0, self.Y, self.Z + dip[0], 0.5, dip, 0.0)
         c = rock.ledges(self.X, self.Y + 2.0, self.Z + 2.0 * dip[1], 0.5, dip, 0.0)
         self.assertTrue(np.allclose(a, b, atol=1e-6) and np.allclose(a, c, atol=1e-6))
-        self.assertTrue(a.min() >= -1.0 - 1e-9 and a.max() <= 1.0 + 1e-9)
+        self.assertTrue(a.min() >= -1.5 - 1e-9 and a.max() <= 1.5 + 1e-9)
         z = np.linspace(0.0, 0.5, 2001)
         p = rock.ledges(np.zeros_like(z), np.zeros_like(z), z, 0.5, [0.0, 0.0], 0.0)
         steep = np.abs(np.diff(p)) / np.diff(z)
@@ -98,12 +98,15 @@ class RockDetailTest(unittest.TestCase):
         self.assertEqual(float(s.min()), 0.0)
         self.assertGreater(float((s == 0).mean()), 0.05)
 
-    def test_joints_groove_on_their_planes(self):
-        x = np.linspace(-10, 10, 4001)
-        j = rock.joints(x, np.full_like(x, 2.55), [1.0, 0.0], 3.0, 0.0)  # midway between the second set's planes
-        self.assertAlmostEqual(float(j[np.argmin(np.abs(x - 3.0))]), 1.0, places=6)
-        self.assertAlmostEqual(float(j[np.argmin(np.abs(x - 1.5))]), 0.0, places=6)
+    def test_joints_groove_on_planes_that_are_not_a_grid(self):
+        x = np.linspace(-30, 30, 24001)
+        j = rock.joints(x, np.full_like(x, 2.55), [1.0, 0.0], 3.0, 0.0)
         self.assertTrue(j.min() >= 0.0 and j.max() <= 1.0)
+        peaks = x[1:-1][(j[1:-1] > j[:-2]) & (j[1:-1] >= j[2:]) & (j[1:-1] > 0.9)]
+        gaps = np.diff(peaks)
+        self.assertGreater(len(peaks), 6)
+        self.assertGreater(float(gaps.std()), 0.4)  # uneven spacing: some joints missing, the rest off their places
+        self.assertGreater(float(gaps.max()), 4.0)
 
     def test_rubble_low_and_only_at_the_walls_foot(self):
         rk = rock.profile("breakdown")
@@ -281,11 +284,49 @@ class DecorTest(unittest.TestCase):
 
     def test_all_the_pieces_closed(self):
         for V, F, tag, g in self.out[0][:600]:
-            if tag == rock.TAG["pool"]:  # a pool's water is a sheet, seen from above
-                continue
+            if tag in (rock.TAG["pool"], rock.TAG["sheet"], rock.TAG["shelf"], rock.TAG["boss"], rock.TAG["crust"]):
+                continue   # a pool's water is a sheet, seen from above; a wall piece is a sheet whose rim is in the wall
             ok, vol = closed_outward(V, F)
             self.assertTrue(ok, tag)
             self.assertGreater(vol, 0.0, tag)
+
+
+@unittest.skipIf(rock is None, "numpy is not installed")
+class FormsTest(unittest.TestCase):
+    """The shapes of meshy_cave_forms.py: closed tubes (helictites, flowers), wall sheets wound toward their normals."""
+
+    def test_helictite_and_flower_closed_and_outward(self):
+        import meshy_cave_forms as forms
+        R = core.Rng(5, "f")
+        V, F = forms.helictite((0.0, 0.0, 1.0), (0.0, 0.0, -1.0), 0.4, 0.015, R)
+        ok, vol = closed_outward(V, F)
+        self.assertTrue(ok)
+        self.assertGreater(vol, 0.0)
+        for V, F in forms.flower((0, 0, 0), (0.0, 1.0, 0.0), 0.2, R, petals=6):
+            ok, vol = closed_outward(V, F)
+            self.assertTrue(ok)
+            self.assertGreater(vol, 0.0)
+
+    def test_wall_mesh_faces_its_normals_and_buries_its_rim(self):
+        import meshy_cave_forms as forms
+        g = np.linspace(-1.0, 1.0, 5)
+        S = np.stack(list(np.meshgrid(g, g, indexing="ij")) + [np.zeros((5, 5))], -1)
+        N = np.tile([0.0, 0.0, 1.0], (5, 5, 1))
+        h = np.full((5, 5), -0.03)
+        h[1:-1, 1:-1] = 0.1
+        V, F = forms.wall_mesh(S, N, h)
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        self.assertTrue(np.all(n[:, 2] > 0))
+        self.assertAlmostEqual(float(V[:, 2].min()), -0.03, places=9)
+
+    def test_the_curtain_and_stalactite_shapes_vary_but_are_repeatable(self):
+        a = rock.stalactite(0, 0, 5.0, 1.8, 0.15, (1.0, 0.0), core.Rng(7, "a"))
+        b = rock.stalactite(0, 0, 5.0, 1.8, 0.15, (1.0, 0.0), core.Rng(7, "a"))
+        c = rock.stalactite(0, 0, 5.0, 1.8, 0.15, (1.0, 0.0), core.Rng(8, "a"))
+        self.assertTrue(np.array_equal(a[0], b[0]))
+        self.assertFalse(np.array_equal(a[0], c[0]) and len(a[0]) == len(c[0]))
+        # it bows: the tip is off the root's axis
+        self.assertGreater(float(np.hypot(*(a[0][np.argmin(a[0][:, 2])][:2]))), 0.0)
 
 
 if __name__ == "__main__":

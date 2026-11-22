@@ -425,6 +425,19 @@ lightmapped material is in the file, and what the viewer does with it:
   without `NORMAL` gets the screen's own derivative. Neither changes the baked light. The occlusion is per vertex, not
   in the page: a second channel in the lossless page cost 313 KB on the Old Rising's, three times what the vertices
   cost.
+- **The rock's colour and wetness** (realism pass 3). A cave mesh also has `_TINT` (a vec3: the albedo the light was
+  graded at, linear, the geology's palette with the macro variation; Draco-quantized with the other application
+  attributes) and, where any vertex is wet, `_WET` (0 to 1: the river and the water's edge, the floor under a drip,
+  flowstone, the speleothems). The viewer lights the scan's texture by `_TINT` over a reference (0.3), so the lantern
+  shows the rock's own colour (the builder takes most of the hue out of each scan, `scan_chroma` in the look, because
+  the scan's hue is no one's palette), adds a Blinn-Phong sheen from the lantern at the eye where `_WET` is over 0
+  (the normal bent by the texture's own luminance), and samples the scan stochastically (hex tiling: three random,
+  rotated copies per triangle of a grid, so no square of it repeats). A mesh without `_TINT` or `_WET` is lit as
+  before. The Area's extras may carry `wdi_mist` (`colour` hex, `density`, `wet_gain`, `max`): a faint cool mist mixed
+  in by distance from the eye, thicker where `_WET` is, per section.
+- **Per-section colour.** The cave look's `section_base_mul` (tools/blender/meshy_looks/cave_fp.json) leans each section's
+  palette (per-channel factors), and a wall's beds and joints are irregular (own strength per bed, joints moved or missing),
+  so the baked `_TINT` differs between sections of one geology and a wall has no regular block grid.
 - **The ink clamp.** A patched material's last step is the viewer's (apps/walk `lantern.ts`): no lilac (where green is
   the least channel it is lifted to the lesser of red and blue), no teal (where green and blue stand together
   well over red, red is lifted to 0.9 of the higher of them) and no pixel under the ink in luminance (the

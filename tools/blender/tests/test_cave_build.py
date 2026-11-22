@@ -709,5 +709,86 @@ class HoldDarkTest(unittest.TestCase):
         i0 = cb.kept_dark(dec, cb.hex_lin("#FFFFFF"))
         self.assertEqual(i0, int(np.argmin(R.lum(R.agx(dec * 10.0)))))
 
+
+@unittest.skipIf(cb is None, "numpy is not installed")
+class RockColourTest(unittest.TestCase):
+    """The rock's palettes and macro variation (realism pass 3): every palette colour is a warm, grey or cold rock colour
+    (never lilac, magenta or teal, never under the ink), the variation has a spread, differs by section and keeps
+    each geology's own base."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.look = cb.load_look()
+        cls.sec, _w = core.load_section(os.path.join(UNDERMERE, "killas.json"))
+
+    def test_every_formation_tag_is_drawn(self):
+        """A formation kind the rock module makes must be in a form group, or the builder drops it from the file."""
+        grouped = {t for tags in cb.FORM_GROUPS.values() for t in tags}
+        for kind, tag in core.rock.TAG.items():
+            self.assertIn(tag, grouped, kind)
+        self.assertEqual(cb.form_scan_kit("speleothem", "ice", {"ice": 1, "flowstone": 1}), "ice")
+
+    def test_every_palette_colour_is_rock(self):
+        ink = cb.hex_srgb("#12141C")
+        for name, p in self.look["palettes"].items():
+            if name == "about":
+                continue
+            for k in ("base", "cream", "iron", "dark", "green"):
+                r, g, b = cb.hex_srgb(p[k])
+                self.assertFalse(b > r and b > g and r < 0.9 * b and g < 0.9 * b and abs(r - g) > 0.3 * b, (name, k))
+                self.assertFalse(g < min(r, b) - 1e-9, (name, k, "lilac"))            # lilac or magenta: green lowest
+                self.assertFalse(g > r + 0.03 and b > r + 0.03 and min(g, b) - r >= 0.67 * (max(g, b) - r)
+                                 and max(g, b) - r > 0.12 * max(g, b), (name, k, "teal"))
+                self.assertGreater(0.2126 * r + 0.7152 * g + 0.0722 * b, 0.2126 * ink[0] + 0.7152 * ink[1]
+                                   + 0.0722 * ink[2], (name, k))
+
+    def test_macro_variation_has_a_spread_and_differs_by_section(self):
+        rng = np.random.default_rng(3)
+        V = rng.uniform(-60.0, 60.0, (4000, 3))
+        N = np.tile([1.0, 0.0, 0.0], (4000, 1))
+        geo = np.zeros(4000, np.int64)
+        names = ["limestone"]
+        wet = np.zeros(4000)
+        rel = np.ones((4000, 3))
+        a = cb.macro_tint(V, N, geo, names, self.sec, self.look, rel, wet)
+        self.assertEqual(a.shape, (4000, 3))
+        self.assertTrue(np.all((a >= 0.0) & (a <= 1.0)))
+        y = a @ np.array([0.2126, 0.7152, 0.0722])
+        self.assertGreater(float(np.percentile(y, 90) / np.percentile(y, 10)), 1.25)   # brightness varies
+        self.assertGreater(float(a.std(0).max()), 0.03)
+        base = cb.hex_srgb(self.look["palettes"]["limestone"]["base"])
+        self.assertLess(float(np.abs(np.median(a, 0) - base).max()), 0.12)              # still limestone grey
+        sec2, _w = core.load_section(os.path.join(UNDERMERE, "spar.json"))
+        b = cb.macro_tint(V, N, geo, names, sec2, self.look, rel, wet)
+        self.assertGreater(float(np.abs(a - b).mean()), 0.01)                           # each section its own
+
+    def test_a_damp_place_goes_green_and_hue_stats_measure_the_spread(self):
+        rng = np.random.default_rng(4)
+        V = rng.uniform(-60.0, 60.0, (4000, 3))
+        N = np.tile([1.0, 0.0, 0.0], (4000, 1))
+        geo, names, rel = np.zeros(4000, np.int64), ["limestone"], np.ones((4000, 3))
+        dry = cb.macro_tint(V, N, geo, names, self.sec, self.look, rel, np.zeros(4000))
+        damp = cb.macro_tint(V, N, geo, names, self.sec, self.look, rel, np.ones(4000))
+        self.assertGreater(float((damp[:, 1] - damp[:, 0]).mean()), float((dry[:, 1] - dry[:, 0]).mean()))
+        st = cb.hue_stats(cb.srgb_to_lin(damp))
+        self.assertGreater(st["luma_p10_p90_ratio"], 1.2)
+        self.assertGreater(st["hue_circ_std_deg"], 0.0)
+        self.assertEqual(cb.hue_stats(np.zeros((0, 3))), {})
+
+    def test_near_min_finds_the_nearest_within_reach(self):
+        P = np.array([[0.0, 0, 0], [5.0, 0, 0], [0.5, 0.5, 0]])
+        Q = np.array([[0.3, 0, 0], [9.0, 9, 9]])
+        d = cb.near_min(P, Q, 1.0)
+        self.assertAlmostEqual(float(d[0]), 0.3, places=9)
+        self.assertTrue(np.isinf(d[1]))
+        self.assertAlmostEqual(float(d[2]), float(np.hypot(0.2, 0.5)), places=9)
+
+    def test_mist_merges_the_section_into_the_default(self):
+        m = cb.mist_for("river", self.look)
+        self.assertEqual(m["colour"], self.look["mist"]["default"]["colour"])
+        self.assertGreater(m["wet_gain"], self.look["mist"]["default"]["wet_gain"])
+        self.assertEqual(cb.mist_for("nowhere", self.look), {k: v for k, v in self.look["mist"]["default"].items()})
+
+
 if __name__ == "__main__":
     unittest.main()

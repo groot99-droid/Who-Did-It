@@ -173,6 +173,23 @@ with the lantern on.
   the file's `_OCCL` attribute (the builder's baked ambient occlusion, per vertex, stored as 1 minus the open share so
   a mesh without it is not occluded): a crevice stays dark and a formation reads as a form. `LANTERN.form` and
   `LANTERN.aoWeight` set the two weights. The falloff, the colour, the reach and the flicker are as before.
+- **The rock's own colour, the wet sheen, hex tiling and the mist.** A cave mesh's `_TINT` (the albedo the baker
+  graded the light at) times the scan's texture is what the lantern lights (over `LANTERN.tintRef`), so the lantern
+  shows the geology's palette, not the scan's one warm hue. Where `_WET` (0 to 1) is over 0 the shader adds a
+  Blinn-Phong term from the lantern at the eye (`LANTERN.gloss`), the normal bent by the texture's own luminance, so a
+  wet surface glints and dry rock takes nothing. The scan is sampled by hex tiling (`LANTERN.stochastic`: the triangle
+  grid, three random rotated and offset copies per triangle blended by weights to a power, the coordinates' own
+  derivatives, a little brightness jitter per tile): the autocorrelation of a wall's luminance at the texture's period
+  fell from 0.63 to 0.01. The Area's `wdi_mist` extras (`setMist`) set a faint cool mist mixed in by distance after the
+  fog and before the ink clamp, thicker on wet surfaces. All of it is in the patched unlit materials, a file without
+  `_TINT`, `_WET` or `wdi_mist` is lit as before.
+- **Not one orange (fix round 1).** The lantern's light is the palette's warm taken 0.3 of the way to white
+  (`LANTERN.whiten`), so grey limestone, cream calcite, olive moss and cold slate keep their hue in it; its knee is
+  3.4 m, so far walls get more of it. The `_TINT` ratio has a luminance floor (`tintFloor`) so the darkest palettes
+  (slate, flooded rock) show their grain. The baked light where it is dim (under `LANTERN.fill.knee`) keeps 35 % of
+  its colour, is pulled 30 % toward a cold grey-blue and gets a small cold floor (`fill`), so the far rock is not the
+  lamps' one orange; the lamp pools themselves are as baked. The scan is read once beyond `stochastic.far` metres.
+  The teal guard now takes in hue 204 and under.
 - **Lightmap pages.** A cave file's shell light is a texture on the second UV set (docs/walk-areas.md, "A cave's
   lightmap"). `src/lightmap.ts` (a `GLTFLoader` plugin, registered in `makeLoader`) reads each material's
   `wdi_lightmap` extras after the file is parsed, takes the page from the material's `emissiveTexture` (GLTFLoader
