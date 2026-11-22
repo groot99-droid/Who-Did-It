@@ -1414,7 +1414,7 @@ class RoomFileV2(unittest.TestCase):
         self.assertEqual(spec["pending"], [])
 
     def test_lancet_rules(self):
-        self.assertEqual(rf.WINDOW_STYLES, ("sash", "lancet"))
+        self.assertEqual(rf.WINDOW_STYLES, ("sash", "lancet", "barred"))
         cases = [(lambda o: o.update(glass=["#2E4C8F", "#C9862C"]), "glass is 3 to 6 colours"),
                  (lambda o: o.update(glass=["#2E4C8F", "#C9862C", "#8A6FA8"]), "is lilac or magenta"),
                  (lambda o: o.update(glass=["#2E4C8F", "#2EC4B6", "#D9B64A"]), "is teal"),
@@ -1423,7 +1423,7 @@ class RoomFileV2(unittest.TestCase):
                  (lambda o: o.update(width=1.5), "a lancet is 0.4 to 1.2 m wide"),
                  (lambda o: o.update(head=2.5), "its arch rises 0.61 m"),
                  (lambda o: o.update(style="rose"), 'style "rose" is not built yet (G14); the builder has: sash, '
-                                                    'lancet (R-O8)')]
+                                                    'lancet, barred (R-O8)')]
         for change, said in cases:
             data = self.chapel()
             change(next(o for o in data["openings"] if o["id"] == "ch.stained_glass_0"))
@@ -1438,6 +1438,49 @@ class RoomFileV2(unittest.TestCase):
             if o["kind"] == "window":
                 self.assertNotIn("glass", o)
                 self.assertNotIn("spring", o)
+
+    # -- G14, second part: the barred window (the county jail's cell)
+    def cell(self):
+        return raw(os.path.join(ROOMS_DIR, "cj_cell.json"))
+
+    def test_the_cell_reads_its_barred_window_and_moon(self):
+        data = self.cell()
+        cfg, spec = self.read(data)
+        wins = [o for o in spec["openings"] if o["kind"] == "window"]
+        self.assertEqual(len(wins), 1)
+        o = wins[0]
+        self.assertEqual((o["id"], o["style"], o["side"], o["at"], o["bars"]), ("cj.window", "barred", "N", -0.5, [5, 1]))
+        self.assertEqual((o["curtains"], o["swag"], o["outside"]), (False, False, "sky"))
+        # the stone surround's foot over the capsule's top: nothing proud of the wall where the walker's head goes
+        self.assertGreaterEqual(o["sill"] - rf.BARRED_SURROUND["sill"], rf.CAPSULE_TOP)
+        # sealed: no door, no portal; the moon through the bars, the day light dropped
+        self.assertEqual([e for e in spec["openings"] if e["kind"] != "window"], [])
+        self.assertEqual([r["window"] for r in spec["lights"] if r["role"] == "moon"], ["cj.window"])
+        self.assertEqual(spec["groups"], ["candle", "moon", "fill"])
+        self.assertEqual(spec["pending"], [])
+
+    def test_barred_rules(self):
+        cases = [(lambda o: o.update(curtains=True, curtain_colour="#4B4A3C"), "a barred window has no curtains or swag"),
+                 (lambda o: o.update(bars=[0, 1]), "bars is a barred window's grate [upright, cross]"),
+                 (lambda o: o.update(bars=[5, 5]), "bars is a barred window's grate [upright, cross]"),
+                 (lambda o: o.update(bars=[5.0, 1]), "bars is a barred window's grate [upright, cross]"),
+                 (lambda o: o.update(width=1.4), "a barred window is 0.3 to 1.2 m wide"),
+                 (lambda o: o.update(head=3.6), "a barred window stands 0.3 to 1.5 m from its sill to its head"),
+                 (lambda o: o.update(sill=1.6, head=2.2), "its stone surround's foot at 1.42 m"),
+                 (lambda o: o.update(glass=["#2E4C8F", "#C9862C", "#D9B64A"]), "glass is a lancet's stained glass")]
+        for change, said in cases:
+            data = self.cell()
+            change(next(o for o in data["openings"] if o["id"] == "cj.window"))
+            self.assertIn(said, self.stops(data), said)
+        # bars are a barred window's only: the parlour's sash windows refuse them
+        data = raw(PARLOUR)
+        next(o for o in data["openings"] if o["kind"] == "window")["bars"] = [4, 1]
+        self.assertIn("bars are a barred window's (R-O15)", self.stops(data))
+        # a sash window reads as it did: no barred key reaches its entry (the finished rooms' bytes)
+        _cfg, spec = self.read(raw(PARLOUR))
+        for o in spec["openings"]:
+            if o["kind"] == "window":
+                self.assertNotIn("bars", o)
 
     @unittest.skipIf(mrb is None, "numpy is not here")
     def test_a_face_frame_reads_as_its_shell_wall(self):
@@ -1584,6 +1627,20 @@ class BuilderV2(unittest.TestCase):
         # a quarry wholly inside stays as it was; one wholly outside is gone
         self.assertEqual(len(mrb.clip_convex([(-0.1, 2.2), (0.1, 2.2), (0.1, 2.4), (-0.1, 2.4)], line)), 4)
         self.assertEqual(mrb.clip_convex([(0.5, 2.2), (0.6, 2.2), (0.6, 2.4), (0.5, 2.4)], line), [])
+
+    def test_a_barred_grate_spaces_its_bars_evenly(self):
+        cuts = mrb.barred_cuts(-0.35, 0.35, 5)
+        self.assertEqual(len(cuts), 5)
+        gaps = [b - a for a, b in zip([-0.35] + cuts, cuts + [0.35])]
+        for g in gaps:                                       # six equal gaps, the jambs at the ends
+            self.assertAlmostEqual(g, 0.7 / 6)
+        self.assertEqual(mrb.barred_cuts(1.95, 2.5, 0), [])
+        self.assertAlmostEqual(mrb.barred_cuts(1.95, 2.5, 1)[0], 2.225)
+        # the grate stands in the lining, back from the wall face; the glass further in, short of the wall's outside
+        g0, g1 = mrb.BARRED_GRATE_O
+        self.assertLess(g0 + mrb.BARRED_FLAT[1], 0.0)
+        self.assertLess(mrb.BARRED_GLASS_O, g1)
+        self.assertGreater(mrb.BARRED_GLASS_O - 0.04, -0.3)
 
     # -- G3: the openings' plain-number parts (the rest is proven by the gate and the scratch rooms' builds)
     @staticmethod

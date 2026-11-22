@@ -1693,6 +1693,92 @@ def skirting_runs(fr: Frame, doors: list) -> list:
     return runs
 
 
+# a barred window (G14, the cell's): the grate's square iron bars in the reveal's room end, the glass's plane into the
+# wall and its iron frame
+BARRED_BAR = 0.024          # an upright's square section
+BARRED_FLAT = (0.05, 0.012)  # a cross bar's height and thickness
+BARRED_GRATE_O = (-0.05, -0.074)   # the uprights' room and far faces into the wall (the cross bars on their room
+# side, 3.8 cm in: nothing of the grate stands out of the wall face)
+BARRED_GLASS_O = -0.2       # the glass's plane, into the wall
+BARRED_FRAME = 0.03         # the light's iron frame on the glass, each side
+
+
+def barred_cuts(a0: float, a1: float, n: int) -> list:
+    """The centres of n bars spaced evenly across a0..a1 (n + 1 equal gaps)."""
+    return [a0 + (a1 - a0) * (i + 1) / (n + 1) for i in range(n)]
+
+
+def barred_one(fr: Frame, mt: dict, o: dict, w: dict, suffix: str) -> dict:
+    """A barred window (G14): a dressed stone surround proud of the wall face round the rectangular cut (its foot over
+    the capsule's top, R-O16), the cut lined in stone from the surround's face back past the glass (the jambs, the
+    soffit, the sill), a grate of square iron uprights and flat cross bars set into the lining at its room end, and a
+    fixed light of glass in an iron frame further in. No sashes, curtains or swag. Names Window_<id> and
+    WindowGlass_<id> as any v2 window; returns the same opening row (the moon comes through it)."""
+    side = o["side"]
+    sa, sb = sorted((fr.to_s(side, o["a"]), fr.to_s(side, o["b"])))
+    s, h = o["z0"], o["z1"]
+    stone, iron = mt["stone"], mt["iron"]
+    go = BARRED_GLASS_O
+    (_o, (dx, dy), (nx, ny), _L) = fr.wall_frame(side)
+    inward = np.array((nx, ny, 0.0))
+    along = np.array((dx, dy, 0.0))
+    up = np.array((0.0, 0.0, 1.0))
+    fw, ft, fb, pr = (rf.BARRED_SURROUND[k] for k in ("side", "head", "sill", "proud"))
+    b = Builder()
+
+    def F(q, want):                    # q: [(s, z)...] on the surround's face, facing `want`
+        pts = [fr.point(side, a, pr, z) for a, z in q]
+        _face_toward(b, pts, [(a / 0.5, z / 0.5) for a, z in q], stone, want)
+
+    # the surround's face: the band under the sill, the band over the head, the two jambs' strips
+    F([(sa - fw, s - fb), (sb + fw, s - fb), (sb + fw, s), (sa - fw, s)], inward)
+    F([(sa - fw, h), (sb + fw, h), (sb + fw, h + ft), (sa - fw, h + ft)], inward)
+    F([(sa - fw, s), (sa, s), (sa, h), (sa - fw, h)], inward)
+    F([(sb, s), (sb + fw, s), (sb + fw, h), (sb, h)], inward)
+    # its outer edges, from the wall face to its face
+    for q, want in (([(sa - fw, s - fb), (sb + fw, s - fb)], -up), ([(sa - fw, h + ft), (sb + fw, h + ft)], up),
+                    ([(sa - fw, s - fb), (sa - fw, h + ft)], -along), ([(sb + fw, s - fb), (sb + fw, h + ft)], along)):
+        (a0, z0), (a1, z1) = q
+        pts = [fr.point(side, a0, 0.0, z0), fr.point(side, a1, 0.0, z1), fr.point(side, a1, pr, z1),
+               fr.point(side, a0, pr, z0)]
+        _face_toward(b, pts, [(0, 0), (1, 0), (1, 0.04), (0, 0.04)], stone, want)
+    # the stone lining round the cut (its foot the wall cut's, 1.6 cm under the sill), from the surround's face back
+    # past the glass, facing the opening's middle
+    sl = o.get("cut_z0", s)
+    line = [(sa, sl), (sb, sl), (sb, h), (sa, h)]
+    mid = ((sa + sb) / 2, (s + h) / 2)
+    for k in range(4):
+        (a0, z0), (a1, z1) = line[k], line[(k + 1) % 4]
+        want = along * (mid[0] - (a0 + a1) / 2) + up * (mid[1] - (z0 + z1) / 2)
+        L = math.hypot(a1 - a0, z1 - z0)
+        pts = [fr.point(side, a0, pr, z0), fr.point(side, a1, pr, z1), fr.point(side, a1, go - 0.04, z1),
+               fr.point(side, a0, go - 0.04, z0)]
+        _face_toward(b, pts, [(0, 0), (L / 0.5, 0), (L / 0.5, 0.5), (0, 0.5)], stone, want)
+    # the grate: the uprights from the sill to the soffit, the flat cross bars across them on the room side
+    nu, nc = w["bars"]
+    g0, g1 = BARRED_GRATE_O
+    hb = BARRED_BAR / 2
+    for c in barred_cuts(sa, sb, nu):
+        wall_box(b, fr, side, c - hb, c + hb, g1, g1 + BARRED_BAR, sl, h, iron)
+    fh, ft = BARRED_FLAT
+    for z in barred_cuts(s, h, nc):
+        wall_box(b, fr, side, sa, sb, g0, g0 + ft, z - fh / 2, z + fh / 2, iron)
+    # the light's iron frame on the glass's room side
+    f = BARRED_FRAME
+    for a0, a1, z0, z1 in ((sa, sb, sl, s + f), (sa, sb, h - f, h), (sa, sa + f, s + f, h - f),
+                           (sb - f, sb, s + f, h - f)):
+        wall_box(b, fr, side, a0, a1, go, go + 0.02, z0, z1, iron)
+    register(b.build(nm("Window" + suffix)), "window", o["id"])
+    g = Builder()
+    pts = [fr.point(side, sa + f, go, s + f), fr.point(side, sb - f, go, s + f), fr.point(side, sb - f, go, h - f),
+           fr.point(side, sa + f, go, h - f)]
+    _face_toward(g, pts, [(0, 0), (1, 0), (1, 1), (0, 1)], mt["glass"], inward)
+    gl = g.build(nm("WindowGlass" + suffix))
+    register(gl, "glass", o["id"] + ":glass")
+    return dict(id=o["id"], side=side, sa=sa, sb=sb, sill=s, head=h, glass_o=go,
+                centre=fr.point(side, (sa + sb) / 2, go, (s + h) / 2), outside=w.get("outside", "sky"))
+
+
 def wall_box(b: Builder, fr: Frame, side: str, s0: float, s1: float, o0: float, o1: float, z0: float, z1: float,
              mat, uv_scale: float = 2.0, skip=(), vgrain: bool | None = None) -> None:
     """A box given in a wall's own terms (s along it, o into the room from its face, z up); a wood's grain runs
@@ -1952,6 +2038,9 @@ def build_windows(fr: Frame, mt: dict) -> list:
         w = o["spec"]
         if w.get("style") == "lancet":
             out.append(lancet_one(fr, mt, o, w, sfx(o["id"]), o["id"] in lit))
+            continue
+        if w.get("style") == "barred":
+            out.append(barred_one(fr, mt, o, w, sfx(o["id"])))
             continue
         cm = curtain_mat(mt, w["curtain_colour"]) if w.get("curtains") else None
         out.append(window_one(fr, mt, o, w, sfx(o["id"]), cm))

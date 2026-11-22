@@ -1,0 +1,168 @@
+{
+  "room": "cj_cell",
+  "about": "The county jail's cell, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 10 x 6 m inside (x -5..5, y -3..3), 2.7 m high. Every prop and night light of packages/content/data/scenes/cj_cell.json is named below; the scene has no spots and no portals (a jailed seat is placed here and leaves on the morning train). The scene is a greybox with no material layer, so the walls, the floor and the trims are this file's own design (decision 12 of the builder base: proposed here, for Story mode). One barred window in the north wall (the plan's G14 barred style) and no door (the plan's default: sealed, no decor door). Grey boxes stand in for the pieces that have no model yet (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "The county jail",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "cell_1": "In the cell",
+    "cell_2": "In the cell",
+    "cell_3": "In the cell",
+    "cell_4": "In the cell",
+    "cell_5": "In the cell",
+    "cell_6": "In the cell",
+    "cell_7": "In the cell",
+    "cell_8": "In the cell",
+    "cell_9": "In the cell",
+    "cell_10": "In the cell"
+  },
+  "height": 2.7,
+  "height_note": "the plan's 2.7 m for the cell (m2_plan Reference E)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.84, 0.84, 0.81]
+  },
+  "floor_note": "stone flags, the chapel's and the cellar's scan, a cold grey between the two (the scene has no material layer: new design)",
+  "wall_colour": "#8F8C82",
+  "wall_colour_note": "guess: a cold limewash over stone, grey with a little warmth; never pink or lilac under the lamp",
+  "ceiling_colour": "#9C988D",
+  "ceiling_colour_note": "the same limewash, a shade lighter overhead",
+  "paint_colour": "#6E6452",
+  "wood_colour": "#3E2F22",
+  "wood_colour_note": "a dark oak for the grey boxes in wood",
+  "skirting": null,
+  "skirting_note": "a jail cell has no skirting: the limewash meets the flags",
+  "picture_rail": null,
+  "picture_rail_note": "no picture rail",
+  "cornice": null,
+  "cornice_note": "and no cornice",
+  "openings": [
+    {
+      "id": "cj.window",
+      "kind": "window",
+      "prop": "cj.window",
+      "style": "barred",
+      "width": 0.7,
+      "sill": 1.95,
+      "head": 2.5,
+      "bars": [5, 1],
+      "note": "the scene's barred window at its tile (5,0), x -0.5 on the north wall: a small high opening (0.7 x 0.55 m, its sill 1.95 m up, on the wall grid's 5 cm) in a dressed stone surround whose foot (1.77 m) stands over the capsule's top, lined in stone, five square iron uprights and one flat cross bar at the lining's room end, a fixed light of glass further in. The moon comes through it (cj.lt_moon)."
+    }
+  ],
+  "openings_note": "no door: the scene has no portal and the plan's default (Reference E) is no decor door. The window says no `outside`: the room has no `outside` block, so it is `sky` (a backdrop behind the north wall, decision 10 of the builder's design)",
+  "moon": {
+    "bearing": 15.0,
+    "elevation": 32.0,
+    "note": "one Sun for the room (R-L9): the moon a little east of north, at the bedroom's 32 degrees, so the barred patch lands on the flags in the middle of the cell, its bars' shadows skewed a little"
+  },
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "cj.lt_lamp",
+      "role": "lamp",
+      "anchor": {
+        "piece": "cj.lamp"
+      },
+      "note": "the lamp in the north-east corner, tile (11,1): the round-3 candle stand's flame stands in for the lantern (wooden_lantern_01 is a .blend, G8)"
+    },
+    {
+      "id": "cj.lt_moon",
+      "role": "moon",
+      "window": "cj.window",
+      "note": "the moon through the barred window (tile (5,0)). The scene's cj.lt_window is a day and dusk light: the walk is night only"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the lamp), moon (the window) and fill = 3, and the AO.",
+  "look": {
+    "note": "G9: the room's override of meshy_looks/interior_fp.json: the parlour's darker-room lever and a light setting of the room's own.",
+    "exposure": {
+      "pool_display": 0.35
+    },
+    "exposure_note": "the parlour's darker-room lever: a cell at night, lit by one lamp and the moon",
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "cell": {
+        "label": "the cell",
+        "mix": {
+          "candle": 1.0,
+          "moon": 40.0,
+          "fill": 4.0
+        },
+        "note": "the first guess (candle 1, moon 6, fill 0.3, after the chapel's lancets) gave a first 128-sample bake (2026-11-22) whose barred moon patch read 1.04 times the floor round it (lost) and 90 % of the vertices on the ink floor, the far wall 0.56 of the lamp's. From that bake's saved light, moon 40 and fill 3 to 6 gave the patch 1.6 times the floor and the far wall 0.62 to 0.72: moon 40 and fill 4 for the second bake"
+      }
+    }
+  },
+  "light": "cell",
+  "light_note": "the room's own light setting (look.settings.cell; --light overrides)",
+  "pieces": [
+    {
+      "id": "cj.bench",
+      "face": "W",
+      "place": ["wall", "E", 0.5],
+      "spec": { "model": "ph", "slug": "painted_wooden_bench", "scale": 1.0, "lod": 0.5 },
+      "note": "the bench at its tile (11,3), against the east wall: the parlour's painted bench (1.17 m long), the cell's only seat with a back"
+    },
+    {
+      "id": "cj.lamp",
+      "key": "candle",
+      "face": "W",
+      "place": ["wall", "E", 2.5],
+      "spec": { "scale": 1.0, "lod": 0.5 },
+      "note": "the lamp at its tile (11,1), in the north-east corner against the east wall: the bedroom's candle stand (side_table_tall_01 and a wooden candlestick with its flame), the flame of cj.lt_lamp"
+    },
+    {
+      "id": "cj.stool",
+      "face": "E",
+      "place": ["wall", "W", -0.5],
+      "spec": { "model": "ph", "slug": "wooden_stool_01", "scale": 1.0, "lod": 0.35 },
+      "note": "the stool at its tile (0,4), against the west wall"
+    },
+    {
+      "id": "cj.barbell",
+      "face": "W",
+      "place": ["wall", "E", -0.95],
+      "spec": {
+        "model": "box",
+        "size": [1.3, 0.35, 0.65],
+        "label": "Barbell: an iron bar with two cast plates, resting on a low wooden stand"
+      },
+      "moved": "D4: from its tile (10,4), (4.5, -0.5), to the east wall's foot, north to south from y -1.6 to -0.3 (0.6 m from the tile's centre): laid east to west across the tile it left tiles (9,4) and (10,4) with no standing room between it and the bench's south end (the first no-bake build's walk)",
+      "note": "the barbell on a stand (0.65 m) so its top is not a step the walker climbs, 0.22 m clear of the bench's south end. No model (a grey box, the plan's box build)."
+    },
+    {
+      "id": "cj.sparring_post",
+      "face": "W",
+      "place": ["at", 4.65, -2.65],
+      "spec": {
+        "model": "box",
+        "size": [0.3, 0.3, 1.7],
+        "label": "Sparring post: a leather-padded timber post on a cross foot"
+      },
+      "moved": "D4: 0.21 m from its tile's centre (4.5, -2.5) into the south-east corner, so the tile (10,6) keeps standing room beside it (the first no-bake build's walk)",
+      "note": "the sparring post at its tile (10,6), in the corner. No model (a grey box)."
+    },
+    {
+      "id": "cj.scrub_pail",
+      "face": "E",
+      "place": ["at", -4.5, -2.5],
+      "spec": { "model": "ph", "slug": "wooden_bucket_01", "scale": 1.0, "lod": 0.4 },
+      "note": "the scrub pail at its tile (1,6), in the south-west corner: the barn's wooden bucket (the scrubbing brush has no model)"
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_cell_1 is that spawn's own view (facing south); from_cell_10 stands on spawn cell_10 and looks back north at the window; north, east, south and west look at one wall each from the middle of the room.",
+  "views": {
+    "spawn_cell_1": [[-3.5, 1.5, 1.6], [-3.5, -3.0, 1.2], 70.0],
+    "from_cell_10": [[1.5, -2.5, 1.6], [1.5, 3.0, 1.4], 70.0],
+    "north": [[0.0, -2.2, 1.6], [-0.5, 3.0, 1.8], 70.0],
+    "east": [[-3.0, 0.0, 1.6], [5.0, 0.0, 1.1], 70.0],
+    "south": [[0.0, 2.2, 1.6], [0.0, -3.0, 1.1], 70.0],
+    "west": [[3.0, 0.0, 1.6], [-5.0, 0.0, 1.1], 70.0],
+    "window": [[-0.5, 0.6, 1.6], [-0.5, 3.0, 2.1], 70.0],
+    "moon_patch": [[-2.6, 2.2, 1.6], [0.2, -0.6, 0.0], 70.0]
+  }
+}
