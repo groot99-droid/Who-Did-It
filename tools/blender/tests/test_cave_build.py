@@ -176,12 +176,66 @@ class CaveBuildTest(unittest.TestCase):
         self.assertTrue(np.allclose(land[:, 2], 4.1))                  # the landing is level at the sill
         self.assertAlmostEqual(float(V[4:8, 0].min()), fr["plane"] - 2.5 - 6.7)
 
+    def test_every_geology_has_its_own_locked_scans(self):
+        """Each of the design's ten geologies has a kit of its own (none falls to the default), every scan a kit
+        names is pinned in the material lock (not only present in someone's cache), the default kit is limestone's,
+        and the cave scans of 2026-11-21 sit where the geology asks for them (CREDITS, the cave_* roles)."""
+        sys.path.insert(0, os.path.join(BLENDER, "materials"))
+        import roles  # noqa: E402
+
+        kits = self.look["kits"]
+        with open(os.path.join(UNDERMERE, "design.json"), encoding="utf-8") as fh:
+            geology = json.load(fh)["geology"]
+        self.assertEqual(len(geology), 10)
+        for g in geology:
+            self.assertIn(g, kits, g)
+            self.assertEqual(set(kits[g]), {"wall", "floor"}, g)
+        self.assertEqual(kits["default"], kits["limestone"])
+        with open(roles.LOCK_FILE, encoding="utf-8") as fh:
+            lock = json.load(fh)["assets"]
+        for kit, v in kits.items():
+            for slug in (v.values() if isinstance(v, dict) else [v]):
+                self.assertIn(slug, lock, f"{kit}: {slug} is not in polyhaven.lock.json")
+                self.assertEqual(lock[slug]["type"], "texture", slug)
+                self.assertTrue(slug in roles.slugs(), f"{kit}: {slug} has no role")
+        want = {
+            "limestone": ("cave_limestone", "cave_limestone_floor"),
+            "flowstone": ("cave_flowstone", "cave_flowstone_floor"),
+            "breakdown": ("cave_breakdown", "cave_breakdown"),
+            "gypsum": ("cave_gypsum", "cave_gypsum"),
+            "lakeclay": ("mud_brown", "cave_clay"),
+            "slate": ("cave_slate", "cave_slate"),
+            "skarn": ("cave_skarn", "cave_granite"),
+            "granite": ("cave_granite", "mine_floor"),
+            "flooded": ("wet_rock", "cave_wet_gravel"),
+            "ice": ("snow", "snow_trodden"),
+            "moss": ("cave_lichen", "moss_rock"),
+        }
+        for kit, (wall, floor) in want.items():
+            self.assertEqual(kits[kit]["wall"], roles.role(wall).slug, kit)
+            self.assertEqual(kits[kit]["floor"], roles.role(floor).slug, kit)
+        # every cave role is used by a kit
+        used = {s for v in kits.values() for s in (v.values() if isinstance(v, dict) else [v])}
+        for name, r in roles.ROLES.items():
+            if name.startswith("cave_"):
+                self.assertIn(r.slug, used, name)
+        self.assertNotIn("moss", geology)   # the moss kit is a layer, never a geology's
+        self.assertEqual(cb.scan_of("moss_wall", kits), "lichen_rock")
+        self.assertEqual(cb.scan_of("basalt_floor", kits), kits["default"]["floor"])
+
     def test_face_materials_split_by_kit_and_surface(self):
         V = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], [10, 10, 0], [11, 10, 0], [10, 11, 0]], float)
         F = np.array([[0, 1, 2], [0, 3, 1], [4, 5, 6]])
         geo = np.array([0, 0, 1])
+        # lake clay has its own floor scan (wet clay under the varved wall); slate's wall and floor are one scan, so
+        # one material, named for the wall
         keys, idx = cb.face_materials(V, F, geo, ["limestone", "lakeclay"], self.look["kits"], 0.7, [])
-        self.assertEqual([keys[i] for i in idx], ["limestone_floor", "limestone_wall", "lakeclay_wall"])
+        self.assertEqual([keys[i] for i in idx], ["limestone_floor", "limestone_wall", "lakeclay_floor"])
+        keys, idx = cb.face_materials(V, F, geo, ["limestone", "slate"], self.look["kits"], 0.7, [])
+        self.assertEqual([keys[i] for i in idx], ["limestone_floor", "limestone_wall", "slate_wall"])
+        # a geology the look has no kit for takes the default kit
+        keys, idx = cb.face_materials(V, F, geo, ["limestone", "basalt"], self.look["kits"], 0.7, [])
+        self.assertEqual(keys[idx[2]], "default_floor")
         keys, idx = cb.face_materials(V, F, geo, ["limestone", "lakeclay"], self.look["kits"], 0.7,
                                       [[9, 9, -1, 12, 12, 1]])
         self.assertEqual(keys[idx[2]], "mouth_wall")
@@ -397,6 +451,22 @@ class CaveBuildTest(unittest.TestCase):
         self.assertLess(float(w.sum()), float(cb.hex_lin("#9A958A").sum()) / 4)   # far darker than the rock
         self.assertLess(cb.WATER_MAX, self.look["hot"]["knee"])
 
+    def test_water_display_hue_clear_of_teal(self):
+        """Through the viewer's AgX, WATER shows blue-grey at every level the water is graded to (the ink up to
+        WATER_MAX): its hue stays over 203 degrees, clear of the teal band (160 to 200) the look checks find, and
+        under 240, short of lilac (the rebuild's first Bottom stills read 199 degrees with the old #1E2A31)."""
+        rb = cb._rb()
+        w = cb.hex_lin(cb.WATER)
+        for target in (0.09, 0.13, cb.WATER_MAX):
+            s = rb.solve_display(w[None, :], target)[0]
+            d = rb.agx(w * s)[0]
+            mx, mn = float(d.max()), float(d.min())
+            r, g, b = (float(v) for v in d)
+            hue = 60.0 * ((r - g) / (mx - mn) + 4.0)   # blue is the largest channel
+            self.assertEqual(mx, b)
+            self.assertGreater(hue, 203.0, target)
+            self.assertLess(hue, 240.0, target)
+
     def test_water_surfaces(self):
         """A stream lies along its passage at its depth over the floor line on the side given; a pool fills its basin
         at its level inside the rail's ring; every triangle faces up; water is never a contract node."""
@@ -445,6 +515,181 @@ class CaveBuildTest(unittest.TestCase):
         np.testing.assert_allclose(Lw[2], [0.0, 0.0, 0.0])    # nothing within 3 m
         np.testing.assert_allclose(Lw[3], [0.0, 1.0, 0.0])    # the nearest, 2.5 m off
 
+    # ---- the rock: moss, formations
+
+    @staticmethod
+    def hue(lin):
+        s = np.clip(np.asarray(lin, float), 0, 1)
+        s = np.where(s <= 0.0031308, 12.92 * s, 1.055 * s ** (1 / 2.4) - 0.055)
+        r, g, b = s
+        mx, mn = max(r, g, b), min(r, g, b)
+        if mx - mn < 1e-9:
+            return None
+        if mx == r:
+            h = (g - b) / (mx - mn) % 6
+        elif mx == g:
+            h = (b - r) / (mx - mn) + 2
+        else:
+            h = (r - g) / (mx - mn) + 4
+        return 60.0 * h
+
+    def test_moss_grows_towards_the_light_and_not_behind_rock(self):
+        V = np.array([[1.0, 0.0, 0.0], [10.0, 0.0, 0.0], [30.0, 0.0, 0.0], [1.0, 0.0, 0.0], [5.0, 0.0, 0.0]])
+        N = np.array([[-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [-1.0, 0.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, -1.0]])
+        src = [("mouth", [0.0, 0.0, 0.0])]
+        w = cb.moss_weight(V, N, src)
+        self.assertGreater(w[0], w[1])          # nearer, more
+        self.assertEqual(w[2], 0.0)             # out of reach
+        self.assertGreater(w[0], w[3])          # turned towards the light, more
+        self.assertLess(w[4], w[1])             # a roof (facing down) at 5 m, less than a wall at 10 m
+        wall = cb.moss_weight(V, N, src, field=lambda P: np.where(P[:, 0] > 4.0, -1.0, 1.0))
+        self.assertAlmostEqual(wall[1], w[1] / 6.0)   # rock between: a sixth
+        self.assertAlmostEqual(wall[0], w[0])
+        self.assertTrue(np.all(cb.moss_weight(V, N, []) == 0.0))
+
+    def test_moss_green_to_olive_never_teal(self):
+        for h in (cb.MOSS_GREEN, cb.MOSS_OLIVE):
+            hu = self.hue(cb.hex_lin(h))
+            self.assertTrue(35.0 <= hu <= 100.0, (h, hu))
+        rock_ = np.tile(cb.hex_lin("#9A958A"), (50, 1))
+        t = cb.moss_tint(rock_, np.linspace(0.0, 1.0, 50), np.zeros((50, 3)))
+        for c in t[10:]:
+            hu = self.hue(c)
+            self.assertTrue(hu is None or 35.0 <= hu <= 100.0, hu)
+        sec = self.secs["swallow"][0]
+        kinds = [k for k, _p in cb.moss_sources(sec)]
+        self.assertIn("mouth", kinds)                   # the Swallow's gate
+        self.assertEqual(cb.moss_sources(self.secs["gallery"][0]), [])
+
+    def test_moss_faces_take_the_moss_kit(self):
+        V = np.array([[0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1]], float)
+        F = np.array([[0, 1, 2], [0, 3, 1]])
+        keys, idx = cb.face_materials(V, F, np.zeros(2, np.int64), ["limestone"], self.look["kits"], 0.7, [],
+                                      moss=np.array([True, False]))
+        self.assertEqual([keys[i] for i in idx], ["moss_floor", "limestone_wall"])
+
+    def test_formation_groups_scans_and_colours(self):
+        kits = self.look["kits"]
+        kind = np.array([0, 1, 2, 3, 5, 6, 7, 8, 9, 13, 14, 10, 12])
+        geo = np.array([0, 0, 0, 0, 0, 0, 0, 1, 2, 1, -1, 0, 0])
+        names = ["limestone", "skarn", "ice"]
+        out = cb.form_split(kind, geo, names, kits, 0)
+        self.assertEqual(sorted(out), [("crystal", "gypsum"), ("icicle", "ice"), ("pool", "flowstone"),
+                                       ("rock", "limestone"), ("rock", "skarn"), ("speleothem", "flowstone")])
+        self.assertEqual(list(out[("speleothem", "flowstone")]), [0, 1, 2, 4, 5, 6])
+        self.assertEqual(list(out[("rock", "skarn")]), [9])
+        self.assertEqual(sum(len(v) for v in out.values()), 11)   # the guards' and seam walls' proxies: none
+        for group in cb.FORM_GROUPS:
+            for g in core.load_json(os.path.join(UNDERMERE, "undermere.network.json"))["geology"]:
+                c = cb.hex_lin(cb.form_albedo(group, g, "#9A958A"))
+                hu = self.hue(c)
+                self.assertTrue(hu is None or not (150.0 <= hu <= 190.0 or 250.0 <= hu <= 330.0), (group, g, hu))
+        for name in ("um_gallery_form_speleothem_flowstone", "um_gallery_form_rock_limestone"):
+            self.assertEqual(cb.name_problems([name]), [])
+
+
+@unittest.skipIf(cb is None, "numpy is not installed")
+class FloorShapeTest(unittest.TestCase):
+    def test_route3_form_is_the_flat_term(self):
+        il = {"form": 0.5, "form_ao": 1.0, "form_gamma": 1.0, "form_base": 1.0}
+        ao = np.array([0.0, 0.5, 1.0])
+        m = cb.floor_shape(np.array([0.0, 5.0, 0.01]), np.ones(3), ao, il)
+        self.assertTrue(np.allclose(m, 1.0 + 0.5 * ao))
+        del il["form_base"]
+        self.assertTrue(np.allclose(cb.floor_shape(np.zeros(3), np.ones(3), ao, il), 1.0 + 0.5 * ao))
+
+    def test_the_floor_carries_the_bake(self):
+        look = cb.load_look()
+        il = look["ink_lift"]
+        have = np.array([0.0, 0.05, 0.2, 1.0, 10.0])
+        m = cb.floor_shape(have, np.ones(5), np.ones(5), il)
+        self.assertTrue(np.all(np.diff(m) > 0))                # more light baked, more lift
+        self.assertLess(float(m[0]), 1.0 + float(il["form"]) * 0.1)   # far from every light: near the bare floor
+        self.assertLessEqual(float(m[-1]), 1.0 + float(il["form"]) + 1e-9)
+        crevice = cb.floor_shape(np.array([1.0]), np.ones(1), np.zeros(1), il)
+        self.assertAlmostEqual(float(crevice[0]), 1.0 + float(il["form"]) * (1.0 - float(il["form_ao"])))
+
+    def test_the_look_names_route3s_grade(self):
+        look = cb.load_look()
+        lt = look["lantern"]
+        self.assertEqual((lt["route3_form"], lt["route3_texture_lift"], lt["route3_dark_percentile"]), (0.5, 0.45, 0.5))
+        self.assertLess(look["weights"]["fill"], 0.5)
+        self.assertEqual(look["weights"]["lamp"], 1.0)
+
+
+@unittest.skipIf(cb is None, "numpy is not installed")
+class HoldDarkTest(unittest.TestCase):
+    """hold_dark with a stand-in for the WebP encoder (the real one needs Blender): a lossy encoder that pulls some
+    texels darker. After the hold no encoded texel displays under the darkest kept texel under the floor's light, so
+    the ink floor that holds that texel at ink holds them all; under the other lights the low texels are raised."""
+
+    @staticmethod
+    def scan(n=6000, seed=3, specks=True):
+        rng = np.random.default_rng(seed)
+        lin = 0.05 + 0.25 * rng.random((n, 3)) * np.array([1.0, 0.9, 0.8])
+        if specks:
+            red = rng.choice(n, 12, replace=False)
+            lin[red] = np.array([0.08, 0.012, 0.01]) * (0.8 + 0.4 * rng.random((12, 1)))   # saturated red specks
+        return lin
+
+    @staticmethod
+    def lossy(x):
+        y = np.asarray(x, np.float64).copy()
+        y[::37] *= 0.7             # the encoder pulls every 37th texel down 30 %
+        return np.round(y * 4095.0) / 4095.0
+
+    def display(self, cols, ref, probe, target):
+        R = cb._rb()
+        c = cb.hex_lin(probe)
+        s = float(R.solve_display((ref * c)[None, :], target)[0])
+        return R.lum(R.agx(cols * c[None, :] * s))
+
+    def ink(self):
+        R = cb._rb()
+        return float(R.lum(np.array(cb.INK, float))) / 255.0
+
+    def test_no_texel_displays_under_ink_at_the_floor(self):
+        # the floor holds the darkest kept texel at ink plus the margin: every encoded texel then clears the ink
+        lin, dec, dark, lows = cb.hold_dark(self.scan(), self.lossy, margin_luma=2.0)
+        self.assertEqual(lin.shape, dec.shape)
+        self.assertTrue(np.allclose(dec, self.lossy(lin)))         # dec is what the encoder makes of the saved texels
+        d = self.display(dec, dark, cb.FLOOR_PROBE, self.ink() + 2.0 / 255.0)
+        self.assertGreaterEqual(float(d.min()), self.ink() - 1e-4)
+
+    def test_an_encoder_the_hold_cannot_beat_raises_the_floor_only_as_needed(self):
+        def stubborn(x):
+            y = np.asarray(x, np.float64).copy()
+            y[7] = y[7] * 0.0 + 0.004                              # one texel the encoder always makes near black
+            return y
+        src = self.scan()
+        _lin, dec, dark, lows = cb.hold_dark(src, stubborn, rounds=3)
+        self.assertEqual(len(lows), 4)
+        self.assertGreater(lows[-2], 0)
+        self.assertGreater(lows[-1], 1.0)
+        ink_t = self.ink() + 2.0 / 255.0
+        d = self.display(dec, dark, cb.FLOOR_PROBE, ink_t)
+        self.assertGreaterEqual(float(d.min()), self.ink() - 1e-4)  # still clears the ink, with a darker kept texel
+        self.assertLess(float(d.min()), self.ink() + 1e-3)          # and no darker than that texel needs
+
+    def test_the_hold_lifts_the_specks_under_every_light(self):
+        src = self.scan(specks=False)
+        ref = src[cb.kept_dark(src, cb.hex_lin(cb.FLOOR_PROBE))]
+        lin, dec, _dark, lows = cb.hold_dark(src, self.lossy, margin_luma=2.0)
+        self.assertGreater(lows[0], 0)                             # the encoder's low texels
+        self.assertEqual(lows[-2], 0)
+        self.assertEqual(lows[-1], 1.0)
+        for p in cb.PROBES:
+            d = self.display(dec, ref, p, self.ink() + 2.0 / 255.0)
+            self.assertGreaterEqual(float(d.min()), self.ink() - 1e-4, p)
+        moved = np.any(lin > src + 1e-12, axis=1)
+        self.assertLess(moved.mean(), 0.05)                        # the scan keeps its look: a few texels raised
+        self.assertTrue(np.all(lin >= src - 1e-12))                # never darkened
+
+    def test_kept_dark_is_the_least_display(self):
+        R = cb._rb()
+        dec = self.lossy(self.scan())
+        i0 = cb.kept_dark(dec, cb.hex_lin("#FFFFFF"))
+        self.assertEqual(i0, int(np.argmin(R.lum(R.agx(dec * 10.0)))))
 
 if __name__ == "__main__":
     unittest.main()

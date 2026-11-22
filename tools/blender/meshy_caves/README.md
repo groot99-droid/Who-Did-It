@@ -41,7 +41,9 @@ section. It holds:
 - `format`: `cave-network/1`.
 - `lattice` and `seed`.
 - `geology`: per rock, `tint`, `repeat_m` (metres per repeat of the detail scan, used for the UVs), `noise`
-  (amplitude in metres) and `bedding` (`[bed thickness, ledge depth]`).
+  (amplitude in metres) and `bedding` (`[bed thickness, ledge depth]`), and optionally `rock`: overrides of the
+  geology's rock profile in `meshy_cave_rock.py` (`dip`, `ledge`, `scallop`, `joints`, `rubble`, and `decor`, the
+  weight of each formation kind).
 - `sections`: the section keys. The core loads each neighbour's file (`<key>.json` beside the network, or
   `files.<key>`) and adds the neighbour's primitives near the region, so a seam's overlap comes out identical in
   both files.
@@ -56,6 +58,7 @@ section. It holds:
 | `passages`      | A centre line of floor points `from`, then `via`, then `to`, with a `profile`, a `width` and a `clear` height. Width and clear are a number or `[start, end]`. The `floor` is `flat`, `ramp` or `stairs` (`riser`, `tread`).                                                |
 | `chambers`      | `hall`, `dome`, `breakdown`, `lake` (a basin with a rail made for it), `pocket` or `stope`. Each has a `center` at floor level, a `size` of `[length, width, height]` and an `axis` (a plan direction, no angles). `walk: false` marks a place the walker must never reach. |
 | `features`      | `stalactites`, `stalagmite`, `column`, `breakdown` (blocks; over 0.5 m they collide) and `flowstone` (a swelling in the field with a banded tint)                                                                                                                           |
+| `decor`         | `false` turns off the formations, fallen rock and breakdown placed by geology (on by default; see "The rock" below)                                                                                                                                                       |
 | `guards`        | Collision rails along plan lines, from `base_z` up `height` (at least 1 m)                                                                                                                                                                                                  |
 | `bridges`       | Collision slabs over cracks                                                                                                                                                                                                                                                 |
 | `drops`         | Deliberate falls, allowed where they start                                                                                                                                                                                                                                  |
@@ -123,7 +126,8 @@ A section's `water` is drawn by the builder (`meshy_cave_build.water_surfaces`),
 
 The water is unlit like the rock and lit by the same bake: each vertex takes the inverse-square mean of the graded
 light of the shell vertices within 1.25 m (`water_light`), as a grey of its luminance (`water_grey`, so a green-leaning
-rock light cannot turn it teal), times a dark blue-grey albedo, held at or over the ink floor. A section rebuilt from a
+rock light cannot turn it teal), times a dark blue-grey albedo (`#1E2933`; through the viewer's AgX its hue is about
+206 degrees, where the first `#1E2A31` showed 200 to 201, at the edge of the teal band), held at or over the ink floor. A section rebuilt from a
 saved bake (`--raw`) gets its water without baking again.
 
 ### Rails
@@ -215,7 +219,7 @@ a `Trav_<id>` node with these fields:
 | Clearance    | Per passage away from its junctions: narrowest width at body height, lowest and highest roof                                                                                                                                                                                               |
 | Collision    | The same field at 0.25 m. It keeps what lies within 3 m above reached floors and 1 m beyond them, decimated on planes (5 degrees) and joined by proxies: rails, bridges, seam walls, stalagmites, columns and blocks. Reports the triangle counts against 60k (target) and 150k (ceiling). |
 | Chunks       | About 12 m, each overlapping the next by one cell                                                                                                                                                                                                                                          |
-| UVs and tint | Cube projection per face, plus per-vertex tint, wet and flowstone band                                                                                                                                                                                                                     |
+| UVs and tint | Cube projection per face, its axis from the normal smoothed over 0.5 m cells and a vote among neighbours (`smooth_axis`; own axis within 1.5 m of a seam plane), plus per-vertex tint, wet and flowstone band                                                                     |
 
 ### The flood
 
@@ -303,3 +307,94 @@ be bypassed); the CLI prints them.
 | Violet      | Portals              |
 
 `<key>_report.json` holds all of the above with `geometry_md5`, `shell_md5`, timings and `ok`.
+
+## The rock
+
+`meshy_cave_rock.py` dresses every section by its geologies (the table `ROCK`):
+
+- **Wall detail**, in the field you see only (the walker's field, the flood and the collision are unchanged): bedding
+  ledges that follow the geology's `dip` (the bed above overhangs the one below), solution scallops (limestone,
+  flowstone and the flooded rock), two sets of vertical joints, and a rubble edge at the wall's foot (at most 0.3 m,
+  below the walker's step). Below 1.8 m a term only takes rock away, so the walker never meets rock it cannot see.
+  Crawls, fissures, climb faces, shafts and a mine's drifts and stopes keep their plain walls.
+- **Decor**, placed on the flood's floors and roofs inside the section's own boxes: stalactites in clusters (straws to
+  2.4 m), stalagmites (cones, candles, mounds and stacks), columns where the two would meet, flowstone curtains
+  against the walls under the roof, rimstone dams round pools, crystals (gypsum, skarn), icicles (ice), breakdown
+  blocks and fallen rocks. Hanging things end at least 2.3 m over the floor under them; a floor item is either at
+  most 0.3 m tall (stepped over, no collision) or at least 0.5 m with a collision proxy and a flood solid; nothing
+  stands within 1.5 m of a seam plane, by a spawn, a portal or an arrival, in a traversal zone or 1 m round it, on a
+  drop, a guard or a bridge, in water, or within 0.9 m of a route's clear core (passages' centre lines, chambers'
+  lines between their mouths). The flood then checks every route again with the solids in place.
+
+
+## The light: a lightmap for the shell
+
+The Blender stage (`meshy_cave_build.py`) bakes the shell's light into a texture, one page per file
+(`meshy_cave_lightmap.py`, plain Python: `python -m unittest tests.test_cave_lightmap`). The rock pieces, kerbs,
+timbers, gates and water keep their light per vertex (COLOR_0).
+
+- **Charts.** The shell's faces are grouped by chunk, material, facing (the six box directions), seam side and a
+  4 m tile, then joined by shared edges. Each chart is its faces projected on its facing's plane, so its texels are
+  square in metres and it never folds over itself. Charts are packed in shelves with 2 texels of padding, filled from
+  their own texels.
+- **Resolution.** The texels per metre come from the shell's projected area, so that one page of at most
+  2048 x 2048 holds it: at most 32 (four texels to the 0.125 m cell), at least 8 (`tpm_for`). Measured on the
+  rock-stage shells: the Great Gallery at 26.5, the Swallow at 30.5. `--lm-tpm` sets it by hand. A shell that only
+  fits one page under 8 texels a metre is logged as a warning and reported (`tpm_under_min`): it needs a second page.
+- **The bake.** The light groups (lamp, sky, fill) and the AO are baked into the page by Cycles (target
+  IMAGE_TEXTURES, the `lightmap` UVs), smoothed within each chart, then graded texel by texel as the vertices are
+  (the ink floor with its shape, the lilac and teal guards, highlights eased, the exposure). The vertices' light
+  is the page sampled at each vertex: the seam stitch and the checks use it. `--raw` reads `<area>_lm_raw.npz`
+  beside `<area>_raw.npz`; the layout must match.
+- **Darker for the lantern.** The walker carries a lantern in the caves, so the fill's weight is a third of route
+  3's (`weights.fill` in the cave look) and the gate lamps keep theirs (`lantern.keep_lamps`: route 1's pool rule,
+  which dimmed a lamp whose pool passed the look's `lamp_pool` display, is reported as `lamp_weight_pool_rule` but not
+  applied; the highlights' easing caps the pool). The bake alone sits far under the ink floor away from the lamps, so the floor
+  decides the level there: it holds each texel's darkest kept scan texel at ink, with a multiplier that carries the
+  bake's shape (`ink_lift.form`, `form_base`, `shape_ref`): rock in a crevice or far from every light sits on the
+  bare floor, rock where the fill or the sky lands a little over it, so the lantern carries. The scans' darkest tail
+  is lifted further (`texture_lift` 0.7, held at the `dark_percentile` 3), which lowers the bare floor.
+- **What the viewer samples** (the rebuild, 2026-11-21). The GLB carries each scan as WebP at quality 80, whose
+  rounding put 1 to 7 % of the texels under the kept darkest level (down to 0.75 of it at the 0.1st percentile), so
+  the viewer showed thousands of pixels under the ink with the lantern off. `derive_scan` first gives the scan's
+  darkest texels their neighbours' colour (`dark_chroma_smooth`, meshy_room_build's: lifting a near-black texel of
+  chroma noise with its hue kept made pure primaries, such as the snow scan's (0, 0, 1) texels), then encodes it with
+  Blender's own WebP encoder and holds its darkest texels as the file shows them (`hold_dark`). The reference is the
+  source's darkest kept texel under the fill's light (`FLOOR_PROBE`, `kept_dark`). Under white, the lamps' and the
+  fill's light (`PROBES`), each encoded texel that would display under the ink, when the floor holds the reference at
+  ink plus the margin, is raised in the source, for up to `WEBP_ROUNDS` encodings. A texel the encoder still keeps low
+  lowers the darkest kept texel just enough to lift it to the ink, so the floor rises only as far as it needs and no
+  texel the viewer samples displays under the ink at the floor. The manifest's `scan_hold` gives each scan's count of
+  low texels per round, then that factor (1 when the hold sufficed). `ink_lift.margin_luma` is 2.0 display levels (it was 1.2).
+  The report also gives the bare floor's own display (`display_bare_floor`): the least level the ink rule allows with these
+  scans. The report
+  (`light.lightmap.grade.away_from_lamps`) compares the texels more than 8 m from every placed lamp with route 3's
+  look on the same bake (every weight 1, its flat form term, its scan grade): as sRGB display values and as the
+  light the screen gives.
+- **Materials.** Two scans that meet hold their darkest texels at ink with different light. The floor's
+  darkest-texel ratio is therefore relaxed across a material's edge (`relax_floor`: the least of the faces round a
+  vertex, rising by at most `floor_blend_per_m` in log a metre), so the light runs on across the edge and only the
+  scan changes. The hold checks a scan's dark texels under the lamps' warm light and the sky's blue too, so a redder
+  texel under a gate lamp does not show under ink either.
+- **Chart borders.** The page of light is stitched along every chart border (`border_edges`, `stitch_edges`): the
+  texels the linear filter reads on both sides of a border move towards their mean, so the viewer reads the same light
+  on both sides; then the floor is applied again, padding included. The page report gives the light's gap across the
+  borders before the stitch and in the saved file.
+- **Seams.** Charts are cut at each built seam's plane, within the seam's region (its window and 3 m round it,
+  from the band to the stub's end). There the texels show the stitched vertex light, which is the same in both files:
+  alone within 0.6 m of the plane and on the stub (so the faces both files have look alike), then giving way to the
+  texels' own light over the next metre. The region's hold fades in over its outer metre, so its edge never shows as a line, and every
+  texel then goes through the same last steps of the grade. The faces whose every vertex shows the vertex light alone
+  (within 0.6 m of the plane, and the stub) are drawn with a copy of their material without the page
+  (`<material>_seamv`, `seam_vertex_faces`): vertex-lit in every viewer, so both files show the stitched light on the
+  faces they share, not the page read between its texels (the rebuild's check: within 0.1 m of well_white's plane
+  the page's light differed by 13 % at p95). A material whose every face lies there is drawn only as its copy. The
+  probes `<area>_seam_lm.npz` hold the light each file shows on the faces near the plane (`vertex_lit` marks the
+  copies' faces).
+- **The file.** The page is saved as lossless WebP (`lightmap.quality` in the look) and put into the GLB after the
+  export. Each shell material gets `emissiveTexture` on `TEXCOORD_1` and the extras `wdi_lightmap` with
+  `vertex_fallback: true`: its primitives keep COLOR_0, the same light per vertex, so a viewer without the lightmap
+  hookup shows the dark bake per vertex (as route 3), not the scan unlit. The scene's extras get `wdi_lantern:
+  true`. docs/walk-areas.md (section 4, "A cave's lightmap") gives the shape and what the viewer does with it. The
+  manifest's `light.lightmap` and `glb.lightmap` report the page, its checks and the file.
+- `--no-lightmap` builds as route 3 did, with the shell's light in COLOR_0.

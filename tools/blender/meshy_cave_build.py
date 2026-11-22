@@ -56,6 +56,7 @@ except ImportError:  # plain Python: the tests
     bpy = None
 
 import meshy_cave_core as core  # noqa: E402
+import meshy_cave_lightmap as lmap  # noqa: E402
 
 LOOK_PATH = os.path.join(HERE, "meshy_looks", "cave_fp.json")
 CACHE = os.path.join(HERE, ".cache", "materials")
@@ -63,6 +64,7 @@ BANNED = ("rope", "torch", "gallows", "crepe", "noose", "sconce", "crape", "geor
 DISTRICT = "The Undermere"
 SCENE = "undermere"
 EYE, CRAWL_EYE = 1.6, 0.55
+ALONG_STEP, ALONG_MAX = 20.0, 6   # the stills along the walking passages: metres apart, how many at most
 PORTAL_CLEAR, SEAM_ARRIVAL_CLEAR = 1.0, 1.2
 GRILLE_PLUG = 0.1  # metres: the collision plug's thickness behind a gate's grille
 GRILLE_H = {"arch": 3.0}  # metres: a grille's bar height by gate type (else 2.1)
@@ -72,7 +74,7 @@ INK = (0x12, 0x14, 0x1C)
 # the rails', the portal frames' and the trestle's timber albedo. Route 2's #6B5440 read lilac beside the orange rock
 # (its red barely over its green, grey-violet against a warm wall); this is darker and warmer, red over green over blue
 TIMBER = "#5A3E27"
-WATER = "#1E2A31"     # standing and running water, unlit like the rock: a dark blue-grey, blue over green over red
+WATER = "#1E2933"     # standing and running water, unlit like the rock: a dark blue-grey, blue over green over red
 WATER_MAX = 0.22      # the water's display luminance is eased under this (route 3's first stills: a lit stream read
                       # as a pale painted strip at 0.45, the Bottom's lake as a white disc)
 WATER_STEP = 0.25     # metres between a water surface's grid lines
@@ -318,15 +320,17 @@ def fill_points(sec_d: dict, look: dict) -> list:
 
 
 def face_materials(V: np.ndarray, F: np.ndarray, geo: np.ndarray, geo_names: list, kits: dict, floor_nz: float,
-                   mouth_boxes: list, mouth_kit: str = "mouth") -> tuple:
-    """Each face's material key, '<kit>_<wall|floor>': its geology's kit, the mouth kit (`mouth_kit`) inside a
-    gate's mouth boxes, floor where the face looks up more than floor_nz. Returns (keys list, per-face index
-    array)."""
+                   mouth_boxes: list, mouth_kit: str = "mouth", moss=None) -> tuple:
+    """Each face's material key, '<kit>_<wall|floor>': its geology's kit, the moss kit where `moss` (per face) is
+    set, the mouth kit (`mouth_kit`) inside a gate's mouth boxes, floor where the face looks up more than floor_nz.
+    Returns (keys list, per-face index array)."""
     a, b, c = V[F[:, 0]], V[F[:, 1]], V[F[:, 2]]
     n = np.cross(b - a, c - a)
     nz = n[:, 2] / np.maximum(np.linalg.norm(n, axis=1), 1e-12)
     floor = nz > floor_nz
     kit = np.array([g if g in kits else "default" for g in geo_names])[geo]
+    if moss is not None and "moss" in kits:
+        kit = np.where(np.asarray(moss, bool), "moss", kit)
     cen = (a + b + c) / 3.0
     for bx in mouth_boxes:
         m = np.all((cen >= np.array(bx[:3])) & (cen <= np.array(bx[3:])), axis=1)
@@ -548,10 +552,136 @@ def set_point_colour(ob, name: str, rgb) -> None:
 # ---------------------------------------------------------------- scans and materials
 
 
-def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45) -> dict:
+def scan_dark_rel(lin: np.ndarray, pct: float, lift: float) -> np.ndarray:
+    """The darkest kept texel over the mean (linear RGB) of a scan's texels (N x 3, linear) with its darkest tail
+    lifted (`lift`) and held at its `pct` percentile, as derive_scan keeps them."""
+    lin = _rb().lift_dark(np.asarray(lin, np.float64), lift)
+    lo = np.minimum(lin[:, 0], lin[:, 2])
+    lin[:, 1] = np.maximum(lin[:, 1], lo)
+    y = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
+    ref = float(np.percentile(y, pct))
+    lin = np.minimum(lin * np.where(y < ref, ref / np.maximum(y, 1e-6), 1.0)[:, None], 1.0)
+    y2 = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
+    return lin[np.argsort(y2)[: max(1, len(y2) // 1000)]].mean(0) / np.maximum(lin.mean(0), 1e-6)
+
+
+WARM_PROBE = "#FFB457"   # the lamps' colour: the scan's darkest texel is also taken under it
+SCAN_R3 = {"lift": 0.45, "pct": 0.5}   # route 3's scan grade (the look's lantern.route3_*), for the report's baseline
+
+
+WEBP_QUALITY = 80   # the glTF exporter's quality for the scans (meshy_room_build.export_glb)
+WEBP_ROUNDS = 12    # passes of hold_dark
+HOLD_LOG: dict = {}   # scan slug -> hold_dark's counts of low texels per round (the build log)
+
+
+def webp_round(lin: np.ndarray, w: int, h: int, path: str, quality: int = WEBP_QUALITY) -> np.ndarray:
+    """The texels (N x 3, linear) as an sRGB WebP at `quality` gives them back (linear), through Blender's own
+    encoder, the one the glTF exporter uses."""
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    srgb = np.where(lin <= 0.0031308, 12.92 * lin, 1.055 * np.power(np.maximum(lin, 0.0), 1 / 2.4) - 0.055)
+    img = bpy.data.images.new("_webp_round", w, h, alpha=False)
+    img.colorspace_settings.name = "sRGB"
+    rgba = np.ones((w * h, 4), np.float32)
+    rgba[:, :3] = np.round(np.clip(srgb, 0.0, 1.0) * 255.0) / 255.0
+    img.pixels.foreach_set(rgba.ravel())
+    img.filepath_raw = path
+    img.file_format = "WEBP"
+    bpy.context.scene.render.image_settings.quality = int(quality)
+    try:
+        img.save(quality=int(quality))
+    except TypeError:
+        img.save()
+    bpy.data.images.remove(img)
+    back = bpy.data.images.load(path, check_existing=False)
+    px = np.empty(w * h * 4, np.float32)
+    back.pixels.foreach_get(px)
+    bpy.data.images.remove(back)
+    try:
+        os.remove(path)
+    except OSError:
+        pass
+    return srgb_to_lin(px.reshape(-1, 4)[:, :3].astype(np.float64))
+
+
+PROBES = ("#FFFFFF", WARM_PROBE, "#C9C2B4")   # lights hold_dark checks a scan's dark texels under: white, the lamps
+# and the fill (the look's colours). Not the night sky's blue: it lands only near a mouth, far over the floor, and a
+# saturated orange texel cannot be held under it without greying the scan
+HOLD_AIM = 1.08   # hold_dark raises a low texel to this times the kept darkest texel's display (the encoder pulls back)
+
+
+HOLD_SCALE_MAX = 3.0   # derive_scan scales a texel under the held level by at most this; grey makes up the rest
+FLOOR_PROBE = "#C9C2B4"   # the fill's colour: the ink floor's light is this colour (grade_rows: fl_n)
+
+
+def kept_dark(dec: np.ndarray, probe) -> int:
+    """The index of the texel (N x 3, linear) that displays darkest through three r186's AgX under the light `probe`
+    (linear RGB), lit so that the scan's darkest 2 % sit near ink: the kept darkest texel."""
+    R_ = _rb()
+    ink_d = float(R_.lum(np.array(INK, float))) / 255.0
+    y = dec @ np.array([0.2126, 0.7152, 0.0722])
+    cand = np.argsort(y)[: max(1, len(y) // 50)]
+    s = float(R_.solve_display((dec[cand].mean(0) * probe)[None, :], ink_d)[0])
+    return int(np.argmin(R_.lum(R_.agx(dec * probe[None, :] * s))))
+
+
+def hold_dark(lin: np.ndarray, encode, probes=PROBES, rounds: int = WEBP_ROUNDS, aim: float = HOLD_AIM,
+              floor_probe=FLOOR_PROBE, margin_luma: float = 2.0):
+    """The scan's darkest texels held as the file will show them. `encode` gives back texels (N x 3, linear) as the
+    file's encoding stores them (Blender's WebP at quality 80 for the GLB: webp_round). The reference is the source's
+    darkest kept texel under the floor's light (`floor_probe`, kept_dark): what the scan's grade (its lifted, held
+    tail) meant to keep; the ink floor holds it at ink plus `margin_luma` display levels (the look's). Under each
+    light in `probes`, every encoded texel that would then display under the ink itself is raised in the source by
+    the factor that lifts it to `aim` times the reference's display, for a few rounds. Last, under the floor's light,
+    if any encoded texel still displays under the ink, the darkest kept texel is lowered (so the floor rises) just
+    enough to lift that texel to the ink: no texel the viewer samples displays under the ink at the floor (the
+    rebuild's check: a mean of the darkest 0.1 % left specks under ink), and a texel the encoder could not hold costs
+    the floor only what it needs. The darkest kept texel returned has the colour of the scan's darkest 2 %. Returns (the texels to save, the encoded texels, the darkest kept texel, the
+    rounds' counts of low texels, then the floor's factor)."""
+    R_ = _rb()
+    lin = np.asarray(lin, np.float64).copy()
+    ink_d = float(R_.lum(np.array(INK, float))) / 255.0
+    ink_t = ink_d + float(margin_luma) / 255.0
+    P = [np.asarray(hex_lin(p) if isinstance(p, str) else p, np.float64) for p in probes]
+    fp = np.asarray(hex_lin(floor_probe) if isinstance(floor_probe, str) else floor_probe, np.float64)
+    ref = lin[kept_dark(lin, fp)].copy()
+    S = [float(R_.solve_display((ref * p)[None, :], ink_t)[0]) for p in P]
+    dec = encode(lin)
+    lows = []
+    for _ in range(rounds):
+        need = np.ones(len(dec))
+        for p, s in zip(P, S):
+            d = R_.lum(R_.agx(dec * p[None, :] * s))
+            low = d < ink_d
+            if low.any():
+                k = R_.solve_display(dec[low] * p[None, :] * s, ink_t * aim, lo=1.0, hi=64.0, iters=30)
+                need[low] = np.maximum(need[low], k)
+        n_low = int((need > 1.0).sum())
+        lows.append(n_low)
+        if not n_low:
+            break
+        up = need > 1.0
+        lin[up] = np.minimum(lin[up] * np.minimum(need[up], 4.0)[:, None], 1.0)
+        dec = encode(lin)
+    sf = float(R_.solve_display((ref * fp)[None, :], ink_t)[0])
+    i0 = int(np.argmin(R_.lum(R_.agx(dec * fp[None, :] * sf))))
+    g = float(R_.solve_display((dec[i0] * fp * sf)[None, :], ink_d + 1e-4, lo=1.0, hi=64.0, iters=40)[0])
+    lows.append(round(max(g, 1.0), 4))   # last: the factor the floor rises by for a texel the encoder kept low
+    # the darkest kept texel in the colour of the scan's darkest 2 % (not one texel's: a slate's bluest texel shows
+    # violet through AgX, which the lilac guard then flags), at the level that puts the reference at ink plus the
+    # margin and the darkest encoded texel at the ink at least
+    y = dec @ np.array([0.2126, 0.7152, 0.0722])
+    cm = dec[np.argsort(y)[: max(1, len(y) // 50)]].mean(0)
+    s_min = float(R_.solve_display((dec[i0] * fp)[None, :], ink_d + 1e-4)[0])
+    q = min(float(R_.solve_display((cm * fp * s_min)[None, :], ink_t)[0]),
+            float(R_.solve_display((cm * fp * sf)[None, :], ink_t)[0]))
+    return lin, dec, cm * q, lows
+
+
+def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45, margin_luma: float = 2.0) -> dict:
     """A locked scan's diffuse, its darkest tail lifted to its `pct` percentile (luminance, keeping the hue) and its
     purple texels greened (green up to the lesser of red and blue), saved as a PNG beside the build and loaded. Returns
-    the image and its linear mean and reference (darkest kept) colours."""
+    the image and its linear mean and reference (darkest kept) colours, and rel_r3: the darkest kept texel over the
+    mean under route 3's grade of the scan (SCAN_R3), for the report's comparison with route 3's look."""
     src = os.path.join(CACHE, slug, f"{slug}_diff_1k.jpg")
     if not os.path.exists(src):
         raise SystemExit(f"scan {slug} is not in {CACHE} (only locked scans are used; nothing is downloaded)")
@@ -562,17 +692,36 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45) -> dict
     bpy.data.images.remove(img)
     rgb = px.reshape(-1, 4)[:, :3].astype(np.float64)   # sRGB values as stored
     lin = srgb_to_lin(rgb)
+    rel_r3 = scan_dark_rel(lin, SCAN_R3["pct"], SCAN_R3["lift"])
     # the darkest texels toward `lift` of the mean (meshy_room_build.lift_dark): a dim cave's mean texel then sits
     # a little over the ink floor that its darkest texel is held to, instead of far above it
+    # the scan's darkest texels take their colour from their neighbours first (meshy_room_build's dark_chroma_smooth):
+    # lift_dark keeps a texel's hue, so a near-black texel of chroma noise became a pure primary (the snow scan's
+    # (0, 0, 1) texels, which no light could hold over the ink)
+    lin = _rb().dark_chroma_smooth(lin.reshape(h, w, 3)).reshape(-1, 3)
     lin = _rb().lift_dark(lin, lift)
     lo = np.minimum(lin[:, 0], lin[:, 2])
     lin[:, 1] = np.maximum(lin[:, 1], lo)
     y = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
     ref = float(np.percentile(y, pct))
-    s = np.where(y < ref, ref / np.maximum(y, 1e-6), 1.0)
-    lin = np.minimum(lin * s[:, None], 1.0)
+    # a texel under the held level is scaled up (its hue kept) by at most HOLD_SCALE_MAX, the rest of the way in grey:
+    # scaling a near-black texel all the way made pure primaries (the snow scan's (0, 0, 1) texels, which no light
+    # could hold over the ink)
+    s = np.minimum(np.where(y < ref, ref / np.maximum(y, 1e-6), 1.0), HOLD_SCALE_MAX)
+    lin = np.minimum(lin * s[:, None] + np.maximum(ref - y * s, 0.0)[:, None] * (y < ref)[:, None], 1.0)
+    # the file carries the scan as WebP at quality 80 (meshy_room_build.export_glb), whose rounding puts 1 to 7 % of
+    # the texels a little under the kept darkest level (to 0.75 of it at the 0.1st percentile, measured on the cave
+    # scans): those texels are raised where the encoded image shows them low, and the darkest kept texel is then
+    # taken from the encoded image, so the ink floor holds for what the viewer samples
+    # the darkest kept texel as the viewer shows it: the scan as the file's WebP encodes it (Blender's encoder, the
+    # glTF exporter's), its few texels that display under the level of the 2 % darkest raised in the source (under
+    # white, the lamps, the fill and the sky: a saturated red texel shows darker than a grey one of the same
+    # luminance), then the absolute darkest encoded texel under each light, so no texel the viewer samples sits
+    # under the ink floor (hold_dark)
+    wpath = os.path.join(out_dir, "textures", f"_webp_{slug}.webp")
+    lin, dec, dark, lows = hold_dark(lin, lambda x: webp_round(x, w, h, wpath), margin_luma=margin_luma)
+    HOLD_LOG[slug] = lows
     y2 = 0.2126 * lin[:, 0] + 0.7152 * lin[:, 1] + 0.0722 * lin[:, 2]
-    dark = lin[np.argsort(y2)[: max(1, len(y2) // 1000)]].mean(0)
     mean = lin.mean(0)
     rel = lin / np.maximum(mean, 1e-6)[None, :]   # the texel as the file shows it (texture x 1/mean)
     lit = y2 > np.percentile(y2, 5)
@@ -591,7 +740,7 @@ def derive_scan(slug: str, out_dir: str, pct: float, lift: float = 0.45) -> dict
     out.file_format = "PNG"
     out.save()
     out.pack()
-    return {"image": out, "mean": mean, "dark": dark, "ref_luma": ref, "path": path, "ratio": ratio}
+    return {"image": out, "mean": mean, "dark": dark, "ref_luma": ref, "path": path, "ratio": ratio, "rel_r3": rel_r3}
 
 
 def flat_material(name: str, colour_lin, emit: bool = False):
@@ -635,9 +784,10 @@ def bake_tree(m) -> None:
     nt.links.new(b.outputs[0], out.inputs["Surface"])
 
 
-def unlit_tree(m, image=None, colour=None) -> None:
+def unlit_tree(m, image=None, colour=None, vertex: bool = True) -> None:
     """The export tree, in the shape the glTF exporter writes as KHR_materials_unlit: an emission (image x the
-    COLOR_0 attribute, or a flat colour) mixed with a transparent BSDF by 'is camera ray' (meshy_room_build's)."""
+    COLOR_0 attribute, or a flat colour) mixed with a transparent BSDF by 'is camera ray' (meshy_room_build's).
+    vertex False: the image alone (a lightmapped material: its light is the lightmap's, not COLOR_0's)."""
     nt = m.node_tree
     nt.nodes.clear()
     N, L = nt.nodes, nt.links
@@ -649,7 +799,12 @@ def unlit_tree(m, image=None, colour=None) -> None:
     L.new(lp.outputs["Is Camera Ray"], mix.inputs[0])
     L.new(N.new("ShaderNodeBsdfTransparent").outputs[0], mix.inputs[1])
     L.new(em.outputs[0], mix.inputs[2])
-    if image is not None:
+    if image is not None and not vertex:
+        ti = N.new("ShaderNodeTexImage")
+        ti.image = image
+        ti.interpolation = "Linear"
+        L.new(ti.outputs["Color"], em.inputs["Color"])
+    elif image is not None:
         ti = N.new("ShaderNodeTexImage")
         ti.image = image
         ti.interpolation = "Linear"
@@ -687,11 +842,12 @@ def rock_materials(keys: list, look: dict, out_dir: str) -> list:
     for key in keys:
         slug = scan_of(key, kits)
         if slug not in scans:
-            scans[slug] = derive_scan(slug, out_dir, pct, float(look["ink_lift"].get("texture_lift", 0.45)))
+            scans[slug] = derive_scan(slug, out_dir, pct, float(look["ink_lift"].get("texture_lift", 0.45)),
+                                      float(look["ink_lift"]["margin_luma"]))
         m = bpy.data.materials.new(f"cave_{key}")
         m.use_nodes = True
         bake_tree(m)
-        MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", **{k: scans[slug][k] for k in ("image", "mean", "dark", "ratio")}}
+        MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", **{k: scans[slug][k] for k in ("image", "mean", "dark", "ratio", "rel_r3")}}
         mats.append(m)
     return mats
 
@@ -717,11 +873,19 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list, mouth
     V = Vq / core.Q
     F = z["shell_faces"].astype(np.int64)
     geo_names = json.loads(str(z["geology"]))
-    keys, fidx = face_materials(V, F, z["shell_face_geo"].astype(np.int64), geo_names, look["kits"],
-                                float(look["floor_normal_z"]), mouth_boxes, mouth_kit)
-    mats = rock_materials(keys, look, out_dir)
-    owner = first_chunk(z["chunk_offsets"], z["chunk_faces"], len(F))
     tint_lin = srgb_to_lin(np.clip(z["shell_tint"].astype(np.float64), 0.0, 1.0))
+    wm = moss_weight(V, vertex_normals(V, F), moss_sources(sec), sec.field_points, sec)
+    tint_lin = moss_tint(tint_lin, wm, V, sec)
+    MOSS["vertices"] = int((wm > 0.05).sum())
+    face_moss = wm[F].mean(1) > MOSS_FACE
+    MOSS["faces"] = int(face_moss.sum())
+    keys, fidx = face_materials(V, F, z["shell_face_geo"].astype(np.int64), geo_names, look["kits"],
+                                float(look["floor_normal_z"]), mouth_boxes, mouth_kit, moss=face_moss)
+    mats = rock_materials(keys, look, out_dir)
+    # the ink floor's darkest-texel ratio per vertex, continuous across the materials' edges (lmap.relax_floor)
+    r_mat = np.array([float(_rb().lum(MATS[m.name]["dark"] / np.maximum(MATS[m.name]["mean"], 1e-4))) for m in mats])
+    r_vert = lmap.relax_floor(V, F, r_mat[fidx], float(look["ink_lift"].get("floor_blend_per_m", 0.25)))
+    owner = first_chunk(z["chunk_offsets"], z["chunk_faces"], len(F))
     uv = z["shell_uv"]
     objs = []
     for ci, ck in enumerate(z["chunk_keys"]):
@@ -747,14 +911,186 @@ def build_shell(z: dict, sec, look: dict, out_dir: str, mouth_boxes: list, mouth
                 fac[sel] = 1.0 / np.maximum(MATS[mats[j].name]["mean"], 1e-4)
         set_point_colour(ob, TINT_ATTR, alb)
         TEXFAC[ob.name] = fac
+        FLOORQ[ob.name] = np.minimum(r_vert[vs] / np.maximum(r_mat[ms], 1e-9), 1.0)
         objs.append(ob)
     return objs, keys
+
+
+# ---------------------------------------------------------------- moss where the light reaches
+
+MOSS_GREEN, MOSS_OLIVE = "#56653A", "#6B5D3B"   # green to olive-brown (hue 80 and 42 degrees), never teal
+MOSS_FACE = 0.45   # a face whose vertices' mean moss weight is over this takes the moss kit's scans
+MOSS_R = {"mouth": 18.0, "shaft": 9.0, "lamp": 6.0}   # metres the light of each kind of source grows moss
+MOSS: dict = {}
+
+
+def vertex_normals(V: np.ndarray, F: np.ndarray) -> np.ndarray:
+    a, b, c = V[F[:, 0]], V[F[:, 1]], V[F[:, 2]]
+    fn = np.cross(b - a, c - a)
+    N = np.zeros_like(V)
+    for k in range(3):
+        np.add.at(N, F[:, k], fn)
+    return N / np.maximum(np.linalg.norm(N, axis=1), 1e-12)[:, None]
+
+
+def moss_sources(sec) -> list:
+    """(kind, point) of the light that reaches into the section: each cave mouth (its portal and its opening's
+    middle), the top of each shaft that opens within 2 m of the surface, and each placed lamp of the section
+    ("lamps": points; the gate's lamp hangs in its mouth, so the mouth stands for it)."""
+    out = []
+    for p in sec.d.get("portals", []) or []:
+        if p.get("kind") == "cave_mouth":
+            out.append(("mouth", [float(v) for v in p["at"]]))
+    for o in sec.d.get("openings", []):
+        if o["id"].startswith("mouth_"):
+            b = o["box"]
+            out.append(("mouth", [0.5 * (b[0] + b[3]), 0.5 * (b[1] + b[4]), b[2] + 1.0]))
+    for p in sec.own:
+        if isinstance(p, core.Passage) and p.profile == "shaft" and float(p.P[:, 2].max()) + max(p.h) > -2.0:
+            out.append(("shaft", [float(p.P[-1, 0]), float(p.P[-1, 1]), float(p.P[:, 2].max())]))
+    for q in sec.d.get("lamps", []) or []:
+        out.append(("lamp", [float(v) for v in q]))
+    return out
+
+
+def moss_weight(V: np.ndarray, N: np.ndarray, sources: list, field=None, sec=None) -> np.ndarray:
+    """Per vertex, 0 to 1: how much moss grows there. Near a source of light (MOSS_R by kind, falling off as the
+    square of 1 - d / R), on faces turned towards it (roofs less), in patches; where rock stands between the vertex
+    and the source (field(points) <= 0 at any of six points along the way) a sixth of it."""
+    w = np.zeros(len(V))
+    for kind, p in sources:
+        R = MOSS_R[kind]
+        q = np.asarray(p, np.float64)
+        d = V - q[None, :]
+        dist = np.linalg.norm(d, axis=1)
+        idx = np.nonzero(dist < R)[0]
+        if not len(idx):
+            continue
+        to = -d[idx] / np.maximum(dist[idx], 1e-9)[:, None]
+        facing = np.clip(0.35 + 0.65 * (N[idx] * to).sum(1), 0.0, 1.0)
+        facing = facing * np.where(N[idx, 2] < -0.5, 0.3, 1.0)
+        ww = (1.0 - dist[idx] / R) ** 2 * facing
+        if field is not None:
+            k = np.nonzero(ww > 0.02)[0]
+            if len(k):
+                P0 = V[idx[k]] + 0.15 * N[idx[k]]
+                seen = np.ones(len(k), bool)
+                for t in (0.15, 0.3, 0.45, 0.6, 0.75, 0.9):
+                    seen &= field(P0 + t * (q[None, :] - P0)) > 0.0
+                ww[k] = np.where(seen, ww[k], ww[k] / 6.0)
+        w[idx] = np.maximum(w[idx], ww)
+    if sec is not None and w.any():
+        u = (V - sec.origin) / sec.cell
+        patch = core.noise_points(u, core.NOISE_LUMP, sec.seed * 17 + 9)
+        w = w * np.clip(0.6 + 0.9 * patch, 0.0, 1.0)
+    return np.clip(w * 1.6, 0.0, 1.0)
+
+
+def moss_tint(tint_lin: np.ndarray, w: np.ndarray, V: np.ndarray, sec=None) -> np.ndarray:
+    """The albedo with the moss's blended in by weight: green to olive-brown in patches (linear)."""
+    if not w.any():
+        return tint_lin
+    mix = np.full(len(V), 0.5)
+    if sec is not None:
+        u = (V - sec.origin) / sec.cell
+        mix = np.clip(0.5 + 0.8 * core.noise_points(u, core.NOISE_BIG, sec.seed * 19 + 4), 0.0, 1.0)
+    moss = hex_lin(MOSS_GREEN)[None, :] * (1.0 - mix)[:, None] + hex_lin(MOSS_OLIVE)[None, :] * mix[:, None]
+    a = (0.85 * w)[:, None]
+    return tint_lin * (1.0 - a) + moss * a
+
+
+# ---------------------------------------------------------------- formations, fallen rock and breakdown
+
+# Each group of the core's formation tags (meshy_cave_rock.TAG) is one object per scan kit, its albedo per vertex
+# from its geology: speleothems in calcite (paler than the rock), blocks and rocks in the rock's own tint.
+SPELEO = {"limestone": "#B8A88B", "flowstone": "#C4B190", "breakdown": "#ABA089", "gypsum": "#DAD3C3",
+          "lakeclay": "#8C765D", "ice": "#D3DCE2", "slate": "#8A8884", "skarn": "#B5A084", "granite": "#A09583",
+          "flooded": "#8D8880"}
+CRYSTAL = {"skarn": "#D9C7A2", "gypsum": "#E8E2D4"}
+ICE = "#D2DBE1"
+POOL = "#48443D"     # the still water in a rimstone pool: wet and dark, a warm grey
+ROCK_SHADE = 0.8     # fallen rock and blocks a little darker than the wall they fell from (dust, damp)
+FORM_GROUPS = {"speleothem": (0, 1, 2, 5, 6, 7), "rock": (3, 13), "crystal": (8,), "icicle": (9,), "pool": (14,)}
+
+
+def form_albedo(group: str, geo_name: str, tint: str) -> str:
+    if group == "speleothem":
+        return SPELEO.get(geo_name, "#C4B79E")
+    if group == "crystal":
+        return CRYSTAL.get(geo_name, "#DCD3C0")
+    if group == "icicle":
+        return ICE
+    if group == "pool":
+        return POOL
+    return tint
+
+
+def form_scan_kit(group: str, geo_name: str, kits: dict) -> str:
+    """The kit whose wall scan a group draws: flowstone's for speleothems, the geology's own for rock, gypsum's for
+    crystals, the ice's for icicles."""
+    if group in ("speleothem", "pool"):
+        return "flowstone" if "flowstone" in kits else "default"
+    if group == "crystal":
+        return "gypsum" if "gypsum" in kits else "default"
+    if group == "icicle":
+        return "ice" if "ice" in kits else "default"
+    return geo_name if geo_name in kits else "default"
+
+
+def form_split(kind: np.ndarray, geo: np.ndarray, geo_names: list, kits: dict, default_geo: int) -> dict:
+    """The formation faces by object: {(group, kit): sorted face indices}. Proxy-only tags (guards, bridges, seam
+    walls) are in no group."""
+    out = {}
+    g = np.where(geo < 0, default_geo, geo)
+    for group, tags in FORM_GROUPS.items():
+        m = np.isin(kind, tags)
+        for gi in (np.unique(g[m]) if m.any() else []):
+            kit = form_scan_kit(group, geo_names[int(gi)], kits)
+            out.setdefault((group, kit), []).append(np.nonzero(m & (g == gi))[0])
+    return {k: np.sort(np.concatenate(v)) for k, v in out.items()}
+
+
+def form_objects(z, sec, look: dict, out_dir: str) -> list:
+    """The core's formations as meshes, one per (group, scan kit), baked like the shell; their albedo per vertex
+    from their geology, varied a little."""
+    if "form_faces" not in z or not len(z["form_faces"]):
+        return []
+    Vq = z["form_verts_q"] / core.Q
+    F = z["form_faces"].astype(np.int64)
+    kind = z["form_kind"].astype(np.int64)
+    geo = z["form_geo"].astype(np.int64) if "form_geo" in z else np.full(len(F), -1)
+    geo_names = json.loads(str(z["geology"]))
+    dg = geo_names.index(sec.d["geology"]) if sec.d.get("geology") in geo_names else 0
+    kits = look["kits"]
+    objs = []
+    for (group, kit), fs in sorted(form_split(kind, geo, geo_names, kits, dg).items()):
+        Fg = F[fs]
+        used, inv = np.unique(Fg.ravel(), return_inverse=True)
+        Vg = Vq[used]
+        Fl = inv.reshape(-1, 3)
+        gf = np.where(geo[fs] < 0, dg, geo[fs])
+        gv = np.zeros(len(Vg), np.int64)
+        gv[Fl.ravel()] = np.repeat(gf, 3)
+        tints = {gi: form_albedo(group, geo_names[gi], sec.geo_of(geo_names[gi])[1]["tint"])
+                 for gi in set(gv.tolist())}
+        ob = textured(f"um_{sec.key}_form_{group}_{kit}", Vg, Fl, kits[kit]["wall"], tints[int(gv[0])], look,
+                      out_dir, repeat=1.0)
+        alb = np.stack([hex_lin(tints[int(gi)]) for gi in gv])
+        u = (Vg - sec.origin) / sec.cell
+        var = 1.0 + 0.15 * core.noise_points(u, 2, sec.seed * 23 + 1)
+        if group == "rock":
+            var = var * ROCK_SHADE
+        set_point_colour(ob, TINT_ATTR, alb * var[:, None])
+        objs.append(ob)
+    return objs
 
 
 TEXFAC: dict = {}     # object name -> per-vertex 1 / scan mean (linear), so texture x COLOR_0 averages to the albedo
 DARK: dict = {}       # object name -> per-vertex darkest kept texel x the factor x the albedo (linear)
 MEANALB: dict = {}    # object name -> per-vertex albedo (linear)
 RATIO: dict = {}      # object name -> per-vertex pinkest and bluest texel (red / green, blue / green; tint in)
+FLOORQ: dict = {}     # shell object name -> per-vertex factor (<= 1) on its darkest texel: relax_floor's over its own
+DARK_R3: dict = {}    # object name -> per-vertex darkest texel under route 3's scan grade (the report's baseline)
 BAKE_ONLY: list = []  # occluders and helpers that never reach the GLB
 EXPORT_ONLY: list = []  # drawn in the GLB, hidden from the bake (the vista's night backdrop)
 
@@ -798,12 +1134,12 @@ def textured(name: str, V, F, slug: str, albedo_hex: str, look: dict, out_dir: s
     key = f"piece_{slug}"
     if f"cave_{key}" not in MATS:
         sc = derive_scan(slug, out_dir, float(look["ink_lift"]["dark_percentile"]),
-                         float(look["ink_lift"].get("texture_lift", 0.45)))
+                         float(look["ink_lift"].get("texture_lift", 0.45)), float(look["ink_lift"]["margin_luma"]))
         m = bpy.data.materials.new(f"cave_{key}")
         m.use_nodes = True
         bake_tree(m)
         MATS[m.name] = {"mat": m, "scan": slug, "kind": "rock", "image": sc["image"], "mean": sc["mean"],
-                        "dark": sc["dark"], "ratio": sc["ratio"]}
+                        "dark": sc["dark"], "ratio": sc["ratio"], "rel_r3": sc["rel_r3"]}
     md = MATS[f"cave_{key}"]
     ob = mesh_object(name, V, F, "cave", uvs=box_uvs(np.asarray(V, float), np.asarray(F), repeat), mats=[md["mat"]])
     alb = np.tile(hex_lin(albedo_hex), (len(ob.data.vertices), 1))
@@ -1620,7 +1956,7 @@ def lamp_pool_E(objs: list, L: dict, lamp_at, look: dict) -> float | None:
     lp = look["lamp_pool"]
     rows = []
     for o in objs:
-        if o.name not in TEXFAC:
+        if o.name not in TEXFAC or "_form_" in o.name:   # the pool on the rock round it (route 1), not on formations
             continue
         co = np.empty(len(o.data.vertices) * 3, np.float32)
         o.data.vertices.foreach_get("co", co)
@@ -1681,20 +2017,84 @@ def hot_of(name: str, look: dict) -> tuple:
     return float(h["knee"]), float(h["max"])
 
 
-def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_bake: bool) -> dict:
-    """The cave's post bake: denoise, the groups by weight, AO, the ink floor on the display (meshy_room_build's
-    solve_display through three r186's AgX), lilac and teal guards, highlights eased; COLOR_0 = k x light x the
-    per-material factor, with k = E / wdi_exposure (the network's exposure is fixed)."""
+def floor_shape(have: np.ndarray, Lf: np.ndarray, open_sky: np.ndarray, il: dict) -> np.ndarray:
+    """The ink floor's multiplier m (>= 1) per row: 1 + form x the AO term x (form_base + (1 - form_base) x s), where s
+    = x / (1 + x) and x the baked light over shape_ref x the floor's light. So the floor itself carries the bake's
+    shape: a crevice (no AO) or rock far from every light sits on the bare floor (its darkest texel at ink), rock where
+    the fill, the sky or a lamp lands rises up to 1 + form. form_base 1 is route 3's flat term (1 + form x the AO
+    term), whatever the bake."""
+    form, form_ao, fg = float(il["form"]), float(il["form_ao"]), float(il["form_gamma"])
+    base = float(il.get("form_base", 1.0))
+    ref = float(il.get("shape_ref", 1.0))
+    x = np.asarray(have, np.float64) / np.maximum(ref * np.asarray(Lf, np.float64), 1e-12)
+    s = x / (1.0 + x)
+    return 1.0 + form * ((1.0 - form_ao) + form_ao * open_sky ** fg) * (base + (1.0 - base) * s)
+
+
+def post_rows(L: np.ndarray, dark: np.ndarray, alb: np.ndarray, ratio, E: float, ink_t: float, hot_knee=None,
+              hot_max=None) -> tuple:
+    """The grade's last steps on rows of light (N x 3, linear): the lilac and teal guards, the darkest texel lifted
+    to the ink where it would show under it, and (with hot_knee and hot_max) the highlights eased. Returns (the light,
+    how many were eased)."""
+    R = _rb()
+    L2 = guard_texels(guard_display(np.asarray(L, np.float64)), ratio)
+    low = R.lum(R.agx(E * dark * L2)) < ink_t - 2e-4
+    if low.any():
+        L2[low] *= R.solve_display(E * dark[low] * L2[low], ink_t, lo=1.0, hi=64.0, iters=30)[:, None]
+    n_over = 0
+    if hot_knee is not None:
+        d = R.lum(R.agx(E * alb * L2))
+        over = d > hot_knee
+        n_over = int(over.sum())
+        if over.any():
+            want = hot_knee + (hot_max - hot_knee) * np.tanh((d[over] - hot_knee) / (hot_max - hot_knee))
+            L2[over] *= R.solve_display(E * alb[over] * L2[over], want, lo=1e-3, hi=1.0, iters=30)[:, None]
+    return L2, n_over
+
+
+def grade_rows(L: np.ndarray, open_sky: np.ndarray, dark: np.ndarray, alb: np.ndarray, ratio, look: dict, E: float,
+               hot_knee: float, hot_max: float) -> tuple:
+    """The grade of rows of light (N x 3, the groups by weight, denoised; open_sky the AO's open share, N): AO, the
+    ink floor on the display (meshy_room_build's solve_display through three r186's AgX) shaped by the bake
+    (floor_shape), then post_rows (the lilac and teal guards, the floor again, highlights eased). dark and alb are the
+    rows' darkest kept texel and albedo (N x 3, linear), ratio their pinkest and bluest texel (N x 2) or None. Returns
+    (the graded light N x 3, info: below_floor (the bake under the floor's light), at_floor (rows the shape lifts by
+    under 2 %), hot_eased, the display of the mean texel after and before, and L1, the light before post_rows). The
+    vertices and the lightmap's texels go through this."""
+    R = _rb()
+    il = look["ink_lift"]
+    ink_t = (float(R.lum(np.array(INK, float))) + float(il["margin_luma"])) / 255.0
+    fl_n = hex_lin(look["fill"]["colour"])
+    fl_n = fl_n / R.lum(fl_n)
+    aoc = look["ao"]
+    L = np.asarray(L, np.float64)
+    open_sky = np.ones(len(L)) if open_sky is None else np.clip(np.asarray(open_sky, np.float64), 0.0, 1.0)
+    if aoc:
+        open_sky = open_sky ** float(aoc["gamma"])
+        L = L * (1.0 - aoc["strength"] + aoc["strength"] * open_sky)[:, None]
+    L = guard_display(L)
+    have = R.lum(L)
+    chroma = np.where((have > 1e-9)[:, None], L / np.maximum(have, 1e-12)[:, None], fl_n[None, :])
+    Lf = R.solve_display(E * dark * fl_n[None, :], ink_t)
+    m = floor_shape(have, Lf, open_sky, il)
+    L1 = np.sqrt((chroma * have[:, None]) ** 2 + (fl_n[None, :] * (Lf * m)[:, None]) ** 2)
+    L2, n_over = post_rows(L1, dark, alb, ratio, E, ink_t, hot_knee, hot_max)
+    info = {"below_floor": int((have < Lf).sum()), "at_floor": int((m < 1.02).sum()), "hot_eased": n_over,
+            "disp": R.lum(R.agx(E * alb * L2)), "rawd": R.lum(R.agx(E * alb * np.maximum(L, 1e-12))), "L1": L1, "m": m,
+            "bare": R.lum(R.agx(E * alb * fl_n[None, :] * Lf[:, None]))}
+    return L2, info
+
+
+def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_bake: bool, skip=()) -> dict:
+    """The cave's post bake: denoise, the groups by weight, then grade_rows; COLOR_0 = k x light x the per-material
+    factor, with k = E / wdi_exposure (the network's exposure is fixed). Objects in `skip` (the lightmapped shell,
+    whose own grade is lm_grade's) are graded for their vertices too (the seams' stitch and the checks use them)."""
     R = _rb()
     we = float(look["wdi_exposure"])
     k = E / we
     il = look["ink_lift"]
     ink_t = (float(R.lum(np.array(INK, float))) + float(il["margin_luma"])) / 255.0
-    form, form_ao, fg = float(il["form"]), float(il["form_ao"]), float(il["form_gamma"])
-    fl_n = hex_lin(look["fill"]["colour"])
-    fl_n = fl_n / R.lum(fl_n)
     wts = look["weights"]
-    aoc = look["ao"]
     rep = {"E": E, "k": k, "wdi_exposure": we, "ink_target_luma": round(ink_t * 255, 2), "vertices": 0,
            "below_floor": 0, "hot_eased": 0, "max_color0": 0.0, "color0_scaled": 0}
     for o in objs:
@@ -1705,34 +2105,15 @@ def grade(objs: list, groups: dict, ao: dict | None, look: dict, E: float, no_ba
         L = sum(float(wts.get(g, 1.0)) * np.asarray(v, np.float64) for g, v in gs.items() if g != "ao")
         if not isinstance(L, np.ndarray):
             L = np.zeros((len(o.data.vertices), 3))
-        if not no_bake:
+        if not no_bake and o.name not in skip:
             L = R.denoise(o, L.astype(np.float32)).astype(np.float64)
-        open_sky = np.ones(len(L))
-        if ao is not None and o.name in ao:
-            open_sky = np.clip(ao[o.name], 0.0, 1.0) ** float(aoc["gamma"])
-            L = L * (1.0 - aoc["strength"] + aoc["strength"] * open_sky)[:, None]
-        L = guard_display(L)
-        have = R.lum(L)
-        chroma = np.where((have > 1e-9)[:, None], L / np.maximum(have, 1e-12)[:, None], fl_n[None, :])
-        dark = DARK[o.name]
-        Lf = R.solve_display(E * dark * fl_n[None, :], ink_t)
-        m = 1.0 + form * ((1.0 - form_ao) + form_ao * open_sky ** fg)
-        L2 = np.sqrt((chroma * have[:, None]) ** 2 + (fl_n[None, :] * (Lf * m)[:, None]) ** 2)
-        L2 = guard_texels(guard_display(L2), RATIO.get(o.name))
-        low = R.lum(R.agx(E * dark * L2)) < ink_t - 2e-4
-        if low.any():
-            L2[low] *= R.solve_display(E * dark[low] * L2[low], ink_t, lo=1.0, hi=64.0, iters=30)[:, None]
-        alb = MEANALB[o.name]
-        d = R.lum(R.agx(E * alb * L2))
-        over = d > hot_knee
-        if over.any():
-            want = hot_knee + (hot_max - hot_knee) * np.tanh((d[over] - hot_knee) / (hot_max - hot_knee))
-            L2[over] *= R.solve_display(E * alb[over] * L2[over], want, lo=1e-3, hi=1.0, iters=30)[:, None]
-            rep["hot_eased"] += int(over.sum())
+        osky = ao[o.name] if (ao is not None and o.name in ao) else None
+        L2, info = grade_rows(L, osky, DARK[o.name], MEANALB[o.name], RATIO.get(o.name), look, E, hot_knee, hot_max)
+        rep["hot_eased"] += info["hot_eased"]
         rep["vertices"] += len(L2)
-        rep["below_floor"] += int((have < Lf).sum())
-        DISP.append(R.lum(R.agx(E * alb * L2)))
-        RAWD.append(R.lum(R.agx(E * alb * np.maximum(L, 1e-12))))
+        rep["below_floor"] += info["below_floor"]
+        DISP.append(info["disp"])
+        RAWD.append(info["rawd"])
         c0 = L2 * k * TEXFAC[o.name] * MEANALB[o.name]   # texture x COLOR_0 ~ k L albedo
         rep["max_color0"] = max(rep["max_color0"], float(c0.max()))
         c0, f, n_ = unit_colour(c0)
@@ -1753,6 +2134,7 @@ RAWD: list = []
 
 
 LIGHT_OUT: dict = {}
+SEAM_DARK: dict = {}  # object name -> per-vertex darkest texel the stitch floored with (the lesser of both files')
 SEAM_BAND = 1.0   # metres each side of a seam plane over which the two files' graded light is blended
 
 
@@ -1766,6 +2148,13 @@ def seam_planes(sec_d: dict, built: set) -> list:
     return out
 
 
+def lm_seams(sec_d: dict, built: set) -> list:
+    """seam_planes' rows with each seam's window (u0, z0, u1, z1) and stub length: the lightmap's seams are local."""
+    win = {sm["id"]: (tuple(float(v) for v in sm["window"]), float(sm.get("stub_m", 8.0)))
+           for sm in sec_d.get("seams", [])}
+    return [(sid, ax, at, sg) + win[sid] for sid, ax, at, sg in seam_planes(sec_d, built)]
+
+
 def stitch_weight(P: np.ndarray, ax: int, at: float, sign: float) -> np.ndarray:
     """The neighbour's share of a vertex's light at a seam: 0 a metre or more inside this file, 0.5 on the plane, 1 a
     metre or more into the neighbour's side (its stub). The neighbour's file gets 1 minus it at the same point, so
@@ -1777,7 +2166,7 @@ def stitch_weight(P: np.ndarray, ax: int, at: float, sign: float) -> np.ndarray:
 def seam_dump(path: str, objs: list, planes: list, reach: float = 12.0) -> int:
     """The graded light (before k and the texture factor) of every vertex within `reach` of a seam plane, keyed by
     its position in 1e-5 m: what the neighbour's build blends with (--stitch)."""
-    keys, Ls = [], []
+    keys, Ls, Ds = [], [], []
     for o in objs:
         if o.name not in LIGHT_OUT:
             continue
@@ -1790,9 +2179,11 @@ def seam_dump(path: str, objs: list, planes: list, reach: float = 12.0) -> int:
         if near.any():
             keys.append(np.rint(P[near] * core.Q).astype(np.int64))
             Ls.append(LIGHT_OUT[o.name][near].astype(np.float32))
+            Ds.append(np.asarray(DARK[o.name], np.float32)[near])
     K = np.concatenate(keys) if keys else np.zeros((0, 3), np.int64)
     L = np.concatenate(Ls) if Ls else np.zeros((0, 3), np.float32)
-    np.savez_compressed(path, keys=K, light=L)
+    D = np.concatenate(Ds) if Ds else np.zeros((0, 3), np.float32)
+    np.savez_compressed(path, keys=K, light=L, dark=D)
     return int(len(K))
 
 
@@ -1804,8 +2195,9 @@ def stitch(objs: list, planes: list, dumps: list, k: float, E: float | None = No
     table = {}
     for path in dumps:
         z = np.load(path)
-        for key, L in zip(map(tuple, z["keys"].tolist()), z["light"]):
-            table[key] = L
+        D = z["dark"] if "dark" in z.files else np.full_like(z["light"], np.inf)
+        for key, L, d_ in zip(map(tuple, z["keys"].tolist()), z["light"], D):
+            table[key] = (L, d_)
     rep = {"vertices_in_band": 0, "matched": 0}
     for o in objs:
         if o.name not in LIGHT_OUT:
@@ -1814,6 +2206,7 @@ def stitch(objs: list, planes: list, dumps: list, k: float, E: float | None = No
         o.data.vertices.foreach_get("co", co)
         P = co.reshape(-1, 3).astype(np.float64)
         L2 = LIGHT_OUT[o.name].copy()
+        dark = np.array(DARK[o.name], dtype=np.float64, copy=True)
         changed = False
         for _sid, ax, at, sign in planes:
             t = stitch_weight(P, ax, at, sign)
@@ -1826,14 +2219,15 @@ def stitch(objs: list, planes: list, dumps: list, k: float, E: float | None = No
             for j, key in zip(idx, map(tuple, K.tolist())):
                 other = table.get(key)
                 if other is not None:
-                    L2[j] = (1.0 - t[j]) * L2[j] + t[j] * other
+                    L2[j] = (1.0 - t[j]) * L2[j] + t[j] * other[0]
+                    dark[j] = np.minimum(dark[j], other[1])   # both files floor a shared vertex alike
                     rep["matched"] += 1
                     changed = True
         if changed:
             if E is not None and ink_t is not None:
                 R = _rb()
                 L2 = guard_texels(guard_display(L2), RATIO.get(o.name))
-                dark = DARK[o.name]
+                SEAM_DARK[o.name] = dark
                 low = R.lum(R.agx(E * dark * L2)) < ink_t - 2e-4
                 if low.any():
                     L2[low] *= R.solve_display(E * dark[low] * L2[low], ink_t, lo=1.0, hi=64.0, iters=30)[:, None]
@@ -1843,6 +2237,517 @@ def stitch(objs: list, planes: list, dumps: list, k: float, E: float | None = No
             LIGHT_OUT[o.name] = L2 * f[:, None]
             _rb().write_attr(o, c0.astype(np.float32))
     return rep
+
+
+# ---------------------------------------------------------------- the shell's lightmap (meshy_cave_lightmap.py)
+
+LM: dict = {}   # the lightmap of this build: its objects, layout, texels, page and report
+
+
+def lm_prepare(objs: list, planes: list, sec_key: str, tpm: float | None = None) -> dict:
+    """The shell's lightmap layout: every chunk's faces in one page (lmap.layout's charts and resolution rule), a
+    second UV map `lightmap` on each chunk, the texels rasterized with their world points and normals, and a float
+    image the bake writes, as each shell material's active image node."""
+    t0 = time.time()
+    Vs, Fs, grp, Ns, foff, voff = [], [], [], [], [0], [0]
+    for i, o in enumerate(objs):
+        me = o.data
+        nv, nf = len(me.vertices), len(me.polygons)
+        co = np.empty(nv * 3, np.float32)
+        me.vertices.foreach_get("co", co)
+        nr = np.empty(nv * 3, np.float32)
+        me.vertices.foreach_get("normal", nr)
+        lv = np.empty(len(me.loops), np.int32)
+        me.loops.foreach_get("vertex_index", lv)
+        pm = np.empty(nf, np.int32)
+        me.polygons.foreach_get("material_index", pm)
+        Vs.append(co.reshape(-1, 3).astype(np.float64))
+        Ns.append(nr.reshape(-1, 3).astype(np.float64))
+        Fs.append(lv.reshape(-1, 3).astype(np.int64) + voff[-1])
+        grp.append(i * 64 + pm.astype(np.int64))
+        foff.append(foff[-1] + nf)
+        voff.append(voff[-1] + nv)
+    V, F, N = np.concatenate(Vs), np.concatenate(Fs), np.concatenate(Ns)
+    lay = lmap.layout(V, F, np.concatenate(grp), planes, tpm=tpm)
+    W, H = lay["W"], lay["H"]
+    face, bary = lmap.rasterize(lay["tex"], W, H)
+    owner = lmap.owner_map(lay["rect"], W, H)
+    flat, tf, tw = lmap.texel_rows(face, bary)
+    chart_of = np.where(face >= 0, lay["chart"][np.maximum(face, 0)], -1)
+    P = lmap.interp(V, F, tf, tw)
+    Nt = lmap.interp(N, F, tf, tw)
+    Nt /= np.maximum(np.linalg.norm(Nt, axis=1, keepdims=True), 1e-9)
+    vt = np.zeros((len(V), 2))
+    vt[F.ravel()] = lay["tex"].reshape(-1, 2)   # each vertex's texel point (one of its corners')
+    for i, o in enumerate(objs):
+        me = o.data
+        layer = me.uv_layers.new(name=lmap.UV_SET)
+        layer.data.foreach_set("uv", lay["uv"][foff[i]:foff[i + 1]].reshape(-1).astype(np.float32))
+        me.uv_layers.active = me.uv_layers[0]
+        me.uv_layers[0].active_render = True   # the scan's UVs stay the first set (TEXCOORD_0)
+    img = bpy.data.images.new(f"um_{sec_key}_lightmap_bake", W, H, alpha=False, float_buffer=True)
+    img.colorspace_settings.name = "Non-Color"
+    mats = sorted({m.name for o in objs for m in o.data.materials if m is not None})
+    for name in mats:
+        nt = MATS[name]["mat"].node_tree
+        tn = nt.nodes.new("ShaderNodeTexImage")
+        tn.image = img
+        tn.name = "lightmap_bake"
+        nt.nodes.active = tn
+    be = lmap.border_edges(V, F, lay["tex"], lay["chart"])
+    LM.clear()
+    LM.update(objs=objs, names=[o.name for o in objs], V=V, F=F, foff=foff, voff=voff, lay=lay, W=W, H=H,
+              face=face, owner=owner, chart_of=chart_of, flat=flat, tf=tf, tw=tw, P=P, N=Nt, vt=vt, image=img,
+              mats=mats, md5=lmap.layout_md5(lay), be=be)
+    rep = {k_: lay[k_] for k_ in ("W", "H", "tpm", "charts", "plane_area_m2", "chart_share")}
+    rep.update(border_edges=be["edges"], border_samples=int(len(be["a"])), tpm_rule=lmap.tpm_for(lay["plane_area_m2"]),
+               tpm_under_min=bool(lay["tpm"] < lmap.TPM_MIN))
+    if lay["tpm"] < lmap.TPM_MIN:
+        log(f"lightmap: WARNING {lay['tpm']} texels per metre, under the rule's least ({lmap.TPM_MIN}): the shell "
+            f"needs a second page")
+    rep.update(texels=int(len(flat)), faces=int(len(F)), faces_without_texel=int(len(F) - len(np.unique(tf))),
+               charts_without_texel=int(lay["charts"] - len(np.unique(chart_of[chart_of >= 0]))),
+               layout_md5=LM["md5"], seconds=round(time.time() - t0, 1))
+    LM["report"] = rep
+    log(f"lightmap: {rep}")
+    return rep
+
+
+def lm_image(rows: np.ndarray, fill: float = 0.0, dilate: bool = True) -> np.ndarray:
+    """Texel rows (n x C) as a page (H x W x C), the padding of each chart filled from its own texels."""
+    H, W = LM["H"], LM["W"]
+    C = rows.shape[1]
+    img = np.full((H * W, C), fill, np.float64)
+    img[LM["flat"]] = rows
+    img = img.reshape(H, W, C)
+    if dilate:
+        img, _f = lmap.dilate(img, LM["face"] >= 0, LM["owner"])
+    return img
+
+
+def lm_rows(img: np.ndarray) -> np.ndarray:
+    return img.reshape(-1, img.shape[-1])[LM["flat"]]
+
+
+def lm_to_vertices(rows: np.ndarray) -> dict:
+    """Texel rows sampled at the shell's vertices (the page bilinear at each vertex's texel point), per object."""
+    img = lm_image(np.asarray(rows, np.float64).reshape(len(LM["flat"]), -1))
+    vals = lmap.bilinear(img, LM["vt"])
+    return {n: vals[LM["voff"][i]:LM["voff"][i + 1]] for i, n in enumerate(LM["names"])}
+
+
+def lm_bake(samples: int, hide: list, kind: str = "DIFFUSE", ao_distance: float | None = None) -> tuple:
+    """One bake of the shell into the page (Cycles, target IMAGE_TEXTURES, the `lightmap` UVs). Returns (the texel
+    rows n x 3, seconds)."""
+    R = _rb()
+    sc = bpy.context.scene
+    sc.render.engine = "CYCLES"
+    R.cycles_device(sc)
+    sc.cycles.samples = samples
+    sc.cycles.use_adaptive_sampling = False
+    sc.cycles.use_denoising = False
+    sc.cycles.caustics_reflective = False
+    sc.cycles.caustics_refractive = False
+    sc.cycles.max_bounces = 6
+    sc.cycles.diffuse_bounces = 4
+    sc.cycles.glossy_bounces = 2
+    sc.cycles.transparent_max_bounces = 8
+    sc.cycles.sample_clamp_indirect = 8.0
+    sc.render.bake.margin = 2
+    try:
+        sc.render.bake.margin_type = "EXTEND"
+    except (AttributeError, TypeError):
+        pass
+    if ao_distance is not None:
+        sc.world.light_settings.distance = ao_distance
+    for o in hide:
+        o.hide_render = True
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in LM["objs"]:
+        o.data.uv_layers.active = o.data.uv_layers[lmap.UV_SET]
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = LM["objs"][0]
+    t0 = time.time()
+    if kind == "AO":
+        bpy.ops.object.bake(type="AO", target="IMAGE_TEXTURES", use_clear=True)
+    else:
+        bpy.ops.object.bake(type="DIFFUSE", pass_filter={"DIRECT", "INDIRECT"}, target="IMAGE_TEXTURES",
+                            use_clear=True)
+    t = time.time() - t0
+    for o in hide:
+        o.hide_render = False
+    for o in LM["objs"]:
+        o.data.uv_layers.active = o.data.uv_layers[0]
+    img = LM["image"]
+    px = np.empty(LM["W"] * LM["H"] * 4, np.float32)
+    img.pixels.foreach_get(px)
+    return px.reshape(-1, 4)[LM["flat"], :3].astype(np.float64), t
+
+
+def lm_bake_groups(samples: int, hide: list, groups: dict, has_sky: bool, ao_cfg: dict) -> tuple:
+    """The shell's light groups (lamp, sky, fill: the others off, as bake_groups) and its AO into texel rows."""
+    sc = bpy.context.scene
+    bg = sc.world.node_tree.nodes["Background"]
+    ws = bg.inputs["Strength"].default_value
+    allL = [o for g in groups.values() for o in g]
+    energy = {o.name: o.data.energy for o in allL}
+    out, secs = {}, {}
+    for g in ("lamp", "sky", "fill"):
+        if g == "sky" and not has_sky:
+            continue
+        if g != "sky" and not groups[g]:
+            continue
+        for o in allL:
+            o.data.energy = energy[o.name] if o in groups.get(g, []) else 0.0
+        bg.inputs["Strength"].default_value = ws if g == "sky" else 0.0
+        out[g], t = lm_bake(samples, hide)
+        secs[g] = round(t, 1)
+        log(f"lightmap: baked group {g} at {samples} samples in {t:.1f} s ({len(LM['flat'])} texels)")
+    for o in allL:
+        o.data.energy = energy[o.name]
+    bg.inputs["Strength"].default_value = ws
+    keep = sc.cycles.samples
+    ao, t = lm_bake(int(ao_cfg["samples"]), hide, "AO", float(ao_cfg["distance_m"]))
+    sc.cycles.samples = keep
+    out["ao"] = ao[:, 0]
+    secs["ao"] = round(t, 1)
+    log(f"lightmap: baked AO in {t:.1f} s")
+    return out, secs
+
+
+def lm_quick(groups: dict) -> dict:
+    """--no-bake: quick_groups' unshadowed stand-in at the texels."""
+    P, Nn = LM["P"], LM["N"]
+    out = {}
+    for g, ls in groups.items():
+        L = np.zeros((len(P), 3))
+        for lo in ls:
+            d = np.array(lo.location) - P
+            r2 = np.maximum((d * d).sum(1), 0.04)
+            cosv = np.clip((d * Nn).sum(1) / np.sqrt(r2), 0.0, 1.0)
+            L += (lo.data.energy / (4 * math.pi) * cosv / r2 / math.pi)[:, None] * np.array(lo.data.color)[None, :]
+        out[g] = L
+    return out
+
+
+def lm_save_raw(path: str, tg: dict, samples: int, seconds: float, meta: dict) -> None:
+    arrs = {f"lm|{g}": np.asarray(v, np.float32) for g, v in tg.items()}
+    arrs["meta|layout_md5"] = np.array(LM["md5"])
+    arrs["meta|texels"] = np.array(len(LM["flat"]))
+    arrs["meta|samples"] = np.array(int(samples))
+    arrs["meta|bakeSeconds"] = np.array(float(seconds))
+    for k_, v_ in meta.items():
+        arrs[f"meta|{k_}"] = np.array(str(v_))
+    np.savez_compressed(path, **arrs)
+    log("saved the lightmap's raw bake", path)
+
+
+def lm_load_raw(path: str) -> dict:
+    if not os.path.exists(path):
+        raise SystemExit(f"--raw: no {path} (the shell's lightmap bake): bake again")
+    z = np.load(path)
+    if str(z["meta|layout_md5"]) != LM["md5"] or int(z["meta|texels"]) != len(LM["flat"]):
+        raise SystemExit(f"--raw {path}: the lightmap's layout does not match this build's; bake again")
+    LM["raw_meta"] = {k.split("|", 1)[1]: str(z[k]) for k in z.files if k.startswith("meta|")}
+    return {k.split("|", 1)[1]: z[k].astype(np.float64) for k in z.files if k.startswith("lm|")}
+
+
+def lm_attr(name: str) -> np.ndarray:
+    """A per-vertex table of the shell (DARK, MEANALB, TEXFAC, RATIO, DARK_R3) for all its objects, in the layout's
+    order."""
+    src = {"dark": DARK, "alb": MEANALB, "texfac": TEXFAC, "ratio": RATIO, "dark_r3": DARK_R3}[name]
+    return np.concatenate([np.asarray(src[n], np.float64) for n in LM["names"]])
+
+
+def disp_lin(d: np.ndarray) -> np.ndarray:
+    """Display values (sRGB-encoded, 0..1) as the light the screen gives (decoded, linear)."""
+    return lmap.srgb_decode(np.asarray(d, np.float64))
+
+
+def lm_grade(tg: dict, look: dict, E: float, k: float, no_bake: bool, w_lamp: float) -> dict:
+    """The texels' grade: the groups by weight (the lamp's at w_lamp), the bake's noise smoothed within each chart,
+    then grade_rows with the texels' own AO and the albedo, darkest texel and tint factor of their face's vertices.
+    The report compares the texels away from the placed lamps with route 3's look on the same bake (every group at
+    weight 1, route 3's flat form term and route 3's scan grade), as sRGB display values and as the light the screen
+    gives."""
+    wts = look["weights"]
+    L = sum(float(wts.get(g, 1.0)) * (w_lamp if g == "lamp" else 1.0) * np.asarray(v, np.float64)
+            for g, v in tg.items() if g != "ao")
+    if not isinstance(L, np.ndarray):
+        L = np.zeros((len(LM["flat"]), 3))
+    if not no_bake:
+        L = lm_rows(lmap.smooth(lm_image(L, dilate=False), LM["face"] >= 0, LM["chart_of"], passes=2))
+    F, tf, tw = LM["F"], LM["tf"], LM["tw"]
+    dark = lmap.interp(lm_attr("dark"), F, tf, tw)
+    alb = lmap.interp(lm_attr("alb"), F, tf, tw)
+    ratio = lmap.interp(lm_attr("ratio"), F, tf, tw)
+    texfac = lm_attr("texfac")[F[tf, 0]]          # constant over a face (per material)
+    hk, hm = float(look["hot"]["knee"]), float(look["hot"]["max"])
+    osky = tg.get("ao")
+    L2, info = grade_rows(L, osky, dark, alb, ratio, look, E, hk, hm)
+    LM.update(L2=L2, L1=info["L1"], dark=dark, alb=alb, ratio=ratio, texfac=texfac, k=k, E=E, hot=(hk, hm))
+    # route 3's look (every group at weight 1, its flat form term, its scan grade) at the same texels, for the report
+    lt = look.get("lantern", {})
+    old = dict(look, weights={"lamp": 1.0, "sky": 1.0, "fill": 1.0},
+               ink_lift=dict(look["ink_lift"], form=float(lt.get("route3_form", 0.5)), form_base=1.0))
+    L0 = sum((w_lamp if g == "lamp" else 1.0) * np.asarray(v, np.float64) for g, v in tg.items() if g != "ao")
+    if not isinstance(L0, np.ndarray):
+        L0 = np.zeros_like(L)
+    if not no_bake:
+        L0 = lm_rows(lmap.smooth(lm_image(L0, dilate=False), LM["face"] >= 0, LM["chart_of"], passes=2))
+    dark0 = lmap.interp(lm_attr("dark_r3"), F, tf, tw)
+    _L20, info0 = grade_rows(L0, osky, dark0, alb, ratio, old, E, hk, hm)
+    far = np.ones(len(L), bool)
+    for lp_ in LM.get("lamps", []):
+        far &= np.linalg.norm(LM["P"] - np.asarray(lp_)[None, :], axis=1) > float(lt.get("lamp_reach_m", 8.0))
+
+    def q(a):
+        return {f"p{p_}": round(float(np.percentile(a, p_)), 4) for p_ in (5, 25, 50, 75, 95)} if len(a) else {}
+
+    rep = {"below_floor_share": round(info["below_floor"] / max(len(L2), 1), 4),
+           "at_floor_share": round(info["at_floor"] / max(len(L2), 1), 4), "hot_eased": info["hot_eased"],
+           "display_mean_texel": q(info["disp"]), "display_before_floor": q(info["rawd"]),
+           "away_from_lamps": {"texels": int(far.sum()), "display_now": q(info["disp"][far]),
+                               "display_route3_look": q(info0["disp"][far])}}
+    if far.any():
+        a_, b_ = info["disp"][far], info0["disp"][far]
+        af = rep["away_from_lamps"]
+        af["ratio_p50"] = round(float(np.percentile(a_, 50) / max(np.percentile(b_, 50), 1e-9)), 4)
+        af["ratio_mean"] = round(float(a_.mean() / max(b_.mean(), 1e-9)), 4)
+        af["light_ratio_p50"] = round(float(disp_lin(np.percentile(a_, 50)) / max(disp_lin(np.percentile(b_, 50)),
+                                                                                  1e-12)), 4)
+        af["light_ratio_mean"] = round(float(disp_lin(a_).mean() / max(disp_lin(b_).mean(), 1e-12)), 4)
+        bb = info["bare"][far]
+        af["display_bare_floor"] = q(bb)
+        af["light_ratio_bare_floor_p50"] = round(float(disp_lin(np.percentile(bb, 50))
+                                                       / max(disp_lin(np.percentile(b_, 50)), 1e-12)), 4)
+        af["at_floor_share"] = round(float((info["m"][far] < 1.02).mean()), 4)
+        af["floor_lift"] = q(info["m"][far])
+    LM["report"]["grade"] = rep
+    log(f"lightmap grade: {rep}")
+    return rep
+
+
+def lm_finish(planes: list, look: dict, out_dir: str, aid: str, quality: int) -> dict:
+    """After the stitch: near each built seam the texels give way to the stitched vertex light (lmap.seam_weight,
+    continuous, so both files show the same light on the plane), and every texel goes through post_rows again (the
+    guards, the floor, the highlights: a texel with no seam near ends as grade_rows left it). The page of light with
+    its padding is then stitched along the chart borders (lmap.stitch_edges: the linear filter reads the same light on
+    both sides of every border), floored again (padding included), multiplied by COLOR_0's factor per texel (k x the
+    tint factor x the albedo, channels at most 1), scaled to its maximum and saved as WebP (`quality` 100 is
+    lossless). The page is read back as the file will hold it: the look's checks and the border check run on that."""
+    R = _rb()
+    E, k = LM["E"], LM["k"]
+    hk, hm = LM["hot"]
+    L1 = LM["L1"].copy()
+    F, tf, tw = LM["F"], LM["tf"], LM["tw"]
+    il = look["ink_lift"]
+    ink_t = (float(R.lum(np.array(INK, float))) + float(il["margin_luma"])) / 255.0
+    rep = {}
+    dark = LM["dark"].copy()
+    if planes:
+        VL = np.concatenate([LIGHT_OUT[n] for n in LM["names"]])
+        SD = np.concatenate([np.asarray(SEAM_DARK.get(n, DARK[n]), np.float64) for n in LM["names"]])
+        w = lmap.seam_weight(LM["P"], planes)
+        band = w < 1.0
+        if band.any():
+            wb = w[band, None]
+            L1[band] = wb * L1[band] + (1.0 - wb) * lmap.interp(VL, F, tf[band], tw[band])
+            # the floor on the plane is the stitch's, the lesser darkest texel of both files: never over this file's
+            dark[band] = np.minimum(dark[band], wb * dark[band] + (1.0 - wb) * lmap.interp(SD, F, tf[band], tw[band]))
+        rep["seam_band_texels"] = int(band.sum())
+    LM["dark_f"] = dark
+    L2, _n = post_rows(L1, dark, LM["alb"], LM["ratio"], E, ink_t, hk, hm)
+    # the page of light, stitched along the chart borders, floored again with the padding
+    fac = k * LM["texfac"] * LM["alb"]
+    pg_L = lm_image(L2)
+    be = LM["be"]
+    gap0 = lmap.border_gaps(pg_L, be)
+    pg_L = lmap.stitch_edges(pg_L, be, int(look.get("lightmap", {}).get("stitch_rounds", 24)))
+    own = LM["owner"].ravel() >= 0
+    pg_D, pg_A, pg_R, pg_F = (lm_image(a_).reshape(-1, a_.shape[1]) for a_ in (dark, LM["alb"], LM["ratio"], fac))
+    rows = pg_L.reshape(-1, 3)
+    fl, _n = post_rows(rows[own], pg_D[own], pg_A[own], pg_R[own], E, ink_t)
+    rows[own] = fl
+    c0p = rows * pg_F
+    c0p[own], f, n_ = unit_colour(c0p[own])
+    rows[own] *= f[:, None]
+    rep["color0_scaled"] = n_
+    L2 = rows[LM["flat"]]
+    LM["page_light"] = rows.reshape(LM["H"], LM["W"], 3).copy()
+    c0 = c0p[LM["flat"]]
+    page = c0p.reshape(LM["H"], LM["W"], 3)
+    S = float(max(page.max(), 1e-6))
+    enc = np.clip(page / S, 0.0, 1.0)
+    srgb = np.where(enc <= 0.0031308, 12.92 * enc, 1.055 * np.power(enc, 1 / 2.4) - 0.055)
+    H, W = LM["H"], LM["W"]
+    img = bpy.data.images.new(f"{aid}_lightmap", W, H, alpha=False)
+    img.colorspace_settings.name = "sRGB"
+    rgba = np.ones((H * W, 4), np.float32)
+    rgba[:, :3] = srgb.reshape(-1, 3)
+    img.pixels.foreach_set(rgba.ravel())
+    tex_dir = os.path.join(out_dir, "textures")
+    os.makedirs(tex_dir, exist_ok=True)
+    path = os.path.join(tex_dir, f"{aid}_lightmap.webp")
+    img.filepath_raw = path
+    img.file_format = "WEBP"
+    bpy.context.scene.render.image_settings.quality = int(quality)
+    try:
+        img.save(quality=int(quality))
+    except TypeError:
+        img.save()
+    bpy.data.images.remove(img)
+    back = bpy.data.images.load(path, check_existing=False)
+    back.colorspace_settings.name = "sRGB"
+    px = np.empty(W * H * 4, np.float32)
+    back.pixels.foreach_get(px)   # an 8-bit image's pixels as stored (sRGB-encoded)
+    decp = lmap.srgb_decode(px.reshape(-1, 4)[:, :3]) * S
+    c0d = decp[LM["flat"]]
+    Ld = c0d / np.maximum(fac, 1e-12)
+    ink_luma = float(R.lum(np.array(INK, float))) / 255.0
+    dd = R.agx(E * LM["dark"] * Ld)
+    md = R.agx(E * LM["alb"] * Ld)
+    err = np.abs(c0d - c0) / np.maximum(c0, 1e-4)
+    # the light the file shows on both sides of each chart border (the page as saved, over each side's factor)
+    ia, wa = lmap.bilinear_taps(be["a"], W, H)
+    ib, wb = lmap.bilinear_taps(be["b"], W, H)
+    fa = (pg_F[ia] * wa[:, :, None]).sum(axis=1)
+    fb = (pg_F[ib] * wb[:, :, None]).sum(axis=1)
+    lum3 = np.array([0.2126, 0.7152, 0.0722])
+    gap = lmap.border_gaps(decp.reshape(H, W, 3), be, fa @ lum3, fb @ lum3) if len(be["a"]) else np.zeros(0)
+
+    def pq(a_):
+        return {f"p{q_}": round(float(np.percentile(a_, q_)), 4) for q_ in (50, 95, 99)} |             {"max": round(float(a_.max()), 4), "over_10pct": round(float((a_ > 0.1).mean()), 4)} if len(a_) else {}
+
+    rep.update(file=os.path.basename(path), bytes=os.path.getsize(path), scale=S, quality=int(quality),
+               dark_texel_under_ink=int((R.lum(dd) < ink_luma - 1e-4).sum()),
+               lilac_share=round(lilac_share(np.concatenate([dd, md])), 6),
+               teal_share=round(float((md[:, 1] > np.maximum(md[:, 0], md[:, 2]) + 0.004).mean()), 6),
+               encode_rel_error_p50=round(float(np.percentile(err, 50)), 4),
+               encode_rel_error_p99=round(float(np.percentile(err, 99)), 4),
+               display_file={f"p{q}": round(float(np.percentile(R.lum(md), q)), 4) for q in (5, 25, 50, 75, 95)},
+               border_light_gap_before_stitch=pq(gap0), border_light_gap_file=pq(gap))
+    LM.update(path=path, scale=S, decoded=back, c0=c0, L2=L2, Ld=Ld)
+    LM["report"]["page"] = rep
+    log(f"lightmap page: {rep}")
+    return rep
+
+
+def lm_seam_probe(path: str, planes: list, near: float = 0.6) -> int:
+    """The light the file shows (its saved page, decoded, over k x the tint factor x the albedo; on the faces
+    seam_vertex_faces draws vertex-lit, their vertex light) at the centre of every shell face within `near` metres of
+    a built seam plane, keyed by the centre in 1e-5 m: the neighbour's file must show the same light there (tools:
+    the seam check)."""
+    if not planes:
+        return 0
+    V, F = LM["V"], LM["F"]
+    C = V[F].mean(axis=1)
+    sel = np.zeros(len(F), bool)
+    for sm in planes:
+        s_, inr = lmap.seam_region(C, sm)
+        sel |= (np.abs(s_) <= near) & inr
+    idx = np.nonzero(sel)[0]
+    tex = LM["lay"]["tex"][idx].mean(axis=1)
+    W, H = LM["W"], LM["H"]
+    px = np.empty(W * H * 4, np.float32)
+    LM["decoded"].pixels.foreach_get(px)
+    page = lmap.srgb_decode(px.reshape(H, W, 4)[:, :, :3]) * LM["scale"]
+    c0 = lmap.bilinear(page, tex)
+    fac = (lm_attr("texfac") * lm_attr("alb"))[F[idx]].mean(axis=1) * LM["k"]
+    dist = np.min(np.stack([np.abs(C[idx, sm[1]] - sm[2]) for sm in planes]), axis=0)
+    VL = np.concatenate([LIGHT_OUT[n] for n in LM["names"]])
+    light = c0 / np.maximum(fac, 1e-12)
+    # the faces seam_vertex_faces draws vertex-lit show the vertex light (COLOR_0), not the page
+    wv = lmap.seam_weight(V, planes)
+    vl = (wv[F[idx]] <= 1e-6).all(axis=1)
+    light[vl] = VL[F[idx[vl]]].mean(axis=1)
+    np.savez_compressed(path, keys=np.rint(C[idx] * core.Q).astype(np.int64), light=light,
+                        plane_dist=dist, light_page=lmap.bilinear(LM["page_light"], tex), vertex_light=VL[F[idx]].mean(1),
+                        vertex_lit=vl)
+    return int(len(idx))
+
+
+SEAMV = "_seamv"   # the suffix of a lightmapped material's copy drawn, vertex-lit, on the faces next to a built seam
+
+
+def seam_vertex_faces(shell: list, planes: list) -> dict:
+    """The shell's faces whose every vertex shows the stitched vertex light alone in the page (lmap.seam_weight 0:
+    within SEAM_HOLD_M of a built seam plane, and its stub) are drawn with a copy of their material (`<name>_seamv`)
+    that has no lightmap: vertex-lit (COLOR_0) in every viewer, so both files show the same light on the faces they
+    share (the stitch made it so), not the page read between its texels (the rebuild's check: within 0.1 m of
+    well_white's plane the page's light differed by 13 % at p95). Their edges with the page's faces have weight 0
+    at both ends, where the page shows the same vertex light. Returns the faces moved and the copies made."""
+    rep = {"faces": 0, "materials": []}
+    if not planes:
+        return rep
+    for o in shell:
+        me = o.data
+        nv = len(me.vertices)
+        co = np.empty(nv * 3, np.float32)
+        me.vertices.foreach_get("co", co)
+        w = lmap.seam_weight(co.reshape(-1, 3).astype(np.float64), planes)
+        loops = np.empty(len(me.loops), np.int32)
+        me.loops.foreach_get("vertex_index", loops)
+        F = loops.reshape(-1, 3)
+        sel = (w[F] <= 1e-6).all(axis=1)
+        if not sel.any():
+            continue
+        pm = np.empty(len(me.polygons), np.int32)
+        me.polygons.foreach_get("material_index", pm)
+        for j in np.unique(pm[sel]).tolist():
+            src = me.materials[j]
+            cname = src.name + SEAMV
+            if cname not in MATS:
+                cp = src.copy()
+                cp.name = cname
+                MATS[cname] = dict(MATS[src.name], mat=cp)
+                rep["materials"].append(cname)
+            cm = MATS[cname]["mat"]
+            names = [m.name for m in me.materials]
+            if cm.name not in names:
+                me.materials.append(cm)
+                names.append(cm.name)
+            pm[sel & (pm == j)] = names.index(cm.name)
+        me.polygons.foreach_set("material_index", pm)
+        me.update()
+        rep["faces"] += int(sel.sum())
+    return rep
+
+
+def lm_still_trees() -> None:
+    """For the stills: each lightmapped material shows its scan x the saved page (decoded) x its scale, as the
+    viewer will (the scan on the first UVs, the page on the `lightmap` UVs)."""
+    for name in LM["mats"]:
+        md = MATS[name]
+        nt = md["mat"].node_tree
+        nt.nodes.clear()
+        N, L = nt.nodes, nt.links
+        out = N.new("ShaderNodeOutputMaterial")
+        em = N.new("ShaderNodeEmission")
+        em.inputs["Strength"].default_value = float(LM["scale"])
+        lp = N.new("ShaderNodeLightPath")
+        mix = N.new("ShaderNodeMixShader")
+        L.new(lp.outputs["Is Camera Ray"], mix.inputs[0])
+        L.new(N.new("ShaderNodeBsdfTransparent").outputs[0], mix.inputs[1])
+        L.new(em.outputs[0], mix.inputs[2])
+        ti = N.new("ShaderNodeTexImage")
+        ti.image = md["image"]
+        uv0 = N.new("ShaderNodeUVMap")
+        uv0.uv_map = "UVMap"
+        L.new(uv0.outputs["UV"], ti.inputs["Vector"])
+        tl = N.new("ShaderNodeTexImage")
+        tl.image = LM["decoded"]
+        tl.interpolation = "Linear"
+        uvn = N.new("ShaderNodeUVMap")
+        uvn.uv_map = lmap.UV_SET
+        L.new(uvn.outputs["UV"], tl.inputs["Vector"])
+        mul = N.new("ShaderNodeMix")
+        mul.data_type, mul.blend_type = "RGBA", "MULTIPLY"
+        mul.inputs[0].default_value = 1.0
+        L.new(ti.outputs["Color"], mul.inputs[6])
+        L.new(tl.outputs["Color"], mul.inputs[7])
+        L.new(mul.outputs[2], em.inputs["Color"])
+        L.new(mix.outputs[0], out.inputs["Surface"])
 
 
 def look_report(objs: list, look: dict, E: float) -> dict:
@@ -1875,6 +2780,7 @@ def finish_attrs(objs: list) -> None:
         a.data.foreach_get("color", c)
         alb = c.reshape(-1, 4)[:, :3].astype(np.float64)
         rows = np.zeros((len(alb), 3))
+        rows_r3 = np.zeros((len(alb), 3))
         q = np.ones((len(alb), 2))
         loops = np.empty(len(o.data.loops), np.int32)
         o.data.loops.foreach_get("vertex_index", loops)
@@ -1889,10 +2795,14 @@ def finish_attrs(objs: list) -> None:
             if md is None or not sel.any():
                 continue
             rows[sel] = md["dark"] / np.maximum(md["mean"], 1e-4)
+            rows_r3[sel] = md["rel_r3"] if "rel_r3" in md else md["dark"] / np.maximum(md["mean"], 1e-4)
             if "ratio" in md:
                 q[sel] = md["ratio"][None, :]
         MEANALB[o.name] = alb
+        if o.name in FLOORQ:
+            rows = rows * FLOORQ[o.name][:, None]
         DARK[o.name] = rows * alb
+        DARK_R3[o.name] = rows_r3 * alb
         g_ = np.maximum(alb[:, 1], 1e-6)
         RATIO[o.name] = q * np.stack([alb[:, 0] / g_, alb[:, 2] / g_], axis=1)
 
@@ -1902,7 +2812,9 @@ def to_export(objs: list, look: dict) -> None:
     for name, md in MATS.items():
         m = md["mat"]
         if md["kind"] == "rock":
-            unlit_tree(m, image=md["image"])
+            # a lightmapped material keeps COLOR_0 too, the shell's vertex light: a viewer without the lightmap
+            # hookup shows that (route 3's way); one with it turns the material's vertex colours off (the contract)
+            unlit_tree(m, image=md["image"], vertex=True)
         elif md["kind"] == "flat":
             unlit_tree(m, image=None, colour=(0.0, 0.0, 0.0))
         elif md["kind"] == "emit":
@@ -2048,6 +2960,27 @@ def stills(sec, nodes: dict, look: dict, out_dir: str, area: str, samples: int =
             e = c - (0.5 * sx + 1.2) * X
             e[2] = foot + 0.25 + (CRAWL_EYE + 0.2 if kind == "crawl" else EYE)
             views.append((z["name"], e, c + 0.5 * sx * X + np.array([0, 0, -0.1])))
+    # along the walking passages, every ALONG_STEP m (at most ALONG_MAX): at eye height, looking on along the floor,
+    # so the walls, the roof's formations and the floor's rock are seen as a walker meets them
+    along = 0
+    for p in sec.own:
+        if not (isinstance(p, core.Passage) and p.walk and p.profile in core.WALK_PROFILES) or p.S < 8.0:
+            continue
+        for s0 in np.arange(0.5 * min(ALONG_STEP, p.S - 6.0), p.S - 6.0, ALONG_STEP):
+            if along >= ALONG_MAX:
+                break
+            pts = []
+            for s_ in (s0, s0 + 6.0):
+                j = int(min(np.searchsorted(p.cum, s_, side="right") - 1, len(p.A) - 1))
+                t_ = (s_ - p.cum[j]) / max(p.L[j], 1e-9)
+                q = p.A[j] + t_ * (p.B[j] - p.A[j])
+                base = float(p.floors(np.array([j]), np.array([t_]), np.zeros(1), True)[1][0])
+                pts.append(np.array([q[0], q[1], base]))
+            e = pts[0] + np.array([0.0, 0.0, EYE])
+            t = pts[1] + np.array([0.0, 0.0, 0.9])
+            if sec.field_points(np.stack([e, 0.5 * (e + t)]))[0] > 0.15:
+                views.append((f"along_{p.id}_{int(s0)}", e, t))
+                along += 1
     files = []
     cams = COL["cams"]
     for name, e, t in views:
@@ -2125,6 +3058,8 @@ def parse(argv):
     ap.add_argument("--blend", action="store_true", help="also save the .blend")
     ap.add_argument("--stitch", default="", help="neighbours' <area>_seam_light.npz files to blend the seams with")
     ap.add_argument("--journey", action="store_true", help="also write <area>_journey.glb (walker's nodes, no Draco)")
+    ap.add_argument("--no-lightmap", action="store_true", help="the shell's light per vertex (COLOR_0), as route 3")
+    ap.add_argument("--lm-tpm", type=float, default=None, help="the lightmap's texels per metre (else the rule's)")
     return ap.parse_args(argv)
 
 
@@ -2136,6 +3071,8 @@ def main(argv) -> int:
     ARGS = a = parse(argv)
     t_all = time.time()
     look = load_look()
+    lt_ = look.get("lantern", {})
+    SCAN_R3.update(lift=float(lt_.get("route3_texture_lift", 0.45)), pct=float(lt_.get("route3_dark_percentile", 0.5)))
     os.makedirs(a.out, exist_ok=True)
     # 1. the core
     if a.core:
@@ -2169,6 +3106,8 @@ def main(argv) -> int:
         else None
     mouth_boxes = [mouth_kit_boxes(b, frame) for b in mouth_boxes]
     objs, keys = build_shell(z, sec, look, a.out, mouth_boxes, mouth_kit_name(look["kits"], gate_d))
+    forms = form_objects(z, sec, look, a.out)
+    objs += forms
     objs += guard_pieces(z, sec, look, a.out)
     gate = gate_piece(sec, look, a.out, gate_d)
     for k_ in ("outcrop", "snow"):
@@ -2188,6 +3127,16 @@ def main(argv) -> int:
     bake_objs = objs + [o for o in others if o.name.endswith("_grille")]
     hide = [coll_ob] + EXPORT_ONLY
     rb.prepare_attrs(bake_objs)
+    planes = seam_planes(sec.d, built)
+    shell = [o for o in objs if o.name.startswith(f"um_{sec.key}_chunk_")]
+    use_lm = bool(shell) and not a.no_lightmap
+    lmc = look.get("lightmap", {})
+    if use_lm:
+        lm_prepare(shell, lm_seams(sec.d, built), sec.key, a.lm_tpm)
+        LM["lamps"] = [gate["lamp_at"]] if gate.get("lamp_at") is not None else []
+    vobjs = [o for o in bake_objs if not (use_lm and o in shell)]
+    lm_raw_path = os.path.join(a.out, f"{aid}_lm_raw.npz")
+    tg, lsecs = None, {}
     # 3. the light
     t_bake = 0.0
     secs = {}
@@ -2196,30 +3145,48 @@ def main(argv) -> int:
     if a.raw:
         g = rb.load_raw(a.raw, bake_objs)
         log(f"light: the saved bake {a.raw} ({rb.RAW_META.get('samples')} samples)")
+        if use_lm:
+            tg = lm_load_raw(a.raw[:-len("_raw.npz")] + "_lm_raw.npz" if a.raw.endswith("_raw.npz") else a.raw)
         ao = {n: d.pop("ao") for n, d in g.items() if "ao" in d}
         samples = rb.RAW_META.get("samples") or samples
         t_bake = rb.RAW_META.get("bakeSeconds") or 0.0
     elif a.no_bake:
         g = quick_groups(bake_objs, groups)
         ao = None
+        if use_lm:
+            tg = lm_quick(groups)
         log("light: --no-bake stand-in (unshadowed)")
     else:
         t0 = time.time()
-        g, secs = bake_groups(bake_objs, samples, hide, groups, bool(gate))
-        ao = rb.run_bake_ao(bake_objs, hide, float(look["ao"]["distance_m"]), int(look["ao"]["samples"]))
+        g, secs = bake_groups(vobjs, samples, hide, groups, bool(gate))
+        ao = rb.run_bake_ao(vobjs, hide, float(look["ao"]["distance_m"]), int(look["ao"]["samples"]))
         secs["ao"] = None
-        t_bake = time.time() - t0
         for n in g:
             g[n]["ao"] = ao[n]
+        if use_lm:
+            t1 = time.time()
+            tg, lsecs = lm_bake_groups(samples, hide, groups, bool(gate), look["ao"])
+            for gg, rows in tg.items():
+                vv = lm_to_vertices(rows if rows.ndim == 2 else rows[:, None])
+                for n, vals in vv.items():
+                    g.setdefault(n, {})[gg] = (vals[:, 0] if rows.ndim == 1 else vals).astype(np.float32)
+            lsecs["total"] = round(time.time() - t1, 1)
+        t_bake = time.time() - t0
         meta = {"section": sec.key, "geometry_md5": report["geometry_md5"], "script": file_md5(__file__),
                 "look": file_md5(LOOK_PATH), "device": rb._CYCLES_DEVICE.get("used", "CPU")}
         rb.save_raw(raw_path, bake_objs, g, samples, t_bake, meta)
+        if use_lm:
+            lm_save_raw(lm_raw_path, tg, samples, lsecs.get("total", 0.0), dict(meta, layout=LM["md5"]))
         ao = {n: d.pop("ao") for n, d in g.items()}
         log(f"bake: {t_bake:.1f} s at {samples} samples on {meta['device']}")
     E = a.E if a.E is not None else look.get("E")
-    w_lamp = 1.0
+    w_lamp = w_rule = 1.0
     if E is not None and gate.get("lamp_at") is not None and not a.no_bake:
-        w_lamp = lamp_weight(bake_objs, g, gate.get("lamp_at"), look, float(E))
+        w_rule = lamp_weight(bake_objs, g, gate.get("lamp_at"), look, float(E))
+        # the lantern's look keeps the placed lamps at their own strength (the highlights' easing caps the pool);
+        # route 3 dimmed a lamp whose pool passed the look's lamp_pool display
+        w_lamp = 1.0 if look.get("lantern", {}).get("keep_lamps") else w_rule
+        log(f"lamp: the pool rule's weight {w_rule:.4g}, used {w_lamp:.4g}")
         if w_lamp < 1.0:
             for n_ in g:
                 if "lamp" in g[n_]:
@@ -2231,6 +3198,8 @@ def main(argv) -> int:
         E = E_pool if E_pool is not None else float(look["wdi_exposure"])
     log(f"exposure: E {E:.5g} (lamp pool {E_pool}), wdi_exposure {look['wdi_exposure']}")
     gr = grade(bake_objs, g, ao, look, float(E), a.no_bake)
+    if use_lm:
+        lm_grade(tg, look, float(E), gr["k"], a.no_bake, w_lamp)
     # the grille: flat iron under its light
     for o in others:
         if o.name.endswith("_grille"):
@@ -2245,7 +3214,6 @@ def main(argv) -> int:
             gr["iron"] = {"display_luma_max": round(float(rb.lum(rb.agx(col * we_)).max()), 4),
                           "display_luma_min": round(float(rb.lum(rb.agx(col * we_)).min()), 4),
                           "lamp_share_mean": round(float(np.clip(share, 0, 1).mean()), 3)}
-    planes = seam_planes(sec.d, built)
     if planes:
         n_dump = seam_dump(os.path.join(a.out, f"{aid}_seam_light.npz"), bake_objs, planes)
         log(f"seam light: {n_dump} vertices near the built seams written for the neighbour's stitch")
@@ -2254,6 +3222,14 @@ def main(argv) -> int:
                     gr["ink_target_luma"] / 255.0)
         gr["stitch"] = st
         log(f"stitch: {st}")
+    if use_lm:
+        lm_finish(lm_seams(sec.d, built), look, a.out, aid, int(lmc.get("quality", 100)))
+        if planes:
+            LM["report"]["seam_probe_faces"] = lm_seam_probe(os.path.join(a.out, f"{aid}_seam_lm.npz"),
+                                                             lm_seams(sec.d, built))
+            LM["report"]["seam_vertex"] = seam_vertex_faces(shell, lm_seams(sec.d, built))
+            log(f"seam faces drawn vertex-lit: {LM['report']['seam_vertex']}")
+        LM["report"]["bake_seconds"] = lsecs
     lk = look_report(bake_objs, look, float(E))
     log(f"look: {lk}")
     water, wrep = water_objects(sec, look, float(E), gr["k"], bake_objs)
@@ -2270,9 +3246,13 @@ def main(argv) -> int:
                      "bake_seconds": round(t_bake, 1), "group_seconds": secs,
                      "device": (rb.RAW_META.get("device") or "unknown") if a.raw
                      else rb._CYCLES_DEVICE.get("used", "CPU"), "grade": gr, "look": lk,
-                     "E_lamp_pool": E_pool, "lamp_weight": round(w_lamp, 5)},
+                     "E_lamp_pool": E_pool, "lamp_weight": round(w_lamp, 5), "lamp_weight_pool_rule": round(w_rule, 5),
+                     "lightmap": LM.get("report") if use_lm else None},
            "materials": sorted({md.get("scan", name) for name, md in MATS.items()}),
-           "collision_triangles": coll_tris, "extras": nodes["extras"]}
+           "scan_hold": dict(HOLD_LOG),
+           "collision_triangles": coll_tris, "extras": nodes["extras"],
+           "rock": {"moss": dict(MOSS), "formation_objects": {o.name: len(o.data.polygons) for o in forms},
+                    "decor": report.get("formations", {}).get("decor")}}
     if a.glb:
         to_export(bake_objs + others + water, look)
         if "cave_iron" in MATS:
@@ -2292,8 +3272,18 @@ def main(argv) -> int:
             nt.links.new(mx.outputs[0], o_.inputs["Surface"])
         glb = os.path.join(a.out, f"walk-{aid}.glb")
         export(glb, bake_objs + others + water, area_ob, coll_ob)
+        before = os.path.getsize(glb)
+        pages = []
+        if use_lm:
+            with open(LM["path"], "rb") as fh:
+                pages.append({"bytes": fh.read(), "name": f"{aid}_lightmap", "scale": LM["scale"]})
+        # a lightmapped material whose every face lies next to a built seam is drawn only as its _seamv copy
+        in_glb = {m_.get("name") for m_ in lmap.read_glb(glb)[0].get("materials", [])}
+        lit = {n_: 0 for n_ in LM.get("mats", []) if n_ in in_glb} if use_lm else {}
+        patched = lmap.patch_glb(glb, pages if lit else [], lit, scene_extras={"wdi_lantern": True})
         out["glb"] = {"file": os.path.basename(glb), "bytes": os.path.getsize(glb),
-                      "md5": file_md5(glb)}
+                      "md5": file_md5(glb), "bytes_before_lightmap": before, "patch": patched,
+                      "lightmap": lmap.glb_lightmap_facts(glb)}
         log(f"glb: {glb} ({os.path.getsize(glb) / 2 ** 20:.2f} MiB)")
         if a.journey:
             jp = os.path.join(a.out, f"{aid}_journey.glb")
@@ -2301,6 +3291,8 @@ def main(argv) -> int:
         if a.blend:
             bpy.ops.wm.save_as_mainfile(filepath=os.path.join(a.out, f"{aid}.blend"), compress=True)
     if a.stills:
+        if use_lm:
+            lm_still_trees()
         sd = a.stills_dir or os.path.join(a.out, "stills")
         os.makedirs(sd, exist_ok=True)
         out["stills"] = [os.path.basename(p) for p in stills(sec, nodes, look, sd, aid)]

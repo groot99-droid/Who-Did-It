@@ -34,6 +34,8 @@ import zlib
 
 import numpy as np
 
+import meshy_cave_rock as rock
+
 CORE_VERSION = 1
 HERE = os.path.dirname(os.path.abspath(__file__))
 SCHEMA_PATH = os.path.join(HERE, "meshy_caves", "schema", "cave.schema.json")
@@ -791,6 +793,8 @@ class Prim:
     blend = 0.5
     amp = 0.0
     geo = 0
+    rock = None    # the rock profile its wall detail follows (meshy_cave_rock), None for none
+    rubble = None  # the rock profile its rubble edge follows, None for none
 
     def hits(self, box):
         b = self.box
@@ -917,10 +921,18 @@ class Passage(Prim):
         fa, base, _ = self.floors(jj, tj, Z, c.collision)
         v = Z - base
         wall = prof_wall(self.profile, d, v, W, H, c.walls)
+        wall0 = wall
+        if self.rock is not None:
+            wall = wall + rock.detail(c, v, self.rock, self.bed)
         if self.amp > 0:
             wall = wall + noise_term(c.n + (bedding(Z, self.bed) if self.bed else 0.0), v, self.amp, c.walls)
         kf = min(0.3, 0.25 * float(min(self.w)))
-        return smin(wall, fa, kf), fa
+        out = smin(wall, fa, kf)
+        if self.rubble is not None:
+            h = rock.rubble(c, wall0, self.rubble)
+            if not isinstance(h, float):
+                out = np.minimum(out, fa - h)
+        return out, fa
 
     def eval_climb(self, c):
         X, Y, Z = c.X, c.Y, c.Z
@@ -1014,13 +1026,21 @@ class Chamber(Prim):
             if self.kind == "breakdown":
                 roof = roof + 0.6 * (np.floor(c.nb * 3.0) / 3.0)
             wall = smin(side, roof, 0.8)
+        wall0 = wall
+        if self.rock is not None:
+            wall = wall + rock.detail(c, v, self.rock, self.bed)
         if self.amp > 0:
             wall = wall + noise_term(c.n + (bedding(c.Z, self.bed) if self.bed else 0.0), v, self.amp, c.walls)
         fa = v
         if self.basin > 0:
             inner = 1.0 - np.sqrt((lx / (0.3 * self.sx)) ** 2 + (ly / (0.3 * self.sy)) ** 2)
             fa = np.maximum(v, np.minimum(v + self.basin, inner * 0.3 * min(self.sx, self.sy)))
-        return smin(wall, fa, 0.3), v
+        out = smin(wall, fa, 0.3)
+        if self.rock is not None:
+            h = rock.rubble(c, wall0, self.rock)
+            if not isinstance(h, float):
+                out = np.minimum(out, fa - h)
+        return out, v
 
     def designed(self, x, y, z):
         if not self.walk:
@@ -1061,9 +1081,11 @@ class Ctx:
     """Points and their noise. collision: the walker's field (the ramp under stairs, and with walls, the default, the
     upright tube foot and the lower walls without their noise push); the rock rule takes the stairs' ramp only."""
 
-    def __init__(self, X, Y, Z, n, nb, collision=False, walls=None):
+    def __init__(self, X, Y, Z, n, nb, collision=False, walls=None, seed=1):
         self.X, self.Y, self.Z, self.n, self.nb, self.collision = X, Y, Z, n, nb, collision
         self.walls = collision if walls is None else walls
+        self.seed = seed
+        self._scal = None  # the scallops at these points, made once (meshy_cave_rock.detail)
 
 
 def union(c, prims, shape, track=False):
@@ -1193,10 +1215,20 @@ class Section:
         nodes = s.get("nodes", {})
         for p in s.get("passages", []):
             gi, g = self.geo_of(p.get("geology") or s.get("geology"))
-            out.append(Passage(s["key"], p, nodes, gi, g))
+            q = Passage(s["key"], p, nodes, gi, g)
+            rk = rock.profile(self.geo_names[gi], g)
+            if q.profile in ("tube", "canyon", "keyhole", "rift"):
+                q.rock = rk  # natural passages; a mine's drift is hewn, crawls, fissures and faces keep their limits
+            if q.profile in WALK_PROFILES and q.floor_kind != "stairs":
+                q.rubble = rk
+            out.append(q)
         for c in s.get("chambers", []):
             gi, g = self.geo_of(c.get("geology") or s.get("geology"))
-            out.append(Chamber(s["key"], c, gi, g))
+            q = Chamber(s["key"], c, gi, g)
+            if q.kind != "stope":
+                q.rock = rk = rock.profile(self.geo_names[gi], g)
+                q.rubble = rk
+            out.append(q)
         for i, f in enumerate(s.get("features", [])):
             if f["kind"] == "flowstone":
                 out.append(Bulge(s["key"], f, i))
@@ -1234,7 +1266,7 @@ class Section:
         Z = (self.origin[2] + (g0[2] + np.arange(n)) * self.cell)[:, None, None]
         nl = noise_block(g0, n, NOISE_LUMP, self.seed)
         nb = noise_block(g0, n, NOISE_BIG, self.seed * 7 + 3)
-        c = Ctx(X, Y, Z, 0.65 * nl + 0.35 * nb, nb, collision)
+        c = Ctx(X, Y, Z, 0.65 * nl + 0.35 * nb, nb, collision, seed=self.seed)
         acc = union(c, ps, (n, n, n))
         return self.clip_stubs(X, Y, Z, acc) if self.stub_clips else acc
 
@@ -1261,7 +1293,7 @@ class Section:
             if not m.any():
                 continue
             idx = np.nonzero(m)[0]
-            c = Ctx(P[idx, 0], P[idx, 1], P[idx, 2], n[idx], nb[idx], collision)
+            c = Ctx(P[idx, 0], P[idx, 1], P[idx, 2], n[idx], nb[idx], collision, seed=self.seed)
             if p.cls == 2:
                 bv, _ = p.eval(c)
                 acc[idx] = smin(acc[idx], bv, 0.35)
@@ -1873,13 +1905,14 @@ RING8 = [(1.0, 0.0), (S8, S8), (0.0, 1.0), (-S8, S8), (-1.0, 0.0), (-S8, -S8), (
 
 class MeshBuf:
     def __init__(self):
-        self.v, self.f, self.tag = [], [], []
+        self.v, self.f, self.tag, self.geo = [], [], [], []
 
-    def add(self, verts, faces, tag):
+    def add(self, verts, faces, tag, geo=-1):
         base = len(self.v)
         self.v += [tuple(p) for p in verts]
-        self.f += [(a + base, b + base, c + base) for a, b, c in faces]
+        self.f += [(int(a) + base, int(b) + base, int(c) + base) for a, b, c in faces]
         self.tag += [tag] * len(faces)
+        self.geo += [geo] * len(faces)
 
     def tube(self, rings, tag, cap_top=True, tip=None, tip_top=None):
         """Rings of (cx, cy, cz, r, (c, s)) joined by quads; a tip point closes the last ring, a cap the first."""
@@ -1920,6 +1953,10 @@ class MeshBuf:
         V = np.array(self.v, dtype=np.float64).reshape(-1, 3)
         return np.rint(V * Q).astype(np.int64), np.array(self.f, dtype=np.int64).reshape(-1, 3), \
             np.array(self.tag, dtype=np.int64)
+
+    def geos(self):
+        """Each face's geology index (-1 where none was given: the hand-placed features')."""
+        return np.array(self.geo, dtype=np.int64)
 
 
 def truncated_cube():
@@ -3506,11 +3543,81 @@ def clearance(sec):
 # ---------------------------------------------------------------- attributes, UVs, chunks
 
 
-def face_uv(Vf, F, repeat):
-    """Cube projection per face: the face's dominant axis picks the plane, UV = position / metres per repeat."""
+UV_SMOOTH_CELL = 0.5    # metres: the grid whose 3 x 3 x 3 neighbourhood smooths the normal that picks a shell projection
+UV_SMOOTH_AGREE = 0.3   # a face takes the smoothed axis only where its own normal agrees with the smoothed one this much
+UV_SMOOTH_MIN = 0.25    # ... and its own normal's share on that axis is at least this (marching cubes' slivers lean)
+UV_MODE_ROUNDS = 4      # rounds of the vote among edge neighbours that removes the last single-face islands
+UV_SEAM_KEEP = 1.5      # metres: within this of a seam plane a face keeps its own axis (both files see the same faces)
+
+
+def smooth_axis(Vf, F, seam_planes=(), cell: float = UV_SMOOTH_CELL, rounds: int = UV_MODE_ROUNDS):
+    """Each face's projection axis from its normal smoothed over its neighbourhood (the area-weighted normals of the
+    faces in the 3 x 3 x 3 cells of `cell` metres around it), so a wall's bedding, scallops and joints keep one
+    projection instead of flipping between planes face by face (the rebuild's check: the Spar Maze's marble showed in
+    triangular facets), then `rounds` of a vote: a face takes the axis most of its edge neighbours have (its own
+    counting half). A face whose own normal disagrees with the smoothed one (a thin fin, a lip), or whose own normal
+    has under UV_SMOOTH_MIN of its length on an axis, never takes that axis. A face within UV_SEAM_KEEP of a seam plane
+    (`seam_planes`: (axis, at) rows; the neighbour's file has other faces beyond it) keeps its own dominant axis.
+    Deterministic: world cells and the faces' edges, not their order. On the Spar Maze: axis changes across edges
+    8.3 % -> 3.2 %, faces unlike two or more neighbours 3.4 % -> 0.4 % of the area."""
     a, b, c = Vf[F[:, 0]], Vf[F[:, 1]], Vf[F[:, 2]]
     n = np.cross(b - a, c - a)
-    axis = np.argmax(np.abs(n), axis=1)
+    own = np.argmax(np.abs(n), axis=1)
+    if not len(F):
+        return own
+    cen = (a + b + c) / 3.0
+    key = np.floor(cen / cell).astype(np.int64)
+    key -= key.min(axis=0) - 1
+    span = int(key.max()) + 2
+    code = (key[:, 0] * span + key[:, 1]) * span + key[:, 2]
+    uk, inv = np.unique(code, return_inverse=True)
+    S = np.zeros((len(uk), 3))
+    np.add.at(S, inv.ravel(), n)
+    acc = np.zeros((len(F), 3))
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                c2 = code + (dx * span + dy) * span + dz
+                j = np.minimum(np.searchsorted(uk, c2), len(uk) - 1)
+                hit = uk[j] == c2
+                acc[hit] += S[j[hit]]
+    nn = np.linalg.norm(n, axis=1)
+    an = np.linalg.norm(acc, axis=1)
+    agree = (acc * n).sum(1) >= UV_SMOOTH_AGREE * np.maximum(an * nn, 1e-30)
+    sm = np.argmax(np.abs(acc), axis=1)
+    share = np.abs(np.take_along_axis(n, sm[:, None], axis=1)[:, 0]) / np.maximum(nn, 1e-30)
+    use = agree & (share >= UV_SMOOTH_MIN) & (an > 0)
+    keep = np.zeros(len(F), bool)
+    for ax, at in seam_planes:
+        keep |= np.abs(cen[:, ax] - at) <= UV_SEAM_KEEP
+    out = np.where(use & ~keep, sm, own)
+    if rounds:
+        e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]]).astype(np.int64)
+        e.sort(axis=1)
+        fi = np.tile(np.arange(len(F)), 3)
+        ec = e[:, 0] * (int(F.max()) + 1) + e[:, 1]
+        o = np.argsort(ec, kind="stable")
+        ec, fi = ec[o], fi[o]
+        pair = ec[1:] == ec[:-1]
+        A, B = fi[:-1][pair], fi[1:][pair]
+        no = np.abs(n) < UV_SMOOTH_MIN * nn[:, None]
+        no[np.arange(len(F)), own] = False
+        for _ in range(rounds):
+            votes = np.zeros((len(F), 3))
+            votes[np.arange(len(F)), out] += 0.5
+            np.add.at(votes, (A, out[B]), 1.0)
+            np.add.at(votes, (B, out[A]), 1.0)
+            votes[no] = -1.0
+            out = np.where(keep, own, np.argmax(votes, axis=1))
+    return out
+
+
+def face_uv(Vf, F, repeat, axis=None):
+    """Cube projection per face: the face's dominant axis (or `axis`, one per face) picks the plane, UV = position /
+    metres per repeat."""
+    a, b, c = Vf[F[:, 0]], Vf[F[:, 1]], Vf[F[:, 2]]
+    n = np.cross(b - a, c - a)
+    axis = np.argmax(np.abs(n), axis=1) if axis is None else np.asarray(axis, np.int64)
     pick = np.array([[1, 2], [0, 2], [0, 1]])[axis]
     corners = np.stack([a, b, c], axis=1)  # (F, 3, 3)
     uv = np.take_along_axis(corners, pick[:, None, :].repeat(3, axis=1), axis=2) / repeat[:, None, None]
@@ -3789,7 +3896,7 @@ def problems(report):
 
 
 def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks=True, write=True, log=print,
-          sec_obj=None, zones_override=None):
+          sec_obj=None, zones_override=None, decor=True):
     """Validate, mesh, build everything; write the npz, plan and report when out_dir is given. Returns a dict with
     the report and the arrays."""
     t_all = time.time()
@@ -3842,8 +3949,21 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
         else:
             prox.box((0.5 * (u0 + u1), mid, 0.5 * (z0 + z1)), 0.5 * (u1 - u0), 0.05, 0.5 * (z1 - z0), 1.0, 0.0, 12)
             solids.append(("aabb", u0, mid - 0.05, u1, mid + 0.05, z0 - 1.0, z1 + 1.0))
-    # the flood
+    # the flood's columns, the formations, fallen rock and breakdown placed on them (meshy_cave_rock.decor), their
+    # solids
     grid = build_grid(sec, m["T"], m["NV"])
+    drep = None
+    if decor and sec.d.get("decor", True):
+        t0 = time.time()
+        pieces, dprox, dsol, drep = rock.decor(sec, grid, zones, guard_segments(sec), sys.modules[__name__])
+        for V_, F_, tag, gi in pieces:
+            vis.add(V_, F_, tag, gi)
+        for V_, F_, tag in dprox:
+            prox.add(V_, F_, tag)
+        solids += dsol
+        drep["seconds"] = round(time.time() - t0, 2)
+        log(f"  decor: {drep['pieces']} pieces ({drep['triangles']} triangles), {drep['collide']} with collision "
+            f"({drep['proxy_triangles']} triangles), {drep['seconds']} s")
     apply_solids(grid, sec, solids)
     fl_rep, fl_parts = (None, None)
     if flood:
@@ -3891,8 +4011,9 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
     attrs = vertex_attrs(sec, Vq, bulges)
     repeats = np.array([float(sec.geo_of(n)[1]["repeat_m"]) for n in sec.geo_names])
     face_geo = attrs["geo"][Fs[:, 0]] if len(Fs) else np.zeros(0, np.int8)
-    uv, uv_axis = face_uv(V, Fs, repeats[face_geo]) if len(Fs) else (np.zeros((0, 3, 2), np.float32),
-                                                                     np.zeros(0, np.int8))
+    sax = smooth_axis(V, Fs, [(ax, at) for _sm, ax, at, _p in sec.seam_boxes]) if len(Fs) else None
+    uv, uv_axis = face_uv(V, Fs, repeats[face_geo], sax) if len(Fs) else (np.zeros((0, 3, 2), np.float32),
+                                                                          np.zeros(0, np.int8))
     ck, coff, cfaces = chunks(cells) if len(Fs) else (np.zeros((0, 3), np.int32), np.zeros(1, np.int64),
                                                       np.zeros(0, np.int32))
     per_chunk = np.diff(coff)
@@ -3933,7 +4054,7 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
                       "total": int(len(Cf) + len(Pf)), "target": COLLISION_TARGET, "ceiling": COLLISION_CEILING,
                       "field_deviation_m": {"max": round(float(devs.max()), 4),
                                             "p99": round(float(np.percentile(devs, 99)), 4)}},
-        "formations": {"triangles": int(len(Ff)), "items": frep},
+        "formations": {"triangles": int(len(Ff)), "items": frep, "decor": drep},
         "budget": {"triangles_loaded": tris + int(len(Ff)), "target": 1500000,
                    "draw_calls_est": int(len(ck)) * max(1, len(set(face_geo.tolist()))) + 2,
                    "collision_total": int(len(Cf) + len(Pf))},
@@ -3961,7 +4082,7 @@ def build(section_path, out_dir=None, network_path=None, flood=True, zone_checks
             chunk_keys=ck, chunk_offsets=coff, chunk_faces=cfaces,
             coll_verts_q=Cvq, coll_faces=Cf.astype(np.int32), proxy_verts_q=Pq, proxy_faces=Pf.astype(np.int32),
             proxy_kind=Pt.astype(np.int8), form_verts_q=Fq, form_faces=Ff.astype(np.int32),
-            form_kind=Ft.astype(np.int8), form_uv=fuv, form_uv_axis=fax,
+            form_kind=Ft.astype(np.int8), form_geo=vis.geos().astype(np.int8), form_uv=fuv, form_uv_axis=fax,
             geology=np.array(json.dumps(sec.geo_names)), zones_json=np.array(json.dumps(zones_out)),
             report_json=np.array(json.dumps(report)))
         plan(os.path.join(out_dir, f"{sec.key}_plan.png"), sec, grid, zones, fl_parts)

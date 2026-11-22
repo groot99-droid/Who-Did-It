@@ -373,6 +373,43 @@ the scene's area prefix and a key (`under_<key>`). What it carries, and why:
   (that rule is for rooms and wild areas), and caves may lie over one another in different files: the valid variant
   `cave_stacked_levels` puts a cave 6 m under another, its mouth's portal and arrival at the same places in plan.
 - In a cave, as in a village section, every spawn stands more than 1 m from every portal of its file (section 5).
+- The scene's extras say `wdi_lantern: true`: the walker carries the lantern there (apps/walk's README, "The
+  lantern"). It is the scene's only extra; no fog or exposure goes there (above).
+
+**A cave's lightmap** (2026-11-21, the realism job's lightmap stage). The cave shell's light is baked into a texture,
+not its vertices. The rock pieces, kerbs, timbers, gates and water keep their light in COLOR_0 as before. What a
+lightmapped material is in the file, and what the viewer does with it:
+
+- The material is `KHR_materials_unlit` with `baseColorTexture` the rock scan on `TEXCOORD_0`, as before. Its
+  primitives have `TEXCOORD_1`, the lightmap's own UV set, and keep `COLOR_0`: the same light per vertex (the
+  vertex fallback, below).
+- `emissiveTexture` is the lightmap page: `{"index": <texture>, "texCoord": 1}`. The texture is an `EXT_texture_webp`
+  image (lossless WebP, 8-bit, sRGB-encoded) with its own sampler: linear filtering, no mip chain, clamped. The page
+  holds, in each texel, what COLOR_0 used to hold for a vertex (k x the light x the tint factor x the albedo, linear),
+  divided by the page's scale S, then sRGB-encoded.
+- `emissiveFactor` is `[S, S, S]`, and the material's extras say `wdi_lightmap: {"page": 0, "texCoord": 1,
+  "scale": S, "encoding": "srgb", "vertex_fallback": true}`. S is at most 1, so no
+  `KHR_materials_emissive_strength` is needed.
+- The viewer shows `base colour x lightmap x S` where it used to show `base colour x COLOR_0`. three.js's
+  `GLTFLoader` reads no emissive for an unlit material (`MeshBasicMaterial`; r186, GLTFLoader.js line 3726). The viewer
+  loads `emissiveTexture` itself, sets it as the material's `lightMap` (sRGB colour space, `channel` 1) and sets
+  `lightMapIntensity` to S x pi, because three's basic shader divides the light map by pi (`meshbasic.glsl.js`
+  line 91). It also sets the material's `vertexColors` to false (`GLTFLoader` turned them on for `COLOR_0`), or the
+  light would count twice. The lantern adds to this light as it does to the vertex light: base colour x lantern(d).
+- **The vertex fallback** (`vertex_fallback: true`). A viewer without that hookup shows the scan x `COLOR_0`: the
+  same dark bake per vertex, as route 3's caves, never the scan unlit. So the files work in today's viewer, and
+  the hookup only sharpens the light.
+- **Seams.** Charts never cross a seam plane. Within 0.6 m of a built seam the texels show the shared vertex light alone,
+  which the stitch makes equal in both files (and over the next metre they give way to their own). The faces there
+  (every vertex within 0.6 m, and the stub) are drawn with a copy of their material named `<material>_seamv`, which
+  has no lightmap and no `wdi_lightmap`: vertex-lit in every viewer. So on the faces both files have, both show the
+  same light (the builder's `<area>_seam_lm.npz` probes, compared by the seam check).
+- **Chart borders.** The builder stitches the page along every chart border, so the linear filter reads the same
+  light on both sides of a border. The viewer needs nothing for this beyond the sampler above (linear, clamped, no
+  mips): a mip chain would average across charts and break it.
+- **Size.** One page per file, at most 2048 x 2048. The texels per metre follow meshy_cave_lightmap.py's rule
+  (`tpm_for`: at most 32, at least 8, so that the shell fits one page). Without mips a 2048 page is 16.8 MB of GPU
+  memory. The file stays under its 10 MB (section 9).
 
 **Extras of spawns and portals.**
 

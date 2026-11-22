@@ -748,5 +748,62 @@ class CancelPairsTest(unittest.TestCase):
         self.assertEqual(len(core.cancel_pairs(same, same)[0]), 2)
 
 
+@unittest.skipIf(core is None, "numpy is not installed")
+class SmoothAxisTest(unittest.TestCase):
+    """The shell's projection axis from the smoothed normal: a bumpy wall at 45 degrees between x and y keeps one
+    projection in patches instead of flipping face by face; near a seam plane each face keeps its own axis."""
+
+    @staticmethod
+    def wall(n=40, seed=5):
+        rng = np.random.default_rng(seed)
+        i, j = np.meshgrid(np.arange(n), np.arange(n), indexing="ij")
+        t = i.ravel() * 0.125
+        z = j.ravel() * 0.125
+        bump = 0.03 * rng.standard_normal(len(t))
+        V = np.stack([t / np.sqrt(2) + bump, -t / np.sqrt(2) + bump, z], axis=1) + np.array([0.0, 10.0, 0.0])
+        F = []
+        for a in range(n - 1):
+            for b in range(n - 1):
+                v = a * n + b
+                F += [[v, v + n, v + 1], [v + 1, v + n, v + n + 1]]
+        return V, np.array(F, np.int64)
+
+    @staticmethod
+    def flips(F, ax):
+        e = np.concatenate([F[:, [0, 1]], F[:, [1, 2]], F[:, [2, 0]]])
+        e.sort(axis=1)
+        fi = np.tile(np.arange(len(F)), 3)
+        code = e[:, 0] * (F.max() + 1) + e[:, 1]
+        o = np.argsort(code)
+        code, fi = code[o], fi[o]
+        same = code[1:] == code[:-1]
+        return float((ax[fi[:-1][same]] != ax[fi[1:][same]]).mean())
+
+    def test_fewer_flips(self):
+        V, F = self.wall()
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        own = np.argmax(np.abs(n), axis=1)
+        ax = core.smooth_axis(V, F)
+        self.assertGreater(self.flips(F, own), 0.2)       # the bumps flip x and y face by face
+        self.assertLess(self.flips(F, ax), 0.5 * self.flips(F, own))
+        self.assertLessEqual(float((ax == 2).mean()), float((own == 2).mean()))   # the bumps' z faces join the wall
+        uv, axis = core.face_uv(V, F, np.full(len(F), 2.0), ax)
+        self.assertTrue(np.array_equal(axis, ax))
+        self.assertEqual(uv.shape, (len(F), 3, 2))
+
+    def test_seam_keeps_own_axis_and_is_deterministic(self):
+        V, F = self.wall()
+        n = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        own = np.argmax(np.abs(n), axis=1)
+        cen = V[F].mean(axis=1)
+        ax = core.smooth_axis(V, F, [(2, 2.0)])
+        near = np.abs(cen[:, 2] - 2.0) <= core.UV_SEAM_KEEP
+        self.assertTrue(np.array_equal(ax[near], own[near]))
+        # the faces' order does not change any face's axis
+        perm = np.random.default_rng(1).permutation(len(F))
+        ax2 = core.smooth_axis(V, F[perm], [(2, 2.0)])
+        self.assertTrue(np.array_equal(ax2, ax[perm]))
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -52,7 +52,20 @@
   "weights": {
     "lamp": 1.0,
     "sky": 1.0,
-    "fill": 1.0
+    "fill": 0.33
+  },
+  "lantern": {
+    "route3_form": 0.5,
+    "route3_texture_lift": 0.45,
+    "route3_dark_percentile": 0.5,
+    "lamp_reach_m": 8.0,
+    "keep_lamps": true,
+    "about": "the walker carries a lantern in the caves (apps/walk src/lantern.ts), so the baked fill is a third of route 3's (weights.fill); placed lamps (the gates' lamps) keep their weight (keep_lamps: the lamp pool rule's dimming, route 1's, is reported but not applied; the highlights' easing caps the pool), and the ink floor still holds the darkest texel. The report compares the display of the texels farther than lamp_reach_m from every placed lamp with route 3's look (every weight 1, form route3_form) on the same bake"
+  },
+  "lightmap": {
+    "quality": 100,
+    "stitch_rounds": 24,
+    "about": "the shell's light is baked into one lightmap page per cave file (meshy_cave_lightmap.py: texels per metre by its rule, at most 32), saved as WebP at quality (100 is lossless) and exported as each shell material's emissiveTexture on TEXCOORD_1 with extras wdi_lightmap (docs/walk-areas.md, section 4, a cave's lightmap)"
   },
   "ao": {
     "distance_m": 1.2,
@@ -61,12 +74,16 @@
     "gamma": 1.0
   },
   "ink_lift": {
-    "margin_luma": 1.2,
-    "dark_percentile": 0.5,
-    "texture_lift": 0.45,
-    "form": 0.5,
+    "margin_luma": 2.0,
+    "dark_percentile": 3.0,
+    "texture_lift": 0.7,
+    "form": 0.6,
     "form_ao": 1.0,
-    "form_gamma": 1.0
+    "form_gamma": 1.0,
+    "form_base": 0.05,
+    "shape_ref": 0.75,
+    "floor_blend_per_m": 0.25,
+    "about": "the ink floor holds each texel's darkest kept scan texel at ink (dark_percentile, after the scan's dark tail is lifted towards texture_lift of its mean); its multiplier is 1 + form x the AO term x (form_base + (1 - form_base) x s), s = x / (1 + x), x the bake over shape_ref x the floor's light (meshy_cave_build.floor_shape), so the floor carries the bake's shape and rock far from every light sits on the bare floor; the darkest-texel ratio is relaxed across the materials' edges by at most exp(floor_blend_per_m) a metre (meshy_cave_lightmap.relax_floor), so the light does not step where two scans meet"
   },
   "hot": {
     "knee": 0.62,
@@ -79,12 +96,17 @@
     "draft_samples": 32
   },
   "kits": {
-    "limestone": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
-    "lakeclay": { "wall": "brown_mud_02", "floor": "brown_mud_02" },
-    "slate": { "wall": "rock_face", "floor": "rock_face" },
-    "breakdown": { "wall": "rock_ground", "floor": "rock_ground" },
-    "flowstone": { "wall": "seaside_rock", "floor": "seaside_rock" },
-    "default": { "wall": "quarry_wall_02", "floor": "rocks_ground_08" },
+    "limestone": { "wall": "rock_01", "floor": "rock_ground_02" },
+    "flowstone": { "wall": "worn_rock_natural_01", "floor": "rock_06" },
+    "breakdown": { "wall": "rocks_ground_06", "floor": "rocks_ground_06" },
+    "gypsum": { "wall": "rock_boulder_dry", "floor": "rock_boulder_dry" },
+    "lakeclay": { "wall": "brown_mud_02", "floor": "brown_mud_03" },
+    "slate": { "wall": "dark_rock_02", "floor": "dark_rock_02" },
+    "skarn": { "wall": "marble_rock_03", "floor": "tiger_rock" },
+    "granite": { "wall": "tiger_rock", "floor": "rocks_ground_08" },
+    "flooded": { "wall": "seaside_rock", "floor": "low_tide_rocks" },
+    "default": { "wall": "rock_01", "floor": "rock_ground_02" },
+    "moss": { "wall": "lichen_rock", "floor": "mossy_rock" },
     "mouth": { "wall": "mossy_rock", "floor": "mossy_rock" },
     "ice": { "wall": "snow_02", "floor": "snow_03" },
     "mouth_cliff_slot": { "wall": "rock_wall_08", "floor": "snow_03" },

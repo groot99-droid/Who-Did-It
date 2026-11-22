@@ -18,6 +18,10 @@
     "passages": { "type": "array", "items": { "$ref": "#/$defs/passage" } },
     "chambers": { "type": "array", "items": { "$ref": "#/$defs/chamber" } },
     "features": { "type": "array", "items": { "$ref": "#/$defs/feature" } },
+    "decor": {
+      "description": "false: no formations, fallen rock or breakdown placed by geology (meshy_cave_rock.decor); default true",
+      "type": "boolean"
+    },
     "guards": { "type": "array", "items": { "$ref": "#/$defs/guard" } },
     "bridges": { "type": "array", "items": { "$ref": "#/$defs/bridge" } },
     "drops": { "type": "array", "items": { "$ref": "#/$defs/drop" } },
@@ -92,7 +96,20 @@
           "minItems": 2,
           "maxItems": 2
         },
-        "detail": { "type": "string" }
+        "detail": { "type": "string" },
+        "rock": {
+          "description": "overrides of the geology's rock profile (meshy_cave_rock.ROCK): dip, ledge, scallop, joints, rubble, decor",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dip": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+            "ledge": { "type": "number", "minimum": 0, "maximum": 0.3 },
+            "scallop": { "type": "number", "minimum": 0, "maximum": 0.2 },
+            "joints": { "type": "array", "minItems": 3, "maxItems": 3 },
+            "rubble": { "type": "number", "minimum": 0, "maximum": 0.3 },
+            "decor": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }
+          }
+        }
       }
     },
     "region": {
