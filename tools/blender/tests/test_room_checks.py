@@ -3,6 +3,7 @@ spans read from the builder's manifest and the scene, the check file only for a 
 banned words. Plain Python on small synthetic manifests: no Blender, no build."""
 
 import json
+import re
 import os
 import sys
 import tempfile
@@ -118,6 +119,16 @@ class FactsTest(unittest.TestCase):
         for w in ("crepe", "crape", "georgette", "gallows", "noose", "rope", "torch", "sconce", "veil"):
             self.assertIn(w, F.banned)
         self.assertEqual(len(F.banned), len(set(F.banned)))
+
+    def test_allowed_ids_are_stripped_from_extra_values_only(self):
+        # decision D7: the cellar's torches keep their scene ids in the lights' extras; the names carry `brand`
+        F = self.facts(parlour_manifest(), cfg={"allowed_ids": ["cl.lt_torch_well"]})
+        self.assertEqual(F.allowed_ids, ("cl.lt_torch_well",))
+        ban = re.compile("|".join(re.escape(w) for w in F.banned), re.I)
+        self.assertIsNone(ban.search(roomcfg.strip_allowed("cl.brand_well:glow:cl.lt_torch_well", F.allowed_ids)))
+        self.assertIsNotNone(ban.search(roomcfg.strip_allowed("cl.lt_torch_trap", F.allowed_ids)))
+        self.assertIsNotNone(ban.search(roomcfg.strip_allowed("a torch", F.allowed_ids)))
+        self.assertEqual(self.facts(parlour_manifest()).allowed_ids, ())
 
     def test_the_parlour_room_file_names_pass_the_scan(self):
         # decision D7: names in the room file (ids, labels) carry no banned word

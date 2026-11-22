@@ -1,0 +1,926 @@
+{
+  "room": "cellar",
+  "about": "The Undercroft, the old vault under the square, a room file v2 (the format: the builder's README, room files). Metres in the room's frame: x east, y north, z up, the floor's centre on the origin; 26 x 14 m inside (x -13..13, y -7..7), 2.6 m high (the plan's height for the cellar). Every prop, spot, portal and night light of packages/content/data/scenes/cellar.json is named below. Three ends: the crypt's in the west (bone niches in the old wall and on a pillar, the steep crypt stair up to the chapel), the well's in the middle of the north side (the ladder up to the well hatch, the bucket, sacks and planks), the Lantern's in the east (casks, barrels and bottle crates under the tavern's trap and its ladder). Three old walls divide the vault into four bays (G21's wall-pieces, D5). No window; pitch dark but for a brand by each way out. Grey boxes stand in for the pieces with no model (decision D2). A key named note, or <key>_note beside <key>, is a comment.",
+  "district": "The Undercroft",
+  "district_note": "equal to the scene's `name`: cc_struct.py compares each spawn's wdi_district with it",
+  "spawn_labels": {
+    "well": "At the foot of the well ladder",
+    "trap": "At the foot of the trap ladder",
+    "crypt": "At the foot of the crypt stair"
+  },
+  "height": 2.6,
+  "height_note": "the plan's 2.6 m for the cellar (Reference E)",
+  "wall_t": 0.3,
+  "floor": {
+    "slug": "rock_wall_08",
+    "role": "stone_wall",
+    "zoom": 1.35,
+    "factor": [0.8, 0.79, 0.74]
+  },
+  "floor_note": "the flags (`f` in the scene's material layer), the chapel's and the mixing room's stone, a step darker",
+  "wall_colour": "#6E6656",
+  "wall_colour_note": "guess: old stone under lime, a dark warm grey (yellow-brown above blue: never pink or lilac under the brands)",
+  "ceiling_colour": "#544B3E",
+  "ceiling_colour_note": "the vault's underside, dark",
+  "paint_colour": "#6E6452",
+  "wood_colour": "#3E2F22",
+  "wood_colour_note": "dark oak: the beams, the ladders, the hatches, the brands, the crypt stair",
+  "skirting": null,
+  "skirting_note": "none: stone to the flags",
+  "picture_rail": null,
+  "picture_rail_note": "none in a cellar",
+  "cornice": null,
+  "cornice_note": "none: the walls meet the vault",
+  "openings": [
+    {
+      "id": "cl.well",
+      "kind": "hatch",
+      "portal": "cl.well",
+      "side": "N",
+      "note": "the well hatch (cl.well: up to the square's well, spawn well, 4 m up) at its tile (14,0): the portal at the north wall's face (0.5, 7.0), at the foot of the ladder up to the boarded leaf in the vault (the pieces cl.well_ladder_* and cl.well_hatch, D6); the well spawn (0.5, 6.5) stands 0.5 m inside it, facing south"
+    },
+    {
+      "id": "cl.trap",
+      "kind": "hatch",
+      "portal": "cl.trap",
+      "side": "E",
+      "note": "the tavern's trap (cl.trap: up to tavern_back, spawn trap, 3 m up) at its tile (27,8): the portal at the east wall's face (13.0, -0.5), at the foot of the ladder (cl.trap_ladder_*, cl.trap_hatch); the trap spawn (12.5, -0.5) stands 0.5 m inside it, facing west"
+    },
+    {
+      "id": "cl.crypt",
+      "kind": "stairs",
+      "portal": "cl.crypt",
+      "side": "W",
+      "flight": {
+        "up": true,
+        "well": [-13.0, -3.0, -12.1, -1.4],
+        "dir": "S",
+        "base": -1.0,
+        "riser": 0.26,
+        "tread": 0.2,
+        "over": 1.0
+      },
+      "flight_note": "G12 (D6: visible stairs): a steep crypt stair 0.9 m wide against the west wall, its first riser at y -1.0 (the south edge of the spawn's tile), rising south (0.26 m risers, 0.2 m treads) through a hole in the vault (y -3.0..-1.4) and on 1.0 m above it into the dark (the chapel's crypt stair). The flight stands on tiles (1,9) and (1,10), which cannot be stood on (listed for the owner, as the chapel's)",
+      "note": "the crypt stair up to the chapel (cl.crypt: to chapel, spawn crypt, 3 m up) at its tile (0,8): the portal at the west wall's face (-13.0, -0.5), 0.5 m north of the flight's foot; the crypt spawn (-12.5, -0.5) stands beside the foot, facing east"
+    }
+  ],
+  "openings_note": "no window and no door: three markers (two hatches and a stair), each with its visible way up",
+  "exposure": null,
+  "exposure_note": "null: chosen from the bake (the builder's choose_exposure)",
+  "lights": [
+    {
+      "id": "cl.lt_torch_well",
+      "role": "wall",
+      "name": "cl.lt_brand_well",
+      "anchor": {
+        "piece": "cl.brand_well",
+        "name": "flame"
+      },
+      "glow": {
+        "shape": "cone",
+        "size": [0.035, 0.12],
+        "material": "flame",
+        "at": [[0.0, 0.0, -0.02]]
+      },
+      "note": "the brand by the well's way out (tile (13,0)): its flame 2 cm over the brand's top, a flame cone on the top; the light's name carries `brand` (D7)"
+    },
+    {
+      "id": "cl.lt_torch_trap",
+      "role": "wall",
+      "name": "cl.lt_brand_trap",
+      "anchor": {
+        "piece": "cl.brand_trap",
+        "name": "flame"
+      },
+      "glow": {
+        "shape": "cone",
+        "size": [0.035, 0.12],
+        "material": "flame",
+        "at": [[0.0, 0.0, -0.02]]
+      },
+      "note": "the brand by the trap's way out (tile (27,7)): its flame 2 cm over the brand's top, a flame cone on the top; the light's name carries `brand` (D7)"
+    },
+    {
+      "id": "cl.lt_torch_crypt",
+      "role": "wall",
+      "name": "cl.lt_brand_crypt",
+      "anchor": {
+        "piece": "cl.brand_crypt",
+        "name": "flame"
+      },
+      "glow": {
+        "shape": "cone",
+        "size": [0.035, 0.12],
+        "material": "flame",
+        "at": [[0.0, 0.0, -0.02]]
+      },
+      "note": "the brand by the crypt's way out (tile (0,7)): its flame 2 cm over the brand's top, a flame cone on the top; the light's name carries `brand` (D7)"
+    }
+  ],
+  "lights_note": "Bake groups: candle (the three brands) and fill = 2, and the AO. No moon: the cellar has no window.",
+  "look": {
+    "note": "G9 and G22: the room's override of meshy_looks/interior_fp.json: the wall brand's role, the gas's faint teal glow, the darker-room lever of the loft (the plan: a darker night for the scenes marked dark) and a light setting of the room's own.",
+    "lights": {
+      "wall": {
+        "color": "#FFB457",
+        "power": 70.0,
+        "radius": 0.06
+      }
+    },
+    "lights_note": "a wall brand: the lamp's colour, more power than a candle and a wider flame (a first guess for the first 128-sample bake to set)",
+    "emit_display": {
+      "M_teal": [0.01, 0.13, 0.11]
+    },
+    "emit_display_note": "the gas's faint shimmer: the loft lamp's teal at a fifth",
+    "exposure": {
+      "pool_display": 0.4
+    },
+    "exposure_note": "a step over the loft's darker-room lever (0.3): at 0.3 the first bake read as a black room with three sparks",
+    "ink_lift": {
+      "form": 0.0
+    },
+    "settings": {
+      "cellar": {
+        "label": "the undercroft",
+        "mix": {
+          "candle": 1.0,
+          "fill": 6.0
+        },
+        "note": "the first guess (fill 0.05, as the loft's) gave a first 128-sample bake (2026-11-22) with 99.4 % of the vertices under the ink; mixes of its saved light (fill 0.05 to 10) moved that share only from fill 10 (87 %): fill 4 and the exposure lever a step up (0.3 to 0.4) for the second bake, whose light read with form (93 % under the ink). From its saved light fill 6 gave 85 % and the far wall 0.76 of the brand wall (fill 4: 0.72, fill 8: 0.79): fill 6 for the final, a dark vault where the walls and pieces still read"
+      }
+    }
+  },
+  "light": "cellar",
+  "light_note": "the room's own light setting (look.settings.cellar; --light overrides)",
+  "skip": {
+    "cl.cobweb_0": "a cobweb between the beams and the wall: a card, which waits for G19 (decals, cards and frost)",
+    "cl.cobweb_1": "a cobweb card, G19",
+    "cl.cobweb_2": "a cobweb card, G19",
+    "cl.cobweb_3": "a cobweb card, G19"
+  },
+  "pieces": [
+    {
+      "id": "cl.vault_wall_w",
+      "decor": true,
+      "spec": {
+        "model": "wall",
+        "outline": [
+          [-8.0, -4.0],
+          [-7.0, -4.0],
+          [-7.0, 4.0],
+          [-8.0, 4.0]
+        ]
+      },
+      "note": "the scene's inner wall at tile column 6, rows 4 to 11 (x -8..-7, y -4..4): the old wall between two bays of the undercroft as a wall-piece (G21, D5), a solid block to the vault; its south end is the pillar the scene dresses"
+    },
+    {
+      "id": "cl.vault_wall_c",
+      "decor": true,
+      "spec": {
+        "model": "wall",
+        "outline": [
+          [-1.0, -4.0],
+          [0.0, -4.0],
+          [0.0, 4.0],
+          [-1.0, 4.0]
+        ]
+      },
+      "note": "the scene's inner wall at tile column 13, rows 4 to 11 (x -1..0, y -4..4): the middle wall between the bays (G21, D5)"
+    },
+    {
+      "id": "cl.vault_wall_e",
+      "decor": true,
+      "spec": {
+        "model": "wall",
+        "outline": [
+          [6.0, -4.0],
+          [7.0, -4.0],
+          [7.0, 4.0],
+          [6.0, 4.0]
+        ]
+      },
+      "note": "the scene's inner wall at tile column 20, rows 4 to 11 (x 6..7, y -4..4): the old wall between two bays of the undercroft as a wall-piece (G21, D5), a solid block to the vault; its south end is the pillar the scene dresses"
+    },
+    {
+      "id": "cl.brand_well",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -0.5, 6.79],
+      "rise": 1.45,
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.06, 0.42],
+        "label": "Wall brand: a pitch-soaked brand of split oak in an iron cup, lit",
+        "finish": "wood",
+        "anchors": {
+          "flame": [0.0, 0.0, 0.44]
+        }
+      },
+      "note": "the scene's cl.lt_torch_well at its tile (13,0), on the N wall (decision D7: a single cellar brand stays; its node and light names carry `brand`, so they pass the word scan): the brand 21 cm out from the wall, its foot 1.45 m up, its flame's light 2 cm over its top (1.89 m)"
+    },
+    {
+      "id": "cl.brand_well_arm",
+      "decor": true,
+      "face": "S",
+      "place": ["wall", "N", -0.5],
+      "rise": 1.62,
+      "spec": {
+        "model": "box",
+        "size": [0.04, 0.15, 0.04],
+        "label": "Iron bracket of the wall brand"
+      },
+      "note": "the brand's iron arm out from the wall, 1 cm short of the brand (a grey box)"
+    },
+    {
+      "id": "cl.brand_trap",
+      "decor": true,
+      "face": "W",
+      "place": ["at", 12.79, 0.5],
+      "rise": 1.45,
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.06, 0.42],
+        "label": "Wall brand: a pitch-soaked brand of split oak in an iron cup, lit",
+        "finish": "wood",
+        "anchors": {
+          "flame": [0.0, 0.0, 0.44]
+        }
+      },
+      "note": "the scene's cl.lt_torch_trap at its tile (27,7), on the E wall (decision D7: a single cellar brand stays; its node and light names carry `brand`, so they pass the word scan): the brand 21 cm out from the wall, its foot 1.45 m up, its flame's light 2 cm over its top (1.89 m)"
+    },
+    {
+      "id": "cl.brand_trap_arm",
+      "decor": true,
+      "face": "W",
+      "place": ["wall", "E", 0.5],
+      "rise": 1.62,
+      "spec": {
+        "model": "box",
+        "size": [0.04, 0.15, 0.04],
+        "label": "Iron bracket of the wall brand"
+      },
+      "note": "the brand's iron arm out from the wall, 1 cm short of the brand (a grey box)"
+    },
+    {
+      "id": "cl.brand_crypt",
+      "decor": true,
+      "face": "E",
+      "place": ["at", -12.79, 0.5],
+      "rise": 1.45,
+      "spec": {
+        "model": "box",
+        "size": [0.06, 0.06, 0.42],
+        "label": "Wall brand: a pitch-soaked brand of split oak in an iron cup, lit",
+        "finish": "wood",
+        "anchors": {
+          "flame": [0.0, 0.0, 0.44]
+        }
+      },
+      "note": "the scene's cl.lt_torch_crypt at its tile (0,7), on the W wall (decision D7: a single cellar brand stays; its node and light names carry `brand`, so they pass the word scan): the brand 21 cm out from the wall, its foot 1.45 m up, its flame's light 2 cm over its top (1.89 m)"
+    },
+    {
+      "id": "cl.brand_crypt_arm",
+      "decor": true,
+      "face": "E",
+      "place": ["wall", "W", 0.5],
+      "rise": 1.62,
+      "spec": {
+        "model": "box",
+        "size": [0.04, 0.15, 0.04],
+        "label": "Iron bracket of the wall brand"
+      },
+      "note": "the brand's iron arm out from the wall, 1 cm short of the brand (a grey box)"
+    },
+    {
+      "id": "cl.well_ladder_rail_a",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.27, 6.9],
+      "spec": {
+        "model": "box",
+        "size": [0.05, 0.05, 2.52],
+        "label": "Well ladder (rail)",
+        "finish": "wood"
+      },
+      "note": "the ladder's rails from the flags to the hatch's frame (2.52 m)"
+    },
+    {
+      "id": "cl.well_ladder_rail_b",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.73, 6.9],
+      "spec": {
+        "model": "box",
+        "size": [0.05, 0.05, 2.52],
+        "label": "Well ladder (rail)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_0",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 0.3,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      },
+      "note": "the rungs every 0.3 m"
+    },
+    {
+      "id": "cl.well_ladder_rung_1",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 0.6,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_2",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_3",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 1.2,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_4",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 1.5,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_5",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 1.8,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_6",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 2.1,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_ladder_rung_7",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.9],
+      "rise": 2.4,
+      "spec": {
+        "model": "box",
+        "size": [0.4, 0.035, 0.035],
+        "label": "Well ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.well_hatch",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.5, 6.6],
+      "rise": 2.525,
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.8, 0.07],
+        "label": "Well hatch: a boarded oak leaf in the vault, shut",
+        "finish": "wood"
+      },
+      "note": "the well hatch (cl.well, decision D6: visible and boarded): an oak leaf in its frame flush under the vault over the ladder's head, the way up to the well on the square"
+    },
+    {
+      "id": "cl.trap_hatch",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.6, -0.5],
+      "rise": 2.525,
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.9, 0.07],
+        "label": "Trap hatch: the tavern's boarded trap seen from below, shut",
+        "finish": "wood"
+      },
+      "note": "the underside of the tavern back room's trap (cl.trap): its leaf in the vault over the ladder's head"
+    },
+    {
+      "id": "cl.trap_ladder_rail_a",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.73],
+      "spec": {
+        "model": "box",
+        "size": [0.05, 0.05, 2.52],
+        "label": "Trap ladder (rail)",
+        "finish": "wood"
+      },
+      "note": "the ladder's rails from the flags to the hatch's frame (2.52 m)"
+    },
+    {
+      "id": "cl.trap_ladder_rail_b",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.27],
+      "spec": {
+        "model": "box",
+        "size": [0.05, 0.05, 2.52],
+        "label": "Trap ladder (rail)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_0",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 0.3,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      },
+      "note": "the rungs every 0.3 m"
+    },
+    {
+      "id": "cl.trap_ladder_rung_1",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 0.6,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_2",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 0.9,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_3",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 1.2,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_4",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 1.5,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_5",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 1.8,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_6",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 2.1,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.trap_ladder_rung_7",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 12.9, -0.5],
+      "rise": 2.4,
+      "spec": {
+        "model": "box",
+        "size": [0.035, 0.4, 0.035],
+        "label": "Trap ladder (rung)",
+        "finish": "wood"
+      }
+    },
+    {
+      "id": "cl.crypt_gate",
+      "decor": true,
+      "face": "S",
+      "place": ["at", -12.55, -0.97],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.05, 1.0],
+        "label": "Crypt gate: a low oak gate across the foot of the crypt stair, on its latch",
+        "finish": "wood"
+      },
+      "note": "a low gate across the foot of the crypt stair (the first person's own), 5 mm north of the first riser: the flight's collision box runs to the floor at its foot, and the gate shows where it stands (the first no-bake build's check found a 0.19 m invisible wall over the low first tread)"
+    },
+    {
+      "id": "cl.ossuary_0",
+      "face": "S",
+      "place": ["wall", "N", -12.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.35, 1.3],
+        "label": "Bone niche: skulls and long bones stacked in a recess of the old wall"
+      },
+      "note": "the bone niche at its tile (1,0), in the north-west corner against the north wall (the plan's ossuary niche: a grey box)"
+    },
+    {
+      "id": "cl.gas_alcove_n",
+      "face": "S",
+      "place": ["wall", "N", -10.5],
+      "spec": {
+        "model": "box",
+        "size": [0.6, 0.16, 0.5],
+        "label": "Gas alcove: the sill of a shallow recess in the old wall, a faint shimmer of marsh gas over it",
+        "glow": {
+          "shape": "card",
+          "size": [0.5, 0.6],
+          "material": "teal",
+          "at": [[0.0, 0.0, 0.5]]
+        }
+      },
+      "note": "the gas pocket at its tile (3,0) on the north wall (V1.5): a grey box for the recess's sill and a faint teal card standing on it, 8 cm off the wall, 0.5 to 1.1 m up (teal only as emitted light: no teal surface)"
+    },
+    {
+      "id": "cl.ossuary_1",
+      "face": "S",
+      "place": ["at", -7.5, -4.185],
+      "spec": {
+        "model": "box",
+        "size": [0.8, 0.35, 1.3],
+        "label": "Bone niche: skulls and long bones in a recess of the pillar's face"
+      },
+      "note": "the second bone niche at its tile (6,11), the pillar at the west vault wall's south end: against its south face"
+    },
+    {
+      "id": "cl.dump",
+      "spot": true,
+      "face": "S",
+      "place": ["at", -8.5, -5.5],
+      "spec": {
+        "model": "box",
+        "size": [1.1, 0.9, 0.25],
+        "label": "Dump: a heap of old sacking and broken staves on the earth (the body spot)"
+      },
+      "note": "the body spot at its tile (5,13): a low heap (0.25 m, under the step: the walker steps onto it), a grey box (the plan's dump patch)"
+    },
+    {
+      "id": "cl.tin_crate",
+      "face": "N",
+      "place": ["wall", "S", -12.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [-0.22, null, 0.0],
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.0, null, 0.0],
+            "rot": 20.0,
+            "lod": 0.5
+          },
+          {
+            "slug": "oil_tin",
+            "scale": 1.0,
+            "at": [0.22, null, 0.0],
+            "rot": -15.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the tin crate at its tile (1,14), in the south-west corner against the south wall, three tins on it (the tavern back room's)"
+    },
+    {
+      "id": "cl.water_bucket",
+      "face": "S",
+      "place": ["wall", "N", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bucket_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the well's bucket at its tile (16,1), against the north wall east of the ladder"
+    },
+    {
+      "id": "cl.flour_sacks",
+      "face": "S",
+      "place": ["at", -1.5, 4.5],
+      "spec": {
+        "model": "box",
+        "size": [0.9, 0.6, 0.7],
+        "label": "Flour sacks: three filled hessian sacks slumped on a pallet"
+      },
+      "note": "the sacks at their tile (12,3), free-standing in the north aisle west of the well (the plan's sack pile, Tier 1: a grey box)"
+    },
+    {
+      "id": "cl.planks",
+      "face": "S",
+      "place": ["wall", "S", -3.5],
+      "spec": {
+        "model": "box",
+        "size": [2.0, 0.35, 0.3],
+        "label": "Plank stack: old floorboards stacked against the wall",
+        "finish": "wood"
+      },
+      "note": "the planks at their tile (10,14), a stack 2 m long against the south wall (the joinery's wood, a box)"
+    },
+    {
+      "id": "cl.study_key",
+      "face": "S",
+      "place": ["wall", "N", 11.5],
+      "rise": 1.25,
+      "spec": {
+        "model": "box",
+        "size": [0.3, 0.1, 0.25],
+        "label": "Key niche: a loose stone in the north wall, the study key behind it"
+      },
+      "note": "the study key's cache (cl.study_key, V1.5, a task piece) at its tile (25,0): a loose stone in the north wall at 1.25 m, within reach"
+    },
+    {
+      "id": "cl.wine_rack_n",
+      "spot": true,
+      "face": "S",
+      "place": ["at", -5.5, 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 0.9,
+        "lod": 0.5
+      },
+      "note": "the north wine rack (a hide spot) at its tile (8,3), free-standing in the north aisle before the west bay: the worn shelf at 0.9 (1.24 x 0.52 x 1.86 m) stands in for the rack; its bottles are a .blend (G8), not built"
+    },
+    {
+      "id": "cl.wine_rack_s",
+      "spot": true,
+      "face": "N",
+      "place": ["at", 5.5, -4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_bookshelf_worn",
+        "scale": 0.9,
+        "lod": 0.5
+      },
+      "note": "the south wine rack (a hide spot) at its tile (19,12), free-standing in the south aisle, facing north"
+    },
+    {
+      "id": "cl.gas_alcove_s",
+      "face": "S",
+      "place": ["at", 6.5, -4.09],
+      "spec": {
+        "model": "box",
+        "size": [0.6, 0.16, 0.5],
+        "label": "Gas alcove: the sill of a shallow recess in the pillar's face, a faint shimmer of marsh gas over it",
+        "glow": {
+          "shape": "card",
+          "size": [0.5, 0.6],
+          "material": "teal",
+          "at": [[0.0, 0.0, 0.5]]
+        }
+      },
+      "note": "the second gas pocket at its tile (20,11), on the south face of the east vault wall's pillar (V1.5)"
+    },
+    {
+      "id": "cl.wine_cask_0",
+      "face": "W",
+      "place": ["wall", "E", 4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "the casks and barrels of the tavern's stores, upright against the east wall at their tiles (26,3..5) and (26,12..14) (the scene's cradles are not built)"
+    },
+    {
+      "id": "cl.wine_cask_1",
+      "face": "W",
+      "place": ["wall", "E", 3.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "at its tile (26,4)"
+    },
+    {
+      "id": "cl.wine_cask_2",
+      "face": "W",
+      "place": ["wall", "E", 2.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "at its tile (26,5)"
+    },
+    {
+      "id": "cl.wine_cask_3",
+      "face": "W",
+      "place": ["wall", "E", -4.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "at its tile (26,12)"
+    },
+    {
+      "id": "cl.barrel_0",
+      "face": "W",
+      "place": ["wall", "E", -5.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "at its tile (26,13)"
+    },
+    {
+      "id": "cl.barrel_1",
+      "face": "W",
+      "place": ["wall", "E", -6.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wine_barrel_01",
+        "scale": 1.0,
+        "lod": 0.4
+      },
+      "note": "at its tile (26,14)"
+    },
+    {
+      "id": "cl.bottle_crate_0",
+      "face": "N",
+      "place": ["wall", "S", 8.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "wooden_crate_01",
+            "scale": 1.0,
+            "at": [0.04, null, 0.0],
+            "rot": 6.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the bottle crates at their tile (22,14), two stacked against the south wall (the bottles are a .blend, G8)"
+    },
+    {
+      "id": "cl.bottle_crate_1",
+      "face": "S",
+      "place": ["at", 7.5, 5.5],
+      "spec": {
+        "model": "ph",
+        "slug": "wooden_crate_01",
+        "scale": 1.0,
+        "lod": 0.5,
+        "dress": [
+          {
+            "slug": "wooden_crate_01",
+            "scale": 1.0,
+            "at": [0.04, null, 0.0],
+            "rot": -5.0,
+            "lod": 0.5
+          }
+        ]
+      },
+      "note": "the second pair at its tile (21,2), free-standing in the north aisle"
+    },
+    {
+      "id": "cl.beam_n",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.0, 5.5],
+      "rise": 2.355,
+      "spec": {
+        "model": "box",
+        "size": [25.98, 0.22, 0.24],
+        "label": "Vault beam",
+        "finish": "wood"
+      },
+      "note": "two oak beams the length of the undercroft over the north and south aisles (the scene's webs hang between the beams and the wall), their undersides at 2.355 m, their tops 5 mm under the vault"
+    },
+    {
+      "id": "cl.beam_s",
+      "decor": true,
+      "face": "S",
+      "place": ["at", 0.0, -5.5],
+      "rise": 2.355,
+      "spec": {
+        "model": "box",
+        "size": [25.98, 0.22, 0.24],
+        "label": "Vault beam",
+        "finish": "wood"
+      }
+    }
+  ],
+  "views_note": "name: [eye x, y, z], [target x, y, z], the vertical field of view in degrees (EYE 1.6 and VFOV 70, the walk viewer's). spawn_well, spawn_trap and spawn_crypt are the spawns' own views.",
+  "views": {
+    "spawn_well": [[0.5, 6.5, 1.6], [0.5, -7.0, 1.4], 70.0],
+    "spawn_trap": [[12.5, -0.5, 1.6], [-13.0, -0.5, 1.4], 70.0],
+    "spawn_crypt": [[-12.5, -0.5, 1.6], [13.0, -0.5, 1.4], 70.0],
+    "north_aisle": [[12.0, 5.6, 1.6], [-13.0, 5.6, 1.2], 70.0],
+    "south_aisle": [[-12.0, -5.6, 1.6], [13.0, -5.6, 1.2], 70.0],
+    "crypt_stair": [[-10.2, 1.2, 1.6], [-13.0, -2.4, 1.4], 70.0],
+    "well_ladder": [[0.5, 3.0, 1.6], [0.5, 7.0, 1.9], 70.0],
+    "trap_ladder": [[9.0, 1.8, 1.6], [13.0, -0.8, 1.6], 70.0],
+    "casks": [[9.5, 5.0, 1.6], [13.0, 3.0, 0.9], 70.0],
+    "west_bay": [[-10.5, -2.5, 1.6], [-5.5, 5.0, 1.1], 70.0],
+    "dump": [[-5.0, -2.6, 1.6], [-8.5, -6.0, 0.2], 70.0]
+  }
+}

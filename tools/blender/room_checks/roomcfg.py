@@ -80,6 +80,18 @@ BANNED = ("crepe", "crape", "georgette", "gallows", "noose", "rope", "torch", "s
 SIDES = "NESW"
 
 
+def strip_allowed(text, allowed):
+    """An extra's value with every allowed scene id taken out, before the banned-word scan: a scene id the owner's
+    rule lets stand in the game's own data (decision D7: the cellar's single torches, `cl.lt_torch_*`) may be carried
+    as a light's or a glow's `wdi_light_id` / `wdi_id`, while every node name still passes the scan. Names and extra
+    keys are never stripped."""
+    out = str(text)
+    for a in sorted(allowed, key=len, reverse=True):
+        out = out.replace(a, "")
+    return out
+
+
+
 def read_json(path, what):
     """A JSON file the checks need (the manifest, the scene); a missing one stops the check: no number is guessed."""
     if not os.path.exists(path):
@@ -142,6 +154,8 @@ class Facts:
         self.no_color0 = man["noColor0"] if man.get("noColor0") is not None else need(cfg, "no_color0", A.config)
         self.banned = tuple(dict.fromkeys(BANNED + tuple(w.lower() for w in cfg.get("banned_words", ()))))
         self.known_fails = cfg.get("known_fails", [])
+        # the scene ids whose banned word the owner allows in an extra's value (strip_allowed): the check file's
+        self.allowed_ids = tuple(str(x) for x in cfg.get("allowed_ids", ()))
 
     # ------------------------------------------------------------------ the walls
     def plane(self, side):

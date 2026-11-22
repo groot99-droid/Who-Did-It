@@ -1,0 +1,11 @@
+{
+  "about": "The Undercroft as the room checks know it (tools/blender/room_checks). Since G2b the checks read the room's numbers from the builder's manifest and the scene (roomcfg.Facts); this file holds only the judged failures and the scene ids allowed in extras.",
+  "allowed_ids": ["cl.lt_torch_well", "cl.lt_torch_trap", "cl.lt_torch_crypt"],
+  "allowed_ids_note": "decision D7: the cellar's single torches stay as objects. Their nodes and lights are named `brand` (cl.brand_*, cl.lt_brand_*), so every name passes the word scan; the lights' and glows' extras keep the scene's own light ids (wdi_light_id, which cc_struct holds to the scene's night lights), and r7_extra takes these three ids out of an extra's value before it scans it",
+  "known_fails": [
+    {
+      "check": "cc_geom:walkable_tiles_standable",
+      "why": "323 of the map's 325 walkable tiles can be stood on. (1,9) and (1,10) lie under the crypt stair (the visible flight up to the chapel, decision D6), 0.9 m wide against the west wall from the crypt spawn's tile southward: a flight up stands on its tiles, as the chapel's crypt stair stands on two of the chapel's. A piece of the room covering walkable tiles, as the bedroom's bed does. Listed for the owner (2026-11-22), not yet ruled on."
+    }
+  ]
+}

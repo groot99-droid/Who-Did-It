@@ -21,7 +21,8 @@ a window's drapes, has no piece to walk up to; a manifest without `coverage` kee
 the room skips is left out of the approach rule (a piece hung on a wall, `rise`, is not: the bedroom's photographs over
 the bed's head are its judged failure); the objects hung on purpose (a
 piece with `rise`, the photographs builder's frames, the cloths over a piece, the openings' joinery) are left out of the floating test; every point
-light with an anchor is held to its flame or its firebox; the banned words are `roomcfg.BANNED` and the check file's.
+light with an anchor is held to its flame or its firebox; the banned words are `roomcfg.BANNED` and the check file's;
+an extra's value may carry a scene id the check file allows (`allowed_ids`, `roomcfg.strip_allowed`), a name never.
 """
 import json
 import math
@@ -313,9 +314,10 @@ hits = [(c, n) for c, n in names_all if BAN.search(n)]
 ex_hits = []
 for n in nodes:
     for k, v in (n.get("extras") or {}).items():
-        if BAN.search(str(k)) or BAN.search(str(v)):
+        if BAN.search(str(k)) or BAN.search(roomcfg.strip_allowed(v, F.allowed_ids)):
             ex_hits.append((n.get("name"), k, str(v)[:60]))
 xcheck("no_banned_word_in_any_name", not hits and not ex_hits, names=len(names_all), hits=hits, extras_hits=ex_hits,
+       allowed_ids=list(F.allowed_ids),
        cloth_materials=sorted({m.get("name", "") for m in J["materials"] if re.search(r"cloth|curtain|linen|coverlet|wool", m.get("name", ""), re.I)}))
 
 # ------------------------------------------------------------------------------------------- 6. intersections, floating
