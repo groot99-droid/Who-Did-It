@@ -32,12 +32,23 @@ export class InputController {
   /** Key code -> handler(down). Held keys get a final `false` when focus is lost. */
   private readonly bindings = new Map<string, (down: boolean) => void>();
   private readonly down = new Set<string>();
+  /** The sprite world's camera heading in quarter turns (round 11, R2); 0 on the Phaser path. Kept across scenes. */
+  private heading_ = 0;
 
   constructor(private sink: MoveSink) {}
 
   /** A new match brings a new feed; the controller outlives the World scene, so repoint it. */
   setSink(sink: MoveSink): void {
     this.sink = sink;
+  }
+
+  get heading(): number {
+    return this.heading_;
+  }
+
+  /** The sprite world turned its camera: screen-frame keys and stick map to the world through this heading. */
+  setHeading(heading: number): void {
+    this.heading_ = heading;
   }
 
   /** Adds the touch controls' state to the keyboard's. */
@@ -81,7 +92,11 @@ export class InputController {
 
   /** The command for the current input state: screen-axis keys and stick turned into the world frame (SPRITES 10.8). */
   current(): Omit<MoveCmd, 'seq'> {
-    const { dx, dy } = worldMove(keyVector(this.pressed), this.touch?.vector() ?? { dx: 0, dy: 0 });
+    const { dx, dy } = worldMove(
+      keyVector(this.pressed),
+      this.touch?.vector() ?? { dx: 0, dy: 0 },
+      this.heading_,
+    );
     return {
       dx,
       dy,

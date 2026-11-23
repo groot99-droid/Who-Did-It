@@ -25,7 +25,16 @@ import { TILE_PX } from '@wdi/shared/constants';
 import type { Rect } from '../view/iso';
 import type { FrameArt, TextureSource } from './art';
 import type { BillboardNode, SceneBuild } from './build';
-import { type Heading, billboardYaw, cameraDirection, matchView, unitsOfRise, unitsOfWidth } from './frame';
+import {
+  type Heading,
+  billboardYaw,
+  cameraDirectionAt,
+  matchView,
+  stepYaw,
+  turnHeading,
+  unitsOfRise,
+  unitsOfWidth,
+} from './frame';
 
 /** How far the camera stands back from its target, in scene units: past every scene's far corner. */
 const CAMERA_DISTANCE = 20_000;
@@ -35,7 +44,12 @@ export class SpriteWorld {
   private readonly renderer: WebGLRenderer;
   private readonly scene = new Scene();
   private readonly camera = new OrthographicCamera(-1, 1, 1, -1, 1, CAMERA_DISTANCE * 2);
-  private readonly heading: Heading = 0;
+  /** R2: the heading snaps at once (input turns with it); the drawn yaw follows it in a quick turn. */
+  private heading_: Heading;
+  private yaw: number;
+  private targetYaw: number;
+  private lastFrame = -1;
+  private readonly billboards: Object3D[] = [];
   private readonly byId = new Map<string, Object3D>();
   private readonly textures = new Map<object, Texture>();
   private readonly billboardMaterials = new Map<Texture, MeshBasicMaterial>();
@@ -47,7 +61,11 @@ export class SpriteWorld {
   constructor(
     build: SceneBuild,
     private readonly art: TextureSource,
+    heading: Heading = 0,
+    private readonly reducedMotion = false,
   ) {
+    this.heading_ = heading;
+    this.yaw = this.targetYaw = billboardYaw(heading);
     this.renderer = new WebGLRenderer({ antialias: false });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvas = this.renderer.domElement;
@@ -75,6 +93,22 @@ export class SpriteWorld {
     }
   }
 
+  get heading(): Heading {
+    return this.heading_;
+  }
+
+  /** The yaw drawn now (mid-turn included): the compass reads it. */
+  get drawnYaw(): number {
+    return this.yaw;
+  }
+
+  /** Turns the camera a quarter turn (R2): the heading snaps, the view follows over `TURN_SECONDS`. */
+  turn(step: 1 | -1): Heading {
+    this.heading_ = turnHeading(this.heading_, step);
+    this.targetYaw += (step * Math.PI) / 2;
+    return this.heading_;
+  }
+
   /** Shows or hides one node by id (the boarded overlay of a portal). */
   setShown(id: string, shown: boolean): void {
     const o = this.byId.get(id);
@@ -88,8 +122,15 @@ export class SpriteWorld {
   render(view: Rect, zoom: number, width: number, height: number): void {
     const size = this.renderer.getSize(this.size);
     if (size.x !== width || size.y !== height) this.renderer.setSize(width, height, false);
+    const now = performance.now();
+    const dt = this.lastFrame < 0 ? 0 : Math.min(0.1, (now - this.lastFrame) / 1000);
+    this.lastFrame = now;
+    if (this.yaw !== this.targetYaw) {
+      this.yaw = stepYaw(this.yaw, this.targetYaw, dt, this.reducedMotion);
+      for (const b of this.billboards) b.rotation.y = this.yaw;
+    }
     const m = matchView(view, zoom, width, height);
-    const dir = cameraDirection(this.heading);
+    const dir = cameraDirectionAt(this.yaw);
     const cam = this.camera;
     cam.left = -m.halfW;
     cam.right = m.halfW;
@@ -157,7 +198,8 @@ export class SpriteWorld {
     const art = this.art(n.atlas, n.frame);
     if (!art) return null;
     const mesh = new Mesh(this.plane(art, n.flipX), this.billboardMaterial(art));
-    mesh.rotation.y = billboardYaw(this.heading);
+    mesh.rotation.y = this.yaw;
+    this.billboards.push(mesh);
     return mesh;
   }
 

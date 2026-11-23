@@ -961,7 +961,11 @@ export class World extends Phaser.Scene {
     const run = ++this.spriteRun; // the scene restarts for every scene: a late load must not mount the last one's
     void import('../world3').then(({ mountSpriteWorld }) => {
       if (run !== this.spriteRun) return;
-      this.sprite = mountSpriteWorld(this.game.canvas, this.textures, this.map, tiled, defs);
+      const input = this.input_; // R2: the heading lives on the controller, so it holds across scenes
+      const heading = input.heading as 0 | 1 | 2 | 3;
+      this.sprite = mountSpriteWorld(this.game.canvas, this.textures, this.map, tiled, defs, heading, (h) =>
+        input.setHeading(h),
+      );
     });
   }
 
