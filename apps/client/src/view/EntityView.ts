@@ -90,6 +90,11 @@ export class EntityView {
     this.heading = heading;
   }
 
+  /** Every figure view drawn now (R3: the sprite world mirrors them). */
+  figures(): PlayerView[] {
+    return [...this.tracked.values()].map((t) => t.view);
+  }
+
   /** Sets the interpolation delay of other figures in ms. */
   setDelayMs(ms: number): void {
     this.delayMs = ms;
