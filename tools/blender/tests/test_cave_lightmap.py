@@ -9,7 +9,10 @@ import sys
 import tempfile
 import unittest
 
-import numpy as np
+try:
+    import numpy as np
+except ImportError:  # no numpy here (plain CI image): skip the whole module
+    raise unittest.SkipTest("numpy is not installed")
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
