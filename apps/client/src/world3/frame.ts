@@ -23,15 +23,47 @@ export const unitsOfWidth = (px: number): number => px / PX_PER_UNIT;
  */
 export type Heading = 0 | 1 | 2 | 3;
 
-/** Unit vector from the target toward the camera, in scene axes, for a heading. */
-export function cameraDirection(heading: Heading): { x: number; y: number; z: number } {
-  const yaw = Math.PI / 4 + (heading * Math.PI) / 2;
+/** The rotation about Y that turns a billboard (a plane facing +Z) toward the camera at a heading. */
+export const billboardYaw = (heading: Heading): number => Math.PI / 4 + (heading * Math.PI) / 2;
+
+/** Unit vector from the target toward the camera, in scene axes, for a yaw (mid-turn included). */
+export function cameraDirectionAt(yaw: number): { x: number; y: number; z: number } {
   const flat = Math.cos(PITCH);
   return { x: flat * Math.sin(yaw), y: Math.sin(PITCH), z: flat * Math.cos(yaw) };
 }
 
-/** The rotation about Y that turns a billboard (a plane facing +Z) toward the camera at a heading. */
-export const billboardYaw = (heading: Heading): number => Math.PI / 4 + (heading * Math.PI) / 2;
+/** Unit vector from the target toward the camera, in scene axes, for a heading. */
+export const cameraDirection = (heading: Heading): { x: number; y: number; z: number } =>
+  cameraDirectionAt(billboardYaw(heading));
+
+/** How long a quarter turn of the camera takes (round 11, R2; Q5: a quick animated turn). */
+export const TURN_SECONDS = 0.25;
+
+/** The heading one quarter turn on from `heading` (`step` +1 or -1). */
+export const turnHeading = (heading: Heading, step: 1 | -1): Heading => ((heading + step + 4) % 4) as Heading;
+
+/**
+ * The yaw `dt` seconds on from `yaw` toward `target`, at a quarter turn per `TURN_SECONDS`, eased out; it lands on
+ * `target` exactly. With `instant` (reduced motion) it lands at once.
+ */
+export function stepYaw(yaw: number, target: number, dt: number, instant = false): number {
+  const left = target - yaw;
+  if (instant || Math.abs(left) < 1e-4) return target;
+  const speed = (Math.PI / 2 / TURN_SECONDS) * Math.max(0.35, Math.min(1, Math.abs(left) / (Math.PI / 4)));
+  const step = speed * dt;
+  return Math.abs(left) <= step ? target : yaw + Math.sign(left) * step;
+}
+
+/**
+ * The screen angle, in degrees clockwise from screen up, at which world north (world -y) points on the ground at a
+ * camera `yaw`: the compass needle. At heading 0 north lies up and to the right, along a diamond edge.
+ */
+export function northAngle(yaw: number): number {
+  const t = yaw - Math.PI / 4;
+  const sx = Math.sin(t) + Math.cos(t);
+  const sy = (Math.sin(t) - Math.cos(t)) / 2;
+  return (Math.atan2(sx, -sy) * 180) / Math.PI;
+}
 
 /**
  * The orthographic frustum that matches a Phaser camera: `view` is its world view (screen px), `zoom` its zoom and
