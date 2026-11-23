@@ -9,6 +9,11 @@ import { AnimId, StatusBit } from './animIds';
 
 /** Atlas direction (screen frame) of the server's yaw (radians clockwise from world north; SPRITES 10.4). */
 export const dirFromYaw = (yaw: number): Direction => screenDirOfYaw(yaw);
+/**
+ * A world yaw as the sprite world's camera turned `heading` quarter turns sees it (round 11, R3): the facing less the
+ * camera's turn, so `dirFromYaw(headingYaw(yaw, heading))` is the atlas direction to draw. Heading 0 changes nothing.
+ */
+export const headingYaw = (yaw: number, heading: number): number => yaw + (heading * Math.PI) / 2;
 
 export type Clip =
   | 'idle'

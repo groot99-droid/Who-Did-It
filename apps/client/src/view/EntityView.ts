@@ -1,6 +1,7 @@
 import type Phaser from 'phaser';
 import { REG_WORLD, type AvatarSnap, type PlayerSnap, type WorldFeed } from '../net/world';
 import { type PlayerLook, PlayerView, dirFromYaw } from './PlayerView';
+import { headingYaw } from './poses';
 import { REMOTE_DELAY_MS, SELF_DELAY_MS, SampleBuffer, TickClock } from './interpolation';
 import { StatusBit } from './animIds';
 import { looks } from '@wdi/content';
@@ -47,6 +48,8 @@ export class EntityView {
   private delayMs = REMOTE_DELAY_MS;
   private readonly clock = new TickClock();
   private readonly off: Array<() => void> = [];
+  /** Round 11, R3: the sprite world's camera heading in quarter turns; 0 on the Phaser path. */
+  private heading = 0;
 
   /**
    * `source` serves `avatars()` and `selfHandle()`; by default the World's feed from the Phaser registry, so the
@@ -80,6 +83,11 @@ export class EntityView {
   /** Draws the viewer's own sprite translucent once they are a ghost, and shows true names over borrowed faces. */
   setGhost(on: boolean): void {
     this.ghost = on;
+  }
+
+  /** The sprite world turned its camera: figures face their atlas direction at this heading (R3). */
+  setHeading(heading: number): void {
+    this.heading = heading;
   }
 
   /** Sets the interpolation delay of other figures in ms. */
@@ -221,7 +229,7 @@ export class EntityView {
     if (s) {
       t.view.setPosition(s.x, s.y);
       // The whole status word: the view picks the gaits, the loops and the signs from it (motion.md 1, PlayerView).
-      t.view.pose(dirFromYaw(s.yaw), s.animId, p.statusBits);
+      t.view.pose(dirFromYaw(headingYaw(s.yaw, this.heading)), s.animId, p.statusBits);
     }
   }
 }
