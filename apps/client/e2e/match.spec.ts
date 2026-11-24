@@ -18,7 +18,7 @@ interface PlayerView {
 }
 /** Round 5 (A50): other seats are avatars in the scene's view, `lookOf` names the seat drawn. */
 interface SceneView {
-  bodies: { size: number };
+  bodies: { size: number; forEach(cb: (b: { x: number; y: number }) => void): void };
   avatars: { forEach(cb: (a: { lookOf: string; x: number; y: number }) => void): void };
 }
 interface StateView {
@@ -38,6 +38,8 @@ interface Match {
   at: (name: string) => { x: number; y: number } | undefined;
   debug: (type: 'debug.deal' | 'debug.clock', payload: unknown) => void;
   bodies: () => number;
+  /** Where the first body lies, as the observer bot sees it. */
+  body: () => { x: number; y: number } | undefined;
   close: () => Promise<void>;
 }
 
@@ -87,6 +89,11 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
     },
     debug: (type, payload) => observer.send(type, payload),
     bodies: () => (observer.state as unknown as StateView).scenes.get('overworld')?.bodies.size ?? 0,
+    body: () => {
+      let at: { x: number; y: number } | undefined;
+      (observer.state as unknown as StateView).scenes.get('overworld')?.bodies.forEach((b) => (at ??= b));
+      return at;
+    },
     close: async () => {
       await swarm.stop();
       await Promise.all(ctxs.map((c) => c.close()));
@@ -173,11 +180,46 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
   ).toBeLessThanOrEqual(1.1);
 }
 
+/**
+ * A kill leaves Footprints one tile from the body (Clues.ts `spawnKillClues`), and a player standing on a clue sees
+ * Collect, not Report (World.ts, A38). Where the walk stops depends on the spawns, so the host can end on the prints:
+ * nudge it toward the body until the prompt offers the report.
+ */
+async function stepOffClues(m: Match): Promise<void> {
+  const prompt = m.host.getByTestId('prompt');
+  for (const t0 = Date.now(); Date.now() - t0 < 5_000;) {
+    if (/report/i.test((await prompt.textContent()) ?? '')) return;
+    const me = m.at('Hana');
+    const to = m.body();
+    if (!me || !to) {
+      await sleep(50);
+      continue;
+    }
+    // The keys walk screen axes (`keysToWorld`): world (dx, dy) is screen keys (dx - dy, dx + dy), up to a scale.
+    const [dx, dy] = [to.x - me.x, to.y - me.y];
+    const [kx, ky] = [dx - dy, dx + dy];
+    const slack = TILE_PX / 8;
+    const keys = [
+      kx > slack ? 'KeyD' : kx < -slack ? 'KeyA' : null,
+      ky > slack ? 'KeyS' : ky < -slack ? 'KeyW' : null,
+    ].filter((k): k is string => k !== null);
+    if (keys.length === 0) {
+      await sleep(50);
+      continue;
+    }
+    for (const k of keys) await m.host.keyboard.down(k);
+    await sleep(80);
+    for (const k of keys) await m.host.keyboard.up(k);
+    await sleep(120);
+  }
+}
+
 /** The host walks to `victim`, strikes with Q and reports the body with E. */
 async function killAndReport(m: Match, victim: string): Promise<void> {
   await walkToward(m, victim);
   await m.host.keyboard.press('KeyQ');
   await expect.poll(m.bodies, { message: 'a body appears' }).toBe(1);
+  await stepOffClues(m);
   await expect(m.host.getByTestId('prompt')).toContainText(/report/i);
   await m.host.keyboard.press('KeyE');
   await expect(m.host.getByTestId('meeting')).toBeVisible();
