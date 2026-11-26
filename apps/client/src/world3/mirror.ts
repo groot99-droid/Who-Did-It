@@ -24,8 +24,9 @@ import { PX_PER_UNIT, RISE_PX_PER_UNIT, unitsOfRise, unitsOfWidth } from './fram
 /**
  * How a view's root is drawn. `upright`: its parts stand as billboards over the root's ground point. `decal`: the root
  * is a `decalHolder` (view/iso.ts), and its parts lie flat on the ground at their world offsets and rotations (R5b).
+ * `label`: upright, but drawn over everything as the Phaser canvas drew it: a figure's nameplate and marks (R5c).
  */
-export type MirrorKind = 'upright' | 'decal';
+export type MirrorKind = 'upright' | 'decal' | 'label';
 
 export interface MirrorSource {
   readonly obj: Phaser.GameObjects.GameObject;
@@ -59,6 +60,8 @@ interface Part {
   fillColor?: number;
   fillAlpha?: number;
   isFilled?: boolean;
+  text?: string;
+  style?: { color?: string; stroke?: string };
   cameraFilter: number;
 }
 
@@ -66,13 +69,20 @@ interface Part {
  * One thing to draw: a frame quad, a disc or a plain quad. `world`: its offset, size and rotation are world px (a
  * decal's part); else its offset is screen px from the root. `flat`: it lies on the ground (a decal's part, a shadow).
  */
-export type Prim = { x: number; y: number; alpha: number; flat: boolean; world: boolean } & (
-  | { kind: 'frame'; part: Part; scale: number; rotation: number }
+export type Prim = {
+  x: number;
+  y: number;
+  alpha: number;
+  flat: boolean;
+  world: boolean;
+  rotation: number;
+} & (
+  | { kind: 'frame'; part: Part; scale: number }
   | { kind: 'disc'; rx: number; ry: number; colour: number }
   | { kind: 'rect'; w: number; h: number; colour: number }
 );
 
-const FRAMED = new Set(['Sprite', 'Image']);
+const FRAMED = new Set(['Sprite', 'Image', 'Text']);
 
 /** The parts a root shows, flattened to offsets in screen px and scales; null when one is a part it cannot draw. */
 export function primsOf(obj: Phaser.GameObjects.GameObject, kind: MirrorKind): Prim[] | null {
@@ -114,9 +124,9 @@ function add(
 ): boolean {
   if (!p.visible) return true;
   const world = rotation !== undefined;
-  const at = { x, y, alpha: alpha * p.alpha, flat: world, world };
+  const at = { x, y, alpha: alpha * p.alpha, flat: world, world, rotation: rotation ?? (p.rotation || 0) };
   const fill = { colour: p.fillColor!, alpha: at.alpha * p.fillAlpha! };
-  if (FRAMED.has(p.type)) out.push({ ...at, kind: 'frame', part: p, scale, rotation: rotation ?? 0 });
+  if (FRAMED.has(p.type)) out.push({ ...at, kind: 'frame', part: p, scale });
   else if (p.type === 'Ellipse' || p.type === 'Arc') {
     const [rx, ry] = p.type === 'Arc' ? [p.radius!, p.radius!] : [p.width! / 2, p.height! / 2];
     // Standing, an ellipse half as tall as it is wide is a ground circle seen at the pitch: a shadow.
@@ -139,7 +149,13 @@ function sizeOf(p: Exclude<Prim, { kind: 'frame' }>): [number, number] {
   return [unitsOfWidth(w), unitsOfRise(h)];
 }
 
-type Slot = { kind: Prim['kind']; mesh: Mesh<BufferGeometry, MeshBasicMaterial>; key: string };
+/** A slot's mesh, the key of what it shows, and the texture of a text it owns (a text redraws its own canvas). */
+type Slot = {
+  kind: Prim['kind'];
+  mesh: Mesh<BufferGeometry, MeshBasicMaterial>;
+  key: string;
+  own?: Texture | undefined;
+};
 type Drawn = { group: Group; slots: Slot[]; seen: boolean };
 
 export class ViewMirror {
@@ -170,7 +186,7 @@ export class ViewMirror {
       d.seen = true;
       const at = toWorld(root.x, root.y);
       d.group.position.set(at.x, 0, at.y);
-      prims.forEach((p, i) => this.draw(d, i, p, yaw));
+      prims.forEach((p, i) => this.draw(d, i, p, yaw, kind === 'label'));
       for (let i = prims.length; i < d.slots.length; i++) d.slots[i]!.mesh.visible = false;
     }
     for (const [o, d] of this.drawn) if (!d.seen) this.drop(o, d);
@@ -187,8 +203,7 @@ export class ViewMirror {
   private slot(d: Drawn, i: number, kind: Prim['kind']): Slot {
     let s = d.slots[i];
     if (s && s.kind !== kind) {
-      if (s.kind === 'frame') s.mesh.geometry.dispose();
-      s.mesh.material.dispose();
+      this.free(s);
       s.mesh.removeFromParent();
       s = undefined;
     }
@@ -202,7 +217,7 @@ export class ViewMirror {
     return s;
   }
 
-  private draw(d: Drawn, i: number, p: Prim, yaw: number): void {
+  private draw(d: Drawn, i: number, p: Prim, yaw: number, over: boolean): void {
     const s = this.slot(d, i, p.kind);
     const m = s.mesh;
     m.visible = p.alpha > 0;
@@ -211,7 +226,7 @@ export class ViewMirror {
       // Lying face up: its up is world north and its right world east; a world rotation turns it clockwise.
       const at = p.world ? p : toWorld(p.x, p.y);
       m.position.set(at.x, DECAL_LIFT + i * DECAL_STEP, at.y);
-      m.rotation.set(-Math.PI / 2, 0, p.kind === 'frame' ? -p.rotation : 0);
+      m.rotation.set(-Math.PI / 2, 0, -p.rotation);
     } else {
       // Standing, facing the camera: x across the screen, y up, each part a step nearer the camera than the last.
       const across = unitsOfWidth(p.x);
@@ -221,7 +236,7 @@ export class ViewMirror {
         unitsOfRise(-p.y),
         -across * Math.sin(yaw) + step * Math.cos(yaw),
       );
-      m.rotation.set(0, yaw, 0);
+      m.rotation.set(0, yaw, -p.rotation);
     }
     const mat = m.material;
     if (p.kind === 'frame') this.frameQuad(s, p);
@@ -237,14 +252,22 @@ export class ViewMirror {
     }
     mat.opacity = p.alpha;
     mat.alphaTest = p.kind === 'frame' ? 0.5 * p.alpha : 0;
-    m.renderOrder = p.flat ? -0.4 : see ? 10 + i : i;
+    // A label stands over every wall and figure, as on the Phaser canvas; its shadow keeps to the ground.
+    const top = over && !p.flat;
+    if (mat.depthTest === top) {
+      mat.depthTest = !top;
+      mat.needsUpdate = true;
+    }
+    m.renderOrder = p.flat ? -0.4 : top ? 1000 + i : see ? 10 + i : i;
   }
 
   private frameQuad(s: Slot, p: Extract<Prim, { kind: 'frame' }>): void {
     const part = p.part;
     const f = part.frame!;
     const image = f.source.image as Image;
-    const key = `${f.texture.key}|${f.name}|${p.scale}|${part.originX}|${part.originY}|${part.flipX}`;
+    const text =
+      part.type === 'Text' ? `|${part.text}|${part.style?.color}|${part.style?.stroke}|${f.cutWidth}` : '';
+    const key = `${f.texture.key}|${f.name}|${p.scale}|${part.originX}|${part.originY}|${part.flipX}${text}`;
     const mat = s.mesh.material;
     mat.color.setHex(part.tintTopLeft ?? 0xffffff);
     if (key === s.key) return;
@@ -268,7 +291,13 @@ export class ViewMirror {
     (g.getAttribute('position') as Float32BufferAttribute).copyArray(pos).needsUpdate = true;
     (g.getAttribute('uv') as Float32BufferAttribute).copyArray(q.uv).needsUpdate = true;
     g.computeBoundingSphere();
-    const tex = this.texture(image);
+    // A text's canvas is its own and redrawn in place: the slot owns its texture and uploads it again on a change.
+    if (text && s.own?.image !== image) {
+      s.own?.dispose();
+      s.own = undefined;
+    }
+    const tex = text ? (s.own ??= this.fresh(image)) : this.texture(image);
+    if (text) tex.needsUpdate = true;
     if (mat.map !== tex) {
       mat.map = tex;
       mat.needsUpdate = true;
@@ -277,22 +306,27 @@ export class ViewMirror {
 
   private texture(image: Image): Texture {
     let t = this.textures.get(image);
-    if (!t) {
-      t = new Texture(image);
-      t.colorSpace = SRGBColorSpace;
-      t.generateMipmaps = false;
-      t.minFilter = LinearFilter;
-      t.needsUpdate = true;
-      this.textures.set(image, t);
-    }
+    if (!t) this.textures.set(image, (t = this.fresh(image)));
     return t;
   }
 
+  private fresh(image: Image): Texture {
+    const t = new Texture(image);
+    t.colorSpace = SRGBColorSpace;
+    t.generateMipmaps = false;
+    t.minFilter = LinearFilter;
+    t.needsUpdate = true;
+    return t;
+  }
+
+  private free(s: Slot): void {
+    if (s.kind === 'frame') s.mesh.geometry.dispose();
+    s.mesh.material.dispose();
+    s.own?.dispose();
+  }
+
   private drop(o: Phaser.GameObjects.GameObject, d: Drawn): void {
-    for (const s of d.slots) {
-      if (s.kind === 'frame') s.mesh.geometry.dispose();
-      s.mesh.material.dispose();
-    }
+    for (const s of d.slots) this.free(s);
     d.group.removeFromParent();
     this.drawn.delete(o);
   }

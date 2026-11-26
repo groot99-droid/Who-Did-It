@@ -82,8 +82,8 @@ describe('the view mirror (R5)', () => {
   it('leaves a root it cannot draw on the Phaser canvas, and drops a root that is gone', () => {
     const scene = new Scene();
     const mirror = new ViewMirror(scene);
-    // A giver without its art: a capsule and a name (a text), left as it is drawn today until R5c.
-    const ring = container([base('Rectangle'), base('Text')], { cameraFilter: CAM });
+    // A hold ring: a `Graphics` the mirror cannot draw, left as it is drawn today.
+    const ring = container([base('Rectangle'), base('Graphics')], { cameraFilter: CAM });
     const b = body();
     mirror.sync([src(ring), src(b)], 0, CAM);
     expect(ring.cameraFilter & CAM).toBe(0);
@@ -151,5 +151,48 @@ describe('the view mirror (R5)', () => {
     expect([rect!.scale.x, rect!.scale.y]).toEqual([unitsOfWidth(14), unitsOfRise(40)]);
     expect(rect!.position.y).toBeCloseTo(unitsOfRise(20));
     expect(mob.cameraFilter & CAM).toBe(CAM);
+  });
+
+  it('draws a figure’s nameplate and marks over everything, and uploads a text again when it changes', () => {
+    const scene = new Scene();
+    const canvas = { width: 80, height: 20 };
+    const plateFrame = { ...FRAME, cutWidth: 80, cutHeight: 20, realWidth: 80, realHeight: 20 };
+    const textFrame = { ...plateFrame, name: '__BASE', texture: { key: 'text1' }, source: { image: canvas } };
+    const plate = base('Text', {
+      y: -60,
+      originX: 0.5,
+      originY: 1,
+      text: '◆ Hana',
+      style: { color: '#fff' },
+    });
+    plate.frame = textFrame;
+    const tick = base('Rectangle', {
+      y: -50,
+      width: 10,
+      height: 10,
+      rotation: Math.PI / 4,
+      fillColor: 1,
+      fillAlpha: 1,
+    });
+    // The sprite world draws the art and the shadow itself (R3) and hides them here.
+    const art = container([sprite()], { visible: false });
+    const fig = container([base('Ellipse', { visible: false }), art, tick, plate], toScreen(64, 64));
+    const mirror = new ViewMirror(scene);
+    mirror.sync([src(fig, 'label')], billboardYaw(2), CAM);
+    const [t, p] = meshes(scene);
+    expect(meshes(scene)).toHaveLength(2);
+    expect(t!.rotation.z).toBeCloseTo(-Math.PI / 4); // the tick's diamond
+    expect(p!.material.depthTest).toBe(false);
+    expect(p!.renderOrder).toBeGreaterThanOrEqual(1000);
+    expect(p!.position.y).toBeCloseTo(unitsOfRise(60));
+    expect(fig.cameraFilter & CAM).toBe(CAM);
+    const tex = p!.material.map!;
+    const v = tex.version;
+    mirror.sync([src(fig, 'label')], billboardYaw(2), CAM);
+    expect(tex.version).toBe(v); // unchanged: not uploaded again
+    plate.text = '◆ Hana (bloodied)';
+    mirror.sync([src(fig, 'label')], billboardYaw(2), CAM);
+    expect(p!.material.map).toBe(tex);
+    expect(tex.version).toBeGreaterThan(v);
   });
 });

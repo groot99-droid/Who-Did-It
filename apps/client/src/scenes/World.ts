@@ -976,7 +976,7 @@ export class World extends Phaser.Scene {
         heading,
         turn,
         () => entities.figures(),
-        () => this.mirrored(), // R5: the bodies, givers, clues, nodes and creatures stand in the sprite world too
+        () => this.mirrored(), // R5: the views, and the figures' nameplates and marks, stand in the sprite world too
       );
       this.sprite.setDayPart(dayPartOf(this.feed.clock().phase));
     });
@@ -984,6 +984,7 @@ export class World extends Phaser.Scene {
 
   /** Round 11, R5: the views the sprite world draws in place of the Phaser canvas. */
   private *mirrored(): Iterable<MirrorSource> {
+    for (const f of this.entities.figures()) yield { obj: f.root, kind: 'label' }; // R5c: nameplates and marks
     for (const b of this.bodyViews.values()) yield { obj: b.root, kind: 'upright' };
     for (const g of this.giverView.roots()) yield { obj: g, kind: 'upright' };
     for (const c of this.clueView.roots()) yield { obj: c, kind: 'decal' };
