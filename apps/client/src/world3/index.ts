@@ -7,6 +7,7 @@ import type { StaticDef } from '../view/statics';
 import { phaserArt } from './art';
 import { buildScene, readSpawns } from './build';
 import { type Heading, northAngle } from './frame';
+import type { FigureSource } from './figures';
 import { SpriteWorld } from './SpriteWorld';
 
 /**
@@ -36,6 +37,7 @@ export function mountSpriteWorld(
   defs: StaticDef[],
   heading: Heading = 0,
   onHeading: (heading: Heading) => void = () => {},
+  figures?: () => Iterable<FigureSource>,
 ): SpriteWorldHandle {
   const art = phaserArt(textures);
   const world = new SpriteWorld(
@@ -44,6 +46,7 @@ export function mountSpriteWorld(
     heading,
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
   );
+  if (figures) world.setFigures(figures);
   const canvas = world.canvas;
   const before = { position: under.style.position, zIndex: under.style.zIndex };
   under.style.position = 'relative';

@@ -63,7 +63,10 @@ export class PlayerView {
   private readonly hat: Phaser.GameObjects.Sprite;
   private readonly blood: Phaser.GameObjects.Sprite;
   private readonly plate: Phaser.GameObjects.Text;
-  private readonly hasArt: boolean;
+  /** Round 11, R3: the sprite world draws `art` and hides it and `shadow` here; the rest stays on this canvas. */
+  readonly hasArt: boolean;
+  readonly art: Phaser.GameObjects.Container;
+  readonly shadow: Phaser.GameObjects.Ellipse;
   /** `char/<bodyId>/...`: the look's own id, or the plain villager when the look is not loaded (SPRITES 10.13). */
   private readonly bodyId: string;
   private readonly tick: Phaser.GameObjects.Rectangle;
@@ -101,7 +104,7 @@ export class PlayerView {
     this.plateColor = isSelf ? palette.colors.mustard : palette.colors.bone;
     const scale = HEIGHT_SCALE[look.height] ?? FIGURE_SCALE;
     this.scale = scale;
-    const shadow = scene.add.ellipse(0, 0, 20 * scale, 10 * scale, 0x12141c, 0.4);
+    const shadow = (this.shadow = scene.add.ellipse(0, 0, 20 * scale, 10 * scale, 0x12141c, 0.4));
     this.body = scene.add.sprite(0, 0, this.hasArt ? bodyTexture : '__DEFAULT');
     this.scarf = scene.add.sprite(0, 0, scene.textures.exists(overlayTexture) ? overlayTexture : '__DEFAULT');
     this.hat = scene.add.sprite(0, 0, scene.textures.exists(overlayTexture) ? overlayTexture : '__DEFAULT');
@@ -124,9 +127,9 @@ export class PlayerView {
       })
       .setOrigin(0.5, 1);
     // The art alone divides by the body texture's texel factor (HD, A164); the plate and tick keep world px.
-    const art = scene.add
+    const art = (this.art = scene.add
       .container(0, 0, [this.body, this.scarf, this.hat, this.blood])
-      .setScale(scale * drawScale(bodyTexture));
+      .setScale(scale * drawScale(bodyTexture)));
     // The greybox mark of an interact pose a look has no clip for: a small teal tick above the head.
     this.tick = scene.add
       .rectangle(0, -Math.round(HEAD_PX * scale + 8), 10, 10, hex(palette.colors.teal))
@@ -335,6 +338,11 @@ export class PlayerView {
     this.last = { x, y, t };
     const s = toScreen(x, y);
     this.root.setPosition(s.x, s.y).setDepth(isoDepth(x, y) + BIAS.character);
+  }
+
+  /** The feet in world px as last drawn, or null before the first position (R3). */
+  get feet(): { x: number; y: number } | null {
+    return this.last;
   }
 
   destroy(): void {

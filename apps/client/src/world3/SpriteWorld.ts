@@ -25,6 +25,7 @@ import { TILE_PX } from '@wdi/shared/constants';
 import type { Rect } from '../view/iso';
 import type { FrameArt, TextureSource } from './art';
 import type { BillboardNode, SceneBuild } from './build';
+import { FigureMirror, type FigureSource } from './figures';
 import {
   type Heading,
   billboardYaw,
@@ -50,6 +51,9 @@ export class SpriteWorld {
   private targetYaw: number;
   private lastFrame = -1;
   private readonly billboards: Object3D[] = [];
+  /** R3: the figures, mirrored from the Phaser views each frame. */
+  private readonly figureMirror: FigureMirror;
+  private figureSource: (() => Iterable<FigureSource>) | null = null;
   private readonly byId = new Map<string, Object3D>();
   private readonly textures = new Map<object, Texture>();
   private readonly billboardMaterials = new Map<Texture, MeshBasicMaterial>();
@@ -66,6 +70,7 @@ export class SpriteWorld {
   ) {
     this.heading_ = heading;
     this.yaw = this.targetYaw = billboardYaw(heading);
+    this.figureMirror = new FigureMirror(this.scene);
     this.renderer = new WebGLRenderer({ antialias: false });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.canvas = this.renderer.domElement;
@@ -109,6 +114,11 @@ export class SpriteWorld {
     return this.heading_;
   }
 
+  /** The figures to draw each frame (R3): the World's figure views. */
+  setFigures(source: () => Iterable<FigureSource>): void {
+    this.figureSource = source;
+  }
+
   /** Shows or hides one node by id (the boarded overlay of a portal). */
   setShown(id: string, shown: boolean): void {
     const o = this.byId.get(id);
@@ -129,6 +139,7 @@ export class SpriteWorld {
       this.yaw = stepYaw(this.yaw, this.targetYaw, dt, this.reducedMotion);
       for (const b of this.billboards) b.rotation.y = this.yaw;
     }
+    if (this.figureSource) this.figureMirror.sync(this.figureSource(), this.yaw);
     const m = matchView(view, zoom, width, height);
     const dir = cameraDirectionAt(this.yaw);
     const cam = this.camera;
@@ -147,6 +158,7 @@ export class SpriteWorld {
   }
 
   destroy(): void {
+    this.figureMirror.destroy();
     for (const g of this.geometries) g.dispose();
     this.unitBox.dispose();
     for (const m of this.billboardMaterials.values()) m.dispose();
