@@ -901,6 +901,7 @@ export class World extends Phaser.Scene {
     const was = this.lastPhase;
     this.lastPhase = phase;
     this.statics.setLit(isLit(dayPartOf(phase)));
+    this.sprite?.setDayPart(dayPartOf(phase)); // R4: the sun and the lamps of the day part
     if (phase === Phase.dusk) {
       this.hud.toast(fill(C['toast.dusk'], { duskS: balance.phases.duskS }), 'warm', undefined, 5000);
     } else if (phase === Phase.night) this.hud.toast(C['toast.night'], 'warm', undefined, 5000);
@@ -976,6 +977,7 @@ export class World extends Phaser.Scene {
         turn,
         () => entities.figures(),
       );
+      this.sprite.setDayPart(dayPartOf(this.feed.clock().phase));
     });
   }
 

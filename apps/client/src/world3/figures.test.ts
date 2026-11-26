@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type BufferGeometry, Scene, type Mesh, type MeshBasicMaterial } from 'three';
+import { type BufferGeometry, Mesh, type MeshBasicMaterial, Scene } from 'three';
 import { PX_PER_UNIT, RISE_PX_PER_UNIT, billboardYaw } from './frame';
 import { FigureMirror, type FigureSource, LAYER_STEP, quadOf } from './figures';
 
@@ -120,6 +120,24 @@ describe('the figure mirror (R3)', () => {
     expect(body!.material.transparent).toBe(true);
     expect(body!.material.opacity).toBeCloseTo(0.45);
     expect(hat!.visible).toBe(false);
+  });
+
+  it('stands a figure on a blob shadow the size of the Phaser shadow it hides (R4)', () => {
+    const scene = new Scene();
+    const made: number[] = [];
+    const mirror = new FigureMirror(scene, (r) => {
+      made.push(r);
+      const m = new Mesh();
+      m.name = 'blob';
+      return m;
+    });
+    const f = figure([sprite('char_a/idle/s/0', { width: 256, height: 512 })], {
+      shadow: { displayWidth: 40, setVisible: () => undefined },
+    });
+    mirror.sync([f.src], 0);
+    mirror.sync([f.src], 0);
+    expect(made).toEqual([40 / 2 / PX_PER_UNIT]); // once per figure, not per frame
+    expect(scene.children[0]!.children.filter((c) => c.name === 'blob')).toHaveLength(1);
   });
 
   it('drops a figure that is gone, and follows a frame change', () => {
