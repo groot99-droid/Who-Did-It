@@ -742,9 +742,10 @@ the tap as they add a step to the others.
 **Looks.** Every card of a deck is a character, a row of `looks.json`: a portrait (the role card, the meeting roster, the reveals, the end screen) and, for a non-cover card, a world character drawn in the 8 directions under `char/<lookId>/<anim>/<dir>` at the seat's height scale with its scarf tinted. The three cover cards (Killer, Accomplice, Drifter) have portraits only and no world character: nobody ever walks as a Killer. Look ids are public and name the character (`vicar`, `baker`), and every client loads the characters and portraits of the match's whole deck before the role card closes, so what a client loads never depends on its own card.
 
 **Figure looks (round 10, B1).** Besides the cards' looks and the villager family, `looks.json` `figures` holds
-the looks of figures that are not seats and not townsfolk: the `constable` (3.31) alone. A figure look has no card
-and no portrait, and a cover can never take one. Its atlas keys are `char/constable/<anim>/<dir>`; until its art
-lands the client draws its fallback villager body in its place; the wire always says `constable`.
+the looks of figures that are not seats and not townsfolk: the `constable` (3.31) and `mallory` (Doc Mallory, the
+apothecary's landmark figure, WORLD 1; owner, A619). A figure look has no card and no portrait, and a cover can never
+take one. Its atlas keys are `char/<lookId>/<anim>/<dir>`; until its art lands the client draws its fallback villager
+body in its place; the wire always says the look id.
 
 **The public look.** `Player.look` holds each seat's look id. It is empty for every seat during the role card and is written for every seat in the same tick when the card closes: a non-cover seat's look is its card's, a cover seat's is the look it picked. From then on the roster, the nameplate, the meeting portraits and a seat's body all show that look, for the whole match.
 

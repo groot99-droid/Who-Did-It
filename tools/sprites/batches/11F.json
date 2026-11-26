@@ -79,14 +79,16 @@
       "look": "villagerlass",
       "source": "higgsfield",
       "drop": "F2c"
+    },
+    {
+      "model": "mallory",
+      "look": "mallory",
+      "source": "higgsfield",
+      "drop": "F2c",
+      "note": "Doc Mallory, the apothecary landmark NPC of apoth_shop (WORLD 1): a looks.json figure look, not a seat and no card (owner, A619)"
     }
   ],
   "gaps": [
-    {
-      "model": "mallory",
-      "source": "higgsfield",
-      "gap": "a model with no look: looks.json has no mallory, so it renders under no id until a look is added (the owner's call)"
-    },
     {
       "model": "killer",
       "source": "meshy",
@@ -94,7 +96,7 @@
     },
     {
       "look": "vicar",
-      "gap": "a look with no model: no character GLB in models.lock.json renders the vicar; today's packed vicar stays until one does"
+      "gap": "a look with no model yet: the owner's Meshy Arcane Scholar joins char-models as characters/meshy_rigged/vicar.glb (A619, #585) and renders in the Meshy drops; today's packed vicar stays until then"
     }
   ]
 }
