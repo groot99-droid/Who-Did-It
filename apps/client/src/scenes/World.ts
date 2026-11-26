@@ -963,9 +963,10 @@ export class World extends Phaser.Scene {
       if (run !== this.spriteRun) return;
       const input = this.input_; // R2: the heading lives on the controller, so it holds across scenes
       const heading = input.heading as 0 | 1 | 2 | 3;
-      this.sprite = mountSpriteWorld(this.game.canvas, this.textures, this.map, tiled, defs, heading, (h) =>
-        input.setHeading(h),
-      );
+      const entities = this.entities; // R3: the figures face their atlas direction at the heading
+      entities.setHeading(heading);
+      const turn = (h: number) => (input.setHeading(h), entities.setHeading(h));
+      this.sprite = mountSpriteWorld(this.game.canvas, this.textures, this.map, tiled, defs, heading, turn);
     });
   }
 
