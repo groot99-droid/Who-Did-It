@@ -38,6 +38,11 @@ export class GiverView {
     return this.drawn.size;
   }
 
+  /** Each giver's root (round 11, R5: the sprite world draws them). */
+  roots(): Phaser.GameObjects.GameObject[] {
+    return [...this.drawn.values()];
+  }
+
   update(items: readonly GiverSpot[], _now: number): void {
     const present = new Set<string>();
     for (const g of items) {
