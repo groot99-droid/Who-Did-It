@@ -22,6 +22,8 @@ export interface BoxNode {
   h: number;
   colour: number;
   hidden: boolean;
+  /** A kit wall, which drops to a sill when it stands between the camera and the player (R4, `cutaway.ts`). */
+  wall: boolean;
 }
 
 /** An upright billboard of an atlas frame, standing on its pivot at (x, y). */
@@ -85,6 +87,7 @@ const boxOf = (d: StaticDef, colour: number): BoxNode => ({
   h: unitsOfRise(d.heightPx),
   colour,
   hidden: d.hidden === true,
+  wall: false,
 });
 
 /**
@@ -127,7 +130,8 @@ export function buildScene(
     }
     const kit = d.id.startsWith('solid.') ? parseKitFrame(d.frame) : null;
     if (kit && BOX_KITS.has(kit.kind)) {
-      nodes.push(boxOf(d, shade(tokenColour('slate'), kit.kind === 'fence' ? 0.8 : 1)));
+      const box = boxOf(d, shade(tokenColour('slate'), kit.kind === 'fence' ? 0.8 : 1));
+      nodes.push({ ...box, wall: kit.kind === 'wall' });
       continue;
     }
     if (d.atlas !== '' && hasArt(d.atlas, d.frame)) {
