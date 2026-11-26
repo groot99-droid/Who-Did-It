@@ -25,7 +25,8 @@ import { TILE_PX } from '@wdi/shared/constants';
 import type { DayPart } from '../view/dayPart';
 import type { Rect } from '../view/iso';
 import type { FrameArt, TextureSource } from './art';
-import type { BillboardNode, SceneBuild } from './build';
+import type { BillboardNode, BoxNode, SceneBuild } from './build';
+import { SILL, cutsView } from './cutaway';
 import { FigureMirror, type FigureSource } from './figures';
 import { blobRadius } from './light';
 import { LightRig } from './lightRig';
@@ -66,6 +67,8 @@ export class SpriteWorld {
   private readonly unitBox = new BoxGeometry(1, 1, 1).translate(0, 0.5, 0);
   private readonly geometries: BufferGeometry[] = [];
   private readonly size = new Vector2();
+  /** The kit walls and their full heights, cut to a sill each frame when they hide the player (R4). */
+  private readonly walls: Array<{ mesh: Mesh; box: BoxNode }> = [];
 
   constructor(
     build: SceneBuild,
@@ -90,6 +93,7 @@ export class SpriteWorld {
           : n.kind === 'billboard'
             ? this.billboard(n)
             : null;
+      if (n.kind === 'box' && n.wall && o instanceof Mesh) this.walls.push({ mesh: o, box: n });
       const obj = o ?? new Object3D();
       obj.name = n.id;
       obj.userData.kind = n.kind;
@@ -149,6 +153,8 @@ export class SpriteWorld {
     if (this.figureSource) this.figureMirror.sync(this.figureSource(), this.yaw);
     const m = matchView(view, zoom, width, height);
     this.rig.follow(m.target.x, m.target.y, m.halfW, m.halfH);
+    for (const { mesh, box } of this.walls)
+      mesh.scale.y = cutsView(box, m.target, this.yaw) ? Math.min(SILL, box.h) : box.h;
     const dir = cameraDirectionAt(this.yaw);
     const cam = this.camera;
     cam.left = -m.halfW;

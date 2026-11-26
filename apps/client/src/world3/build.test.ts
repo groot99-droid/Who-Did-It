@@ -77,5 +77,8 @@ describe('buildScene (round 11, R1)', () => {
     expect(boxes[0]).toMatchObject({ w: b.width, d: b.height });
     const walls = build.nodes.filter((n) => n.id.startsWith('solid.') && n.kind === 'box');
     expect(walls.length).toBeGreaterThan(0);
+    // Only kit walls drop to a sill (R4): a building keeps its height.
+    expect(boxes[0]).toMatchObject({ wall: false });
+    expect(walls.some((n) => n.kind === 'box' && n.wall)).toBe(true);
   });
 });
