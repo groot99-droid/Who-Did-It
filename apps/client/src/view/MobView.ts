@@ -33,6 +33,8 @@ const TINT_FILL = 1;
  */
 export class MobView {
   private readonly drawn = new Map<string, Drawn>();
+  /** Corpses gone from the feed, still fading. */
+  private readonly fading = new Set<Phaser.GameObjects.GameObject>();
 
   constructor(
     private readonly scene: Phaser.Scene,
@@ -41,6 +43,11 @@ export class MobView {
 
   get count(): number {
     return this.drawn.size;
+  }
+
+  /** Each creature's sprite or disc, and the corpses still fading (round 11, R5: the sprite world draws them). */
+  roots(): Phaser.GameObjects.GameObject[] {
+    return [...[...this.drawn.values()].map((d) => d.obj), ...this.fading];
   }
 
   update(items: readonly MobSnap[], _now: number): void {
@@ -75,14 +82,15 @@ export class MobView {
     for (const [id, d] of this.drawn) {
       if (present.has(id)) continue;
       this.drawn.delete(id);
-      if (d.dead && !this.reducedMotion())
+      if (d.dead && !this.reducedMotion()) {
+        this.fading.add(d.obj);
         this.scene.tweens.add({
           targets: d.obj,
           alpha: 0,
           duration: FADE_MS,
-          onComplete: () => d.obj.destroy(),
+          onComplete: () => (this.fading.delete(d.obj), d.obj.destroy()),
         });
-      else d.obj.destroy();
+      } else d.obj.destroy();
     }
   }
 
@@ -114,6 +122,7 @@ export class MobView {
   }
 
   destroy(): void {
+    this.fading.clear();
     for (const d of this.drawn.values()) d.obj.destroy();
     this.drawn.clear();
   }

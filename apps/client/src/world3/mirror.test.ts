@@ -34,6 +34,13 @@ const body = () => {
     { x: s.x, y: s.y },
   );
 };
+/** A clue as `ClueView` builds it in a `decalHolder`: a glow and a print at world offsets. */
+const clue = (theta: number) => {
+  const glow = base('Arc', { radius: 44, fillColor: 0x40a0a0, fillAlpha: 0.25 });
+  const print = sprite({ x: 10, y: -5, rotation: theta, scaleX: 0.5 });
+  const inner = container([glow, print], { rotation: Math.PI / 4, scaleX: Math.SQRT2, scaleY: Math.SQRT2 });
+  return container([inner], { ...toScreen(256, 512), scaleY: 0.5 });
+};
 const src = (o: unknown, kind: MirrorKind = 'upright') => ({ obj: o as Phaser.GameObjects.GameObject, kind });
 const meshes = (scene: Scene) =>
   scene.children.flatMap((g) => g.children) as Array<Mesh<BufferGeometry, MeshBasicMaterial>>;
@@ -75,7 +82,7 @@ describe('the view mirror (R5)', () => {
   it('leaves a root it cannot draw on the Phaser canvas, and drops a root that is gone', () => {
     const scene = new Scene();
     const mirror = new ViewMirror(scene);
-    // A giver without its art: a capsule and a name, left as it is drawn today.
+    // A giver without its art: a capsule and a name (a text), left as it is drawn today until R5c.
     const ring = container([base('Rectangle'), base('Text')], { cameraFilter: CAM });
     const b = body();
     mirror.sync([src(ring), src(b)], 0, CAM);
@@ -103,5 +110,46 @@ describe('the view mirror (R5)', () => {
     expect(m.material.opacity).toBeCloseTo(0.55);
     expect(m.material.transparent).toBe(true);
     expect(m.material.color.getHex()).toBe(0xff0000);
+  });
+
+  it('lays a clue flat at its world offsets and rotation, the same at every heading', () => {
+    const theta = Math.PI / 2;
+    for (const h of [0, 3] as const) {
+      const scene = new Scene();
+      new ViewMirror(scene).sync([src(clue(theta), 'decal')], billboardYaw(h), CAM);
+      const g = scene.children[0]!;
+      expect([Math.round(g.position.x), Math.round(g.position.z)]).toEqual([256, 512]);
+      const [glow, print] = meshes(scene);
+      expect([glow!.scale.x, glow!.scale.y]).toEqual([44, 44]); // world px
+      expect(glow!.position.y).toBeCloseTo(DECAL_LIFT);
+      expect([print!.position.x, print!.position.z]).toEqual([10, -5]);
+      expect(print!.position.y).toBeGreaterThan(glow!.position.y); // each part over the last
+      expect(print!.rotation.z).toBeCloseTo(-theta);
+      const pos = print!.geometry.getAttribute('position').array;
+      expect(pos[3]! - pos[0]!).toBeCloseTo(16); // 32 px at scale 0.5, in world px
+    }
+  });
+
+  it('stands a greybox disc or block where the Phaser one stood, at its size on screen', () => {
+    const scene = new Scene();
+    // A creature without art (MobView): a 30 x 22 disc 10 px up; a capsule (a body without art): a 14 x 40 block.
+    const mob = base('Ellipse', {
+      ...toScreen(128, 128),
+      width: 30,
+      height: 22,
+      fillColor: 0x8a5a3a,
+      fillAlpha: 0.95,
+    });
+    const block = container([
+      base('Rectangle', { y: -20, width: 14, height: 40, fillColor: 0x6f7a8c, fillAlpha: 1 }),
+    ]);
+    new ViewMirror(scene).sync([src(mob), src(block)], billboardYaw(1), CAM);
+    const [disc, rect] = meshes(scene);
+    expect(disc!.rotation.y).toBeCloseTo(billboardYaw(1)); // standing, not lying
+    expect([disc!.scale.x, disc!.scale.y]).toEqual([unitsOfWidth(15), unitsOfRise(11)]);
+    expect(disc!.material.color.getHex()).toBe(0x8a5a3a);
+    expect([rect!.scale.x, rect!.scale.y]).toEqual([unitsOfWidth(14), unitsOfRise(40)]);
+    expect(rect!.position.y).toBeCloseTo(unitsOfRise(20));
+    expect(mob.cameraFilter & CAM).toBe(CAM);
   });
 });

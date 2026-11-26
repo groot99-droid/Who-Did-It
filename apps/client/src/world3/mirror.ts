@@ -1,7 +1,7 @@
-// The views in the sprite world (round 11, R5): a Phaser view (a body, a giver) still chooses all it shows; this draws
-// its sprites in the 3D scene at its root's ground point, so it stands right at every heading and walls hide it. The
-// Phaser camera skips a mirrored root (`cameraFilter`). A root with a part the mirror cannot draw (a capsule, a text,
-// a `Graphics`) stays on the Phaser canvas at its heading-0 place, as before R5.
+// The views in the sprite world (round 11, R5): a Phaser view (a body, a clue, a creature, ...) still chooses all it
+// shows; this draws its sprites, discs and plain quads in the 3D scene at its root's ground point, so it stands right
+// at every heading and walls hide it. The Phaser camera skips a mirrored root (`cameraFilter`). A root with a part the
+// mirror cannot draw (a text, a `Graphics`) stays on the Phaser canvas at its heading-0 place, as before R5.
 import type Phaser from 'phaser';
 import { toWorld } from '@wdi/shared/iso';
 import {
@@ -19,10 +19,13 @@ import {
   Texture,
 } from 'three';
 import { LAYER_STEP, type LayerFrame, quadOf } from './figures';
-import { PX_PER_UNIT, unitsOfRise, unitsOfWidth } from './frame';
+import { PX_PER_UNIT, RISE_PX_PER_UNIT, unitsOfRise, unitsOfWidth } from './frame';
 
-/** How a view's root is drawn. `upright`: its parts stand as billboards over the root's ground point. */
-export type MirrorKind = 'upright';
+/**
+ * How a view's root is drawn. `upright`: its parts stand as billboards over the root's ground point. `decal`: the root
+ * is a `decalHolder` (view/iso.ts), and its parts lie flat on the ground at their world offsets and rotations (R5b).
+ */
+export type MirrorKind = 'upright' | 'decal';
 
 export interface MirrorSource {
   readonly obj: Phaser.GameObjects.GameObject;
@@ -43,6 +46,7 @@ interface Part {
   y: number;
   scaleX: number;
   scaleY: number;
+  rotation: number;
   list?: Part[];
   frame?: Phaser.Textures.Frame;
   originX?: number;
@@ -51,23 +55,37 @@ interface Part {
   tintTopLeft?: number;
   width?: number;
   height?: number;
+  radius?: number;
   fillColor?: number;
   fillAlpha?: number;
   isFilled?: boolean;
   cameraFilter: number;
 }
 
-/** One thing to draw, at an offset in screen px from the root: a frame quad standing, or a shadow lying (`flat`). */
-export type Prim = { x: number; y: number; alpha: number; flat: boolean } & (
-  { kind: 'frame'; part: Part; scale: number } | { kind: 'disc'; rx: number; colour: number }
+/**
+ * One thing to draw: a frame quad, a disc or a plain quad. `world`: its offset, size and rotation are world px (a
+ * decal's part); else its offset is screen px from the root. `flat`: it lies on the ground (a decal's part, a shadow).
+ */
+export type Prim = { x: number; y: number; alpha: number; flat: boolean; world: boolean } & (
+  | { kind: 'frame'; part: Part; scale: number; rotation: number }
+  | { kind: 'disc'; rx: number; ry: number; colour: number }
+  | { kind: 'rect'; w: number; h: number; colour: number }
 );
 
 const FRAMED = new Set(['Sprite', 'Image']);
 
 /** The parts a root shows, flattened to offsets in screen px and scales; null when one is a part it cannot draw. */
-export function primsOf(obj: Phaser.GameObjects.GameObject, _kind: MirrorKind): Prim[] | null {
+export function primsOf(obj: Phaser.GameObjects.GameObject, kind: MirrorKind): Prim[] | null {
   const out: Prim[] = [];
   const root = obj as unknown as Part;
+  if (kind === 'decal') {
+    // decalHolder: the root (squashed 1 x 0.5) > inner (pi/4 and sqrt 2: the projection) > parts at world offsets.
+    const inner = root.list?.[0];
+    if (!inner?.list) return null;
+    for (const p of inner.list)
+      if (!add(out, p, p.x, p.y, p.scaleX, root.alpha * inner.alpha, p.rotation || 0)) return null;
+    return out;
+  }
   if (root.list) {
     if (!walk(out, root.list, 0, 0, root.scaleX, root.scaleY, root.alpha)) return null;
   } else if (!add(out, root, 0, 0, root.scaleX, 1)) return null;
@@ -84,17 +102,41 @@ function walk(out: Prim[], list: Part[], ox: number, oy: number, sx: number, sy:
   return true;
 }
 
-function add(out: Prim[], p: Part, x: number, y: number, scale: number, alpha: number): boolean {
+/** Adds part `p` at offset (x, y); a `rotation` (a world one) makes it a decal's part, flat on the ground. */
+function add(
+  out: Prim[],
+  p: Part,
+  x: number,
+  y: number,
+  scale: number,
+  alpha: number,
+  rotation?: number,
+): boolean {
   if (!p.visible) return true;
-  const a = alpha * p.alpha;
-  if (FRAMED.has(p.type)) out.push({ x, y, alpha: a, flat: false, kind: 'frame', part: p, scale });
-  else if (p.type === 'Ellipse' && Math.abs(p.height! * 2 - p.width!) < 1) {
-    // An ellipse half as tall as it is wide is a ground circle seen at the pitch: a shadow.
-    const fill = { colour: p.fillColor!, alpha: a * p.fillAlpha! };
+  const world = rotation !== undefined;
+  const at = { x, y, alpha: alpha * p.alpha, flat: world, world };
+  const fill = { colour: p.fillColor!, alpha: at.alpha * p.fillAlpha! };
+  if (FRAMED.has(p.type)) out.push({ ...at, kind: 'frame', part: p, scale, rotation: rotation ?? 0 });
+  else if (p.type === 'Ellipse' || p.type === 'Arc') {
+    const [rx, ry] = p.type === 'Arc' ? [p.radius!, p.radius!] : [p.width! / 2, p.height! / 2];
+    // Standing, an ellipse half as tall as it is wide is a ground circle seen at the pitch: a shadow.
+    const ground = !world && p.type === 'Ellipse' && Math.abs(2 * ry - rx) < 0.5;
     if (p.isFilled !== false)
-      out.push({ x, y, ...fill, flat: true, kind: 'disc', rx: (p.width! / 2) * scale });
+      out.push({ ...at, ...fill, kind: 'disc', rx: rx * scale, ry: ry * scale, flat: world || ground });
+  } else if (p.type === 'Rectangle') {
+    if (p.isFilled !== false)
+      out.push({ ...at, ...fill, kind: 'rect', w: p.width! * scale, h: p.height! * scale });
   } else return false;
   return true;
+}
+
+/** A disc's radii or a plain quad's size, in scene units. */
+function sizeOf(p: Exclude<Prim, { kind: 'frame' }>): [number, number] {
+  const [w, h] = p.kind === 'disc' ? [p.rx, p.ry] : [p.w, p.h];
+  if (p.world) return [w, h];
+  // A shadow: the world circle whose screen half-width is `rx` (toScreen widens a world length by PX_PER_UNIT).
+  if (p.flat) return [w / PX_PER_UNIT, w / PX_PER_UNIT];
+  return [unitsOfWidth(w), unitsOfRise(h)];
 }
 
 type Slot = { kind: Prim['kind']; mesh: Mesh<BufferGeometry, MeshBasicMaterial>; key: string };
@@ -104,6 +146,7 @@ export class ViewMirror {
   private readonly drawn = new Map<Phaser.GameObjects.GameObject, Drawn>();
   private readonly textures = new Map<Image, Texture>();
   private readonly disc = new CircleGeometry(1, 24);
+  private readonly square = new PlaneGeometry(1, 1);
 
   constructor(private readonly scene: Scene) {}
 
@@ -138,6 +181,7 @@ export class ViewMirror {
     for (const t of this.textures.values()) t.dispose();
     this.textures.clear();
     this.disc.dispose();
+    this.square.dispose();
   }
 
   private slot(d: Drawn, i: number, kind: Prim['kind']): Slot {
@@ -149,7 +193,7 @@ export class ViewMirror {
       s = undefined;
     }
     if (!s) {
-      const geometry = kind === 'frame' ? new PlaneGeometry(1, 1) : this.disc;
+      const geometry = kind === 'frame' ? new PlaneGeometry(1, 1) : kind === 'disc' ? this.disc : this.square;
       const mesh = new Mesh(geometry, new MeshBasicMaterial({ side: DoubleSide }));
       s = { kind, mesh, key: '' };
       d.slots[i] = s;
@@ -164,10 +208,10 @@ export class ViewMirror {
     m.visible = p.alpha > 0;
     if (!m.visible) return;
     if (p.flat) {
-      // Lying face up on the ground, at the world offset of its screen offset.
-      const at = toWorld(p.x, p.y);
+      // Lying face up: its up is world north and its right world east; a world rotation turns it clockwise.
+      const at = p.world ? p : toWorld(p.x, p.y);
       m.position.set(at.x, DECAL_LIFT + i * DECAL_STEP, at.y);
-      m.rotation.set(-Math.PI / 2, 0, 0);
+      m.rotation.set(-Math.PI / 2, 0, p.kind === 'frame' ? -p.rotation : 0);
     } else {
       // Standing, facing the camera: x across the screen, y up, each part a step nearer the camera than the last.
       const across = unitsOfWidth(p.x);
@@ -182,9 +226,7 @@ export class ViewMirror {
     const mat = m.material;
     if (p.kind === 'frame') this.frameQuad(s, p);
     else {
-      // A shadow: the world circle whose screen half-width is `rx` (toScreen widens a world length by PX_PER_UNIT).
-      const r = p.rx / PX_PER_UNIT;
-      m.scale.set(r, r, 1);
+      m.scale.set(...sizeOf(p), 1);
       mat.color.setHex(p.colour);
     }
     const see = p.alpha < 1 || p.kind !== 'frame';
@@ -220,8 +262,10 @@ export class ViewMirror {
       imageHeight: image.height,
     };
     const q = quadOf(frame, part.originX ?? 0.5, part.originY ?? 0.5, p.scale, part.flipX === true);
+    // A decal's quad is in world px: undo quadOf's screen-to-scene scaling (the mesh's rotation lays it down).
+    const pos = p.world ? q.pos.map((v, i) => v * (i % 3 === 0 ? PX_PER_UNIT : RISE_PX_PER_UNIT)) : q.pos;
     const g = s.mesh.geometry;
-    (g.getAttribute('position') as Float32BufferAttribute).copyArray(q.pos).needsUpdate = true;
+    (g.getAttribute('position') as Float32BufferAttribute).copyArray(pos).needsUpdate = true;
     (g.getAttribute('uv') as Float32BufferAttribute).copyArray(q.uv).needsUpdate = true;
     g.computeBoundingSphere();
     const tex = this.texture(image);

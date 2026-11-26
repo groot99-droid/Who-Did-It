@@ -42,6 +42,11 @@ export class NodeView {
     return this.drawn.size;
   }
 
+  /** Each node's sprite or disc, and the swept-up heaps still breaking (round 11, R5: the sprite world draws them). */
+  roots(): Phaser.GameObjects.GameObject[] {
+    return [...[...this.drawn.values()].map((d) => d.obj), ...this.leaving];
+  }
+
   has(id: string): boolean {
     return this.drawn.has(id);
   }

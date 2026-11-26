@@ -79,6 +79,11 @@ export class ClueView {
     }
   }
 
+  /** Each clue's root, a `decalHolder` (round 11, R5: the sprite world draws them). */
+  roots(): Phaser.GameObjects.Container[] {
+    return [...this.drawn.values()].map((d) => d.root);
+  }
+
   /** The collect ring around a clue: `progress` 0..1 of the hold, or null to clear it. */
   setHold(at: { x: number; y: number } | null, progress = 0): void {
     this.ring.clear();

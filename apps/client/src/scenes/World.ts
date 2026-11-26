@@ -976,7 +976,7 @@ export class World extends Phaser.Scene {
         heading,
         turn,
         () => entities.figures(),
-        () => this.mirrored(), // R5: the bodies and givers stand in the sprite world too
+        () => this.mirrored(), // R5: the bodies, givers, clues, nodes and creatures stand in the sprite world too
       );
       this.sprite.setDayPart(dayPartOf(this.feed.clock().phase));
     });
@@ -986,6 +986,9 @@ export class World extends Phaser.Scene {
   private *mirrored(): Iterable<MirrorSource> {
     for (const b of this.bodyViews.values()) yield { obj: b.root, kind: 'upright' };
     for (const g of this.giverView.roots()) yield { obj: g, kind: 'upright' };
+    for (const c of this.clueView.roots()) yield { obj: c, kind: 'decal' };
+    for (const n of this.nodeView.roots()) yield { obj: n, kind: 'upright' };
+    for (const m of this.mobView.roots()) yield { obj: m, kind: 'upright' };
   }
 
   /** Camera zoom snaps to a multiple of 0.5 (SPRITES 10.9); bounds hold the scene's diamond, centred if smaller. */
