@@ -17,14 +17,15 @@ import {
   SRGBColorSpace,
   Texture,
 } from 'three';
-import { unitsOfRise, unitsOfWidth } from './frame';
+import { PX_PER_UNIT, unitsOfRise, unitsOfWidth } from './frame';
 
 /** What the mirror reads of one figure view (`PlayerView`). */
 export interface FigureSource {
   readonly feet: { x: number; y: number } | null;
   readonly hasArt: boolean;
   readonly art: Phaser.GameObjects.Container;
-  readonly shadow: Phaser.GameObjects.GameObject & { setVisible(v: boolean): unknown };
+  /** The Phaser shadow under the feet: hidden here, its width sizes the blob shadow (R4). */
+  readonly shadow: Phaser.GameObjects.GameObject & { setVisible(v: boolean): unknown; displayWidth: number };
   readonly root: Phaser.GameObjects.Container;
 }
 
@@ -90,7 +91,11 @@ export class FigureMirror {
   private readonly drawn = new Map<FigureSource, Drawn>();
   private readonly textures = new Map<Image, Texture>();
 
-  constructor(private readonly scene: Scene) {}
+  /** `blob` makes the blob shadow a figure stands on (R4), a disc of the radius it is given. */
+  constructor(
+    private readonly scene: Scene,
+    private readonly blob?: (radius: number) => Mesh,
+  ) {}
 
   /** Draws every figure with art as it stands now, facing the camera at `yaw`; a figure gone is dropped. */
   sync(figures: Iterable<FigureSource>, yaw: number): void {
@@ -102,6 +107,8 @@ export class FigureMirror {
       let d = this.drawn.get(f);
       if (!d) {
         d = { group: new Group(), layers: [], seen: true };
+        // The Phaser shadow is an ellipse on the ground: a circle whose screen half-width is its radius at PX_PER_UNIT.
+        if (this.blob) d.group.add(this.blob(f.shadow.displayWidth / 2 / PX_PER_UNIT));
         this.scene.add(d.group);
         this.drawn.set(f, d);
       }

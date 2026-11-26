@@ -1,13 +1,13 @@
 // The sprite world in Three.js (round 11, R1; sprite-world.md 1): ground tile planes, boxes and upright billboards
 // under an orthographic camera at the isometric pitch. It draws only what `buildScene` lists, which is only what the
-// scene's tilemap holds; the figures and every live view still draw on the Phaser canvas above it until R3 and R5.
+// scene's tilemap holds; the figures stand in it (R3), lit by the sun and the lamps of the day part (R4), and every
+// live view still draws on the Phaser canvas above it until R5.
 import {
-  AmbientLight,
   BoxGeometry,
   BufferGeometry,
   Color,
-  DirectionalLight,
   Float32BufferAttribute,
+  Group,
   LinearFilter,
   Mesh,
   MeshBasicMaterial,
@@ -22,10 +22,13 @@ import {
   WebGLRenderer,
 } from 'three';
 import { TILE_PX } from '@wdi/shared/constants';
+import type { DayPart } from '../view/dayPart';
 import type { Rect } from '../view/iso';
 import type { FrameArt, TextureSource } from './art';
 import type { BillboardNode, SceneBuild } from './build';
 import { FigureMirror, type FigureSource } from './figures';
+import { blobRadius } from './light';
+import { LightRig } from './lightRig';
 import {
   type Heading,
   billboardYaw,
@@ -53,6 +56,8 @@ export class SpriteWorld {
   private readonly billboards: Object3D[] = [];
   /** R3: the figures, mirrored from the Phaser views each frame. */
   private readonly figureMirror: FigureMirror;
+  /** R4: the sun, the ambient, the lamps and the blob shadows. */
+  private readonly rig: LightRig;
   private figureSource: (() => Iterable<FigureSource>) | null = null;
   private readonly byId = new Map<string, Object3D>();
   private readonly textures = new Map<object, Texture>();
@@ -70,16 +75,13 @@ export class SpriteWorld {
   ) {
     this.heading_ = heading;
     this.yaw = this.targetYaw = billboardYaw(heading);
-    this.figureMirror = new FigureMirror(this.scene);
+    this.rig = new LightRig(this.scene);
+    this.figureMirror = new FigureMirror(this.scene, (r) => this.rig.blob(r));
     this.renderer = new WebGLRenderer({ antialias: false });
     this.renderer.setPixelRatio(window.devicePixelRatio);
+    this.renderer.shadowMap.enabled = true;
     this.canvas = this.renderer.domElement;
     this.scene.background = new Color(build.voidColour);
-    // R4 replaces this light with the sun and the lamps of the day part.
-    this.scene.add(new AmbientLight(0xffffff, 1.6));
-    const key = new DirectionalLight(0xffffff, 1.4);
-    key.position.set(-0.4, 1, 0.8);
-    this.scene.add(key);
     this.scene.add(this.groundMesh(build));
     for (const n of build.nodes) {
       const o =
@@ -119,6 +121,11 @@ export class SpriteWorld {
     this.figureSource = source;
   }
 
+  /** Lights the scene for a part of the day (R4): the sun, the ambient and the lamps. */
+  setDayPart(part: DayPart): void {
+    this.rig.setPart(part);
+  }
+
   /** Shows or hides one node by id (the boarded overlay of a portal). */
   setShown(id: string, shown: boolean): void {
     const o = this.byId.get(id);
@@ -141,6 +148,7 @@ export class SpriteWorld {
     }
     if (this.figureSource) this.figureMirror.sync(this.figureSource(), this.yaw);
     const m = matchView(view, zoom, width, height);
+    this.rig.follow(m.target.x, m.target.y, m.halfW, m.halfH);
     const dir = cameraDirectionAt(this.yaw);
     const cam = this.camera;
     cam.left = -m.halfW;
@@ -159,6 +167,7 @@ export class SpriteWorld {
 
   destroy(): void {
     this.figureMirror.destroy();
+    this.rig.dispose();
     for (const g of this.geometries) g.dispose();
     this.unitBox.dispose();
     for (const m of this.billboardMaterials.values()) m.dispose();
@@ -190,6 +199,7 @@ export class SpriteWorld {
     // The ground lies under everything and writes no depth: art that reaches below its pivot (a prop's footprint
     // diamond) is drawn over it, not clipped by it.
     const mesh = new Mesh(g, new MeshLambertMaterial({ vertexColors: true, depthWrite: false }));
+    mesh.receiveShadow = true;
     mesh.name = 'ground';
     mesh.renderOrder = -1;
     return mesh;
@@ -203,16 +213,35 @@ export class SpriteWorld {
     }
     const mesh = new Mesh(this.unitBox, mat);
     mesh.scale.set(w, h, d);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
     return mesh;
   }
 
+  /**
+   * A billboard on its blob shadow. A lantern post (`frameAlt`) holds its lit and its unlit frame and a lamp, and
+   * the rig shows the frame of the day part.
+   */
   private billboard(n: BillboardNode): Object3D | null {
     const art = this.art(n.atlas, n.frame);
     if (!art) return null;
-    const mesh = new Mesh(this.plane(art, n.flipX), this.billboardMaterial(art));
-    mesh.rotation.y = this.yaw;
-    this.billboards.push(mesh);
-    return mesh;
+    const group = new Group();
+    const face = (a: FrameArt): Mesh => {
+      const mesh = new Mesh(this.plane(a, n.flipX), this.billboardMaterial(a));
+      mesh.rotation.y = this.yaw;
+      this.billboards.push(mesh);
+      group.add(mesh);
+      return mesh;
+    };
+    const lit = face(art);
+    group.add(this.rig.blob(blobRadius(unitsOfWidth(art.w * art.scale))));
+    if (n.frameAlt !== undefined) {
+      const alt = this.art(n.atlas, n.frameAlt);
+      const unlit = alt ? face(alt) : null;
+      const lamp = this.rig.addLantern(lit, unlit);
+      group.add(lamp.light); // the light stands at the post, so it moves and hides with it
+    }
+    return group;
   }
 
   /** A plane of the frame's size whose origin is the frame's pivot, with the crop's texture coordinates. */

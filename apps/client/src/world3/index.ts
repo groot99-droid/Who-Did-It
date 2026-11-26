@@ -2,6 +2,7 @@
 // `?render=sprite`, so a default load never fetches Three.js. It lays its canvas under the Phaser canvas, which keeps
 // drawing the figures and every view R5 has not ported yet, and the DOM overlay HUD above both.
 import type Phaser from 'phaser';
+import type { DayPart } from '../view/dayPart';
 import type { SceneMap, TiledMap } from '../view/sceneMap';
 import type { StaticDef } from '../view/statics';
 import { phaserArt } from './art';
@@ -25,6 +26,8 @@ export interface SpriteWorldHandle {
   /** Draws a frame matching the Phaser camera; call once per World update. */
   frame(cam: Phaser.Cameras.Scene2D.Camera): void;
   setShown(id: string, shown: boolean): void;
+  /** Lights the scene for a part of the day (R4): the sun, the ambient and the lamps. */
+  setDayPart(part: DayPart): void;
   setHidden(hidden: boolean): void;
   destroy(): void;
 }
@@ -94,6 +97,7 @@ export function mountSpriteWorld(
       needle.style.transform = `rotate(${northAngle(world.drawnYaw)}deg)`;
     },
     setShown: (id, shown) => world.setShown(id, shown),
+    setDayPart: (part) => world.setDayPart(part),
     setHidden(hide) {
       hidden = hide;
       canvas.style.visibility = hide ? 'hidden' : '';
