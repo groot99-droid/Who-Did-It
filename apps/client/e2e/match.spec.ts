@@ -126,6 +126,16 @@ async function startMatch(browser: Browser, botCount: number, botVote: string): 
  * The spawn squares moved with the round-5 and round-6 maps, so the way is read off the avatars, not assumed.
  */
 async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> {
+  // The target keeps moving and the keys release a tick late, so a run can end 1.13 to 1.17 tiles short of the 1.1
+  // limit (1 of 3 runs on a loaded CI box). Settle, and close the gap again, before the assertion judges it.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await walkTowardOnce(m, victim, ms, attempt === 2);
+    await sleep(150);
+    if (m.tilesBetween('Hana', victim) <= 1.1) return;
+  }
+}
+
+async function walkTowardOnce(m: Match, victim: string, ms: number, assert: boolean): Promise<void> {
   const clock = m.swarm.rooms[0]!.state as unknown as { tick: number; phaseEndsTick: number };
   let last: { x: number; y: number } | undefined;
   let lastAt = Date.now();
@@ -173,6 +183,7 @@ async function walkToward(m: Match, victim: string, ms = 30_000): Promise<void> 
   } finally {
     for (const key of [...held]) await set(key, false);
   }
+  if (!assert) return;
   const at = (name: string) => JSON.stringify(m.at(name) ?? null);
   expect(
     m.tilesBetween('Hana', victim),
