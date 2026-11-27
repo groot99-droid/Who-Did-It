@@ -73,7 +73,7 @@ import { nearestAvatar } from '../view/targets';
 import { DEFAULT_MAP_ID } from '../net/protocol';
 import { REG_AUDIO, REG_CUTSCENE, getFlags, getNet } from './registry';
 import { readRenderMode } from '../flags';
-import type { SpriteWorldHandle } from '../world3'; // round 11, R1: types only; the module loads on `?render=sprite`
+import type { MirrorSource, SpriteWorldHandle } from '../world3'; // round 11, R1: types only; the module loads on `?render=sprite`
 
 /** How close a player must stand to a door to use it, in tiles (balance.json `doors.reachTiles`, GDD 3.7). */
 const PORTAL_REACH_TILES = balance.doors.reachTiles;
@@ -976,9 +976,16 @@ export class World extends Phaser.Scene {
         heading,
         turn,
         () => entities.figures(),
+        () => this.mirrored(), // R5: the bodies and givers stand in the sprite world too
       );
       this.sprite.setDayPart(dayPartOf(this.feed.clock().phase));
     });
+  }
+
+  /** Round 11, R5: the views the sprite world draws in place of the Phaser canvas. */
+  private *mirrored(): Iterable<MirrorSource> {
+    for (const b of this.bodyViews.values()) yield { obj: b.root, kind: 'upright' };
+    for (const g of this.giverView.roots()) yield { obj: g, kind: 'upright' };
   }
 
   /** Camera zoom snaps to a multiple of 0.5 (SPRITES 10.9); bounds hold the scene's diamond, centred if smaller. */

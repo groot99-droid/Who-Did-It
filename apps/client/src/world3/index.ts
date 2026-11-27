@@ -9,6 +9,9 @@ import { phaserArt } from './art';
 import { buildScene, readSpawns } from './build';
 import { type Heading, northAngle } from './frame';
 import type { FigureSource } from './figures';
+import type { MirrorSource } from './mirror';
+
+export type { MirrorSource } from './mirror';
 import { SpriteWorld } from './SpriteWorld';
 
 /**
@@ -41,6 +44,7 @@ export function mountSpriteWorld(
   heading: Heading = 0,
   onHeading: (heading: Heading) => void = () => {},
   figures?: () => Iterable<FigureSource>,
+  views?: () => Iterable<MirrorSource>,
 ): SpriteWorldHandle {
   const art = phaserArt(textures);
   const world = new SpriteWorld(
@@ -50,6 +54,7 @@ export function mountSpriteWorld(
     window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true,
   );
   if (figures) world.setFigures(figures);
+  if (views) world.setViews(views);
   const canvas = world.canvas;
   const before = { position: under.style.position, zIndex: under.style.zIndex };
   under.style.position = 'relative';
@@ -91,7 +96,7 @@ export function mountSpriteWorld(
       canvas.style.top = `${under.offsetTop}px`;
       canvas.style.width = `${under.clientWidth}px`;
       canvas.style.height = `${under.clientHeight}px`;
-      world.render(cam.worldView, cam.zoom, under.clientWidth, under.clientHeight);
+      world.render(cam.worldView, cam.zoom, under.clientWidth, under.clientHeight, cam.id);
       compass.style.left = `${under.offsetLeft + under.clientWidth - 44}px`;
       compass.style.top = `${under.offsetTop + 64}px`; // under the HUD's settings button
       needle.style.transform = `rotate(${northAngle(world.drawnYaw)}deg)`;

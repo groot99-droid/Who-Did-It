@@ -30,6 +30,7 @@ import { SILL, cutsView } from './cutaway';
 import { FigureMirror, type FigureSource } from './figures';
 import { blobRadius } from './light';
 import { LightRig } from './lightRig';
+import { type MirrorSource, ViewMirror } from './mirror';
 import {
   type Heading,
   billboardYaw,
@@ -60,6 +61,8 @@ export class SpriteWorld {
   /** R4: the sun, the ambient, the lamps and the blob shadows. */
   private readonly rig: LightRig;
   private figureSource: (() => Iterable<FigureSource>) | null = null;
+  private readonly viewMirror: ViewMirror;
+  private viewSource: (() => Iterable<MirrorSource>) | null = null;
   private readonly byId = new Map<string, Object3D>();
   private readonly textures = new Map<object, Texture>();
   private readonly billboardMaterials = new Map<Texture, MeshBasicMaterial>();
@@ -80,6 +83,7 @@ export class SpriteWorld {
     this.yaw = this.targetYaw = billboardYaw(heading);
     this.rig = new LightRig(this.scene);
     this.figureMirror = new FigureMirror(this.scene, (r) => this.rig.blob(r));
+    this.viewMirror = new ViewMirror(this.scene);
     this.renderer = new WebGLRenderer({ antialias: false });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.shadowMap.enabled = true;
@@ -125,6 +129,11 @@ export class SpriteWorld {
     this.figureSource = source;
   }
 
+  /** The other views to draw each frame (R5): bodies, clues, givers, ... */
+  setViews(source: () => Iterable<MirrorSource>): void {
+    this.viewSource = source;
+  }
+
   /** Lights the scene for a part of the day (R4): the sun, the ambient and the lamps. */
   setDayPart(part: DayPart): void {
     this.rig.setPart(part);
@@ -138,9 +147,9 @@ export class SpriteWorld {
 
   /**
    * Draws one frame matching the Phaser camera: `view` its world view in screen px, `zoom` its zoom, and the canvas
-   * `width` x `height` in CSS px.
+   * `width` x `height` in CSS px. `cameraId` is that camera's id bit: it skips the views drawn here (R5).
    */
-  render(view: Rect, zoom: number, width: number, height: number): void {
+  render(view: Rect, zoom: number, width: number, height: number, cameraId = 0): void {
     const size = this.renderer.getSize(this.size);
     if (size.x !== width || size.y !== height) this.renderer.setSize(width, height, false);
     const now = performance.now();
@@ -151,6 +160,7 @@ export class SpriteWorld {
       for (const b of this.billboards) b.rotation.y = this.yaw;
     }
     if (this.figureSource) this.figureMirror.sync(this.figureSource(), this.yaw);
+    if (this.viewSource) this.viewMirror.sync(this.viewSource(), this.yaw, cameraId);
     const m = matchView(view, zoom, width, height);
     this.rig.follow(m.target.x, m.target.y, m.halfW, m.halfH);
     for (const { mesh, box } of this.walls)
@@ -173,6 +183,7 @@ export class SpriteWorld {
 
   destroy(): void {
     this.figureMirror.destroy();
+    this.viewMirror.destroy();
     this.rig.dispose();
     for (const g of this.geometries) g.dispose();
     this.unitBox.dispose();
