@@ -1,0 +1,153 @@
+{
+  "format": "cave-section/1",
+  "key": "killas",
+  "name": "The Killas Rift",
+  "notes": "under_killas: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "slate",
+  "region": {
+    "boxes": [
+      [-113.25, -12.75, -13.25, -104.5, -10.25, -7.625],
+      [-113.75, -13.25, -13.625, -109.75, -4.25, -3.125],
+      [-113.75, -7.75, -14.625, -109.75, 3.75, -3.5],
+      [-113.75, 0.25, -16.5, -109.25, 15.75, -4.5],
+      [-112.75, 12.25, -18.5, -107.25, 25.75, -6.375],
+      [-110.75, 22.25, -19.875, -104.75, 31.75, -8.375],
+      [-112.25, 26.75, -20.0, -95.75, 43.25, -5.5],
+      [-105.75, 33.25, -10.5, -101.75, 38.25, -6.0],
+      [-105.25, 34.75, -10.5, -100.75, 42.75, -5.875],
+      [-109.625, 27.125, -20.0, -100.5, 36.25, -2.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "ki_slot",
+      "from": [-104.5, -11.5, -12.2],
+      "to": [-111.95, -11.5, -12.2],
+      "profile": "fissure",
+      "width": 0.43,
+      "clear": 3.5,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "slate",
+      "notes": "the Killas Slot (west half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "ki_rift",
+      "from": [-111.95, -11.5, -12.2],
+      "to": [-106.5, 30.0, -18.8],
+      "profile": "rift",
+      "width": 1.4,
+      "clear": 8.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "slate",
+      "notes": "the Killas Rift",
+      "via": [
+        [-111.5, -6.0, -12.6],
+        [-112.0, 2.0, -13.6],
+        [-111.0, 14.0, -15.4],
+        [-109.0, 24.0, -17.4]
+      ]
+    },
+    {
+      "id": "ki_spout_face",
+      "from": [-104.0, 35.0, -19.0],
+      "to": [-103.747, 35.759, -9.5],
+      "profile": "climb_face",
+      "width": 2.0,
+      "clear": 3.0,
+      "geology": "slate",
+      "ledge_depth": 2.0,
+      "approach": 1.5,
+      "notes": "the Spout climb"
+    },
+    {
+      "id": "ki_spout_1",
+      "from": [-104.0, 35.0, -9.5],
+      "to": [-103.5, 36.5, -9.5],
+      "profile": "tube",
+      "width": 1.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "slate",
+      "notes": "the Spout ledge and inlet (leg 1 of 2)"
+    },
+    {
+      "id": "ki_spout_2",
+      "from": [-103.5, 36.5, -9.5],
+      "to": [-102.5, 41.0, -9.3],
+      "profile": "tube",
+      "width": 1.4,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "slate",
+      "notes": "the Spout ledge and inlet (leg 2 of 2)"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "ki_falls",
+      "kind": "hall",
+      "center": [-105.09, 31.73, -19.0],
+      "size": [7.0, 5.0, 16.0],
+      "axis": [0.316, 0.949],
+      "geology": "slate",
+      "notes": "the Slate Falls",
+      "blend": 0.0,
+      "noise": 0.0
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_killas",
+      "at": [-106.0, 31.5, -19.0],
+      "yaw_deg": -30.0,
+      "mode": "walk",
+      "notes": "The Slate Falls"
+    }
+  ],
+  "seams": [
+    {
+      "id": "swallow_killas",
+      "neighbour": "swallow",
+      "side": "b",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "x",
+        "at": -104.5,
+        "toward": "+"
+      },
+      "window": [-11.72, -12.205, -11.28, -8.694],
+      "stub_m": 4.0,
+      "portal": [-104.95, -11.5, -12.2],
+      "arrival": {
+        "at": [-106.15, -11.5, -12.2],
+        "mode": "sidle",
+        "yaw_deg": 90.0
+      },
+      "notes": "the Killas Slot: a fault slot in slate, 0.43 m wide"
+    }
+  ],
+  "openings": [],
+  "joins": [
+    ["ki_spout_face", "ki_falls"],
+    ["ki_spout_1", "ki_falls"],
+    ["ki_spout_2", "ki_falls"],
+    ["ki_rift", "ki_slot"],
+    ["ki_slot", "sw_killasslot"],
+    ["ki_spout_1", "ki_spout_face"],
+    ["ki_spout_2", "ki_spout_face"],
+    ["ki_falls", "ki_rift"],
+    ["sw_killasslot", "ki_slot"]
+  ]
+}

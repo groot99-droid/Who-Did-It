@@ -1,0 +1,210 @@
+{
+  "format": "cave-section/1",
+  "key": "reach",
+  "name": "The Drowned Reach",
+  "notes": "under_reach: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "lakeclay",
+  "region": {
+    "boxes": [
+      [24.5, -31.375, -31.25, 34.5, -27.75, -28.125],
+      [29.75, -32.625, -31.5, 37.0, -22.5, -21.125],
+      [31.0, -31.0, -31.75, 43.0, -22.5, -21.375],
+      [37.0, -31.0, -32.125, 51.0, -24.5, -21.625],
+      [45.0, -30.5, -32.75, 63.0, -22.0, -22.0],
+      [57.0, -28.0, -33.375, 73.0, -18.0, -22.625],
+      [67.0, -24.0, -33.625, 79.0, -17.0, -23.25],
+      [73.0, -27.0, -34.25, 87.0, -17.0, -23.5],
+      [81.0, -32.0, -35.0, 95.0, -21.0, -24.125],
+      [89.0, -32.0, -35.625, 99.0, -25.5, -25.0],
+      [93.0, -37.0, -36.0, 101.375, -25.5, -25.5],
+      [97.625, -35.75, -36.0, 101.375, -32.0, -31.0],
+      [74.125, -21.625, -33.625, 77.625, -17.125, -29.25],
+      [74.5, -20.0, -33.625, 77.125, -15.5, -29.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "re_duck",
+      "from": [24.5, -29.6, -30.2],
+      "to": [32.75, -29.6, -30.2],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.05,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Duck (east half)"
+    },
+    {
+      "id": "re_canyon",
+      "from": [32.75, -29.6, -30.2],
+      "to": [99.5, -33.9, -35.0],
+      "profile": "canyon",
+      "width": 4.0,
+      "clear": 8.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Drowned Reach",
+      "via": [
+        [34.0, -25.5, -30.4],
+        [40.0, -28.0, -30.7],
+        [48.0, -27.5, -31.1],
+        [60.0, -25.0, -31.7],
+        [70.0, -21.0, -32.3],
+        [76.0, -20.0, -32.6],
+        [84.0, -24.0, -33.2],
+        [92.0, -29.0, -34.0],
+        [96.0, -28.5, -34.6]
+      ]
+    },
+    {
+      "id": "re_ledge",
+      "from": [99.5, -33.9, -35.0],
+      "to": [101.375, -33.9, -35.0],
+      "profile": "canyon",
+      "width": 1.6,
+      "clear": 3.0,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the ledge behind the Cascade (north half)"
+    },
+    {
+      "id": "re_jointmouth",
+      "from": [76.0, -20.0, -32.6],
+      "to": [75.8, -18.75, -32.6],
+      "profile": "tube",
+      "width": 1.2,
+      "clear": 2.3,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Spar Joint's mouth"
+    },
+    {
+      "id": "re_joint",
+      "from": [75.8, -18.75, -32.6],
+      "to": [75.8, -15.5, -32.6],
+      "profile": "fissure",
+      "width": 0.44,
+      "clear": 2.5,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Spar Joint (south half)",
+      "noise": 0.0,
+      "blend": 0.0
+    }
+  ],
+  "chambers": [],
+  "spawns": [
+    {
+      "id": "undermere_reach",
+      "at": [60.0, -25.0, -31.7],
+      "yaw_deg": -70.0,
+      "mode": "walk",
+      "notes": "The Drowned Reach"
+    }
+  ],
+  "seams": [
+    {
+      "id": "river_reach",
+      "neighbour": "river",
+      "side": "b",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": 24.5,
+        "toward": "-"
+      },
+      "window": [-30.435, -30.285, -28.765, -29.065],
+      "stub_m": 10.2,
+      "portal": [24.95, -29.6, -30.2],
+      "arrival": {
+        "at": [26.15, -29.6, -30.2],
+        "mode": "crawl",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Duck: the roof dips to 1.05 m over a gravel bank beside the stream"
+    },
+    {
+      "id": "reach_spar",
+      "neighbour": "spar",
+      "side": "a",
+      "kind": "squeeze",
+      "plane": {
+        "axis": "y",
+        "at": -15.5,
+        "toward": "+"
+      },
+      "window": [75.575, -32.606, 76.025, -30.095],
+      "stub_m": 9.3,
+      "portal": [75.8, -15.95, -32.6],
+      "arrival": {
+        "at": [75.8, -17.15, -32.6],
+        "mode": "sidle",
+        "yaw_deg": -180.0
+      },
+      "notes": "the Spar Joint: a joint lined with spar crystals, 0.44 m wide"
+    },
+    {
+      "id": "reach_bottom",
+      "neighbour": "bottom",
+      "side": "a",
+      "kind": "sump_ledge",
+      "plane": {
+        "axis": "x",
+        "at": 101.375,
+        "toward": "+"
+      },
+      "window": [-34.845, -35.145, -32.955, -31.855],
+      "stub_m": 3.9,
+      "portal": [100.92, -33.9, -35.0],
+      "arrival": {
+        "at": [99.72, -33.9, -35.0],
+        "mode": "walk",
+        "yaw_deg": -270.0
+      },
+      "notes": "the ledge behind the Cascade: the river falls past the ledge's edge into the Bottom"
+    }
+  ],
+  "openings": [],
+  "water": [
+    {
+      "id": "re_stream",
+      "kind": "stream",
+      "along": "re_canyon",
+      "side": "right",
+      "width": 2.0,
+      "depth": 0.25,
+      "notes": "the river's east half, on the floor's lower (south) half, 0.25 m deep; it falls past the ledge behind the Cascade (the design's re_stream)"
+    }
+  ],
+  "joins": [
+    ["bo_cascade_face", "re_canyon"],
+    ["bo_cascade_face", "re_ledge"],
+    ["bo_ledge", "re_canyon"],
+    ["bo_ledge", "re_ledge"],
+    ["bo_west", "re_canyon"],
+    ["bo_west", "re_ledge"],
+    ["re_canyon", "re_duck"],
+    ["re_canyon", "re_joint"],
+    ["re_canyon", "re_jointmouth"],
+    ["re_canyon", "re_ledge"],
+    ["re_canyon", "sp_joint"],
+    ["re_duck", "ri_duck"],
+    ["re_joint", "re_jointmouth"],
+    ["re_joint", "sp_joint"],
+    ["re_jointmouth", "sp_joint"],
+    ["ri_duck", "re_duck"],
+    ["re_ledge", "bo_ledge"]
+  ]
+}

@@ -1,0 +1,264 @@
+{
+  "format": "village-gates/1",
+  "scene": "undermere",
+  "portal_ns": "um",
+  "note": "The surface side of the Undermere's four gates, read by meshy_walk_export.py --gates (meshy_gates.py). Positions, sills, headings, portals and arrivals are the network design's (meshy_caves/undermere/design.json, gates[]); kit_* values are this file's own. Local kit coordinates: lx to the right of a walker facing into the cave, ly into the cave from the grille's plane, lz up from the kit's sill. Facings are degrees counter-clockwise from east.",
+  "look": {
+    "lamp_color_srgb": "#FFB457",
+    "lamp_W": 20.0,
+    "lamp_range_m": 8.0,
+    "flame": 0.9,
+    "panel_albedo": 0.035,
+    "lamp_near_m": 0.6,
+    "ink_srgb": "#12141C",
+    "ink_margin": 1.5,
+    "lights_reach_m": 40.0,
+    "ao_rays": 16,
+    "ao_reach_m": 6.0,
+    "ao_floor": 0.35,
+    "green_margin": 0.03,
+    "note": "Unlit pieces lit per vertex by the viewer's own light model (meshy_looks/final.json's moon and sky light, the village's kept lights, three's Lambert, no shadows, as apps/walk draws the lit village) plus the gate's lamp, painted in; no live light is added. COLOR_0 never shows under the ink at the village's exposure."
+  },
+  "atlas": {
+    "px": 512,
+    "cells": {
+      "rock": {
+        "uv": [0.0, 0.5, 0.5, 1.0],
+        "scan": "rock_face",
+        "metres": 2.0,
+        "saturation": 0.2,
+        "gain": 2.0
+      },
+      "stone": { "uv": [0.5, 0.5, 1.0, 1.0], "scan": "rock_wall_08", "metres": 2.0, "saturation": 0.75 },
+      "timber": { "uv": [0.0, 0.0, 0.5, 0.5], "scan": "weathered_planks", "metres": 1.5 },
+      "snow": { "uv": [0.5, 0.25, 0.75, 0.5], "scan": "snow_02", "metres": 1.0 },
+      "ice": { "uv": [0.75, 0.25, 1.0, 0.5], "srgb": "#C4CCD3", "metres": 1.0 },
+      "iron": { "uv": [0.5, 0.0, 0.75, 0.25], "srgb": "#2A2B2E", "metres": 1.0 },
+      "white": { "uv": [0.75, 0.0, 1.0, 0.25], "srgb": "#FFFFFF", "metres": 1.0 }
+    }
+  },
+  "gates": [
+    {
+      "id": "swallow",
+      "name": "The Swallow Gate",
+      "district": "West woods",
+      "village_area": "village_west_woods",
+      "cave_area": "under_swallow",
+      "type": "notch",
+      "mouth": [-57.5, -20.1, -0.1],
+      "in_deg": 90.0,
+      "opening": [1.8, 2.0],
+      "portal": { "node": "Portal_um.swallow_in", "xy": [-57.5, -20.55] },
+      "arrival": {
+        "node": "Spawn_overworld_mouth_swallow",
+        "xy": [-57.5, -22.1],
+        "facing_deg": -90.0,
+        "label": "At the Swallow Gate"
+      },
+      "cave_side": {
+        "portal": "Portal_um.swallow_out",
+        "portal_at": [-57.5, -19.65, -0.1],
+        "arrival": "Spawn_undermere_mouth_swallow",
+        "arrival_at": [-57.5, -18.0, -0.1]
+      },
+      "lamp": [1.2, -0.62, 1.62],
+      "kit": {
+        "jamb_w": 0.5,
+        "jamb_back": 1.1,
+        "lip_h": 0.55,
+        "lip_front": -0.62,
+        "water_lines": [0.6, 1.4],
+        "icicles": 9
+      },
+      "budget_tris": 3000,
+      "sees": "a dark notch in the crypt knoll's lake face under an overhanging limestone lip; two pale water lines; icicles at the lip; frost on the sill; the Company's grille and its lamp"
+    },
+    {
+      "id": "cutting",
+      "name": "The Cutting Gate",
+      "district": "Up the line",
+      "village_area": "village_north_woods",
+      "cave_area": "under_ice",
+      "type": "slot",
+      "mouth": [32.0, 136.5, 0.45],
+      "in_deg": 180.0,
+      "opening": [1.4, 2.6],
+      "portal": { "node": "Portal_um.cutting_in", "xy": [32.5, 136.5] },
+      "arrival": {
+        "node": "Spawn_overworld_mouth_cutting",
+        "xy": [34.0, 136.5],
+        "facing_deg": 0.0,
+        "label": "At the Cutting Gate"
+      },
+      "cave_side": {
+        "portal": "Portal_um.cutting_out",
+        "portal_at": [31.55, 136.5, 0.45],
+        "arrival": "Spawn_undermere_mouth_cutting",
+        "arrival_at": [30.0, 136.4, 0.42]
+      },
+      "lamp": [0.98, -0.45, 2.2],
+      "kit": {
+        "panel_ly": 0.05,
+        "trim_back": 0.45,
+        "frost_fins": 10,
+        "face": {
+          "half_w": 3.3,
+          "ly": -0.1,
+          "bulge": 0.45,
+          "back": 0.9,
+          "top": 3.35,
+          "top_jag": 0.35,
+          "taper": 0.9,
+          "row_jag": 0.2,
+          "end_jag": 0.35,
+          "flat_m": 0.6,
+          "cols": [1.2, 1.9, 2.6],
+          "rows": [-0.35, 0.6, 1.5, 2.4],
+          "tint": [0.64, 0.68, 0.68],
+          "note": "the blasted face in front of the export's steep snow face (31.5 to 32.0 m east, measured), as wide as cliff:024's model (y 133.26 to 139.75, lx -3.24 to 3.25); lx of its column lines beside the slot, lz of its row lines"
+        }
+      },
+      "budget_tris": 400,
+      "sees": "a tall slot blasted in the cutting's rock face (cliff:024) behind a timber-and-iron railway grille; hoarfrost at its edges; ice on its floor; one small lamp"
+    },
+    {
+      "id": "adit",
+      "name": "The Adit Gate",
+      "district": "Mill Lane and the Waterwheel Lumber Mill",
+      "village_area": "village_mill_lane",
+      "cave_area": "under_adit",
+      "type": "adit",
+      "mouth": [125.0, 4.5, 4.1],
+      "in_deg": 0.0,
+      "opening": [1.44, 2.1],
+      "portal": { "node": "Portal_um.adit_in", "xy": [124.55, 4.5] },
+      "arrival": {
+        "node": "Spawn_overworld_mouth_adit",
+        "xy": [122.0, 4.5],
+        "facing_deg": 180.0,
+        "label": "At the Adit Gate"
+      },
+      "cave_side": {
+        "portal": "Portal_um.adit_out",
+        "portal_at": [125.45, 4.5, 4.1],
+        "arrival": "Spawn_undermere_mouth_adit",
+        "arrival_at": [126.6, 4.5, 3.94]
+      },
+      "lamp": [-1.12, -1.26, 1.95],
+      "kit": {
+        "cutting": "adit_cutting",
+        "wall_face": 1.0,
+        "wall_thick": 0.55,
+        "parapet_h": 1.0,
+        "parapet_thick": 0.45,
+        "parapet_from_m": 0.35,
+        "headwall": [-1.0, 0.5],
+        "opening_masonry": 0.9,
+        "set_post": 0.18,
+        "lintel_z": 2.1,
+        "gutter": [-2.0, 0.0]
+      },
+      "budget_tris": 2200,
+      "sees": "Vane's adit: a stone-lined cutting off the outlaws' trail down a 15 degree ramp to a landing; a dry-stone headwall with a timbered opening, the Company's grille at its back and one lamp"
+    },
+    {
+      "id": "rising",
+      "name": "The Old Rising Gate",
+      "district": "East hills",
+      "village_area": "village_east_hills",
+      "cave_area": "under_rising",
+      "type": "arch",
+      "mouth": [194.4, 0.5, 9.45],
+      "kit_origin": [194.6, 0.5, 10.8],
+      "kit_origin_note": "the grille's line (x 194.6, y -1.75 to 2.75) stands on the ledge at the cliff's foot, 10.8 m (measured in the export blend: HM_Ground_B5_10_00 10.76 to 10.82 there), not at the design's 9.45; five stone steps climb from the pool's floor (9.41) to a landing at the grille's door, and the portal stands on that landing",
+      "in_deg": 0.0,
+      "opening": [4.5, 3.2],
+      "portal": {
+        "node": "Portal_um.rising_in",
+        "xy": [194.4, 0.5],
+        "design_xy": [193.9, 0.5],
+        "departure": "on the landing at the grille (10.83 m), 0.2 m in front of its plane: the design's point lies at the foot of the bank (9.41), 0.7 m in front of the grille and 1.4 m below it, where the walker reached it 1.7 m short of the arch"
+      },
+      "arrival": {
+        "node": "Spawn_overworld_mouth_rising",
+        "xy": [184.0, -4.0],
+        "design_xy": [192.3, 0.5],
+        "departure": "on the trestle's snow west of the hollow before the steps, at the open way out of it to the ravine: at the design's point, at the foot of the steps, the walker stood among the fallen timbers and saw them at eye height whichever way it faced; from here, facing west, it sees down the ravine and walks straight out to it on the snow, the fallen timbers behind it (2026-11-21: from (187.5, -2.0) a timber lay across the way at the chest 4 m on, and nearer the hollow a leaning timber stood before the eye)",
+        "facing_deg": 180.0,
+        "label": "At the Old Rising Gate"
+      },
+      "cave_side": {
+        "portal": "Portal_um.rising_out",
+        "portal_at": [195.1, 0.5, 9.47],
+        "arrival": "Spawn_undermere_mouth_rising",
+        "arrival_at": [196.7, 0.55, 9.49]
+      },
+      "lamp": [-2.75, -0.5, 2.3],
+      "kit": {
+        "spring": 2.2,
+        "jamb_w": 0.55,
+        "ring": 0.45,
+        "door_w": 0.8,
+        "icicles": 12,
+        "steps_from": 9.41,
+        "steps": 5,
+        "step_half_w": 0.75,
+        "landing_half_w": 2.8,
+        "landing": [-0.75, -0.05],
+        "tread": 0.32,
+        "jamb_foot": -1.6,
+        "press": {
+          "object": "broken_trestle@0.001",
+          "box_m": [190.6, -3.0, 195.0, 3.8],
+          "slope": 0.5,
+          "below_z": 11.6,
+          "fade_z": 1.6,
+          "under_ground_m": 0.15,
+          "note": "the trestle model's own snowy base (9.7 to 11.2 m, measured) lies over the pool's floor (9.41) where the walk's ground is; its vertices under below_z go down to a cap: under the ground the collision has there inside this box, and a bank rising slope metres a metre round it, so the steps and the landing show in a hollow with smooth sides (the earlier linear fade left stretched shards of snow beside the steps)"
+        },
+        "walk_solid": {
+          "object": "broken_trestle@0.001",
+          "patch_m": [179, -18, 194, 18],
+          "step_m": 0.5,
+          "sample_m": 0.25,
+          "head_m": 1.8,
+          "low_m": 0.4,
+          "over_m": 3.0,
+          "wall_m": 3.0,
+          "ease_passes": 2,
+          "ease_m": 0.3,
+          "ease_rise_m": 0.6,
+          "guard": {
+            "grid_m": 0.125,
+            "radius_m": 0.25,
+            "from_m": 0.4,
+            "to_m": 1.75,
+            "raise_m": 0.3,
+            "raise_cap_m": 0.6,
+            "step_height_m": 0.35,
+            "body_radius_m": 0.3,
+            "note": "the body test of the field (walk_solid_guard), at every walker centre on a grid_m grid: where the trestle reaches into the body (from_m to to_m over the feet, within radius_m of the centre; the step height and the capsule radius are the viewer's, apps/walk/src/config.ts), the nearest corner of the field rises over it if it is a stone at the shin (at most raise_m over from_m, raise_cap_m in all), else the square round that corner becomes a wall: vertical faces from under its ground to over_m over the highest ground round it (the viewer's capsule climbs a steep face of the field that is not vertical)"
+          },
+          "note": "the bowl's floor (9.41) lies under the trestle's snow sheet (9.7 to 9.9) and its fallen timbers, and a bank about 1.1 m high closes it to the west: the walker waded through them and could not climb out. In this patch the walk's ground is the snow as pressed and what rests on it within low_m (stepped onto), its small bumps eased by at most ease_m, meeting the ravine's floor at its west side; a timber or a deck whose underside is between low_m and head_m over that ground (at the chest), a point standing ease_rise_m over its neighbourhood and every point failing the guard's body test are walls: vertical faces over_m over the ground round them (2026-11-21: the walk's level had been the top of whatever stood under 1.8 m over the snow, so the walker stood on chest-high timbers, and the steep cells meant as walls were climbed by the viewer's capsule)"
+        }
+      },
+      "budget_tris": 600,
+      "sees": "a broad resurgence arch at the foot of the ravine headwall (cliff:020) under the broken trestle; icicles at its lip; the grille across it with a narrow iron door in its middle"
+    }
+  ],
+  "terrain": [
+    {
+      "key": "adit_cutting",
+      "kind": "channel",
+      "width_m": 2.6,
+      "points_m": [
+        [114.8, 4.5, 5.89],
+        [121.5, 4.5, 4.1],
+        [127.0, 4.5, 4.1]
+      ],
+      "clip_m": [112.0, 2.5, 125.0, 6.5],
+      "collision_patch_m": [114.0, 2.0, 125.0, 7.0],
+      "note": "the network design's row (design.json adit_cut.terrain_rows): ground-grid vertices inside the 2.6 m strip and the clip are lowered to the floor (min), the render ground's 0.5 m grid as it is; the collision's 1 m grid is replaced inside collision_patch_m by a patch with the cutting's floor, walls, parapets and headwall"
+    }
+  ]
+}

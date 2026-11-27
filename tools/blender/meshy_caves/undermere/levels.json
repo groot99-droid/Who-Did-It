@@ -1,0 +1,813 @@
+{
+  "format": "cave-section/1",
+  "key": "levels",
+  "name": "Vane's Levels",
+  "notes": "under_levels: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "granite",
+  "region": {
+    "boxes": [
+      [153.375, 9.875, 2.5, 157.625, 14.375, 7.0],
+      [142.25, 5.875, -6.0, 145.0, 14.125, -1.0],
+      [145.0, 5.875, -6.0, 157.625, 14.125, 7.0],
+      [139.875, 5.0, -6.0, 146.5, 10.125, -1.5],
+      [124.25, -0.625, -18.0, 144.125, 9.25, -1.5],
+      [122.0, -1.5, -18.0, 128.625, 3.75, -13.5],
+      [106.375, -7.0, -30.0, 126.25, 2.875, -13.5],
+      [104.0, -7.875, -30.0, 110.75, -2.75, -25.5],
+      [93.25, -11.75, -38.375, 108.375, -3.5, -25.5],
+      [142.0, 6.0, -6.0, 146.375, 15.0, -1.5],
+      [142.0, 11.0, -6.0, 146.5, 21.0, -1.5],
+      [142.5, 17.0, -6.0, 147.0, 22.625, -1.5],
+      [141.75, 17.375, -6.0, 148.25, 23.875, 3.0],
+      [116.0, -0.5, -18.25, 128.5, 8.0, -13.5],
+      [106.0, 4.0, -18.5, 120.0, 8.0, -13.75],
+      [101.5, 4.0, -18.5, 110.0, 8.0, -14.0],
+      [99.5, 4.0, -18.625, 105.5, 11.5, -14.0],
+      [99.0, 7.5, -18.625, 103.5, 11.5, -14.125],
+      [104.5, -6.875, -30.375, 110.625, 6.0, -25.5],
+      [99.75, 2.0, -30.75, 108.5, 9.5, -25.875],
+      [99.75, 5.5, -31.0, 103.875, 16.125, -26.25],
+      [99.75, 12.25, -31.0, 103.5, 16.0, -26.5],
+      [104.5, 2.0, -30.375, 112.5, 11.0, -25.875],
+      [108.5, 7.0, -30.25, 112.5, 30.0, -25.625],
+      [108.5, 26.0, -30.0, 112.5, 44.0, -25.5],
+      [93.375, -15.375, -38.5, 98.75, -7.5, -33.875],
+      [94.625, -17.0, -38.75, 105.5, -11.25, -34.0],
+      [101.5, -17.5, -39.0, 108.5, -13.0, -34.25],
+      [104.5, -19.375, -39.25, 108.875, -13.5, -34.5],
+      [104.875, -19.625, -39.25, 112.625, -15.5, -36.125],
+      [109.0, -20.125, -39.25, 112.625, -15.875, -36.125],
+      [142.75, 19.0, -1.5, 147.25, 23.5, 3.0],
+      [142.5, 19.5, -41.0, 147.5, 24.5, 13.5]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "lv_platform_1",
+      "from": [155.5, 14.375, 3.6],
+      "to": [155.5, 13.875, 3.6],
+      "profile": "drift",
+      "width": [1.4, 1.568],
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Incline Head (leg 1 of 1) (its 0.5 m at the seam levels_adit; round 4)"
+    },
+    {
+      "id": "lv_platform_1r",
+      "from": [155.5, 13.875, 3.6],
+      "to": [155.5, 12.0, 3.6],
+      "profile": "drift",
+      "width": [1.568, 2.2],
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Incline Head (leg 1 of 1) (the rest, beyond 0.5 m from the seam levels_adit; round 4)"
+    },
+    {
+      "id": "lv_incline_1",
+      "from": [155.5, 12.0, 3.6],
+      "to": [144.36, 8.0, -5.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2458,
+        "tread": 0.3303
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 1 of 7)"
+    },
+    {
+      "id": "lv_incline_2",
+      "from": [144.36, 8.0, -5.0],
+      "to": [142.01, 7.15, -5.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 2 of 7)"
+    },
+    {
+      "id": "lv_incline_3",
+      "from": [142.01, 7.15, -5.0],
+      "to": [126.47, 1.57, -17.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.25,
+        "tread": 0.3384
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 3 of 7)"
+    },
+    {
+      "id": "lv_incline_4",
+      "from": [126.47, 1.57, -17.0],
+      "to": [124.12, 0.72, -17.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 4 of 7)"
+    },
+    {
+      "id": "lv_incline_5",
+      "from": [124.12, 0.72, -17.0],
+      "to": [108.57, -4.87, -29.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.25,
+        "tread": 0.3387
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 5 of 7)"
+    },
+    {
+      "id": "lv_incline_6",
+      "from": [108.57, -4.87, -29.0],
+      "to": [106.22, -5.71, -29.0],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 6 of 7)"
+    },
+    {
+      "id": "lv_incline_7",
+      "from": [106.22, -5.71, -29.0],
+      "to": [95.39, -9.6, -37.36],
+      "profile": "drift",
+      "width": 2.2,
+      "clear": 2.4,
+      "floor": {
+        "kind": "stairs",
+        "riser": 0.2459,
+        "tread": 0.3304
+      },
+      "geology": "granite",
+      "notes": "the Incline (leg 7 of 7)"
+    },
+    {
+      "id": "lv_first",
+      "from": [144.36, 8.0, -5.0],
+      "to": [145.0, 20.6, -5.0],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the First Level",
+      "via": [
+        [144.0, 13.0, -5.0],
+        [144.5, 19.0, -5.0]
+      ]
+    },
+    {
+      "id": "lv_ladder_face",
+      "from": [145.0, 20.6, -5.0],
+      "to": [145.0, 21.4, -0.5],
+      "profile": "climb_face",
+      "width": 1.2,
+      "clear": 2.4,
+      "geology": "granite",
+      "ledge_depth": 1.6,
+      "approach": 1.5,
+      "notes": "the Engine Shaft ladderway"
+    },
+    {
+      "id": "lv_second_1",
+      "from": [126.47, 1.57, -17.0],
+      "to": [118.0, 6.0, -17.2],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 1 of 5)"
+    },
+    {
+      "id": "lv_second_2",
+      "from": [118.0, 6.0, -17.2],
+      "to": [108.0, 6.0, -17.4],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 2 of 5)"
+    },
+    {
+      "id": "lv_second_3",
+      "from": [108.0, 6.0, -17.4],
+      "to": [103.5, 6.0, -17.5],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 3 of 5)"
+    },
+    {
+      "id": "lv_second_4",
+      "from": [103.5, 6.0, -17.5],
+      "to": [101.5, 9.5, -17.55],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 4 of 5)"
+    },
+    {
+      "id": "lv_second_5",
+      "from": [99.5, 9.5, -17.59],
+      "to": [99.0, 9.5, -17.6],
+      "profile": "drift",
+      "width": [1.52, 1.4],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 5 of 5) (its 0.5 m at the seam white_levels; round 4)"
+    },
+    {
+      "id": "lv_second_5r",
+      "from": [101.5, 9.5, -17.55],
+      "to": [99.5, 9.5, -17.59],
+      "profile": "drift",
+      "width": [2.0, 1.52],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Second Level (leg 5 of 5) (the rest, beyond 0.5 m from the seam white_levels; round 4)"
+    },
+    {
+      "id": "lv_longdrift_1",
+      "from": [108.57, -4.87, -29.0],
+      "to": [106.5, 4.0, -29.3],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Long Drift (leg 1 of 4)"
+    },
+    {
+      "id": "lv_longdrift_2",
+      "from": [106.5, 4.0, -29.3],
+      "to": [101.8, 7.5, -29.7],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Long Drift (leg 2 of 4)"
+    },
+    {
+      "id": "lv_longdrift_3",
+      "from": [101.8, 7.5, -29.7],
+      "to": [101.65, 14.1, -29.95],
+      "profile": "drift",
+      "width": [2.0, 1.6],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Long Drift (leg 3 of 4)"
+    },
+    {
+      "id": "lv_longdrift_4",
+      "from": [100.25, 14.1, -29.987],
+      "to": [99.75, 14.1, -30.0],
+      "profile": "drift",
+      "width": [1.305, 1.2],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Long Drift (leg 4 of 4) (its 0.5 m at the seam spar_levels; round 4)"
+    },
+    {
+      "id": "lv_longdrift_4r",
+      "from": [101.65, 14.1, -29.95],
+      "to": [100.25, 14.1, -29.987],
+      "profile": "drift",
+      "width": [1.6, 1.305],
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Long Drift (leg 4 of 4) (the rest, beyond 0.5 m from the seam spar_levels; round 4)"
+    },
+    {
+      "id": "lv_deadend",
+      "from": [106.5, 4.0, -29.3],
+      "to": [110.5, 42.0, -28.8],
+      "profile": "drift",
+      "width": 1.8,
+      "clear": 2.3,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the long drift's north drive",
+      "via": [
+        [110.5, 9.0, -29.2],
+        [110.5, 28.0, -29.0]
+      ]
+    },
+    {
+      "id": "lv_wet",
+      "from": [95.39, -9.6, -37.36],
+      "to": [106.758, -17.33, -38.2],
+      "profile": "drift",
+      "width": 2.0,
+      "clear": 2.4,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "granite",
+      "notes": "the Wet Level",
+      "via": [
+        [96.74, -13.36, -37.45],
+        [103.5, -15.0, -37.75],
+        [106.5, -15.5, -37.9]
+      ]
+    },
+    {
+      "id": "lv_plug",
+      "from": [106.758, -17.33, -38.2],
+      "to": [110.8, -20.125, -38.2],
+      "profile": "crawl",
+      "width": 1.6,
+      "clear": 1.05,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "granite",
+      "notes": "the Last Plug (north half)",
+      "via": [[110.8, -17.725, -38.2]]
+    },
+    {
+      "id": "engine_shaft",
+      "from": [145.0, 22.0, -40.0],
+      "to": [145.0, 22.0, 12.0],
+      "profile": "shaft",
+      "width": 2.8,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Engine Shaft"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "lv_sollar",
+      "kind": "stope",
+      "center": [145.0, 21.2, -0.5],
+      "size": [2.4, 1.6, 2.4],
+      "axis": [1.0, 0.0],
+      "geology": "granite",
+      "notes": "the sollar"
+    }
+  ],
+  "guards": [
+    {
+      "id": "rim_engine_ladder_w",
+      "line": [
+        [144.4, 20.75],
+        [141.9, 20.75]
+      ],
+      "base_z": -0.5,
+      "height": 1.0,
+      "notes": "the sollar's timber rail"
+    },
+    {
+      "id": "rim_engine_ladder_e",
+      "line": [
+        [145.6, 20.75],
+        [148.1, 20.75]
+      ],
+      "base_z": -0.5,
+      "height": 1.0,
+      "notes": "the sollar's timber rail"
+    },
+    {
+      "id": "engine_station_rail",
+      "line": [
+        [143.9, 20.68],
+        [146.1, 20.68]
+      ],
+      "base_z": -5.0,
+      "height": 1.1,
+      "thickness": 0.12,
+      "notes": "the station's timber rail across the shaft side (1.1 m); the ladder's stiles rise from it"
+    },
+    {
+      "id": "engine_sollar_rail",
+      "line": [
+        [143.5, 22.04],
+        [146.5, 22.04]
+      ],
+      "base_z": -0.5,
+      "height": 1.0,
+      "thickness": 0.08,
+      "notes": "the sollar's timber rail along its open (north) side (1.0 m); the rotten ladder above has no climb zone"
+    },
+    {
+      "id": "engine_collar_rail",
+      "line": [
+        [144.0, 20.5],
+        [146.0, 20.5]
+      ],
+      "base_z": 3.55,
+      "height": 1.1,
+      "thickness": 0.12,
+      "notes": "the collar station's timber rail across the shaft side (1.1 m)"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_levels",
+      "at": [124.12, 0.72, -17.0],
+      "yaw_deg": 110.0,
+      "mode": "walk",
+      "notes": "The Incline, second landing"
+    }
+  ],
+  "seams": [
+    {
+      "id": "white_levels",
+      "neighbour": "white",
+      "side": "b",
+      "kind": "mine_door",
+      "plane": {
+        "axis": "x",
+        "at": 99.0,
+        "toward": "-"
+      },
+      "window": [8.655, -17.685, 10.345, -15.115],
+      "stub_m": 5.5,
+      "portal": [99.45, 9.5, -17.59],
+      "arrival": {
+        "at": [100.65, 9.5, -17.57],
+        "mode": "walk",
+        "yaw_deg": -90.0
+      },
+      "notes": "a Company air door in the second level's drive (inside the workings)"
+    },
+    {
+      "id": "spar_levels",
+      "neighbour": "spar",
+      "side": "b",
+      "kind": "bend",
+      "plane": {
+        "axis": "x",
+        "at": 99.75,
+        "toward": "-"
+      },
+      "window": [13.362, -30.125, 14.838, -27.515],
+      "stub_m": 3.9,
+      "portal": [100.2, 14.1, -29.99],
+      "arrival": {
+        "at": [101.4, 14.1, -29.96],
+        "mode": "walk",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Spar Elbow: the long drift's holing, between a right-angle bend in the joint and a bend in the drive"
+    },
+    {
+      "id": "bottom_levels",
+      "neighbour": "bottom",
+      "side": "b",
+      "kind": "choke",
+      "plane": {
+        "axis": "y",
+        "at": -20.125,
+        "toward": "-"
+      },
+      "window": [109.915, -38.286, 111.685, -37.065],
+      "stub_m": 4.4,
+      "portal": [110.8, -19.68, -38.2],
+      "arrival": {
+        "at": [110.8, -18.48, -38.2],
+        "mode": "crawl",
+        "yaw_deg": 0.0
+      },
+      "notes": "the Last Plug: the burst bulkhead, crawled through its timbers"
+    },
+    {
+      "id": "levels_adit",
+      "neighbour": "adit",
+      "side": "a",
+      "kind": "mine_door",
+      "plane": {
+        "axis": "y",
+        "at": 14.375,
+        "toward": "+"
+      },
+      "window": [154.582, 3.435, 156.418, 6.165],
+      "stub_m": 3.9,
+      "portal": [155.5, 13.93, 3.6],
+      "arrival": {
+        "at": [155.5, 12.72, 3.6],
+        "mode": "walk",
+        "yaw_deg": -180.0
+      },
+      "notes": "a Company air door at the incline head (inside the workings)"
+    }
+  ],
+  "openings": [
+    {
+      "id": "engine_collar_window",
+      "box": [143.4, 19.45, 3.3, 146.6, 19.55, 6.5],
+      "notes": "route 2: an ink window on the shaft box's south face at the collar, where the adit's Shaft Collar drive runs on beyond this file (Vane's Adit draws it)"
+    }
+  ],
+  "water": [
+    {
+      "id": "lv_wet_water",
+      "kind": "stream",
+      "along": "lv_wet",
+      "side": "all",
+      "depth": 0.2,
+      "notes": "the wet level's water over its whole floor, 0.2 m deep, running to the Engine Shaft's sump (the design's lv_wet_water)"
+    }
+  ],
+  "joins": [
+    ["lv_incline_1", "lv_incline_3"],
+    ["lv_incline_1", "lv_incline_4"],
+    ["lv_incline_1", "lv_incline_5"],
+    ["lv_incline_1", "lv_incline_6"],
+    ["lv_incline_1", "lv_incline_7"],
+    ["lv_incline_2", "lv_incline_4"],
+    ["lv_incline_2", "lv_incline_5"],
+    ["lv_incline_2", "lv_incline_6"],
+    ["lv_incline_2", "lv_incline_7"],
+    ["lv_incline_3", "lv_incline_5"],
+    ["lv_incline_3", "lv_incline_6"],
+    ["lv_incline_3", "lv_incline_7"],
+    ["lv_incline_4", "lv_incline_6"],
+    ["lv_incline_4", "lv_incline_7"],
+    ["lv_incline_5", "lv_incline_7"],
+    ["lv_second_1", "lv_second_3"],
+    ["lv_second_1", "lv_second_4"],
+    ["lv_second_1", "lv_second_5"],
+    ["lv_second_2", "lv_second_4"],
+    ["lv_second_2", "lv_second_5"],
+    ["lv_second_3", "lv_second_5"],
+    ["lv_longdrift_1", "lv_longdrift_3"],
+    ["lv_longdrift_1", "lv_longdrift_4"],
+    ["lv_longdrift_2", "lv_longdrift_4"],
+    ["engine_shaft", "ad_shaftside"],
+    ["engine_shaft", "lv_first"],
+    ["engine_shaft", "lv_ladder_face"],
+    ["engine_shaft", "lv_sollar"],
+    ["engine_shaft", "lv_wet"],
+    ["lv_sollar", "lv_ladder_face"],
+    ["lv_ladder_face", "lv_first"],
+    ["ad_doorway_1", "lv_incline_1"],
+    ["ad_doorway_1", "lv_incline_2"],
+    ["ad_doorway_1", "lv_incline_3"],
+    ["ad_doorway_1", "lv_incline_4"],
+    ["ad_doorway_1", "lv_incline_5"],
+    ["ad_doorway_1", "lv_incline_6"],
+    ["ad_doorway_1", "lv_incline_7"],
+    ["ad_doorway_2", "lv_incline_1"],
+    ["ad_doorway_2", "lv_incline_2"],
+    ["ad_doorway_2", "lv_incline_3"],
+    ["ad_doorway_2", "lv_incline_4"],
+    ["ad_doorway_2", "lv_incline_5"],
+    ["ad_doorway_2", "lv_incline_6"],
+    ["ad_doorway_2", "lv_incline_7"],
+    ["ad_doorway_1", "lv_platform_1"],
+    ["ad_doorway_2", "lv_platform_1"],
+    ["bo_plug", "lv_plug"],
+    ["lv_deadend", "lv_longdrift_1"],
+    ["lv_deadend", "lv_longdrift_2"],
+    ["lv_deadend", "lv_longdrift_3"],
+    ["lv_deadend", "lv_longdrift_4"],
+    ["lv_first", "lv_incline_1"],
+    ["lv_first", "lv_incline_2"],
+    ["lv_first", "lv_incline_3"],
+    ["lv_first", "lv_incline_4"],
+    ["lv_first", "lv_incline_5"],
+    ["lv_first", "lv_incline_6"],
+    ["lv_first", "lv_incline_7"],
+    ["lv_first", "lv_sollar"],
+    ["lv_incline_1", "lv_longdrift_1"],
+    ["lv_incline_1", "lv_longdrift_2"],
+    ["lv_incline_1", "lv_longdrift_3"],
+    ["lv_incline_1", "lv_longdrift_4"],
+    ["lv_incline_2", "lv_longdrift_1"],
+    ["lv_incline_2", "lv_longdrift_2"],
+    ["lv_incline_2", "lv_longdrift_3"],
+    ["lv_incline_2", "lv_longdrift_4"],
+    ["lv_incline_3", "lv_longdrift_1"],
+    ["lv_incline_3", "lv_longdrift_2"],
+    ["lv_incline_3", "lv_longdrift_3"],
+    ["lv_incline_3", "lv_longdrift_4"],
+    ["lv_incline_4", "lv_longdrift_1"],
+    ["lv_incline_4", "lv_longdrift_2"],
+    ["lv_incline_4", "lv_longdrift_3"],
+    ["lv_incline_4", "lv_longdrift_4"],
+    ["lv_incline_5", "lv_longdrift_1"],
+    ["lv_incline_5", "lv_longdrift_2"],
+    ["lv_incline_5", "lv_longdrift_3"],
+    ["lv_incline_5", "lv_longdrift_4"],
+    ["lv_incline_6", "lv_longdrift_1"],
+    ["lv_incline_6", "lv_longdrift_2"],
+    ["lv_incline_6", "lv_longdrift_3"],
+    ["lv_incline_6", "lv_longdrift_4"],
+    ["lv_incline_7", "lv_longdrift_1"],
+    ["lv_incline_7", "lv_longdrift_2"],
+    ["lv_incline_7", "lv_longdrift_3"],
+    ["lv_incline_7", "lv_longdrift_4"],
+    ["lv_incline_1", "lv_platform_1"],
+    ["lv_incline_2", "lv_platform_1"],
+    ["lv_incline_3", "lv_platform_1"],
+    ["lv_incline_4", "lv_platform_1"],
+    ["lv_incline_5", "lv_platform_1"],
+    ["lv_incline_6", "lv_platform_1"],
+    ["lv_incline_7", "lv_platform_1"],
+    ["lv_incline_1", "lv_second_1"],
+    ["lv_incline_1", "lv_second_2"],
+    ["lv_incline_1", "lv_second_3"],
+    ["lv_incline_1", "lv_second_4"],
+    ["lv_incline_1", "lv_second_5"],
+    ["lv_incline_2", "lv_second_1"],
+    ["lv_incline_2", "lv_second_2"],
+    ["lv_incline_2", "lv_second_3"],
+    ["lv_incline_2", "lv_second_4"],
+    ["lv_incline_2", "lv_second_5"],
+    ["lv_incline_3", "lv_second_1"],
+    ["lv_incline_3", "lv_second_2"],
+    ["lv_incline_3", "lv_second_3"],
+    ["lv_incline_3", "lv_second_4"],
+    ["lv_incline_3", "lv_second_5"],
+    ["lv_incline_4", "lv_second_1"],
+    ["lv_incline_4", "lv_second_2"],
+    ["lv_incline_4", "lv_second_3"],
+    ["lv_incline_4", "lv_second_4"],
+    ["lv_incline_4", "lv_second_5"],
+    ["lv_incline_5", "lv_second_1"],
+    ["lv_incline_5", "lv_second_2"],
+    ["lv_incline_5", "lv_second_3"],
+    ["lv_incline_5", "lv_second_4"],
+    ["lv_incline_5", "lv_second_5"],
+    ["lv_incline_6", "lv_second_1"],
+    ["lv_incline_6", "lv_second_2"],
+    ["lv_incline_6", "lv_second_3"],
+    ["lv_incline_6", "lv_second_4"],
+    ["lv_incline_6", "lv_second_5"],
+    ["lv_incline_7", "lv_second_1"],
+    ["lv_incline_7", "lv_second_2"],
+    ["lv_incline_7", "lv_second_3"],
+    ["lv_incline_7", "lv_second_4"],
+    ["lv_incline_7", "lv_second_5"],
+    ["lv_incline_1", "lv_wet"],
+    ["lv_incline_2", "lv_wet"],
+    ["lv_incline_3", "lv_wet"],
+    ["lv_incline_4", "lv_wet"],
+    ["lv_incline_5", "lv_wet"],
+    ["lv_incline_6", "lv_wet"],
+    ["lv_incline_7", "lv_wet"],
+    ["lv_longdrift_1", "sp_elbow"],
+    ["lv_longdrift_2", "sp_elbow"],
+    ["lv_longdrift_3", "sp_elbow"],
+    ["lv_longdrift_4", "sp_elbow"],
+    ["lv_longdrift_1", "sp_m1"],
+    ["lv_longdrift_2", "sp_m1"],
+    ["lv_longdrift_3", "sp_m1"],
+    ["lv_longdrift_4", "sp_m1"],
+    ["lv_plug", "lv_wet"],
+    ["lv_second_1", "wh_holing_1"],
+    ["lv_second_1", "wh_holing_2"],
+    ["lv_second_2", "wh_holing_1"],
+    ["lv_second_2", "wh_holing_2"],
+    ["lv_second_3", "wh_holing_1"],
+    ["lv_second_3", "wh_holing_2"],
+    ["lv_second_4", "wh_holing_1"],
+    ["lv_second_4", "wh_holing_2"],
+    ["lv_second_5", "wh_holing_1"],
+    ["lv_second_5", "wh_holing_2"],
+    ["lv_second_1", "wh_trunk2"],
+    ["lv_second_2", "wh_trunk2"],
+    ["lv_second_3", "wh_trunk2"],
+    ["lv_second_4", "wh_trunk2"],
+    ["lv_second_5", "wh_trunk2"],
+    ["ad_shaftside", "lv_first"],
+    ["ad_shaftside", "lv_ladder_face"],
+    ["ad_shaftside", "lv_sollar"],
+    ["lv_second_5", "lv_second_5r"],
+    ["lv_second_5r", "lv_second_1"],
+    ["lv_second_5r", "lv_second_2"],
+    ["lv_second_5r", "lv_second_3"],
+    ["lv_second_5r", "lv_incline_1"],
+    ["lv_second_5r", "lv_incline_2"],
+    ["lv_second_5r", "lv_incline_3"],
+    ["lv_second_5r", "lv_incline_4"],
+    ["lv_second_5r", "lv_incline_5"],
+    ["lv_second_5r", "lv_incline_6"],
+    ["lv_second_5r", "lv_incline_7"],
+    ["lv_second_5r", "wh_holing_1"],
+    ["lv_second_5r", "wh_holing_2"],
+    ["lv_second_5r", "wh_trunk2"],
+    ["lv_second_5", "lv_second_4"],
+    ["lv_longdrift_4", "lv_longdrift_4r"],
+    ["lv_longdrift_4r", "lv_longdrift_1"],
+    ["lv_longdrift_4r", "lv_longdrift_2"],
+    ["lv_longdrift_4r", "lv_deadend"],
+    ["lv_longdrift_4r", "lv_incline_1"],
+    ["lv_longdrift_4r", "lv_incline_2"],
+    ["lv_longdrift_4r", "lv_incline_3"],
+    ["lv_longdrift_4r", "lv_incline_4"],
+    ["lv_longdrift_4r", "lv_incline_5"],
+    ["lv_longdrift_4r", "lv_incline_6"],
+    ["lv_longdrift_4r", "lv_incline_7"],
+    ["lv_longdrift_4r", "sp_elbow"],
+    ["lv_longdrift_4r", "sp_m1"],
+    ["lv_longdrift_4", "lv_longdrift_3"],
+    ["lv_platform_1", "lv_platform_1r"],
+    ["lv_platform_1r", "ad_doorway_1"],
+    ["lv_platform_1r", "ad_doorway_2"],
+    ["lv_platform_1r", "lv_incline_1"],
+    ["lv_platform_1r", "lv_incline_2"],
+    ["lv_platform_1r", "lv_incline_3"],
+    ["lv_platform_1r", "lv_incline_4"],
+    ["lv_platform_1r", "lv_incline_5"],
+    ["lv_platform_1r", "lv_incline_6"],
+    ["lv_platform_1r", "lv_incline_7"],
+    ["lv_platform_1", "lv_incline_1"],
+    ["wh_holing_2", "lv_second_5"],
+    ["sp_elbow", "lv_longdrift_4"],
+    ["lv_platform_1", "ad_doorway_2"],
+    ["ad_doorway_2r", "lv_incline_1"],
+    ["ad_doorway_2r", "lv_incline_2"],
+    ["ad_doorway_2r", "lv_incline_3"],
+    ["ad_doorway_2r", "lv_incline_4"],
+    ["ad_doorway_2r", "lv_incline_5"],
+    ["ad_doorway_2r", "lv_incline_6"],
+    ["ad_doorway_2r", "lv_incline_7"],
+    ["ad_doorway_2r", "lv_platform_1"],
+    ["wh_holing_2r", "lv_second_1"],
+    ["wh_holing_2r", "lv_second_2"],
+    ["wh_holing_2r", "lv_second_3"],
+    ["wh_holing_2r", "lv_second_4"],
+    ["wh_holing_2r", "lv_second_5"],
+    ["wh_holing_2r", "lv_second_5r"],
+    ["lv_second_5r", "lv_second_4"],
+    ["lv_longdrift_4r", "lv_longdrift_3"],
+    ["ad_doorway_2r", "lv_platform_1r"]
+  ],
+  "bridges": [
+    {
+      "id": "engine_sollar_deck",
+      "box": [143.6, 20.6, 146.4, 22.0],
+      "top_z": -0.5,
+      "thickness": 0.2,
+      "notes": "the sollar: a timber platform across the south half of the Engine Shaft at -0.5, where the ladder's mantle lands"
+    }
+  ]
+}

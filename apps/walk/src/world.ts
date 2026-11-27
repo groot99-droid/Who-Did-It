@@ -3,6 +3,7 @@ import { exposureFromExtras } from './look';
 import { BvhCollider } from './physics/collider';
 import { findPortals, type Portal } from './portals';
 import { findSpawns, type Spawn } from './spawn';
+import { findZones, spawnModes, type TraverseKind, type TraverseZone } from './traverse';
 
 export const COLLISION_NAME = 'HM_Collision';
 export const AREA_PREFIX = 'Area_';
@@ -20,6 +21,10 @@ export interface World {
   areas: Object3D[];
   /** The `Portal_*` doors, in every area. */
   portals: Portal[];
+  /** The `Trav_*` traversal zones (crawl, sidle, climb), in every area; none in a file without them. */
+  zones: TraverseZone[];
+  /** The mode a spawn asks to arrive in (its `wdi_mode`), by spawn id. */
+  spawnModes: Map<string, TraverseKind>;
   fog: Fog | FogExp2 | null;
 }
 
@@ -158,6 +163,8 @@ export function buildWorld(root: Object3D, extras?: Record<string, unknown>): Wo
     hasSun,
     areas,
     portals: findPortals(root),
+    zones: findZones(root),
+    spawnModes: spawnModes(root),
     fog: fogFromExtras(extras),
   };
 }

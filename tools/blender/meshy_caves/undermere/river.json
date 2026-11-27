@@ -1,0 +1,220 @@
+{
+  "format": "cave-section/1",
+  "key": "river",
+  "name": "The Lake River",
+  "notes": "under_river: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "lakeclay",
+  "region": {
+    "boxes": [
+      [-82.0, -37.875, -26.625, -73.5, -35.375, -22.0],
+      [-77.75, -39.625, -27.0, -69.5, -33.5, -16.5],
+      [-75.5, -39.625, -27.375, -65.5, -26.5, -16.875],
+      [-71.5, -32.5, -27.5, -63.0, -25.5, -17.25],
+      [-69.0, -31.5, -28.0, -53.0, -20.5, -17.375],
+      [-59.0, -26.5, -28.5, -44.5, -13.0, -18.0],
+      [-50.5, -19.0, -28.625, -41.0, -12.25, -18.375],
+      [-47.0, -18.5, -29.0, -33.0, -12.25, -18.5],
+      [-39.0, -25.5, -29.5, -22.0, -12.5, -19.0],
+      [-28.0, -29.5, -30.0, -9.0, -19.5, -19.5],
+      [-15.0, -30.5, -30.5, 1.0, -23.5, -20.0],
+      [-5.0, -30.5, -30.625, 9.5, -24.5, -20.375],
+      [3.375, -34.5, -30.875, 15.0, -24.5, -20.5],
+      [9.0, -34.5, -31.0, 19.0, -23.5, -20.75],
+      [13.0, -32.625, -31.25, 19.25, -23.5, -20.875],
+      [4.625, -27.75, -30.625, 8.125, -23.125, -27.375],
+      [14.5, -31.375, -31.25, 24.5, -27.75, -28.125],
+      [-47.0, -15.5, -28.625, -41.0, -9.5, -18.25]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "ri_slit",
+      "from": [-82.0, -36.6, -25.6],
+      "to": [-74.75, -36.6, -25.6],
+      "profile": "fissure",
+      "width": 0.45,
+      "clear": 2.6,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Curtain Slit (east half)",
+      "noise": 0.0,
+      "blend": 0.0
+    },
+    {
+      "id": "ri_canyon",
+      "from": [-74.75, -36.6, -25.6],
+      "to": [16.25, -29.6, -30.2],
+      "profile": "canyon",
+      "width": 4.0,
+      "clear": 8.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Lake River",
+      "via": [
+        [-72.5, -36.6, -25.9],
+        [-68.5, -29.5, -26.3],
+        [-66.0, -28.5, -26.4],
+        [-56.0, -23.5, -27.0],
+        [-47.5, -16.0, -27.4],
+        [-44.0, -15.3, -27.6],
+        [-36.0, -15.5, -28.0],
+        [-25.0, -22.5, -28.5],
+        [-12.0, -26.5, -29.0],
+        [-2.0, -27.5, -29.4],
+        [6.4, -27.5, -29.6],
+        [12.0, -31.5, -29.8],
+        [16.0, -26.5, -29.95]
+      ]
+    },
+    {
+      "id": "ri_rattle",
+      "from": [6.4, -23.125, -29.5],
+      "to": [6.4, -26.0, -29.55],
+      "profile": "crawl",
+      "width": 1.4,
+      "clear": 1.05,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "lakeclay",
+      "notes": "the Rattle (south half)"
+    },
+    {
+      "id": "ri_duck",
+      "from": [16.25, -29.6, -30.2],
+      "to": [24.5, -29.6, -30.2],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.05,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "lakeclay",
+      "notes": "the Duck (west half)"
+    },
+    {
+      "id": "bottomless_pit",
+      "from": [-44.0, -12.5, -27.6],
+      "to": [-44.0, -12.5, -18.25],
+      "profile": "shaft",
+      "width": 4.0,
+      "clear": 0.5,
+      "walk": false,
+      "notes": "the Bottomless Pit"
+    }
+  ],
+  "chambers": [],
+  "spawns": [
+    {
+      "id": "undermere_river",
+      "at": [-36.0, -15.5, -28.0],
+      "yaw_deg": 60.0,
+      "mode": "walk",
+      "notes": "The Lake River"
+    }
+  ],
+  "seams": [
+    {
+      "id": "swallow_river",
+      "neighbour": "swallow",
+      "side": "b",
+      "kind": "curtain",
+      "plane": {
+        "axis": "x",
+        "at": -82.0,
+        "toward": "-"
+      },
+      "window": [-36.831, -25.605, -36.37, -22.995],
+      "stub_m": 8.5,
+      "portal": [-81.55, -36.6, -25.6],
+      "arrival": {
+        "at": [-80.35, -36.6, -25.6],
+        "mode": "sidle",
+        "yaw_deg": -90.0
+      },
+      "notes": "the Curtain Slit: a slit through a flowstone curtain, 0.45 m wide"
+    },
+    {
+      "id": "well_river",
+      "neighbour": "well",
+      "side": "b",
+      "kind": "choke",
+      "plane": {
+        "axis": "y",
+        "at": -23.125,
+        "toward": "+"
+      },
+      "window": [5.615, -29.585, 7.186, -28.365],
+      "stub_m": 8.0,
+      "portal": [6.4, -23.57, -29.51],
+      "arrival": {
+        "at": [6.4, -24.77, -29.53],
+        "mode": "crawl",
+        "yaw_deg": -180.0
+      },
+      "notes": "the Rattle: a crawl among loose breakdown blocks, 1.05 m high"
+    },
+    {
+      "id": "river_reach",
+      "neighbour": "reach",
+      "side": "a",
+      "kind": "arch",
+      "plane": {
+        "axis": "x",
+        "at": 24.5,
+        "toward": "+"
+      },
+      "window": [-30.435, -30.285, -28.765, -29.065],
+      "stub_m": 10.2,
+      "portal": [24.05, -29.6, -30.2],
+      "arrival": {
+        "at": [22.85, -29.6, -30.2],
+        "mode": "crawl",
+        "yaw_deg": -270.0
+      },
+      "notes": "the Duck: the roof dips to 1.05 m over a gravel bank beside the stream"
+    }
+  ],
+  "openings": [
+    {
+      "id": "bottomless_pit_cap",
+      "box": [-46.6, -15.1, -18.27, -41.4, -9.9, -17.25],
+      "notes": "the ink cap where the other file's part of the Bottomless Pit begins"
+    }
+  ],
+  "water": [
+    {
+      "id": "ri_stream",
+      "kind": "stream",
+      "along": "ri_canyon",
+      "side": "right",
+      "width": 1.6,
+      "depth": 0.25,
+      "notes": "the Lake River: the south half of the canyon's floor, 0.25 m deep; the walkway on the north half stays dry (the design's ri_stream)"
+    }
+  ],
+  "joins": [
+    ["bottomless_pit", "ga_trunk_1"],
+    ["bottomless_pit", "ga_trunk_2"],
+    ["bottomless_pit", "ga_trunk_3"],
+    ["bottomless_pit", "ga_trunk_4"],
+    ["bottomless_pit", "ga_trunk_5"],
+    ["bottomless_pit", "ri_canyon"],
+    ["re_duck", "ri_duck"],
+    ["ri_canyon", "ri_duck"],
+    ["ri_canyon", "ri_rattle"],
+    ["ri_canyon", "ri_slit"],
+    ["ri_canyon", "we_rattle"],
+    ["ri_rattle", "we_rattle"],
+    ["ri_slit", "sw_slit"],
+    ["sw_slit", "ri_slit"],
+    ["we_rattle", "ri_rattle"],
+    ["ri_duck", "re_duck"]
+  ]
+}

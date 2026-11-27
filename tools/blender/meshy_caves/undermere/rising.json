@@ -1,0 +1,188 @@
+{
+  "format": "cave-section/1",
+  "key": "rising",
+  "name": "The Old Rising",
+  "notes": "under_rising: written by the Undermere design's work/to_builder.py from network.json",
+  "network": "undermere.network.json",
+  "geology": "flowstone",
+  "region": {
+    "boxes": [
+      [192.375, -2.5, 8.375, 200.5, 3.625, 13.75],
+      [194.5, -2.5, 8.5, 203.5, 5.0, 13.875],
+      [199.75, 7.5, 9.5, 203.375, 15.375, 12.875],
+      [199.0, 6.75, 9.25, 208.0, 12.0, 14.625],
+      [201.5, 4.0, 8.75, 208.0, 12.0, 14.375],
+      [204.5, -3.5, 8.5, 212.0, 4.0, 13.125],
+      [208.0, -6.0, 8.5, 215.5, 0.5, 13.125],
+      [198.5, -1.5, 5.5, 209.5, 9.5, 15.625],
+      [192.375, -1.5, 8.375, 196.5, 2.5, 13.0]
+    ]
+  },
+  "nodes": {},
+  "passages": [
+    {
+      "id": "rs_arch",
+      "from": [191.5, 0.5, 9.45],
+      "to": [200.5, 2.0, 9.6],
+      "profile": "tube",
+      "width": 4.0,
+      "clear": 3.2,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Rising Arch (route 2: from 191.5, so the arch runs out through the headwall's face at x 192.375 to the ravine)",
+      "via": [[197.5, 0.6, 9.5]]
+    },
+    {
+      "id": "rs_gour",
+      "from": [201.6, 15.375, 10.6],
+      "to": [201.6, 9.35, 10.6],
+      "profile": "crawl",
+      "width": 1.5,
+      "clear": 1.25,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Gour Dam (south half)"
+    },
+    {
+      "id": "rs_link",
+      "from": [201.6, 9.35, 10.6],
+      "to": [204.0, 6.5, 9.8],
+      "profile": "tube",
+      "width": 3.0,
+      "clear": 3.0,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Gour Passage",
+      "via": [[205.5, 9.5, 10.3]]
+    },
+    {
+      "id": "rs_overflow_1",
+      "from": [206.5, 2.0, 9.6],
+      "to": [210.0, -1.5, 9.6],
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.5,
+      "floor": {
+        "kind": "flat"
+      },
+      "geology": "flowstone",
+      "notes": "the Overflow Passage (leg 1 of 2)"
+    },
+    {
+      "id": "rs_overflow_2",
+      "from": [210.0, -1.5, 9.6],
+      "to": [213.5, -4.0, 9.5],
+      "profile": "tube",
+      "width": 2.0,
+      "clear": 2.5,
+      "floor": {
+        "kind": "ramp"
+      },
+      "geology": "flowstone",
+      "notes": "the Overflow Passage (leg 2 of 2)"
+    }
+  ],
+  "chambers": [
+    {
+      "id": "rs_basin",
+      "kind": "hall",
+      "center": [204.0, 4.0, 9.6],
+      "size": [9.0, 7.0, 5.0],
+      "axis": [1.0, 0.0],
+      "geology": "flowstone",
+      "notes": "the Sump Basin (round 5: written as a hall; its water rs_sump_pool is the lake chamber rs_basin_water)"
+    },
+    {
+      "id": "rs_basin_water",
+      "kind": "lake",
+      "center": [207.2, 4.6, 9.6],
+      "size": [4.0, 3.333, 3.0],
+      "axis": [1.0, 0.0],
+      "basin_depth": 3.0,
+      "geology": "flowstone",
+      "notes": "rs_sump_pool: the basin is the design's water ellipse 2.4 x 2.0 m; the builder's rail is its guard"
+    }
+  ],
+  "spawns": [
+    {
+      "id": "undermere_rising",
+      "at": [204.0, 6.5, 9.8],
+      "yaw_deg": -180.0,
+      "mode": "walk",
+      "notes": "The Sump Basin"
+    },
+    {
+      "id": "undermere_mouth_rising",
+      "at": [196.7, 0.55, 9.49],
+      "yaw_deg": -90.0,
+      "mode": "walk"
+    }
+  ],
+  "portals": [
+    {
+      "id": "um.rising_out",
+      "at": [195.1, 0.5, 9.47],
+      "to": "overworld",
+      "to_spawn": "mouth_rising",
+      "kind": "cave_mouth"
+    }
+  ],
+  "seams": [
+    {
+      "id": "domes_rising",
+      "neighbour": "domes",
+      "side": "b",
+      "kind": "arch",
+      "plane": {
+        "axis": "y",
+        "at": 15.375,
+        "toward": "+"
+      },
+      "window": [200.785, 10.534, 202.415, 11.916],
+      "stub_m": 8.1,
+      "portal": [201.6, 14.93, 10.6],
+      "arrival": {
+        "at": [201.6, 13.72, 10.6],
+        "mode": "crawl",
+        "yaw_deg": -180.0
+      },
+      "notes": "the Gour Dam: a crawl over gour rims under a low roof"
+    }
+  ],
+  "openings": [
+    {
+      "id": "mouth_rising",
+      "box": [192.375, -2.0, 8.95, 196.4, 3.0, 12.95],
+      "notes": "the gate's mouth (the vista beyond)"
+    }
+  ],
+  "water": [
+    {
+      "id": "rs_sump_pool",
+      "kind": "pool",
+      "chamber": "rs_basin_water",
+      "level": 9.3,
+      "notes": "the deep sump pool, black, the rising's source, 0.3 m under the hall's floor (the design's rs_sump_pool)"
+    }
+  ],
+  "joins": [
+    ["do_gour", "rs_gour"],
+    ["rs_arch", "rs_link"],
+    ["rs_basin", "rs_gour"],
+    ["rs_gour", "rs_link"],
+    ["rs_arch", "rs_basin"],
+    ["rs_basin", "rs_link"],
+    ["rs_basin", "rs_overflow_1"],
+    ["rs_basin", "rs_overflow_2"],
+    ["rs_basin_water", "rs_arch"],
+    ["rs_basin_water", "rs_link"],
+    ["rs_basin_water", "rs_overflow_1"],
+    ["rs_basin_water", "rs_basin"]
+  ]
+}

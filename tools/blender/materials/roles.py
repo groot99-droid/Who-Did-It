@@ -65,6 +65,13 @@ ROLES: dict[str, Role] = {
     "linen": Role("rough_linen", 0.5, "bone"),
     "leather": Role("brown_leather", 0.5, "wood"),
     "fur": Role("curly_teddy_natural", 0.5, "litter"),
+    "carpet": Role("dirty_carpet", 0.6, "brick", note="a worn wool carpet; the interiors' rugs (meshy_interior_build)"),
+    "coverlet": Role("floral_jacquard", 0.253, "slate",
+                     note="a dark floral jacquard: the first-person rooms' bed coverlets (meshy_room_build)"),
+    # the first-person rooms (meshy_room_build): painted plaster walls and ceilings, dark joinery
+    "wall_plaster": Role("beige_wall_001", 3.0, "plaster",
+                         note="smooth painted plaster, toned per room: walls, ceilings and painted joinery"),
+    "joinery": Role("dark_wood", 2.0, "wood", note="dark mahogany: doors, skirting, architraves, picture rails"),
     "flour_sack": Role("hessian_380", 0.5, "bone"),
     "bread_crust": Role("mud_cracked_dry_03", 0.25, "lantern", tint="#D9A066",
                         note="stand-in: a cracked dry crust pattern tinted to the loaf"),
@@ -104,6 +111,20 @@ ROLES: dict[str, Role] = {
     "timber_rough": Role("raw_wooden_floor_01", 2.0, "wood",
                          note="rough-sawn planks with nail holes; mine timbering, lagging, walkways"),
     "wet_rock": Role("seaside_rock", 2.0, "stone", note="dark cliff rock with a wet sheen; the sea door, the sump"),
+    # the Undermere's geology kits (meshy_looks/cave_fp.json `kits`, read by meshy_cave_build.py; fetched 2026-11-21)
+    "cave_limestone": Role("rock_01", 1.5, "stone", note="smooth grey solution-worn rock; limestone walls"),
+    "cave_limestone_floor": Role("rock_ground_02", 3.0, "stone", note="damp grit and loose stones; limestone floors"),
+    "cave_flowstone": Role("worn_rock_natural_01", 2.0, "stone",
+                           note="pale worn rock with smooth sheets; flowstone and dripstone walls"),
+    "cave_flowstone_floor": Role("rock_06", 1.5, "stone", note="stained, smoothed rock; rimstone and flowstone floors"),
+    "cave_gypsum": Role("rock_boulder_dry", 1.8, "bone", note="pale chalky crust; the gypsum-dry White Gallery"),
+    "cave_breakdown": Role("rocks_ground_06", 3.0, "stone", note="fallen blocks in grit; breakdown piles"),
+    "cave_skarn": Role("marble_rock_03", 1.8, "brick", note="fractured, veined marble; the skarn's boxwork walls"),
+    "cave_granite": Role("tiger_rock", 2.55, "stone", note="coarse granite; the tin lode's workings, the skarn's floor"),
+    "cave_slate": Role("dark_rock_02", 2.0, "slate", note="dark stratified rock with cleavage; the Killas slate"),
+    "cave_clay": Role("brown_mud_03", 1.3, "litter", note="wet clay with clumps and puddles; lake-clay floors"),
+    "cave_wet_gravel": Role("low_tide_rocks", 2.17, "stone", note="wet gravel and stones; the flooded floors"),
+    "cave_lichen": Role("lichen_rock", 2.0, "moss", note="rock with lichen and moss; the mouths' twilight walls"),
 }
 
 # Today's `env/kits.py` names as roles, so a caller swaps `SURFACE_TEXTURES[name]` for `LEGACY_SURFACES[name]`
